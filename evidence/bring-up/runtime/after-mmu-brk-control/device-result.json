@@ -1,0 +1,17 @@
+{
+  "device": "SM-T970 / gts7xlwifi",
+  "image_sha256": "150ed5ff9d73d81b17d3f6d32e609b9a9e42fdfe0397da7c5eea7d62f7ce7b4d",
+  "image_source_revision": "fc4828781445ebab36819d6cdad8a2eddde82435",
+  "probe": {
+    "function": "_start_first_cpu",
+    "target": "BRK #0",
+    "occurrence": 1,
+    "position": "after-MMU-control",
+    "reset_delay_seconds": 50
+  },
+  "observation_source": "Human reply in this chat",
+  "observation": "约 50 秒复位",
+  "observation_window_seconds": 60,
+  "result": "The deliberate BRK after MMU enable reached the reviewed fault terminal and requested reset at about 50 seconds.",
+  "limits": "This validates BRK delivery and the bounded fault terminal at the reviewed site only. It does not run C startup, does not exercise PE_create_console, and does not classify other fault types or later vector mappings."
+}

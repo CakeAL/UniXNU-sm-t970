@@ -1,0 +1,19 @@
+{
+  "device": "SM-T970 / gts7xlwifi",
+  "image_source_revision": "fc4828781445ebab36819d6cdad8a2eddde82435",
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/after-mmu-brk-control/boot.img --no-reboot",
+  "exit_code": 0,
+  "boot_upload_succeeded": true,
+  "boot_image_sha256": "150ed5ff9d73d81b17d3f6d32e609b9a9e42fdfe0397da7c5eea7d62f7ce7b4d",
+  "boot_image_bytes": 62713856,
+  "source_kernel_sha256": "bfb50a1a009f4dd08d54cb94d6187d768c7a5ef976427abd235756874f38473c",
+  "heimdall_binary_sha256": "75337a7c6ad9a5e18c0730fa474c81133587cc04cbe08dd3f270c860128a6c6f",
+  "automatic_reboot_requested": false,
+  "checkpoint_observation": "pending measured human feedback for deliberate after-MMU BRK control",
+  "expected_control_delay_seconds": 50,
+  "control_site": "0xfffffff0073f3370",
+  "C_startup_executed": false,
+  "limits": "This deliberate control does not exercise PE_create_console or later C startup. No generic reset/no-reset result may be decoded as a specific timing class.",
+  "restore_state": "diagnostic BOOT installed; original BOOT restoration pending completion of ongoing diagnosis",
+  "restore_boot_sha256": "6f49af2f77ae0e55b4f76b29b0e0491ff0228c42ae97ba0533b97631483566fc"
+}

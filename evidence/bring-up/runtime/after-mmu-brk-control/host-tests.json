@@ -1,0 +1,11 @@
+{
+  "source_revision": "fc4828781445ebab36819d6cdad8a2eddde82435",
+  "command": "PATH=/opt/homebrew/opt/llvm/bin:/opt/homebrew/opt/lld/bin:$PATH .cache/probe-test-venv/bin/python -m unittest discover -s tests -v",
+  "tests_passed": 8,
+  "fat_kernel_BRK_verified": true,
+  "PE_create_console_call_unchanged": true,
+  "guard_bytes_and_vector_branches_verified": true,
+  "IRQ_FIQ_reserved_slots_unchanged": true,
+  "C_startup_executed": false,
+  "limits": "Host checks and simulated ESR/counter only; hardware control result remains pending."
+}

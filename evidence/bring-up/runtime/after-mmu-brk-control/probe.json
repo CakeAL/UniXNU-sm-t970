@@ -1,0 +1,64 @@
+{
+  "device_revision": "fc4828781445ebab36819d6cdad8a2eddde82435",
+  "framework_revision": "194aae294c1107e791f4f74b2be371a391ac6bc4",
+  "probe": {
+    "function": "_start_first_cpu",
+    "target": "BRK #0",
+    "occurrence": 1,
+    "position": "after-MMU-control",
+    "reset_delay_seconds": null
+  },
+  "board_sha256": "9d129fa9b34d72bc93aa160b3978f940a8ce445dd979cb176bd28879ef4fb672",
+  "source_kernel_sha256": "bfb50a1a009f4dd08d54cb94d6187d768c7a5ef976427abd235756874f38473c",
+  "firmware_sha256": "515105d758a9d61078dffce5012db0754a71cec351a1bb34b30ee791196b5690",
+  "firmware_dtb_sha256": "86c14aa305a6cf5db46665f4095d28aadcb1ea5ce9d213cd711641a07504ed1d",
+  "boot_sha256": "150ed5ff9d73d81b17d3f6d32e609b9a9e42fdfe0397da7c5eea7d62f7ce7b4d",
+  "boot_bytes": 62713856,
+  "boot_partition_bytes": 71303168,
+  "hardware_tested": false,
+  "note": "Probe modifies a payload copy only; no flash or reboot performed",
+  "fault_guard": {
+    "active_vectors_address": "0xfffffff0073ee000",
+    "bootstrap_selection": "0xfffffff0073f332c",
+    "guard_address": "0xfffffff0073f1680",
+    "guard_bytes": 112,
+    "guard_sha256": "daab48e7b8b6cb114eaeab5177b1802928a9f18b4bb9d4009af01622dd5f8d90",
+    "entries": {
+      "sync_guard": "0xfffffff0073f1680",
+      "serror_guard": "0xfffffff0073f169c",
+      "panic_guard": "0xfffffff0073f16a4"
+    },
+    "modified_entries": [
+      "0xfffffff0073ee000",
+      "0xfffffff0073ee180",
+      "0xfffffff0073ee200",
+      "0xfffffff0073ee380",
+      "0xfffffff0073ee400",
+      "0xfffffff0073ee580",
+      "0xfffffff0079803b0",
+      "0xfffffff0072714e8",
+      "0xfffffff0073f3370"
+    ],
+    "IRQ_FIQ_and_reserved_slots_preserved": true,
+    "normal_return_delay_seconds": null,
+    "fault_delays_seconds": {
+      "synchronous": 20,
+      "SError": 30,
+      "panic": 40,
+      "BRK": 50
+    },
+    "brk_control": true,
+    "control_site": "0xfffffff0073f3370",
+    "expected_control_delay_seconds": 50,
+    "C_startup_executed": false,
+    "entry_probe_log": "patched kernel.macho: stage 1 blue bar, stage 2 magenta bar, no reset probe",
+    "counter_hz": 19200000,
+    "limits": "Pre-interrupt diagnostic only. No device BRK control yet, no register/text capture, and no recovery from a plain spin loop or inaccessible diagnostic code.",
+    "fat_kernel_control_and_guards_verified": true
+  },
+  "generator_sha256": "a5f75cf12ceb45223d6a5f1d281903b85991deb3bc090b35c8274758244da3ba",
+  "build_command": "python3.14 scripts/build-entry-probe.py --target _PE_create_console --function _arm_init --delay 6 --guard-early-faults --brk-control --output out/step7/probes/after-mmu-brk-control",
+  "checked_call_site": "0xfffffff0073f3370",
+  "checked_callee": null,
+  "payload_kernel_extracted_and_matched": true
+}

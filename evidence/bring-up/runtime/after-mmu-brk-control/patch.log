@@ -1,0 +1,2 @@
+patched kernel.macho: stage 1 blue bar, stage 2 magenta bar, no reset probe
+early fault classification: sync 20s / SError 30s / panic 40s / BRK 50s

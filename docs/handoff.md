@@ -44,7 +44,7 @@
 - 下一轮加 `--brk-control`：在 `0xfffffff0073f3370`（MMU 开启后、C 初始化前）
   用 `BRK #0` 替换已检查的 `mov x0, #0x300000`。预期约 50 秒后复位，
   控制台建立调用不修改、不执行；先验证诊断通道，再解释负结果。
-- BOOT 最近刷入的是 `console-create-guarded` 异常分类探针（`e18c6ca0…`），已报告 60 秒未复位；
+- BOOT 最近刷入的是 `after-mmu-brk-control` 正控制镜像（`150ed5ff…`），机主确认约 50 秒复位；正控制成立，诊断通道可用。
   原始 BOOT 恢复待完成，后续镜像以 `evidence/bring-up/runtime/*/flash.json` 回执为准。
 - 以下为 ds 交接当时的状态、命令和待办，保留作历史基线；当前进展以本节及适配记录为准。
 
