@@ -15,6 +15,7 @@ components = [
   "ArmDTPlatform",
 ]
 paths = [
+  "evidence/bring-up/runtime/idle-return/probe.json",
   "docs/handoff.md",
   "evidence/device-repository/result.json",
   "docs/firmware.md",
@@ -59,6 +60,7 @@ procedure = [
   "Run python3.14 ../UniXNU-sm-t970/scripts/check-platform.py --unixnu . to compare DT/ADT bindings with the captured hardware.",
 ]
 findings = [
+  "Committed-source isolated probe build passed at 6a3ae24fba8bc4cb44dcdb0898b92582751a36b9; board defaults and source kernel hashes are unchanged.",
   "Step 7 continuation preserves the handed-off minimal boot configuration and removes persistent entry-probe settings from board.toml. scripts/build-entry-probe.py supplies one in-memory probe override and writes a new ignored artifact directory per experiment.",
   "All seven local Step 3 repository requirements passed at 18d3a77cd98f47ee42aa1f95d6584d22c3a13a18; source pins and template files are complete and the example marker is removed. Runtime milestones remain separate.",
   "The final reviewed framework commit is 194aae294c1107e791f4f74b2be371a391ac6bc4; in addition to v2/raw packing it normalizes the upstream shim image_size to include the 112-byte shim while preserving the firmware copy size. Eight regression cases pass.",
@@ -91,6 +93,7 @@ next_action = [
   "Continue Step 7 with an isolated, versioned checkpoint image and record the actual user-observed device result.",
 ]
 evidence = [
+  { kind = "host", reference = "evidence/bring-up/runtime/idle-return/probe.json", command = "python3.14 scripts/build-entry-probe.py --target _idle_thread_create --delay 6 --output out/step7/probes/idle-return", result = "Committed-source isolated probe build passed at 6a3ae24fba8bc4cb44dcdb0898b92582751a36b9; board defaults and source kernel hashes are unchanged.", revision = "6a3ae24fba8bc4cb44dcdb0898b92582751a36b9" },
   { kind = "host", reference = "evidence/device-repository/result.json", command = "python3.14 scripts/check-platform.py --unixnu ../UniXNU", result = "All seven local Step 3 repository requirements passed at 18d3a77cd98f47ee42aa1f95d6584d22c3a13a18; source pins and template files are complete and the example marker is removed. Runtime milestones remain separate.", revision = "18d3a77cd98f47ee42aa1f95d6584d22c3a13a18" },
   { kind = "source", reference = "log.txt", result = "Archived stock-Android shell output identifies SM-T970, gts7xlwifi and SM8250; it is hardware inventory, not UniXNU verification." },
   { kind = "device", reference = "evidence/adb-2026-11-01/identity.txt", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Saved Android properties, kernel identity and existing Magisk root context; no XNU verification is claimed.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },
@@ -116,6 +119,7 @@ components = [
   "DarwinBoot",
 ]
 paths = [
+  "evidence/bring-up/runtime/idle-return/firmware.log",
   "tests/test_prepare_uefi.py",
   "evidence/device-repository/firmware.log",
   "evidence/device-repository/modules.json",
@@ -155,6 +159,7 @@ procedure = [
   "Collect selected boot properties, the live DT and the first 4096 bytes of boot/recovery with the inventory script; only parsed header fields are saved.",
 ]
 findings = [
+  "The prepared SEC patch rebuild passed; built FV inspection confirms TzDxe/PILDxe/PILProxyDxe absent and AdvancedLogDxe present.",
   "The handed-off runtime workaround excludes TzDxe, PILDxe and PILProxyDxe from DSC/FDF dispatch: the handoff reports TEE and missing-UFS partition assertions before the menu. The SEC x0 HOB patch is now hash-checked and automatically prepared. These reports do not certify TEE/PIL functionality.",
   "Handoff follow-up: prepare-uefi.py now applies or recognizes the SEC x0-to-HOB patch using its exact patch hash and four pre/postimage hashes; clean upstream application and a second idempotent run passed. The cached Mu source modifications are therefore reproducible rather than implicit workspace state.",
   "The normal unixnu build firmware command passed on committed sources; the 3 MiB FD contains all four UniXNU/DarwinBoot modules plus DiskIo, FAT and Unicode collation (7 checked modules among 91 FV files).",
@@ -188,6 +193,7 @@ next_action = [
   "Build the current minimal dispatch firmware with the automatically applied SEC patch, then capture runtime logs before claiming broader firmware services.",
 ]
 evidence = [
+  { kind = "host", reference = "evidence/bring-up/runtime/idle-return/firmware.log", command = "python3.14 scripts/build-entry-probe.py --target _idle_thread_create --delay 6 --output out/step7/probes/idle-return", result = "The prepared SEC patch rebuild passed; built FV inspection confirms TzDxe/PILDxe/PILProxyDxe absent and AdvancedLogDxe present.", revision = "6a3ae24fba8bc4cb44dcdb0898b92582751a36b9" },
   { kind = "host", reference = "evidence/device-repository/firmware.log", command = "GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=submodule.active GIT_CONFIG_VALUE_0=__no_module_submodules__ PATH=/opt/homebrew/opt/llvm/bin:/opt/homebrew/opt/lld/bin:$PATH python3.14 ../UniXNU/unixnu build firmware -D . --uefi .cache/uefi-source/Mu-Silicium --edk2 .cache/uefi-source/Mu-Silicium/Mu_Basecore --local-module refer:edk2=.cache/uefi-source/Mu-Silicium/Mu_Basecore", result = "The normal unixnu build firmware command passed on committed sources; the 3 MiB FD contains all four UniXNU/DarwinBoot modules plus DiskIo, FAT and Unicode collation (7 checked modules among 91 FV files).", revision = "18d3a77cd98f47ee42aa1f95d6584d22c3a13a18" },
   { kind = "source", reference = "package/firmware/inputs.json", result = "Exact firmware source/submodule revisions and all 84 local stock input hashes; no binaries are committed." },
   { kind = "source", reference = "package/firmware/Platforms/Samsung/gts7xlwifiPkg/gts7xlwifi.dsc", result = "T970 platform definition with device-derived memory/configuration libraries and UniXNU loader integration." },
@@ -213,6 +219,7 @@ components = [
   "ArmCpu",
 ]
 paths = [
+  "evidence/bring-up/runtime/idle-return/probe.json",
   "evidence/adb-2026-11-01/cpu.txt",
   "dts/sm-t970.dts",
 ]
@@ -230,6 +237,7 @@ procedure = [
   "Collect /proc/cpuinfo, online/present CPU lists, cpufreq policies, /proc/interrupts and the live DT using the inventory script.",
 ]
 findings = [
+  "The next image targets idle_thread_create return at 0xfffffff00798c8c4. Its modified kernel was independently extracted from the FAT payload and matched to the patch site. No result for this image has yet been observed.",
   "The user confirms the handed-off reset-before initialize_screen probe did not reset. That probe resets immediately at the call site, so the next test isolates whether idle_thread_create returns; no conclusion about initialize_screen internals is drawn.",
   "The first-boot DRAM window now excludes the entire observed camera CMA allocation window; CPU0-only topology and the disabled peripheral policy are unchanged.",
   "The board now includes disabled measured peripheral declarations alongside the unchanged CPU0-only topology; the checker compares their GIC interrupt cell translation without enabling peripheral drivers.",
@@ -250,6 +258,7 @@ next_action = [
   "After host DT/ADT checks, verify the boot CPU, timer and GIC through the first T970 UEFI/XNU log before enabling any secondary core.",
 ]
 evidence = [
+  { kind = "host", reference = "evidence/bring-up/runtime/idle-return/probe.json", command = "python3.14 scripts/build-entry-probe.py --target _idle_thread_create --delay 6 --output out/step7/probes/idle-return", result = "The next image targets idle_thread_create return at 0xfffffff00798c8c4. Its modified kernel was independently extracted from the FAT payload and matched to the patch site. No result for this image has yet been observed.", revision = "6a3ae24fba8bc4cb44dcdb0898b92582751a36b9" },
   { kind = "device", reference = "evidence/adb-2026-11-01/cpu.txt", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Saved CPU identity, 0-7 CPU lists, three frequency policies and Android interrupt counters.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },
   { kind = "device", reference = "evidence/adb-2026-11-01/live-device-tree.dts", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Live CPU affinity, GICv3 register ranges and the 19200000 Hz timer declaration.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },
   { kind = "source", reference = "dts/sm-t970.dts", result = "Explicit CPU0-only bootstrap; measured shared affinities are retained." },
@@ -261,6 +270,7 @@ id = "memory"
 status = "implemented"
 components = []
 paths = [
+  "evidence/bring-up/runtime/idle-return/platform.json",
   "evidence/device-repository/platform.json",
   "dts/sm-t970-peripherals.dtsi",
   "evidence/adb-2026-11-01/memory.txt",
@@ -283,6 +293,7 @@ procedure = [
   "Capture root-readable /proc/iomem and the live DT, then compare physical memory and reserved-memory reg values.",
 ]
 findings = [
+  "Current platform checks passed in explicit firmware-envelope mode with the 256 MiB ADT owned-window request. Reserved holes are reported, not reclaimed; per-boot allocation-map capture is still pending.",
   "The handed-off diagnostic DTS uses the 0x80000000+0x80000000 ADT envelope to include the reported DarwinBoot window at 0xc0000000. It is explicitly tagged as firmware-envelope in the board checker, with a 256 MiB owned-window request matching the pinned loader default. Reserved holes are retained and not declared free.",
   "The pinned DarwinBoot AllocateWindow uses only EfiConventionalMemory and AllocatePages; boot_args.MemorySize and MemorySizeActual describe that allocation, not all 2 GiB of the envelope. The checker retains strict bank/non-overlap checks for physical-bank mode and reports the envelope overlaps separately; actual per-boot EFI allocation remains a runtime measurement.",
   "The committed-source platform check passed with a 2 GiB measured-bank subrange, 30 static reservations, all 13 stock dynamic-pool windows, 45 stock XBL regions and seven disabled peripheral ranges.",
@@ -309,6 +320,7 @@ next_action = [
   "Capture the actual owned-window physical base/size and EFI memory map on the next observable boot; do not reclaim the rest of the ADT envelope.",
 ]
 evidence = [
+  { kind = "host", reference = "evidence/bring-up/runtime/idle-return/platform.json", command = "python3.14 scripts/build-entry-probe.py --target _idle_thread_create --delay 6 --output out/step7/probes/idle-return", result = "Current platform checks passed in explicit firmware-envelope mode with the 256 MiB ADT owned-window request. Reserved holes are reported, not reclaimed; per-boot allocation-map capture is still pending.", revision = "6a3ae24fba8bc4cb44dcdb0898b92582751a36b9" },
   { kind = "host", reference = "evidence/device-repository/platform.json", command = "python3.14 scripts/check-platform.py --unixnu ../UniXNU", result = "The committed-source platform check passed with a 2 GiB measured-bank subrange, 30 static reservations, all 13 stock dynamic-pool windows, 45 stock XBL regions and seven disabled peripheral ranges.", revision = "18d3a77cd98f47ee42aa1f95d6584d22c3a13a18" },
   { kind = "source", reference = "evidence/device-inputs/boot-firmware.json", result = "Original SM-T970 platform memory constants extracted from its XBL; stock allocations and new-firmware runtime allocations remain distinct." },
   { kind = "source", reference = "log.txt", result = "Archived /proc/meminfo contains MemTotal 7806144 kB and CmaTotal 458752 kB." },
@@ -615,6 +627,7 @@ components = [
   "XnuPrelink",
 ]
 paths = [
+  "evidence/bring-up/runtime/idle-return/probe.json",
   "evidence/device-repository/boot.json",
   "evidence/device-repository/pack.log",
   "ipsw/**",
@@ -646,6 +659,7 @@ procedure = [
   "Read BuildManifest.plist from the local IPSW using Python zipfile and plistlib to identify its OS version, build and product types.",
 ]
 findings = [
+  "The isolated probe boot image is 62713856 bytes, within the measured 71303168-byte BOOT limit. Its header/payload sections round-trip; no Data image is included.",
   "The previously uncommitted board console patch is now part of the declared series, for 61 total patches (56 arch, 2 SoC, 2 OS, 1 board). Isolated probe generation reuses the built source kernel and firmware, patches only a payload copy, checks the measured BOOT size limit and leaves board defaults untouched.",
   "The required Mu SEC entry-argument HOB integration is now versioned in package/firmware/patches and inputs.json, independently of the currently retained runtime probe.",
   "The normal bootimg command produced a 3993600-byte header-v2/raw-kernel/separate-DTB firmware-only check image and verified its sections and load addresses. Ramdisk is empty; no XNU kernel/payload or device boot is claimed.",
@@ -675,6 +689,7 @@ next_action = [
   "Build the isolated idle_thread_create after-return payload/image, verify the BOOT size and hashes, then use the confirmed recovery path for a single checkpoint test.",
 ]
 evidence = [
+  { kind = "host", reference = "evidence/bring-up/runtime/idle-return/probe.json", command = "python3.14 scripts/build-entry-probe.py --target _idle_thread_create --delay 6 --output out/step7/probes/idle-return", result = "The isolated probe boot image is 62713856 bytes, within the measured 71303168-byte BOOT limit. Its header/payload sections round-trip; no Data image is included.", revision = "6a3ae24fba8bc4cb44dcdb0898b92582751a36b9" },
   { kind = "host", reference = "evidence/device-repository/boot.json", command = "PATH=/opt/homebrew/opt/llvm/bin:/opt/homebrew/opt/lld/bin:$PATH python3.14 ../UniXNU/unixnu bootimg -D . --uefi .cache/uefi-source/Mu-Silicium --fd .cache/uefi-source/Mu-Silicium/Build/gts7xlwifiPkg/DEBUG_CLANGPDB/FV/SILICIUM_UEFI.fd --dtb out/uefi-candidate/firmware.dtb --ramdisk none --output out/uefi-candidate/boot.img", result = "The normal bootimg command produced a 3993600-byte header-v2/raw-kernel/separate-DTB firmware-only check image and verified its sections and load addresses. Ramdisk is empty; no XNU kernel/payload or device boot is claimed.", revision = "18d3a77cd98f47ee42aa1f95d6584d22c3a13a18" },
   { kind = "source", reference = "evidence/ipsw-21H461-manifest.json", result = "Saved IPSW manifest version/build/product types, archive byte size and manifest SHA256." },
   { kind = "source", reference = "board.toml", result = "Explicit component selection, four ordered patch series and pending firmware integration." },
@@ -720,6 +735,7 @@ procedure = [
   "Run python3 scripts/collect-adb-inventory.py --root --output evidence/<new-capture>; review per-command stderr, checksums, GPT CRC results and DT sanitization before updating this record.",
 ]
 findings = [
+  "The isolated idle-return artifacts are archived with source hashes and the exact call site; the original Magisk BOOT backup still matches 6f49af2f77ae0e55b4f76b29b0e0491ff0228c42ae97ba0533b97631483566fc.",
   "Probe control flow was checked against both the generator and the current kernel disassembly. reset-before ignores the delay and immediately issues PSCI SYSTEM_RESET. A new after-return idle_thread_create probe is the next discriminating test; physical source images and restore hashes are recorded.",
   "Three source-patch preparation tests passed (apply/repeat, reject changed patch, preserve unknown local edits); an additional test used all four actual upstream SEC preimages and checked idempotence.",
   "The completed Step 3 archive ties actual commands, source hashes, platform checks, normal firmware compilation and boot-image round-trip to clean committed device/framework revisions.",
@@ -747,6 +763,7 @@ next_action = [
   "Record whether the isolated after-return idle_thread_create probe resets after six seconds, then choose the next bootstrap-thread boundary.",
 ]
 evidence = [
+  { kind = "host", reference = "evidence/bring-up/runtime/idle-return/probe.json", command = "python3.14 scripts/build-entry-probe.py --target _idle_thread_create --delay 6 --output out/step7/probes/idle-return", result = "The isolated idle-return artifacts are archived with source hashes and the exact call site; the original Magisk BOOT backup still matches 6f49af2f77ae0e55b4f76b29b0e0491ff0228c42ae97ba0533b97631483566fc.", revision = "6a3ae24fba8bc4cb44dcdb0898b92582751a36b9" },
   { kind = "host", reference = "evidence/device-repository/platform.log", command = "python3.14 scripts/check-platform.py --unixnu ../UniXNU", result = "The completed Step 3 archive ties actual commands, source hashes, platform checks, normal firmware compilation and boot-image round-trip to clean committed device/framework revisions.", revision = "18d3a77cd98f47ee42aa1f95d6584d22c3a13a18" },
   { kind = "source", reference = "scripts/collect-adb-inventory.py", result = "Read-only collection commands, binary transport checks, primary GPT CRC validation and DT sanitization implementation." },
   { kind = "device", reference = "evidence/adb-2026-11-01/capture.json", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Capture timestamps, commands, exit statuses, original-FDT hash and saved-file SHA256 values.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },
