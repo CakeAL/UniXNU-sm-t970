@@ -1,0 +1,360 @@
+# Android hardware inventory; all UniXNU implementation milestones remain planned.
+# Unknown parameters are listed only as limits or the next measurement.
+# Device-evidence revisions are omitted until the collection sources are committed.
+# Keep device identity in sync with board.toml when that file is added.
+schema_version = 1
+
+[device]
+name = "sm-t970"
+soc = "SM8250"
+os_profile = "ipados-17.7.11-21H461"
+summary = "Samsung Galaxy Tab S7+ Wi-Fi (SM-T970, gts7xlwifi, SM8250). Hardware inputs collected over ADB from Android 12 with existing Magisk root on 2026-11-01; target iPadOS 17.7.11 (21H461). No UniXNU boot milestone is verified."
+
+[[area]]
+id = "configuration"
+status = "planned"
+components = []
+paths = ["porting.toml", ".gitignore", "log.txt", "evidence/adb-2026-11-01/identity.txt"]
+inputs = [
+  "ADB reports SM-T970, gts7xlwifi, SM8250, board platform kona and hardware qcom.",
+  "The target OS is iPadOS 17.7.11, build 21H461, matching the local IPSW BuildManifest.plist.",
+]
+configuration = ["Intended device name sm-t970, SoC SM8250 and OS profile ipados-17.7.11-21H461; no board configuration has been created."]
+procedure = ["Run python3 scripts/collect-adb-inventory.py --root --output evidence/<new-capture> using the existing ADB/root access; inspect identity.txt before choosing dependencies."]
+findings = [
+  "The current kernel identifies itself as Linux 4.19.113-239839, aarch64; Android SDK is 32 with security patch 2022-09-01.",
+  "This record describes collected inputs; no board.toml, source pins or component selection have been established.",
+]
+completion = [
+  "A board.toml with matching device identity resolves the selected SoC and OS profiles and pinned sources.",
+]
+limits = [
+  "The OS profile name records the intended target, not an already resolved build configuration.",
+  "All 13 mandatory areas now have inventory entries; board identity, component coverage and build resolution still require board.toml and pinned sources.",
+]
+next_action = [
+  "Prepare board.toml and feeds.toml for SM-T970 after reviewing the SM8250 support and the selected OS profile.",
+]
+evidence = [
+  { kind = "source", reference = "log.txt", result = "Archived stock-Android shell output identifies SM-T970, gts7xlwifi and SM8250; it is hardware inventory, not UniXNU verification." },
+  { kind = "device", reference = "evidence/adb-2026-11-01/identity.txt", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Saved Android properties, kernel identity and existing Magisk root context; no XNU verification is claimed." },
+]
+
+[[area]]
+id = "firmware"
+status = "planned"
+components = []
+paths = ["evidence/adb-2026-11-01/display_boot.txt"]
+inputs = [
+  "Stock bootloader property: T970ZCU2CVK1.",
+  "Stock build fingerprint: samsung/gts7xlwifizc/gts7xlwifi:12/SP2A.220305.013/T970ZCU2CVK1:user/release-keys.",
+  "Boot properties report ro.boot.flash.locked=0, ro.boot.verifiedbootstate=orange and ro.boot.warranty_bit=1.",
+  "Live DT /psci declares arm,psci-1.0 with method smc; CPUs declare enable-method psci.",
+  "Read-only inspection of boot and recovery headers reports ANDROID! magic, header version 2 and page size 4096 bytes.",
+]
+configuration = ["Recorded Android bootloader and header values are inputs for a future T970 UEFI launch configuration; no UniXNU firmware configuration exists."]
+procedure = [
+  "The existing Android shell transcript records getprop ro.bootloader and getprop ro.build.fingerprint.",
+  "Collect selected boot properties, the live DT and the first 4096 bytes of boot/recovery with the inventory script; only parsed header fields are saved.",
+]
+findings = [
+  "The archived properties identify an Android 12 stock build and bootloader T970ZCU2CVK1.",
+  "The running Android environment has Magisk root and reports an unlocked/orange boot state; this does not verify a UEFI launch method.",
+]
+completion = [
+  "A board-specific UEFI image starts reproducibly and produces an accessible boot log.",
+]
+limits = [
+  "UEFI launch, framebuffer handoff and boot-services exit have not been tested; the running boot image is not assumed to be pristine factory firmware.",
+]
+next_action = [
+  "Document a T970-specific recovery and UEFI launch path using the measured Android v2 header and partition limits before testing an image.",
+]
+evidence = [
+  { kind = "source", reference = "log.txt", result = "The archived getprop output reports bootloader T970ZCU2CVK1 and the complete Android 12 build fingerprint." },
+  { kind = "device", reference = "evidence/adb-2026-11-01/identity.txt", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "The saved boot properties report flash.locked=0, orange verified-boot state and warranty_bit=1." },
+  { kind = "device", reference = "evidence/adb-2026-11-01/capture.json", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Parsed boot/recovery header fields identify Android boot header v2 and 4096-byte pages; collection commands are recorded." },
+  { kind = "device", reference = "evidence/adb-2026-11-01/live-device-tree.dts", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "The sanitized live DT declares PSCI 1.0 using SMC." },
+]
+
+[[area]]
+id = "cpu"
+status = "planned"
+components = []
+paths = ["evidence/adb-2026-11-01/cpu.txt"]
+inputs = [
+  "Android exposes CPUs 0-7. Live DT affinity values are 0x000, 0x100, 0x200, 0x300, 0x400, 0x500, 0x600 and 0x700.",
+  "CPU frequency policies group CPUs 0-3, 4-6 and 7, with reported maxima 1804800, 2419200 and 3091200 kHz respectively.",
+  "GICv3 distributor is 0x17a00000 + 0x10000; redistributor region is 0x17a60000 + 0x100000 with stride 0x20000.",
+  "The arm,armv8-timer DT node declares clock-frequency 19200000 Hz.",
+]
+configuration = ["The collected DT supplies CPU reg/enable-method, GIC reg/redistributor-stride and timer clock-frequency inputs; XNU CPU options are not selected."]
+procedure = ["Collect /proc/cpuinfo, online/present CPU lists, cpufreq policies, /proc/interrupts and the live DT using the inventory script."]
+findings = [
+  "Core identity differs in Affinity1 (0x100 steps); retaining only the lowest MPIDR byte would lose the recorded core distinction.",
+  "Android's three frequency policies are not automatically the cluster layout required by the selected XNU profile.",
+  "GICv3 arch_timer and IPI counters are visible in Android; they do not demonstrate XNU secondary-core startup.",
+]
+completion = ["Each enabled XNU CPU reaches its checkpoint and handles timers and IPIs with the measured affinity and timer rate."]
+limits = ["PSCI calls, CPU startup, interrupt routing and scheduling have not been exercised under UniXNU."]
+next_action = ["Compare the measured affinities and GIC/timer resources with the candidate SM8250 DTSI and CPU patches before enabling XNU secondary cores."]
+evidence = [
+  { kind = "device", reference = "evidence/adb-2026-11-01/cpu.txt", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Saved CPU identity, 0-7 CPU lists, three frequency policies and Android interrupt counters." },
+  { kind = "device", reference = "evidence/adb-2026-11-01/live-device-tree.dts", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Live CPU affinity, GICv3 register ranges and the 19200000 Hz timer declaration." },
+]
+
+[[area]]
+id = "memory"
+status = "planned"
+components = []
+paths = ["evidence/adb-2026-11-01/memory.txt", "evidence/adb-2026-11-01/live-device-tree.dts"]
+inputs = [
+  "Stock /proc/meminfo reports MemTotal: 7806144 kB and CmaTotal: 458752 kB.",
+  "Live /memory reg tuples (base + size): 0x80000000 + 0x3bb00000, 0x180000000 + 0x100000000, 0xc0000000 + 0xc0000000.",
+  "The live DT includes firmware reservations, display splash at 0x9c000000 + 0x2300000 and ramoops at 0x9fa00000 + 0x100000.",
+  "Applications SMMU: 0x15000000 + 0x100000; GPU SMMU: 0x03da0000 + 0x10000. Both declare qcom,qsmmu-v500.",
+]
+configuration = ["Preserve the measured /memory reg and /reserved-memory reg values as Android input data; no XNU DMA policy or memory handoff map is configured."]
+procedure = [
+  "The existing Android shell transcript records cat /proc/meminfo.",
+  "Capture root-readable /proc/iomem and the live DT, then compare physical memory and reserved-memory reg values.",
+]
+findings = [
+  "MemTotal describes memory exposed to the running Android kernel; it does not establish installed DRAM capacity, physical banks or firmware reservations.",
+  "CmaTotal describes the stock kernel's CMA pool; it is not a complete reserved-memory map for the XNU handoff.",
+  "Several reserved-memory node unit addresses differ from their reg values, and some display ranges overlap; consume actual reg properties and reconcile their ownership before reuse.",
+]
+completion = [
+  "The board memory description accounts for physical DRAM banks, firmware reservations and the UEFI-to-XNU handoff regions.",
+]
+limits = [
+  "The saved DT and iomem describe the Android environment; UEFI allocations, secure-world ownership, DMA widths and XNU cache/SMMU rules remain unverified.",
+]
+next_action = [
+  "Reconcile saved /memory, reserved-memory and iomem ranges, then reserve explicit UEFI and XNU handoff allocations without reclaiming firmware-owned regions.",
+]
+evidence = [
+  { kind = "source", reference = "log.txt", result = "Archived /proc/meminfo contains MemTotal 7806144 kB and CmaTotal 458752 kB." },
+  { kind = "device", reference = "evidence/adb-2026-11-01/memory.txt", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Root-readable meminfo, physical iomem ranges and IOMMU class inventory." },
+  { kind = "device", reference = "evidence/adb-2026-11-01/live-device-tree.dts", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Live memory banks, firmware reservations, display splash, ramoops and SMMU resources." },
+]
+
+[[area]]
+id = "storage"
+status = "planned"
+components = []
+paths = ["evidence/adb-2026-11-01/storage.txt", "evidence/adb-2026-11-01/gpt.json"]
+inputs = [
+  "UFS controller: 0x01d84000 + 0x3000; UFS ICE: 0x01d90000 + 0x8000. Controller interrupt cells are <0 0x109 4>.",
+  "UFS PHY: qcom,ufs-phy-qmp-v4 at 0x01d87000 + 0xe00; two lanes per direction. Clock, reset and supply references are preserved in the live DT.",
+  "SAMSUNG KLUEG8UHDB-C2D1 revision 0090; logical and physical block size 4096 bytes. sda/sdb/sdc/sdd map to SCSI LUNs 0/1/2/3.",
+  "boot=sda22 (71303168 bytes), recovery=sda23 (86888448 bytes), dtbo=sda21 (10485760 bytes), super=sda28 (9961472000 bytes), userdata=sda36 (243668070400 bytes).",
+]
+configuration = ["The Android by-name mapping and GPT provide measured partition inputs; no UniXNU root volume or writable Data region has been allocated."]
+procedure = ["Read block sysfs and by-name links; read each LUN's primary GPT header and entry array and validate their CRC32 values without writing any block device."]
+findings = [
+  "Primary GPT headers and entry-array CRCs passed for all four inspected LUNs; their entries and byte offsets are saved in gpt.json.",
+  "Linux block sysfs start/size values use 512-byte units, while this device's GPT LBAs use 4096-byte logical blocks; convert explicitly when comparing them.",
+]
+completion = ["UFS reads return correct capacity, GPT and known blocks under XNU; the chosen root mounts and writes persist only inside the allocated Data region."]
+limits = ["No storage writes, repartitioning, XNU UFS driver, root mounting or persistence tests were performed; backup GPT copies and filesystem contents were not read."]
+next_action = ["Resolve UFS clocks, reset and regulator phandles from the saved DT, then compare the target driver and root-volume policy with the measured four-LUN layout."]
+evidence = [
+  { kind = "device", reference = "evidence/adb-2026-11-01/storage.txt", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Saved device model, revision, block geometry, partition sizes and by-name mappings." },
+  { kind = "device", reference = "evidence/adb-2026-11-01/gpt.json", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Primary GPT header and entry CRCs passed on LUNs 0-3; GUIDs are omitted and partition names/byte ranges are preserved." },
+  { kind = "device", reference = "evidence/adb-2026-11-01/live-device-tree.dts", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Board UFS controller/PHY resources, interrupt cells, clocks, reset and power supplies." },
+]
+
+[[area]]
+id = "display"
+status = "planned"
+components = []
+paths = ["evidence/adb-2026-11-01/display.txt"]
+inputs = [
+  "DRM controller is ae00000.qcom,mdss_mdp; DSI-1 advertises 2800x1752 modes at 120 and 60 Hz. Android wm reports physical size 1752x2800 and density 340.",
+  "Panel sysfs reports SDC_801417. The selected boot argument is msm_drm.dsi_display0=ss_dsi_panel_S6TUUM3_AMSA24VU01_WQXGA:.",
+  "The selected S6TUUM3 DT panel declares dsi_cmd_mode, DCS brightness control, max level 355, four data lanes and 24 bits per pixel.",
+]
+configuration = ["The selected Android panel and its timing/DSC/control properties are present in the live DT; no UEFI GOP or XNU display configuration has been created."]
+procedure = ["Collect DRM modes, panel type and brightness limits; read only display-selection tokens from /proc/cmdline and match the selected S6TUUM3 node in the live DT."]
+findings = [
+  "The live DT contains many alternative panels; the boot selector identifies S6TUUM3 rather than the S6TUUM2 candidate.",
+  "DRM mode geometry is landscape while wm and touch coordinates are portrait; display/input orientation must be mapped explicitly.",
+  "At capture time DPMS was Off and brightness was zero; this records Android runtime state, not a display failure.",
+]
+completion = ["A known image has correct geometry and colors, followed by working userland presentation and brightness control."]
+limits = ["Framebuffer physical address, stride, pixel format and UEFI GOP handoff are not verified by the mode list."]
+next_action = ["Use the selected S6TUUM3 resources to establish a T970 UEFI framebuffer and capture its actual address, stride and pixel format."]
+evidence = [
+  { kind = "device", reference = "evidence/adb-2026-11-01/display.txt", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Saved DRM modes, SDC_801417 panel type, brightness limits and Android geometry." },
+  { kind = "device", reference = "evidence/adb-2026-11-01/display_boot.txt", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "The filtered Android command line selects S6TUUM3_AMSA24VU01_WQXGA." },
+  { kind = "device", reference = "evidence/adb-2026-11-01/live-device-tree.dts", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "The selected panel's timing, link and DCS control inputs are preserved." },
+]
+
+[[area]]
+id = "input"
+status = "planned"
+components = []
+paths = ["evidence/adb-2026-11-01/input.txt"]
+inputs = [
+  "Touch binds to fts_touch (stm,fts_touch), I2C bus 4 address 0x49 on controller 0x994000. DT IRQ GPIO is 15, with irq_type 0x2008.",
+  "Touch DT supplies are pm8150_l14 and pm8150_l13; firmware path is tsp_stm/fts1ba90a_gts7xl.bin. Android touch axes span X 0-1751 and Y 0-2799.",
+  "S Pen binds to wacom_w90xx (wacom,w90xx), I2C bus 9 address 0x56 on controller 0x88c000. DT IRQ GPIO is 136 and firmware path is epen/w9021_gts7xl.bin.",
+  "Wacom DT max_coords=<0x5880 0x3750>, max_pressure=4095 and invert=<0 1 1>; GPIO keys, power-key and hall inputs are also enumerated.",
+]
+configuration = ["The live DT records GENI I2C resources, supplies, IRQs and coordinate transforms; no XNU HID or touch component has been selected."]
+procedure = ["Read /proc/bus/input/devices, getevent -lp and bound I2C driver links; correlate them with the exact touch and Wacom DT nodes."]
+findings = ["The bound touch driver is STM FTS; the template's Novatek implementation is not established as compatible. Wacom reports a separate input device and requires its own protocol handling."]
+completion = ["Touch contacts preserve stable IDs and releases, coordinates map correctly to the display, and keys/pen produce the expected HID reports."]
+limits = ["Protocol transactions, touch/pen firmware hashes and XNU event delivery were not tested; no input events were injected."]
+next_action = ["Locate the matching STM FTS and Wacom driver sources and firmware assets, then document report formats, power sequencing and coordinate transforms."]
+evidence = [
+  { kind = "device", reference = "evidence/adb-2026-11-01/input.txt", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Saved input capability lists and bound fts_touch / wacom_w90xx I2C drivers." },
+  { kind = "device", reference = "evidence/adb-2026-11-01/live-device-tree.dts", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Touch and pen bus addresses, IRQ GPIOs, firmware names, supplies and coordinate properties." },
+]
+
+[[area]]
+id = "gpu"
+status = "planned"
+components = []
+paths = ["evidence/adb-2026-11-01/gpu.txt"]
+inputs = [
+  "KGSL reports Adreno650v3, seven power levels and a maximum clock of 670000000 Hz; the GPU DT chipid is 0x06050002.",
+  "GPU register window: 0x03d00000 + 0x40000. GMU register window: 0x03d6a000 + 0x30000; PDC windows are also present in the DT.",
+  "a650_gmu.bin is 41548 bytes with SHA256 df79fa8482fcc7587bb239b9c9e2b24bce4729893b990fe3f82b30da8175b01c.",
+  "a650_sqe.fw is 31632 bytes with SHA256 b4c27420fd6a5c6b511b254cc0fad8cdd40eea38ceb3418f895a1084f4460487.",
+]
+configuration = ["The live DT records GPU/GMU interrupts, clocks, supplies and SMMU resources; no UniXNU GPU backend or Metal ABI has been selected."]
+procedure = ["Read KGSL identity and frequency nodes, list GPU firmware files and calculate the GMU/SQE hashes without executing GPU commands."]
+findings = ["The measured GPU is A650, so A740 register sequences and firmware cannot be assumed compatible. Presence of a615_zap files alone does not establish which secure firmware the running driver loads."]
+completion = ["GMU boots, bounded GPU submissions and fences complete, memory mappings remain valid, and a known rendered image reaches a Metal client and display."]
+limits = ["No GMU bring-up, command submission, DMA/SMMU ownership or Metal rendering was tested under UniXNU."]
+next_action = ["Compare the measured A650 resources and firmware hashes with the candidate SM8250 GMU implementation and document the loaded secure-firmware path."]
+evidence = [
+  { kind = "device", reference = "evidence/adb-2026-11-01/gpu.txt", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Saved Adreno650v3 identity, seven frequencies, firmware sizes and GMU/SQE SHA256 values." },
+  { kind = "device", reference = "evidence/adb-2026-11-01/live-device-tree.dts", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "GPU/GMU register windows, chipid, interrupts and board power resources." },
+]
+
+[[area]]
+id = "network"
+status = "planned"
+components = []
+paths = ["evidence/adb-2026-11-01/network.txt"]
+inputs = [
+  "wlan0 maps to PCIe endpoint 0000:01:00.0, vendor/device 17cb:1101, subsystem 17cb:0108, bound to cnss_pci behind controller 0x01c00000.",
+  "The endpoint firmware directory /vendor/firmware/qca6390 contains amss20.bin, m3.bin, bdwlan variants and regdb.bin.",
+  "The live DT WLAN node is named qcom,cnss-qca6490@b0000000 and declares compatible qcom,cnss-qca6490; the naming difference is retained as an unresolved input.",
+]
+configuration = ["The PCIe DT records clocks, supplies, resets and iommu-map inputs; no UniXNU network component or OS network interface has been selected."]
+procedure = ["Read PCI IDs, driver links, wlan0's device path and firmware directory names; do not collect SSIDs, MAC addresses or network traffic."]
+findings = [
+  "The bound PCI endpoint and firmware-directory name are more specific observations than a generic SoC Wi-Fi assumption; exact chipset/revision must be reconciled with the driver source.",
+  "The network collection exits 1 because optional firmware_mnt globs do not match; PCI and qca6390 directory output was still captured.",
+]
+completion = ["Scanning, association, address configuration and sustained RX/TX traffic pass using the selected firmware and XNU network interface."]
+limits = ["No Wi-Fi scans, reconnects, traffic tests or firmware loading were initiated; the DT/firmware naming difference is unresolved."]
+next_action = ["Resolve PCI 17cb:1101 and the board firmware selection in the matching Android driver before choosing a UniXNU network implementation."]
+evidence = [
+  { kind = "device", reference = "evidence/adb-2026-11-01/network.txt", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Saved PCI endpoint IDs, cnss_pci binding, firmware names and optional-path errors." },
+  { kind = "device", reference = "evidence/adb-2026-11-01/live-device-tree.dts", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "The board DT WLAN compatible and PCIe resource declarations, including the qca6490 name." },
+]
+
+[[area]]
+id = "audio"
+status = "planned"
+components = []
+paths = ["evidence/adb-2026-11-01/audio.txt"]
+inputs = [
+  "ALSA card 0 is kona-mtp-snd-card with playback/capture PCM endpoints. LPASS is exposed at 0x17300000 and an ADSP loader is present.",
+  "Four devices at I2C bus 6 addresses 0x40-0x43 bind to the cs35l41 driver behind controller 0xa8c000.",
+  "ADSP firmware segments exist under /vendor/firmware_mnt/image/adsp.*; /vendor/firmware contains cs35l40-spk-dsp1-spk-prot firmware files.",
+]
+configuration = ["The DT sound node declares qcom,kona-asoc-snd and bolero_codec among its codec names; no XNU audio route or DSP service is configured."]
+procedure = ["Collect ALSA card/PCM lists, bound amplifier links and firmware file names, then inspect the sound and ADSP DT nodes."]
+findings = ["The bound amplifier driver is cs35l41 while available DSP firmware filenames use cs35l40; file names alone do not prove the loaded amplifier firmware or route."]
+completion = ["Each declared route plays or records the selected audio format and handles start/stop through the required DSP and codec services."]
+limits = ["No playback, recording, mixer writes or DSP restart was performed; loaded firmware, codec wiring and actual routes are not verified."]
+next_action = ["Trace the bound amplifier driver and Android audio configuration to determine firmware selection, MI2S wiring and the first playback route."]
+evidence = [
+  { kind = "device", reference = "evidence/adb-2026-11-01/audio.txt", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Saved ALSA endpoints, four cs35l41 bindings, ADSP loader paths and firmware file inventory." },
+  { kind = "device", reference = "evidence/adb-2026-11-01/live-device-tree.dts", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Sound-card, ADSP/LPASS and amplifier declarations for this board." },
+]
+
+[[area]]
+id = "power"
+status = "planned"
+components = []
+paths = ["evidence/adb-2026-11-01/power.txt"]
+inputs = [
+  "Power-supply devices include max77705-charger, max77705-fuelgauge, pca9468-charger and sec-direct-charger.",
+  "MAX77705 is at I2C bus 2 address 0x66 and PCA9468 at 0x57, behind controller 0x980000.",
+  "The battery snapshot reports Li-ion, capacity=100, voltage_now=4252000, temp=289 and charge_full_design=10090000; raw vendor values are preserved without assuming units.",
+  "Android exposes power states freeze/mem and mem_sleep choices s2idle/[deep]; CPU/GPU/DDR/WLAN thermal-zone names are recorded.",
+]
+configuration = ["Board regulator, RPMh and power-supply declarations are preserved in the live DT; no XNU power policy is configured."]
+procedure = ["Read selected power-supply attributes, available sleep states and thermal-zone names; do not write charging, regulator or suspend controls."]
+findings = ["Advertised Android sleep states and power-supply entries do not establish UniXNU suspend, charging support or physical presence of every listed supply type."]
+completion = ["Battery units match measurements, charging and thermal controls operate correctly, and each supported sleep/resume transition restores dependent peripherals."]
+limits = ["Vendor battery units, firmware ownership and state transitions remain unverified; no suspend/resume or charging-control experiment was run."]
+next_action = ["Read the matching battery/charger driver sources to establish units and ownership, then map required regulators and clocks for the first boot path."]
+evidence = [
+  { kind = "device", reference = "evidence/adb-2026-11-01/power.txt", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Saved charger/fuel-gauge paths, raw battery snapshot, sleep-state declarations and thermal-zone names." },
+  { kind = "device", reference = "evidence/adb-2026-11-01/live-device-tree.dts", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Board battery, charger, regulator and RPMh input declarations." },
+]
+
+[[area]]
+id = "packaging"
+status = "planned"
+components = []
+paths = ["ipsw/**", "evidence/ipsw-21H461-manifest.json"]
+inputs = [
+  "Local archive: ipsw/iPad_Pro_HFR_17.7.11_21H461_Restore.ipsw.",
+  "BuildManifest.plist reports ProductVersion 17.7.11 and ProductBuildVersion 21H461.",
+  "BuildManifest.plist lists SupportedProductTypes iPad7,1, iPad7,2, iPad7,3 and iPad7,4.",
+]
+configuration = ["Target OS profile is ipados-17.7.11-21H461; kernel ABI inputs, patch order, ADT and payload remain unconfigured."]
+procedure = [
+  "Read BuildManifest.plist from the local IPSW using Python zipfile and plistlib to identify its OS version, build and product types.",
+]
+findings = [
+  "The local archive's manifest matches the intended iPadOS 17.7.11 / 21H461 target.",
+  "The manifest's product types describe the Apple restore targets; they do not establish SM-T970 compatibility.",
+]
+completion = [
+  "The selected profile's inputs produce a kernel, payload and a boot image matching the SM-T970 boot path.",
+]
+limits = [
+  "Manifest inspection does not verify archive authenticity or integrity, driver ABI compatibility, or bootability.",
+  "The IPSW is a local external input; its selected manifest fields are archived, but no complete image build is recorded.",
+]
+next_action = [
+  "Resolve the target OS profile, then inventory its required kernelcache, trust-cache, Data seed and ABI inputs against this IPSW.",
+]
+evidence = [
+  { kind = "source", reference = "evidence/ipsw-21H461-manifest.json", result = "Saved IPSW manifest version/build/product types, archive byte size and manifest SHA256." },
+]
+
+[[area]]
+id = "diagnostics"
+status = "planned"
+components = []
+paths = ["scripts/**", "evidence/README.md", "evidence/adb-2026-11-01/capture.json", "evidence/adb-2026-11-01/diagnostics.txt"]
+inputs = [
+  "Existing ADB and Magisk su can read the live FDT, physical iomem, input capabilities and primary GPT metadata while SELinux remains Enforcing.",
+  "Android pstore lists console-ramoops-0 and pmsg-ramoops-0; their contents were not collected.",
+  "capture.json records timestamps in Asia/Shanghai, remote commands, exit codes, boot header fields and evidence-file SHA256 values.",
+]
+configuration = ["The collector uses adb -d shell -T to preserve binary bytes and remote exit status. Evidence is an Android inventory snapshot, not an XNU verification run."]
+procedure = ["Run python3 scripts/collect-adb-inventory.py --root --output evidence/<new-capture>; review per-command stderr, checksums, GPT CRC results and DT sanitization before updating this record."]
+findings = [
+  "On this Magisk setup, exec-out through su inserted CR bytes into binary output; shell -T returned an FDT whose length matches its header. The collector verifies this before decoding.",
+  "The sanitized DTS omits /chosen and identifying properties; the selected display token is captured separately. It is an input reference, not a ready-to-flash board DTB.",
+]
+completion = ["Every claimed UniXNU milestone has matching source/image revisions, a reproducible command and accessible firmware/kernel logs."]
+limits = ["These device observations are Android input inventory, not a device-verified UniXNU milestone. Their collection-source commit revisions are not yet available and are omitted; complete evidence validation requires those revisions. Recovery, UART, UEFI log export and XNU crash capture are not tested."]
+next_action = ["Document and validate the board-specific recovery/logging path before a UEFI test; keep future image hashes and source revisions beside its boot log."]
+evidence = [
+  { kind = "source", reference = "scripts/collect-adb-inventory.py", result = "Read-only collection commands, binary transport checks, primary GPT CRC validation and DT sanitization implementation." },
+  { kind = "device", reference = "evidence/adb-2026-11-01/capture.json", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Capture timestamps, commands, exit statuses, original-FDT hash and saved-file SHA256 values." },
+  { kind = "device", reference = "evidence/adb-2026-11-01/diagnostics.txt", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Root/SELinux context, diagnostic input paths and pstore filenames without user-log contents." },
+]

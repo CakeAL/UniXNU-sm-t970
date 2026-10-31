@@ -1,0 +1,677 @@
+$ ls -l /dev/block/by-name
+cat /proc/partitions
+for d in /sys/class/block/sd*; do
+    printf '
+%s
+' "$d"
+    for k in start size partition queue/logical_block_size queue/physical_block_size device/vendor device/model device/rev; do
+        if [ -f "$d/$k" ]; then printf '%s=' "$k"; cat "$d/$k"; fi
+    done
+done
+ls -l /sys/class/scsi_device
+
+total 0
+lrwxrwxrwx 1 root root 15 2019-12-05 04:34 abl -> /dev/block/sdd8
+lrwxrwxrwx 1 root root 15 2019-12-05 04:34 aop -> /dev/block/sdd7
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 apdp -> /dev/block/sdd15
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 apnhlos -> /dev/block/sda19
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 bksecapp -> /dev/block/sdd11
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 bluetooth -> /dev/block/sdd10
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 boot -> /dev/block/sda22
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 bota -> /dev/block/sda15
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 btd -> /dev/block/sdd34
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 cache -> /dev/block/sda31
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 cmnlib -> /dev/block/sdd13
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 cmnlib64 -> /dev/block/sdd14
+lrwxrwxrwx 1 root root 15 2019-12-05 04:34 ddr -> /dev/block/sdd1
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 debug -> /dev/block/sda11
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 devcfg -> /dev/block/sdd23
+lrwxrwxrwx 1 root root 15 2019-12-05 04:34 devinfo -> /dev/block/sdd9
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 dpo -> /dev/block/sdd17
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 dqmdbg -> /dev/block/sda18
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 dsp -> /dev/block/sda20
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 dtbo -> /dev/block/sda21
+lrwxrwxrwx 1 root root 15 2019-12-05 04:34 efs -> /dev/block/sda9
+lrwxrwxrwx 1 root root 15 2019-12-05 04:34 fsc -> /dev/block/sda3
+lrwxrwxrwx 1 root root 15 2019-12-05 04:34 fsg -> /dev/block/sdd3
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 hdm -> /dev/block/sdd33
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 hidden -> /dev/block/sda32
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 hyp -> /dev/block/sdd35
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 keydata -> /dev/block/sda25
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 keymaster -> /dev/block/sdd12
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 keyrefuge -> /dev/block/sda24
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 keystore -> /dev/block/sda14
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 limits -> /dev/block/sdd19
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 limits-cdsp -> /dev/block/sdd20
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 logdump -> /dev/block/sda35
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 logfs -> /dev/block/sdd22
+lrwxrwxrwx 1 root root 15 2019-12-05 04:34 mdm1m9kefs1 -> /dev/block/sda4
+lrwxrwxrwx 1 root root 15 2019-12-05 04:34 mdm1m9kefs2 -> /dev/block/sda5
+lrwxrwxrwx 1 root root 15 2019-12-05 04:34 mdm1m9kefs3 -> /dev/block/sdd4
+lrwxrwxrwx 1 root root 15 2019-12-05 04:34 mdm1m9kefsc -> /dev/block/sda6
+lrwxrwxrwx 1 root root 15 2019-12-05 04:34 mdmddr -> /dev/block/sdd2
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 metadata -> /dev/block/sda27
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 misc -> /dev/block/sda13
+lrwxrwxrwx 1 root root 15 2019-12-05 04:34 modemst1 -> /dev/block/sda1
+lrwxrwxrwx 1 root root 15 2019-12-05 04:34 modemst2 -> /dev/block/sda2
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 msadp -> /dev/block/sdd16
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 multiimgoem -> /dev/block/sdd28
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 multiimgqti -> /dev/block/sdd29
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 omr -> /dev/block/sda33
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 optics -> /dev/block/sda30
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 pad -> /dev/block/sdd37
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 param -> /dev/block/sda10
+lrwxrwxrwx 1 root root 15 2019-12-05 04:34 persist -> /dev/block/sda8
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 persistent -> /dev/block/sda16
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 prism -> /dev/block/sda29
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 qupfw -> /dev/block/sdd26
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 recovery -> /dev/block/sda23
+lrwxrwxrwx 1 root root 14 2019-12-05 04:34 sda -> /dev/block/sda
+lrwxrwxrwx 1 root root 14 2019-12-05 04:34 sdb -> /dev/block/sdb
+lrwxrwxrwx 1 root root 14 2019-12-05 04:34 sdc -> /dev/block/sdc
+lrwxrwxrwx 1 root root 14 2019-12-05 04:34 sdd -> /dev/block/sdd
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 sec_efs -> /dev/block/sda12
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 secdata -> /dev/block/sdd30
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 spu -> /dev/block/sda34
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 spunvm -> /dev/block/sdd18
+lrwxrwxrwx 1 root root 15 2019-12-05 04:34 ssd -> /dev/block/sda7
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 steady -> /dev/block/sda17
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 storsec -> /dev/block/sdd24
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 super -> /dev/block/sda28
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 toolsfv -> /dev/block/sdd21
+lrwxrwxrwx 1 root root 15 2019-12-05 04:34 tz -> /dev/block/sdd5
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 tziccc -> /dev/block/sdd36
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 uefisecapp -> /dev/block/sdd27
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 uefivarstore -> /dev/block/sdd31
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 userdata -> /dev/block/sda36
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 vbmeta -> /dev/block/sdd25
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 vbmeta_samsung -> /dev/block/sda26
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 vk -> /dev/block/sdd32
+lrwxrwxrwx 1 root root 15 2019-12-05 04:34 xbl -> /dev/block/sdb1
+lrwxrwxrwx 1 root root 15 2019-12-05 04:34 xbl_config -> /dev/block/sdb2
+major minor  #blocks  name
+
+   1        0       8192 ram0
+   1        1       8192 ram1
+   1        2       8192 ram2
+   1        3       8192 ram3
+   1        4       8192 ram4
+   1        5       8192 ram5
+   1        6       8192 ram6
+   1        7       8192 ram7
+   1        8       8192 ram8
+   1        9       8192 ram9
+   1       10       8192 ram10
+   1       11       8192 ram11
+   1       12       8192 ram12
+   1       13       8192 ram13
+   1       14       8192 ram14
+   1       15       8192 ram15
+   7        0        924 loop0
+   7        8      36398 loop1
+   7       16       8809 loop2
+   7       24     112092 loop3
+   7       32      42021 loop4
+   7       40      42021 loop5
+   7       48       8809 loop6
+   7       56        318 loop7
+   7       64     112092 loop8
+   7       72       1952 loop9
+   7       80        328 loop10
+   7       88        318 loop11
+   7       96        924 loop12
+   7      104        374 loop13
+   7      112      36398 loop14
+   7      120        318 loop15
+   7      128       2246 loop16
+   7      136      40888 loop17
+   7      144        872 loop18
+   7      152       8408 loop19
+   7      160      13824 loop20
+   7      168       7592 loop21
+   7      176       6096 loop22
+   7      184       2032 loop23
+   7      192       5570 loop24
+   7      200        348 loop25
+   7      208       5164 loop26
+   7      216       6860 loop27
+   7      224      19488 loop28
+   7      232       4064 loop29
+   7      240      51472 loop30
+   7      248      14017 loop31
+ 254        0    4194304 zram0
+   8       32       8192 sdc
+   8       33       4096 sdc1
+   8       34       4052 sdc2
+   8       16       8192 sdb
+   8       17       4096 sdb1
+   8       18       4052 sdb2
+   8       48      61440 sdd
+   8       49       1024 sdd1
+   8       50       1024 sdd2
+   8       51       2048 sdd3
+   8       52       2048 sdd4
+   8       53       4096 sdd5
+   8       54        512 sdd6
+   8       55        512 sdd7
+   8       56       4096 sdd8
+   8       57          4 sdd9
+   8       58       1024 sdd10
+   8       59        384 sdd11
+   8       60        512 sdd12
+   8       61        512 sdd13
+   8       62        512 sdd14
+   8       63        256 sdd15
+ 259        0        256 sdd16
+ 259        1          4 sdd17
+ 259        2       8192 sdd18
+ 259        3          4 sdd19
+ 259        4          4 sdd20
+ 259        5       2048 sdd21
+ 259        6       8192 sdd22
+ 259        7        128 sdd23
+ 259        8        512 sdd24
+ 259        9         64 sdd25
+ 259       10         80 sdd26
+ 259       11       2048 sdd27
+ 259       12         32 sdd28
+ 259       13         32 sdd29
+ 259       14         32 sdd30
+ 259       15        512 sdd31
+ 259       16       2048 sdd32
+ 259       17       2048 sdd33
+ 259       18       2048 sdd34
+ 259       19       1024 sdd35
+ 259       20       2048 sdd36
+ 259       21      11476 sdd37
+   8        0  249835520 sda
+   8        1       2048 sda1
+   8        2       2048 sda2
+   8        3          4 sda3
+   8        4       2048 sda4
+   8        5       2048 sda5
+   8        6         32 sda6
+   8        7          8 sda7
+   8        8      32768 sda8
+   8        9      20480 sda9
+   8       10      10240 sda10
+   8       11      10240 sda11
+   8       12      20480 sda12
+   8       13       1024 sda13
+   8       14        512 sda14
+   8       15      40960 sda15
+ 259       22        512 sda16
+ 259       23       4096 sda17
+ 259       24      16384 sda18
+ 259       25     176128 sda19
+ 259       26      65536 sda20
+ 259       27      10240 sda21
+ 259       28      69632 sda22
+ 259       29      84852 sda23
+ 259       30      16384 sda24
+ 259       31      16384 sda25
+ 259       32         64 sda26
+ 259       33      32768 sda27
+ 259       34    9728000 sda28
+ 259       35     921600 sda29
+ 259       36      20480 sda30
+ 259       37     409600 sda31
+ 259       38      40960 sda32
+ 259       39      51200 sda33
+ 259       40      51200 sda34
+ 259       41      16384 sda35
+ 259       42  237957100 sda36
+ 253        0    6265064 dm-0
+ 253        1    1338244 dm-1
+ 253        2     312688 dm-2
+ 253        3       4248 dm-3
+   7      256       5984 loop32
+   7      264       8880 loop33
+   7      272        836 loop34
+   7      280    1048576 loop35
+ 253        5       8648 dm-5
+ 253        7       3916 dm-7
+ 253        8        728 dm-8
+ 253       12       6520 dm-12
+ 253       13      19200 dm-13
+ 253       15       5004 dm-15
+ 253       16        256 dm-16
+ 253       19       5456 dm-19
+ 253       20       5872 dm-20
+ 253       21       1908 dm-21
+ 253       22      13556 dm-22
+ 253       23       7404 dm-23
+ 253       24       5844 dm-24
+ 253       25      13832 dm-25
+ 253       26      50932 dm-26
+ 253       31       8132 dm-31
+ 253       33        772 dm-33
+
+/sys/class/block/sda
+size=499671040
+queue/logical_block_size=4096
+queue/physical_block_size=4096
+device/vendor=SAMSUNG 
+device/model=KLUEG8UHDB-C2D1 
+device/rev=0090
+
+/sys/class/block/sda1
+start=2112
+size=4096
+partition=1
+
+/sys/class/block/sda10
+start=125080
+size=20480
+partition=10
+
+/sys/class/block/sda11
+start=145560
+size=20480
+partition=11
+
+/sys/class/block/sda12
+start=166040
+size=40960
+partition=12
+
+/sys/class/block/sda13
+start=207000
+size=2048
+partition=13
+
+/sys/class/block/sda14
+start=209048
+size=1024
+partition=14
+
+/sys/class/block/sda15
+start=210072
+size=81920
+partition=15
+
+/sys/class/block/sda16
+start=291992
+size=1024
+partition=16
+
+/sys/class/block/sda17
+start=293016
+size=8192
+partition=17
+
+/sys/class/block/sda18
+start=301208
+size=32768
+partition=18
+
+/sys/class/block/sda19
+start=333976
+size=352256
+partition=19
+
+/sys/class/block/sda2
+start=6208
+size=4096
+partition=2
+
+/sys/class/block/sda20
+start=686232
+size=131072
+partition=20
+
+/sys/class/block/sda21
+start=817304
+size=20480
+partition=21
+
+/sys/class/block/sda22
+start=837784
+size=139264
+partition=22
+
+/sys/class/block/sda23
+start=977048
+size=169704
+partition=23
+
+/sys/class/block/sda24
+start=1146752
+size=32768
+partition=24
+
+/sys/class/block/sda25
+start=1179520
+size=32768
+partition=25
+
+/sys/class/block/sda26
+start=1212288
+size=128
+partition=26
+
+/sys/class/block/sda27
+start=1212416
+size=65536
+partition=27
+
+/sys/class/block/sda28
+start=1277952
+size=19456000
+partition=28
+
+/sys/class/block/sda29
+start=20733952
+size=1843200
+partition=29
+
+/sys/class/block/sda3
+start=10304
+size=8
+partition=3
+
+/sys/class/block/sda30
+start=22577152
+size=40960
+partition=30
+
+/sys/class/block/sda31
+start=22618112
+size=819200
+partition=31
+
+/sys/class/block/sda32
+start=23437312
+size=81920
+partition=32
+
+/sys/class/block/sda33
+start=23519232
+size=102400
+partition=33
+
+/sys/class/block/sda34
+start=23621632
+size=102400
+partition=34
+
+/sys/class/block/sda35
+start=23724032
+size=32768
+partition=35
+
+/sys/class/block/sda36
+start=23756800
+size=475914200
+partition=36
+
+/sys/class/block/sda4
+start=10312
+size=4096
+partition=4
+
+/sys/class/block/sda5
+start=14408
+size=4096
+partition=5
+
+/sys/class/block/sda6
+start=18504
+size=64
+partition=6
+
+/sys/class/block/sda7
+start=18568
+size=16
+partition=7
+
+/sys/class/block/sda8
+start=18584
+size=65536
+partition=8
+
+/sys/class/block/sda9
+start=84120
+size=40960
+partition=9
+
+/sys/class/block/sdb
+size=16384
+queue/logical_block_size=4096
+queue/physical_block_size=4096
+device/vendor=SAMSUNG 
+device/model=KLUEG8UHDB-C2D1 
+device/rev=0090
+
+/sys/class/block/sdb1
+start=48
+size=8192
+partition=1
+
+/sys/class/block/sdb2
+start=8240
+size=8104
+partition=2
+
+/sys/class/block/sdc
+size=16384
+queue/logical_block_size=4096
+queue/physical_block_size=4096
+device/vendor=SAMSUNG 
+device/model=KLUEG8UHDB-C2D1 
+device/rev=0090
+
+/sys/class/block/sdc1
+start=48
+size=8192
+partition=1
+
+/sys/class/block/sdc2
+start=8240
+size=8104
+partition=2
+
+/sys/class/block/sdd
+size=122880
+queue/logical_block_size=4096
+queue/physical_block_size=4096
+device/vendor=SAMSUNG 
+device/model=KLUEG8UHDB-C2D1 
+device/rev=0090
+
+/sys/class/block/sdd1
+start=48
+size=2048
+partition=1
+
+/sys/class/block/sdd10
+start=30776
+size=2048
+partition=10
+
+/sys/class/block/sdd11
+start=32824
+size=768
+partition=11
+
+/sys/class/block/sdd12
+start=33592
+size=1024
+partition=12
+
+/sys/class/block/sdd13
+start=34616
+size=1024
+partition=13
+
+/sys/class/block/sdd14
+start=35640
+size=1024
+partition=14
+
+/sys/class/block/sdd15
+start=36664
+size=512
+partition=15
+
+/sys/class/block/sdd16
+start=37176
+size=512
+partition=16
+
+/sys/class/block/sdd17
+start=37688
+size=8
+partition=17
+
+/sys/class/block/sdd18
+start=37696
+size=16384
+partition=18
+
+/sys/class/block/sdd19
+start=54080
+size=8
+partition=19
+
+/sys/class/block/sdd2
+start=2096
+size=2048
+partition=2
+
+/sys/class/block/sdd20
+start=54088
+size=8
+partition=20
+
+/sys/class/block/sdd21
+start=54096
+size=4096
+partition=21
+
+/sys/class/block/sdd22
+start=58192
+size=16384
+partition=22
+
+/sys/class/block/sdd23
+start=74576
+size=256
+partition=23
+
+/sys/class/block/sdd24
+start=74832
+size=1024
+partition=24
+
+/sys/class/block/sdd25
+start=75856
+size=128
+partition=25
+
+/sys/class/block/sdd26
+start=75984
+size=160
+partition=26
+
+/sys/class/block/sdd27
+start=76144
+size=4096
+partition=27
+
+/sys/class/block/sdd28
+start=80240
+size=64
+partition=28
+
+/sys/class/block/sdd29
+start=80304
+size=64
+partition=29
+
+/sys/class/block/sdd3
+start=4144
+size=4096
+partition=3
+
+/sys/class/block/sdd30
+start=80368
+size=64
+partition=30
+
+/sys/class/block/sdd31
+start=80432
+size=1024
+partition=31
+
+/sys/class/block/sdd32
+start=81456
+size=4096
+partition=32
+
+/sys/class/block/sdd33
+start=85552
+size=4096
+partition=33
+
+/sys/class/block/sdd34
+start=89648
+size=4096
+partition=34
+
+/sys/class/block/sdd35
+start=93744
+size=2048
+partition=35
+
+/sys/class/block/sdd36
+start=95792
+size=4096
+partition=36
+
+/sys/class/block/sdd37
+start=99888
+size=22952
+partition=37
+
+/sys/class/block/sdd4
+start=8240
+size=4096
+partition=4
+
+/sys/class/block/sdd5
+start=12336
+size=8192
+partition=5
+
+/sys/class/block/sdd6
+start=20528
+size=1024
+partition=6
+
+/sys/class/block/sdd7
+start=21552
+size=1024
+partition=7
+
+/sys/class/block/sdd8
+start=22576
+size=8192
+partition=8
+
+/sys/class/block/sdd9
+start=30768
+size=8
+partition=9
+total 0
+lrwxrwxrwx 1 root root 0 2026-11-01 01:35 0:0:0:0 -> ../../devices/platform/soc/1d84000.ufshc/host0/target0:0:0/0:0:0:0/scsi_device/0:0:0:0
+lrwxrwxrwx 1 root root 0 2026-11-01 01:35 0:0:0:1 -> ../../devices/platform/soc/1d84000.ufshc/host0/target0:0:0/0:0:0:1/scsi_device/0:0:0:1
+lrwxrwxrwx 1 root root 0 2026-11-01 01:35 0:0:0:2 -> ../../devices/platform/soc/1d84000.ufshc/host0/target0:0:0/0:0:0:2/scsi_device/0:0:0:2
+lrwxrwxrwx 1 root root 0 2026-11-01 01:35 0:0:0:3 -> ../../devices/platform/soc/1d84000.ufshc/host0/target0:0:0/0:0:0:3/scsi_device/0:0:0:3
+lrwxrwxrwx 1 root root 0 2026-11-01 01:35 0:0:0:49456 -> ../../devices/platform/soc/1d84000.ufshc/host0/target0:0:0/0:0:0:49456/scsi_device/0:0:0:49456
+lrwxrwxrwx 1 root root 0 2026-11-01 01:35 0:0:0:49476 -> ../../devices/platform/soc/1d84000.ufshc/host0/target0:0:0/0:0:0:49476/scsi_device/0:0:0:49476
+lrwxrwxrwx 1 root root 0 2026-11-01 01:35 0:0:0:49488 -> ../../devices/platform/soc/1d84000.ufshc/host0/target0:0:0/0:0:0:49488/scsi_device/0:0:0:49488
+
+[stderr]
+
+[exit_code] 0

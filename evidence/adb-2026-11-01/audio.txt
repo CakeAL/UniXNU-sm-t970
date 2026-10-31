@@ -1,0 +1,96 @@
+$ cat /proc/asound/cards
+cat /proc/asound/pcm
+ls -l /sys/bus/slimbus/devices /sys/bus/platform/devices/*adsp* /sys/bus/platform/devices/*lpass* /sys/bus/i2c/drivers/*cs35* /sys/bus/i2c/drivers/*wcd*
+ls -l /vendor/firmware/*cs35* /vendor/firmware_mnt/image/adsp.*
+
+ 0 [konamtpsndcard ]: kona-mtp-snd-ca - kona-mtp-snd-card
+                      kona-mtp-snd-card
+00-00: MultiMedia1 (*) :  : playback 1 : capture 1
+00-01: MultiMedia2 (*) :  : playback 1 : capture 1
+00-02: VoiceMMode1 (*) :  : playback 1 : capture 1
+00-03: VoIP (*) :  : playback 1 : capture 1
+00-04: MultiMedia3 (*) :  : playback 1
+00-05: AFE-PROXY RX msm-stub-rx-5 :  : playback 1
+00-06: AFE-PROXY TX msm-stub-tx-6 :  : capture 1
+00-08: AUXPCM Hostless (*) :  : playback 1 : capture 1
+00-09: MultiMedia5 (*) :  : playback 1 : capture 1
+00-10: Listen 1 Audio Service (*) :  : capture 1
+00-12: MultiMedia10 (*) :  : playback 1 : capture 1
+00-13: MM_NOIRQ (*) :  : playback 1 : capture 1
+00-14: HDMI_RX_HOSTLESS (*) :  : playback 1
+00-15: VoiceMMode2 (*) :  : playback 1 : capture 1
+00-16: Listen 2 Audio Service (*) :  : capture 1
+00-17: Listen 3 Audio Service (*) :  : capture 1
+00-18: Listen 4 Audio Service (*) :  : capture 1
+00-19: Listen 5 Audio Service (*) :  : capture 1
+00-20: Listen 6 Audio Service (*) :  : capture 1
+00-21: Listen 7 Audio Service (*) :  : capture 1
+00-22: Listen 8 Audio Service (*) :  : capture 1
+00-23: MultiMedia9 (*) :  : playback 1 : capture 1
+00-24: MultiMedia11 (*) :  : playback 1
+00-29: MM_NOIRQ_2 (*) :  : playback 1 : capture 1
+00-30: CDC_DMA Hostless (*) :  : playback 1 : capture 1
+00-31: TX3_CDC_DMA Hostless (*) :  : capture 1
+00-32: Tertiary MI2S_TX Hostless Capture (*) :  : capture 1
+00-33: WSA CDC DMA0 Capture wsa_macro_vifeedback-33 :  : capture 1
+00-34: MultiMedia6 (*) :  : playback 1 : capture 1
+00-35: USB Audio Hostless (*) :  : playback 1 : capture 1
+00-36: SLIMBUS_7 Hostless (*) :  : playback 1 : capture 1
+00-38: SLIMBUS_8 Hostless (*) :  : playback 1 : capture 1
+00-39: TX CDC DMA5 Capture tx_macro_tx3-39 :  : capture 1
+00-41: Quaternary MI2S_RX Hostless (*) :  : playback 1
+
+lrwxrwxrwx 1 root root 0 2026-11-01 01:35 /sys/bus/platform/devices/1519d000.adsp_tbu -> ../../../devices/platform/soc/15000000.apps-smmu/1519d000.adsp_tbu
+lrwxrwxrwx 1 root root 0 2026-11-01 01:35 /sys/bus/platform/devices/17300000.qcom,lpass -> ../../../devices/platform/soc/17300000.qcom,lpass
+lrwxrwxrwx 1 root root 0 2026-11-01 01:35 /sys/bus/platform/devices/soc:ipcc-self-ping-adsp -> ../../../devices/platform/soc/soc:ipcc-self-ping-adsp
+lrwxrwxrwx 1 root root 0 2026-11-01 01:35 /sys/bus/platform/devices/soc:qcom,msm-adsp-loader -> ../../../devices/platform/soc/soc:qcom,msm-adsp-loader
+lrwxrwxrwx 1 root root 0 2026-11-01 01:35 /sys/bus/platform/devices/soc:qcom,msm-adsprpc-mem -> ../../../devices/platform/soc/soc:qcom,msm-adsprpc-mem
+lrwxrwxrwx 1 root root 0 2026-11-01 01:35 /sys/bus/platform/devices/soc:qcom,msm-audio-apr:qcom,q6core-audio:vote_lpass_audio_hw -> ../../../devices/platform/soc/soc:qcom,msm-audio-apr/soc:qcom,msm-audio-apr:qcom,q6core-audio/soc:qcom,msm-audio-apr:qcom,q6core-audio:vote_lpass_audio_hw
+lrwxrwxrwx 1 root root 0 2026-11-01 01:35 /sys/bus/platform/devices/soc:qcom,msm-audio-apr:qcom,q6core-audio:vote_lpass_core_hw -> ../../../devices/platform/soc/soc:qcom,msm-audio-apr/soc:qcom,msm-audio-apr:qcom,q6core-audio/soc:qcom,msm-audio-apr:qcom,q6core-audio:vote_lpass_core_hw
+lrwxrwxrwx 1 root root 0 2026-11-01 01:35 /sys/bus/platform/devices/soc:qcom,smp2p-adsp -> ../../../devices/platform/soc/soc:qcom,smp2p-adsp
+
+/sys/bus/i2c/drivers/cs35l41:
+total 0
+lrwxrwxrwx 1 root root    0 2026-11-01 01:35 6-0040 -> ../../../../devices/platform/soc/a8c000.i2c/i2c-6/6-0040
+lrwxrwxrwx 1 root root    0 2026-11-01 01:35 6-0041 -> ../../../../devices/platform/soc/a8c000.i2c/i2c-6/6-0041
+lrwxrwxrwx 1 root root    0 2026-11-01 01:35 6-0042 -> ../../../../devices/platform/soc/a8c000.i2c/i2c-6/6-0042
+lrwxrwxrwx 1 root root    0 2026-11-01 01:35 6-0043 -> ../../../../devices/platform/soc/a8c000.i2c/i2c-6/6-0043
+--w------- 1 root root 4096 2026-11-01 01:35 bind
+--w------- 1 root root 4096 2026-11-01 01:35 uevent
+--w------- 1 root root 4096 2026-11-01 01:35 unbind
+
+/sys/bus/slimbus/devices:
+total 0
+lrwxrwxrwx 1 root root 0 2026-11-01 01:35 btfmslim_slave -> ../../../devices/platform/soc/3ac0000.slim/btfmslim_slave
+lrwxrwxrwx 1 root root 0 2026-11-01 01:35 btfmslim_slave_ifd -> ../../../devices/platform/soc/3ac0000.slim/btfmslim_slave_ifd
+lrwxrwxrwx 1 root root 0 2026-11-01 01:35 sb-1 -> ../../../devices/sb-1
+-rw-r--r-- 1 root root        984 2008-12-31 23:00 /vendor/firmware/cs35l40-spk-dsp1-spk-prot-calib.bin
+-rw-r--r-- 1 root root       4220 2008-12-31 23:00 /vendor/firmware/cs35l40-spk-dsp1-spk-prot.bin
+-rw-r--r-- 1 root root      31780 2008-12-31 23:00 /vendor/firmware/cs35l40-spk-dsp1-spk-prot.wmfw
+-r--r----- 1 root system      756 2022-11-05 01:15 /vendor/firmware_mnt/image/adsp.b00
+-r--r----- 1 root system     7624 2022-11-05 01:15 /vendor/firmware_mnt/image/adsp.b01
+-r--r----- 1 root system    82552 2022-11-05 01:15 /vendor/firmware_mnt/image/adsp.b02
+-r--r----- 1 root system   358784 2022-11-05 01:15 /vendor/firmware_mnt/image/adsp.b03
+-r--r----- 1 root system  1961452 2022-11-05 01:15 /vendor/firmware_mnt/image/adsp.b04
+-r--r----- 1 root system  2487860 2022-11-05 01:15 /vendor/firmware_mnt/image/adsp.b05
+-r--r----- 1 root system    38640 2022-11-05 01:15 /vendor/firmware_mnt/image/adsp.b06
+-r--r----- 1 root system    28972 2022-11-05 01:15 /vendor/firmware_mnt/image/adsp.b07
+-r--r----- 1 root system   126736 2022-11-05 01:15 /vendor/firmware_mnt/image/adsp.b08
+-r--r----- 1 root system    64424 2022-11-05 01:15 /vendor/firmware_mnt/image/adsp.b09
+-r--r----- 1 root system   610304 2022-11-05 01:15 /vendor/firmware_mnt/image/adsp.b10
+-r--r----- 1 root system 11984892 2022-11-05 01:15 /vendor/firmware_mnt/image/adsp.b11
+-r--r----- 1 root system  1589280 2022-11-05 01:15 /vendor/firmware_mnt/image/adsp.b12
+-r--r----- 1 root system    20480 2022-11-05 01:15 /vendor/firmware_mnt/image/adsp.b13
+-r--r----- 1 root system     2464 2022-11-05 00:33 /vendor/firmware_mnt/image/adsp.b14
+-r--r----- 1 root system     4416 2022-11-05 01:15 /vendor/firmware_mnt/image/adsp.b15
+-r--r----- 1 root system   305864 2022-11-05 01:15 /vendor/firmware_mnt/image/adsp.b16
+-r--r----- 1 root system  1367348 2022-11-05 01:15 /vendor/firmware_mnt/image/adsp.b17
+-r--r----- 1 root system   488496 2022-11-05 01:15 /vendor/firmware_mnt/image/adsp.b18
+-r--r----- 1 root system  2326392 2022-11-05 01:15 /vendor/firmware_mnt/image/adsp.b19
+-r--r----- 1 root system      132 2022-11-05 01:15 /vendor/firmware_mnt/image/adsp.b20
+-r--r----- 1 root system     8380 2022-11-05 01:15 /vendor/firmware_mnt/image/adsp.mdt
+
+[stderr]
+ls: /sys/bus/i2c/drivers/*wcd*: No such file or directory
+
+[exit_code] 0

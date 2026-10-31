@@ -1,0 +1,7 @@
+$ tr ' ' '\n' < /proc/cmdline | grep -E '^(msm_drm[.]dsi_display|mdss_mdp[.]panel)'
+
+msm_drm.dsi_display0=ss_dsi_panel_S6TUUM3_AMSA24VU01_WQXGA:
+
+[stderr]
+
+[exit_code] 0

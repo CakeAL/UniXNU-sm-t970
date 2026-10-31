@@ -1,0 +1,21 @@
+$ id; getenforce
+ls -ld /sys/firmware/fdt /sys/firmware/devicetree/base /sys/kernel/debug /sys/fs/pstore
+ls -l /sys/fs/pstore
+ls -l /dev/block/by-name/boot /dev/block/by-name/recovery /dev/block/by-name/dtbo
+
+uid=0(root) gid=0(root) groups=0(root) context=u:r:magisk:s0
+Enforcing
+drwxr-xr-x  14 root   root      0 2026-11-01 01:35 /sys/firmware/devicetree/base
+-r--------   1 root   root 837154 2026-11-01 01:35 /sys/firmware/fdt
+dr-xr-x---   2 system log       0 2019-12-05 04:34 /sys/fs/pstore
+drwxr-xr-x 108 root   root      0 2026-09-10 12:39 /sys/kernel/debug
+total 0
+-r--r----- 1 system log 262132 2019-12-05 04:34 console-ramoops-0
+-r--r----- 1 system log 262132 2019-12-05 04:34 pmsg-ramoops-0
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 /dev/block/by-name/boot -> /dev/block/sda22
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 /dev/block/by-name/dtbo -> /dev/block/sda21
+lrwxrwxrwx 1 root root 16 2019-12-05 04:34 /dev/block/by-name/recovery -> /dev/block/sda23
+
+[stderr]
+
+[exit_code] 0

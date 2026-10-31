@@ -1,0 +1,29 @@
+$ id; uname -a; getenforce
+for p in ro.product.model ro.product.device ro.soc.model ro.soc.manufacturer ro.board.platform ro.hardware ro.bootloader ro.build.version.release ro.build.version.sdk ro.build.version.security_patch ro.build.fingerprint ro.boot.flash.locked ro.boot.vbmeta.device_state ro.boot.verifiedbootstate ro.boot.warranty_bit ro.boot.bootdevice ro.boot.boot_devices; do
+    printf '%s=' "$p"; getprop "$p"
+done
+
+uid=0(root) gid=0(root) groups=0(root) context=u:r:magisk:s0
+Linux localhost 4.19.113-239839 #1 SMP PREEMPT Sat Nov 5 00:50:28 KST 2022 aarch64
+Enforcing
+ro.product.model=SM-T970
+ro.product.device=gts7xlwifi
+ro.soc.model=SM8250
+ro.soc.manufacturer=QTI
+ro.board.platform=kona
+ro.hardware=qcom
+ro.bootloader=T970ZCU2CVK1
+ro.build.version.release=12
+ro.build.version.sdk=32
+ro.build.version.security_patch=2022-09-01
+ro.build.fingerprint=samsung/gts7xlwifizc/gts7xlwifi:12/SP2A.220305.013/T970ZCU2CVK1:user/release-keys
+ro.boot.flash.locked=0
+ro.boot.vbmeta.device_state=
+ro.boot.verifiedbootstate=orange
+ro.boot.warranty_bit=1
+ro.boot.bootdevice=1d84000.ufshc
+ro.boot.boot_devices=soc/1d84000.ufshc
+
+[stderr]
+
+[exit_code] 0

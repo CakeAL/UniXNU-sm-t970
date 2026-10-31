@@ -1,0 +1,36 @@
+$ for p in /sys/class/kgsl/kgsl-3d0/gpu_model /sys/class/kgsl/kgsl-3d0/gpu_available_frequencies /sys/class/kgsl/kgsl-3d0/max_gpuclk /sys/class/kgsl/kgsl-3d0/num_pwrlevels /sys/class/kgsl/kgsl-3d0/usesgmem; do
+    if [ -f "$p" ]; then printf '
+%s
+' "$p"; cat "$p"; fi
+done
+ls -l /vendor/firmware/a650* /vendor/firmware/a615_zap*
+sha256sum /vendor/firmware/a650_gmu.bin /vendor/firmware/a650_sqe.fw
+
+
+/sys/class/kgsl/kgsl-3d0/gpu_model
+Adreno650v3
+
+/sys/class/kgsl/kgsl-3d0/gpu_available_frequencies
+670000000 587000000 525000000 490000000 441600000 400000000 305000000 
+
+/sys/class/kgsl/kgsl-3d0/max_gpuclk
+670000000
+
+/sys/class/kgsl/kgsl-3d0/num_pwrlevels
+7
+
+/sys/class/kgsl/kgsl-3d0/usesgmem
+1
+-rw-r--r-- 1 root root   148 2008-12-31 23:00 /vendor/firmware/a615_zap.b00
+-rw-r--r-- 1 root root  6560 2008-12-31 23:00 /vendor/firmware/a615_zap.b01
+-rw-r--r-- 1 root root  1984 2008-12-31 23:00 /vendor/firmware/a615_zap.b02
+-rw-r--r-- 1 root root 14272 2008-12-31 23:00 /vendor/firmware/a615_zap.elf
+-rw-r--r-- 1 root root  6708 2008-12-31 23:00 /vendor/firmware/a615_zap.mdt
+-rw-r--r-- 1 root root 41548 2008-12-31 23:00 /vendor/firmware/a650_gmu.bin
+-rw-r--r-- 1 root root 31632 2008-12-31 23:00 /vendor/firmware/a650_sqe.fw
+df79fa8482fcc7587bb239b9c9e2b24bce4729893b990fe3f82b30da8175b01c  /vendor/firmware/a650_gmu.bin
+b4c27420fd6a5c6b511b254cc0fad8cdd40eea38ceb3418f895a1084f4460487  /vendor/firmware/a650_sqe.fw
+
+[stderr]
+
+[exit_code] 0

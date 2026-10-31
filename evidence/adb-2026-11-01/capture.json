@@ -1,0 +1,110 @@
+{
+  "captured_at": "2026-11-01T01:35:00.758871+08:00",
+  "root": true,
+  "transport": "adb -d (one USB device; serial omitted)",
+  "purpose": "Stock Android inventory only; no UniXNU validation",
+  "commands": {
+    "identity": {
+      "remote_shell": "id; uname -a; getenforce\nfor p in ro.product.model ro.product.device ro.soc.model ro.soc.manufacturer ro.board.platform ro.hardware ro.bootloader ro.build.version.release ro.build.version.sdk ro.build.version.security_patch ro.build.fingerprint ro.boot.flash.locked ro.boot.vbmeta.device_state ro.boot.verifiedbootstate ro.boot.warranty_bit ro.boot.bootdevice ro.boot.boot_devices; do\n    printf '%s=' \"$p\"; getprop \"$p\"\ndone",
+      "exit_code": 0
+    },
+    "cpu": {
+      "remote_shell": "cat /proc/cpuinfo\ngetconf PAGE_SIZE\nfor p in /sys/devices/system/cpu/possible /sys/devices/system/cpu/present /sys/devices/system/cpu/online /sys/devices/system/cpu/cpu[0-9]*/topology/* /sys/devices/system/cpu/cpufreq/policy*/related_cpus /sys/devices/system/cpu/cpufreq/policy*/cpuinfo_max_freq /sys/devices/system/cpu/cpufreq/policy*/scaling_available_frequencies; do\n    if [ -f \"$p\" ]; then printf '\n%s\n' \"$p\"; cat \"$p\"; fi\ndone\ncat /proc/interrupts",
+      "exit_code": 0
+    },
+    "memory": {
+      "remote_shell": "cat /proc/meminfo\ncat /proc/iomem\nls -l /sys/class/iommu",
+      "exit_code": 0
+    },
+    "storage": {
+      "remote_shell": "ls -l /dev/block/by-name\ncat /proc/partitions\nfor d in /sys/class/block/sd*; do\n    printf '\n%s\n' \"$d\"\n    for k in start size partition queue/logical_block_size queue/physical_block_size device/vendor device/model device/rev; do\n        if [ -f \"$d/$k\" ]; then printf '%s=' \"$k\"; cat \"$d/$k\"; fi\n    done\ndone\nls -l /sys/class/scsi_device",
+      "exit_code": 0
+    },
+    "display": {
+      "remote_shell": "ls -l /sys/class/drm /sys/class/graphics /sys/class/lcd /sys/class/backlight\nfor p in /sys/class/drm/card0-DSI-1/status /sys/class/drm/card0-DSI-1/enabled /sys/class/drm/card0-DSI-1/modes /sys/class/drm/card0-DSI-1/dpms /sys/class/lcd/panel/lcd_type /sys/class/backlight/*/max_brightness /sys/class/backlight/*/brightness; do\n    if [ -f \"$p\" ]; then printf '\n%s\n' \"$p\"; cat \"$p\"; fi\ndone\nwm size; wm density",
+      "exit_code": 0
+    },
+    "display_boot": {
+      "remote_shell": "tr ' ' '\\n' < /proc/cmdline | grep -E '^(msm_drm[.]dsi_display|mdss_mdp[.]panel)'",
+      "exit_code": 0
+    },
+    "input": {
+      "remote_shell": "cat /proc/bus/input/devices\ngetevent -lp\nfor d in /sys/bus/i2c/devices/*-* /sys/bus/spi/devices/*; do\n    if [ -d \"$d\" ]; then\n        printf '\n%s\n' \"$d\"; readlink -f \"$d/driver\"\n        for k in name modalias; do if [ -f \"$d/$k\" ]; then printf '%s=' \"$k\"; cat \"$d/$k\"; fi; done\n    fi\ndone",
+      "exit_code": 0
+    },
+    "gpu": {
+      "remote_shell": "for p in /sys/class/kgsl/kgsl-3d0/gpu_model /sys/class/kgsl/kgsl-3d0/gpu_available_frequencies /sys/class/kgsl/kgsl-3d0/max_gpuclk /sys/class/kgsl/kgsl-3d0/num_pwrlevels /sys/class/kgsl/kgsl-3d0/usesgmem; do\n    if [ -f \"$p\" ]; then printf '\n%s\n' \"$p\"; cat \"$p\"; fi\ndone\nls -l /vendor/firmware/a650* /vendor/firmware/a615_zap*\nsha256sum /vendor/firmware/a650_gmu.bin /vendor/firmware/a650_sqe.fw",
+      "exit_code": 0
+    },
+    "network": {
+      "remote_shell": "for d in /sys/bus/pci/devices/*; do\n    printf '\n%s\n' \"$d\"; readlink -f \"$d/driver\"\n    for k in vendor device subsystem_vendor subsystem_device class modalias; do\n        if [ -f \"$d/$k\" ]; then printf '%s=' \"$k\"; cat \"$d/$k\"; fi\n    done\ndone\nreadlink -f /sys/class/net/wlan0/device\nls -l /sys/class/net/wlan0/device/driver\nls -l /vendor/firmware/qca6390 /vendor/firmware/wlan /vendor/firmware_mnt/image/*wlan* /vendor/firmware_mnt/image/*bdwlan* /vendor/firmware_mnt/image/*qca*",
+      "exit_code": 1
+    },
+    "audio": {
+      "remote_shell": "cat /proc/asound/cards\ncat /proc/asound/pcm\nls -l /sys/bus/slimbus/devices /sys/bus/platform/devices/*adsp* /sys/bus/platform/devices/*lpass* /sys/bus/i2c/drivers/*cs35* /sys/bus/i2c/drivers/*wcd*\nls -l /vendor/firmware/*cs35* /vendor/firmware_mnt/image/adsp.*",
+      "exit_code": 0
+    },
+    "power": {
+      "remote_shell": "ls -l /sys/class/power_supply\nfor d in /sys/class/power_supply/*; do\n    printf '\n%s\n' \"$d\"\n    for k in type status present capacity voltage_now current_now temp technology charge_full charge_full_design energy_full_design online; do\n        if [ -f \"$d/$k\" ]; then printf '%s=' \"$k\"; cat \"$d/$k\"; fi\n    done\ndone\nfor p in /sys/power/state /sys/power/mem_sleep /sys/class/thermal/thermal_zone*/type; do\n    if [ -f \"$p\" ]; then printf '\n%s\n' \"$p\"; cat \"$p\"; fi\ndone",
+      "exit_code": 0
+    },
+    "diagnostics": {
+      "remote_shell": "id; getenforce\nls -ld /sys/firmware/fdt /sys/firmware/devicetree/base /sys/kernel/debug /sys/fs/pstore\nls -l /sys/fs/pstore\nls -l /dev/block/by-name/boot /dev/block/by-name/recovery /dev/block/by-name/dtbo",
+      "exit_code": 0
+    }
+  },
+  "device_tree": {
+    "command": "cat /sys/firmware/fdt",
+    "original_size": 837154,
+    "original_sha256": "86c14aa305a6cf5db46665f4095d28aadcb1ea5ce9d213cd711641a07504ed1d",
+    "omitted": [
+      "/chosen"
+    ],
+    "note": "Original DT is not saved; sanitized DTS is not a flashable board DTB."
+  },
+  "boot_header": {
+    "kernel_size": 53596172,
+    "kernel_addr": 32768,
+    "ramdisk_size": 1246359,
+    "ramdisk_addr": 33554432,
+    "second_size": 0,
+    "second_addr": 0,
+    "tags_addr": 31457280,
+    "page_size": 4096,
+    "header_version": 2,
+    "os_version": 369099113,
+    "command": "dd if=/dev/block/by-name/boot bs=4096 count=1 2>/dev/null",
+    "magic": "ANDROID!"
+  },
+  "recovery_header": {
+    "kernel_size": 53596172,
+    "kernel_addr": 32768,
+    "ramdisk_size": 14124346,
+    "ramdisk_addr": 33554432,
+    "second_size": 0,
+    "second_addr": 0,
+    "tags_addr": 31457280,
+    "page_size": 4096,
+    "header_version": 2,
+    "os_version": 369099113,
+    "command": "dd if=/dev/block/by-name/recovery bs=4096 count=1 2>/dev/null",
+    "magic": "ANDROID!"
+  },
+  "completed_at": "2026-11-01T01:35:25.434447+08:00",
+  "files_sha256": {
+    "audio.txt": "0f1d51c5fef447fd37773c3fa66f83457156a7775d9fea1df6dc57e784a928a7",
+    "cpu.txt": "df4111f155214e64b6c2f4811396dd5f9c61fa49da8a4f25d96082f725437dfb",
+    "diagnostics.txt": "f8a2f7812fec065c11469c2cd36f88ad1a53e055e6a9b641f477ea79f93a6e13",
+    "display.txt": "e3680d5195cb33453428ae408f7ce795b7f245795cc6cc9db7c4eee7761556da",
+    "display_boot.txt": "ee434a359ef256cb347222e77a0f9f8cad419956af4d6814b1d7f67d883c1c4e",
+    "gpt.json": "010b16fad4d2fb2285f178a1090eb9784a21f026f10b5fc5140d77d78a5d53f9",
+    "gpu.txt": "bbafbb611ad1be83dc3c912a8ba95403ee7cc91d5092e1f34f253be2c388182e",
+    "identity.txt": "f3474c3abf113447ffb803a93c84f97e6cebeed3f523d421d839488b79405700",
+    "input.txt": "ef0fe234f42ccacc1979b80ef0116fedb31bd62f7c374943aaf5a2835ecb593d",
+    "live-device-tree.dts": "fc8678605ea00ca3223e7185cf685919a31f3c67eb756f5e6d81ed635aa34d7b",
+    "memory.txt": "ab5ec82ab6ccccb354ff0a81430c7ddd6522ab368b68ef3498bc2755eff55ac9",
+    "network.txt": "8bd74a4f3da3c6e196ce26676be62ca0ad9924030283fcd85144cf20037c64d2",
+    "power.txt": "94968c1994bc5f01b6140e1914cab077f1593100509f9bb29c57dbcbe9212bc3",
+    "storage.txt": "0ba6364b6e043a1532111e943500863a24ff1eb1516a2471359f8765c99e6ea4"
+  }
+}

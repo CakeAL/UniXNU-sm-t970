@@ -1,0 +1,666 @@
+{
+  "sda": {
+    "logical_block_size": 4096,
+    "scsi_path": "/sys/devices/platform/soc/1d84000.ufshc/host0/target0:0:0/0:0:0:0",
+    "primary_header_crc_valid": true,
+    "entry_array_crc_valid": true,
+    "commands": [
+      "dd if=/dev/block/sda bs=4096 count=2 2>/dev/null",
+      "dd if=/dev/block/sda bs=4096 skip=2 count=2 2>/dev/null"
+    ],
+    "partitions": [
+      {
+        "index": 1,
+        "name": "modemst1",
+        "first_lba": 264,
+        "last_lba": 775,
+        "offset_bytes": 1081344,
+        "size_bytes": 2097152
+      },
+      {
+        "index": 2,
+        "name": "modemst2",
+        "first_lba": 776,
+        "last_lba": 1287,
+        "offset_bytes": 3178496,
+        "size_bytes": 2097152
+      },
+      {
+        "index": 3,
+        "name": "fsc",
+        "first_lba": 1288,
+        "last_lba": 1288,
+        "offset_bytes": 5275648,
+        "size_bytes": 4096
+      },
+      {
+        "index": 4,
+        "name": "mdm1m9kefs1",
+        "first_lba": 1289,
+        "last_lba": 1800,
+        "offset_bytes": 5279744,
+        "size_bytes": 2097152
+      },
+      {
+        "index": 5,
+        "name": "mdm1m9kefs2",
+        "first_lba": 1801,
+        "last_lba": 2312,
+        "offset_bytes": 7376896,
+        "size_bytes": 2097152
+      },
+      {
+        "index": 6,
+        "name": "mdm1m9kefsc",
+        "first_lba": 2313,
+        "last_lba": 2320,
+        "offset_bytes": 9474048,
+        "size_bytes": 32768
+      },
+      {
+        "index": 7,
+        "name": "ssd",
+        "first_lba": 2321,
+        "last_lba": 2322,
+        "offset_bytes": 9506816,
+        "size_bytes": 8192
+      },
+      {
+        "index": 8,
+        "name": "persist",
+        "first_lba": 2323,
+        "last_lba": 10514,
+        "offset_bytes": 9515008,
+        "size_bytes": 33554432
+      },
+      {
+        "index": 9,
+        "name": "efs",
+        "first_lba": 10515,
+        "last_lba": 15634,
+        "offset_bytes": 43069440,
+        "size_bytes": 20971520
+      },
+      {
+        "index": 10,
+        "name": "param",
+        "first_lba": 15635,
+        "last_lba": 18194,
+        "offset_bytes": 64040960,
+        "size_bytes": 10485760
+      },
+      {
+        "index": 11,
+        "name": "debug",
+        "first_lba": 18195,
+        "last_lba": 20754,
+        "offset_bytes": 74526720,
+        "size_bytes": 10485760
+      },
+      {
+        "index": 12,
+        "name": "sec_efs",
+        "first_lba": 20755,
+        "last_lba": 25874,
+        "offset_bytes": 85012480,
+        "size_bytes": 20971520
+      },
+      {
+        "index": 13,
+        "name": "misc",
+        "first_lba": 25875,
+        "last_lba": 26130,
+        "offset_bytes": 105984000,
+        "size_bytes": 1048576
+      },
+      {
+        "index": 14,
+        "name": "keystore",
+        "first_lba": 26131,
+        "last_lba": 26258,
+        "offset_bytes": 107032576,
+        "size_bytes": 524288
+      },
+      {
+        "index": 15,
+        "name": "bota",
+        "first_lba": 26259,
+        "last_lba": 36498,
+        "offset_bytes": 107556864,
+        "size_bytes": 41943040
+      },
+      {
+        "index": 16,
+        "name": "persistent",
+        "first_lba": 36499,
+        "last_lba": 36626,
+        "offset_bytes": 149499904,
+        "size_bytes": 524288
+      },
+      {
+        "index": 17,
+        "name": "steady",
+        "first_lba": 36627,
+        "last_lba": 37650,
+        "offset_bytes": 150024192,
+        "size_bytes": 4194304
+      },
+      {
+        "index": 18,
+        "name": "dqmdbg",
+        "first_lba": 37651,
+        "last_lba": 41746,
+        "offset_bytes": 154218496,
+        "size_bytes": 16777216
+      },
+      {
+        "index": 19,
+        "name": "apnhlos",
+        "first_lba": 41747,
+        "last_lba": 85778,
+        "offset_bytes": 170995712,
+        "size_bytes": 180355072
+      },
+      {
+        "index": 20,
+        "name": "dsp",
+        "first_lba": 85779,
+        "last_lba": 102162,
+        "offset_bytes": 351350784,
+        "size_bytes": 67108864
+      },
+      {
+        "index": 21,
+        "name": "dtbo",
+        "first_lba": 102163,
+        "last_lba": 104722,
+        "offset_bytes": 418459648,
+        "size_bytes": 10485760
+      },
+      {
+        "index": 22,
+        "name": "boot",
+        "first_lba": 104723,
+        "last_lba": 122130,
+        "offset_bytes": 428945408,
+        "size_bytes": 71303168
+      },
+      {
+        "index": 23,
+        "name": "recovery",
+        "first_lba": 122131,
+        "last_lba": 143343,
+        "offset_bytes": 500248576,
+        "size_bytes": 86888448
+      },
+      {
+        "index": 24,
+        "name": "keyrefuge",
+        "first_lba": 143344,
+        "last_lba": 147439,
+        "offset_bytes": 587137024,
+        "size_bytes": 16777216
+      },
+      {
+        "index": 25,
+        "name": "keydata",
+        "first_lba": 147440,
+        "last_lba": 151535,
+        "offset_bytes": 603914240,
+        "size_bytes": 16777216
+      },
+      {
+        "index": 26,
+        "name": "vbmeta_samsung",
+        "first_lba": 151536,
+        "last_lba": 151551,
+        "offset_bytes": 620691456,
+        "size_bytes": 65536
+      },
+      {
+        "index": 27,
+        "name": "metadata",
+        "first_lba": 151552,
+        "last_lba": 159743,
+        "offset_bytes": 620756992,
+        "size_bytes": 33554432
+      },
+      {
+        "index": 28,
+        "name": "super",
+        "first_lba": 159744,
+        "last_lba": 2591743,
+        "offset_bytes": 654311424,
+        "size_bytes": 9961472000
+      },
+      {
+        "index": 29,
+        "name": "prism",
+        "first_lba": 2591744,
+        "last_lba": 2822143,
+        "offset_bytes": 10615783424,
+        "size_bytes": 943718400
+      },
+      {
+        "index": 30,
+        "name": "optics",
+        "first_lba": 2822144,
+        "last_lba": 2827263,
+        "offset_bytes": 11559501824,
+        "size_bytes": 20971520
+      },
+      {
+        "index": 31,
+        "name": "cache",
+        "first_lba": 2827264,
+        "last_lba": 2929663,
+        "offset_bytes": 11580473344,
+        "size_bytes": 419430400
+      },
+      {
+        "index": 32,
+        "name": "hidden",
+        "first_lba": 2929664,
+        "last_lba": 2939903,
+        "offset_bytes": 11999903744,
+        "size_bytes": 41943040
+      },
+      {
+        "index": 33,
+        "name": "omr",
+        "first_lba": 2939904,
+        "last_lba": 2952703,
+        "offset_bytes": 12041846784,
+        "size_bytes": 52428800
+      },
+      {
+        "index": 34,
+        "name": "spu",
+        "first_lba": 2952704,
+        "last_lba": 2965503,
+        "offset_bytes": 12094275584,
+        "size_bytes": 52428800
+      },
+      {
+        "index": 35,
+        "name": "logdump",
+        "first_lba": 2965504,
+        "last_lba": 2969599,
+        "offset_bytes": 12146704384,
+        "size_bytes": 16777216
+      },
+      {
+        "index": 36,
+        "name": "userdata",
+        "first_lba": 2969600,
+        "last_lba": 62458874,
+        "offset_bytes": 12163481600,
+        "size_bytes": 243668070400
+      }
+    ]
+  },
+  "sdb": {
+    "logical_block_size": 4096,
+    "scsi_path": "/sys/devices/platform/soc/1d84000.ufshc/host0/target0:0:0/0:0:0:1",
+    "primary_header_crc_valid": true,
+    "entry_array_crc_valid": true,
+    "commands": [
+      "dd if=/dev/block/sdb bs=4096 count=2 2>/dev/null",
+      "dd if=/dev/block/sdb bs=4096 skip=2 count=1 2>/dev/null"
+    ],
+    "partitions": [
+      {
+        "index": 1,
+        "name": "xbl",
+        "first_lba": 6,
+        "last_lba": 1029,
+        "offset_bytes": 24576,
+        "size_bytes": 4194304
+      },
+      {
+        "index": 2,
+        "name": "xbl_config",
+        "first_lba": 1030,
+        "last_lba": 2042,
+        "offset_bytes": 4218880,
+        "size_bytes": 4149248
+      }
+    ]
+  },
+  "sdc": {
+    "logical_block_size": 4096,
+    "scsi_path": "/sys/devices/platform/soc/1d84000.ufshc/host0/target0:0:0/0:0:0:2",
+    "primary_header_crc_valid": true,
+    "entry_array_crc_valid": true,
+    "commands": [
+      "dd if=/dev/block/sdc bs=4096 count=2 2>/dev/null",
+      "dd if=/dev/block/sdc bs=4096 skip=2 count=1 2>/dev/null"
+    ],
+    "partitions": [
+      {
+        "index": 1,
+        "name": "xbl",
+        "first_lba": 6,
+        "last_lba": 1029,
+        "offset_bytes": 24576,
+        "size_bytes": 4194304
+      },
+      {
+        "index": 2,
+        "name": "xbl_config",
+        "first_lba": 1030,
+        "last_lba": 2042,
+        "offset_bytes": 4218880,
+        "size_bytes": 4149248
+      }
+    ]
+  },
+  "sdd": {
+    "logical_block_size": 4096,
+    "scsi_path": "/sys/devices/platform/soc/1d84000.ufshc/host0/target0:0:0/0:0:0:3",
+    "primary_header_crc_valid": true,
+    "entry_array_crc_valid": true,
+    "commands": [
+      "dd if=/dev/block/sdd bs=4096 count=2 2>/dev/null",
+      "dd if=/dev/block/sdd bs=4096 skip=2 count=2 2>/dev/null"
+    ],
+    "partitions": [
+      {
+        "index": 1,
+        "name": "ddr",
+        "first_lba": 6,
+        "last_lba": 261,
+        "offset_bytes": 24576,
+        "size_bytes": 1048576
+      },
+      {
+        "index": 2,
+        "name": "mdmddr",
+        "first_lba": 262,
+        "last_lba": 517,
+        "offset_bytes": 1073152,
+        "size_bytes": 1048576
+      },
+      {
+        "index": 3,
+        "name": "fsg",
+        "first_lba": 518,
+        "last_lba": 1029,
+        "offset_bytes": 2121728,
+        "size_bytes": 2097152
+      },
+      {
+        "index": 4,
+        "name": "mdm1m9kefs3",
+        "first_lba": 1030,
+        "last_lba": 1541,
+        "offset_bytes": 4218880,
+        "size_bytes": 2097152
+      },
+      {
+        "index": 5,
+        "name": "tz",
+        "first_lba": 1542,
+        "last_lba": 2565,
+        "offset_bytes": 6316032,
+        "size_bytes": 4194304
+      },
+      {
+        "index": 6,
+        "name": "pad",
+        "first_lba": 2566,
+        "last_lba": 2693,
+        "offset_bytes": 10510336,
+        "size_bytes": 524288
+      },
+      {
+        "index": 7,
+        "name": "aop",
+        "first_lba": 2694,
+        "last_lba": 2821,
+        "offset_bytes": 11034624,
+        "size_bytes": 524288
+      },
+      {
+        "index": 8,
+        "name": "abl",
+        "first_lba": 2822,
+        "last_lba": 3845,
+        "offset_bytes": 11558912,
+        "size_bytes": 4194304
+      },
+      {
+        "index": 9,
+        "name": "devinfo",
+        "first_lba": 3846,
+        "last_lba": 3846,
+        "offset_bytes": 15753216,
+        "size_bytes": 4096
+      },
+      {
+        "index": 10,
+        "name": "bluetooth",
+        "first_lba": 3847,
+        "last_lba": 4102,
+        "offset_bytes": 15757312,
+        "size_bytes": 1048576
+      },
+      {
+        "index": 11,
+        "name": "bksecapp",
+        "first_lba": 4103,
+        "last_lba": 4198,
+        "offset_bytes": 16805888,
+        "size_bytes": 393216
+      },
+      {
+        "index": 12,
+        "name": "keymaster",
+        "first_lba": 4199,
+        "last_lba": 4326,
+        "offset_bytes": 17199104,
+        "size_bytes": 524288
+      },
+      {
+        "index": 13,
+        "name": "cmnlib",
+        "first_lba": 4327,
+        "last_lba": 4454,
+        "offset_bytes": 17723392,
+        "size_bytes": 524288
+      },
+      {
+        "index": 14,
+        "name": "cmnlib64",
+        "first_lba": 4455,
+        "last_lba": 4582,
+        "offset_bytes": 18247680,
+        "size_bytes": 524288
+      },
+      {
+        "index": 15,
+        "name": "apdp",
+        "first_lba": 4583,
+        "last_lba": 4646,
+        "offset_bytes": 18771968,
+        "size_bytes": 262144
+      },
+      {
+        "index": 16,
+        "name": "msadp",
+        "first_lba": 4647,
+        "last_lba": 4710,
+        "offset_bytes": 19034112,
+        "size_bytes": 262144
+      },
+      {
+        "index": 17,
+        "name": "dpo",
+        "first_lba": 4711,
+        "last_lba": 4711,
+        "offset_bytes": 19296256,
+        "size_bytes": 4096
+      },
+      {
+        "index": 18,
+        "name": "spunvm",
+        "first_lba": 4712,
+        "last_lba": 6759,
+        "offset_bytes": 19300352,
+        "size_bytes": 8388608
+      },
+      {
+        "index": 19,
+        "name": "limits",
+        "first_lba": 6760,
+        "last_lba": 6760,
+        "offset_bytes": 27688960,
+        "size_bytes": 4096
+      },
+      {
+        "index": 20,
+        "name": "limits-cdsp",
+        "first_lba": 6761,
+        "last_lba": 6761,
+        "offset_bytes": 27693056,
+        "size_bytes": 4096
+      },
+      {
+        "index": 21,
+        "name": "toolsfv",
+        "first_lba": 6762,
+        "last_lba": 7273,
+        "offset_bytes": 27697152,
+        "size_bytes": 2097152
+      },
+      {
+        "index": 22,
+        "name": "logfs",
+        "first_lba": 7274,
+        "last_lba": 9321,
+        "offset_bytes": 29794304,
+        "size_bytes": 8388608
+      },
+      {
+        "index": 23,
+        "name": "devcfg",
+        "first_lba": 9322,
+        "last_lba": 9353,
+        "offset_bytes": 38182912,
+        "size_bytes": 131072
+      },
+      {
+        "index": 24,
+        "name": "storsec",
+        "first_lba": 9354,
+        "last_lba": 9481,
+        "offset_bytes": 38313984,
+        "size_bytes": 524288
+      },
+      {
+        "index": 25,
+        "name": "vbmeta",
+        "first_lba": 9482,
+        "last_lba": 9497,
+        "offset_bytes": 38838272,
+        "size_bytes": 65536
+      },
+      {
+        "index": 26,
+        "name": "qupfw",
+        "first_lba": 9498,
+        "last_lba": 9517,
+        "offset_bytes": 38903808,
+        "size_bytes": 81920
+      },
+      {
+        "index": 27,
+        "name": "uefisecapp",
+        "first_lba": 9518,
+        "last_lba": 10029,
+        "offset_bytes": 38985728,
+        "size_bytes": 2097152
+      },
+      {
+        "index": 28,
+        "name": "multiimgoem",
+        "first_lba": 10030,
+        "last_lba": 10037,
+        "offset_bytes": 41082880,
+        "size_bytes": 32768
+      },
+      {
+        "index": 29,
+        "name": "multiimgqti",
+        "first_lba": 10038,
+        "last_lba": 10045,
+        "offset_bytes": 41115648,
+        "size_bytes": 32768
+      },
+      {
+        "index": 30,
+        "name": "secdata",
+        "first_lba": 10046,
+        "last_lba": 10053,
+        "offset_bytes": 41148416,
+        "size_bytes": 32768
+      },
+      {
+        "index": 31,
+        "name": "uefivarstore",
+        "first_lba": 10054,
+        "last_lba": 10181,
+        "offset_bytes": 41181184,
+        "size_bytes": 524288
+      },
+      {
+        "index": 32,
+        "name": "vk",
+        "first_lba": 10182,
+        "last_lba": 10693,
+        "offset_bytes": 41705472,
+        "size_bytes": 2097152
+      },
+      {
+        "index": 33,
+        "name": "hdm",
+        "first_lba": 10694,
+        "last_lba": 11205,
+        "offset_bytes": 43802624,
+        "size_bytes": 2097152
+      },
+      {
+        "index": 34,
+        "name": "btd",
+        "first_lba": 11206,
+        "last_lba": 11717,
+        "offset_bytes": 45899776,
+        "size_bytes": 2097152
+      },
+      {
+        "index": 35,
+        "name": "hyp",
+        "first_lba": 11718,
+        "last_lba": 11973,
+        "offset_bytes": 47996928,
+        "size_bytes": 1048576
+      },
+      {
+        "index": 36,
+        "name": "tziccc",
+        "first_lba": 11974,
+        "last_lba": 12485,
+        "offset_bytes": 49045504,
+        "size_bytes": 2097152
+      },
+      {
+        "index": 37,
+        "name": "pad",
+        "first_lba": 12486,
+        "last_lba": 15354,
+        "offset_bytes": 51142656,
+        "size_bytes": 11751424
+      }
+    ]
+  }
+}

@@ -1,0 +1,417 @@
+$ cat /proc/bus/input/devices
+getevent -lp
+for d in /sys/bus/i2c/devices/*-* /sys/bus/spi/devices/*; do
+    if [ -d "$d" ]; then
+        printf '
+%s
+' "$d"; readlink -f "$d/driver"
+        for k in name modalias; do if [ -f "$d/$k" ]; then printf '%s=' "$k"; cat "$d/$k"; fi; done
+    fi
+done
+
+I: Bus=0000 Vendor=0000 Product=0000 Version=0000
+N: Name="qpnp_pon"
+P: Phys=qpnp_pon/input0
+S: Sysfs=/devices/platform/soc/c440000.qcom,spmi/spmi-0/spmi0-00/c440000.qcom,spmi:qcom,pm8150@0:qcom,power-on@800/input/input0
+U: Uniq=<omitted>
+H: Handlers=sec_key_notifier event0 
+B: PROP=0
+B: EV=3
+B: KEY=14000000000000 0
+
+I: Bus=0000 Vendor=0000 Product=0000 Version=0000
+N: Name="meta_event"
+P: Phys=
+S: Sysfs=/devices/virtual/input/input1
+U: Uniq=<omitted>
+H: Handlers=event1 
+B: PROP=0
+B: EV=5
+B: REL=c0
+
+I: Bus=0019 Vendor=0001 Product=0001 Version=0100
+N: Name="gpio_keys"
+P: Phys=gpio-keys/input0
+S: Sysfs=/devices/platform/soc/soc:gpio_keys/input/input2
+U: Uniq=<omitted>
+H: Handlers=sec_key_notifier event2 
+B: PROP=0
+B: EV=3
+B: KEY=8000000000000 0
+
+I: Bus=0018 Vendor=0000 Product=0000 Version=0000
+N: Name="sec_touchscreen"
+P: Phys=sec_touchscreen/input1
+S: Sysfs=/devices/platform/soc/994000.i2c/i2c-4/4-0049/input/input3
+U: Uniq=<omitted>
+H: Handlers=sec_key_notifier event3 kgsl sde 
+B: PROP=2
+B: EV=b
+B: KEY=80 0 420 0 0 8000 0 0
+B: ABS=4263800000000003
+
+I: Bus=0018 Vendor=0000 Product=0000 Version=0000
+N: Name="sec_touchpad"
+P: Phys=sec_touchscreen/input1
+S: Sysfs=/devices/platform/soc/994000.i2c/i2c-4/4-0049/input/input4
+U: Uniq=<omitted>
+H: Handlers=sec_key_notifier event4 kgsl sde 
+B: PROP=1
+B: EV=b
+B: KEY=80 0 e520 0 0 8000 0 0
+B: ABS=4263800000000003
+
+I: Bus=0000 Vendor=0000 Product=0000 Version=0000
+N: Name="hall_logical"
+P: Phys=hall_logical
+S: Sysfs=/devices/platform/soc/soc:hall_logical/input/input5
+U: Uniq=<omitted>
+H: Handlers=event5 
+B: PROP=0
+B: EV=100021
+B: SW=80200000
+
+I: Bus=0018 Vendor=0000 Product=0000 Version=0000
+N: Name="sec_e-pen"
+P: Phys=
+S: Sysfs=/devices/platform/soc/88c000.i2c/i2c-9/9-0056/input/input6
+U: Uniq=<omitted>
+H: Handlers=sec_key_notifier event6 
+B: PROP=0
+B: EV=2b
+B: KEY=c03 0 2000000000000000 100000000000 0 0
+B: ABS=f000003
+B: SW=280000
+
+I: Bus=0018 Vendor=0000 Product=0000 Version=0000
+N: Name="grip_sensor"
+P: Phys=
+S: Sysfs=/devices/virtual/input/input7
+U: Uniq=<omitted>
+H: Handlers=event7 
+B: PROP=0
+B: EV=5
+B: REL=283
+
+I: Bus=0018 Vendor=0000 Product=0000 Version=0000
+N: Name="grip_notifier"
+P: Phys=
+S: Sysfs=/devices/virtual/input/input8
+U: Uniq=<omitted>
+H: Handlers=event8 
+B: PROP=0
+B: EV=5
+B: REL=1
+
+I: Bus=0018 Vendor=0000 Product=0000 Version=0000
+N: Name="grip_sensor_wifi"
+P: Phys=
+S: Sysfs=/devices/virtual/input/input9
+U: Uniq=<omitted>
+H: Handlers=event9 
+B: PROP=0
+B: EV=5
+B: REL=283
+
+I: Bus=0018 Vendor=0000 Product=0000 Version=0000
+N: Name="grip_notifier"
+P: Phys=
+S: Sysfs=/devices/virtual/input/input10
+U: Uniq=<omitted>
+H: Handlers=event10 
+B: PROP=0
+B: EV=5
+B: REL=1
+
+I: Bus=0000 Vendor=0000 Product=0000 Version=0000
+N: Name="hall"
+P: Phys=hall
+S: Sysfs=/devices/platform/soc/soc:hall/input/input11
+U: Uniq=<omitted>
+H: Handlers=event11 
+B: PROP=0
+B: EV=100021
+B: SW=200000
+
+I: Bus=0000 Vendor=0000 Product=0000 Version=0000
+N: Name="hall_wacom"
+P: Phys=hall_wacom
+S: Sysfs=/devices/platform/soc/soc:hall_wacom/input/input12
+U: Uniq=<omitted>
+H: Handlers=event12 
+B: PROP=0
+B: EV=100021
+B: SW=40000000
+
+add device 1: /dev/input/event8
+  name:     "grip_notifier"
+  events:
+    REL (0002): REL_X                
+  input props:
+    <none>
+add device 2: /dev/input/event9
+  name:     "grip_sensor_wifi"
+  events:
+    REL (0002): REL_X                 REL_Y                 REL_DIAL              REL_MISC             
+  input props:
+    <none>
+add device 3: /dev/input/event6
+  name:     "sec_e-pen"
+  events:
+    KEY (0001): KEY_HOMEPAGE          00fd                  BTN_DIGI              BTN_TOOL_RUBBER      
+                BTN_TOUCH             BTN_STYLUS           
+    ABS (0003): ABS_X                 : value 13129, min 0, max 16714, fuzz 4, flat 0, resolution 0
+                ABS_Y                 : value 20408, min 0, max 26712, fuzz 4, flat 0, resolution 0
+                ABS_PRESSURE          : value 0, min 0, max 4095, fuzz 0, flat 0, resolution 0
+                ABS_DISTANCE          : value 0, min 0, max 255, fuzz 0, flat 0, resolution 0
+                ABS_TILT_X            : value -1, min -63, max 63, fuzz 0, flat 0, resolution 0
+                ABS_TILT_Y            : value 16, min -63, max 63, fuzz 0, flat 0, resolution 0
+    SW  (0005): 0013*                 0015                 
+  input props:
+    <none>
+add device 4: /dev/input/event4
+  name:     "sec_touchpad"
+  events:
+    KEY (0001): KEY_WAKEUP            BTN_TOOL_FINGER       BTN_TOOL_QUINTTAP     BTN_TOUCH            
+                BTN_TOOL_DOUBLETAP    BTN_TOOL_TRIPLETAP    BTN_TOOL_QUADTAP      01c7                 
+    ABS (0003): ABS_X                 : value 0, min 0, max 1751, fuzz 0, flat 0, resolution 0
+                ABS_Y                 : value 0, min 0, max 2799, fuzz 0, flat 0, resolution 0
+                ABS_MT_SLOT           : value 0, min 0, max 9, fuzz 0, flat 0, resolution 0
+                ABS_MT_TOUCH_MAJOR    : value 0, min 0, max 255, fuzz 0, flat 0, resolution 0
+                ABS_MT_TOUCH_MINOR    : value 0, min 0, max 255, fuzz 0, flat 0, resolution 0
+                ABS_MT_POSITION_X     : value 0, min 0, max 1751, fuzz 0, flat 0, resolution 0
+                ABS_MT_POSITION_Y     : value 0, min 0, max 2799, fuzz 0, flat 0, resolution 0
+                ABS_MT_TRACKING_ID    : value 0, min 0, max 65535, fuzz 0, flat 0, resolution 0
+                003e                  : value 0, min 0, max -1, fuzz 0, flat 0, resolution 0
+  input props:
+    INPUT_PROP_POINTER
+add device 5: /dev/input/event5
+  name:     "hall_logical"
+  events:
+    SW  (0005): 0015                  001f                 
+  input props:
+    <none>
+add device 6: /dev/input/event10
+  name:     "grip_notifier"
+  events:
+    REL (0002): REL_X                
+  input props:
+    <none>
+add device 7: /dev/input/event7
+  name:     "grip_sensor"
+  events:
+    REL (0002): REL_X                 REL_Y                 REL_DIAL              REL_MISC             
+  input props:
+    <none>
+add device 8: /dev/input/event12
+  name:     "hall_wacom"
+  events:
+    SW  (0005): 001e                 
+  input props:
+    <none>
+add device 9: /dev/input/event11
+  name:     "hall"
+  events:
+    SW  (0005): 0015*                
+  input props:
+    <none>
+add device 10: /dev/input/event1
+  name:     "meta_event"
+  events:
+    REL (0002): REL_HWHEEL            REL_DIAL             
+  input props:
+    <none>
+add device 11: /dev/input/event3
+  name:     "sec_touchscreen"
+  events:
+    KEY (0001): KEY_WAKEUP            BTN_TOOL_FINGER       BTN_TOUCH             01c7                 
+    ABS (0003): ABS_X                 : value 0, min 0, max 1751, fuzz 0, flat 0, resolution 0
+                ABS_Y                 : value 0, min 0, max 2799, fuzz 0, flat 0, resolution 0
+                ABS_MT_SLOT           : value 0, min 0, max 9, fuzz 0, flat 0, resolution 0
+                ABS_MT_TOUCH_MAJOR    : value 0, min 0, max 255, fuzz 0, flat 0, resolution 0
+                ABS_MT_TOUCH_MINOR    : value 0, min 0, max 255, fuzz 0, flat 0, resolution 0
+                ABS_MT_POSITION_X     : value 0, min 0, max 1751, fuzz 0, flat 0, resolution 0
+                ABS_MT_POSITION_Y     : value 0, min 0, max 2799, fuzz 0, flat 0, resolution 0
+                ABS_MT_TRACKING_ID    : value 0, min 0, max 65535, fuzz 0, flat 0, resolution 0
+                003e                  : value 0, min 0, max -1, fuzz 0, flat 0, resolution 0
+  input props:
+    INPUT_PROP_DIRECT
+add device 12: /dev/input/event0
+  name:     "qpnp_pon"
+  events:
+    KEY (0001): KEY_VOLUMEDOWN        KEY_POWER            
+  input props:
+    <none>
+add device 13: /dev/input/event2
+  name:     "gpio_keys"
+  events:
+    KEY (0001): KEY_VOLUMEUP         
+  input props:
+    <none>
+
+/sys/bus/i2c/devices/0-0020
+/sys/bus/i2c/drivers/A96T3X6
+name=a96t3x6
+modalias=of:Na96t3x6T<NULL>Ca96t3x6
+
+/sys/bus/i2c/devices/1-0020
+/sys/bus/i2c/drivers/A96T3X6_WIFI
+name=a96t3x6_wifi
+modalias=of:Na96t3x6T<NULL>Ca96t3x6_wifi
+
+/sys/bus/i2c/devices/2-0025
+/sys/bus/i2c/drivers/dummy
+name=dummy
+modalias=i2c:dummy
+
+/sys/bus/i2c/devices/2-0036
+/sys/bus/i2c/drivers/dummy
+name=dummy
+modalias=i2c:dummy
+
+/sys/bus/i2c/devices/2-0057
+/sys/bus/i2c/drivers/pca9468-charger
+name=pca9468
+modalias=of:Npca9468T<NULL>Cnxp,pca9468
+
+/sys/bus/i2c/devices/2-0062
+/sys/bus/i2c/drivers/dummy
+name=dummy
+modalias=i2c:dummy
+
+/sys/bus/i2c/devices/2-0066
+/sys/bus/i2c/drivers/max77705
+name=max77705
+modalias=of:Nmax77705T<NULL>Cmaxim,max77705
+
+/sys/bus/i2c/devices/2-0069
+/sys/bus/i2c/drivers/dummy
+name=dummy
+modalias=i2c:dummy
+
+/sys/bus/i2c/devices/3-0028
+/sys/devices/platform/soc/984000.i2c/i2c-3/3-0028/driver
+name=nq-nci
+modalias=of:NnqT<NULL>Cqcom,nq-nci
+
+/sys/bus/i2c/devices/4-0049
+/sys/bus/i2c/drivers/fts_touch
+name=fts_touch
+modalias=of:NtouchscreenT<NULL>Cstm,fts_touch
+
+/sys/bus/i2c/devices/5-002a
+/sys/bus/i2c/drivers/stm32_pogo_i2c
+name=stm32_pogo
+modalias=of:Nstm32T<NULL>Cstm,stm32_pogo
+
+/sys/bus/i2c/devices/5-0051
+/sys/bus/i2c/drivers/dummy
+name=dummy
+modalias=i2c:dummy
+
+/sys/bus/i2c/devices/6-0040
+/sys/bus/i2c/drivers/cs35l41
+name=cs35l41
+modalias=of:Ncs35l41T<NULL>Ccirrus,cs35l41
+
+/sys/bus/i2c/devices/6-0041
+/sys/bus/i2c/drivers/cs35l41
+name=cs35l41
+modalias=of:Ncs35l41T<NULL>Ccirrus,cs35l41
+
+/sys/bus/i2c/devices/6-0042
+/sys/bus/i2c/drivers/cs35l41
+name=cs35l41
+modalias=of:Ncs35l41T<NULL>Ccirrus,cs35l41
+
+/sys/bus/i2c/devices/6-0043
+/sys/bus/i2c/drivers/cs35l41
+name=cs35l41
+modalias=of:Ncs35l41T<NULL>Ccirrus,cs35l41
+
+/sys/bus/i2c/devices/7-0028
+/sys/bus/i2c/drivers/ps5169
+name=ps5169_driver
+modalias=of:Nps5169T<NULL>Cps5169_driver
+
+/sys/bus/i2c/devices/8-0010
+/sys/devices/platform/soc/884000.i2c/i2c-8/8-0010/driver
+name=i2c-pmic
+modalias=of:Nqcom,smb1390T<NULL>Cqcom,i2c-pmic
+
+/sys/bus/i2c/devices/8-0018
+/sys/bus/i2c/drivers/i2c_pmic
+name=i2c-pmic
+modalias=of:Nqcom,smb1390_slaveT<NULL>Cqcom,i2c-pmic
+
+/sys/bus/i2c/devices/8-0025
+/sys/devices/platform/soc/884000.i2c/i2c-8/8-0025/driver
+name=hl6111r
+modalias=of:Nhalo,hl6111rT<NULL>Chalo,hl6111r
+
+/sys/bus/i2c/devices/8-0064
+/sys/devices/platform/soc/884000.i2c/i2c-8/8-0064/driver
+name=rtc6226
+modalias=of:NnqT<NULL>Crtc6226
+
+/sys/bus/i2c/devices/9-0009
+/sys/bus/i2c/drivers/dummy
+name=dummy
+modalias=i2c:dummy
+
+/sys/bus/i2c/devices/9-0056
+/sys/bus/i2c/drivers/wacom_w90xx
+name=w90xx
+modalias=of:NwacomT<NULL>Cwacom,w90xx
+
+/sys/bus/i2c/devices/i2c-0
+/sys/devices/platform/soc/soc:i2c@16/i2c-0/driver
+name=soc:i2c@16
+
+/sys/bus/i2c/devices/i2c-1
+/sys/devices/platform/soc/soc:i2c@18/i2c-1/driver
+name=soc:i2c@18
+
+/sys/bus/i2c/devices/i2c-10
+/sys/devices/platform/soc/ae90000.qcom,dp_display/i2c-10/driver
+name=sde_dp_aux
+
+/sys/bus/i2c/devices/i2c-2
+/sys/devices/platform/soc/980000.i2c/i2c-2/driver
+name=Geni-I2C
+
+/sys/bus/i2c/devices/i2c-3
+/sys/devices/platform/soc/984000.i2c/i2c-3/driver
+name=Geni-I2C
+
+/sys/bus/i2c/devices/i2c-4
+/sys/devices/platform/soc/994000.i2c/i2c-4/driver
+name=Geni-I2C
+
+/sys/bus/i2c/devices/i2c-5
+/sys/devices/platform/soc/a84000.i2c/i2c-5/driver
+name=Geni-I2C
+
+/sys/bus/i2c/devices/i2c-6
+/sys/devices/platform/soc/a8c000.i2c/i2c-6/driver
+name=Geni-I2C
+
+/sys/bus/i2c/devices/i2c-7
+/sys/devices/platform/soc/880000.i2c/i2c-7/driver
+name=Geni-I2C
+
+/sys/bus/i2c/devices/i2c-8
+/sys/devices/platform/soc/884000.i2c/i2c-8/driver
+name=Geni-I2C
+
+/sys/bus/i2c/devices/i2c-9
+/sys/devices/platform/soc/88c000.i2c/i2c-9/driver
+name=Geni-I2C
+
+/sys/bus/spi/devices/spi7.0
+/sys/devices/platform/soc/99c000.spi/spi_master/spi7/spi7.0/driver
+modalias=spi:gw9558x_factory
+
+[stderr]
+
+[exit_code] 0

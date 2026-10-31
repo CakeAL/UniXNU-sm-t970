@@ -1,0 +1,14 @@
+{
+  "ProductVersion": "17.7.11",
+  "ProductBuildVersion": "21H461",
+  "SupportedProductTypes": [
+    "iPad7,1",
+    "iPad7,2",
+    "iPad7,3",
+    "iPad7,4"
+  ],
+  "archive": "ipsw/iPad_Pro_HFR_17.7.11_21H461_Restore.ipsw",
+  "archive_size_bytes": 6835124840,
+  "manifest_sha256": "199fb5de41c26d86c080b4e8e402c40309c5f42e7bda18c210451b09bcb49bf7",
+  "method": "Python zipfile.ZipFile.read(BuildManifest.plist), parsed with plistlib.loads; archive identity and bootability not verified"
+}

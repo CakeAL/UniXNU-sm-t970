@@ -1,0 +1,52 @@
+$ for d in /sys/bus/pci/devices/*; do
+    printf '
+%s
+' "$d"; readlink -f "$d/driver"
+    for k in vendor device subsystem_vendor subsystem_device class modalias; do
+        if [ -f "$d/$k" ]; then printf '%s=' "$k"; cat "$d/$k"; fi
+    done
+done
+readlink -f /sys/class/net/wlan0/device
+ls -l /sys/class/net/wlan0/device/driver
+ls -l /vendor/firmware/qca6390 /vendor/firmware/wlan /vendor/firmware_mnt/image/*wlan* /vendor/firmware_mnt/image/*bdwlan* /vendor/firmware_mnt/image/*qca*
+
+
+/sys/bus/pci/devices/0000:00:00.0
+/sys/bus/pci/drivers/pci-msm-rc
+vendor=0x17cb
+device=0x010b
+subsystem_vendor=0x0000
+subsystem_device=0x0000
+class=0x060400
+modalias=pci:v000017CBd0000010Bsv00000000sd00000000bc06sc04i00
+
+/sys/bus/pci/devices/0000:01:00.0
+/sys/bus/pci/drivers/cnss_pci
+vendor=0x17cb
+device=0x1101
+subsystem_vendor=0x17cb
+subsystem_device=0x0108
+class=0xff0000
+modalias=pci:v000017CBd00001101sv000017CBsd00000108bcFFsc00i00
+/sys/devices/platform/soc/1c00000.qcom,pcie/pci0000:00/0000:00:00.0/0000:01:00.0
+lrwxrwxrwx 1 root root 0 2026-11-01 01:35 /sys/class/net/wlan0/device/driver -> ../../../../../../../bus/pci/drivers/cnss_pci
+/vendor/firmware/qca6390:
+total 4796
+-rw-r--r-- 1 root root 4372640 2008-12-31 23:00 amss20.bin
+-rw-r--r-- 1 root root   57900 2008-12-31 23:00 bdwlan.e05
+-rw-r--r-- 1 root root   57900 2008-12-31 23:00 bdwlan.elf
+-rw-r--r-- 1 root root   57900 2008-12-31 23:00 bdwlan.elf1
+-rw-r--r-- 1 root root   57900 2008-12-31 23:00 bdwlan.elf2
+-rw-r--r-- 1 root root  266684 2008-12-31 23:00 m3.bin
+-rw-r--r-- 1 root root   19348 2008-12-31 23:00 regdb.bin
+
+/vendor/firmware/wlan:
+total 4
+drwxr-xr-x 2 root shell 4096 2008-12-31 23:00 qca_cld
+
+[stderr]
+ls: /vendor/firmware_mnt/image/*wlan*: No such file or directory
+ls: /vendor/firmware_mnt/image/*bdwlan*: No such file or directory
+ls: /vendor/firmware_mnt/image/*qca*: No such file or directory
+
+[exit_code] 1

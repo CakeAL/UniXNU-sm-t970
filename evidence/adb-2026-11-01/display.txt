@@ -1,0 +1,67 @@
+$ ls -l /sys/class/drm /sys/class/graphics /sys/class/lcd /sys/class/backlight
+for p in /sys/class/drm/card0-DSI-1/status /sys/class/drm/card0-DSI-1/enabled /sys/class/drm/card0-DSI-1/modes /sys/class/drm/card0-DSI-1/dpms /sys/class/lcd/panel/lcd_type /sys/class/backlight/*/max_brightness /sys/class/backlight/*/brightness; do
+    if [ -f "$p" ]; then printf '
+%s
+' "$p"; cat "$p"; fi
+done
+wm size; wm density
+
+/sys/class/backlight:
+total 0
+lrwxrwxrwx 1 root root 0 2026-11-01 01:35 panel -> ../../devices/virtual/lcd/panel/panel
+lrwxrwxrwx 1 root root 0 2026-11-01 01:35 panel0-backlight -> ../../devices/platform/soc/ae00000.qcom,mdss_mdp/backlight/panel0-backlight
+
+/sys/class/drm:
+total 0
+lrwxrwxrwx 1 root root    0 2026-11-01 01:35 card0 -> ../../devices/platform/soc/ae00000.qcom,mdss_mdp/drm/card0
+lrwxrwxrwx 1 root root    0 2026-11-01 01:35 card0-DP-1 -> ../../devices/platform/soc/ae00000.qcom,mdss_mdp/drm/card0/card0-DP-1
+lrwxrwxrwx 1 root root    0 2026-11-01 01:35 card0-DSI-1 -> ../../devices/platform/soc/ae00000.qcom,mdss_mdp/drm/card0/card0-DSI-1
+lrwxrwxrwx 1 root root    0 2026-11-01 01:35 card0-Virtual-1 -> ../../devices/platform/soc/ae00000.qcom,mdss_mdp/drm/card0/card0-Virtual-1
+lrwxrwxrwx 1 root root    0 2026-11-01 01:35 renderD128 -> ../../devices/platform/soc/ae00000.qcom,mdss_mdp/drm/renderD128
+lrwxrwxrwx 1 root root    0 2026-11-01 01:35 sde-crtc-0 -> ../../devices/platform/soc/ae00000.qcom,mdss_mdp/drm/card0/sde-crtc-0
+lrwxrwxrwx 1 root root    0 2026-11-01 01:35 sde-crtc-1 -> ../../devices/platform/soc/ae00000.qcom,mdss_mdp/drm/card0/sde-crtc-1
+lrwxrwxrwx 1 root root    0 2026-11-01 01:35 sde-crtc-2 -> ../../devices/platform/soc/ae00000.qcom,mdss_mdp/drm/card0/sde-crtc-2
+lrwxrwxrwx 1 root root    0 2026-11-01 01:35 sde-crtc-3 -> ../../devices/platform/soc/ae00000.qcom,mdss_mdp/drm/card0/sde-crtc-3
+lrwxrwxrwx 1 root root    0 2026-11-01 01:35 sde-crtc-4 -> ../../devices/platform/soc/ae00000.qcom,mdss_mdp/drm/card0/sde-crtc-4
+-r--r--r-- 1 root root 4096 2026-11-01 01:35 version
+
+/sys/class/graphics:
+total 0
+
+/sys/class/lcd:
+total 0
+lrwxrwxrwx 1 root root 0 2026-11-01 01:35 panel -> ../../devices/virtual/lcd/panel
+
+/sys/class/drm/card0-DSI-1/status
+connected
+
+/sys/class/drm/card0-DSI-1/enabled
+enabled
+
+/sys/class/drm/card0-DSI-1/modes
+2800x1752x120x255014cmdHS
+2800x1752x60x255014cmdHS
+
+/sys/class/drm/card0-DSI-1/dpms
+Off
+
+/sys/class/lcd/panel/lcd_type
+SDC_801417
+
+/sys/class/backlight/panel/max_brightness
+0
+
+/sys/class/backlight/panel0-backlight/max_brightness
+355
+
+/sys/class/backlight/panel/brightness
+0
+
+/sys/class/backlight/panel0-backlight/brightness
+0
+Physical size: 1752x2800
+Physical density: 340
+
+[stderr]
+
+[exit_code] 0
