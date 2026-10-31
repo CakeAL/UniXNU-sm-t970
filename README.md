@@ -24,6 +24,8 @@ vsc/
 - `dts/`：实测连续高内存段、30 个静态保留区、CPU0 及禁用的板级外设资源。
 - `package/firmware/`：T970 配置、DSC/FDF、内存／配置库、44 个厂商模块包装和 UniXNU 接入。
 - `proprietary-files.txt`：130 份资产的来源与 SHA256；二进制留在本机忽略目录。
+- 固件日志导出器已接入（`AdvancedLogDxe` → **Tools → Advanced Logger**）；
+  主机证据见[验证记录](evidence/firmware-log-exporter/README.md)，屏幕菜单与二维码尚未验证。
 - [porting.toml](porting.toml)：13 个部分的适配范围、实现和验证证据。
 
 当前选择 `ArmDTPlatform`、`ArmCpu`、`SoftwareAES`、`XnuPrelink`、`DarwinBoot`；
