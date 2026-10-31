@@ -1,0 +1,13 @@
+{
+  "attachment": "IMG_20261101_065828.jpg",
+  "image_sha256": "f759eb8085bb67c4a1d2ac02ea18898e6d146118fc790148638f33cfc81cd9a7",
+  "observation_source": "Visual inspection of user-provided chat image",
+  "visible": [
+    "green, blue and magenta horizontal bars",
+    "UniXNU boot menu and prior loader diagnostics remain visible",
+    "Exiting boot services. A green bar across the top marks the loader handoff before the kernel branch.",
+    "SecurityLock: LockType: SOFTWARE_LOCK; Function: LockCapsuleInterface; Output: Lock Capsule Interface"
+  ],
+  "interpretation": "The quoted loader handoff sentence is emitted by DarwinBoot before entering XNU; its presence in an unchanged framebuffer is not evidence of XNU console output. No readable panic/ESR/ELR record is identified.",
+  "limits": "Photo transcription only; local file path supplied by the user was unavailable to the tool, so no photo hash or copy is claimed."
+}

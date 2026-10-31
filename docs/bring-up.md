@@ -173,6 +173,35 @@ ExitBootServices 后的 XNU 输出。
 原内核及构建报告保存在 `out/step7/baseline-console-skip/`（忽略目录）；旧状态探针
 固定到该内核哈希，更换内核后拒绝应用是预期行为。
 
+该修复版返回后探针 `f759eb80…` 实机未复位；机主照片显示保留的固件／加载器画面，
+没有确认 XNU 新日志。新内核可能更早停在恢复的 `PE_create_console`，因此改查该调用。
+
+### 早期异常分类
+
+```sh
+PATH=$PWD/.cache/bin:/opt/homebrew/opt/llvm/bin:/opt/homebrew/opt/lld/bin:$PATH \
+python3.14 scripts/build-entry-probe.py --target _PE_create_console --function _arm_init \
+  --delay 6 --guard-early-faults --output out/step7/probes/console-create-guarded
+```
+
+该模式只接受已审阅修复版内核哈希，且只允许 `arm_init` 中 `PE_create_console` 返回点。
+它检查编译后的引导代码实际选择 `ExceptionVectorsBase`，保留六个 IRQ/FIQ 槽及保留槽，
+将六个同步异常／SError 入口及 panic 两个入口转向终止式诊断代码。
+
+| 复位延时（从相应路径进入时计算） | 对应路径 |
+| --- | --- |
+| 约 6 秒 | `PE_create_console` 返回 |
+| 约 20 秒 | 同步异常，非 BRK |
+| 约 30 秒 | SError |
+| 约 40 秒 | panic 入口 |
+| 约 50 秒 | BRK 同步异常（含将来的正控制） |
+
+从色条出现开始计时，观察至少 60 秒并报告实际秒数。到检查点／异常前的运行时间
+也计入人类观测，模糊时间不强行分类。尚无实机 BRK 正控制，不复位不能证明是死循环。
+它不记录异常寄存器，不继续执行正常异常处理，不用于系统运行；只用于开启中断之前
+的这一检查点。主机 Unicorn 测试验证四个异常终止路径的延时和无内存写入行为，
+不是实机向量投递或 PSCI 验证。
+
 当前 DTS 是 ADT 的低地址包络。它包含固件保留洞，不是 2 GiB 可用内存池；DarwinBoot
 单独通过 EFI conventional memory 分配 256 MiB，并把该大小写入 boot_args。检查器会报告
 包络中的保留区，但并不把这些地址标记为空闲；每次实际分配仍需运行时日志验证。

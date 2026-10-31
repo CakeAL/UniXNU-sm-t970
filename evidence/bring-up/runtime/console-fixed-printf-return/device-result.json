@@ -1,0 +1,17 @@
+{
+  "device": "SM-T970 / gts7xlwifi",
+  "image_sha256": "f759eb8085bb67c4a1d2ac02ea18898e6d146118fc790148638f33cfc81cd9a7",
+  "image_source_revision": "2395531cddeebbdc939bc14c61e36d355e680760",
+  "probe": {
+    "function": "_PE_init_iokit",
+    "target": "_PE_init_printf",
+    "occurrence": 1,
+    "position": "after-return",
+    "reset_delay_seconds": 6
+  },
+  "observation_source": "Human reply in this chat",
+  "observation": "仍未复位；随后提供 IMG_20261101_065828.jpg，画面为三条色条及保留的固件/加载器文字。",
+  "result": "checkpoint-not-observed",
+  "limits": "No reset at the target checkpoint. Photo contains retained firmware/loader text; it does not establish a new XNU text log or that PE_create_console returned.",
+  "photo_attachment": "IMG_20261101_065828.jpg (provided in chat; no local image copy archived)"
+}

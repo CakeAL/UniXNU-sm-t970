@@ -12,6 +12,7 @@
 - SEC 补丁已在 `ac1ca14` 接入准备工具；固定补丁和四个文件的前／后像哈希，
   干净源码应用、重复执行及保留未知修改的检查均通过，不再依赖缓存的手工修改。
 - 重置探针从默认 `board.toml` 移出，用 `scripts/build-entry-probe.py` 隔离生成。
+  本项后续调用边界和状态结果属于旧内核 `4131d5b1…`，不能直接套到修复版。
   机主已确认 `idle_thread_create`、`sched_startup` 返回后探针均自动复位；
   `PE_init_iokit` 返回后探针（`9b0f8f68…`）仍停在色条，没有自动复位。
   每轮完整镜像哈希、刷写回执与观察见 `evidence/bring-up/runtime/`。
@@ -32,9 +33,14 @@
 - 修复准备：以 `t970-console-bootstrap.patch` 替换旧绕过补丁，恢复控制台建立，
   并在其前先调用 `PE_init_printf(FALSE)`。旧内核保存在本机忽略目录
   `out/step7/baseline-console-skip/`；新内核 `bfb50a1a…` 已编译、链接、预链接通过，
-  最终机器码确认先装输出回调再无条件建立控制台。`PE_init_printf(TRUE)` 返回点待实机验证。
+  最终机器码确认先装输出回调再无条件建立控制台。修复版 `PE_init_printf(TRUE)` 返回后
+  镜像（`f759eb80…`）仍未复位。照片中的 UEFI 菜单、DarwinBoot 交接句及固件文字
+  是保留像素，没有确认新的 XNU 文本输出；不能断定新内核仍停在旧卡点。
   旧状态探针固定到原内核哈希，更换内核后拒绝运行是预期行为。
-- BOOT 最近刷入的是 `console-state` 诊断镜像（`670e78ee…`），已报告约 4 秒复位；
+- 下一轮用 `--guard-early-faults` 检查更早的 `arm_init` 中 `PE_create_console` 返回：
+  正常 6 秒，同步异常／SError／panic／BRK 分别 20／30／40／50 秒后请求复位。
+  主机测试和活动向量选择核对通过；设备 BRK 正控制尚未完成，不复位仍有多种可能。
+- BOOT 最近刷入的是 `console-fixed-printf-return` 修复后探针（`f759eb80…`），已确认未复位；
   原始 BOOT 恢复待完成，后续镜像以 `evidence/bring-up/runtime/*/flash.json` 回执为准。
 - 以下为 ds 交接当时的状态、命令和待办，保留作历史基线；当前进展以本节及适配记录为准。
 

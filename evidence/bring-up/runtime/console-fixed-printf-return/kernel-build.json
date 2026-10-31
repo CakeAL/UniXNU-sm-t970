@@ -1,0 +1,18 @@
+{
+  "device": "sm-t970",
+  "command": "GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=submodule.active GIT_CONFIG_VALUE_0=__no_module_submodules__ PATH=$PWD/.cache/bin:/opt/homebrew/opt/llvm/bin:/opt/homebrew/opt/lld/bin:$PATH python3.14 ../UniXNU/unixnu build kernel -D .",
+  "exit_code": 0,
+  "kernel_sha256": "bfb50a1a009f4dd08d54cb94d6187d768c7a5ef976427abd235756874f38473c",
+  "kernel_bytes": 51908608,
+  "baseline_kernel_sha256": "4131d5b15cccc0a6a1697ba19e0cb59a3caced16ac09e6a8ee1823e296956444",
+  "baseline_preserved": true,
+  "patch_sha256": "e26e9bbf637613cf97accbb392abdad604ed3d9bf01dbfa3fcdfef0d1b654d80",
+  "compiled_order": {
+    "PE_init_printf_FALSE_call": "0xfffffff0079b6198",
+    "PE_create_console_call": "0xfffffff0079b619c",
+    "argument_is_false": true,
+    "adjacent_unconditional_calls": true
+  },
+  "device_tested": false,
+  "source_revision": "2395531cddeebbdc939bc14c61e36d355e680760"
+}

@@ -1,0 +1,88 @@
+== submodules ${UNIXNU}
+== tree ${UNIXNU}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree
+== kernel: XNU
+== kernel: prepare XNU d8b80295118e
++ git clone --quiet --shared --no-checkout ${UNIXNU}/out/feeds/xnu-b7545ced ${UNIXNU}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work
+== kernel: patch apple-only-cpu-tunables.patch
+== kernel: patch architectural-timer-entry.patch
+== kernel: patch armvirt-platform-personality.patch
+== kernel: patch cxx-flag-dependencies.patch
+== kernel: patch disabled-deferred-reclaim.patch
+== kernel: patch external-archive-dependencies.patch
+== kernel: patch kernel-sdk-root.patch
+== kernel: patch local-availability.patch
+== kernel: patch mockfs-intermediate-lookup.patch
+== kernel: patch mockfs-memory-device-width.patch
+== kernel: patch mockfs-statfs.patch
+== kernel: patch mockfs-test-file.patch
+== kernel: patch mockfs-typed-allocation.patch
+== kernel: patch native-4k-bootstrap-capacity.patch
+== kernel: patch native-4k-signature-hash-cache.patch
+== kernel: patch native-4k-user-abi.patch
+== kernel: patch native-aes-personality.patch
+== kernel: patch native-arm-pan.patch
+== kernel: patch native-dt-panic-region.patch
+== kernel: patch native-lookup-trace.patch
+== kernel: patch native-priv-work-interval.patch
+== kernel: patch native-quiet-managed-page-report.patch
+== kernel: patch native-text-fixup.patch
+== kernel: patch native-trust-cache-runtime.patch
+== kernel: patch native-union-getattrlistbulk.patch
+== kernel: patch native-union-lower-directory.patch
+== kernel: patch native-work-interval-soft-fail.patch
+== kernel: patch native-work-interval-trace.patch
+== kernel: patch native-work-interval-instance.patch
+== kernel: patch non-apple-cache-monitor.patch
+== kernel: patch non-apple-iommu-bootstrap.patch
+== kernel: patch non-apple-pmap-field.patch
+== kernel: patch null-root-media.patch
+== kernel: patch offline-component-load-probes.patch
+== kernel: patch offline-legacy-start.patch
+== kernel: patch offline-native-gpu-broker.patch
+== kernel: patch offline-owner-boot-manifest.patch
+== kernel: patch offline-owner-cache-carrier.patch
+== kernel: patch offline-owner-root-binding-audit.patch
+== kernel: patch offline-owner-root-crypto-probe.patch
+== kernel: patch offline-owner-systemos-mount.patch
+== kernel: patch offline-owner-z-air-init.patch
+== kernel: patch offline-pgz-alignment-probe.patch
+== kernel: patch pgz-aligned-validation.patch
+== kernel: patch public-entitlements-header.patch
+== kernel: patch published-freezer-condition.patch
+== kernel: patch source-corecrypto14-bootstrap.patch
+== kernel: patch source-machine-layer.patch
+== kernel: patch source-pthread-bootstrap.patch
+== kernel: patch zzw-native-adreno-sandbox-grant.patch
+== kernel: patch zzwb-native-sandbox-grant-set-properties.patch
+== kernel: patch zzx-pmap-sync-64bit-pa.patch
+== kernel: patch zzy-native-gpu-addon-mount.patch
+== kernel: patch zzy-staged-system-apps.patch
+== kernel: patch zzyb-native-cryptex-os-view.patch
+== kernel: patch zzyc-owner-skip-launch-constraints.patch
+== kernel: patch native-smp-secondary.patch
+== kernel: patch native-smp-type-clusters.patch
+== kernel: patch xnu-10063.141.1-security-init.patch
+== kernel: patch xnu-10063.141.1-sparse-index.patch
+== kernel: patch t970-console-bootstrap.patch
++ python3 ${UNIXNU}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/scripts/prepare-xnu-source.py
+Restored 26 omitted public headers from Apple; blob hashes verified
+== kernel: archive-01-build-corecrypto-14
++ python3 ${UNIXNU}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/scripts/build-corecrypto-14.py
+== kernel: archive-02-build-corecrypto-14
++ python3 ${UNIXNU}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/scripts/build-corecrypto-14.py --namespace
+== kernel: component-ArmDTPlatform
++ python3 ${UNIXNU}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/scripts/build-arm-driver.py ArmDTPlatform
+== kernel: component-ArmCpu
++ python3 ${UNIXNU}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/scripts/build-arm-driver.py ArmCpu
+== kernel: component-SoftwareAES
++ python3 ${UNIXNU}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/scripts/build-arm-driver.py SoftwareAES
+== kernel: archive-06-build-software-aes-bindings
++ python3 ${UNIXNU}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/scripts/build-software-aes-bindings.py
+== kernel: archive-07-build-mockfs-fixture
++ python3 ${UNIXNU}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/scripts/build-mockfs-fixture.py
+== kernel: archive-08-build-libpthread-kernel
++ python3 ${UNIXNU}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/scripts/build-libpthread-kernel.py
++ bash ${UNIXNU}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/scripts/build-xnu-4k-baseline.sh
+== kernel: prelink
++ python3 ${UNIXNU}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/kits/XnuPrelink/emit_prelink.py --kernel ${UNIXNU}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/mach.development.bcm2837.unstripped.noctf --prelinked ${UNIXNU}/out/ipsw/21H461/kernelcache.decompressed --slide=-0x1000000 --output ${UNIXNU}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/kernel/kernel.macho --root com.apple.AppleFSCompression.AppleFSCompressionTypeZlib --root com.apple.driver.AppleARMPlatform --root com.apple.driver.AppleARMWatchdogTimer --root com.apple.driver.AppleAudioClockLibs --root com.apple.driver.AppleEffaceableStorage --root com.apple.driver.AppleIISController --root com.apple.driver.AppleM2ScalerCSCDriver --root com.apple.driver.AppleMobileFileIntegrity --root com.apple.driver.ApplePMGR --root com.apple.driver.IODARTFamily --root com.apple.filesystems.apfs --root com.apple.iokit.CoreAnalyticsFamily --root com.apple.iokit.IOAVFamily --root com.apple.iokit.IOAudio2Family --root com.apple.iokit.IOCECFamily --root com.apple.iokit.IOCryptoAcceleratorFamily --root com.apple.iokit.IOGPUFamily --root com.apple.iokit.IOHDCPFamily --root com.apple.iokit.IOMobileGraphicsFamily --root com.apple.iokit.IOReportFamily --root com.apple.iokit.IOSlowAdaptiveClockingFamily --root com.apple.iokit.IOStorageFamily --root com.apple.iokit.IOSurface --root com.apple.kec.Libm --root com.apple.kec.corecrypto --root com.apple.kext.AppleMatch --root com.apple.kext.CoreTrust --root com.apple.security.AppleImage4 --root com.apple.security.sandbox --root com.apple.iokit.IOHIDFamily --root com.apple.iokit.IOHIDEventDriver --early-security-init com.apple.driver.AppleMobileFileIntegrity=0xfffffff005ab4ae0
+== kernel: ${UNIXNU}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/kernel/kernel.macho sha256 bfb50a1a009f4dd08d54cb94d6187d768c7a5ef976427abd235756874f38473c
