@@ -23,7 +23,7 @@
 ## 对本设备的含义
 
 - `sched_startup` 返回和 `PE_init_iokit` 调用前均已确认；后者返回尚未确认。
-- 下一步测该函数中 `InitIOKit` 调用前，区分前段控制台／启动属性处理和后段 IOKit。
+- 该函数中 `InitIOKit` 调用前探针也未复位，下一步测第一个调用 `PE_init_printf(TRUE)` 返回后。
 - 现有 OS profile 使用 `CONFIG_XNU_CRYPTO_BOOTSTRAP="prelinked"`；主机构建报告列出了
   `com.apple.kec.corecrypto`。这只证明构建纳入，不能证明运行时初始化成功。
 - 不凭色条推断 `g_crypto_funcs` 状态，也不跳过加密自检。需要本机运行时证据后再决定修复。

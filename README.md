@@ -8,7 +8,8 @@
 当前继续第 7 步的 **CPU0／initrd 早期引导诊断**。主机构建链已打通；据 ds 交接，
 设备已进入 UniXNU 菜单、挂载 payload 并交接 XNU，曾用探针确认 MMU 开启。
 本轮机主确认 `idle_thread_create` 和 `sched_startup` 返回后探针复位，
-`PE_init_iokit` 调用前探针复位、返回后探针未复位，正排查该调用内部。
+`PE_init_iokit` 调用前探针复位，其内部 `InitIOKit` 调用前探针未复位，
+正检查前段 `PE_init_printf`／控制台和启动属性处理。
 根卷／用户态、SMP 和外设功能仍未完成，具体来源与验证等级见 `porting.toml`。
 
 两个仓库并列放置，普通构建命令在主仓库执行：
