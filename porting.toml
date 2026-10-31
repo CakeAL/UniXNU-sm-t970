@@ -114,6 +114,7 @@ components = [
   "DarwinBoot",
 ]
 paths = [
+  "tests/test_prepare_uefi.py",
   "evidence/device-repository/firmware.log",
   "evidence/device-repository/modules.json",
   "package/firmware/**",
@@ -152,6 +153,7 @@ procedure = [
   "Collect selected boot properties, the live DT and the first 4096 bytes of boot/recovery with the inventory script; only parsed header fields are saved.",
 ]
 findings = [
+  "Handoff follow-up: prepare-uefi.py now applies or recognizes the SEC x0-to-HOB patch using its exact patch hash and four pre/postimage hashes; clean upstream application and a second idempotent run passed. The cached Mu source modifications are therefore reproducible rather than implicit workspace state.",
   "The normal unixnu build firmware command passed on committed sources; the 3 MiB FD contains all four UniXNU/DarwinBoot modules plus DiskIo, FAT and Unicode collation (7 checked modules among 91 FV files).",
   "A T970-specific overlay selects the pinned Kona support, original numeric configuration and a nonoverlapping 44-region map derived from the stock 45-region map; Android SEC LOG scratch is omitted because it overlaps FV/FD/stack and Mu would halt on it.",
   "44 vendor modules use 84 exact PE32/DEPEX/RAW inputs from this T970 XBL. Vendor UFS/USB DMA dispatch is omitted from the CPU0/initrd candidate.",
@@ -636,6 +638,7 @@ procedure = [
   "Read BuildManifest.plist from the local IPSW using Python zipfile and plistlib to identify its OS version, build and product types.",
 ]
 findings = [
+  "The required Mu SEC entry-argument HOB integration is now versioned in package/firmware/patches and inputs.json, independently of the currently retained runtime probe.",
   "The normal bootimg command produced a 3993600-byte header-v2/raw-kernel/separate-DTB firmware-only check image and verified its sections and load addresses. Ramdisk is empty; no XNU kernel/payload or device boot is claimed.",
   "Actual bootimg invocation exposed the pinned upstream BootShim declaring only FD_SIZE in ARM64 image_size. The shared packer now normalizes the header with strict base/size checks; a real header-v2 raw-kernel/separate-DTB firmware-only image packs and unpacks successfully.",
   "The board package now contains a real T970 firmware overlay and build integration; its vendor assets stay local. Kernel board patch series remains empty.",
@@ -676,6 +679,7 @@ id = "diagnostics"
 status = "implemented"
 components = []
 paths = [
+  "tests/**",
   "evidence/device-repository/platform.log",
   "scripts/**",
   "evidence/README.md",
@@ -706,6 +710,7 @@ procedure = [
   "Run python3 scripts/collect-adb-inventory.py --root --output evidence/<new-capture>; review per-command stderr, checksums, GPT CRC results and DT sanitization before updating this record.",
 ]
 findings = [
+  "Three source-patch preparation tests passed (apply/repeat, reject changed patch, preserve unknown local edits); an additional test used all four actual upstream SEC preimages and checked idempotence.",
   "The completed Step 3 archive ties actual commands, source hashes, platform checks, normal firmware compilation and boot-image round-trip to clean committed device/framework revisions.",
   "The strengthened dynamic-pool check caught an overlap with camera_mem_region that static-reservation-only checks missed. It now verifies the reduced 2 GiB window against all original pool bounds and measured-bank containment.",
   "The platform checker now additionally compares seven disabled controller register/IRQ descriptions, the touch/pen addresses and firmware names, dynamic reserved-pool windows and 45 original XBL regions. None is a runtime or DMA test.",

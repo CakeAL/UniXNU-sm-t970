@@ -127,6 +127,20 @@ RAM 作为日志缓冲。调试输出仍经硬件端口写到屏幕，原有 DEB
 
 ## 固件清单范围
 
+### SEC 的 FDT/initrd 交接补丁
+
+上游固定提交的 SEC 不保存入口 x0；`UniXNURamDiskDxe` 需要从
+`DAEE82E6-8090-4E72-BFB9-78C13CD4E359` HOB 中读取这个 FDT 地址。
+`package/firmware/patches/0001-sec-entry-arg-hob.patch` 在汇编入口保存 x0，
+并在 HOB 建立后发布该值。`inputs.json` 固定补丁和四个目标文件修改前后的 SHA256。
+
+`prepare-uefi.py` 先校验补丁及文件状态，再应用；已经应用则验证而不重复打补丁。
+状态不完整或存在未知源码改动时拒绝覆盖。无需依赖交接时 Mu 工作目录中的手工修改。
+
+```sh
+python3.14 -m unittest discover -s tests -v
+```
+
 `proprietary-files.txt` 共 130 条：43 个文件系统资产、3 个 builtin 固件和 84 个候选 UEFI 输入。
 `builtin-firmware.json` 通过同一 boot kernel 中一致的 AArch64 相对重定位确认触控、笔、键盘
 固件的数据位置及长度，记录 SHA256；未把其他设备的二进制当作本机输入。

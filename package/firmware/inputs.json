@@ -608,5 +608,29 @@
       "reason": "NoHob Android logging scratch overlaps FD/FV/stack; Mu ValidateMemoryMap would halt."
     }
   ],
-  "boot_verified": false
+  "boot_verified": false,
+  "patches": [
+    {
+      "path": "patches/0001-sec-entry-arg-hob.patch",
+      "sha256": "261960f2b69ff746b8d7a0ab86f380b86cb42047cbe4686fd4e9a3ace58348b8",
+      "files": {
+        "Silicon/Silicium/SiliciumPkg/Sec/AArch64/ModuleEntryPoint.S": {
+          "before_sha256": "ac62466d82cb6f1cfe3a67d59de304a60e555fac142dc36c80dace94f53fc149",
+          "after_sha256": "853e67ab880109d32c431a78f758d8acc9c4e650877899add53f35f8004b97bf"
+        },
+        "Silicon/Silicium/SiliciumPkg/Sec/Sec.c": {
+          "before_sha256": "77639c5a4ca526b199e9bcff2271625bac9952de8b3766d6a2ec03719c5da783",
+          "after_sha256": "70dcd65fd2e43a6a538405b9a8a18f7075109a1b02d8915f39da2acfda586cdd"
+        },
+        "Silicon/Silicium/SiliciumPkg/Sec/Sec.inf": {
+          "before_sha256": "a340343850e43c28ecca533a2623590ddef3513219848157353a02821458e9f3",
+          "after_sha256": "854106b676a824acf718bc03a81f1d9eae6480923e36937269a3631a521a2687"
+        },
+        "Silicon/Silicium/SiliciumPkg/SiliciumPkg.dec": {
+          "before_sha256": "780722e7141d6ac0244bf1e394d2b4d3fe20f6b0deb11571de491dce01082676",
+          "after_sha256": "d566278282c5f2b6274663a2f92414d228f2d91ca2c79fa54ae08269f0a493a3"
+        }
+      }
+    }
+  ]
 }

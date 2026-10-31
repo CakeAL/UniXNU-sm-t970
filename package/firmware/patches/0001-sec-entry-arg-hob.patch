@@ -1,0 +1,79 @@
+diff --git a/Silicon/Silicium/SiliciumPkg/Sec/AArch64/ModuleEntryPoint.S b/Silicon/Silicium/SiliciumPkg/Sec/AArch64/ModuleEntryPoint.S
+index 0c05ffa..3c93a70 100644
+--- a/Silicon/Silicium/SiliciumPkg/Sec/AArch64/ModuleEntryPoint.S
++++ b/Silicon/Silicium/SiliciumPkg/Sec/AArch64/ModuleEntryPoint.S
+@@ -13,6 +13,11 @@
+ .set CTRL_SPAN_BIT, BIT23
+ 
+ ASM_FUNC (_ModuleEntryPoint)
++  // The previous stage hands over the device-tree address in x0; keep it for
++  // the platform so UniXNURamDiskDxe can find the initrd in /chosen.
++  adr   x1, ASM_PFX (gSecEntryArg0)
++  str   x0, [x1]
++
+   // Do Platform Specific Initialization
+   bl    ASM_PFX (PlatformAssemblyInitialize)
+ 
+@@ -61,3 +66,9 @@ ASM_PFX (MainEntryPoint):
+ 
+   // Do Infinite Spin
+   b     .
++
++  // First argument of the previous stage, written once at entry
++  .align 3
++  .global ASM_PFX (gSecEntryArg0)
++ASM_PFX (gSecEntryArg0):
++  .quad 0
+diff --git a/Silicon/Silicium/SiliciumPkg/Sec/Sec.c b/Silicon/Silicium/SiliciumPkg/Sec/Sec.c
+index 8d586b3..43d0ab8 100644
+--- a/Silicon/Silicium/SiliciumPkg/Sec/Sec.c
++++ b/Silicon/Silicium/SiliciumPkg/Sec/Sec.c
+@@ -18,6 +18,9 @@
+ 
+ #include "Sec.h"
+ 
++// First argument (x0) of the previous stage, saved by ModuleEntryPoint.S
++extern UINT64  gSecEntryArg0;
++
+ #ifndef MDEPKG_NDEBUG
+ STATIC
+ VOID
+@@ -130,6 +133,14 @@ SecMain (VOID)
+     return;
+   }
+ 
++  // Pass on what the previous stage handed over in x0: the device-tree address
++  // that carries /chosen's initrd range.
++  {
++    UINT64  EntryArg = gSecEntryArg0;
++
++    BuildGuidDataHob (&gSiliciumEntryArgHobGuid, &EntryArg, sizeof (EntryArg));
++  }
++
+   // Run Library Cconstructors
+   ProcessLibraryConstructorList ();
+ 
+diff --git a/Silicon/Silicium/SiliciumPkg/Sec/Sec.inf b/Silicon/Silicium/SiliciumPkg/Sec/Sec.inf
+index 79afd19..8c3129e 100644
+--- a/Silicon/Silicium/SiliciumPkg/Sec/Sec.inf
++++ b/Silicon/Silicium/SiliciumPkg/Sec/Sec.inf
+@@ -51,6 +51,7 @@
+   gArmMpCoreInfoPpiGuid
+ 
+ [Guids]
++  gSiliciumEntryArgHobGuid
+   gArmMpCoreInfoGuid
+ 
+ [Pcd]
+diff --git a/Silicon/Silicium/SiliciumPkg/SiliciumPkg.dec b/Silicon/Silicium/SiliciumPkg/SiliciumPkg.dec
+index 99cd697..d7606db 100644
+--- a/Silicon/Silicium/SiliciumPkg/SiliciumPkg.dec
++++ b/Silicon/Silicium/SiliciumPkg/SiliciumPkg.dec
+@@ -9,6 +9,7 @@
+ 
+ [Guids]
+   gSiliciumPkgTokenSpaceGuid          = { 0x055720A6, 0xA739, 0x0047, { 0xBE, 0xC1, 0x67, 0xFC, 0x38, 0x34, 0x54, 0x53 } }
++  gSiliciumEntryArgHobGuid            = { 0xDAEE82E6, 0x8090, 0x4E72, { 0xBF, 0xB9, 0x78, 0xC1, 0x3C, 0xD4, 0xE3, 0x59 } }
+ 
+ [Protocols]
+   gKeypadDeviceProtocolGuid           = { 0xA412C1AC, 0x0295, 0x4AE3, { 0xB5, 0x9F, 0x52, 0x23, 0x1F, 0x26, 0x55, 0x4D } }
