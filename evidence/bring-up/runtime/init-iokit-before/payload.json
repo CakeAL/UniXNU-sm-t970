@@ -1,0 +1,14 @@
+{
+  "kernel_sha256": "4131d5b15cccc0a6a1697ba19e0cb59a3caced16ac09e6a8ee1823e296956444",
+  "payload_kernel_sha256": "7352592cdddf59edeb64551a9d9510f3a5b5039a50e773de7fbe30c424a25858",
+  "adt_sha256": "f11740927d48f27ac097659ef39df3a992931de292107526be9147494683414b",
+  "kernel_args": "-v cpus=1",
+  "trust_cache_sha256": "7416ca4f8377146626bb284e2133c76bee6cb4e3ee0af5d648b186235a7323a7",
+  "gpu_addon_sha256": null,
+  "data_ramdisk_sha256": null,
+  "skip_setup": false,
+  "panic_screen": false,
+  "payload_sha256": "9889e28bd56fb2462d7a01b718870cbd7996f652670b2acfee8704a2c453cba6",
+  "payload_bytes": 58720256,
+  "hardware_tested": false
+}

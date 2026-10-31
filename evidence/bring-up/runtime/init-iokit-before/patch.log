@@ -1,0 +1,1 @@
+patched kernel.macho: stage 1 blue bar, stage 2 magenta bar, stage 4 reset before call #1 to _InitIOKit in _PE_init_iokit (at 0xfffffff00794a390)
