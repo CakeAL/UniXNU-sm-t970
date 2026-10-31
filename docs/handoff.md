@@ -15,10 +15,13 @@
   机主已确认 `idle_thread_create`、`sched_startup` 返回后探针均自动复位；
   `PE_init_iokit` 返回后探针（`9b0f8f68…`）仍停在色条，没有自动复位。
   每轮完整镜像哈希、刷写回执与观察见 `evidence/bring-up/runtime/`。
-  下一处检查应为 `PE_init_iokit` 调用前，先区分函数内部与更早的路径。
+  `PE_init_iokit` 调用前探针（`458218bd…`）已由机主确认自动复位：
+  未通过的路径缩到该调用内部。下一处为其内部 `InitIOKit` 调用前，
+  用于区分前段控制台／启动属性处理与 IOKit 初始化；尚不确定具体失败指令或故障类型。
 - [相近设备案例](related-bring-up.md)记录了 Surface Duo 2 同阶段的加密 provider 问题，
   以及 SM8250 小米 10 至尊版的验证边界。均不是 T970 根因的证据。
-- BOOT 当前仍是 `iokit-return` 诊断镜像，原始 BOOT 恢复待完成。
+- BOOT 最近刷入的是 `iokit-before` 诊断镜像，机主已回到 Download Mode；
+  原始 BOOT 恢复待完成，后续镜像以 `evidence/bring-up/runtime/*/flash.json` 回执为准。
 - 以下为 ds 交接当时的状态、命令和待办，保留作历史基线；当前进展以本节及适配记录为准。
 
 ## 总体现状

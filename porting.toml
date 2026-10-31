@@ -241,6 +241,8 @@ procedure = [
   "Collect /proc/cpuinfo, online/present CPU lists, cpufreq policies, /proc/interrupts and the live DT using the inventory script.",
 ]
 findings = [
+  "The user confirmed automatic reset before PE_init_iokit with image 458218bd4e846aad1408daea717d2263aa86d94ae8dac2a364f0c507a12b2421, while the after-return image did not reset. This brackets the unconfirmed path inside PE_init_iokit; the exact failing instruction and fault type remain unknown.",
+  "User observation for _PE_init_iokit before-call image 458218bd4e846aad1408daea717d2263aa86d94ae8dac2a364f0c507a12b2421: automatic reset observed; checkpoint reached.",
   "Uploaded the isolated PE_init_iokit before-call BOOT image 458218bd4e846aad1408daea717d2263aa86d94ae8dac2a364f0c507a12b2421 using patched Heimdall, exit 0. Human checkpoint feedback and original BOOT restoration are pending; transfer does not establish execution.",
   "Prepared isolated _PE_init_iokit before-call image 458218bd4e846aad1408daea717d2263aa86d94ae8dac2a364f0c507a12b2421; the FAT kernel was independently extracted and its branch at 0xfffffff00798ca8c matches the intended probe. Device result is pending.",
   "External zeta/SM8350 records describe a PE_init_iokit failure caused by a NULL crypto provider and a version-specific fix; T970 uses prelinked crypto and has no runtime pointer result. See docs/related-bring-up.md; no root cause is inferred from similarity.",
@@ -267,9 +269,10 @@ limits = [
   "CPU0 diagnostic execution is observed; full platform matching and runtime interrupt handling are not verified.",
 ]
 next_action = [
-  "Test immediately before PE_init_iokit; its after-return checkpoint was not observed. If reached, inspect InitIOKit and ConfigureIOKit before enabling secondary cores.",
+  "Test before InitIOKit inside PE_init_iokit to separate console/boot-property setup from IOKit initialization and ConfigureIOKit.",
 ]
 evidence = [
+  { kind = "device", reference = "evidence/bring-up/runtime/iokit-before/device-result.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/iokit-before/boot.img --no-reboot", result = "User observation for _PE_init_iokit before-call image 458218bd4e846aad1408daea717d2263aa86d94ae8dac2a364f0c507a12b2421: automatic reset observed; checkpoint reached.", revision = "823c3db8eaa3ffcfe00cf3bac360db394fb58740" },
   { kind = "device", reference = "evidence/bring-up/runtime/iokit-before/flash.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/iokit-before/boot.img --no-reboot", result = "Uploaded the isolated PE_init_iokit before-call BOOT image 458218bd4e846aad1408daea717d2263aa86d94ae8dac2a364f0c507a12b2421 using patched Heimdall, exit 0. Human checkpoint feedback and original BOOT restoration are pending; transfer does not establish execution.", revision = "823c3db8eaa3ffcfe00cf3bac360db394fb58740" },
   { kind = "host", reference = "evidence/bring-up/runtime/iokit-before/probe.json", command = "python3.14 scripts/build-entry-probe.py --target _PE_init_iokit --before --function _kernel_bootstrap_thread --occurrence 1 --delay 6 --output out/step7/probes/iokit-before", result = "Prepared isolated _PE_init_iokit before-call image 458218bd4e846aad1408daea717d2263aa86d94ae8dac2a364f0c507a12b2421; the FAT kernel was independently extracted and its branch at 0xfffffff00798ca8c matches the intended probe. Device result is pending.", revision = "823c3db8eaa3ffcfe00cf3bac360db394fb58740" },
   { kind = "source", reference = "docs/related-bring-up.md", result = "Compared zeta IOKit/provider diagnosis and cas CPU0 verification boundaries; next T970 checkpoint is before PE_init_iokit." },
@@ -682,6 +685,7 @@ procedure = [
   "Read BuildManifest.plist from the local IPSW using Python zipfile and plistlib to identify its OS version, build and product types.",
 ]
 findings = [
+  "The user confirmed automatic reset before PE_init_iokit with image 458218bd4e846aad1408daea717d2263aa86d94ae8dac2a364f0c507a12b2421, while the after-return image did not reset. This brackets the unconfirmed path inside PE_init_iokit; the exact failing instruction and fault type remain unknown.",
   "Uploaded the isolated PE_init_iokit before-call BOOT image 458218bd4e846aad1408daea717d2263aa86d94ae8dac2a364f0c507a12b2421 using patched Heimdall, exit 0. Human checkpoint feedback and original BOOT restoration are pending; transfer does not establish execution.",
   "Prepared isolated _PE_init_iokit before-call image 458218bd4e846aad1408daea717d2263aa86d94ae8dac2a364f0c507a12b2421; the FAT kernel was independently extracted and its branch at 0xfffffff00798ca8c matches the intended probe. Device result is pending.",
   "The iokit-return BOOT image uploaded successfully; the user observed no automatic reset. Upload verifies transfer only, not IOKit completion or userland readiness. Original BOOT restoration remains pending.",
@@ -768,6 +772,8 @@ procedure = [
   "Run python3 scripts/collect-adb-inventory.py --root --output evidence/<new-capture>; review per-command stderr, checksums, GPT CRC results and DT sanitization before updating this record.",
 ]
 findings = [
+  "The user confirmed automatic reset before PE_init_iokit with image 458218bd4e846aad1408daea717d2263aa86d94ae8dac2a364f0c507a12b2421, while the after-return image did not reset. This brackets the unconfirmed path inside PE_init_iokit; the exact failing instruction and fault type remain unknown.",
+  "User observation for _PE_init_iokit before-call image 458218bd4e846aad1408daea717d2263aa86d94ae8dac2a364f0c507a12b2421: automatic reset observed; checkpoint reached.",
   "Uploaded the isolated PE_init_iokit before-call BOOT image 458218bd4e846aad1408daea717d2263aa86d94ae8dac2a364f0c507a12b2421 using patched Heimdall, exit 0. Human checkpoint feedback and original BOOT restoration are pending; transfer does not establish execution.",
   "Prepared isolated _PE_init_iokit before-call image 458218bd4e846aad1408daea717d2263aa86d94ae8dac2a364f0c507a12b2421; the FAT kernel was independently extracted and its branch at 0xfffffff00798ca8c matches the intended probe. Device result is pending.",
   "External zeta/SM8350 records describe a PE_init_iokit failure caused by a NULL crypto provider and a version-specific fix; T970 uses prelinked crypto and has no runtime pointer result. See docs/related-bring-up.md; no root cause is inferred from similarity.",
@@ -802,9 +808,10 @@ limits = [
   "ADB inputs and BOOT-only reset checkpoints are archived. Original BOOT restoration is pending; UART, usable UEFI log export and XNU fault capture remain unverified.",
 ]
 next_action = [
-  "Compare PE_init_iokit before-call and after-return checkpoints, then inspect console, InitIOKit and ConfigureIOKit boundaries; retain exact image hashes and restore BOOT after diagnosis.",
+  "Test before InitIOKit inside PE_init_iokit, then select an internal boundary based on the result; retain exact image hashes and restore BOOT after diagnosis.",
 ]
 evidence = [
+  { kind = "device", reference = "evidence/bring-up/runtime/iokit-before/device-result.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/iokit-before/boot.img --no-reboot", result = "User observation for _PE_init_iokit before-call image 458218bd4e846aad1408daea717d2263aa86d94ae8dac2a364f0c507a12b2421: automatic reset observed; checkpoint reached.", revision = "823c3db8eaa3ffcfe00cf3bac360db394fb58740" },
   { kind = "device", reference = "evidence/bring-up/runtime/iokit-before/flash.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/iokit-before/boot.img --no-reboot", result = "Uploaded the isolated PE_init_iokit before-call BOOT image 458218bd4e846aad1408daea717d2263aa86d94ae8dac2a364f0c507a12b2421 using patched Heimdall, exit 0. Human checkpoint feedback and original BOOT restoration are pending; transfer does not establish execution.", revision = "823c3db8eaa3ffcfe00cf3bac360db394fb58740" },
   { kind = "host", reference = "evidence/bring-up/runtime/iokit-before/probe.json", command = "python3.14 scripts/build-entry-probe.py --target _PE_init_iokit --before --function _kernel_bootstrap_thread --occurrence 1 --delay 6 --output out/step7/probes/iokit-before", result = "Prepared isolated _PE_init_iokit before-call image 458218bd4e846aad1408daea717d2263aa86d94ae8dac2a364f0c507a12b2421; the FAT kernel was independently extracted and its branch at 0xfffffff00798ca8c matches the intended probe. Device result is pending.", revision = "823c3db8eaa3ffcfe00cf3bac360db394fb58740" },
   { kind = "source", reference = "docs/related-bring-up.md", result = "Compared zeta IOKit/provider diagnosis and cas CPU0 verification boundaries; next T970 checkpoint is before PE_init_iokit." },
