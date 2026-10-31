@@ -1,0 +1,12 @@
+{
+  "device": "SM-T970 / gts7xlwifi",
+  "image_sha256": "55b7c0354446888e80d0ed77258e4f29c236fdd9df6e65bfafbfab2cb72ab5ed",
+  "image_source_revision": "6a3ae24fba8bc4cb44dcdb0898b92582751a36b9",
+  "checkpoint": "_idle_thread_create return in _kernel_bootstrap_thread",
+  "reset_delay_seconds": 6,
+  "observation_source": "Human reply in this chat",
+  "observation": "三条色条后自动复位了",
+  "result": "checkpoint-observed",
+  "conclusion": "idle_thread_create returned; no conclusion about later scheduler initialization or root mount",
+  "download_mode_reentered": "Human confirmed before the next checkpoint test"
+}

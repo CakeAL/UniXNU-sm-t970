@@ -219,6 +219,7 @@ components = [
   "ArmCpu",
 ]
 paths = [
+  "evidence/bring-up/runtime/idle-return/device-result.json",
   "evidence/bring-up/runtime/idle-return/probe.json",
   "evidence/adb-2026-11-01/cpu.txt",
   "dts/sm-t970.dts",
@@ -237,6 +238,7 @@ procedure = [
   "Collect /proc/cpuinfo, online/present CPU lists, cpufreq policies, /proc/interrupts and the live DT using the inventory script.",
 ]
 findings = [
+  "The user observed automatic reset with the exact idle-return image 55b7c0354446888e80d0ed77258e4f29c236fdd9df6e65bfafbfab2cb72ab5ed. This confirms idle_thread_create returned; the next checkpoint is sched_startup return, not initialize_screen internals.",
   "The next image targets idle_thread_create return at 0xfffffff00798c8c4. Its modified kernel was independently extracted from the FAT payload and matched to the patch site. No result for this image has yet been observed.",
   "The user confirms the handed-off reset-before initialize_screen probe did not reset. That probe resets immediately at the call site, so the next test isolates whether idle_thread_create returns; no conclusion about initialize_screen internals is drawn.",
   "The first-boot DRAM window now excludes the entire observed camera CMA allocation window; CPU0-only topology and the disabled peripheral policy are unchanged.",
@@ -258,6 +260,7 @@ next_action = [
   "After host DT/ADT checks, verify the boot CPU, timer and GIC through the first T970 UEFI/XNU log before enabling any secondary core.",
 ]
 evidence = [
+  { kind = "device", reference = "evidence/bring-up/runtime/idle-return/device-result.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/idle-return/boot.img --no-reboot", result = "The user observed automatic reset with the exact idle-return image 55b7c0354446888e80d0ed77258e4f29c236fdd9df6e65bfafbfab2cb72ab5ed. This confirms idle_thread_create returned; the next checkpoint is sched_startup return, not initialize_screen internals.", revision = "6a3ae24fba8bc4cb44dcdb0898b92582751a36b9" },
   { kind = "host", reference = "evidence/bring-up/runtime/idle-return/probe.json", command = "python3.14 scripts/build-entry-probe.py --target _idle_thread_create --delay 6 --output out/step7/probes/idle-return", result = "The next image targets idle_thread_create return at 0xfffffff00798c8c4. Its modified kernel was independently extracted from the FAT payload and matched to the patch site. No result for this image has yet been observed.", revision = "6a3ae24fba8bc4cb44dcdb0898b92582751a36b9" },
   { kind = "device", reference = "evidence/adb-2026-11-01/cpu.txt", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Saved CPU identity, 0-7 CPU lists, three frequency policies and Android interrupt counters.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },
   { kind = "device", reference = "evidence/adb-2026-11-01/live-device-tree.dts", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Live CPU affinity, GICv3 register ranges and the 19200000 Hz timer declaration.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },
@@ -735,6 +738,7 @@ procedure = [
   "Run python3 scripts/collect-adb-inventory.py --root --output evidence/<new-capture>; review per-command stderr, checksums, GPT CRC results and DT sanitization before updating this record.",
 ]
 findings = [
+  "The user observed automatic reset with the exact idle-return image 55b7c0354446888e80d0ed77258e4f29c236fdd9df6e65bfafbfab2cb72ab5ed. This confirms idle_thread_create returned; the next checkpoint is sched_startup return, not initialize_screen internals.",
   "The isolated idle_thread_create after-return image (55b7c035...) was uploaded successfully to BOOT with patched Heimdall and --no-reboot. This records the write only; the new checkpoint outcome and restoration are pending the user startup/observation.",
   "The isolated idle-return artifacts are archived with source hashes and the exact call site; the original Magisk BOOT backup still matches 6f49af2f77ae0e55b4f76b29b0e0491ff0228c42ae97ba0533b97631483566fc.",
   "Probe control flow was checked against both the generator and the current kernel disassembly. reset-before ignores the delay and immediately issues PSCI SYSTEM_RESET. A new after-return idle_thread_create probe is the next discriminating test; physical source images and restore hashes are recorded.",
@@ -764,6 +768,7 @@ next_action = [
   "Record whether the isolated after-return idle_thread_create probe resets after six seconds, then choose the next bootstrap-thread boundary.",
 ]
 evidence = [
+  { kind = "device", reference = "evidence/bring-up/runtime/idle-return/device-result.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/idle-return/boot.img --no-reboot", result = "The user observed automatic reset with the exact idle-return image 55b7c0354446888e80d0ed77258e4f29c236fdd9df6e65bfafbfab2cb72ab5ed. This confirms idle_thread_create returned; the next checkpoint is sched_startup return, not initialize_screen internals.", revision = "6a3ae24fba8bc4cb44dcdb0898b92582751a36b9" },
   { kind = "device", reference = "evidence/bring-up/runtime/idle-return/flash.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/idle-return/boot.img --no-reboot", result = "The isolated idle_thread_create after-return image (55b7c035...) was uploaded successfully to BOOT with patched Heimdall and --no-reboot. This records the write only; the new checkpoint outcome and restoration are pending the user startup/observation.", revision = "6a3ae24fba8bc4cb44dcdb0898b92582751a36b9" },
   { kind = "host", reference = "evidence/bring-up/runtime/idle-return/probe.json", command = "python3.14 scripts/build-entry-probe.py --target _idle_thread_create --delay 6 --output out/step7/probes/idle-return", result = "The isolated idle-return artifacts are archived with source hashes and the exact call site; the original Magisk BOOT backup still matches 6f49af2f77ae0e55b4f76b29b0e0491ff0228c42ae97ba0533b97631483566fc.", revision = "6a3ae24fba8bc4cb44dcdb0898b92582751a36b9" },
   { kind = "host", reference = "evidence/device-repository/platform.log", command = "python3.14 scripts/check-platform.py --unixnu ../UniXNU", result = "The completed Step 3 archive ties actual commands, source hashes, platform checks, normal firmware compilation and boot-image round-trip to clean committed device/framework revisions.", revision = "18d3a77cd98f47ee42aa1f95d6584d22c3a13a18" },
