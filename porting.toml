@@ -219,6 +219,7 @@ components = [
   "ArmCpu",
 ]
 paths = [
+  "evidence/bring-up/runtime/sched-return/**",
   "evidence/bring-up/runtime/idle-return/device-result.json",
   "evidence/bring-up/runtime/idle-return/probe.json",
   "evidence/adb-2026-11-01/cpu.txt",
@@ -238,6 +239,7 @@ procedure = [
   "Collect /proc/cpuinfo, online/present CPU lists, cpufreq policies, /proc/interrupts and the live DT using the inventory script.",
 ]
 findings = [
+  "Prepared isolated _sched_startup after-return image 4a5e423389efb142c3c5b8b5afedf98dcc59c7b0db1a29782805c95d8a298721; the FAT kernel was independently extracted and its branch at 0xfffffff00798c8f0 matches the intended probe. Device result is pending.",
   "The user observed automatic reset with the exact idle-return image 55b7c0354446888e80d0ed77258e4f29c236fdd9df6e65bfafbfab2cb72ab5ed. This confirms idle_thread_create returned; the next checkpoint is sched_startup return, not initialize_screen internals.",
   "The next image targets idle_thread_create return at 0xfffffff00798c8c4. Its modified kernel was independently extracted from the FAT payload and matched to the patch site. No result for this image has yet been observed.",
   "The user confirms the handed-off reset-before initialize_screen probe did not reset. That probe resets immediately at the call site, so the next test isolates whether idle_thread_create returns; no conclusion about initialize_screen internals is drawn.",
@@ -260,6 +262,7 @@ next_action = [
   "After host DT/ADT checks, verify the boot CPU, timer and GIC through the first T970 UEFI/XNU log before enabling any secondary core.",
 ]
 evidence = [
+  { kind = "host", reference = "evidence/bring-up/runtime/sched-return/probe.json", command = "python3.14 scripts/build-entry-probe.py --target _sched_startup --function _kernel_bootstrap_thread --occurrence 1 --delay 6 --output out/step7/probes/sched-return", result = "Prepared isolated _sched_startup after-return image 4a5e423389efb142c3c5b8b5afedf98dcc59c7b0db1a29782805c95d8a298721; the FAT kernel was independently extracted and its branch at 0xfffffff00798c8f0 matches the intended probe. Device result is pending.", revision = "70d032a1e07798c222b8e738399d04e6f87456a0" },
   { kind = "device", reference = "evidence/bring-up/runtime/idle-return/device-result.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/idle-return/boot.img --no-reboot", result = "The user observed automatic reset with the exact idle-return image 55b7c0354446888e80d0ed77258e4f29c236fdd9df6e65bfafbfab2cb72ab5ed. This confirms idle_thread_create returned; the next checkpoint is sched_startup return, not initialize_screen internals.", revision = "6a3ae24fba8bc4cb44dcdb0898b92582751a36b9" },
   { kind = "host", reference = "evidence/bring-up/runtime/idle-return/probe.json", command = "python3.14 scripts/build-entry-probe.py --target _idle_thread_create --delay 6 --output out/step7/probes/idle-return", result = "The next image targets idle_thread_create return at 0xfffffff00798c8c4. Its modified kernel was independently extracted from the FAT payload and matched to the patch site. No result for this image has yet been observed.", revision = "6a3ae24fba8bc4cb44dcdb0898b92582751a36b9" },
   { kind = "device", reference = "evidence/adb-2026-11-01/cpu.txt", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Saved CPU identity, 0-7 CPU lists, three frequency policies and Android interrupt counters.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },
@@ -630,6 +633,7 @@ components = [
   "XnuPrelink",
 ]
 paths = [
+  "evidence/bring-up/runtime/sched-return/**",
   "evidence/bring-up/runtime/idle-return/probe.json",
   "evidence/device-repository/boot.json",
   "evidence/device-repository/pack.log",
@@ -662,6 +666,7 @@ procedure = [
   "Read BuildManifest.plist from the local IPSW using Python zipfile and plistlib to identify its OS version, build and product types.",
 ]
 findings = [
+  "Prepared isolated _sched_startup after-return image 4a5e423389efb142c3c5b8b5afedf98dcc59c7b0db1a29782805c95d8a298721; the FAT kernel was independently extracted and its branch at 0xfffffff00798c8f0 matches the intended probe. Device result is pending.",
   "The isolated probe boot image is 62713856 bytes, within the measured 71303168-byte BOOT limit. Its header/payload sections round-trip; no Data image is included.",
   "The previously uncommitted board console patch is now part of the declared series, for 61 total patches (56 arch, 2 SoC, 2 OS, 1 board). Isolated probe generation reuses the built source kernel and firmware, patches only a payload copy, checks the measured BOOT size limit and leaves board defaults untouched.",
   "The required Mu SEC entry-argument HOB integration is now versioned in package/firmware/patches and inputs.json, independently of the currently retained runtime probe.",
@@ -692,6 +697,7 @@ next_action = [
   "Build the isolated idle_thread_create after-return payload/image, verify the BOOT size and hashes, then use the confirmed recovery path for a single checkpoint test.",
 ]
 evidence = [
+  { kind = "host", reference = "evidence/bring-up/runtime/sched-return/probe.json", command = "python3.14 scripts/build-entry-probe.py --target _sched_startup --function _kernel_bootstrap_thread --occurrence 1 --delay 6 --output out/step7/probes/sched-return", result = "Prepared isolated _sched_startup after-return image 4a5e423389efb142c3c5b8b5afedf98dcc59c7b0db1a29782805c95d8a298721; the FAT kernel was independently extracted and its branch at 0xfffffff00798c8f0 matches the intended probe. Device result is pending.", revision = "70d032a1e07798c222b8e738399d04e6f87456a0" },
   { kind = "host", reference = "evidence/bring-up/runtime/idle-return/probe.json", command = "python3.14 scripts/build-entry-probe.py --target _idle_thread_create --delay 6 --output out/step7/probes/idle-return", result = "The isolated probe boot image is 62713856 bytes, within the measured 71303168-byte BOOT limit. Its header/payload sections round-trip; no Data image is included.", revision = "6a3ae24fba8bc4cb44dcdb0898b92582751a36b9" },
   { kind = "host", reference = "evidence/device-repository/boot.json", command = "PATH=/opt/homebrew/opt/llvm/bin:/opt/homebrew/opt/lld/bin:$PATH python3.14 ../UniXNU/unixnu bootimg -D . --uefi .cache/uefi-source/Mu-Silicium --fd .cache/uefi-source/Mu-Silicium/Build/gts7xlwifiPkg/DEBUG_CLANGPDB/FV/SILICIUM_UEFI.fd --dtb out/uefi-candidate/firmware.dtb --ramdisk none --output out/uefi-candidate/boot.img", result = "The normal bootimg command produced a 3993600-byte header-v2/raw-kernel/separate-DTB firmware-only check image and verified its sections and load addresses. Ramdisk is empty; no XNU kernel/payload or device boot is claimed.", revision = "18d3a77cd98f47ee42aa1f95d6584d22c3a13a18" },
   { kind = "source", reference = "evidence/ipsw-21H461-manifest.json", result = "Saved IPSW manifest version/build/product types, archive byte size and manifest SHA256." },
@@ -738,6 +744,7 @@ procedure = [
   "Run python3 scripts/collect-adb-inventory.py --root --output evidence/<new-capture>; review per-command stderr, checksums, GPT CRC results and DT sanitization before updating this record.",
 ]
 findings = [
+  "Prepared isolated _sched_startup after-return image 4a5e423389efb142c3c5b8b5afedf98dcc59c7b0db1a29782805c95d8a298721; the FAT kernel was independently extracted and its branch at 0xfffffff00798c8f0 matches the intended probe. Device result is pending.",
   "The user observed automatic reset with the exact idle-return image 55b7c0354446888e80d0ed77258e4f29c236fdd9df6e65bfafbfab2cb72ab5ed. This confirms idle_thread_create returned; the next checkpoint is sched_startup return, not initialize_screen internals.",
   "The isolated idle_thread_create after-return image (55b7c035...) was uploaded successfully to BOOT with patched Heimdall and --no-reboot. This records the write only; the new checkpoint outcome and restoration are pending the user startup/observation.",
   "The isolated idle-return artifacts are archived with source hashes and the exact call site; the original Magisk BOOT backup still matches 6f49af2f77ae0e55b4f76b29b0e0491ff0228c42ae97ba0533b97631483566fc.",
@@ -768,6 +775,7 @@ next_action = [
   "Record whether the isolated after-return idle_thread_create probe resets after six seconds, then choose the next bootstrap-thread boundary.",
 ]
 evidence = [
+  { kind = "host", reference = "evidence/bring-up/runtime/sched-return/probe.json", command = "python3.14 scripts/build-entry-probe.py --target _sched_startup --function _kernel_bootstrap_thread --occurrence 1 --delay 6 --output out/step7/probes/sched-return", result = "Prepared isolated _sched_startup after-return image 4a5e423389efb142c3c5b8b5afedf98dcc59c7b0db1a29782805c95d8a298721; the FAT kernel was independently extracted and its branch at 0xfffffff00798c8f0 matches the intended probe. Device result is pending.", revision = "70d032a1e07798c222b8e738399d04e6f87456a0" },
   { kind = "device", reference = "evidence/bring-up/runtime/idle-return/device-result.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/idle-return/boot.img --no-reboot", result = "The user observed automatic reset with the exact idle-return image 55b7c0354446888e80d0ed77258e4f29c236fdd9df6e65bfafbfab2cb72ab5ed. This confirms idle_thread_create returned; the next checkpoint is sched_startup return, not initialize_screen internals.", revision = "6a3ae24fba8bc4cb44dcdb0898b92582751a36b9" },
   { kind = "device", reference = "evidence/bring-up/runtime/idle-return/flash.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/idle-return/boot.img --no-reboot", result = "The isolated idle_thread_create after-return image (55b7c035...) was uploaded successfully to BOOT with patched Heimdall and --no-reboot. This records the write only; the new checkpoint outcome and restoration are pending the user startup/observation.", revision = "6a3ae24fba8bc4cb44dcdb0898b92582751a36b9" },
   { kind = "host", reference = "evidence/bring-up/runtime/idle-return/probe.json", command = "python3.14 scripts/build-entry-probe.py --target _idle_thread_create --delay 6 --output out/step7/probes/idle-return", result = "The isolated idle-return artifacts are archived with source hashes and the exact call site; the original Magisk BOOT backup still matches 6f49af2f77ae0e55b4f76b29b0e0491ff0228c42ae97ba0533b97631483566fc.", revision = "6a3ae24fba8bc4cb44dcdb0898b92582751a36b9" },

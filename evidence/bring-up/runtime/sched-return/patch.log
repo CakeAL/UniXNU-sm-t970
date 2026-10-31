@@ -1,0 +1,1 @@
+patched kernel.macho: stage 1 blue bar, stage 2 magenta bar, stage 4 reset after call #1 to _sched_startup in _kernel_bootstrap_thread (at 0xfffffff00798c8f0)
