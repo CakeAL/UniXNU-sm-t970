@@ -104,8 +104,11 @@ DTBs, extracted binaries, identity seeds and generated images in ignored storage
 The staged vendor UFS/USB DMA dispatch remains absent from the CPU0 initrd image.
 Build/pack checks do not authorize overwriting a tablet partition.
 Do not leave a reset probe in board.toml. Use scripts/build-entry-probe.py for
-one checkpoint per ignored output directory; reset-before is immediate, while
-an after-return probe waits its configured delay. Preserve source kernel and
+one checkpoint per ignored output directory; ordinary reset-before is immediate,
+while an after-return probe waits its configured delay. The explicit
+--console-state mode instead reads two states before gc_enable and terminates
+after 4/14/24/34 seconds; see docs/bring-up.md before interpreting its timing.
+Preserve source kernel and
 prior images, and bind every device observation to its image hash.
 Commit coherent groups of completed diagnostic work, as requested by the
 maintainer. Keep image preparation, upload receipts and their observations

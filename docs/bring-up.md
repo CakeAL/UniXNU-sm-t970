@@ -127,6 +127,40 @@ python3.14 scripts/build-entry-probe.py --target _idle_thread_create --delay 6 -
 不变。`--before` 表示到达调用点时立即复位，不使用延时；默认表示调用返回后再等待 6 秒。
 没有复位只能记作“检查点未观察到”，不能直接证明被测函数内部阻塞。
 
+### 控制台状态诊断
+
+已确认 `vcattach` 中 `gc_enable` 调用前可达、返回后探针未触发。
+`--console-state` 在同一位置只读 `_gc_initialized` 的低位及 `_PE_putc` 是否非空，
+不调用 `gc_enable`，不修改这两个变量，以延时编码后 PSCI 复位：
+
+| 到达检查点后的延时 | gc_initialized 低位 | PE_putc |
+| --- | --- | --- |
+| 约 4 秒 | 0 | NULL |
+| 约 14 秒 | 1 | NULL |
+| 约 24 秒 | 0 | 非空 |
+| 约 34 秒 | 1 | 非空 |
+
+```sh
+PATH=$PWD/.cache/bin:/opt/homebrew/opt/llvm/bin:/opt/homebrew/opt/lld/bin:$PATH \
+python3.14 scripts/build-entry-probe.py --target _gc_enable --function _vcattach \
+  --before --console-state --output out/step7/probes/console-state
+```
+
+从色条出现后计时并观察至少 45 秒，记录实测秒数；色条到检查点还有执行时间，
+模糊的时间或未复位不能解码成状态。该模式覆盖普通 `--before` 的立即复位语义。
+它固定到已审阅的内核 SHA256，核对符号、调用与空白区；未知内核直接拒绝。
+`scripts/console-state-probe.py` 编码的 AArch64 指令可在主机隔离环境用 Unicorn 测试：
+
+```sh
+PATH=/opt/homebrew/opt/llvm/bin:/opt/homebrew/opt/lld/bin:$PATH \
+.cache/probe-test-venv/bin/python -m unittest discover -s tests -v
+```
+
+测试覆盖四种状态、64 位非空指针及只读行为；模拟计数器不是实机计时或 PSCI 验证。
+该探针不捕获异常，也不提供文本日志。XNU 日志需已适配 UART／原生 USB、屏幕诊断，
+或明确保留区的写入与重启后读取实现。ADB 和 UEFI Advanced Logger 不会自动获得
+ExitBootServices 后的 XNU 输出。
+
 当前 DTS 是 ADT 的低地址包络。它包含固件保留洞，不是 2 GiB 可用内存池；DarwinBoot
 单独通过 EFI conventional memory 分配 256 MiB，并把该大小写入 boot_args。检查器会报告
 包络中的保留区，但并不把这些地址标记为空闲；每次实际分配仍需运行时日志验证。

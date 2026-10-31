@@ -7,6 +7,7 @@ inputs remain in ignored storage. Every run has a new output directory.
 import argparse
 import copy
 import hashlib
+import importlib.util
 import json
 from pathlib import Path
 import re
@@ -25,10 +26,13 @@ def main():
     parser.add_argument('--target', required=True, help='exact called kernel symbol, e.g. _idle_thread_create')
     parser.add_argument('--function', default='_kernel_bootstrap_thread')
     parser.add_argument('--before', action='store_true', help='reset immediately before the call, not after its return')
+    parser.add_argument('--console-state', action='store_true', help='read console state before gc_enable; reset after 4/14/24/34 seconds')
     parser.add_argument('--occurrence', type=int, default=1)
     parser.add_argument('--delay', type=int, default=6, help='reset delay for an after-return probe')
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
+    if args.console_state and (args.target, args.function, args.before, args.occurrence) != ('_gc_enable', '_vcattach', True, 1):
+        parser.error('--console-state requires --target _gc_enable --function _vcattach --before --occurrence 1')
     if any(not re.fullmatch(r'_[A-Za-z0-9_]+', value) for value in (args.target, args.function)):
         parser.error('Use exact kernel symbol names')
     if args.occurrence < 1 or not 1 <= args.delay <= 60:
@@ -68,7 +72,21 @@ def main():
     output.mkdir(parents=True)
     ctx.work = output
     ctx.logs = output / 'logs'
-    image = payload.build(ctx, kernel=kernel)
+    state = None
+    payload_kernel = kernel
+    if args.console_state:
+        state_spec = importlib.util.spec_from_file_location('console_state_probe', device / 'scripts/console-state-probe.py')
+        state_module = importlib.util.module_from_spec(state_spec)
+        state_spec.loader.exec_module(state_module)
+        payload_kernel = output / 'diagnostic/kernel.macho'
+        state = state_module.patch_copy(kernel, payload_kernel, args.unixnu.resolve())
+        ctx.logs.mkdir(parents=True, exist_ok=True)
+        (ctx.logs / 'payload-patch.log').write_text(state['entry_probe_log'] + '\nconsole-state reset delays: 4/14/24/34 seconds; no call to gc_enable\n')
+        # This copy already has entry bars and the state probe. Avoid patching it twice.
+        for key in list(spec):
+            if key.startswith('entry_probe_reset_'):
+                del spec[key]
+    image = payload.build(ctx, kernel=payload_kernel)
     boot = bootimg.build(ctx, ctx.uefi, fd, dtb, ramdisk=image, output=output / 'boot.img')
     gpt = json.loads((device / 'evidence/adb-2026-11-01/gpt.json').read_text())
     sizes = [p['size_bytes'] for lun in gpt.values() for p in lun['partitions'] if p['name'] == 'boot']
@@ -86,6 +104,10 @@ def main():
               'boot_sha256': sha(boot), 'boot_bytes': boot.stat().st_size,
               'boot_partition_bytes': sizes[0], 'hardware_tested': False,
               'note': 'Probe modifies a payload copy only; no flash or reboot performed'}
+    if state:
+        report['console_state'] = state
+        report['probe']['reset_delay_seconds'] = None
+        report['generator_sha256'] = sha(device / 'scripts/console-state-probe.py')
     (output / 'probe.json').write_text(json.dumps(report, indent=2) + '\n')
     print('Prepared isolated probe:', output / 'probe.json')
 
