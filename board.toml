@@ -1,0 +1,43 @@
+schema_version = 2
+
+[board]
+example = true
+name = "sm-t970"
+soc = "SM8250"
+soc_source = "sm8250"
+os_profile = "ipados-17.7.11-21H461"
+description = "Samsung Galaxy Tab S7+ Wi-Fi (SM-T970, gts7xlwifi), single-core platform bootstrap"
+kit = "sm-t970"
+
+[components]
+include = ["ArmDTPlatform", "ArmCpu", "SoftwareAES", "XnuPrelink", "DarwinBoot"]
+
+[kernel]
+defconfig = "sm-t970_defconfig"
+config_fragments = ["arch:configs/common.config", "soc:configs/sm8250.config", "os:configs/ipados.config"]
+patch_series = ["arch:patches/xnu/series", "soc:patches/xnu/series", "os:patches/xnu/series", "device:patches/xnu/series"]
+
+[device_tree]
+source = "device:dts/sm-t970.dts"
+include_dirs = ["soc:dts"]
+
+[firmware]
+# T970 UEFI config/DSC/FD paths are not established yet.
+# Keep board.example=true until the launch path and RAM handoff are verified.
+packages = ["{uefi}", "{tree}/package", "{tree}/drivers/DarwinBoot", "{edk2}"]
+
+[firmware.defines]
+DEVICE_MODEL = "sm-t970"
+
+[payload]
+volume = "T970"
+size_mib = 192
+loader = "firmware"
+title = "UniXNU SM-T970 platform bootstrap"
+kernel_args = ["-v", "cpus=1"]
+
+[payload.adt]
+# Supply the board's identity seed through --unique-chip-id.
+# OS identity seed from the selected iPad7,1 profile, not the Qualcomm SoC ID.
+chip_id = "8011"
+unique_chip_id = "required"

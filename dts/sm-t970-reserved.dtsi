@@ -1,0 +1,176 @@
+// Static reservations copied from evidence/adb-2026-11-01/live-device-tree.dts.
+// Input SHA256: fc8678605ea00ca3223e7185cf685919a31f3c67eb756f5e6d81ed635aa34d7b
+// Node names are retained verbatim; reg values, not unit addresses, are authoritative.
+// Size-only dynamic reservations still need a firmware allocator policy.
+/ {
+    reserved-memory {
+        #address-cells = <2>;
+        #size-cells = <2>;
+        ranges;
+
+        uh_heap_region {
+            reg = <0x0 0xb0400000 0x0 0x1800000>;
+        };
+
+        hyp_region@80000000 {
+            reg = <0x0 0x80000000 0x0 0x600000>;
+            no-map;
+        };
+
+        xbl_aop_region@80700000 {
+            reg = <0x0 0x80603000 0x0 0x25d000>;
+            no-map;
+        };
+
+        reserved-memory@80860000 {
+            reg = <0x0 0x80860000 0x0 0x20000>;
+            compatible = "qcom,cmd-db";
+            no-map;
+        };
+
+        smem_region@80900000 {
+            reg = <0x0 0x80900000 0x0 0x200000>;
+            no-map;
+        };
+
+        removed_region@80b00000 {
+            reg = <0x0 0x80b00000 0x0 0x7900000>;
+            no-map;
+        };
+
+        pil_camera_region@86200000 {
+            reg = <0x0 0x8fd00000 0x0 0x500000>;
+            compatible = "removed-dma-pool";
+            no-map;
+        };
+
+        pil_wlan_fw_region@86700000 {
+            reg = <0x0 0x90200000 0x0 0x100000>;
+            compatible = "removed-dma-pool";
+            no-map;
+        };
+
+        pil_ipa_fw_region@86800000 {
+            reg = <0x0 0x90300000 0x0 0x10000>;
+            compatible = "removed-dma-pool";
+            no-map;
+        };
+
+        pil_ipa_gsi_region@86810000 {
+            reg = <0x0 0x90310000 0x0 0xa000>;
+            compatible = "removed-dma-pool";
+            no-map;
+        };
+
+        pil_gpu_region@8681a000 {
+            reg = <0x0 0x9031a000 0x0 0x2000>;
+            compatible = "removed-dma-pool";
+            no-map;
+        };
+
+        pil_npu_region@86900000 {
+            reg = <0x0 0x8d400000 0x0 0x500000>;
+            compatible = "removed-dma-pool";
+            no-map;
+        };
+
+        pil_video_region@86e00000 {
+            reg = <0x0 0x8d900000 0x0 0x500000>;
+            compatible = "removed-dma-pool";
+            no-map;
+        };
+
+        pil_cvp_region@87300000 {
+            reg = <0x0 0x8de00000 0x0 0x500000>;
+            compatible = "removed-dma-pool";
+            no-map;
+        };
+
+        pil_cdsp_region@87800000 {
+            reg = <0x0 0x8e300000 0x0 0x1a00000>;
+            compatible = "removed-dma-pool";
+            no-map;
+        };
+
+        pil_slpi_region@88c00000 {
+            reg = <0x0 0x89200000 0x0 0x1500000>;
+            compatible = "removed-dma-pool";
+            no-map;
+        };
+
+        pil_adsp_region@8a100000 {
+            reg = <0x0 0x8a700000 0x0 0x2c00000>;
+            compatible = "removed-dma-pool";
+            no-map;
+        };
+
+        pil_spss_region@8be00000 {
+            reg = <0x0 0x8d300000 0x0 0x100000>;
+            compatible = "removed-dma-pool";
+            no-map;
+        };
+
+        cdsp_secure_heap@8bf00000 {
+            reg = <0x0 0x90400000 0x0 0x600000>;
+            compatible = "removed-dma-pool";
+            no-map;
+        };
+
+        cont_splash_region@9c000000 {
+            reg = <0x0 0x9c000000 0x0 0x2300000>;
+        };
+
+        disp_rdump_region@9c000000 {
+            reg = <0x0 0x9c000000 0x0 0x1388000>;
+        };
+
+        dfps_data_region@9e300000 {
+            reg = <0x0 0x9e300000 0x0 0x100000>;
+        };
+
+        sec_debug_region@0 {
+            reg = <0x0 0x9f000000 0x0 0x800000>;
+            compatible = "removed-dma-pool";
+            no-map;
+        };
+
+        sec_debug_rdx_bootdev@0 {
+            reg = <0x1 0x0 0x0 0xad00000>;
+        };
+
+        ss_plog_region@9F800000 {
+            reg = <0x0 0x9f800000 0x0 0x200000>;
+            compatible = "removed-dma-pool";
+            no-map;
+        };
+
+        ramoops@9FA00000 {
+            reg = <0x0 0x9fa00000 0x0 0x100000>;
+            compatible = "ramoops";
+        };
+
+        rkp_region@B0200000 {
+            reg = <0x0 0xb0200000 0x0 0x200000>;
+            compatible = "removed-dma-pool";
+        };
+
+        tima_region@B0100000 {
+            reg = <0x0 0xb0100000 0x0 0x100000>;
+            compatible = "removed-dma-pool";
+            no-map;
+        };
+
+        hdm_region@9FB00000 {
+            reg = <0x0 0x9fb00000 0x0 0x1000>;
+            compatible = "removed-dma-pool";
+            no-map;
+        };
+
+        kaslr_region@A0001000 {
+            reg = <0x0 0xa0001000 0x0 0x1000>;
+            compatible = "removed-dma-pool";
+            no-map;
+        };
+
+    };
+};

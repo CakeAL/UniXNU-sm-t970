@@ -36,10 +36,12 @@ repartitioning, flashing or reboots were performed. Serial numbers, network
 addresses, full command lines and user logs are not collected. Input unique
 IDs are omitted. No raw proprietary firmware is copied into this directory.
 
-The record cites the ADB observations as `device` evidence, with every UniXNU
-area still `planned`. Their collection-source commit revisions are not yet
-available and are omitted rather than invented. Full upstream evidence
-validation therefore remains pending, together with `board.toml`. The saved
-script and IPSW manifest excerpt are `source` references. These snapshots are
-not `host-verified` or `device-verified` claims about an implemented port. Once
-implementation is tested, add actual source/image revisions and boot evidence.
+The record cites the ADB observations as `device` evidence. Their collection
+script and input snapshots are archived at device commit
+`54fafba28ae100130a1d21bf0936983ab632c782`. This identifies the collection
+source, not a booted XNU kernel. The script and IPSW excerpt also provide
+source references. These Android snapshots do not verify an implemented port.
+
+The format-2 board configuration and CPU/memory DTS wiring now exist, with
+implementation scope and remaining UEFI/DMA constraints recorded in
+`porting.toml`. Platform host checks are kept separate from device boot claims.

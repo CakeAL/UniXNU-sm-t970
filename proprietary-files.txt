@@ -1,0 +1,5 @@
+# Required firmware inputs: relative path | source | SHA-256 | consumer
+# Fill each entry from this board's firmware package.
+# Inventory only: neither asset is consumed by the single-core platform stage.
+vendor/firmware/a650_gmu.bin | SM-T970 T970ZCU2CVK1 /vendor/firmware/a650_gmu.bin | df79fa8482fcc7587bb239b9c9e2b24bce4729893b990fe3f82b30da8175b01c | future A650 GMU backend
+vendor/firmware/a650_sqe.fw | SM-T970 T970ZCU2CVK1 /vendor/firmware/a650_sqe.fw | b4c27420fd6a5c6b511b254cc0fad8cdd40eea38ceb3418f895a1084f4460487 | future A650 command processor

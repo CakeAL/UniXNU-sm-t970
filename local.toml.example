@@ -1,0 +1,5 @@
+# Copy to ignored local.toml only when overriding a reviewed source checkout.
+# Normal builds use the pinned feeds and component catalog without local overrides.
+[local]
+# drivers = "../local-drivers"
+# kits = "../local-kits"

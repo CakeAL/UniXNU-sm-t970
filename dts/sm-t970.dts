@@ -1,0 +1,31 @@
+/dts-v1/;
+/include/ "sm8250.dtsi"
+
+/ {
+    model = "Samsung Galaxy Tab S7+ Wi-Fi (SM-T970)";
+    compatible = "samsung,gts7xlwifi", "qcom,sm8250";
+
+    // Candidate contiguous handoff bank, measured in the live Android DT:
+    // /memory reg[1] = base 0x180000000, size 0x100000000.
+    // UEFI allocatable memory and all firmware ownership still require checking.
+    // This is a host-conversion fixture, not a verified boot-time memory map.
+    memory@180000000 {
+        device_type = "memory";
+        reg = <1 0x80000000 1 0>;
+    };
+};
+
+/include/ "sm-t970-reserved.dtsi"
+
+// Keep the first hardware test on the boot CPU. Shared affinities and timer/GIC
+// resources were compared with evidence/adb-2026-11-01/live-device-tree.dts.
+&cpu0 { status = "okay"; };
+&cpu1 { status = "disabled"; };
+&cpu2 { status = "disabled"; };
+&cpu3 { status = "disabled"; };
+&cpu4 { status = "disabled"; };
+&cpu5 { status = "disabled"; };
+&cpu6 { status = "disabled"; };
+&cpu7 { status = "disabled"; };
+
+// UFS, GPU and other peripherals remain disabled in the shared DTSI.
