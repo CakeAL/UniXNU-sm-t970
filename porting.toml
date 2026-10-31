@@ -240,6 +240,8 @@ procedure = [
   "Collect /proc/cpuinfo, online/present CPU lists, cpufreq policies, /proc/interrupts and the live DT using the inventory script.",
 ]
 findings = [
+  "External zeta/SM8350 records describe a PE_init_iokit failure caused by a NULL crypto provider and a version-specific fix; T970 uses prelinked crypto and has no runtime pointer result. See docs/related-bring-up.md; no root cause is inferred from similarity.",
+  "User observation for _PE_init_iokit after-return image 9b0f8f683db2802cefc30287b206ac33f7c0d3acf480457b9447c53afdf947dd: no automatic reset observed; checkpoint not established.",
   "Prepared isolated _PE_init_iokit after-return image 9b0f8f683db2802cefc30287b206ac33f7c0d3acf480457b9447c53afdf947dd; the FAT kernel was independently extracted and its branch at 0xfffffff00798ca8c matches the intended probe. Device result is pending.",
   "User observation for _sched_startup after-return image 4a5e423389efb142c3c5b8b5afedf98dcc59c7b0db1a29782805c95d8a298721: automatic reset observed; checkpoint reached.",
   "Prepared isolated _sched_startup after-return image 4a5e423389efb142c3c5b8b5afedf98dcc59c7b0db1a29782805c95d8a298721; the FAT kernel was independently extracted and its branch at 0xfffffff00798c8f0 matches the intended probe. Device result is pending.",
@@ -258,13 +260,15 @@ completion = [
   "Each enabled XNU CPU reaches its checkpoint and handles timers and IPIs with the measured affinity and timer rate.",
 ]
 limits = [
-  "PSCI calls, CPU startup, interrupt routing and scheduling have not been exercised under UniXNU.",
-  "Implemented scope is DTS/component wiring only; no compiled CPU driver or runtime interrupt handling is verified.",
+  "Human-observed reset checkpoints establish idle_thread_create and sched_startup return only; timer IRQs, IPI routing and secondary CPU startup remain unverified.",
+  "CPU0 diagnostic execution is observed; full platform matching and runtime interrupt handling are not verified.",
 ]
 next_action = [
-  "After host DT/ADT checks, verify the boot CPU, timer and GIC through the first T970 UEFI/XNU log before enabling any secondary core.",
+  "Test immediately before PE_init_iokit; its after-return checkpoint was not observed. If reached, inspect InitIOKit and ConfigureIOKit before enabling secondary cores.",
 ]
 evidence = [
+  { kind = "source", reference = "docs/related-bring-up.md", result = "Compared zeta IOKit/provider diagnosis and cas CPU0 verification boundaries; next T970 checkpoint is before PE_init_iokit." },
+  { kind = "device", reference = "evidence/bring-up/runtime/iokit-return/device-result.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/iokit-return/boot.img --no-reboot", result = "User observation for _PE_init_iokit after-return image 9b0f8f683db2802cefc30287b206ac33f7c0d3acf480457b9447c53afdf947dd: no automatic reset observed; checkpoint not established.", revision = "8d83c81f1e8af641b1faa6eb27ff5abd4ec76ea3" },
   { kind = "host", reference = "evidence/bring-up/runtime/iokit-return/probe.json", command = "python3.14 scripts/build-entry-probe.py --target _PE_init_iokit --function _kernel_bootstrap_thread --occurrence 1 --delay 6 --output out/step7/probes/iokit-return", result = "Prepared isolated _PE_init_iokit after-return image 9b0f8f683db2802cefc30287b206ac33f7c0d3acf480457b9447c53afdf947dd; the FAT kernel was independently extracted and its branch at 0xfffffff00798ca8c matches the intended probe. Device result is pending.", revision = "8d83c81f1e8af641b1faa6eb27ff5abd4ec76ea3" },
   { kind = "device", reference = "evidence/bring-up/runtime/sched-return/device-result.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/sched-return/boot.img --no-reboot", result = "User observation for _sched_startup after-return image 4a5e423389efb142c3c5b8b5afedf98dcc59c7b0db1a29782805c95d8a298721: automatic reset observed; checkpoint reached.", revision = "70d032a1e07798c222b8e738399d04e6f87456a0" },
   { kind = "host", reference = "evidence/bring-up/runtime/sched-return/probe.json", command = "python3.14 scripts/build-entry-probe.py --target _sched_startup --function _kernel_bootstrap_thread --occurrence 1 --delay 6 --output out/step7/probes/sched-return", result = "Prepared isolated _sched_startup after-return image 4a5e423389efb142c3c5b8b5afedf98dcc59c7b0db1a29782805c95d8a298721; the FAT kernel was independently extracted and its branch at 0xfffffff00798c8f0 matches the intended probe. Device result is pending.", revision = "70d032a1e07798c222b8e738399d04e6f87456a0" },
@@ -672,6 +676,7 @@ procedure = [
   "Read BuildManifest.plist from the local IPSW using Python zipfile and plistlib to identify its OS version, build and product types.",
 ]
 findings = [
+  "The iokit-return BOOT image uploaded successfully; the user observed no automatic reset. Upload verifies transfer only, not IOKit completion or userland readiness. Original BOOT restoration remains pending.",
   "Prepared isolated _PE_init_iokit after-return image 9b0f8f683db2802cefc30287b206ac33f7c0d3acf480457b9447c53afdf947dd; the FAT kernel was independently extracted and its branch at 0xfffffff00798ca8c matches the intended probe. Device result is pending.",
   "Prepared isolated _sched_startup after-return image 4a5e423389efb142c3c5b8b5afedf98dcc59c7b0db1a29782805c95d8a298721; the FAT kernel was independently extracted and its branch at 0xfffffff00798c8f0 matches the intended probe. Device result is pending.",
   "The isolated probe boot image is 62713856 bytes, within the measured 71303168-byte BOOT limit. Its header/payload sections round-trip; no Data image is included.",
@@ -704,6 +709,7 @@ next_action = [
   "Build the isolated idle_thread_create after-return payload/image, verify the BOOT size and hashes, then use the confirmed recovery path for a single checkpoint test.",
 ]
 evidence = [
+  { kind = "device", reference = "evidence/bring-up/runtime/iokit-return/flash.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/iokit-return/boot.img --no-reboot", result = "BOOT upload succeeded for 9b0f8f683db2802cefc30287b206ac33f7c0d3acf480457b9447c53afdf947dd; after-return checkpoint was not observed. Original BOOT restoration pending.", revision = "8d83c81f1e8af641b1faa6eb27ff5abd4ec76ea3" },
   { kind = "host", reference = "evidence/bring-up/runtime/iokit-return/probe.json", command = "python3.14 scripts/build-entry-probe.py --target _PE_init_iokit --function _kernel_bootstrap_thread --occurrence 1 --delay 6 --output out/step7/probes/iokit-return", result = "Prepared isolated _PE_init_iokit after-return image 9b0f8f683db2802cefc30287b206ac33f7c0d3acf480457b9447c53afdf947dd; the FAT kernel was independently extracted and its branch at 0xfffffff00798ca8c matches the intended probe. Device result is pending.", revision = "8d83c81f1e8af641b1faa6eb27ff5abd4ec76ea3" },
   { kind = "host", reference = "evidence/bring-up/runtime/sched-return/probe.json", command = "python3.14 scripts/build-entry-probe.py --target _sched_startup --function _kernel_bootstrap_thread --occurrence 1 --delay 6 --output out/step7/probes/sched-return", result = "Prepared isolated _sched_startup after-return image 4a5e423389efb142c3c5b8b5afedf98dcc59c7b0db1a29782805c95d8a298721; the FAT kernel was independently extracted and its branch at 0xfffffff00798c8f0 matches the intended probe. Device result is pending.", revision = "70d032a1e07798c222b8e738399d04e6f87456a0" },
   { kind = "host", reference = "evidence/bring-up/runtime/idle-return/probe.json", command = "python3.14 scripts/build-entry-probe.py --target _idle_thread_create --delay 6 --output out/step7/probes/idle-return", result = "The isolated probe boot image is 62713856 bytes, within the measured 71303168-byte BOOT limit. Its header/payload sections round-trip; no Data image is included.", revision = "6a3ae24fba8bc4cb44dcdb0898b92582751a36b9" },
@@ -752,6 +758,8 @@ procedure = [
   "Run python3 scripts/collect-adb-inventory.py --root --output evidence/<new-capture>; review per-command stderr, checksums, GPT CRC results and DT sanitization before updating this record.",
 ]
 findings = [
+  "External zeta/SM8350 records describe a PE_init_iokit failure caused by a NULL crypto provider and a version-specific fix; T970 uses prelinked crypto and has no runtime pointer result. See docs/related-bring-up.md; no root cause is inferred from similarity.",
+  "User observation for _PE_init_iokit after-return image 9b0f8f683db2802cefc30287b206ac33f7c0d3acf480457b9447c53afdf947dd: no automatic reset observed; checkpoint not established.",
   "Prepared isolated _PE_init_iokit after-return image 9b0f8f683db2802cefc30287b206ac33f7c0d3acf480457b9447c53afdf947dd; the FAT kernel was independently extracted and its branch at 0xfffffff00798ca8c matches the intended probe. Device result is pending.",
   "User observation for _sched_startup after-return image 4a5e423389efb142c3c5b8b5afedf98dcc59c7b0db1a29782805c95d8a298721: automatic reset observed; checkpoint reached.",
   "Prepared isolated _sched_startup after-return image 4a5e423389efb142c3c5b8b5afedf98dcc59c7b0db1a29782805c95d8a298721; the FAT kernel was independently extracted and its branch at 0xfffffff00798c8f0 matches the intended probe. Device result is pending.",
@@ -779,12 +787,14 @@ completion = [
   "Every claimed UniXNU milestone has matching source/image revisions, a reproducible command and accessible firmware/kernel logs.",
 ]
 limits = [
-  "ADB evidence tooling and input snapshots are archived at device commit 54fafba28ae100130a1d21bf0936983ab632c782. No device-verified UniXNU milestone is claimed; recovery, UART, UEFI log export and XNU crash capture remain untested.",
+  "ADB inputs and BOOT-only reset checkpoints are archived. Original BOOT restoration is pending; UART, usable UEFI log export and XNU fault capture remain unverified.",
 ]
 next_action = [
-  "Record whether the isolated after-return idle_thread_create probe resets after six seconds, then choose the next bootstrap-thread boundary.",
+  "Compare PE_init_iokit before-call and after-return checkpoints, then inspect console, InitIOKit and ConfigureIOKit boundaries; retain exact image hashes and restore BOOT after diagnosis.",
 ]
 evidence = [
+  { kind = "source", reference = "docs/related-bring-up.md", result = "Compared zeta IOKit/provider diagnosis and cas CPU0 verification boundaries; next T970 checkpoint is before PE_init_iokit." },
+  { kind = "device", reference = "evidence/bring-up/runtime/iokit-return/device-result.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/iokit-return/boot.img --no-reboot", result = "User observation for _PE_init_iokit after-return image 9b0f8f683db2802cefc30287b206ac33f7c0d3acf480457b9447c53afdf947dd: no automatic reset observed; checkpoint not established.", revision = "8d83c81f1e8af641b1faa6eb27ff5abd4ec76ea3" },
   { kind = "host", reference = "evidence/bring-up/runtime/iokit-return/probe.json", command = "python3.14 scripts/build-entry-probe.py --target _PE_init_iokit --function _kernel_bootstrap_thread --occurrence 1 --delay 6 --output out/step7/probes/iokit-return", result = "Prepared isolated _PE_init_iokit after-return image 9b0f8f683db2802cefc30287b206ac33f7c0d3acf480457b9447c53afdf947dd; the FAT kernel was independently extracted and its branch at 0xfffffff00798ca8c matches the intended probe. Device result is pending.", revision = "8d83c81f1e8af641b1faa6eb27ff5abd4ec76ea3" },
   { kind = "device", reference = "evidence/bring-up/runtime/sched-return/device-result.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/sched-return/boot.img --no-reboot", result = "User observation for _sched_startup after-return image 4a5e423389efb142c3c5b8b5afedf98dcc59c7b0db1a29782805c95d8a298721: automatic reset observed; checkpoint reached.", revision = "70d032a1e07798c222b8e738399d04e6f87456a0" },
   { kind = "host", reference = "evidence/bring-up/runtime/sched-return/probe.json", command = "python3.14 scripts/build-entry-probe.py --target _sched_startup --function _kernel_bootstrap_thread --occurrence 1 --delay 6 --output out/step7/probes/sched-return", result = "Prepared isolated _sched_startup after-return image 4a5e423389efb142c3c5b8b5afedf98dcc59c7b0db1a29782805c95d8a298721; the FAT kernel was independently extracted and its branch at 0xfffffff00798c8f0 matches the intended probe. Device result is pending.", revision = "70d032a1e07798c222b8e738399d04e6f87456a0" },

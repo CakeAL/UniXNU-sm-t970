@@ -1,0 +1,16 @@
+{
+  "device": "SM-T970 / gts7xlwifi",
+  "image_sha256": "9b0f8f683db2802cefc30287b206ac33f7c0d3acf480457b9447c53afdf947dd",
+  "image_source_revision": "8d83c81f1e8af641b1faa6eb27ff5abd4ec76ea3",
+  "probe": {
+    "function": "_kernel_bootstrap_thread",
+    "target": "_PE_init_iokit",
+    "occurrence": 1,
+    "position": "after-return",
+    "reset_delay_seconds": 6
+  },
+  "observation_source": "Human reply in this chat",
+  "observation": "仍停在色条，没有自动复位",
+  "result": "checkpoint-not-observed",
+  "limits": "Checkpoint result does not certify subsequent initialization, root mounting or userland."
+}

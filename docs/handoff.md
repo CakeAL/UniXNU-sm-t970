@@ -11,8 +11,14 @@
   `evidence/bring-up/runtime/handoff-observation.json`。
 - SEC 补丁已在 `ac1ca14` 接入准备工具；固定补丁和四个文件的前／后像哈希，
   干净源码应用、重复执行及保留未知修改的检查均通过，不再依赖缓存的手工修改。
-- 重置探针从默认 `board.toml` 移出。下一轮用 `scripts/build-entry-probe.py`
-  独立生成 `idle_thread_create` **返回之后**的探针；之前只确认到达调用前，不能当作已经返回。
+- 重置探针从默认 `board.toml` 移出，用 `scripts/build-entry-probe.py` 隔离生成。
+  机主已确认 `idle_thread_create`、`sched_startup` 返回后探针均自动复位；
+  `PE_init_iokit` 返回后探针（`9b0f8f68…`）仍停在色条，没有自动复位。
+  每轮完整镜像哈希、刷写回执与观察见 `evidence/bring-up/runtime/`。
+  下一处检查应为 `PE_init_iokit` 调用前，先区分函数内部与更早的路径。
+- [相近设备案例](related-bring-up.md)记录了 Surface Duo 2 同阶段的加密 provider 问题，
+  以及 SM8250 小米 10 至尊版的验证边界。均不是 T970 根因的证据。
+- BOOT 当前仍是 `iokit-return` 诊断镜像，原始 BOOT 恢复待完成。
 - 以下为 ds 交接当时的状态、命令和待办，保留作历史基线；当前进展以本节及适配记录为准。
 
 ## 总体现状
