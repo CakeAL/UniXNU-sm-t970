@@ -68,6 +68,7 @@ findings = [
   "Step 3 seven-item audit at device configuration 6d3012ab3fbbbb3d4517d1a4ed4ccb87b795a028: all 13 template files are present and tracked; identities, renamed entry paths, three config fragments, four series and eight inherited archive recipes agree. Firmware config/DSC/FD and real handoff inputs remain incomplete.",
   "At the original audit, the 13-area check passed while Step 3 inputs remained incomplete and example was true. The completion update above supersedes that configuration.",
   "board.toml [payload] tools is now true, so the generated boot menu carries Tools, and the platform checker verifies the firmware log-exporter wiring that backs it. Host builds, not a menu image, confirm this configuration change; the device remains unbooted.",
+  "Step 4 ran defconfig/fetch/status/tree. unixnu fetch rewrote unixnu.lock with all nine resolved sources (eight Apple/EDK references plus sm8250 at 166235ec...), and status resolves arch arm64/4KiB, the pinned SM8250 feed, the iPadOS profile and this board.toml in that order; 19 modules and 61 patches (56 arch, 2 SoC, 3 OS, 0 board) agree with the declared series, and build_config is empty because no unixnu.local.toml exists yet.",
 ]
 completion = [
   "A board.toml with matching device identity resolves the selected SoC and OS profiles and pinned sources.",
@@ -661,6 +662,7 @@ findings = [
   "Step 2 adds reproducible checks for reviewed framework/profile hashes, explicit device component pins, declared OS ABI scope and source file presence. These checks do not execute driver protocols or validate private ABI layouts.",
   "Archived the Step 2 PASS report with input hashes and the resolved configuration; historical platform-bootstrap evidence remains bound to its earlier source revision.",
   "check-platform.py now rejects a missing exporter in DSC/FDF, missing AdvancedLoggerAccessLib/QrEncoderLib/HdwPortLib/PeilessArm/DXE_CORE mappings, a fabricated PcdAdvancedLoggerBase, or board [payload] tools other than true. It also ignores untracked *.DS_Store when verifying pinned component checkouts.",
+  "scripts/check-build-config.py independently re-resolves the four patch series and compares them with status, re-checks every module checkout and unixnu.lock pin, and verifies the assembled tree links drivers/kits/refer to those exact sources, kits/sm-t970 to this package directory, and tree/scripts to the merged framework/SoC/device copies. Two framework behaviours are checked rather than assumed: SoC sources are deliberately not linked into tree/refer, and the feed cache may be a symlink to the same pinned checkout.",
 ]
 completion = [
   "Every claimed UniXNU milestone has matching source/image revisions, a reproducible command and accessible firmware/kernel logs.",

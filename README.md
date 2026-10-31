@@ -45,8 +45,12 @@ python3.14 ./unixnu fetch sm8250 ArmDTPlatform ArmCpu SoftwareAES XnuPrelink Dar
 python3.14 ./unixnu status --json -D ../UniXNU-sm-t970
 python3.14 ./unixnu tree -D ../UniXNU-sm-t970
 python3.14 ../UniXNU-sm-t970/scripts/check-platform.py --unixnu .
+python3.14 ../UniXNU-sm-t970/scripts/check-build-config.py --unixnu .
 python3.14 scripts/porting-record.py check --device ../UniXNU-sm-t970
 ```
+
+`check-build-config.py` 核对第 4 步的解析结果：配置层顺序、profile、组件与补丁顺序、
+19 个模块和 `unixnu.lock` 的固定版本，以及 `out/.../tree/` 到这些源码的链接。
 
 详细的固件获取、提取、固定子模块、准备和构建命令见[固件输入与构建](docs/firmware.md)。
 不要使用其他设备的配置或二进制替代 T970 输入。固件 FDT 与 XNU 硬件 DTB 是不同输入。
