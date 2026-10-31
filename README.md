@@ -61,6 +61,7 @@ XNU 内核和完整 payload 构建还需 Apple 原始 kernelcache、信任与 Da
 ## 记录
 
 - [第 3 步七项验收](docs/device-repository-checklist.md)
+- [存储（UFS）适配分析](docs/storage.md)：板级输入、ShengUfs 不适用判断与后续工作
 - [提交后的主机构建与打包证据](evidence/device-repository/README.md)
 - [共享支持选择与精确版本](docs/shared-support.md)
 - [原厂 ADB 与固件来源证据](evidence/README.md)

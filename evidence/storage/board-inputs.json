@@ -1,0 +1,229 @@
+{
+  "scope": "SM-T970 UFS hardware inventory from captured evidence; no device access",
+  "sources": {
+    "live_dts": "evidence/adb-2026-11-01/live-device-tree.dts",
+    "gpt": "evidence/adb-2026-11-01/gpt.json",
+    "headers": {
+      "gcc": {
+        "sha256": "ec7b2a775a7f96a543c064c7fc733fb83ffa7e3dae3c4bb517200627ae5f7fed",
+        "clocks_verified": 37,
+        "resets_verified": 2
+      },
+      "rpmh": {
+        "sha256": "0e999a4dfbfe07a0f9e83e86c22ae5fcd7939b3ee816b4222159010528667e51",
+        "clocks_verified": 2
+      }
+    }
+  },
+  "controller": {
+    "node": "ufshc@1d84000",
+    "compatible": [
+      "qcom,ufshc"
+    ],
+    "reg": [
+      "0x1d84000+0x3000",
+      "0x1d90000+0x8000"
+    ],
+    "reg_names": [
+      "ufs_mem",
+      "ufs_ice"
+    ],
+    "interrupts": [
+      [
+        0,
+        265,
+        4
+      ]
+    ],
+    "lanes_per_direction": 2,
+    "dev_ref_clk_freq": 0,
+    "pinctrl": [
+      "dev-reset-assert",
+      "dev-reset-deassert"
+    ]
+  },
+  "phy": {
+    "node": "ufsphy_mem@1d87000",
+    "compatible": [
+      "qcom,ufs-phy-qmp-v4"
+    ],
+    "reg": [
+      "0x1d87000+0xe00",
+      "0x1d90000+0x8000"
+    ],
+    "reg_names": [
+      "phy_mem",
+      "ufs_ice"
+    ],
+    "lanes_per_direction": 2,
+    "clocks": [
+      "ref_clk_src",
+      "ref_aux_clk"
+    ]
+  },
+  "clocks": [
+    {
+      "name": "core_clk",
+      "provider": "qcom,gcc@100000",
+      "id": 167,
+      "mapping": "GCC_UFS_PHY_AXI_CLK"
+    },
+    {
+      "name": "bus_aggr_clk",
+      "provider": "qcom,gcc@100000",
+      "id": 6,
+      "mapping": "GCC_AGGRE_UFS_PHY_AXI_CLK"
+    },
+    {
+      "name": "iface_clk",
+      "provider": "qcom,gcc@100000",
+      "id": 166,
+      "mapping": "GCC_UFS_PHY_AHB_CLK"
+    },
+    {
+      "name": "core_clk_unipro",
+      "provider": "qcom,gcc@100000",
+      "id": 179,
+      "mapping": "GCC_UFS_PHY_UNIPRO_CORE_CLK"
+    },
+    {
+      "name": "core_clk_ice",
+      "provider": "qcom,gcc@100000",
+      "id": 170,
+      "mapping": "GCC_UFS_PHY_ICE_CORE_CLK"
+    },
+    {
+      "name": "ref_clk",
+      "provider": "qcom,rpmhclk",
+      "id": 0,
+      "mapping": "RPMH_CXO_CLK"
+    },
+    {
+      "name": "tx_lane0_sync_clk",
+      "provider": "qcom,gcc@100000",
+      "id": 178,
+      "mapping": "GCC_UFS_PHY_TX_SYMBOL_0_CLK"
+    },
+    {
+      "name": "rx_lane0_sync_clk",
+      "provider": "qcom,gcc@100000",
+      "id": 176,
+      "mapping": "GCC_UFS_PHY_RX_SYMBOL_0_CLK"
+    },
+    {
+      "name": "rx_lane1_sync_clk",
+      "provider": "qcom,gcc@100000",
+      "id": 177,
+      "mapping": "GCC_UFS_PHY_RX_SYMBOL_1_CLK"
+    }
+  ],
+  "resets": [
+    {
+      "name": "core_reset",
+      "provider": "qcom,gcc@100000",
+      "id": 33,
+      "mapping": "GCC_UFS_PHY_BCR"
+    }
+  ],
+  "supplies": {
+    "vdd-hba-supply": "qcom,gdsc@177004",
+    "vcc-supply": "regulator-pm8150-l17",
+    "vccq-supply": "regulator-pm8150-l6",
+    "vccq2-supply": "regulator-pm8150-s4",
+    "qcom,vddp-ref-clk-supply": "regulator-pm8150-l6",
+    "qcom,vccq-parent-supply": "regulator-pm8150a-s8"
+  },
+  "phy_supplies": {
+    "vdda-phy-supply": "regulator-pm8150-l5",
+    "vdda-pll-supply": "regulator-pm8150-l9"
+  },
+  "gpt": {
+    "luns": {
+      "sda": {
+        "logical_block_size": 4096,
+        "partitions": 36,
+        "gpt_crc_valid": true,
+        "scsi_path": "/sys/devices/platform/soc/1d84000.ufshc/host0/target0:0:0/0:0:0:0",
+        "userdata": 2969600,
+        "last_lba": 62458874,
+        "key_partitions": {
+          "boot": {
+            "first_lba": 104723,
+            "size_bytes": 71303168
+          },
+          "dtbo": {
+            "first_lba": 102163,
+            "size_bytes": 10485760
+          },
+          "recovery": {
+            "first_lba": 122131,
+            "size_bytes": 86888448
+          },
+          "super": {
+            "first_lba": 159744,
+            "size_bytes": 9961472000
+          },
+          "userdata": {
+            "first_lba": 2969600,
+            "size_bytes": 243668070400
+          }
+        }
+      },
+      "sdb": {
+        "logical_block_size": 4096,
+        "partitions": 2,
+        "gpt_crc_valid": true,
+        "scsi_path": "/sys/devices/platform/soc/1d84000.ufshc/host0/target0:0:0/0:0:0:1",
+        "userdata": null,
+        "last_lba": 2042,
+        "key_partitions": {}
+      },
+      "sdc": {
+        "logical_block_size": 4096,
+        "partitions": 2,
+        "gpt_crc_valid": true,
+        "scsi_path": "/sys/devices/platform/soc/1d84000.ufshc/host0/target0:0:0/0:0:0:2",
+        "userdata": null,
+        "last_lba": 2042,
+        "key_partitions": {}
+      },
+      "sdd": {
+        "logical_block_size": 4096,
+        "partitions": 37,
+        "gpt_crc_valid": true,
+        "scsi_path": "/sys/devices/platform/soc/1d84000.ufshc/host0/target0:0:0/0:0:0:3",
+        "userdata": null,
+        "last_lba": 15354,
+        "key_partitions": {}
+      }
+    },
+    "userdata_first_lba": 2969600,
+    "userdata_size_bytes": 243668070400,
+    "ufs_interface": "/sys/devices/platform/soc/1d84000.ufshc/host0/target0:0:0/0:0:0:0"
+  },
+  "compatibility": {
+    "driver": {
+      "id": "ShengUfs",
+      "revision": "e2b32cc429e8cf1501161c1d8c517f8994ceb9b2",
+      "scope": "SM8550 UFS controller"
+    },
+    "controller_base_matches": true,
+    "controller_size_matches": true,
+    "phy_base_matches": false,
+    "phy_size_matches": false,
+    "stock_iommus_present": false,
+    "sheng_stream_id": 96,
+    "gcc_controller_present": true,
+    "lanes_per_direction": 2,
+    "selected": false,
+    "reason": "ShengUfs hard-codes the SM8550 PHY window, SM8550 clock/reset policy and a fixed apps-SMMU stream; this board has a different PHY window, an ICE block, no iommus property and its own userdata geometry."
+  },
+  "required_work": [
+    "Port the controller bring-up to qcom,ufshc + QMP PHY v4 at 0x1d87000/0xe000 with the UFS_PHY clock/reset ids above, or document a firmware-state takeover.",
+    "Decide SMMU ownership: the stock DT has no iommus property, so stream/context ownership must be read from firmware or the kernel driver, not copied from sheng stream 0x60.",
+    "Implement ICE handling for the 0x1d90000/0x8000 block or prove it can stay disabled.",
+    "Recompute the userdata/root window from this GPT instead of sheng LBA 3094592..64007162.",
+    "Provide the storage ABI inputs, archive recipe and root-volume policy, then build a kernel."
+  ],
+  "result": "inventory-only; storage driver not selected and UFS stays disabled"
+}

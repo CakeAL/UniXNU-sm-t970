@@ -310,6 +310,9 @@ components = []
 paths = [
   "evidence/adb-2026-11-01/storage.txt",
   "evidence/adb-2026-11-01/gpt.json",
+  "docs/storage.md",
+  "evidence/storage/board-inputs.json",
+  "scripts/collect-storage-inputs.py",
 ]
 inputs = [
   "UFS controller: 0x01d84000 + 0x3000; UFS ICE: 0x01d90000 + 0x8000. Controller interrupt cells are <0 0x109 4>.",
@@ -328,6 +331,9 @@ findings = [
   "Primary GPT headers and entry-array CRCs passed for all four inspected LUNs; their entries and byte offsets are saved in gpt.json.",
   "Linux block sysfs start/size values use 512-byte units, while this device's GPT LBAs use 4096-byte logical blocks; convert explicitly when comparing them.",
   "Step 2 catalog review found ShengUfs declares SM8550/sheng clock, SMMU and userdata-layout dependencies. It and RamBlock/VirtIO/VerifiedRoot remain unselected until a T970 storage/root policy and interfaces are established.",
+  "Step 6 storage inventory resolves the UFS controller (0x1d84000+0x3000 and ICE 0x1d90000+0x8000), QMP PHY v4 (0x1d87000+0xe000), all nine clock names to kona IDs (UFS_PHY_AXI 167, AGGRE_UFS_PHY_AXI 6, UFS_PHY_AHB 166, UNIPRO 179, ICE 170, TX/RX symbol clocks, RPMH_CXO 0), reset core_reset=GCC_UFS_PHY_BCR(33) and every regulator phandle; the stock UFS node has no iommus property.",
+  "ShengUfs is not selected: it is scoped to the SM8550 controller with a 0x1d80000/0x2000 PHY, SM8550 clock policy, a fixed apps-SMMU stream 0x60 and sheng userdata LBAs. The T970 controller base matches but the PHY window, ICE block, SMMU ownership and userdata geometry do not.",
+  "No SM8250/kona UFS implementation exists in the reviewed repositories: the shared SoC DTSI only declares disabled ufs/ufsphy nodes, and the SM8250 pipa port carries only package/SmmuBypass.h. UFS therefore stays disabled; storage remains planned pending a real driver port.",
 ]
 completion = [
   "UFS reads return correct capacity, GPT and known blocks under XNU; the chosen root mounts and writes persist only inside the allocated Data region.",
@@ -336,12 +342,15 @@ limits = [
   "No storage writes, repartitioning, XNU UFS driver, root mounting or persistence tests were performed; backup GPT copies and filesystem contents were not read.",
 ]
 next_action = [
-  "Resolve UFS clocks, reset and regulator phandles from the saved DT, then compare the target driver and root-volume policy with the measured four-LUN layout.",
+  "Port or adopt an SM8250 (qcom,ufshc + QMP PHY v4 at 0x1d87000+0xe000) UFS driver using the resolved UFS_PHY clock/reset IDs, then determine SMMU/ICE ownership and recompute the userdata window from the measured GPT before enabling any storage component.",
 ]
 evidence = [
   { kind = "device", reference = "evidence/adb-2026-11-01/storage.txt", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Saved device model, revision, block geometry, partition sizes and by-name mappings.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },
   { kind = "device", reference = "evidence/adb-2026-11-01/gpt.json", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Primary GPT header and entry CRCs passed on LUNs 0-3; GUIDs are omitted and partition names/byte ranges are preserved.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },
   { kind = "device", reference = "evidence/adb-2026-11-01/live-device-tree.dts", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Board UFS controller/PHY resources, interrupt cells, clocks, reset and power supplies.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },
+  { kind = "source", reference = "evidence/storage/board-inputs.json", result = "Machine-readable UFS inventory with resolved clock/reset/supply phandles, GPT geometry, kona header hashes and the ShengUfs compatibility decision." },
+  { kind = "source", reference = "docs/storage.md", result = "Storage decision record: measured inputs, ShengUfs mismatch table, required porting work and verification plan." },
+  { kind = "source", reference = "scripts/collect-storage-inputs.py", result = "Deterministic collector for the UFS inventory; verified to produce the same JSON twice." },
 ]
 
 [[area]]
@@ -685,6 +694,7 @@ findings = [
   "check-platform.py now rejects a missing exporter in DSC/FDF, missing AdvancedLoggerAccessLib/QrEncoderLib/HdwPortLib/PeilessArm/DXE_CORE mappings, a fabricated PcdAdvancedLoggerBase, or board [payload] tools other than true. It also ignores untracked *.DS_Store when verifying pinned component checkouts.",
   "scripts/check-build-config.py independently re-resolves the four patch series and compares them with status, re-checks every module checkout and unixnu.lock pin, and verifies the assembled tree links drivers/kits/refer to those exact sources, kits/sm-t970 to this package directory, and tree/scripts to the merged framework/SoC/device copies. Two framework behaviours are checked rather than assumed: SoC sources are deliberately not linked into tree/refer, and the feed cache may be a symlink to the same pinned checkout.",
   "The Step 5 checkers share scripts/fdt.py for structural FDT parsing, so the firmware blob and the board DTB are read the same way. The checker also scans the built FV when present and requires the five UniXNU/DarwinBoot modules.",
+  "scripts/collect-storage-inputs.py derives the UFS inventory from the captured live DT and GPT, cross-checks every UFS clock/reset ID against the kona gcc/rpmh headers, and records the header hashes; it enables nothing and needs no device.",
 ]
 completion = [
   "Every claimed UniXNU milestone has matching source/image revisions, a reproducible command and accessible firmware/kernel logs.",
