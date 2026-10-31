@@ -34,7 +34,9 @@ DTS 使用 Android 实测的 `0x180000000 + 0x100000000` 连续内存段进行�
 `board.example = true` 因而保留，官方工具会拒绝构建内核/镜像。
 T970 的 UEFI 配置、启动方法与固件路径仍待确定。
 
-主机上的配置解析、DTS 编译和 ADT 检查不代表 XNU 编译或设备启动成功。
+主机上的配置解析、DTS 编译和 ADT 检查已通过；报告见
+[evidence/platform-bootstrap](evidence/platform-bootstrap/README.md)。这些检查不代表
+XNU 编译或设备启动成功。
 
 ## 主机检查
 

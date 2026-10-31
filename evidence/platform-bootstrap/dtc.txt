@@ -1,0 +1,3 @@
+{device}/dts/sm-t970-reserved.dtsi:11.24-13.11: Warning (unit_address_vs_reg): /reserved-memory/uh_heap_region: node has a reg or ranges property, but no unit name
+{device}/dts/sm-t970-reserved.dtsi:119.37-121.11: Warning (unique_unit_address): /reserved-memory/cont_splash_region@9c000000: duplicate unit-address (also used in node /reserved-memory/disp_rdump_region@9c000000)
+{device}/dts/sm-t970-reserved.dtsi:131.28-135.11: Warning (unique_unit_address): /reserved-memory/sec_debug_region@0: duplicate unit-address (also used in node /reserved-memory/sec_debug_rdx_bootdev@0)

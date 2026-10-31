@@ -45,3 +45,6 @@ source references. These Android snapshots do not verify an implemented port.
 The format-2 board configuration and CPU/memory DTS wiring now exist, with
 implementation scope and remaining UEFI/DMA constraints recorded in
 `porting.toml`. Platform host checks are kept separate from device boot claims.
+
+See [platform-bootstrap/README.md](platform-bootstrap/README.md) for the committed
+configuration host checks and their exact source revision.

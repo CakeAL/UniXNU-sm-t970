@@ -1,0 +1,50 @@
+[
+  {
+    "name": "sm8250",
+    "repository": "https://github.com/FFT-infra/UniXNU-sm8250-common",
+    "commit": "166235ec2480ff0992627b7aafa15c65ce6b4efa",
+    "tree": "ae822f4e2802773946a1bf99088bcc8d8b89c453",
+    "archive_sha256": "d326bb67939479b454976e91598ad51901ce2bd6f69dfe32a65c0758eee52872",
+    "verification": "Archive Git tree and reconstructed commit object both match upstream Git object IDs; shallow source checkout."
+  },
+  {
+    "name": "ArmDTPlatform",
+    "repository": "https://github.com/UniXNU/ArmDTPlatform",
+    "commit": "417ff95d6a6e8607ddea9309ec45c3bfd4a67c60",
+    "tree": "51bcace2bfe260582ab7b402d52fe0fc7b99741a",
+    "archive_sha256": "e13ff6f321ff555e814594bc88a1b378ffb32264138a79317023bd032165bb97",
+    "verification": "Archive Git tree and reconstructed commit object both match upstream Git object IDs; shallow source checkout."
+  },
+  {
+    "name": "ArmCpu",
+    "repository": "https://github.com/UniXNU/ArmCpu",
+    "commit": "9066b53bbc82e92a98ec44a11dd50fd13eaf1a1b",
+    "tree": "23a4fa6508c9425f81d4bac3f19e21569737c08a",
+    "archive_sha256": "e5a3143107c7b30cddd6873d105e8fb3d0f53a73a7db3eb26ea609e64c293212",
+    "verification": "Archive Git tree and reconstructed commit object both match upstream Git object IDs; shallow source checkout."
+  },
+  {
+    "name": "SoftwareAES",
+    "repository": "https://github.com/UniXNU/SoftwareAES",
+    "commit": "4a45326da5c2cd6fe6813d79ee43db20805628af",
+    "tree": "3e35216eee78374ec4a5b0373a802d481635c0c6",
+    "archive_sha256": "b64bd23634002f67d4c5cf4598e3123304914e9b7fb1398be07feed3c15f2926",
+    "verification": "Archive Git tree and reconstructed commit object both match upstream Git object IDs; shallow source checkout."
+  },
+  {
+    "name": "XnuPrelink",
+    "repository": "https://github.com/UniXNU/XnuPrelink",
+    "commit": "f876e3ee62e18fc06653dd75ed7dafcfb3950ac0",
+    "tree": "94ae18aa9df36583c4b208af51d3d69e4abb29ee",
+    "archive_sha256": "e1542e02f8810469dd7a1f48b18e08271e585c33273b602e7195cb12c5a23499",
+    "verification": "Archive Git tree and reconstructed commit object both match upstream Git object IDs; shallow source checkout."
+  },
+  {
+    "name": "DarwinBoot",
+    "repository": "https://github.com/UniXNU/DarwinBoot",
+    "commit": "3325e352d7df68a9f9ad74832ed94a6acbbd7390",
+    "tree": "e1e8e913afd327b09f35e55a5a738b3316099a8a",
+    "archive_sha256": "d8bfa1b50108f328b39b191ecff38b6d4cbbf9b5505eaa54625f0dfc35c53ae5",
+    "verification": "Archive Git tree and reconstructed commit object both match upstream Git object IDs; shallow source checkout."
+  }
+]
