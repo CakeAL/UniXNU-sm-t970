@@ -39,8 +39,8 @@
 `ufshc@1d84000`／`phy@1d87000` 节点，`UniXNU-pipa`（同为 SM8250）只有
 `package/SmmuBypass.h`，没有 UFS 或存储驱动。
 
-因此**不选择 ShengUfs**；把它的 SM8550 常量直接套到 T970 会写错 PHY 窗口、时钟与
-SMMU 所有权。存储部分保持 `planned`。
+因此不选择目录里的 ShengUfs 实现；把它的 SM8550 常量直接套到 T970 会写错 PHY 窗口、
+时钟与 SMMU 所有权。后续可沿用 `ShengUfs` 组件 ID 指向本设备 fork。存储部分保持 `planned`。
 
 ## 同 SoC 设备的做法
 
@@ -69,11 +69,12 @@ userdata 窗口并保留固件接管，是可行且已有实机验证先例的�
 
 ## 继续实现所需工作
 
-1. 把控制器初始化移植为 `qcom,ufshc` + QMP PHY v4（`0x1d87000+0xe000`）的序列，
-   使用上表的时钟/复位 ID；或明确记录固件状态接管的依据。
-2. 确定 SMMU 归属：从固件或原厂内核读取 UFS 的 stream/context，而不是沿用 sheng `0x60`。
-3. 处理 ICE `0x1d90000+0x8000`，或证明可保持关闭并记录依据。
-4. 按本机 GPT 重算 userdata/根卷窗口，不使用 sheng 的 LBA。
+1. 以 umi 的 NativeUfs 为基建立本设备 fork，保留固件状态接管（不写时钟/PHY），
+   在 `feeds.toml` 固定并在构建时用 `--local-module driver:ShengUfs=...` 指向工作副本。
+2. 用 SM8250 的 `0x0e0`／`0x4e0` 读 SMR/S2CR，复用空闲 context，并记录固件留下的
+   GCC 门控与链路状态作为接管依据。
+3. ICE `0x1d90000+0x8000`：只读验证其状态，或明确记录继续由固件管理。
+4. 按本机 GPT 重算 userdata 窗口（起始 LBA 2969600、结束 62458874），不使用 sheng 的 LBA。
 5. 提供存储 ABI 输入、archive 配方与根卷策略，然后构建内核。
 
 ## 验证计划
