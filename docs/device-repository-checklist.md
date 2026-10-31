@@ -1,57 +1,56 @@
-# 第 3 步：设备仓库核查
+# 第 3 步：设备仓库七项验收
 
-核查依据：UniXNU `04b4e558bcded5213c2d802984862dc062f28257` 中
-`docs/zh/porting/steps.md` 第 3 步的七项要求和设备仓库完成清单。
-本次检查的设备配置基线为 `6d3012ab3fbbbb3d4517d1a4ed4ccb87b795a028`。
+范围为 SM-T970 的 **CPU0／initrd 平台引导输入**。第 3 步要求建立具体设备仓库，
+后续 XNU／iPadOS 实机启动与外设实现分别使用适配记录的完成等级；不相互替代。
 
-**结论：设备仓库已建立，七项要求尚未全部完成。** 下表区分本地结构完成与仍缺的设备输入。
+原始审计基线 `6d3012ab3fbbbb3d4517d1a4ed4ccb87b795a028` 确实缺少固件接入和清单输入。
+本次已经补齐下表文件，移除示例标记，并进入提交后的主机复核；最终检查结果单独归档。
 
-| 项 | 当前结果 | 已有证据及缺项 |
+| 项 | 已完成的仓库内容 | 后续独立验证 |
 | --- | --- | --- |
-| 1. `board.toml` | 部分完成 | `name/kit=sm-t970`、SM8250 来源、iPadOS profile、DTS 入口和五组件集合均已填写。完整继承 ARM64 的 8 条归档配方。`firmware.config`、`firmware.dsc`、`firmware.fd` 尚缺真实 T970 输入。 |
-| 2. `feeds.toml` | 已完成当前选型 | SoC URL／完整提交已固定，另外固定五个组件。`board.soc=SM8250`、`board.soc_source=sm8250` 和 DTS 的 `sm8250.dtsi` include 一致。 |
-| 3. 名称、路径、配置与补丁 | 已完成 | `sm-t970_defconfig` 与 `device:dts/sm-t970.dts` 均指向实际文件。三个配置片段和 arch／soc／os／device 四个 series 均存在，解析出 61 个补丁。 |
-| 4. DTS 硬件描述 | 部分完成 | 已填写实测候选 RAM 窗口、CPU0 启用状态及 30 个静态保留区；GIC／定时器沿用核对后的 SoC 输入。UEFI 可分配内存、动态保留区和固件所有权未确认。板级外设仍禁用，未建立完整连接与 DMA／电源策略。 |
-| 5. `proprietary-files.txt` | 原厂文件清单已扩展，仍有缺项 | 已通过 ADB 记录 43 个 GPU／Wi-Fi／蓝牙／音频资产的实际路径、大小和 SHA256。触控、笔和键盘的 DTS 固件名在五个文件系统根目录中未找到；无线板型数据的实际选择和 UEFI 厂商 DXE 集合仍待落实。当前单核阶段没有消费这些外设固件。 |
-| 6. 记录、文档及模板文件 | 本地文件要求已完成 | `porting.toml` 身份与 `board.toml` 一致，覆盖当前五组件及其依赖。README、AGENTS、记录工作流、忽略规则、`local.toml.example`、`package/.gitkeep` 均已保留并受版本控制。官方记录检查器通过 13 个部分。此项不表示远端 CI、发布和硬件验证已经完成。 |
-| 7. 移除 `board.example=true` | 条件尚未满足，保留 | 前述固件路径和实际内存交接输入未齐全，因此暂不移除。实际调用 `build kernel` 和 `bootimg` 均以 exit 1 拒绝示例配置，未进入构建或打包。 |
+| 1. `board.toml` | 设备名／kit、SM8250、OS profile、DTS 和固件 config／DSC／FD 均有具体输入。五组件及 8 条继承归档配方完整；T970 DSC/FDF 与配置存在并已编译出 3 MiB FD。 | UEFI 实机入口、GOP 与内存交接。 |
+| 2. `feeds.toml` | SoC URL／完整提交和五组件固定版本已填写，`board.soc`、`soc_source`、DTS include 一致；固件及嵌套子模块提交另有精确清单。 | 发布后的远端可获取性及 CI。 |
+| 3. 名称、配置和补丁 | `sm-t970_defconfig`、`device:dts/sm-t970.dts` 与真实文件一致；三个配置片段和四层 series 解析出 61 个补丁。 | XNU 编译和预链接。 |
+| 4. DTS | 实测连续高 RAM、30 个静态保留区、CPU0 和禁用外设输入已填写。检查原厂动态池分配窗口和 XBL 区域与高 RAM 不相交；对照实机 DT 核对七组控制器范围和 IRQ。 | 实际 UEFI 分配、DMA 所有权；外设启用前的时钟／电源／ABI 实现。 |
+| 5. 固件清单 | 共 130 项来源与 SHA256：43 份文件系统资产、3 份本机内核 builtin 固件、84 份候选 UEFI 的 PE32／DEPEX／RAW 输入。触控／笔／键盘已通过重定位表解析补齐。 | 未启用的无线 board-data 变体选择、驱动消费接口和加载验证。 |
+| 6. 记录及模板文件 | 身份一致，13 个部分覆盖五组件及依赖，归属路径指向实际文件；README、AGENTS、工作流、忽略规则和 `local.toml.example` 保留。package 具有实际固件代码／配方。 | 远端 CI、公开发布和设备页面同步。 |
+| 7. 示例标记 | 必要占位输入已经替换，已移除 `board.example = true`，允许正常主机构建／打包。 | 该标记不代表固件或 iPadOS 已通过实机验证。 |
+
+所有未启用的外设仍为 `planned`。禁止仅通过填入其他板型的寄存器／固件或提高记录等级
+清空待办。设备仓库输入完成与整个移植完成是不同结果。
 
 ## 核对范围
 
-- 官方模板全部 13 个文件均有对应的设备文件，重命名映射为
-  `configs/example_defconfig` → `configs/sm-t970_defconfig`、
+- 官方模板全部 13 个文件均有对应的受版本控制文件。重命名映射为
+  `configs/example_defconfig` → `configs/sm-t970_defconfig`，
   `dts/board.dts` → `dts/sm-t970.dts`。
-- 实际配置文件中没有遗留 `REQUIRED_` 值或 SM8550 板型输入，RAM 也不是零范围。
-  输入缺失通过省略固件路径、适配记录中的限制和 `example` 标记明确表达。
-- 当前组件集合为 `ArmDTPlatform`、`ArmCpu`、`SoftwareAES`、`XnuPrelink`、
-  `DarwinBoot`。选型快照、feed、目录及实际源码版本已在第 2 步核对。
-- 空的板级 patch series 和 `package/.gitkeep` 是有效模板结构，不代表已经实现了
-  板级服务。未来启用外设时必须补齐实际代码、归档、初始化和 ABI 输入。
-- 本机覆盖文件、缓存和生成目录处于忽略范围，没有为通过核查改写硬件参数。
+- 实际配置没有 `REQUIRED_`、零 RAM 或 SM8550 输入。真实设备身份种子和生成文件留在
+  本机配置／忽略目录；主机测试用身份 `1`，不作为启动输入。
+- 当前组件：`ArmDTPlatform`、`ArmCpu`、`SoftwareAES`、`XnuPrelink`、`DarwinBoot`。
+  SoC／组件／架构／OS 输入继续按选型快照核对。
+- 主仓库从原审计提交推进到 `7ebc585543fd1a89e1d47d17442899ab61978f9a`，仅增加
+  经过测试的 raw kernel／Android v2 独立 DTB 打包支持；组件与内核补丁选择不变。
+- 空板级 XNU series 仍有效。板级 package 现在提供实际 T970 固件 overlay；未声明已有
+  XNU 存储、输入、GPU、网络、音频或电源服务。
 
-## 可复核命令
+## 复核命令
 
 从设备仓库执行：
 
 ```sh
+python3.14 ../UniXNU/unixnu defconfig sm-t970_defconfig -D .
 python3.14 ../UniXNU/unixnu status --json -D .
+python3.14 scripts/check-platform.py --unixnu ../UniXNU
 python3.14 ../UniXNU/scripts/porting-record.py check --device .
 ```
 
-当前配置下，以下命令**预期失败**，应输出 `EXAMPLE device repository`：
+固件构建／提取和独立 FDT 要求见[固件说明](firmware.md)。实际构建报告应记录设备提交、
+主仓库和固件版本、输入哈希、FD 大小及镜像回读结果。不要把后续缺少 kernelcache／
+信任／Data 等负载输入的错误误判成模板仓库标记仍未解除。
 
-```sh
-python3.14 ../UniXNU/unixnu build kernel -D .
-python3.14 ../UniXNU/unixnu bootimg -D .
-```
+## 为什么之前没有完成
 
-这些拒绝只验证当前配置标记生效，没有执行内核编译、固件打包或设备操作。
-
-## 收尾条件
-
-第 3 步完全完成前，需要确定真实的 T970 UEFI 配置／DSC／FD 路径，落实可用的
-RAM／保留区交接方案，并按实际启用的组件补齐所需板级与固件输入。
-之后重新检查记录、配置和补丁／归档选择，再移除 `board.example=true`。
-未启用的外设仍可作为明确的后续适配项，不需要为了清空待办而虚构实现。
-
-第 4 步的配置解析可以继续独立核查；其通过不能替代这里尚缺的固件和硬件输入。
+之前的工作停在模板结构、两份 GPU 固件和只覆盖静态保留区的主机检查，没有继续使用
+已授权的 ADB 去补齐本可取得的输入，也没有建立 T970 固件 overlay。该阶段确实未完成。
+此外，旧设备说明把“解除示例标记”绑到后续实机验证，比创建仓库步骤要求更强，混淆了
+配置完整性与硬件验证等级。这次补齐真实来源和实现，允许主机构建，保留真实验证限制。

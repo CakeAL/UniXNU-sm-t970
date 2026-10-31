@@ -87,8 +87,18 @@ brightness, buttons, Wi-Fi, DSP, battery and CPU frequency in the porting record
 
 Use Python 3.11+ (python3.14 on this host). Preserve the existing evidence and
 its revisions. The current DTS enables CPU0 only and uses a measured high RAM
-bank as a host-conversion candidate. Keep board.example=true until a T970 UEFI
-launch path and allocatable memory map have been verified. Do not enable UFS,
+bank as a host-conversion candidate. The completed repository inputs no longer
+carry board.example: this permits host builds and does not certify boot readiness.
+Track runtime UEFI allocation, GOP and actual launch results separately in the
+record; do not mark them device-verified from a host build. Do not enable UFS,
 GPU, touch or audio from a template: their board interfaces remain unimplemented.
 Run scripts/check-platform.py with the sibling UniXNU checkout for DT/ADT checks.
+Firmware overlay and exact binary hashes live in package/firmware; read
+docs/firmware.md before preparing a dedicated pinned Mu-Silicium checkout.
+Use its Mu_Basecore and the exact nested submodules in inputs.json. Target boot
+packing uses header v2, an uncompressed shim/FD and a separate firmware DTB.
+Hardware DTB/host-check ADT are not the stock firmware DTB. Keep private firmware
+DTBs, extracted binaries, identity seeds and generated images in ignored storage.
+The staged vendor UFS/USB DMA dispatch remains absent from the CPU0 initrd image.
+Build/pack checks do not authorize overwriting a tablet partition.
 Commit each completed step, as requested by the maintainer.

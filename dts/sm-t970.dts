@@ -16,6 +16,7 @@
 };
 
 /include/ "sm-t970-reserved.dtsi"
+/include/ "sm-t970-peripherals.dtsi"
 
 // Keep the first hardware test on the boot CPU. Shared affinities and timer/GIC
 // resources were compared with evidence/adb-2026-11-01/live-device-tree.dts.
@@ -28,4 +29,4 @@
 &cpu6 { status = "disabled"; };
 &cpu7 { status = "disabled"; };
 
-// UFS, GPU and other peripherals remain disabled in the shared DTSI.
+// Measured board peripheral resources are included above and remain disabled.

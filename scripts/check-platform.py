@@ -140,6 +140,46 @@ def main():
         for base, size in dt.registers(node):
             require(base + size <= span[0][0] or span[0][0] + span[0][1] <= base,
                     'Candidate handoff bank overlaps a static firmware reservation')
+    dynamic = []
+    for node in live_reserved.children:
+        if 'reg' in node.properties or 'size' not in node.properties:
+            continue
+        cells = node.cells('alloc-ranges')
+        require(cells and len(cells) % 4 == 0, 'Unbounded stock dynamic pool: ' + node.name)
+        for i in range(0, len(cells), 4):
+            base, size = dt.number(cells[i:i + 2]), dt.number(cells[i + 2:i + 4])
+            require(base + size <= span[0][0] or span[0][0] + span[0][1] <= base,
+                    'Candidate bank intersects a stock dynamic pool allocation window')
+        dynamic.append(node.name)
+    stock_boot = json.loads((device / 'evidence/device-inputs/boot-firmware.json').read_text())
+    for region in stock_boot['platform_config']['regions']:
+        require(region['base'] + region['size'] <= span[0][0] or
+                span[0][0] + span[0][1] <= region['base'],
+                'Candidate bank overlaps a stock XBL platform region: ' + region['name'])
+    # Board overrides must preserve observed ranges; Linux has three-cell GIC
+    # descriptors while the selected shared UniXNU binding adds an affinity cell.
+    peripheral_pairs = [('ufshc@1d84000', 'ufshc@1d84000'),
+                        ('phy@1d87000', 'ufsphy_mem@1d87000'),
+                        ('gpu@3d00000', 'qcom,kgsl-3d0@3d00000'),
+                        ('gmu@3d6a000', 'qcom,gmu@3d6a000'),
+                        ('pinctrl@f000000', 'pinctrl@f000000'),
+                        ('i2c@994000', 'i2c@994000'), ('i2c@88c000', 'i2c@88c000')]
+    board_nodes = {n.name: n for n in tree.walk()}
+    live_nodes = {n.name: n for n in live.walk()}
+    for board_name, live_name in peripheral_pairs:
+        candidate, observed = board_nodes[board_name], live_nodes[live_name]
+        require(not candidate.enabled(), 'Unimplemented peripheral enabled: ' + board_name)
+        require(dt.registers(candidate) == dt.registers(observed), 'Board peripheral range mismatch: ' + board_name)
+        if 'interrupts' in observed.properties:
+            values = observed.cells('interrupts')
+            translated = [v for i in range(0, len(values), 3) for v in values[i:i + 3] + [0]]
+            require(candidate.cells('interrupts') == translated, 'Board interrupt mismatch: ' + board_name)
+    for name, firmware_key in [('touchscreen@49', 'stm,firmware_name'), ('wacom@56', 'wacom,fw_path')]:
+        candidate, observed = board_nodes[name], live_nodes[name]
+        require(not candidate.enabled() and dt.registers(candidate) == dt.registers(observed),
+                'Input scope/address mismatch: ' + name)
+        require(candidate.properties[firmware_key] == observed.properties[firmware_key],
+                'Input firmware name mismatch: ' + name)
     exported = [n for n in tree.walk() if n.enabled() and 'unixnu,adt-name' in n.properties]
     require(exported == [gic], 'Unexpected exported peripheral in the minimal platform tree')
 
@@ -162,8 +202,9 @@ def main():
     require(decoded['/arm-io/intc']['redistributor-stride'] == struct.pack('<Q', 0x20000), 'ADT GIC stride mismatch')
 
     tracked_inputs = ['board.toml', 'feeds.toml', 'configs/sm-t970_defconfig', 'dts/sm-t970.dts',
-                      'dts/sm-t970-reserved.dtsi', 'scripts/check-platform.py', 'unixnu.lock',
-                      'evidence/shared-support/selection.json']
+                      'dts/sm-t970-reserved.dtsi', 'dts/sm-t970-peripherals.dtsi',
+                      'scripts/check-platform.py', 'unixnu.lock',
+                      'evidence/shared-support/selection.json', 'evidence/device-inputs/boot-firmware.json']
     git(device, 'ls-files', '--error-unmatch', *tracked_inputs)
     require(not git(device, 'diff', '--name-only', 'HEAD', '--', *tracked_inputs),
             'Commit the platform inputs before archiving a verification report')
@@ -177,6 +218,9 @@ def main():
               'enabled_cpu_affinities': [0], 'timebase_hz': 19200000,
               'candidate_dram_base': hex(span[0][0]), 'candidate_dram_size': hex(span[0][1]),
               'static_reservations': len(actual), 'patch_count': len(selected_patches),
+              'stock_dynamic_pool_windows_checked': dynamic,
+              'stock_xbl_regions_checked': len(stock_boot['platform_config']['regions']),
+              'disabled_peripheral_ranges_checked': len(peripheral_pairs),
               'patch_order': [p.name for p in selected_patches], 'archive_recipe_count': len(archive_plan),
               'input_sha256': {p: hashlib.sha256((device / p).read_bytes()).hexdigest() for p in tracked_inputs},
               'result': 'PASS', 'boot_enabled': not ctx.example,

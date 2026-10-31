@@ -56,3 +56,18 @@ It records negative touch/pen/keyboard filesystem probes and selected live kerne
 config lines without claiming that these missing files are built into the kernel.
 Wi-Fi board-data variants are inventoried without choosing a variant. No binary
 or personal calibration data is saved; these assets have no selected consumer yet.
+
+
+The follow-up in `device-inputs/` adds:
+
+- `boot-firmware.json`: bounded, read-only XBL/XBL-config/ABL metadata,
+  FV/FFS header checksums, gzip-volume inspection and numeric platform inputs.
+  Its collector is archived at `d78ea5816f3d724aef25d269cf29823cc241186b`.
+  Optional exact binary extraction stays in ignored host storage.
+- `builtin-firmware.json`: three input firmware blobs in this tablet's current
+  boot kernel. AArch64 RELATIVE entries reconstruct the unique consistent
+  builtin_fw table, image offsets, lengths and SHA256. No raw kernel is committed.
+
+The original filesystem-only negative probes remain valid observations of those
+paths; the later builtin table resolves the three assets' source. These captures
+do not certify a pristine factory boot image, UEFI execution or XNU input drivers.

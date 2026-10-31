@@ -15,6 +15,7 @@ components = [
   "ArmDTPlatform",
 ]
 paths = [
+  "docs/firmware.md",
   "porting.toml",
   ".gitignore",
   "log.txt",
@@ -50,6 +51,8 @@ procedure = [
   "Run python3.14 ../UniXNU-sm-t970/scripts/check-platform.py --unixnu . to compare DT/ADT bindings with the captured hardware.",
 ]
 findings = [
+  "Step 3 completion replaces the initial staging audit: real T970 firmware config/DSC/FDF/FD inputs now exist; stock asset hashes, disabled peripheral descriptions and exact firmware source pins are recorded. board.example is removed to enable host builds; hardware boot remains unverified.",
+  "The framework pin advances to 7ebc585543fd1a89e1d47d17442899ab61978f9a for tested raw-kernel/Android-v2 separate-DTB packing. The component catalog, ARM64/OS profile hashes, SoC and all five component pins are unchanged.",
   "The official examples/device structure is present, retaining the existing hardware inventory and scripts. Board-specific names replace the template identity.",
   "The resolved bootstrap contains five canonical components, three configuration fragments and 61 ordered patches, including both SM8250 CPU patches.",
   "Kernel archive recipes remain inherited from ARM64. Component choice is configuration work, not evidence that any XNU driver has executed.",
@@ -59,17 +62,17 @@ findings = [
   "The platform checker now rejects framework/profile drift and disagreement among reviewed component pins, device feeds, catalog ABI scope and actual clean source checkouts.",
   "Step 2 verification passed against 25f9797275c93b227585ab4403923da34c4fec19 with explicit six-source feeds and frozen framework/profile inputs. The selected minimal support and pending hardware/ABI work meet the source-selection deliverable.",
   "Step 3 seven-item audit at device configuration 6d3012ab3fbbbb3d4517d1a4ed4ccb87b795a028: all 13 template files are present and tracked; identities, renamed entry paths, three config fragments, four series and eight inherited archive recipes agree. Firmware config/DSC/FD and real handoff inputs remain incomplete.",
-  "The official 13-area record check passes, but the repository does not yet meet every Step 3 completion item. board.example=true is retained; structure validation is not evidence of firmware integration.",
+  "At the original audit, the 13-area check passed while Step 3 inputs remained incomplete and example was true. The completion update above supersedes that configuration.",
 ]
 completion = [
   "A board.toml with matching device identity resolves the selected SoC and OS profiles and pinned sources.",
 ]
 limits = [
-  "board.example=true remains because UEFI config/DSC/FD paths and the allocatable RAM handoff are unverified. Build and bootimg refuse this staging configuration.",
-  "Apple reference sources and kernelcache/ABI/seed inputs are not fully prepared; no kernel, package, firmware or boot image is built.",
+  "Repository completion and removal of the example marker permit host builds; they do not certify a UEFI launch or an iPadOS boot.",
+  "Apple kernelcache/private ABI, trust-cache, Data seed and XNU image compilation remain separate later-stage work.",
 ]
 next_action = [
-  "Resolve the Step 3 firmware config/DSC/FD and memory-handoff inputs listed in docs/device-repository-checklist.md; repeat the checklist before removing board.example=true.",
+  "Run and archive the committed platform/firmware/Android-v2 packing checks, then continue Step 4 and first-boot preparation.",
 ]
 evidence = [
   { kind = "source", reference = "log.txt", result = "Archived stock-Android shell output identifies SM-T970, gts7xlwifi and SM8250; it is hardware inventory, not UniXNU verification." },
@@ -87,11 +90,16 @@ evidence = [
 
 [[area]]
 id = "firmware"
-status = "planned"
+status = "implemented"
 components = [
   "DarwinBoot",
 ]
 paths = [
+  "package/firmware/**",
+  "scripts/prepare-uefi.py",
+  "scripts/build-uefi-candidate.py",
+  "scripts/collect-builtin-firmware.py",
+  "evidence/device-inputs/builtin-firmware.json",
   "scripts/adb_readonly.py",
   "scripts/collect-boot-firmware.py",
   "evidence/device-inputs/boot-firmware.json",
@@ -109,13 +117,17 @@ inputs = [
   "Read-only inspection of boot and recovery headers reports ANDROID! magic, header version 2 and page size 4096 bytes.",
 ]
 configuration = [
-  "DarwinBoot is selected for eventual UEFI integration. Firmware package search roots are present, but no T970 config/DSC/FD path is invented.",
+  "board firmware.config=gts7xlwifi, dsc=gts7xlwifiPkg/gts7xlwifi.dsc and fd=Build/gts7xlwifiPkg/{target}_CLANGPDB/FV/SILICIUM_UEFI.fd point to the prepared pinned Mu-Silicium tree.",
+  "prepare-uefi.py validates each pinned submodule and stock input hash, then stages the committed overlay; build-uefi-candidate.py exercises the official firmware builder without booting.",
 ]
 procedure = [
   "The existing Android shell transcript records getprop ro.bootloader and getprop ro.build.fingerprint.",
   "Collect selected boot properties, the live DT and the first 4096 bytes of boot/recovery with the inventory script; only parsed header fields are saved.",
 ]
 findings = [
+  "A T970-specific overlay selects the pinned Kona support, original numeric configuration and a nonoverlapping 44-region map derived from the stock 45-region map; Android SEC LOG scratch is omitted because it overlaps FV/FD/stack and Mu would halt on it.",
+  "44 vendor modules use 84 exact PE32/DEPEX/RAW inputs from this T970 XBL. Vendor UFS/USB DMA dispatch is omitted from the CPU0/initrd candidate.",
+  "DSC and FDF include UniXNU, UniXNUDxe, DarwinBoot and UniXNURamDiskDxe; DiskIo, FAT and Unicode collation are present. The actual EDK build produced a 3145728-byte FD before this implementation commit; a committed-source build report is the next check.",
   "Read-only XBL extraction validates FV/FFS header checksums and decompresses its gzip-guided volume. The snapshot has 121 FFS records, 94 PE32 assets and 45 platform regions. Stock FD is 0x9fc00000+0x300000; stack is 0x9ff90000+0x40000. These constants do not verify a new UEFI launch.",
   "The follow-up read-only inventory hashes 43 stock assets (6 GPU, 8 Wi-Fi, 2 Bluetooth, 27 audio). This expands the original two-file inventory; none is selected by the CPU0 bootstrap.",
   "The archived properties identify an Android 12 stock build and bootloader T970ZCU2CVK1.",
@@ -129,13 +141,16 @@ completion = [
   "A board-specific UEFI image starts reproducibly and produces an accessible boot log.",
 ]
 limits = [
-  "UEFI launch, framebuffer handoff and boot-services exit have not been tested; the running boot image is not assumed to be pristine factory firmware.",
-  "Mu-Silicium is a reviewed reference candidate only, not a selected working T970 firmware. Third-party forks have not been exhaustively searched.",
+  "UEFI launch, actual GOP/stride/pixel format, initrd discovery, runtime memory allocations and boot-services exit are untested. The running boot image is Magisk-modified.",
+  "A host-built T970-specific candidate is now selected; it is not an upstream-certified or device-verified T970 port.",
 ]
 next_action = [
-  "Document a T970-specific recovery and UEFI launch path using the measured Android v2 header and partition limits before testing an image.",
+  "Capture UEFI runtime memory/GOP/initrd results and a recoverable launch procedure before claiming a hardware milestone.",
 ]
 evidence = [
+  { kind = "source", reference = "package/firmware/inputs.json", result = "Exact firmware source/submodule revisions and all 84 local stock input hashes; no binaries are committed." },
+  { kind = "source", reference = "package/firmware/Platforms/Samsung/gts7xlwifiPkg/gts7xlwifi.dsc", result = "T970 platform definition with device-derived memory/configuration libraries and UniXNU loader integration." },
+  { kind = "device", reference = "evidence/device-inputs/boot-firmware.json", command = "python3.14 scripts/collect-boot-firmware.py --output evidence/device-inputs/boot-firmware.json --extract-dir .cache/stock-inputs/extracted", result = "121 FFS records and 45 platform regions from the connected device XBL; stock constants are not a new UEFI runtime map.", revision = "d78ea5816f3d724aef25d269cf29823cc241186b" },
   { kind = "device", reference = "evidence/device-inputs/firmware.json", command = "python3.14 scripts/collect-firmware-inputs.py --output evidence/device-inputs/firmware.json", result = "43 stock asset hashes and three negative filesystem probes captured with the committed collector.", revision = "a1b5223ed24b8e2d30629717e081af52241bb95b" },
   { kind = "source", reference = "evidence/device-inputs/boot-firmware.json", result = "Stock XBL FFS inventory, numeric platform configuration, and Android v2 boot/recovery geometry. Proprietary binaries remain in ignored local extraction storage." },
   { kind = "source", reference = "evidence/device-inputs/firmware.json", result = "Read-only firmware inventory with exact paths, sizes, hashes, identity and negative input-firmware probes; collector revision will be attached after committing it." },
@@ -171,6 +186,7 @@ procedure = [
   "Collect /proc/cpuinfo, online/present CPU lists, cpufreq policies, /proc/interrupts and the live DT using the inventory script.",
 ]
 findings = [
+  "The board now includes disabled measured peripheral declarations alongside the unchanged CPU0-only topology; the checker compares their GIC interrupt cell translation without enabling peripheral drivers.",
   "Core identity differs in Affinity1 (0x100 steps); retaining only the lowest MPIDR byte would lose the recorded core distinction.",
   "Android's three frequency policies are not automatically the cluster layout required by the selected XNU profile.",
   "GICv3 arch_timer and IPI counters are visible in Android; they do not demonstrate XNU secondary-core startup.",
@@ -199,6 +215,7 @@ id = "memory"
 status = "implemented"
 components = []
 paths = [
+  "dts/sm-t970-peripherals.dtsi",
   "evidence/adb-2026-11-01/memory.txt",
   "evidence/adb-2026-11-01/live-device-tree.dts",
   "dts/sm-t970.dts",
@@ -211,14 +228,15 @@ inputs = [
   "Applications SMMU: 0x15000000 + 0x100000; GPU SMMU: 0x03da0000 + 0x10000. Both declare qcom,qsmmu-v500.",
 ]
 configuration = [
-  "The host-conversion DTS uses exactly the measured contiguous bank 0x180000000 + 0x100000000; 30 static reserved-memory reg declarations are copied into sm-t970-reserved.dtsi.",
-  "No DMA component, stream ownership or UEFI allocation policy is configured. Other physical banks remain in the source inventory rather than being merged into a fabricated contiguous range.",
+  "DTS describes the measured contiguous high bank 0x180000000+0x100000000 and all 30 static reservations. Other physical banks remain in stock evidence.",
+  "The firmware overlay supplies the original low-memory configuration/stack/FD map. No XNU DMA device or dynamic Android CMA allocator is enabled.",
 ]
 procedure = [
   "The existing Android shell transcript records cat /proc/meminfo.",
   "Capture root-readable /proc/iomem and the live DT, then compare physical memory and reserved-memory reg values.",
 ]
 findings = [
+  "The completed repository supplies the candidate bank and static reservations, and checks every original dynamic-pool allocation window and all 45 XBL platform regions against that bank. The firmware overlay owns its low-memory heap/FD/stack; real UEFI allocation still needs runtime evidence.",
   "The stock XBL describes 45 platform regions, including low-memory firmware heaps/FD/stack. Its DDR descriptors do not intersect the candidate high handoff bank. This is a static source comparison, not a GetMemoryMap result.",
   "MemTotal describes memory exposed to the running Android kernel; it does not establish installed DRAM capacity, physical banks or firmware reservations.",
   "CmaTotal describes the stock kernel's CMA pool; it is not a complete reserved-memory map for the XNU handoff.",
@@ -233,8 +251,8 @@ completion = [
   "The board memory description accounts for physical DRAM banks, firmware reservations and the UEFI-to-XNU handoff regions.",
 ]
 limits = [
-  "The saved DT and iomem describe the Android environment; UEFI allocations, secure-world ownership, DMA widths and XNU cache/SMMU rules remain unverified.",
-  "Implemented scope is the candidate DTS and static reservations only; board.example remains true until real UEFI allocations and all firmware ownership are checked.",
+  "The saved DT, XBL and iomem describe original software. New UEFI allocations, secure-world ownership, DMA widths and XNU cache/SMMU behavior require separate runtime checks.",
+  "Removing board.example completes the concrete input configuration; it does not make the candidate RAM bank device-verified.",
 ]
 next_action = [
   "Reconcile saved /memory, reserved-memory and iomem ranges, then reserve explicit UEFI and XNU handoff allocations without reclaiming firmware-owned regions.",
@@ -270,6 +288,7 @@ procedure = [
   "Read block sysfs and by-name links; read each LUN's primary GPT header and entry array and validate their CRC32 values without writing any block device.",
 ]
 findings = [
+  "Disabled board UFS/PHY reg and interrupt overrides now preserve the exact stock ranges, including ICE. No root/Data policy or XNU storage driver is enabled.",
   "Primary GPT headers and entry-array CRCs passed for all four inspected LUNs; their entries and byte offsets are saved in gpt.json.",
   "Linux block sysfs start/size values use 512-byte units, while this device's GPT LBAs use 4096-byte logical blocks; convert explicitly when comparing them.",
   "Step 2 catalog review found ShengUfs declares SM8550/sheng clock, SMMU and userdata-layout dependencies. It and RamBlock/VirtIO/VerifiedRoot remain unselected until a T970 storage/root policy and interfaces are established.",
@@ -302,7 +321,7 @@ inputs = [
   "The selected S6TUUM3 DT panel declares dsi_cmd_mode, DCS brightness control, max level 355, four data lanes and 24 bits per pixel.",
 ]
 configuration = [
-  "The selected Android panel and its timing/DSC/control properties are present in the live DT; no UEFI GOP or XNU display configuration has been created.",
+  "The unbooted UEFI overlay uses the measured 2800x1752 panel geometry and original Display Reserved base; SimpleFb stride/pixel format and actual GOP service require hardware validation. No XNU display component is selected.",
 ]
 procedure = [
   "Collect DRM modes, panel type and brightness limits; read only display-selection tokens from /proc/cmdline and match the selected S6TUUM3 node in the live DT.",
@@ -348,7 +367,9 @@ procedure = [
   "Read /proc/bus/input/devices, getevent -lp and bound I2C driver links; correlate them with the exact touch and Wacom DT nodes.",
 ]
 findings = [
-  "The three stock DT names for touch, pen and keyboard were absent from the five checked filesystem roots. CONFIG_EXTRA_FIRMWARE is empty; driver-specific embedded assets still require source/image inspection.",
+  "The actual boot kernel contains all three named input firmware blobs. A unique common image base and 24-byte builtin_fw layout are reconstructed through AArch64 RELATIVE relocations; source offsets, lengths and SHA256 are recorded in builtin-firmware.json.",
+  "The disabled board I2C nodes describe measured controller/IRQ resources and input firmware names/coordinate properties; clock/regulator/HID implementations remain planned.",
+  "The filesystem-only capture did not find the three input assets; the subsequent builtin-kernel inspection above resolves their source and hashes.",
   "The bound touch driver is STM FTS; the template's Novatek implementation is not established as compatible. Wacom reports a separate input device and requires its own protocol handling.",
   "Step 2 keeps ShengNovatekTouch, QcomGeniSpi and ShengHidInput unselected: their Novatek/SPI/sheng dependencies do not match the measured STM FTS/I2C and independent Wacom input paths.",
 ]
@@ -356,13 +377,14 @@ completion = [
   "Touch contacts preserve stable IDs and releases, coordinates map correctly to the display, and keys/pen produce the expected HID reports.",
 ]
 limits = [
-  "Protocol transactions, touch/pen firmware hashes and XNU event delivery were not tested; no input events were injected.",
+  "Firmware hashes and static I2C/IRQ inputs are established. Protocol transactions, sequencing and XNU event delivery remain untested; no input events were injected.",
 ]
 next_action = [
-  "Locate the matching STM FTS and Wacom driver sources and firmware assets, then document report formats, power sequencing and coordinate transforms.",
+  "Use the exact STM FTS/Wacom assets and stock interfaces to implement protocol parsing, power sequencing and HID mapping.",
 ]
 evidence = [
-  { kind = "source", reference = "evidence/device-inputs/firmware.json", result = "The three stock DT names for touch, pen and keyboard were absent from the five checked filesystem roots. CONFIG_EXTRA_FIRMWARE is empty; driver-specific embedded assets still require source/image inspection." },
+  { kind = "source", reference = "evidence/device-inputs/builtin-firmware.json", result = "Three exact builtin assets recovered from the connected device kernel; filesystem absence is resolved without substituting binaries from another board." },
+  { kind = "source", reference = "evidence/device-inputs/firmware.json", result = "The filesystem-only capture did not find the three input assets; the subsequent builtin-kernel inspection above resolves their source and hashes." },
   { kind = "device", reference = "evidence/adb-2026-11-01/input.txt", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Saved input capability lists and bound fts_touch / wacom_w90xx I2C drivers.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },
   { kind = "device", reference = "evidence/adb-2026-11-01/live-device-tree.dts", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Touch and pen bus addresses, IRQ GPIOs, firmware names, supplies and coordinate properties.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },
 ]
@@ -387,6 +409,7 @@ procedure = [
   "Read KGSL identity and frequency nodes, list GPU firmware files and calculate the GMU/SQE hashes without executing GPU commands.",
 ]
 findings = [
+  "Disabled GPU/GMU overrides now preserve the stock named register windows and interrupts. Unverified shared iommus references are removed; no GPU DMA mapping is invented.",
   "Six A650 files include GMU/SQE and the split signed ZAP image.",
   "The measured GPU is A650, so A740 register sequences and firmware cannot be assumed compatible. Presence of a615_zap files alone does not establish which secure firmware the running driver loads.",
   "Known GMU/SQE files and hashes are listed in proprietary-files.txt as inventory only; no GPU component or consumption recipe is enabled.",
@@ -538,17 +561,19 @@ inputs = [
   "BuildManifest.plist lists SupportedProductTypes iPad7,1, iPad7,2, iPad7,3 and iPad7,4.",
 ]
 configuration = [
-  "OS profile ipados-17.7.11-21H461 supplies XNU d8b80295118ef25ac3a784134bcf95cd8e88109f, Apple identity and prelink settings. SoftwareAES and XnuPrelink are selected; inherited archive recipes are preserved.",
-  "package/ retains the template .gitkeep; patches/xnu/series is an empty board patch series. There is no fabricated board service or image recipe.",
+  "OS profile ipados-17.7.11-21H461 retains the reviewed XNU/Apple identity/prelink settings and archive recipes.",
+  "package/firmware provides the concrete firmware overlay. Boot packing selects header v2, raw kernel, separate DTB at base+0x1f00000, kernel at base+0x8000 and ramdisk at base+0x2000000.",
 ]
 procedure = [
   "Read BuildManifest.plist from the local IPSW using Python zipfile and plistlib to identify its OS version, build and product types.",
 ]
 findings = [
+  "The board package now contains a real T970 firmware overlay and build integration; its vendor assets stay local. Kernel board patch series remains empty.",
+  "The shared packer now supports observed raw kernel/header-v2/separate-DTB layout, validates DTB/ramdisk addresses and byte content, and has seven passing regression cases. XNU payload inputs are still a later stage.",
   "A second boot-header capture confirms header v2, header_size=1660, page_size=4096, DTB address=0x1f00000, boot DTB bytes=1580275, and separate recovery DTBO geometry. Source boot is Magisk-modified.",
   "The local archive's manifest matches the intended iPadOS 17.7.11 / 21H461 target.",
   "The manifest's product types describe the Apple restore targets; they do not establish SM-T970 compatibility.",
-  "The format-2 template layout is in place. The staging example flag deliberately blocks kernel/image builds until the missing firmware and handoff inputs are established.",
+  "The initial format-2 staging layout blocked builds; the completed device input configuration now removes the example flag without claiming a hardware boot.",
   "Step 2 reuses XNU 10063.141.1 / Darwin 23.6.0 and the existing profile kernelcache hash, DriverKit and TrustCache header tags. Source-level ABI scope was reviewed; private ABI and actual prelink remain unverified.",
   "Step 3 example-gate check invoked build kernel and bootimg against the existing configuration; both returned exit 1 with EXAMPLE device repository before building or packaging. No missing input was replaced with a fabricated path.",
 ]
@@ -561,7 +586,7 @@ limits = [
   "The selected profile kernelcache SHA256 f18b4df865405f2a287b84977d7aca745e056d656d9fc9df1662970ce2969de7 has not been checked against a locally extracted/decompressed kernelcache.",
 ]
 next_action = [
-  "Resolve the target OS profile, then inventory its required kernelcache, trust-cache, Data seed and ABI inputs against this IPSW.",
+  "Archive the firmware-only packed-image check, then prepare actual XNU kernelcache, trust-cache, Data seed and ABI inputs against the selected IPSW.",
 ]
 evidence = [
   { kind = "source", reference = "evidence/ipsw-21H461-manifest.json", result = "Saved IPSW manifest version/build/product types, archive byte size and manifest SHA256." },
@@ -595,6 +620,7 @@ procedure = [
   "Run python3 scripts/collect-adb-inventory.py --root --output evidence/<new-capture>; review per-command stderr, checksums, GPT CRC results and DT sanitization before updating this record.",
 ]
 findings = [
+  "The platform checker now additionally compares seven disabled controller register/IRQ descriptions, the touch/pen addresses and firmware names, dynamic reserved-pool windows and 45 original XBL regions. None is a runtime or DMA test.",
   "On this Magisk setup, exec-out through su inserted CR bytes into binary output; shell -T returned an FDT whose length matches its header. The collector verifies this before decoding.",
   "The sanitized DTS omits /chosen and identifying properties; the selected display token is captured separately. It is an input reference, not a ready-to-flash board DTB.",
   "The platform checker verifies CPU affinities, GIC ranges/stride, timer rate, the measured RAM-bank selection, all static reservation reg values and ADT byte order. It does not invoke ADB or produce a boot image.",

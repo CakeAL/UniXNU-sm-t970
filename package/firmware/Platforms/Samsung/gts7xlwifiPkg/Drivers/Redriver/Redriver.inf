@@ -1,0 +1,15 @@
+# Stock T970 XBL binary; source/hash checked by prepare-uefi.py.
+[Defines]
+  INF_VERSION = 0x0001001B
+  BASE_NAME = Redriver
+  FILE_GUID = 15d9c26d-7088-48d9-88f0-07190388b27a
+  MODULE_TYPE = DXE_DRIVER
+  VERSION_STRING = 1.0
+  ENTRY_POINT = EfiEntry
+
+[Binaries.AARCH64]
+  DXE_DEPEX|Redriver.depex|*
+  PE32|Redriver.efi|*
+
+[Depex]
+  TRUE

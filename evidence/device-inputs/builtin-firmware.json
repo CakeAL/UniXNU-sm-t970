@@ -1,0 +1,44 @@
+{
+  "inferred_link_base": "0xffffff8008080000",
+  "relative_relocations": 146830,
+  "layout": "builtin_fw: name pointer, data pointer, u64 length; 24 bytes",
+  "files": [
+    {
+      "name": "tsp_stm/fts1ba90a_gts7xl.bin",
+      "table_offset": 42201144,
+      "data_offset": 32982448,
+      "size": 117268,
+      "sha256": "85705dd7230dd4dda76c80e3787186b2ec1072e6e86a26c1ec441739a202110a"
+    },
+    {
+      "name": "epen/w9021_gts7xl.bin",
+      "table_offset": 42201192,
+      "data_offset": 33361904,
+      "size": 262164,
+      "sha256": "0c6796f2bccd67609f312e3482e8a81e065ea3c84a1ffcc887ad1a5a9704ae69"
+    },
+    {
+      "name": "keyboard_stm/stm32_gts7l.bin",
+      "table_offset": 42201216,
+      "data_offset": 33624080,
+      "size": 53305,
+      "sha256": "2b0459c2a1eee2a74d60e14f9d900a4fd24c532c0c12ec8eebc750e6e3ca2575"
+    }
+  ],
+  "captured_at": "2026-11-01T03:08:12.353089+08:00",
+  "device": {
+    "model": "SM-T970",
+    "codename": "gts7xlwifi",
+    "bootloader": "T970ZCU2CVK1"
+  },
+  "commands": [
+    "dd if=/dev/block/by-name/boot bs=4096 count=1 2>/dev/null",
+    "dd if=/dev/block/by-name/boot bs=4096 skip=1 count=13086 2>/dev/null"
+  ],
+  "header_version": 2,
+  "kernel_compression": "none",
+  "kernel_field_bytes": 53596172,
+  "kernel_field_sha256": "549a2703116c5a230a5dd6bb521ebd7dff0251c5ef8fd0e989a77f21a06e6b58",
+  "image_sha256": "549a2703116c5a230a5dd6bb521ebd7dff0251c5ef8fd0e989a77f21a06e6b58",
+  "scope": "Firmware bytes in the current Magisk-modified boot kernel, not a UniXNU input-driver test"
+}

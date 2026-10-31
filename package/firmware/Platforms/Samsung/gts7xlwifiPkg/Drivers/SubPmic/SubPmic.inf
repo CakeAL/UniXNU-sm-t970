@@ -1,0 +1,15 @@
+# Stock T970 XBL binary; source/hash checked by prepare-uefi.py.
+[Defines]
+  INF_VERSION = 0x0001001B
+  BASE_NAME = SubPmic
+  FILE_GUID = ea1269e6-498a-e8d0-a835-bd6fbbf84139
+  MODULE_TYPE = DXE_DRIVER
+  VERSION_STRING = 1.0
+  ENTRY_POINT = EfiEntry
+
+[Binaries.AARCH64]
+  DXE_DEPEX|SubPmic.depex|*
+  PE32|SubPmic.efi|*
+
+[Depex]
+  TRUE

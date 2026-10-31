@@ -1,0 +1,15 @@
+# Stock T970 XBL binary; source/hash checked by prepare-uefi.py.
+[Defines]
+  INF_VERSION = 0x0001001B
+  BASE_NAME = Muic
+  FILE_GUID = 2cc73155-a1f9-4c4b-88e2-caf9390e126a
+  MODULE_TYPE = DXE_DRIVER
+  VERSION_STRING = 1.0
+  ENTRY_POINT = EfiEntry
+
+[Binaries.AARCH64]
+  DXE_DEPEX|Muic.depex|*
+  PE32|Muic.efi|*
+
+[Depex]
+  TRUE

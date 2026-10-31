@@ -1,0 +1,14 @@
+# Stock T970 XBL binary; source/hash checked by prepare-uefi.py.
+[Defines]
+  INF_VERSION = 0x0001001B
+  BASE_NAME = LimitsDxe
+  FILE_GUID = f09ad92e-4e91-490f-ab99-e69939b840b2
+  MODULE_TYPE = DXE_DRIVER
+  VERSION_STRING = 1.0
+  ENTRY_POINT = EfiEntry
+
+[Binaries.AARCH64]
+  PE32|LimitsDxe.efi|*
+
+[Depex]
+  TRUE

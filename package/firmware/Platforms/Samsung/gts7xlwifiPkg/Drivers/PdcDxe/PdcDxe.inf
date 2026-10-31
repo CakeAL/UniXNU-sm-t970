@@ -1,0 +1,15 @@
+# Stock T970 XBL binary; source/hash checked by prepare-uefi.py.
+[Defines]
+  INF_VERSION = 0x0001001B
+  BASE_NAME = PdcDxe
+  FILE_GUID = b43c22db-6333-490c-872d-0a73439059fd
+  MODULE_TYPE = DXE_DRIVER
+  VERSION_STRING = 1.0
+  ENTRY_POINT = EfiEntry
+
+[Binaries.AARCH64]
+  DXE_DEPEX|PdcDxe.depex|*
+  PE32|PdcDxe.efi|*
+
+[Depex]
+  TRUE

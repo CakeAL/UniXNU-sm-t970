@@ -1,7 +1,6 @@
 schema_version = 2
 
 [board]
-example = true
 name = "sm-t970"
 soc = "SM8250"
 soc_source = "sm8250"
@@ -22,9 +21,13 @@ source = "device:dts/sm-t970.dts"
 include_dirs = ["soc:dts"]
 
 [firmware]
-# T970 UEFI config/DSC/FD paths are not established yet.
-# Keep board.example=true until the launch path and RAM handoff are verified.
-packages = ["{uefi}", "{tree}/package", "{tree}/drivers/DarwinBoot", "{edk2}"]
+# Stage package/firmware with scripts/prepare-uefi.py first. Inputs are filled
+# and host builds are enabled; this T970 firmware has not been booted.
+config = "gts7xlwifi"
+dsc = "gts7xlwifiPkg/gts7xlwifi.dsc"
+fd = "Build/gts7xlwifiPkg/{target}_CLANGPDB/FV/SILICIUM_UEFI.fd"
+packages = ["{uefi}", "{uefi}/Platforms/Samsung", "{uefi}/Common/Mu", "{uefi}/Common/Mu_OEM_Sample", "{uefi}/Silicon/Qualcomm", "{uefi}/Silicon/Silicium", "{tree}/package", "{tree}/drivers/DarwinBoot", "{edk2}"]
+submodules = ["Common/Mu", "Common/Mu_OEM_Sample"]
 
 [firmware.defines]
 DEVICE_MODEL = "sm-t970"
