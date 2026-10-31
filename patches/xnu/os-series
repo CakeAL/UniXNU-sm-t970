@@ -1,0 +1,9 @@
+# OS-layer patches kept for this board.
+#
+# The ipados-17.7.11-21H461 profile series also lists zzz-boot-progress.patch,
+# which patches the bsd_init.c block guarded by XNU_SHENG_PMGR. That symbol and
+# sheng_pmgr_run() come from the framework's sheng-platform-power.patch, which
+# this board does not apply; the boot-progress patch is diagnostics only, so it
+# is omitted here instead of pulling sheng's PMGR hook into the T970 kernel.
+component:XnuPrelink/patches/xnu-10063.141.1-security-init.patch
+component:XnuPrelink/patches/xnu-10063.141.1-sparse-index.patch
