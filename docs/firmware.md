@@ -71,6 +71,32 @@ PATH=/opt/homebrew/opt/llvm/bin:/opt/homebrew/opt/lld/bin:$PATH python3.14 scrip
 固件检查镜像可以使用 `--ramdisk none`；它没有 XNU payload，不代表 iPadOS 引导镜像。
 Samsung 原厂环境未证明支持 `fastboot boot`，本阶段不执行重启或分区写入。
 
+## 固件日志导出器
+
+第 5 步要求首次启动时能从菜单导出固件日志。本板已按
+[固件日志导出器步骤](https://unixnu.com/zh/porting/log-capture#firmware-setup)接入：
+
+| 项目 | 值 |
+| --- | --- |
+| DSC `[Components]` / FDF | `UniXNUPkg/Driver/AdvancedLogDxe/AdvancedLogDxe.inf`（FFS GUID `8D4E7F50-3A2C-4C9A-9E1B-50C4C8472D41`） |
+| 日志访问 | `AdvancedLoggerAccessLib`（`Common/Mu/AdvLoggerPkg`） |
+| 二维码 | `QrEncoderLib`（`Common/Mu/MsGraphicsPkg`） |
+| 硬件端口 | `AdvancedLoggerHdwPortLib` → `SerialPortLib`；DEBUG 下为 `FrameBufferSerialPortLib` |
+| 设备名 | `gUniXNUPkgTokenSpaceGuid.PcdUniXNUDeviceModel = "gts7xlwifi"` |
+| 菜单 | `board.toml [payload] tools = true` → **Tools → Advanced Logger** |
+
+日志缓冲由 DXE Core 阶段的 `AdvancedLoggerLib` 通过
+`AllocateReservedPages(PcdAdvancedLoggerPages)` 分配（默认 1024 页，即 4 MiB），随后安装
+`gAdvancedLoggerProtocolGuid`；导出器的 Depex 依赖该协议，因此协议不存在时驱动不会加载。
+SEC 阶段使用 PeilessArm 实例并让 `PcdAdvancedLoggerBase` 保持 0：本阶段不凭空固定一段
+RAM 作为日志缓冲。调试输出仍经硬件端口写到屏幕，原有 DEBUG 屏幕诊断保留。
+
+已验证（主机）：DEBUG 固件编译通过；`FVMAIN.Fv` 共 92 个 FFS 文件，导出器以
+`8D4E7F50-3A2C-4C9A-9E1B-50C4C8472D41` 出现在卷内，并被 `FVMAIN.inf` 列出。
+
+尚未验证：屏幕上的 Tools 菜单、二维码传输和日志内容。含菜单的 payload 镜像需要 XNU
+内核与 Apple 负载输入，本阶段未构建，`tools` 的菜单项只经过生成代码路径核对。
+
 ## 固件清单范围
 
 `proprietary-files.txt` 共 130 条：43 个文件系统资产、3 个 builtin 固件和 84 个候选 UEFI 输入。

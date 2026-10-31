@@ -38,6 +38,8 @@ size_mib = 192
 loader = "firmware"
 title = "UniXNU SM-T970 platform bootstrap"
 kernel_args = ["-v", "cpus=1"]
+# Adds Tools -> Advanced Logger to the generated menu (porting/log-capture).
+tools = true
 
 [payload.adt]
 # Supply the board's identity seed through --unique-chip-id.

@@ -66,6 +66,7 @@ findings = [
   "Step 2 verification passed against 25f9797275c93b227585ab4403923da34c4fec19 with explicit six-source feeds and frozen framework/profile inputs. The selected minimal support and pending hardware/ABI work meet the source-selection deliverable.",
   "Step 3 seven-item audit at device configuration 6d3012ab3fbbbb3d4517d1a4ed4ccb87b795a028: all 13 template files are present and tracked; identities, renamed entry paths, three config fragments, four series and eight inherited archive recipes agree. Firmware config/DSC/FD and real handoff inputs remain incomplete.",
   "At the original audit, the 13-area check passed while Step 3 inputs remained incomplete and example was true. The completion update above supersedes that configuration.",
+  "board.toml [payload] tools is now true, so the generated boot menu carries Tools, and the platform checker verifies the firmware log-exporter wiring that backs it. Host builds, not a menu image, confirm this configuration change; the device remains unbooted.",
 ]
 completion = [
   "A board.toml with matching device identity resolves the selected SoC and OS profiles and pinned sources.",
@@ -143,6 +144,9 @@ findings = [
   "Reviewed Project-Silicium/Mu-Silicium commit 4bd8ae83bf37de41777f19e0777db70f59383a6d: KonaPkg and Samsung r8qPkg exist, but no T970/gts7xlwifi platform/config was found in the inspected upstream directories.",
   "The r8q reference declares Android header v1 and 1080x2400 display geometry, while the T970 inventory reports header v2 and 2800x1752 modes. No reference-board boot parameters or firmware path were adopted.",
   "Step 3 audit confirms firmware.config, firmware.dsc and firmware.fd are absent. Only package search roots are configured; the known GPU manifest entries are inventory, not a complete enabled-firmware integration.",
+  "The firmware log exporter is now wired: AdvancedLogDxe (FFS 8D4E7F50-3A2C-4C9A-9E1B-50C4C8472D41) is in the DSC Components and FDF, AdvancedLoggerAccessLib and QrEncoderLib come from Common/Mu, PcdUniXNUDeviceModel is gts7xlwifi, and board [payload] tools adds the Tools entry.",
+  "AdvancedLoggerLib is mapped for SEC (PeilessArm), DXE_CORE, DXE_DRIVER, DXE_RUNTIME_DRIVER, UEFI_DRIVER and UEFI_APPLICATION, with AdvancedLoggerHdwPortLib over SerialPortLib and BaseDebugLibAdvancedLogger only in DEBUG. PcdAdvancedLoggerBase stays 0, so the DXE Core library reserves the 4 MiB buffer instead of a fabricated fixed address; SEC and DEBUG screen output still reach FrameBufferSerialPortLib.",
+  "A DEBUG rebuild with the exporter produced a 3145728-byte FD containing 92 FV files, including the exporter GUID, and FVMAIN.inf lists it. The earlier 91-file, 6108b542... FD is superseded.",
 ]
 completion = [
   "A board-specific UEFI image starts reproducibly and produces an accessible boot log.",
@@ -593,6 +597,7 @@ findings = [
   "The initial format-2 staging layout blocked builds; the completed device input configuration now removes the example flag without claiming a hardware boot.",
   "Step 2 reuses XNU 10063.141.1 / Darwin 23.6.0 and the existing profile kernelcache hash, DriverKit and TrustCache header tags. Source-level ABI scope was reviewed; private ABI and actual prelink remain unverified.",
   "Step 3 example-gate check invoked build kernel and bootimg against the existing configuration; both returned exit 1 with EXAMPLE device repository before building or packaging. No missing input was replaced with a fabricated path.",
+  "tools=true only changes the generated menu; the payload/initrd image was not built because XNU kernel and Apple payload inputs are still absent, so the Tools entry and QR export remain unverified on an image.",
 ]
 completion = [
   "The selected profile's inputs produce a kernel, payload and a boot image matching the SM-T970 boot path.",
@@ -648,6 +653,7 @@ findings = [
   "The committed platform checker produced a PASS report tied to its exact source revision and input file hashes; sanitized resolved configuration and unchanged dtc naming warnings are archived.",
   "Step 2 adds reproducible checks for reviewed framework/profile hashes, explicit device component pins, declared OS ABI scope and source file presence. These checks do not execute driver protocols or validate private ABI layouts.",
   "Archived the Step 2 PASS report with input hashes and the resolved configuration; historical platform-bootstrap evidence remains bound to its earlier source revision.",
+  "check-platform.py now rejects a missing exporter in DSC/FDF, missing AdvancedLoggerAccessLib/QrEncoderLib/HdwPortLib/PeilessArm/DXE_CORE mappings, a fabricated PcdAdvancedLoggerBase, or board [payload] tools other than true. It also ignores untracked *.DS_Store when verifying pinned component checkouts.",
 ]
 completion = [
   "Every claimed UniXNU milestone has matching source/image revisions, a reproducible command and accessible firmware/kernel logs.",

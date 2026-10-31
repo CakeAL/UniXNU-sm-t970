@@ -106,6 +106,7 @@ READ_LOCK_STATUS   = TRUE
   INF UniXNUPkg/Driver/UniXNUDxe/UniXNUDxe.inf
   INF UniXNUPkg/Driver/UniXNURamDiskDxe/UniXNURamDiskDxe.inf
   INF DarwinBootPkg/Driver/DarwinBoot.inf
+  INF UniXNUPkg/Driver/AdvancedLogDxe/AdvancedLogDxe.inf
 
   !include QcomPkg/Extra.fdf.inc
 

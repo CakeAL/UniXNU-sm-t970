@@ -137,3 +137,50 @@
   UniXNUPkg/Driver/UniXNUDxe/UniXNUDxe.inf
   UniXNUPkg/Driver/UniXNURamDiskDxe/UniXNURamDiskDxe.inf
   DarwinBootPkg/Driver/DarwinBoot.inf
+
+#
+# Advanced Logger and the UniXNU firmware log exporter
+# (https://unixnu.com/zh/porting/log-capture#firmware-setup).
+#
+# The SEC instance only initialises the hardware port: PcdAdvancedLoggerBase
+# stays 0, so no fixed RAM address is invented. The DXE Core instance reserves
+# PcdAdvancedLoggerPages (4 MiB by default) from the DXE heap and installs
+# gAdvancedLoggerProtocolGuid, which is the exporter's Depex. Debug output is
+# still written to SerialPortLib (FrameBufferSerialPortLib in DEBUG), so the
+# panel diagnostics that already existed remain.
+#
+[PcdsFixedAtBuild]
+  gUniXNUPkgTokenSpaceGuid.PcdUniXNUDeviceModel|"gts7xlwifi"
+
+[LibraryClasses]
+  AdvancedLoggerAccessLib|AdvLoggerPkg/Library/AdvancedLoggerAccessLib/AdvancedLoggerAccessLib.inf
+  AdvancedLoggerHdwPortLib|AdvLoggerPkg/Library/AdvancedLoggerHdwPortLib/AdvancedLoggerHdwPortLib.inf
+  QrEncoderLib|MsGraphicsPkg/Library/QrEncoderLib/QrEncoderLib.inf
+
+[LibraryClasses.common.SEC]
+  AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/PeilessArm/AdvancedLoggerLib.inf
+
+[LibraryClasses.common.DXE_CORE]
+  AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/DxeCore/AdvancedLoggerLib.inf
+
+[LibraryClasses.common.DXE_DRIVER]
+  AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/Dxe/AdvancedLoggerLib.inf
+
+[LibraryClasses.common.DXE_RUNTIME_DRIVER]
+  AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/Runtime/AdvancedLoggerLib.inf
+
+[LibraryClasses.common.UEFI_DRIVER]
+  AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/Dxe/AdvancedLoggerLib.inf
+
+[LibraryClasses.common.UEFI_APPLICATION]
+  AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/Dxe/AdvancedLoggerLib.inf
+
+!if $(TARGET) == DEBUG
+[LibraryClasses]
+  AssertLib|AdvLoggerPkg/Library/AssertLib/AssertLib.inf
+  DebugLib|AdvLoggerPkg/Library/BaseDebugLibAdvancedLogger/BaseDebugLibAdvancedLogger.inf
+!endif
+
+[Components]
+  # Tools -> Advanced Logger, exported as OneSend QR frames.
+  UniXNUPkg/Driver/AdvancedLogDxe/AdvancedLogDxe.inf

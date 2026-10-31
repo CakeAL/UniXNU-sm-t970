@@ -94,7 +94,9 @@ def main():
         require(module.path is not None, name + ': source unavailable; run unixnu fetch')
         revision = git(module.path, 'rev-parse', 'HEAD')
         require(revision == spec['revision'], name + ': checkout differs from selected source pin')
-        require(not git(module.path, 'status', '--porcelain', '--', '.'), name + ': source is modified')
+        # Untracked macOS metadata is not source; tracked changes still fail.
+        require(not git(module.path, 'status', '--porcelain', '--', '.', ':(exclude)*.DS_Store'),
+                name + ': source is modified')
         for filename in spec.get('source_files', []):
             require((module.path / filename).is_file(), name + ': declared source file missing: ' + filename)
         versions[name] = revision
@@ -203,10 +205,31 @@ def main():
             'GIC ADT address translation mismatch')
     require(decoded['/arm-io/intc']['redistributor-stride'] == struct.pack('<Q', 0x20000), 'ADT GIC stride mismatch')
 
+    # Firmware log exporter wiring (porting/log-capture#firmware-setup).
+    platform = device / 'package/firmware/Platforms/Samsung/gts7xlwifiPkg'
+    firmware_dsc = (platform / 'gts7xlwifi.dsc').read_text()
+    firmware_fdf = (platform / 'gts7xlwifi.fdf').read_text()
+    exporter = 'UniXNUPkg/Driver/AdvancedLogDxe/AdvancedLogDxe.inf'
+    require(firmware_dsc.count(exporter) == 1, 'AdvancedLogDxe is missing from the platform DSC')
+    require(firmware_fdf.count('INF ' + exporter) == 1, 'AdvancedLogDxe is missing from the FDF')
+    for mapping in ('AdvancedLoggerAccessLib|AdvLoggerPkg/Library/AdvancedLoggerAccessLib/',
+                    'QrEncoderLib|MsGraphicsPkg/Library/QrEncoderLib/',
+                    'AdvancedLoggerHdwPortLib|AdvLoggerPkg/Library/AdvancedLoggerHdwPortLib/',
+                    'AdvancedLoggerLib|AdvLoggerPkg/Library/AdvancedLoggerLib/PeilessArm/',
+                    '[LibraryClasses.common.DXE_CORE]', '[LibraryClasses.common.DXE_RUNTIME_DRIVER]',
+                    'gUniXNUPkgTokenSpaceGuid.PcdUniXNUDeviceModel|"gts7xlwifi"'):
+        require(mapping in firmware_dsc, 'Advanced Logger wiring missing: ' + mapping)
+    require('PcdAdvancedLoggerBase|' not in firmware_dsc,
+            'A fixed Advanced Logger address must not be invented before a runtime map exists')
+    board_spec = tomllib.loads((device / 'board.toml').read_text())
+    require(board_spec['payload'].get('tools') is True,
+            'board [payload] tools must be true for the Tools menu entry')
     tracked_inputs = ['board.toml', 'feeds.toml', 'configs/sm-t970_defconfig', 'dts/sm-t970.dts',
                       'dts/sm-t970-reserved.dtsi', 'dts/sm-t970-peripherals.dtsi',
                       'scripts/check-platform.py', 'unixnu.lock',
-                      'evidence/shared-support/selection.json', 'evidence/device-inputs/boot-firmware.json']
+                      'evidence/shared-support/selection.json', 'evidence/device-inputs/boot-firmware.json',
+                      'package/firmware/Platforms/Samsung/gts7xlwifiPkg/gts7xlwifi.dsc',
+                      'package/firmware/Platforms/Samsung/gts7xlwifiPkg/gts7xlwifi.fdf']
     git(device, 'ls-files', '--error-unmatch', *tracked_inputs)
     require(not git(device, 'diff', '--name-only', 'HEAD', '--', *tracked_inputs),
             'Commit the platform inputs before archiving a verification report')
@@ -223,6 +246,8 @@ def main():
               'stock_dynamic_pool_windows_checked': dynamic,
               'stock_xbl_regions_checked': len(stock_boot['platform_config']['regions']),
               'disabled_peripheral_ranges_checked': len(peripheral_pairs),
+              'firmware_log_exporter': {'dsc': True, 'fdf': True, 'tools_menu': True,
+                                        'fixed_logger_address': False},
               'patch_order': [p.name for p in selected_patches], 'archive_recipe_count': len(archive_plan),
               'input_sha256': {p: hashlib.sha256((device / p).read_bytes()).hexdigest() for p in tracked_inputs},
               'result': 'PASS', 'boot_enabled': not ctx.example,
