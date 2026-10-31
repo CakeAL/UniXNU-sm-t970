@@ -92,6 +92,9 @@ components = [
   "DarwinBoot",
 ]
 paths = [
+  "scripts/adb_readonly.py",
+  "scripts/collect-boot-firmware.py",
+  "evidence/device-inputs/boot-firmware.json",
   "scripts/collect-firmware-inputs.py",
   "evidence/device-inputs/firmware.json",
   "evidence/adb-2026-11-01/display_boot.txt",
@@ -113,6 +116,7 @@ procedure = [
   "Collect selected boot properties, the live DT and the first 4096 bytes of boot/recovery with the inventory script; only parsed header fields are saved.",
 ]
 findings = [
+  "Read-only XBL extraction validates FV/FFS header checksums and decompresses its gzip-guided volume. The snapshot has 121 FFS records, 94 PE32 assets and 45 platform regions. Stock FD is 0x9fc00000+0x300000; stack is 0x9ff90000+0x40000. These constants do not verify a new UEFI launch.",
   "The follow-up read-only inventory hashes 43 stock assets (6 GPU, 8 Wi-Fi, 2 Bluetooth, 27 audio). This expands the original two-file inventory; none is selected by the CPU0 bootstrap.",
   "The archived properties identify an Android 12 stock build and bootloader T970ZCU2CVK1.",
   "The running Android environment has Magisk root and reports an unlocked/orange boot state; this does not verify a UEFI launch method.",
@@ -132,6 +136,8 @@ next_action = [
   "Document a T970-specific recovery and UEFI launch path using the measured Android v2 header and partition limits before testing an image.",
 ]
 evidence = [
+  { kind = "device", reference = "evidence/device-inputs/firmware.json", command = "python3.14 scripts/collect-firmware-inputs.py --output evidence/device-inputs/firmware.json", result = "43 stock asset hashes and three negative filesystem probes captured with the committed collector.", revision = "a1b5223ed24b8e2d30629717e081af52241bb95b" },
+  { kind = "source", reference = "evidence/device-inputs/boot-firmware.json", result = "Stock XBL FFS inventory, numeric platform configuration, and Android v2 boot/recovery geometry. Proprietary binaries remain in ignored local extraction storage." },
   { kind = "source", reference = "evidence/device-inputs/firmware.json", result = "Read-only firmware inventory with exact paths, sizes, hashes, identity and negative input-firmware probes; collector revision will be attached after committing it." },
   { kind = "source", reference = "log.txt", result = "The archived getprop output reports bootloader T970ZCU2CVK1 and the complete Android 12 build fingerprint." },
   { kind = "device", reference = "evidence/adb-2026-11-01/identity.txt", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "The saved boot properties report flash.locked=0, orange verified-boot state and warranty_bit=1.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },
@@ -213,6 +219,7 @@ procedure = [
   "Capture root-readable /proc/iomem and the live DT, then compare physical memory and reserved-memory reg values.",
 ]
 findings = [
+  "The stock XBL describes 45 platform regions, including low-memory firmware heaps/FD/stack. Its DDR descriptors do not intersect the candidate high handoff bank. This is a static source comparison, not a GetMemoryMap result.",
   "MemTotal describes memory exposed to the running Android kernel; it does not establish installed DRAM capacity, physical banks or firmware reservations.",
   "CmaTotal describes the stock kernel's CMA pool; it is not a complete reserved-memory map for the XNU handoff.",
   "Several reserved-memory node unit addresses differ from their reg values, and some display ranges overlap; consume actual reg properties and reconcile their ownership before reuse.",
@@ -233,6 +240,7 @@ next_action = [
   "Reconcile saved /memory, reserved-memory and iomem ranges, then reserve explicit UEFI and XNU handoff allocations without reclaiming firmware-owned regions.",
 ]
 evidence = [
+  { kind = "source", reference = "evidence/device-inputs/boot-firmware.json", result = "Original SM-T970 platform memory constants extracted from its XBL; stock allocations and new-firmware runtime allocations remain distinct." },
   { kind = "source", reference = "log.txt", result = "Archived /proc/meminfo contains MemTotal 7806144 kB and CmaTotal 458752 kB." },
   { kind = "device", reference = "evidence/adb-2026-11-01/memory.txt", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Root-readable meminfo, physical iomem ranges and IOMMU class inventory.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },
   { kind = "device", reference = "evidence/adb-2026-11-01/live-device-tree.dts", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Live memory banks, firmware reservations, display splash, ramoops and SMMU resources.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },
@@ -537,6 +545,7 @@ procedure = [
   "Read BuildManifest.plist from the local IPSW using Python zipfile and plistlib to identify its OS version, build and product types.",
 ]
 findings = [
+  "A second boot-header capture confirms header v2, header_size=1660, page_size=4096, DTB address=0x1f00000, boot DTB bytes=1580275, and separate recovery DTBO geometry. Source boot is Magisk-modified.",
   "The local archive's manifest matches the intended iPadOS 17.7.11 / 21H461 target.",
   "The manifest's product types describe the Apple restore targets; they do not establish SM-T970 compatibility.",
   "The format-2 template layout is in place. The staging example flag deliberately blocks kernel/image builds until the missing firmware and handoff inputs are established.",

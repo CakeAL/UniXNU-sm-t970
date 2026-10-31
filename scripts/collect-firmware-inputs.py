@@ -12,8 +12,9 @@ import json
 from pathlib import Path
 import re
 import shlex
-import subprocess
 from zoneinfo import ZoneInfo
+
+from adb_readonly import read
 
 
 FAMILIES = {
@@ -30,15 +31,6 @@ INPUT_NAMES = ["tsp_stm/fts1ba90a_gts7xl.bin", "epen/w9021_gts7xl.bin",
                "keyboard_stm/stm32_gts7l.bin"]
 SEARCH_ROOTS = ["/vendor/firmware", "/vendor/firmware_mnt/image", "/odm/firmware",
                 "/system/etc/firmware", "/lib/firmware"]
-
-
-def read(command):
-    result = subprocess.run(["adb", "-d", "shell", "-T", "su -c " + shlex.quote(command)],
-                            capture_output=True, timeout=60)
-    if result.returncode:
-        raise RuntimeError(result.stderr.decode(errors="replace") or
-                           f"ADB command failed ({result.returncode}): {command}")
-    return result.stdout
 
 
 def collect():
