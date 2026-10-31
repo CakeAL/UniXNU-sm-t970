@@ -1,0 +1,3 @@
+== ramdisk: empty; build payload or pass --ramdisk FILE to include configured boot entries
+== bootimg
+== bootimg: {device}/out/hardware-description/boot.img (3993600 bytes)

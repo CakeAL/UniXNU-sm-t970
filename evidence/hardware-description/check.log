@@ -1,0 +1,4 @@
++ /opt/homebrew/bin/dtc -I dts -O dtb -o {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/device-tree/hardware.dtb -i {unixnu}/out/feeds/UniXNU-sm8250-common-a7c5a8ff/dts {device}/dts/sm-t970.dts
+PASS: firmware DTB is a complete handoff tree; board DTS compiles to an ADT with the consumed resources.
+PASS: the two DTBs are distinct and the firmware config/volume carry the required UniXNU integration.
+Report: {device}/out/hardware-description/result.json

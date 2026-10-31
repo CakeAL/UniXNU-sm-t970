@@ -1,0 +1,47 @@
+{
+  "scope": "Step 5 host check of the two device-tree inputs and the firmware integration",
+  "device_revision": "7b71e1e9ad1dd16a70e31e2fe536dd09c340200f",
+  "firmware_dtb": {
+    "path": "{device}/out/firmware-inputs/firmware.dtb",
+    "bytes": 837154,
+    "sha256": "86c14aa305a6cf5db46665f4095d28aadcb1ea5ce9d213cd711641a07504ed1d",
+    "nodes": 4533,
+    "memory": [
+      "0x80000000+0x3bb00000",
+      "0x180000000+0x100000000",
+      "0xc0000000+0xc0000000"
+    ],
+    "reserved_memory_entries": 0,
+    "chosen_properties": [
+      "bootargs",
+      "kaslr-seed",
+      "linux,initrd-end",
+      "linux,initrd-start"
+    ]
+  },
+  "board_dts": {
+    "bytes": 7061,
+    "sha256": "321dbc88450b4141b05685b80d3d83c7f00fbc6cbfd28b21fb017ae5f0ee9cd8",
+    "nodes": 56,
+    "memory": [
+      "0x200000000+0x80000000"
+    ],
+    "adt_bytes": 11240
+  },
+  "firmware_integration": {
+    "dsc": true,
+    "fdf": true,
+    "base_configuration": "{device}/.cache/uefi-source/Mu-Silicium/Silicon/Silicium/SiliciumPkg/SiliciumPkg.dsc.inc"
+  },
+  "built_firmware": {
+    "fd_bytes": 3145728,
+    "fd_sha256": "29c7f28024dc06f66b481c1b904b27a99a2458e96fb05c45067c736dc75ac7de",
+    "fv_files": 92
+  },
+  "result": "PASS",
+  "limits": [
+    "The ADT was generated with artificial identity 1 and is not a boot input.",
+    "The firmware DTB is the stock bootloader handoff tree; its /chosen identity values stay in ignored storage.",
+    "Nothing was compiled into a payload, written to the device or booted."
+  ]
+}

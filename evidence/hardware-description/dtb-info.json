@@ -1,0 +1,47 @@
+{
+  "source": "/sys/firmware/fdt on the connected device (read-only through su)",
+  "device": {
+    "ro.product.model": "SM-T970",
+    "ro.product.device": "gts7xlwifi",
+    "ro.bootloader": "T970ZCU2CVK1",
+    "ro.build.id": "SP2A.220305.013",
+    "ro.build.version.release": "12"
+  },
+  "size_bytes": 837154,
+  "sha256": "86c14aa305a6cf5db46665f4095d28aadcb1ea5ce9d213cd711641a07504ed1d",
+  "fdt_version": 17,
+  "node_count": 4533,
+  "property_count": 23367,
+  "model": "Samsung GTS7XL PROJECT - PV Rev0.4 (board-id,6)",
+  "compatible": [
+    "qcom,kona-mtp",
+    "qcom,kona",
+    "qcom,mtp"
+  ],
+  "memory": [
+    "0x80000000+0x3bb00000",
+    "0x180000000+0x100000000",
+    "0xc0000000+0xc0000000"
+  ],
+  "reserved_memory_entries": 43,
+  "reserved_memory_bytes": 542257152,
+  "chosen_property_names": [
+    "bootargs",
+    "kaslr-seed",
+    "linux,initrd-end",
+    "linux,initrd-start"
+  ],
+  "identity_properties_withheld": [
+    "bootargs",
+    "kaslr-seed",
+    "linux,initrd-end",
+    "linux,initrd-start"
+  ],
+  "structural_sha256": "51e843df6a1a9063ab42adb677459c23ddd03c13d608d35c8954ee1cf64b991c",
+  "note": "Full blob is local-only because /chosen carries identity and boot state; withheld values never enter this report.",
+  "compare": {
+    "path": "out/uefi-candidate/firmware.dtb",
+    "sha256": "86c14aa305a6cf5db46665f4095d28aadcb1ea5ce9d213cd711641a07504ed1d",
+    "identical": true
+  }
+}
