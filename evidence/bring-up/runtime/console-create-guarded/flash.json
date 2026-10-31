@@ -1,0 +1,23 @@
+{
+  "device": "SM-T970 / gts7xlwifi",
+  "image_source_revision": "a1a2beee0635e6368761b19c1f8549e8a6976d9e",
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/console-create-guarded/boot.img --no-reboot",
+  "exit_code": 0,
+  "boot_upload_succeeded": true,
+  "boot_image_sha256": "e18c6ca0e905e0e40a2283447a765bdc322bbcc85bf0cb19fe80ec857007be29",
+  "boot_image_bytes": 62713856,
+  "source_kernel_sha256": "bfb50a1a009f4dd08d54cb94d6187d768c7a5ef976427abd235756874f38473c",
+  "heimdall_binary_sha256": "75337a7c6ad9a5e18c0730fa474c81133587cc04cbe08dd3f270c860128a6c6f",
+  "automatic_reboot_requested": false,
+  "checkpoint_observation": "Human reports no reset after 60 seconds; no timing code can be decoded.",
+  "normal_return_delay_seconds": 6,
+  "fault_delays_seconds": {
+    "synchronous": 20,
+    "SError": 30,
+    "panic": 40,
+    "BRK": 50
+  },
+  "limits": "Fault handlers classify early paths globally; a fault outcome alone does not locate the fault inside PE_create_console. Hardware BRK control is not yet verified.",
+  "restore_state": "diagnostic BOOT installed; original BOOT restoration pending completion of ongoing diagnosis",
+  "restore_boot_sha256": "6f49af2f77ae0e55b4f76b29b0e0491ff0228c42ae97ba0533b97631483566fc"
+}

@@ -111,6 +111,9 @@ after 4/14/24/34 seconds; see docs/bring-up.md before interpreting its timing.
 --guard-early-faults is restricted to PE_create_console return in arm_init on
 the reviewed repaired kernel. It preserves IRQ/FIQ slots, terminates sync/SError/
 panic/BRK paths after 20/30/40/50 seconds, and is never a normal boot image.
+Its --brk-control option replaces the first reviewed post-MMU instruction with
+BRK #0 and does not run C startup. Qualify this control before interpreting a
+missing fault signal as evidence about a console function.
 Preserve source kernel and
 prior images, and bind every device observation to its image hash.
 Commit coherent groups of completed diagnostic work, as requested by the

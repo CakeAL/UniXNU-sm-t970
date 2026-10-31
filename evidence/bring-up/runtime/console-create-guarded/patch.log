@@ -1,0 +1,2 @@
+patched kernel.macho: stage 1 blue bar, stage 2 magenta bar, stage 4 reset after call #1 to _PE_create_console in _arm_init (at 0xfffffff0079b619c)
+early fault classification: sync 20s / SError 30s / panic 40s / BRK 50s

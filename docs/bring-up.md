@@ -202,6 +202,20 @@ python3.14 scripts/build-entry-probe.py --target _PE_create_console --function _
 的这一检查点。主机 Unicorn 测试验证四个异常终止路径的延时和无内存写入行为，
 不是实机向量投递或 PSCI 验证。
 
+实机 `e18c6ca0…` 在 60 秒内未复位，不能判定为死循环或无异常。
+先用独立目录生成 MMU 后 BRK 正控制：
+
+```sh
+PATH=$PWD/.cache/bin:/opt/homebrew/opt/llvm/bin:/opt/homebrew/opt/lld/bin:$PATH \
+python3.14 scripts/build-entry-probe.py --target _PE_create_console --function _arm_init \
+  --delay 6 --guard-early-faults --brk-control --output out/step7/probes/after-mmu-brk-control
+```
+
+该选项覆盖普通目标检查：MMU 后第一处已审阅指令改成 `BRK #0`，
+保留原始 `PE_create_console` 调用字节，不运行 C 初始化，预期由 BRK 处理路径在约 50 秒后
+请求 PSCI 复位。成功仅验证该点的 BRK 投递及诊断终止路径，不能验证 C 初始化、
+其他故障种类或后期向量映射；失败也不能直接归因于控制台。
+
 当前 DTS 是 ADT 的低地址包络。它包含固件保留洞，不是 2 GiB 可用内存池；DarwinBoot
 单独通过 EFI conventional memory 分配 256 MiB，并把该大小写入 boot_args。检查器会报告
 包络中的保留区，但并不把这些地址标记为空闲；每次实际分配仍需运行时日志验证。

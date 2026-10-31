@@ -11,6 +11,7 @@ import importlib.util
 import json
 from pathlib import Path
 import re
+import shlex
 import subprocess
 import sys
 
@@ -28,10 +29,13 @@ def main():
     parser.add_argument('--before', action='store_true', help='reset immediately before the call, not after its return')
     parser.add_argument('--console-state', action='store_true', help='read console state before gc_enable; reset after 4/14/24/34 seconds')
     parser.add_argument('--guard-early-faults', action='store_true', help='classify faults while testing PE_create_console return in arm_init')
+    parser.add_argument('--brk-control', action='store_true', help='with --guard-early-faults, trigger BRK after MMU enable instead of running C startup')
     parser.add_argument('--occurrence', type=int, default=1)
     parser.add_argument('--delay', type=int, default=6, help='reset delay for an after-return probe')
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
+    if args.brk_control and not args.guard_early_faults:
+        parser.error('--brk-control requires --guard-early-faults')
     if args.console_state and (args.target, args.function, args.before, args.occurrence) != ('_gc_enable', '_vcattach', True, 1):
         parser.error('--console-state requires --target _gc_enable --function _vcattach --before --occurrence 1')
     if args.guard_early_faults and (args.console_state or (args.target, args.function, args.before, args.occurrence) != ('_PE_create_console', '_arm_init', False, 1) or args.delay > 8):
@@ -95,7 +99,7 @@ def main():
         fault_module = importlib.util.module_from_spec(fault_spec)
         fault_spec.loader.exec_module(fault_module)
         payload_kernel = output / 'diagnostic/kernel.macho'
-        fault = fault_module.patch_copy(kernel, payload_kernel, args.unixnu.resolve(), args.delay)
+        fault = fault_module.patch_copy(kernel, payload_kernel, args.unixnu.resolve(), args.delay, brk_control=args.brk_control)
         ctx.logs.mkdir(parents=True, exist_ok=True)
         (ctx.logs / 'payload-patch.log').write_text(fault['entry_probe_log'] + '\nearly fault classification: sync 20s / SError 30s / panic 40s / BRK 50s\n')
         for key in list(spec):
@@ -126,6 +130,10 @@ def main():
     if fault:
         report['fault_guard'] = fault
         report['generator_sha256'] = sha(device / 'scripts/early-fault-probe.py')
+        if args.brk_control:
+            report['probe'] = {'function': '_start_first_cpu', 'target': 'BRK #0',
+                               'occurrence': 1, 'position': 'after-MMU-control', 'reset_delay_seconds': None}
+    report['build_command'] = shlex.join(['python3.14', 'scripts/build-entry-probe.py', *sys.argv[1:]])
     (output / 'probe.json').write_text(json.dumps(report, indent=2) + '\n')
     print('Prepared isolated probe:', output / 'probe.json')
 

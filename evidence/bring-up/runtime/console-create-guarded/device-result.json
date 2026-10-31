@@ -1,0 +1,17 @@
+{
+  "device": "SM-T970 / gts7xlwifi",
+  "image_sha256": "e18c6ca0e905e0e40a2283447a765bdc322bbcc85bf0cb19fe80ec857007be29",
+  "image_source_revision": "a1a2beee0635e6368761b19c1f8549e8a6976d9e",
+  "probe": {
+    "function": "_arm_init",
+    "target": "_PE_create_console",
+    "occurrence": 1,
+    "position": "after-return",
+    "reset_delay_seconds": 6
+  },
+  "observation_source": "Human reply in this chat",
+  "observation": "60秒后仍未复位",
+  "observation_window_seconds": 60,
+  "result": "Neither the normal return checkpoint nor a bounded fault terminal was observed.",
+  "limits": "Hardware BRK control is not yet verified. This does not establish a spin loop, prove an exception-free path, identify a failing instruction, or establish PE_create_console entry."
+}

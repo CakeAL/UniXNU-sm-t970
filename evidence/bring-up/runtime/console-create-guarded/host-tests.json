@@ -1,0 +1,15 @@
+{
+  "source_revision": "a1a2beee0635e6368761b19c1f8549e8a6976d9e",
+  "command": "PATH=/opt/homebrew/opt/llvm/bin:/opt/homebrew/opt/lld/bin:$PATH .cache/probe-test-venv/bin/python -m unittest discover -s tests -v",
+  "tests_passed": 8,
+  "fault_terminal_cases_seconds": {
+    "synchronous": 20,
+    "SError": 30,
+    "panic": 40,
+    "BRK": 50
+  },
+  "memory_writes_observed_in_terminal_emulation": 0,
+  "fat_guard_bytes_and_vector_branches_verified": true,
+  "IRQ_FIQ_reserved_slots_unchanged": true,
+  "limits": "ESR and counter are simulated; reset is trapped. No device BRK control or captured hardware fault registers."
+}

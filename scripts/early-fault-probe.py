@@ -97,7 +97,7 @@ def selected_vectors(module, data, names):
     return base, matches[0]
 
 
-def patch_copy(source, output, unixnu, delay):
+def patch_copy(source, output, unixnu, delay, brk_control=False):
     raw = source.read_bytes()
     if hashlib.sha256(raw).hexdigest() != KERNEL_SHA256:
         raise ValueError('Early fault probe requires the reviewed repaired SM-T970 kernel')
@@ -122,8 +122,8 @@ def patch_copy(source, output, unixnu, delay):
         raise ValueError('Early fault diagnostic exceeds its checked padding')
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_bytes(raw)
-    standard = subprocess.run([sys.executable, str(shared), str(output), '--reset-after', '_PE_create_console',
-                               '--in', '_arm_init', '--reset-delay', str(delay)],
+    options = ['--no-reset'] if brk_control else ['--reset-after', '_PE_create_console', '--in', '_arm_init', '--reset-delay', str(delay)]
+    standard = subprocess.run([sys.executable, str(shared), str(output), *options],
                               check=True, capture_output=True, text=True)
     data = bytearray(output.read_bytes())
     if any(data[start:end]):
@@ -139,6 +139,14 @@ def patch_copy(source, output, unixnu, delay):
         va = names[name]
         struct.pack_into('<I', data, module.file_offset(va), module.branch(va, entries['panic_guard']))
         changes.append(hex(va))
+    if brk_control:
+        at = module.file_offset(module.AFTER_MMU_VA)
+        if struct.unpack_from('<I', data, at)[0] != 0xd2a00600:
+            raise ValueError('Unexpected original post-MMU control instruction')
+        struct.pack_into('<I', data, at, 0xd4200000)  # BRK #0; never execute C startup.
+        changes.append(hex(module.AFTER_MMU_VA))
+        if data[module.file_offset(site):module.file_offset(site) + 4] != raw[module.file_offset(site):module.file_offset(site) + 4]:
+            raise ValueError('BRK control unexpectedly modified PE_create_console call')
     for slot in (1, 2, 5, 6, 9, 10, 12, 13, 14, 15):
         at = module.file_offset(vectors + slot * 0x80)
         if data[at:at + 0x80] != raw[at:at + 0x80]:
@@ -149,6 +157,10 @@ def patch_copy(source, output, unixnu, delay):
             'guard_sha256': hashlib.sha256(code).hexdigest(),
             'entries': {key: hex(value) for key, value in entries.items()},
             'modified_entries': changes, 'IRQ_FIQ_and_reserved_slots_preserved': True,
-            'normal_return_delay_seconds': delay, 'fault_delays_seconds': DELAYS,
+            'normal_return_delay_seconds': None if brk_control else delay, 'fault_delays_seconds': DELAYS,
+            'brk_control': brk_control,
+            'control_site': hex(module.AFTER_MMU_VA) if brk_control else None,
+            'expected_control_delay_seconds': 50 if brk_control else None,
+            'C_startup_executed': False if brk_control else 'not established',
             'entry_probe_log': standard.stdout.strip(), 'counter_hz': 19200000,
             'limits': 'Pre-interrupt diagnostic only. No device BRK control yet, no register/text capture, and no recovery from a plain spin loop or inaccessible diagnostic code.'}

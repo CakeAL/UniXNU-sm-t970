@@ -37,10 +37,14 @@
   镜像（`f759eb80…`）仍未复位。照片中的 UEFI 菜单、DarwinBoot 交接句及固件文字
   是保留像素，没有确认新的 XNU 文本输出；不能断定新内核仍停在旧卡点。
   旧状态探针固定到原内核哈希，更换内核后拒绝运行是预期行为。
-- 下一轮用 `--guard-early-faults` 检查更早的 `arm_init` 中 `PE_create_console` 返回：
+- 已用 `--guard-early-faults` 检查更早的 `arm_init` 中 `PE_create_console` 返回：
   正常 6 秒，同步异常／SError／panic／BRK 分别 20／30／40／50 秒后请求复位。
+  机主报告 `e18c6ca0…` 60 秒后仍未复位，既未确认正常检查点，也未确认异常分类路径。
   主机测试和活动向量选择核对通过；设备 BRK 正控制尚未完成，不复位仍有多种可能。
-- BOOT 最近刷入的是 `console-fixed-printf-return` 修复后探针（`f759eb80…`），已确认未复位；
+- 下一轮加 `--brk-control`：在 `0xfffffff0073f3370`（MMU 开启后、C 初始化前）
+  用 `BRK #0` 替换已检查的 `mov x0, #0x300000`。预期约 50 秒后复位，
+  控制台建立调用不修改、不执行；先验证诊断通道，再解释负结果。
+- BOOT 最近刷入的是 `console-create-guarded` 异常分类探针（`e18c6ca0…`），已报告 60 秒未复位；
   原始 BOOT 恢复待完成，后续镜像以 `evidence/bring-up/runtime/*/flash.json` 回执为准。
 - 以下为 ds 交接当时的状态、命令和待办，保留作历史基线；当前进展以本节及适配记录为准。
 
