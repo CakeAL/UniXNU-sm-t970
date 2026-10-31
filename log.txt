@@ -1,0 +1,54 @@
+127|gts7xlwifi:/ $ getprop ro.product.model
+SM-T970
+gts7xlwifi:/ $ getprop ro.product.device
+gts7xlwifi
+gts7xlwifi:/ $ getprop ro.soc.model
+SM8250
+gts7xlwifi:/ $ getprop ro.bootloader
+T970ZCU2CVK1
+gts7xlwifi:/ $ getprop ro.build.fingerprint
+samsung/gts7xlwifizc/gts7xlwifi:12/SP2A.220305.013/T970ZCU2CVK1:user/release-keys
+gts7xlwifi:/ $ cat /proc/meminfo
+MemTotal:        7806144 kB
+MemFree:          179532 kB
+MemAvailable:    3743976 kB
+Buffers:            3224 kB
+Cached:          3891232 kB
+SwapCached:        28612 kB
+Active:          2141572 kB
+Inactive:        2794992 kB
+Active(anon):    1158456 kB
+Inactive(anon):   388380 kB
+Active(file):     983116 kB
+Inactive(file):  2406612 kB
+Unevictable:       90908 kB
+Mlocked:           90908 kB
+RbinTotal:        327680 kB
+RbinAlloced:        5128 kB
+RbinPool:              0 kB
+RbinFree:           1536 kB
+RbinCached:       321012 kB
+SwapTotal:       4194300 kB
+SwapFree:        1373912 kB
+Dirty:               400 kB
+Writeback:             0 kB
+AnonPages:       1450184 kB
+Mapped:           828192 kB
+Shmem:             93896 kB
+KReclaimable:     243204 kB
+Slab:             531516 kB
+SReclaimable:     164220 kB
+SUnreclaim:       367296 kB
+KernelStack:       79044 kB
+PageTables:       129612 kB
+NFS_Unstable:          0 kB
+Bounce:                0 kB
+WritebackTmp:          0 kB
+CommitLimit:     7933532 kB
+Committed_AS:   167115448 kB
+VmallocTotal:   263061440 kB
+VmallocUsed:      166104 kB
+VmallocChunk:          0 kB
+Percpu:            11648 kB
+CmaTotal:         458752 kB
+CmaFree:             248 kB
