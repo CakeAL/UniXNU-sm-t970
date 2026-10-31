@@ -48,3 +48,11 @@ implementation scope and remaining UEFI/DMA constraints recorded in
 
 See [platform-bootstrap/README.md](platform-bootstrap/README.md) for the committed
 configuration host checks and their exact source revision.
+
+`device-inputs/firmware.json` extends the stock input inventory with hashes and
+sizes for 43 allowlisted GPU, Wi-Fi, Bluetooth and audio files. Reproduce with
+`python3.14 scripts/collect-firmware-inputs.py --output evidence/<new>/firmware.json`.
+It records negative touch/pen/keyboard filesystem probes and selected live kernel
+config lines without claiming that these missing files are built into the kernel.
+Wi-Fi board-data variants are inventoried without choosing a variant. No binary
+or personal calibration data is saved; these assets have no selected consumer yet.

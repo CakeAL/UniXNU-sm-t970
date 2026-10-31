@@ -12,7 +12,7 @@
 | 2. `feeds.toml` | 已完成当前选型 | SoC URL／完整提交已固定，另外固定五个组件。`board.soc=SM8250`、`board.soc_source=sm8250` 和 DTS 的 `sm8250.dtsi` include 一致。 |
 | 3. 名称、路径、配置与补丁 | 已完成 | `sm-t970_defconfig` 与 `device:dts/sm-t970.dts` 均指向实际文件。三个配置片段和 arch／soc／os／device 四个 series 均存在，解析出 61 个补丁。 |
 | 4. DTS 硬件描述 | 部分完成 | 已填写实测候选 RAM 窗口、CPU0 启用状态及 30 个静态保留区；GIC／定时器沿用核对后的 SoC 输入。UEFI 可分配内存、动态保留区和固件所有权未确认。板级外设仍禁用，未建立完整连接与 DMA／电源策略。 |
-| 5. `proprietary-files.txt` | 当前仅部分清单 | 已列出 `a650_gmu.bin`、`a650_sqe.fw` 的来源和 SHA256。触控、笔、无线及 ADSP 等输入已在记录中列出路径或候选，但完整固件选择、哈希和消费接口尚未齐备。当前单核阶段没有消费这些外设固件。 |
+| 5. `proprietary-files.txt` | 原厂文件清单已扩展，仍有缺项 | 已通过 ADB 记录 43 个 GPU／Wi-Fi／蓝牙／音频资产的实际路径、大小和 SHA256。触控、笔和键盘的 DTS 固件名在五个文件系统根目录中未找到；无线板型数据的实际选择和 UEFI 厂商 DXE 集合仍待落实。当前单核阶段没有消费这些外设固件。 |
 | 6. 记录、文档及模板文件 | 本地文件要求已完成 | `porting.toml` 身份与 `board.toml` 一致，覆盖当前五组件及其依赖。README、AGENTS、记录工作流、忽略规则、`local.toml.example`、`package/.gitkeep` 均已保留并受版本控制。官方记录检查器通过 13 个部分。此项不表示远端 CI、发布和硬件验证已经完成。 |
 | 7. 移除 `board.example=true` | 条件尚未满足，保留 | 前述固件路径和实际内存交接输入未齐全，因此暂不移除。实际调用 `build kernel` 和 `bootimg` 均以 exit 1 拒绝示例配置，未进入构建或打包。 |
 

@@ -92,6 +92,8 @@ components = [
   "DarwinBoot",
 ]
 paths = [
+  "scripts/collect-firmware-inputs.py",
+  "evidence/device-inputs/firmware.json",
   "evidence/adb-2026-11-01/display_boot.txt",
   "proprietary-files.txt",
   "evidence/shared-support/uefi-candidate.json",
@@ -111,6 +113,7 @@ procedure = [
   "Collect selected boot properties, the live DT and the first 4096 bytes of boot/recovery with the inventory script; only parsed header fields are saved.",
 ]
 findings = [
+  "The follow-up read-only inventory hashes 43 stock assets (6 GPU, 8 Wi-Fi, 2 Bluetooth, 27 audio). This expands the original two-file inventory; none is selected by the CPU0 bootstrap.",
   "The archived properties identify an Android 12 stock build and bootloader T970ZCU2CVK1.",
   "The running Android environment has Magisk root and reports an unlocked/orange boot state; this does not verify a UEFI launch method.",
   "The template firmware integration slots are retained as a table with only known package roots; board.example=true prevents treating the staging configuration as boot-ready.",
@@ -129,6 +132,7 @@ next_action = [
   "Document a T970-specific recovery and UEFI launch path using the measured Android v2 header and partition limits before testing an image.",
 ]
 evidence = [
+  { kind = "source", reference = "evidence/device-inputs/firmware.json", result = "Read-only firmware inventory with exact paths, sizes, hashes, identity and negative input-firmware probes; collector revision will be attached after committing it." },
   { kind = "source", reference = "log.txt", result = "The archived getprop output reports bootloader T970ZCU2CVK1 and the complete Android 12 build fingerprint." },
   { kind = "device", reference = "evidence/adb-2026-11-01/identity.txt", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "The saved boot properties report flash.locked=0, orange verified-boot state and warranty_bit=1.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },
   { kind = "device", reference = "evidence/adb-2026-11-01/capture.json", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Parsed boot/recovery header fields identify Android boot header v2 and 4096-byte pages; collection commands are recorded.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },
@@ -336,6 +340,7 @@ procedure = [
   "Read /proc/bus/input/devices, getevent -lp and bound I2C driver links; correlate them with the exact touch and Wacom DT nodes.",
 ]
 findings = [
+  "The three stock DT names for touch, pen and keyboard were absent from the five checked filesystem roots. CONFIG_EXTRA_FIRMWARE is empty; driver-specific embedded assets still require source/image inspection.",
   "The bound touch driver is STM FTS; the template's Novatek implementation is not established as compatible. Wacom reports a separate input device and requires its own protocol handling.",
   "Step 2 keeps ShengNovatekTouch, QcomGeniSpi and ShengHidInput unselected: their Novatek/SPI/sheng dependencies do not match the measured STM FTS/I2C and independent Wacom input paths.",
 ]
@@ -349,6 +354,7 @@ next_action = [
   "Locate the matching STM FTS and Wacom driver sources and firmware assets, then document report formats, power sequencing and coordinate transforms.",
 ]
 evidence = [
+  { kind = "source", reference = "evidence/device-inputs/firmware.json", result = "The three stock DT names for touch, pen and keyboard were absent from the five checked filesystem roots. CONFIG_EXTRA_FIRMWARE is empty; driver-specific embedded assets still require source/image inspection." },
   { kind = "device", reference = "evidence/adb-2026-11-01/input.txt", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Saved input capability lists and bound fts_touch / wacom_w90xx I2C drivers.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },
   { kind = "device", reference = "evidence/adb-2026-11-01/live-device-tree.dts", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Touch and pen bus addresses, IRQ GPIOs, firmware names, supplies and coordinate properties.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },
 ]
@@ -373,6 +379,7 @@ procedure = [
   "Read KGSL identity and frequency nodes, list GPU firmware files and calculate the GMU/SQE hashes without executing GPU commands.",
 ]
 findings = [
+  "Six A650 files include GMU/SQE and the split signed ZAP image.",
   "The measured GPU is A650, so A740 register sequences and firmware cannot be assumed compatible. Presence of a615_zap files alone does not establish which secure firmware the running driver loads.",
   "Known GMU/SQE files and hashes are listed in proprietary-files.txt as inventory only; no GPU component or consumption recipe is enabled.",
   "Step 2 retains the SoC A650Gmu operations as a future reference only. Adreno740 is scoped to A740/SM8550 and AdrenoMetal depends on that backend; neither is selected for T970.",
@@ -387,6 +394,7 @@ next_action = [
   "Compare the measured A650 resources and firmware hashes with the candidate SM8250 GMU implementation and document the loaded secure-firmware path.",
 ]
 evidence = [
+  { kind = "source", reference = "evidence/device-inputs/firmware.json", result = "Six A650 files include GMU/SQE and the split signed ZAP image." },
   { kind = "device", reference = "evidence/adb-2026-11-01/gpu.txt", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Saved Adreno650v3 identity, seven frequencies, firmware sizes and GMU/SQE SHA256 values.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },
   { kind = "device", reference = "evidence/adb-2026-11-01/live-device-tree.dts", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "GPU/GMU register windows, chipid, interrupts and board power resources.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },
 ]
@@ -410,6 +418,7 @@ procedure = [
   "Read PCI IDs, driver links, wlan0's device path and firmware directory names; do not collect SSIDs, MAC addresses or network traffic.",
 ]
 findings = [
+  "Eight Wi-Fi files and two Bluetooth files are hashed. The Wi-Fi board-data variant is not selected.",
   "The bound PCI endpoint and firmware-directory name are more specific observations than a generic SoC Wi-Fi assumption; exact chipset/revision must be reconciled with the driver source.",
   "The network collection exits 1 because optional firmware_mnt globs do not match; PCI and qca6390 directory output was still captured.",
   "Ath12kWifi is not selected at Step 2: its catalog hardware inputs do not establish compatibility with PCI 17cb:1101 and the unresolved QCA6390/QCA6490 naming on this board.",
@@ -424,6 +433,7 @@ next_action = [
   "Resolve PCI 17cb:1101 and the board firmware selection in the matching Android driver before choosing a UniXNU network implementation.",
 ]
 evidence = [
+  { kind = "source", reference = "evidence/device-inputs/firmware.json", result = "Eight Wi-Fi files and two Bluetooth files are hashed. The Wi-Fi board-data variant is not selected." },
   { kind = "device", reference = "evidence/adb-2026-11-01/network.txt", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Saved PCI endpoint IDs, cnss_pci binding, firmware names and optional-path errors.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },
   { kind = "device", reference = "evidence/adb-2026-11-01/live-device-tree.dts", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "The board DT WLAN compatible and PCIe resource declarations, including the qca6490 name.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },
 ]
@@ -447,6 +457,7 @@ procedure = [
   "Collect ALSA card/PCM lists, bound amplifier links and firmware file names, then inspect the sound and ADSP DT nodes.",
 ]
 findings = [
+  "27 ADSP/amp firmware and service-description files are hashed; loaded DSP routes are not inferred.",
   "The bound amplifier driver is cs35l41 while available DSP firmware filenames use cs35l40; file names alone do not prove the loaded amplifier firmware or route.",
 ]
 completion = [
@@ -459,6 +470,7 @@ next_action = [
   "Trace the bound amplifier driver and Android audio configuration to determine firmware selection, MI2S wiring and the first playback route.",
 ]
 evidence = [
+  { kind = "source", reference = "evidence/device-inputs/firmware.json", result = "27 ADSP/amp firmware and service-description files are hashed; loaded DSP routes are not inferred." },
   { kind = "device", reference = "evidence/adb-2026-11-01/audio.txt", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Saved ALSA endpoints, four cs35l41 bindings, ADSP loader paths and firmware file inventory.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },
   { kind = "device", reference = "evidence/adb-2026-11-01/live-device-tree.dts", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Sound-card, ADSP/LPASS and amplifier declarations for this board.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },
 ]

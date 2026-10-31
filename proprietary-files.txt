@@ -1,5 +1,50 @@
-# Required firmware inputs: relative path | source | SHA-256 | consumer
-# Fill each entry from this board's firmware package.
-# Inventory only: neither asset is consumed by the single-core platform stage.
-vendor/firmware/a650_gmu.bin | SM-T970 T970ZCU2CVK1 /vendor/firmware/a650_gmu.bin | df79fa8482fcc7587bb239b9c9e2b24bce4729893b990fe3f82b30da8175b01c | future A650 GMU backend
-vendor/firmware/a650_sqe.fw | SM-T970 T970ZCU2CVK1 /vendor/firmware/a650_sqe.fw | b4c27420fd6a5c6b511b254cc0fad8cdd40eea38ceb3418f895a1084f4460487 | future A650 command processor
+# Stock asset inventory: relative path | source | SHA-256 | consumer
+# No listed external peripheral firmware is selected by the current CPU0 bootstrap.
+# Source: connected SM-T970 T970ZCU2CVK1; see evidence/device-inputs/firmware.json.
+# Wi-Fi board-data variants are candidates; the loaded variant is not established.
+# Touch/pen/keyboard names were not found at the five searched firmware roots.
+# Missing: tsp_stm/fts1ba90a_gts7xl.bin; epen/w9021_gts7xl.bin;
+# keyboard_stm/stm32_gts7l.bin. No missing binary has an invented hash.
+vendor/firmware/a650_gmu.bin | SM-T970 T970ZCU2CVK1 /vendor/firmware/a650_gmu.bin | df79fa8482fcc7587bb239b9c9e2b24bce4729893b990fe3f82b30da8175b01c | future gpu adaptation; stock asset only
+vendor/firmware/a650_sqe.fw | SM-T970 T970ZCU2CVK1 /vendor/firmware/a650_sqe.fw | b4c27420fd6a5c6b511b254cc0fad8cdd40eea38ceb3418f895a1084f4460487 | future gpu adaptation; stock asset only
+vendor/firmware/cs35l40-spk-dsp1-spk-prot-calib.bin | SM-T970 T970ZCU2CVK1 /vendor/firmware/cs35l40-spk-dsp1-spk-prot-calib.bin | 029328f207c9377b907681a2671098aede7c3c92ea1bd5503eb8e200fad3fcd9 | future audio adaptation; stock asset only
+vendor/firmware/cs35l40-spk-dsp1-spk-prot.bin | SM-T970 T970ZCU2CVK1 /vendor/firmware/cs35l40-spk-dsp1-spk-prot.bin | ca4f29c718e6971798ddb50277ab82d9334718f2fc8db3ad979b03bd6fe612c5 | future audio adaptation; stock asset only
+vendor/firmware/cs35l40-spk-dsp1-spk-prot.wmfw | SM-T970 T970ZCU2CVK1 /vendor/firmware/cs35l40-spk-dsp1-spk-prot.wmfw | e3c60f841f3d9043f3a942befe9cdebd1da3dd0a0dfac54dbf4713d07a5e77f9 | future audio adaptation; stock asset only
+vendor/firmware/htbtfw20.tlv | SM-T970 T970ZCU2CVK1 /vendor/firmware/htbtfw20.tlv | ce7f2a8629026880c97c10346e6ecab4417028b4534021078b1ffcd9863f9730 | future bluetooth adaptation; stock asset only
+vendor/firmware/htnv20.bin | SM-T970 T970ZCU2CVK1 /vendor/firmware/htnv20.bin | 01a813a45ad644a8ac1dc0f94016d1a61cfb9edb6bef7c8a888f82e0ff1bd515 | future bluetooth adaptation; stock asset only
+vendor/firmware/qca6390/amss20.bin | SM-T970 T970ZCU2CVK1 /vendor/firmware/qca6390/amss20.bin | e74e4ebb22988952b0d90973ed50195791f950a820e7093828340dc340c3dde9 | future wifi adaptation; stock asset only
+vendor/firmware/qca6390/bdwlan.e05 | SM-T970 T970ZCU2CVK1 /vendor/firmware/qca6390/bdwlan.e05 | e7182e96ff5c219616c1c7042fa404e5118f3adc2991d00863736b57c0fd4885 | future wifi adaptation; stock asset only
+vendor/firmware/qca6390/bdwlan.elf | SM-T970 T970ZCU2CVK1 /vendor/firmware/qca6390/bdwlan.elf | e7182e96ff5c219616c1c7042fa404e5118f3adc2991d00863736b57c0fd4885 | future wifi adaptation; stock asset only
+vendor/firmware/qca6390/bdwlan.elf1 | SM-T970 T970ZCU2CVK1 /vendor/firmware/qca6390/bdwlan.elf1 | edf798e91afd1d597ab43ef6f3e0ec13e99b4b671071a8bd1dac3fc23df57db8 | future wifi adaptation; stock asset only
+vendor/firmware/qca6390/bdwlan.elf2 | SM-T970 T970ZCU2CVK1 /vendor/firmware/qca6390/bdwlan.elf2 | 0d56468f0712c1191f156356683b3fdf831ac3bac2e24a54cf010cd92c50da74 | future wifi adaptation; stock asset only
+vendor/firmware/qca6390/m3.bin | SM-T970 T970ZCU2CVK1 /vendor/firmware/qca6390/m3.bin | ffde756249606a38a34474f0a18d023c15e5d44953f77c6adcd28d2a8842bd49 | future wifi adaptation; stock asset only
+vendor/firmware/qca6390/regdb.bin | SM-T970 T970ZCU2CVK1 /vendor/firmware/qca6390/regdb.bin | 964c361efc96db7b251d3f6355f5a933d969e71dd7a7565a685fbbfdafb8f83f | future wifi adaptation; stock asset only
+vendor/firmware/wlan/qca_cld/WCNSS_qcom_cfg.ini | SM-T970 T970ZCU2CVK1 /vendor/firmware/wlan/qca_cld/WCNSS_qcom_cfg.ini | cb20c52b725ab1cd2372f157c579467ad1024773ae00ac7f4cd62d4ff962cf3b | future wifi adaptation; stock asset only
+vendor/firmware_mnt/image/a650_zap.b00 | SM-T970 T970ZCU2CVK1 /vendor/firmware_mnt/image/a650_zap.b00 | ec9b9d5a67456384809624b14a00d15d36297e5f2e75728504cd872bc95e0947 | future gpu adaptation; stock asset only
+vendor/firmware_mnt/image/a650_zap.b01 | SM-T970 T970ZCU2CVK1 /vendor/firmware_mnt/image/a650_zap.b01 | 83cd3f4e3886a5e509173a22c0de0009a7c73f956e636c7d792ca7feac49a68b | future gpu adaptation; stock asset only
+vendor/firmware_mnt/image/a650_zap.b02 | SM-T970 T970ZCU2CVK1 /vendor/firmware_mnt/image/a650_zap.b02 | a415e5452fa8f597670a6e51010e97bfabca7d20fbce8044caed64d9d5873113 | future gpu adaptation; stock asset only
+vendor/firmware_mnt/image/a650_zap.mdt | SM-T970 T970ZCU2CVK1 /vendor/firmware_mnt/image/a650_zap.mdt | 56ed13adffa9af0bd8a39eefe025318312b734c3741badf1adc8f5a91ae0bb02 | future gpu adaptation; stock asset only
+vendor/firmware_mnt/image/adsp.b00 | SM-T970 T970ZCU2CVK1 /vendor/firmware_mnt/image/adsp.b00 | 9cd20853ea09c4b3fd9259a523bf50a8a8a5ad419840007a21b85d9c2617c39e | future audio adaptation; stock asset only
+vendor/firmware_mnt/image/adsp.b01 | SM-T970 T970ZCU2CVK1 /vendor/firmware_mnt/image/adsp.b01 | e3a339f0ae9b8e0d6f58117a487d4e3c9b05834c1cc689f87d4abf91c1dc5bec | future audio adaptation; stock asset only
+vendor/firmware_mnt/image/adsp.b02 | SM-T970 T970ZCU2CVK1 /vendor/firmware_mnt/image/adsp.b02 | f10e949463f54e041eaf5ab955641cd1f011c5103240b3f8f8124b4abc667aa6 | future audio adaptation; stock asset only
+vendor/firmware_mnt/image/adsp.b03 | SM-T970 T970ZCU2CVK1 /vendor/firmware_mnt/image/adsp.b03 | 1f760ce5ff08372d0927e87632162bab630093a7a31a1a415179aea4f85d03d9 | future audio adaptation; stock asset only
+vendor/firmware_mnt/image/adsp.b04 | SM-T970 T970ZCU2CVK1 /vendor/firmware_mnt/image/adsp.b04 | bfc5a6c78eeab83c1e3e8dee9978ac9bec8c339ebff64c293085b4ef79bba522 | future audio adaptation; stock asset only
+vendor/firmware_mnt/image/adsp.b05 | SM-T970 T970ZCU2CVK1 /vendor/firmware_mnt/image/adsp.b05 | f34686f80cab110deea79fa809713da7d7a3a7388177fe83e6b841899cc3fe1b | future audio adaptation; stock asset only
+vendor/firmware_mnt/image/adsp.b06 | SM-T970 T970ZCU2CVK1 /vendor/firmware_mnt/image/adsp.b06 | 6330322efc9e7ceb48f9c2c75db0e38f6f546f04f11a96b2da4695ad0ca8277b | future audio adaptation; stock asset only
+vendor/firmware_mnt/image/adsp.b07 | SM-T970 T970ZCU2CVK1 /vendor/firmware_mnt/image/adsp.b07 | cb9fbd8220da1b64e22959f62518782be53251140bcd30ae469e33ad1de2951d | future audio adaptation; stock asset only
+vendor/firmware_mnt/image/adsp.b08 | SM-T970 T970ZCU2CVK1 /vendor/firmware_mnt/image/adsp.b08 | 9ab5abde33109089eeb1bf8ee44233e0a0d5a546e5a2f32c9ec1d02a861736c3 | future audio adaptation; stock asset only
+vendor/firmware_mnt/image/adsp.b09 | SM-T970 T970ZCU2CVK1 /vendor/firmware_mnt/image/adsp.b09 | 60b01a8e5a478c79cc31f8c5548c59260d7a40b2296cbd33615279ec6159dae0 | future audio adaptation; stock asset only
+vendor/firmware_mnt/image/adsp.b10 | SM-T970 T970ZCU2CVK1 /vendor/firmware_mnt/image/adsp.b10 | eeead0a774ac358d78b3b3b66a62af9aba8f40e3226bc66a05f86569eb3ec69c | future audio adaptation; stock asset only
+vendor/firmware_mnt/image/adsp.b11 | SM-T970 T970ZCU2CVK1 /vendor/firmware_mnt/image/adsp.b11 | 3b48362e239929a2396dd3d18e6865cac0d18178e0afb94e41e5fbe9e9fe2519 | future audio adaptation; stock asset only
+vendor/firmware_mnt/image/adsp.b12 | SM-T970 T970ZCU2CVK1 /vendor/firmware_mnt/image/adsp.b12 | 2c0824dfd0443a5c928e5c5a469e0bb598847da247656bd3292a77cf1bd49a00 | future audio adaptation; stock asset only
+vendor/firmware_mnt/image/adsp.b13 | SM-T970 T970ZCU2CVK1 /vendor/firmware_mnt/image/adsp.b13 | cc61635da46b2c9974335ea37e0b5fd660a5c8a42a89b271fa7ec2ac4b8b26f6 | future audio adaptation; stock asset only
+vendor/firmware_mnt/image/adsp.b14 | SM-T970 T970ZCU2CVK1 /vendor/firmware_mnt/image/adsp.b14 | 01c4b3e9a729b06d0262df06b0054fc89463d20a7f041faa6c35ae14e408bcb9 | future audio adaptation; stock asset only
+vendor/firmware_mnt/image/adsp.b15 | SM-T970 T970ZCU2CVK1 /vendor/firmware_mnt/image/adsp.b15 | 91937540ab206d861f60932ef419337e69a32205e76216d63a75a0b42db1e6ca | future audio adaptation; stock asset only
+vendor/firmware_mnt/image/adsp.b16 | SM-T970 T970ZCU2CVK1 /vendor/firmware_mnt/image/adsp.b16 | 06b510cf18094d197f5a656cd55dec814731d827cbca955c5cf30e6811591fdf | future audio adaptation; stock asset only
+vendor/firmware_mnt/image/adsp.b17 | SM-T970 T970ZCU2CVK1 /vendor/firmware_mnt/image/adsp.b17 | 41cf2040f89ba1f28c6ea3c0003661ca1ae2ef87bb76c10283f3c778def5acce | future audio adaptation; stock asset only
+vendor/firmware_mnt/image/adsp.b18 | SM-T970 T970ZCU2CVK1 /vendor/firmware_mnt/image/adsp.b18 | 227637d4ffc6a75cca205827f1305a588480cdfab5a80c3228c5429bd33e5b79 | future audio adaptation; stock asset only
+vendor/firmware_mnt/image/adsp.b19 | SM-T970 T970ZCU2CVK1 /vendor/firmware_mnt/image/adsp.b19 | 341491e5dfa3fdd66179e5013ca12e32a027fe5be1542e9c8142afbe65139694 | future audio adaptation; stock asset only
+vendor/firmware_mnt/image/adsp.b20 | SM-T970 T970ZCU2CVK1 /vendor/firmware_mnt/image/adsp.b20 | c071d27cbba524bcf015318ece5cfe33f6a94d1348125969d89cd4189baecda8 | future audio adaptation; stock asset only
+vendor/firmware_mnt/image/adsp.mdt | SM-T970 T970ZCU2CVK1 /vendor/firmware_mnt/image/adsp.mdt | a9a5c00004f887147fbde5fec6e4b40f5e5d0481074d459fc8ff64fea8cce08a | future audio adaptation; stock asset only
+vendor/firmware_mnt/image/adspr.jsn | SM-T970 T970ZCU2CVK1 /vendor/firmware_mnt/image/adspr.jsn | 4781dc9312fa017b0e611c752dae2183c0f205af8300b28417a496dae511b0a5 | future audio adaptation; stock asset only
+vendor/firmware_mnt/image/adspua.jsn | SM-T970 T970ZCU2CVK1 /vendor/firmware_mnt/image/adspua.jsn | d6c6376f53e5449eb4f7b9e5a30679ebc2a9afaad28c13ff171f979e7b1af1f6 | future audio adaptation; stock asset only

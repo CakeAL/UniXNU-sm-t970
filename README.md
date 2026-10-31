@@ -17,7 +17,7 @@ vsc/
 - `configs/sm-t970_defconfig`：本阶段的内核选项。
 - `dts/`：板级 CPU 启用状态、候选连续 RAM 窗口和采集到的静态保留区。
 - `package/`：后续板级服务；当前保留模板的空目录。
-- `proprietary-files.txt`：已知 GPU 固件来源和哈希，目前没有消费这些固件的驱动。
+- `proprietary-files.txt`：43 个原厂 GPU、无线、蓝牙和音频资产的来源与哈希；当前单核阶段不消费这些资产。
 - [porting.toml](porting.toml)：唯一的设备适配记录，包含 13 个部分。
 - [evidence/README.md](evidence/README.md)：ADB 原始输入与采集方法。
 

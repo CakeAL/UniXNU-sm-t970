@@ -1,0 +1,513 @@
+{
+  "captured_at": "2026-11-01T02:45:58.372159+08:00",
+  "device": {
+    "model": "SM-T970",
+    "codename": "gts7xlwifi",
+    "bootloader": "T970ZCU2CVK1"
+  },
+  "transport": "adb -d shell -T su -c (serial omitted)",
+  "scope": "Stock filesystem firmware metadata; not a UniXNU boot result or a complete UEFI binary inventory",
+  "commands": [
+    "for f in /vendor/firmware/a650_* /vendor/firmware_mnt/image/a650_zap.*; do if [ -f \"$f\" ]; then sha256sum \"$f\"; stat -c \"%s\" \"$f\"; fi; done",
+    "for f in /vendor/firmware/qca6390/* /vendor/firmware/wlan/qca_cld/WCNSS_qcom_cfg.ini; do if [ -f \"$f\" ]; then sha256sum \"$f\"; stat -c \"%s\" \"$f\"; fi; done",
+    "for f in /vendor/firmware/htbtfw20.tlv /vendor/firmware/htnv20.bin; do if [ -f \"$f\" ]; then sha256sum \"$f\"; stat -c \"%s\" \"$f\"; fi; done",
+    "for f in /vendor/firmware/cs35l40-spk-dsp1-* /vendor/firmware_mnt/image/adsp.* /vendor/firmware_mnt/image/adspr.jsn /vendor/firmware_mnt/image/adspua.jsn; do if [ -f \"$f\" ]; then sha256sum \"$f\"; stat -c \"%s\" \"$f\"; fi; done",
+    "for f in /vendor/firmware/tsp_stm/fts1ba90a_gts7xl.bin /vendor/firmware_mnt/image/tsp_stm/fts1ba90a_gts7xl.bin /odm/firmware/tsp_stm/fts1ba90a_gts7xl.bin /system/etc/firmware/tsp_stm/fts1ba90a_gts7xl.bin /lib/firmware/tsp_stm/fts1ba90a_gts7xl.bin; do if [ -f \"$f\" ]; then sha256sum \"$f\"; fi; done",
+    "for f in /vendor/firmware/epen/w9021_gts7xl.bin /vendor/firmware_mnt/image/epen/w9021_gts7xl.bin /odm/firmware/epen/w9021_gts7xl.bin /system/etc/firmware/epen/w9021_gts7xl.bin /lib/firmware/epen/w9021_gts7xl.bin; do if [ -f \"$f\" ]; then sha256sum \"$f\"; fi; done",
+    "for f in /vendor/firmware/keyboard_stm/stm32_gts7l.bin /vendor/firmware_mnt/image/keyboard_stm/stm32_gts7l.bin /odm/firmware/keyboard_stm/stm32_gts7l.bin /system/etc/firmware/keyboard_stm/stm32_gts7l.bin /lib/firmware/keyboard_stm/stm32_gts7l.bin; do if [ -f \"$f\" ]; then sha256sum \"$f\"; fi; done"
+  ],
+  "files": [
+    {
+      "family": "gpu",
+      "source": "/vendor/firmware/a650_gmu.bin",
+      "sha256": "df79fa8482fcc7587bb239b9c9e2b24bce4729893b990fe3f82b30da8175b01c",
+      "size": 41548,
+      "selected": false,
+      "consumer": "future gpu adaptation; stock asset only"
+    },
+    {
+      "family": "gpu",
+      "source": "/vendor/firmware/a650_sqe.fw",
+      "sha256": "b4c27420fd6a5c6b511b254cc0fad8cdd40eea38ceb3418f895a1084f4460487",
+      "size": 31632,
+      "selected": false,
+      "consumer": "future gpu adaptation; stock asset only"
+    },
+    {
+      "family": "audio",
+      "source": "/vendor/firmware/cs35l40-spk-dsp1-spk-prot-calib.bin",
+      "sha256": "029328f207c9377b907681a2671098aede7c3c92ea1bd5503eb8e200fad3fcd9",
+      "size": 984,
+      "selected": false,
+      "consumer": "future audio adaptation; stock asset only"
+    },
+    {
+      "family": "audio",
+      "source": "/vendor/firmware/cs35l40-spk-dsp1-spk-prot.bin",
+      "sha256": "ca4f29c718e6971798ddb50277ab82d9334718f2fc8db3ad979b03bd6fe612c5",
+      "size": 4220,
+      "selected": false,
+      "consumer": "future audio adaptation; stock asset only"
+    },
+    {
+      "family": "audio",
+      "source": "/vendor/firmware/cs35l40-spk-dsp1-spk-prot.wmfw",
+      "sha256": "e3c60f841f3d9043f3a942befe9cdebd1da3dd0a0dfac54dbf4713d07a5e77f9",
+      "size": 31780,
+      "selected": false,
+      "consumer": "future audio adaptation; stock asset only"
+    },
+    {
+      "family": "bluetooth",
+      "source": "/vendor/firmware/htbtfw20.tlv",
+      "sha256": "ce7f2a8629026880c97c10346e6ecab4417028b4534021078b1ffcd9863f9730",
+      "size": 210668,
+      "selected": false,
+      "consumer": "future bluetooth adaptation; stock asset only"
+    },
+    {
+      "family": "bluetooth",
+      "source": "/vendor/firmware/htnv20.bin",
+      "sha256": "01a813a45ad644a8ac1dc0f94016d1a61cfb9edb6bef7c8a888f82e0ff1bd515",
+      "size": 6108,
+      "selected": false,
+      "consumer": "future bluetooth adaptation; stock asset only"
+    },
+    {
+      "family": "wifi",
+      "source": "/vendor/firmware/qca6390/amss20.bin",
+      "sha256": "e74e4ebb22988952b0d90973ed50195791f950a820e7093828340dc340c3dde9",
+      "size": 4372640,
+      "selected": false,
+      "consumer": "future wifi adaptation; stock asset only"
+    },
+    {
+      "family": "wifi",
+      "source": "/vendor/firmware/qca6390/bdwlan.e05",
+      "sha256": "e7182e96ff5c219616c1c7042fa404e5118f3adc2991d00863736b57c0fd4885",
+      "size": 57900,
+      "selected": false,
+      "consumer": "future wifi adaptation; stock asset only"
+    },
+    {
+      "family": "wifi",
+      "source": "/vendor/firmware/qca6390/bdwlan.elf",
+      "sha256": "e7182e96ff5c219616c1c7042fa404e5118f3adc2991d00863736b57c0fd4885",
+      "size": 57900,
+      "selected": false,
+      "consumer": "future wifi adaptation; stock asset only"
+    },
+    {
+      "family": "wifi",
+      "source": "/vendor/firmware/qca6390/bdwlan.elf1",
+      "sha256": "edf798e91afd1d597ab43ef6f3e0ec13e99b4b671071a8bd1dac3fc23df57db8",
+      "size": 57900,
+      "selected": false,
+      "consumer": "future wifi adaptation; stock asset only"
+    },
+    {
+      "family": "wifi",
+      "source": "/vendor/firmware/qca6390/bdwlan.elf2",
+      "sha256": "0d56468f0712c1191f156356683b3fdf831ac3bac2e24a54cf010cd92c50da74",
+      "size": 57900,
+      "selected": false,
+      "consumer": "future wifi adaptation; stock asset only"
+    },
+    {
+      "family": "wifi",
+      "source": "/vendor/firmware/qca6390/m3.bin",
+      "sha256": "ffde756249606a38a34474f0a18d023c15e5d44953f77c6adcd28d2a8842bd49",
+      "size": 266684,
+      "selected": false,
+      "consumer": "future wifi adaptation; stock asset only"
+    },
+    {
+      "family": "wifi",
+      "source": "/vendor/firmware/qca6390/regdb.bin",
+      "sha256": "964c361efc96db7b251d3f6355f5a933d969e71dd7a7565a685fbbfdafb8f83f",
+      "size": 19348,
+      "selected": false,
+      "consumer": "future wifi adaptation; stock asset only"
+    },
+    {
+      "family": "wifi",
+      "source": "/vendor/firmware/wlan/qca_cld/WCNSS_qcom_cfg.ini",
+      "sha256": "cb20c52b725ab1cd2372f157c579467ad1024773ae00ac7f4cd62d4ff962cf3b",
+      "size": 14311,
+      "selected": false,
+      "consumer": "future wifi adaptation; stock asset only"
+    },
+    {
+      "family": "gpu",
+      "source": "/vendor/firmware_mnt/image/a650_zap.b00",
+      "sha256": "ec9b9d5a67456384809624b14a00d15d36297e5f2e75728504cd872bc95e0947",
+      "size": 148,
+      "selected": false,
+      "consumer": "future gpu adaptation; stock asset only"
+    },
+    {
+      "family": "gpu",
+      "source": "/vendor/firmware_mnt/image/a650_zap.b01",
+      "sha256": "83cd3f4e3886a5e509173a22c0de0009a7c73f956e636c7d792ca7feac49a68b",
+      "size": 6712,
+      "selected": false,
+      "consumer": "future gpu adaptation; stock asset only"
+    },
+    {
+      "family": "gpu",
+      "source": "/vendor/firmware_mnt/image/a650_zap.b02",
+      "sha256": "a415e5452fa8f597670a6e51010e97bfabca7d20fbce8044caed64d9d5873113",
+      "size": 1676,
+      "selected": false,
+      "consumer": "future gpu adaptation; stock asset only"
+    },
+    {
+      "family": "gpu",
+      "source": "/vendor/firmware_mnt/image/a650_zap.mdt",
+      "sha256": "56ed13adffa9af0bd8a39eefe025318312b734c3741badf1adc8f5a91ae0bb02",
+      "size": 6860,
+      "selected": false,
+      "consumer": "future gpu adaptation; stock asset only"
+    },
+    {
+      "family": "audio",
+      "source": "/vendor/firmware_mnt/image/adsp.b00",
+      "sha256": "9cd20853ea09c4b3fd9259a523bf50a8a8a5ad419840007a21b85d9c2617c39e",
+      "size": 756,
+      "selected": false,
+      "consumer": "future audio adaptation; stock asset only"
+    },
+    {
+      "family": "audio",
+      "source": "/vendor/firmware_mnt/image/adsp.b01",
+      "sha256": "e3a339f0ae9b8e0d6f58117a487d4e3c9b05834c1cc689f87d4abf91c1dc5bec",
+      "size": 7624,
+      "selected": false,
+      "consumer": "future audio adaptation; stock asset only"
+    },
+    {
+      "family": "audio",
+      "source": "/vendor/firmware_mnt/image/adsp.b02",
+      "sha256": "f10e949463f54e041eaf5ab955641cd1f011c5103240b3f8f8124b4abc667aa6",
+      "size": 82552,
+      "selected": false,
+      "consumer": "future audio adaptation; stock asset only"
+    },
+    {
+      "family": "audio",
+      "source": "/vendor/firmware_mnt/image/adsp.b03",
+      "sha256": "1f760ce5ff08372d0927e87632162bab630093a7a31a1a415179aea4f85d03d9",
+      "size": 358784,
+      "selected": false,
+      "consumer": "future audio adaptation; stock asset only"
+    },
+    {
+      "family": "audio",
+      "source": "/vendor/firmware_mnt/image/adsp.b04",
+      "sha256": "bfc5a6c78eeab83c1e3e8dee9978ac9bec8c339ebff64c293085b4ef79bba522",
+      "size": 1961452,
+      "selected": false,
+      "consumer": "future audio adaptation; stock asset only"
+    },
+    {
+      "family": "audio",
+      "source": "/vendor/firmware_mnt/image/adsp.b05",
+      "sha256": "f34686f80cab110deea79fa809713da7d7a3a7388177fe83e6b841899cc3fe1b",
+      "size": 2487860,
+      "selected": false,
+      "consumer": "future audio adaptation; stock asset only"
+    },
+    {
+      "family": "audio",
+      "source": "/vendor/firmware_mnt/image/adsp.b06",
+      "sha256": "6330322efc9e7ceb48f9c2c75db0e38f6f546f04f11a96b2da4695ad0ca8277b",
+      "size": 38640,
+      "selected": false,
+      "consumer": "future audio adaptation; stock asset only"
+    },
+    {
+      "family": "audio",
+      "source": "/vendor/firmware_mnt/image/adsp.b07",
+      "sha256": "cb9fbd8220da1b64e22959f62518782be53251140bcd30ae469e33ad1de2951d",
+      "size": 28972,
+      "selected": false,
+      "consumer": "future audio adaptation; stock asset only"
+    },
+    {
+      "family": "audio",
+      "source": "/vendor/firmware_mnt/image/adsp.b08",
+      "sha256": "9ab5abde33109089eeb1bf8ee44233e0a0d5a546e5a2f32c9ec1d02a861736c3",
+      "size": 126736,
+      "selected": false,
+      "consumer": "future audio adaptation; stock asset only"
+    },
+    {
+      "family": "audio",
+      "source": "/vendor/firmware_mnt/image/adsp.b09",
+      "sha256": "60b01a8e5a478c79cc31f8c5548c59260d7a40b2296cbd33615279ec6159dae0",
+      "size": 64424,
+      "selected": false,
+      "consumer": "future audio adaptation; stock asset only"
+    },
+    {
+      "family": "audio",
+      "source": "/vendor/firmware_mnt/image/adsp.b10",
+      "sha256": "eeead0a774ac358d78b3b3b66a62af9aba8f40e3226bc66a05f86569eb3ec69c",
+      "size": 610304,
+      "selected": false,
+      "consumer": "future audio adaptation; stock asset only"
+    },
+    {
+      "family": "audio",
+      "source": "/vendor/firmware_mnt/image/adsp.b11",
+      "sha256": "3b48362e239929a2396dd3d18e6865cac0d18178e0afb94e41e5fbe9e9fe2519",
+      "size": 11984892,
+      "selected": false,
+      "consumer": "future audio adaptation; stock asset only"
+    },
+    {
+      "family": "audio",
+      "source": "/vendor/firmware_mnt/image/adsp.b12",
+      "sha256": "2c0824dfd0443a5c928e5c5a469e0bb598847da247656bd3292a77cf1bd49a00",
+      "size": 1589280,
+      "selected": false,
+      "consumer": "future audio adaptation; stock asset only"
+    },
+    {
+      "family": "audio",
+      "source": "/vendor/firmware_mnt/image/adsp.b13",
+      "sha256": "cc61635da46b2c9974335ea37e0b5fd660a5c8a42a89b271fa7ec2ac4b8b26f6",
+      "size": 20480,
+      "selected": false,
+      "consumer": "future audio adaptation; stock asset only"
+    },
+    {
+      "family": "audio",
+      "source": "/vendor/firmware_mnt/image/adsp.b14",
+      "sha256": "01c4b3e9a729b06d0262df06b0054fc89463d20a7f041faa6c35ae14e408bcb9",
+      "size": 2464,
+      "selected": false,
+      "consumer": "future audio adaptation; stock asset only"
+    },
+    {
+      "family": "audio",
+      "source": "/vendor/firmware_mnt/image/adsp.b15",
+      "sha256": "91937540ab206d861f60932ef419337e69a32205e76216d63a75a0b42db1e6ca",
+      "size": 4416,
+      "selected": false,
+      "consumer": "future audio adaptation; stock asset only"
+    },
+    {
+      "family": "audio",
+      "source": "/vendor/firmware_mnt/image/adsp.b16",
+      "sha256": "06b510cf18094d197f5a656cd55dec814731d827cbca955c5cf30e6811591fdf",
+      "size": 305864,
+      "selected": false,
+      "consumer": "future audio adaptation; stock asset only"
+    },
+    {
+      "family": "audio",
+      "source": "/vendor/firmware_mnt/image/adsp.b17",
+      "sha256": "41cf2040f89ba1f28c6ea3c0003661ca1ae2ef87bb76c10283f3c778def5acce",
+      "size": 1367348,
+      "selected": false,
+      "consumer": "future audio adaptation; stock asset only"
+    },
+    {
+      "family": "audio",
+      "source": "/vendor/firmware_mnt/image/adsp.b18",
+      "sha256": "227637d4ffc6a75cca205827f1305a588480cdfab5a80c3228c5429bd33e5b79",
+      "size": 488496,
+      "selected": false,
+      "consumer": "future audio adaptation; stock asset only"
+    },
+    {
+      "family": "audio",
+      "source": "/vendor/firmware_mnt/image/adsp.b19",
+      "sha256": "341491e5dfa3fdd66179e5013ca12e32a027fe5be1542e9c8142afbe65139694",
+      "size": 2326392,
+      "selected": false,
+      "consumer": "future audio adaptation; stock asset only"
+    },
+    {
+      "family": "audio",
+      "source": "/vendor/firmware_mnt/image/adsp.b20",
+      "sha256": "c071d27cbba524bcf015318ece5cfe33f6a94d1348125969d89cd4189baecda8",
+      "size": 132,
+      "selected": false,
+      "consumer": "future audio adaptation; stock asset only"
+    },
+    {
+      "family": "audio",
+      "source": "/vendor/firmware_mnt/image/adsp.mdt",
+      "sha256": "a9a5c00004f887147fbde5fec6e4b40f5e5d0481074d459fc8ff64fea8cce08a",
+      "size": 8380,
+      "selected": false,
+      "consumer": "future audio adaptation; stock asset only"
+    },
+    {
+      "family": "audio",
+      "source": "/vendor/firmware_mnt/image/adspr.jsn",
+      "sha256": "4781dc9312fa017b0e611c752dae2183c0f205af8300b28417a496dae511b0a5",
+      "size": 403,
+      "selected": false,
+      "consumer": "future audio adaptation; stock asset only"
+    },
+    {
+      "family": "audio",
+      "source": "/vendor/firmware_mnt/image/adspua.jsn",
+      "sha256": "d6c6376f53e5449eb4f7b9e5a30679ebc2a9afaad28c13ff171f979e7b1af1f6",
+      "size": 555,
+      "selected": false,
+      "consumer": "future audio adaptation; stock asset only"
+    }
+  ],
+  "input_firmware_probes": [
+    {
+      "firmware_name": "tsp_stm/fts1ba90a_gts7xl.bin",
+      "searched": [
+        "/vendor/firmware/tsp_stm/fts1ba90a_gts7xl.bin",
+        "/vendor/firmware_mnt/image/tsp_stm/fts1ba90a_gts7xl.bin",
+        "/odm/firmware/tsp_stm/fts1ba90a_gts7xl.bin",
+        "/system/etc/firmware/tsp_stm/fts1ba90a_gts7xl.bin",
+        "/lib/firmware/tsp_stm/fts1ba90a_gts7xl.bin"
+      ],
+      "found": [],
+      "conclusion": "not found in searched filesystem paths"
+    },
+    {
+      "firmware_name": "epen/w9021_gts7xl.bin",
+      "searched": [
+        "/vendor/firmware/epen/w9021_gts7xl.bin",
+        "/vendor/firmware_mnt/image/epen/w9021_gts7xl.bin",
+        "/odm/firmware/epen/w9021_gts7xl.bin",
+        "/system/etc/firmware/epen/w9021_gts7xl.bin",
+        "/lib/firmware/epen/w9021_gts7xl.bin"
+      ],
+      "found": [],
+      "conclusion": "not found in searched filesystem paths"
+    },
+    {
+      "firmware_name": "keyboard_stm/stm32_gts7l.bin",
+      "searched": [
+        "/vendor/firmware/keyboard_stm/stm32_gts7l.bin",
+        "/vendor/firmware_mnt/image/keyboard_stm/stm32_gts7l.bin",
+        "/odm/firmware/keyboard_stm/stm32_gts7l.bin",
+        "/system/etc/firmware/keyboard_stm/stm32_gts7l.bin",
+        "/lib/firmware/keyboard_stm/stm32_gts7l.bin"
+      ],
+      "found": [],
+      "conclusion": "not found in searched filesystem paths"
+    }
+  ],
+  "kernel_config": {
+    "command": "cat /proc/config.gz",
+    "uncompressed_sha256": "f1404529ab248a2456f3d6702b4d9a52769dd9a3f223df021f1a16adc91dd6ee",
+    "selected_lines": [
+      "CONFIG_FW_LOADER=y",
+      "CONFIG_EXTRA_FIRMWARE=\"\"",
+      "CONFIG_SEC_DEBUG_TSP_LOG=y",
+      "CONFIG_TOUCHSCREEN_DUMP_MODE=y",
+      "CONFIG_WACOM_HALL=y",
+      "CONFIG_TOUCHSCREEN_PROPERTIES=y",
+      "# CONFIG_TOUCHSCREEN_ADS7846 is not set",
+      "# CONFIG_TOUCHSCREEN_AD7877 is not set",
+      "# CONFIG_TOUCHSCREEN_AD7879 is not set",
+      "# CONFIG_TOUCHSCREEN_ADC is not set",
+      "# CONFIG_TOUCHSCREEN_AR1021_I2C is not set",
+      "# CONFIG_TOUCHSCREEN_ATMEL_MXT is not set",
+      "# CONFIG_TOUCHSCREEN_AUO_PIXCIR is not set",
+      "# CONFIG_TOUCHSCREEN_BU21013 is not set",
+      "# CONFIG_TOUCHSCREEN_BU21029 is not set",
+      "# CONFIG_TOUCHSCREEN_CHIPONE_ICN8318 is not set",
+      "# CONFIG_TOUCHSCREEN_CY8CTMG110 is not set",
+      "# CONFIG_TOUCHSCREEN_CYTTSP_CORE is not set",
+      "# CONFIG_TOUCHSCREEN_CYTTSP4_CORE is not set",
+      "# CONFIG_TOUCHSCREEN_DYNAPRO is not set",
+      "# CONFIG_TOUCHSCREEN_HAMPSHIRE is not set",
+      "# CONFIG_TOUCHSCREEN_EETI is not set",
+      "# CONFIG_TOUCHSCREEN_EGALAX is not set",
+      "# CONFIG_TOUCHSCREEN_EGALAX_SERIAL is not set",
+      "# CONFIG_TOUCHSCREEN_EXC3000 is not set",
+      "# CONFIG_TOUCHSCREEN_FUJITSU is not set",
+      "# CONFIG_TOUCHSCREEN_GOODIX is not set",
+      "# CONFIG_TOUCHSCREEN_HIDEEP is not set",
+      "# CONFIG_TOUCHSCREEN_ILI210X is not set",
+      "# CONFIG_TOUCHSCREEN_S6SY761 is not set",
+      "# CONFIG_TOUCHSCREEN_GUNZE is not set",
+      "# CONFIG_TOUCHSCREEN_EKTF2127 is not set",
+      "# CONFIG_TOUCHSCREEN_ELAN is not set",
+      "# CONFIG_TOUCHSCREEN_ELO is not set",
+      "# CONFIG_TOUCHSCREEN_WACOM_W8001 is not set",
+      "# CONFIG_TOUCHSCREEN_WACOM_I2C is not set",
+      "# CONFIG_TOUCHSCREEN_MAX11801 is not set",
+      "# CONFIG_TOUCHSCREEN_MCS5000 is not set",
+      "# CONFIG_TOUCHSCREEN_MMS114 is not set",
+      "# CONFIG_TOUCHSCREEN_MELFAS_MIP4 is not set",
+      "# CONFIG_TOUCHSCREEN_MTOUCH is not set",
+      "# CONFIG_TOUCHSCREEN_IMX6UL_TSC is not set",
+      "# CONFIG_TOUCHSCREEN_INEXIO is not set",
+      "# CONFIG_TOUCHSCREEN_MK712 is not set",
+      "# CONFIG_TOUCHSCREEN_PENMOUNT is not set",
+      "# CONFIG_TOUCHSCREEN_EDT_FT5X06 is not set",
+      "# CONFIG_TOUCHSCREEN_TOUCHRIGHT is not set",
+      "# CONFIG_TOUCHSCREEN_TOUCHWIN is not set",
+      "# CONFIG_TOUCHSCREEN_PIXCIR is not set",
+      "# CONFIG_TOUCHSCREEN_WDT87XX_I2C is not set",
+      "# CONFIG_TOUCHSCREEN_USB_COMPOSITE is not set",
+      "# CONFIG_TOUCHSCREEN_TOUCHIT213 is not set",
+      "# CONFIG_TOUCHSCREEN_TSC_SERIO is not set",
+      "# CONFIG_TOUCHSCREEN_TSC2004 is not set",
+      "# CONFIG_TOUCHSCREEN_TSC2005 is not set",
+      "# CONFIG_TOUCHSCREEN_TSC2007 is not set",
+      "# CONFIG_TOUCHSCREEN_RM_TS is not set",
+      "# CONFIG_TOUCHSCREEN_SILEAD is not set",
+      "# CONFIG_TOUCHSCREEN_SIS_I2C is not set",
+      "# CONFIG_TOUCHSCREEN_ST1232 is not set",
+      "# CONFIG_TOUCHSCREEN_STMFTS is not set",
+      "# CONFIG_TOUCHSCREEN_SUR40 is not set",
+      "# CONFIG_TOUCHSCREEN_SURFACE3_SPI is not set",
+      "# CONFIG_TOUCHSCREEN_SX8654 is not set",
+      "# CONFIG_TOUCHSCREEN_TPS6507X is not set",
+      "# CONFIG_TOUCHSCREEN_ZET6223 is not set",
+      "# CONFIG_TOUCHSCREEN_ZFORCE is not set",
+      "# CONFIG_TOUCHSCREEN_ROHM_BU21023 is not set",
+      "# CONFIG_TOUCHSCREEN_ST is not set",
+      "# CONFIG_TOUCHSCREEN_SYNAPTICS_DSX is not set",
+      "# CONFIG_TOUCHSCREEN_DUAL_FOLDABLE is not set",
+      "# CONFIG_TOUCHSCREEN_SEC_TS_Y79A is not set",
+      "# CONFIG_TOUCHSCREEN_SEC_TS_GLOVEMODE is not set",
+      "# CONFIG_TOUCHSCREEN_SEC_TS_Y79A_C is not set",
+      "# CONFIG_TOUCHSCREEN_SEC_TS_Y771_SUB is not set",
+      "# CONFIG_TOUCHSCREEN_ZINITIX_ZTW522 is not set",
+      "# CONFIG_TOUCHSCREEN_FTS9CU80F_B is not set",
+      "CONFIG_TOUCHSCREEN_FTS1BA90A=y",
+      "# CONFIG_TOUCHSCREEN_NOVATEK_NT36523 is not set",
+      "# CONFIG_TOUCHSCREEN_MELFAS_MSS100 is not set",
+      "# CONFIG_TOUCHSCREEN_ZINITIX_ZT7650 is not set",
+      "# CONFIG_TOUCHSCREEN_STM_FTS5CU56A is not set",
+      "CONFIG_TOUCHSCREEN_SYNAPTICS_TCM=y",
+      "CONFIG_TOUCHSCREEN_SYNAPTICS_TCM_I2C=y",
+      "# CONFIG_TOUCHSCREEN_SYNAPTICS_TCM_SPI is not set",
+      "CONFIG_TOUCHSCREEN_SYNAPTICS_TCM_CORE=y",
+      "CONFIG_TOUCHSCREEN_SYNAPTICS_TCM_TOUCH=y",
+      "CONFIG_TOUCHSCREEN_SYNAPTICS_TCM_DEVICE=y",
+      "# CONFIG_TOUCHSCREEN_SYNAPTICS_TCM_TESTING is not set",
+      "# CONFIG_TOUCHSCREEN_SYNAPTICS_TCM_REFLASH is not set",
+      "# CONFIG_TOUCHSCREEN_SYNAPTICS_TCM_RECOVERY is not set",
+      "# CONFIG_TOUCHSCREEN_SYNAPTICS_TCM_ZEROFLASH is not set",
+      "CONFIG_TOUCHSCREEN_SYNAPTICS_TCM_DIAGNOSTICS=y",
+      "# CONFIG_TOUCHSCREEN_FTS is not set",
+      "# CONFIG_TOUCHSCREEN_NT36XXX is not set"
+    ]
+  },
+  "uefi_interfaces": {
+    "/sys/firmware/efi": false,
+    "/sys/firmware/memmap": false
+  },
+  "limits": [
+    "Missing input firmware may be built into the kernel; absence in these paths does not establish that.",
+    "Board-data variants are inventoried without choosing the loaded variant.",
+    "No proprietary binaries or personal calibration data are saved."
+  ]
+}
