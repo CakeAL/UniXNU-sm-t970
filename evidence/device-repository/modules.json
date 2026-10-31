@@ -1,0 +1,13 @@
+{
+  "fv_file_count": 91,
+  "required_modules": {
+    "UniXNU": "9b665204-a133-47a2-9396-9e2b370a4e25",
+    "UniXNUDxe": "29b950cf-586d-49ea-9d71-f88645ccdaf6",
+    "RamDisk": "75ca63ad-fbae-4a06-92a0-f937c671251d",
+    "DarwinBoot": "1b64af87-8415-4b57-9b16-680d70913b9f",
+    "DiskIo": "6b38f7b4-ad98-40e9-9093-aca2b5a253c4",
+    "FAT": "961578fe-b6b7-44c3-af35-6bc705cd2b1f",
+    "UnicodeCollation": "cd3bafb6-50fb-4fe8-8e4e-ab74d2c1a600"
+  },
+  "all_present": true
+}

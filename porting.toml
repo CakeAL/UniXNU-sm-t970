@@ -15,6 +15,7 @@ components = [
   "ArmDTPlatform",
 ]
 paths = [
+  "evidence/device-repository/result.json",
   "docs/firmware.md",
   "porting.toml",
   ".gitignore",
@@ -51,6 +52,7 @@ procedure = [
   "Run python3.14 ../UniXNU-sm-t970/scripts/check-platform.py --unixnu . to compare DT/ADT bindings with the captured hardware.",
 ]
 findings = [
+  "All seven local Step 3 repository requirements passed at 18d3a77cd98f47ee42aa1f95d6584d22c3a13a18; source pins and template files are complete and the example marker is removed. Runtime milestones remain separate.",
   "The final reviewed framework commit is 194aae294c1107e791f4f74b2be371a391ac6bc4; in addition to v2/raw packing it normalizes the upstream shim image_size to include the 112-byte shim while preserving the firmware copy size. Eight regression cases pass.",
   "Step 3 completion replaces the initial staging audit: real T970 firmware config/DSC/FDF/FD inputs now exist; stock asset hashes, disabled peripheral descriptions and exact firmware source pins are recorded. board.example is removed to enable host builds; hardware boot remains unverified.",
   "The framework pin advances to 7ebc585543fd1a89e1d47d17442899ab61978f9a for tested raw-kernel/Android-v2 separate-DTB packing. The component catalog, ARM64/OS profile hashes, SoC and all five component pins are unchanged.",
@@ -76,6 +78,7 @@ next_action = [
   "Run and archive the committed platform/firmware/Android-v2 packing checks, then continue Step 4 and first-boot preparation.",
 ]
 evidence = [
+  { kind = "host", reference = "evidence/device-repository/result.json", command = "python3.14 scripts/check-platform.py --unixnu ../UniXNU", result = "All seven local Step 3 repository requirements passed at 18d3a77cd98f47ee42aa1f95d6584d22c3a13a18; source pins and template files are complete and the example marker is removed. Runtime milestones remain separate.", revision = "18d3a77cd98f47ee42aa1f95d6584d22c3a13a18" },
   { kind = "source", reference = "log.txt", result = "Archived stock-Android shell output identifies SM-T970, gts7xlwifi and SM8250; it is hardware inventory, not UniXNU verification." },
   { kind = "device", reference = "evidence/adb-2026-11-01/identity.txt", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Saved Android properties, kernel identity and existing Magisk root context; no XNU verification is claimed.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },
   { kind = "source", reference = "board.toml", result = "Format-2 T970 bootstrap selection and example gate." },
@@ -91,11 +94,13 @@ evidence = [
 
 [[area]]
 id = "firmware"
-status = "implemented"
+status = "host-verified"
 components = [
   "DarwinBoot",
 ]
 paths = [
+  "evidence/device-repository/firmware.log",
+  "evidence/device-repository/modules.json",
   "package/firmware/**",
   "scripts/prepare-uefi.py",
   "scripts/build-uefi-candidate.py",
@@ -126,6 +131,7 @@ procedure = [
   "Collect selected boot properties, the live DT and the first 4096 bytes of boot/recovery with the inventory script; only parsed header fields are saved.",
 ]
 findings = [
+  "The normal unixnu build firmware command passed on committed sources; the 3 MiB FD contains all four UniXNU/DarwinBoot modules plus DiskIo, FAT and Unicode collation (7 checked modules among 91 FV files).",
   "A T970-specific overlay selects the pinned Kona support, original numeric configuration and a nonoverlapping 44-region map derived from the stock 45-region map; Android SEC LOG scratch is omitted because it overlaps FV/FD/stack and Mu would halt on it.",
   "44 vendor modules use 84 exact PE32/DEPEX/RAW inputs from this T970 XBL. Vendor UFS/USB DMA dispatch is omitted from the CPU0/initrd candidate.",
   "DSC and FDF include UniXNU, UniXNUDxe, DarwinBoot and UniXNURamDiskDxe; DiskIo, FAT and Unicode collation are present. The actual EDK build produced a 3145728-byte FD before this implementation commit; a committed-source build report is the next check.",
@@ -149,6 +155,7 @@ next_action = [
   "Capture UEFI runtime memory/GOP/initrd results and a recoverable launch procedure before claiming a hardware milestone.",
 ]
 evidence = [
+  { kind = "host", reference = "evidence/device-repository/firmware.log", command = "GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=submodule.active GIT_CONFIG_VALUE_0=__no_module_submodules__ PATH=/opt/homebrew/opt/llvm/bin:/opt/homebrew/opt/lld/bin:$PATH python3.14 ../UniXNU/unixnu build firmware -D . --uefi .cache/uefi-source/Mu-Silicium --edk2 .cache/uefi-source/Mu-Silicium/Mu_Basecore --local-module refer:edk2=.cache/uefi-source/Mu-Silicium/Mu_Basecore", result = "The normal unixnu build firmware command passed on committed sources; the 3 MiB FD contains all four UniXNU/DarwinBoot modules plus DiskIo, FAT and Unicode collation (7 checked modules among 91 FV files).", revision = "18d3a77cd98f47ee42aa1f95d6584d22c3a13a18" },
   { kind = "source", reference = "package/firmware/inputs.json", result = "Exact firmware source/submodule revisions and all 84 local stock input hashes; no binaries are committed." },
   { kind = "source", reference = "package/firmware/Platforms/Samsung/gts7xlwifiPkg/gts7xlwifi.dsc", result = "T970 platform definition with device-derived memory/configuration libraries and UniXNU loader integration." },
   { kind = "device", reference = "evidence/device-inputs/boot-firmware.json", command = "python3.14 scripts/collect-boot-firmware.py --output evidence/device-inputs/boot-firmware.json --extract-dir .cache/stock-inputs/extracted", result = "121 FFS records and 45 platform regions from the connected device XBL; stock constants are not a new UEFI runtime map.", revision = "d78ea5816f3d724aef25d269cf29823cc241186b" },
@@ -217,6 +224,7 @@ id = "memory"
 status = "implemented"
 components = []
 paths = [
+  "evidence/device-repository/platform.json",
   "dts/sm-t970-peripherals.dtsi",
   "evidence/adb-2026-11-01/memory.txt",
   "evidence/adb-2026-11-01/live-device-tree.dts",
@@ -238,6 +246,7 @@ procedure = [
   "Capture root-readable /proc/iomem and the live DT, then compare physical memory and reserved-memory reg values.",
 ]
 findings = [
+  "The committed-source platform check passed with a 2 GiB measured-bank subrange, 30 static reservations, all 13 stock dynamic-pool windows, 45 stock XBL regions and seven disabled peripheral ranges.",
   "Committed-source checking found camera_mem_region allows allocations in 0x180000000+0x80000000. The first-boot DRAM window is therefore narrowed to the remaining measured subrange 0x200000000+0x80000000 (2 GiB), outside all 13 original dynamic-pool allocation windows. The checker verifies containment in a real bank rather than demanding the entire bank.",
   "The completed repository supplies the candidate bank and static reservations, and checks every original dynamic-pool allocation window and all 45 XBL platform regions against that bank. The firmware overlay owns its low-memory heap/FD/stack; real UEFI allocation still needs runtime evidence.",
   "The stock XBL describes 45 platform regions, including low-memory firmware heaps/FD/stack. Its DDR descriptors do not intersect the candidate high handoff bank. This is a static source comparison, not a GetMemoryMap result.",
@@ -261,6 +270,7 @@ next_action = [
   "Reconcile saved /memory, reserved-memory and iomem ranges, then reserve explicit UEFI and XNU handoff allocations without reclaiming firmware-owned regions.",
 ]
 evidence = [
+  { kind = "host", reference = "evidence/device-repository/platform.json", command = "python3.14 scripts/check-platform.py --unixnu ../UniXNU", result = "The committed-source platform check passed with a 2 GiB measured-bank subrange, 30 static reservations, all 13 stock dynamic-pool windows, 45 stock XBL regions and seven disabled peripheral ranges.", revision = "18d3a77cd98f47ee42aa1f95d6584d22c3a13a18" },
   { kind = "source", reference = "evidence/device-inputs/boot-firmware.json", result = "Original SM-T970 platform memory constants extracted from its XBL; stock allocations and new-firmware runtime allocations remain distinct." },
   { kind = "source", reference = "log.txt", result = "Archived /proc/meminfo contains MemTotal 7806144 kB and CmaTotal 458752 kB." },
   { kind = "device", reference = "evidence/adb-2026-11-01/memory.txt", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Root-readable meminfo, physical iomem ranges and IOMMU class inventory.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },
@@ -553,6 +563,8 @@ components = [
   "XnuPrelink",
 ]
 paths = [
+  "evidence/device-repository/boot.json",
+  "evidence/device-repository/pack.log",
   "ipsw/**",
   "evidence/ipsw-21H461-manifest.json",
   "package/**",
@@ -571,6 +583,7 @@ procedure = [
   "Read BuildManifest.plist from the local IPSW using Python zipfile and plistlib to identify its OS version, build and product types.",
 ]
 findings = [
+  "The normal bootimg command produced a 3993600-byte header-v2/raw-kernel/separate-DTB firmware-only check image and verified its sections and load addresses. Ramdisk is empty; no XNU kernel/payload or device boot is claimed.",
   "Actual bootimg invocation exposed the pinned upstream BootShim declaring only FD_SIZE in ARM64 image_size. The shared packer now normalizes the header with strict base/size checks; a real header-v2 raw-kernel/separate-DTB firmware-only image packs and unpacks successfully.",
   "The board package now contains a real T970 firmware overlay and build integration; its vendor assets stay local. Kernel board patch series remains empty.",
   "The shared packer now supports observed raw kernel/header-v2/separate-DTB layout, validates DTB/ramdisk addresses and byte content, and has seven passing regression cases. XNU payload inputs are still a later stage.",
@@ -593,6 +606,7 @@ next_action = [
   "Archive the firmware-only packed-image check, then prepare actual XNU kernelcache, trust-cache, Data seed and ABI inputs against the selected IPSW.",
 ]
 evidence = [
+  { kind = "host", reference = "evidence/device-repository/boot.json", command = "PATH=/opt/homebrew/opt/llvm/bin:/opt/homebrew/opt/lld/bin:$PATH python3.14 ../UniXNU/unixnu bootimg -D . --uefi .cache/uefi-source/Mu-Silicium --fd .cache/uefi-source/Mu-Silicium/Build/gts7xlwifiPkg/DEBUG_CLANGPDB/FV/SILICIUM_UEFI.fd --dtb out/uefi-candidate/firmware.dtb --ramdisk none --output out/uefi-candidate/boot.img", result = "The normal bootimg command produced a 3993600-byte header-v2/raw-kernel/separate-DTB firmware-only check image and verified its sections and load addresses. Ramdisk is empty; no XNU kernel/payload or device boot is claimed.", revision = "18d3a77cd98f47ee42aa1f95d6584d22c3a13a18" },
   { kind = "source", reference = "evidence/ipsw-21H461-manifest.json", result = "Saved IPSW manifest version/build/product types, archive byte size and manifest SHA256." },
   { kind = "source", reference = "board.toml", result = "Explicit component selection, four ordered patch series and pending firmware integration." },
 ]
@@ -602,6 +616,7 @@ id = "diagnostics"
 status = "implemented"
 components = []
 paths = [
+  "evidence/device-repository/platform.log",
   "scripts/**",
   "evidence/README.md",
   "evidence/adb-2026-11-01/capture.json",
@@ -624,6 +639,7 @@ procedure = [
   "Run python3 scripts/collect-adb-inventory.py --root --output evidence/<new-capture>; review per-command stderr, checksums, GPT CRC results and DT sanitization before updating this record.",
 ]
 findings = [
+  "The completed Step 3 archive ties actual commands, source hashes, platform checks, normal firmware compilation and boot-image round-trip to clean committed device/framework revisions.",
   "The strengthened dynamic-pool check caught an overlap with camera_mem_region that static-reservation-only checks missed. It now verifies the reduced 2 GiB window against all original pool bounds and measured-bank containment.",
   "The platform checker now additionally compares seven disabled controller register/IRQ descriptions, the touch/pen addresses and firmware names, dynamic reserved-pool windows and 45 original XBL regions. None is a runtime or DMA test.",
   "On this Magisk setup, exec-out through su inserted CR bytes into binary output; shell -T returned an FDT whose length matches its header. The collector verifies this before decoding.",
@@ -643,6 +659,7 @@ next_action = [
   "Document and validate the board-specific recovery/logging path before a UEFI test; keep future image hashes and source revisions beside its boot log.",
 ]
 evidence = [
+  { kind = "host", reference = "evidence/device-repository/platform.log", command = "python3.14 scripts/check-platform.py --unixnu ../UniXNU", result = "The completed Step 3 archive ties actual commands, source hashes, platform checks, normal firmware compilation and boot-image round-trip to clean committed device/framework revisions.", revision = "18d3a77cd98f47ee42aa1f95d6584d22c3a13a18" },
   { kind = "source", reference = "scripts/collect-adb-inventory.py", result = "Read-only collection commands, binary transport checks, primary GPT CRC validation and DT sanitization implementation." },
   { kind = "device", reference = "evidence/adb-2026-11-01/capture.json", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Capture timestamps, commands, exit statuses, original-FDT hash and saved-file SHA256 values.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },
   { kind = "device", reference = "evidence/adb-2026-11-01/diagnostics.txt", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Root/SELinux context, diagnostic input paths and pstore filenames without user-log contents.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },

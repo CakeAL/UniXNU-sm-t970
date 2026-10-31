@@ -2,17 +2,19 @@
 
 当前选择面向 **SM-T970 单核平台起步阶段**，结果是固定来源和明确的待完成事项。
 它不表示这些组件已在 T970 上运行，也不表示 UEFI 或外设适配已经完成。
+第 3 步已补齐设备固件输入并完成主机构建／打包；最新结果见
+[设备仓库验收](device-repository-checklist.md)。原第 2 步报告保留原始提交。
 
 ## 配置层与精确版本
 
 | 层 | 来源与版本 | 本设备采用的范围 |
 | --- | --- | --- |
-| ARM64 与构建工具 | `UniXNU/UniXNU`，`04b4e558bcded5213c2d802984862dc062f28257` | `profiles/arch/arm64`，4 KiB 页配置、通用归档配方和补丁 |
+| ARM64 与构建工具 | `UniXNU/UniXNU`，`194aae294c1107e791f4f74b2be371a391ac6bc4` | 原架构／OS profile 不变；第 3 步补入 v2 打包与 BootShim 修复 |
 | SoC | `FFT-infra/UniXNU-sm8250-common`，`166235ec2480ff0992627b7aafa15c65ce6b4efa` | SM8250 DTSI、CPU affinity、GICv3、19.2 MHz 定时器和两项 CPU 补丁 |
 | OS | 同一 UniXNU 提交中的 `profiles/os/ipados-17.7.11-21H461` | 复用现有 iPadOS profile，不建立新 OS profile |
 | XNU | `apple-oss-distributions/xnu`，`d8b80295118ef25ac3a784134bcf95cd8e88109f` | XNU 10063.141.1／Darwin 23.6.0；尚未编译 |
 | 设备 | 本仓库的 `board.toml`、DTS、固件清单与适配记录 | 只启用 CPU0；内存和外设连接取自设备证据 |
-| UEFI | 尚未选定可用于 T970 的实现 | 已核对的上游候选及缺口见下文；不编造 DSC、FD 或设备配置路径 |
+| UEFI | Mu-Silicium `4bd8ae83bf37de41777f19e0777db70f59383a6d` 加本仓库 T970 overlay | 采用本机 XBL 输入，已编译 FD；尚未进行实机启动 |
 
 SoC 和五个选中组件的完整 Git URL／提交写入 `feeds.toml`。主仓库必须使用上表的
 已核对版本；其组件目录提供元数据和配方。现有源码 checkout 可以优先于 feed，
@@ -33,7 +35,7 @@ profile 的 SHA256 和组件版本。平台检查会拒绝主仓库版本或这�
 | `ArmCpu` | `9066b53bbc82e92a98ec44a11dd50fd13eaf1a1b` | 实测 GICv3、架构定时器和 SoC affinity；通过 `IOPlatformDevice` CPU nub 启动；内核归档 |
 | `SoftwareAES` | `4a45326da5c2cd6fe6813d79ee43db20805628af` | 目录声明支持所选 iPadOS ABI；实现 `IOAESAccelerator` 软件 AES；私有布局和实际预链接仍待验证 |
 | `XnuPrelink` | `f876e3ee62e18fc06653dd75ed7dafcfb3950ac0` | 采用 OS profile 的 kernelcache、root bundles、slide 与补丁；预链接工具 |
-| `DarwinBoot` | `3325e352d7df68a9f9ad74832ed94a6acbbd7390` | ARM64 UEFI 加载器；接收 Mach-O、ADT 和 sidecar；尚未加入 T970 固件 |
+| `DarwinBoot` | `3325e352d7df68a9f9ad74832ed94a6acbbd7390` | ARM64 UEFI 加载器；第 3 步已加入并在实际 T970 候选 FD 中核对存在 |
 
 目录中这五项的 `dependencies` 均为空，因此当前组件集合依赖闭合。归档沿用 ARM64
 完整列表，三个内核组件分别由 `component:ArmDTPlatform`、`component:ArmCpu`、
@@ -68,8 +70,9 @@ A650 渲染后端。T970 的 GMU／SQE 固件已记录哈希，AOP command DB、
   且面板模式为 2800×1752，因此不能直接采用这些板级参数。
 
 这只是对上述上游固定提交的检查，不代表所有第三方分支都没有 T970 移植。
-候选不写入设备构建 feed，也不冒充已选定的 `uefi-sm-t970`。
-目录证据见 `evidence/shared-support/uefi-candidate.json`。
+此目录审计保留在 `evidence/shared-support/uefi-candidate.json`。
+第 3 步在该固定源码上建立了独立 T970 overlay，未直接使用 r8q 的参数或二进制。
+具体来源、子模块、设备配置及已验证的主机构建范围见[固件说明](firmware.md)。
 
 ## 暂不选择的实现与待完成工作
 
@@ -83,10 +86,10 @@ A650 渲染后端。T970 的 GMU／SQE 固件已记录哈希，AOP command DB、
 | GPU／Metal | `Adreno740` 是 A740 后端，`AdrenoMetal` 依赖它 | 补齐 A650 后端、电源、DMA、同步和所选 OS ABI 后再接前端 |
 | Wi-Fi | `Ath12kWifi` 声明的硬件输入未覆盖当前尚有命名差异的 T970 endpoint | 核实 PCI 17cb:1101、实际固件和驱动系列，再做组件选择 |
 | 音频／电源 | 板级 DSP、CS35L41、MAX77705／PCA9468 输入尚未形成可用接口 | 核对固件、路由、单位和电源所有者，不复制其他板的服务 |
-| 固件平台 | 上游有 Kona／r8q 参考，但没有本次已核对的 T970 实现 | 建立／查明 T970 启动与恢复路径、内存图、面板初始化及日志通道 |
+| 固件实机验证 | T970 overlay 和主机构建／打包已完成 | 验证启动与恢复路径、实际内存图、GOP 和日志通道 |
 
 这些待办属于后续硬件或 ABI 工作，不要求在第 2 步声称已实现。
-当前 `board.example=true` 和单核、外设禁用状态保持原样。
+第 3 步已完成必要输入并移除 `board.example`；单核与外设禁用策略继续保持。
 
 ## 复核入口
 
@@ -97,3 +100,5 @@ A650 渲染后端。T970 的 GMU／SQE 固件已记录哈希，AOP command DB、
 本步主机检查已通过，精确的检查提交和输入哈希见
 `evidence/shared-support/result.json`；配置解析结果与候选证据一同归档在
 `evidence/shared-support/`。官方记录检查器通过全部 13 个部分。
+第 2 步的原始主仓库基线为 `04b4e558bcded5213c2d802984862dc062f28257`；
+第 3 步更新后的活动版本和结果另存于 `evidence/device-repository/`。

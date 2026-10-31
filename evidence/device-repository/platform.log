@@ -1,0 +1,4 @@
++ /opt/homebrew/bin/dtc -I dts -O dtb -o ${UNIXNU}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/device-tree/hardware.dtb -i ${UNIXNU}/out/feeds/UniXNU-sm8250-common-a7c5a8ff/dts ${DEVICE}/dts/sm-t970.dts
+PASS: source pins and archive/patch plans resolve; measured CPU/GIC/timer and 30 static reservations match.
+PASS: single-core DT compiles and ADT platform nodes, byte order and register translations match.
+Kernel build and device boot were not performed. Report: ${DEVICE}/out/platform-check/result.json

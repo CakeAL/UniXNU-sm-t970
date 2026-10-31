@@ -54,6 +54,7 @@ XNU 内核和完整 payload 构建还需 Apple 原始 kernelcache、信任与 Da
 ## 记录
 
 - [第 3 步七项验收](docs/device-repository-checklist.md)
+- [提交后的主机构建与打包证据](evidence/device-repository/README.md)
 - [共享支持选择与精确版本](docs/shared-support.md)
 - [原厂 ADB 与固件来源证据](evidence/README.md)
 - [移植步骤](https://unixnu.com/zh/porting/steps)、[驱动适配](https://unixnu.com/zh/porting/drivers)

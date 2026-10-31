@@ -1,6 +1,10 @@
 # Step 2 shared-support review
 
 Reviewed selection and checker commit: `25f9797275c93b227585ab4403923da34c4fec19`.
+This directory's result/status/candidate files preserve the historical Step 2
+observations. `selection.json` is the active source constraint and has advanced
+with the tested Step 3 packing fixes. See ../device-repository/ for current
+firmware, platform and packing results; the original reports are not rewritten.
 
 - `selection.json`: exact framework, architecture/OS profile hashes, SoC and
   component pins, dependency/ABI declarations, and the unselected UEFI status.
