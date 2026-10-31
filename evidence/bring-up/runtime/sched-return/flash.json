@@ -1,0 +1,14 @@
+{
+  "device": "SM-T970 / gts7xlwifi",
+  "image_source_revision": "70d032a1e07798c222b8e738399d04e6f87456a0",
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/sched-return/boot.img --no-reboot",
+  "exit_code": 0,
+  "boot_upload_succeeded": true,
+  "boot_image_sha256": "4a5e423389efb142c3c5b8b5afedf98dcc59c7b0db1a29782805c95d8a298721",
+  "boot_image_bytes": 62713856,
+  "heimdall_binary_sha256": "75337a7c6ad9a5e18c0730fa474c81133587cc04cbe08dd3f270c860128a6c6f",
+  "automatic_reboot_requested": false,
+  "checkpoint_observation": "reset",
+  "restore_state": "pending completion of ongoing checkpoint diagnosis; user confirmed Download Mode for next test",
+  "restore_boot_sha256": "6f49af2f77ae0e55b4f76b29b0e0491ff0228c42ae97ba0533b97631483566fc"
+}
