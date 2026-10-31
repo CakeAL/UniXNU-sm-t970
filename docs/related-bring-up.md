@@ -25,7 +25,8 @@
 - `sched_startup` 返回和 `PE_init_iokit` 调用前均已确认；后者返回尚未确认。
 - 该函数中 `InitIOKit` 调用前、`PE_init_printf(TRUE)` 返回后探针均未复位；
   `vcattach` 内首个锁初始化调用返回、`gc_enable` 调用前已确认，后者返回未确认。
-  下一步读取控制台初始化标志及输出回调；尚无加密 provider 失败的设备证据。
+  状态探针约 4 秒复位支持控制台未初始化、输出回调为空；正在恢复早期初始化。
+  尚无加密 provider 失败的设备证据。
 - 现有 OS profile 使用 `CONFIG_XNU_CRYPTO_BOOTSTRAP="prelinked"`；主机构建报告列出了
   `com.apple.kec.corecrypto`。这只证明构建纳入，不能证明运行时初始化成功。
 - 不凭色条推断 `g_crypto_funcs` 状态，也不跳过加密自检。需要本机运行时证据后再决定修复。

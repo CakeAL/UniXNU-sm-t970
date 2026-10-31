@@ -1,0 +1,22 @@
+{
+  "device": "SM-T970 / gts7xlwifi",
+  "image_sha256": "670e78ee17a752fc297dc6537a0c98d0074d8d191c599aa065804bd9ae6cb341",
+  "image_source_revision": "923b3500bd58cca08462256e7f5d5f8f921da284",
+  "probe": {
+    "function": "_vcattach",
+    "target": "_gc_enable",
+    "occurrence": 1,
+    "position": "before-call",
+    "reset_delay_seconds": null
+  },
+  "observation_source": "Human reply in this chat",
+  "observation": "约4秒后复位",
+  "observed_delay_seconds_approx": 4,
+  "decoded_code": 0,
+  "decoded_state": {
+    "gc_initialized_low_bit": 0,
+    "PE_putc": "NULL"
+  },
+  "result": "Observed approximate timing supports state code 0 at the confirmed gc_enable call site.",
+  "limits": "Human timing from color bars, not a serial trace or fault register capture. Does not identify the precise failing instruction inside gc_enable or certify a repair."
+}

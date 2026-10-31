@@ -1,0 +1,17 @@
+diff --git a/osfmk/arm/arm_init.c b/osfmk/arm/arm_init.c
+index a81d6c4..4c7b73b 100644
+--- a/osfmk/arm/arm_init.c
++++ b/osfmk/arm/arm_init.c
+@@ -584,10 +584,9 @@ arm_init(
+ 		(void)switch_to_serial_console(); /* Switch into serial mode from video console */
+ 		disableConsoleOutput = FALSE;     /* Allow printfs to happen */
+ 	}
+-	PE_create_console();
+-
+-	/* setup console output */
++	/* Install the output callback before console/panic setup can emit text. */
+ 	PE_init_printf(FALSE);
++	PE_create_console();
+ 
+ #if __arm64__
+ #if DEBUG

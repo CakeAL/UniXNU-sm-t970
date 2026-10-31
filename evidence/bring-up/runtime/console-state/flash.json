@@ -1,0 +1,21 @@
+{
+  "device": "SM-T970 / gts7xlwifi",
+  "image_source_revision": "923b3500bd58cca08462256e7f5d5f8f921da284",
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/console-state/boot.img --no-reboot",
+  "exit_code": 0,
+  "boot_upload_succeeded": true,
+  "boot_image_sha256": "670e78ee17a752fc297dc6537a0c98d0074d8d191c599aa065804bd9ae6cb341",
+  "boot_image_bytes": 62713856,
+  "heimdall_binary_sha256": "75337a7c6ad9a5e18c0730fa474c81133587cc04cbe08dd3f270c860128a6c6f",
+  "automatic_reboot_requested": false,
+  "checkpoint_observation": "Human reports automatic reset about four seconds after color bars; supports code 0 (gc_initialized low bit 0, PE_putc NULL).",
+  "state_encoding": "code = (gc_initialized & 1) | ((PE_putc != NULL) << 1)",
+  "reset_delays_seconds": {
+    "0": 4,
+    "1": 14,
+    "2": 24,
+    "3": 34
+  },
+  "restore_state": "diagnostic BOOT installed; original BOOT restoration pending completion of ongoing diagnosis",
+  "restore_boot_sha256": "6f49af2f77ae0e55b4f76b29b0e0491ff0228c42ae97ba0533b97631483566fc"
+}

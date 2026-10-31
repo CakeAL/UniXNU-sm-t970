@@ -161,6 +161,18 @@ PATH=/opt/homebrew/opt/llvm/bin:/opt/homebrew/opt/lld/bin:$PATH \
 或明确保留区的写入与重启后读取实现。ADB 和 UEFI Advanced Logger 不会自动获得
 ExitBootServices 后的 XNU 输出。
 
+### 恢复控制台初始化
+
+机主报告状态镜像 `670e78ee…` 约 4 秒后复位，支持该检查点上初始化标志低位为 0、
+`PE_putc` 为 NULL。旧实验补丁同时跳过了 `PE_create_console` 和
+`PE_init_printf(FALSE)`；后续 `vcattach` 仍会走屏幕启用路径，因此这个绕过不完整。
+
+替换补丁 `t970-console-bootstrap.patch` 恢复 `PE_create_console`，并把
+`PE_init_printf(FALSE)` 放到它之前，以便建立控制台时已有输出回调。
+修复是否能通过原先失败的 `PE_init_printf(TRUE)` 返回点，需要新的独立镜像实机验证。
+原内核及构建报告保存在 `out/step7/baseline-console-skip/`（忽略目录）；旧状态探针
+固定到该内核哈希，更换内核后拒绝应用是预期行为。
+
 当前 DTS 是 ADT 的低地址包络。它包含固件保留洞，不是 2 GiB 可用内存池；DarwinBoot
 单独通过 EFI conventional memory 分配 256 MiB，并把该大小写入 boot_args。检查器会报告
 包络中的保留区，但并不把这些地址标记为空闲；每次实际分配仍需运行时日志验证。

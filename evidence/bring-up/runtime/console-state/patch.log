@@ -1,0 +1,2 @@
+patched kernel.macho: stage 1 blue bar, stage 2 magenta bar, stage 4 reset before call #1 to _gc_enable in _vcattach (at 0xfffffff0073c4968)
+console-state reset delays: 4/14/24/34 seconds; no call to gc_enable

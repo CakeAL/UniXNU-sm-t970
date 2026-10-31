@@ -22,14 +22,19 @@
   `arm_usimple_lock_init` 返回后探针（`95ff2c91…`）已复位，确认进入并通过锁初始化。
   `vcattach` 内 `gc_enable` 返回后探针（`a914135d…`）未复位，调用前探针
   （`59dc0bb6…`）已复位，范围缩到 `gc_enable` 调用内部。
-  下一轮用 `--console-state` 在该可达位置只读 `gc_initialized` 与 `PE_putc`，
-  以 4/14/24/34 秒复位延时区分四种组合，详见 `docs/bring-up.md`。
+  `--console-state` 镜像（`670e78ee…`）由机主报告约 4 秒后复位，
+  支持 `gc_initialized` 低位为 0、`PE_putc` 为 NULL，详见该轮 `device-result.json`。
   源码显示跳过 `PE_create_console` 也会跳过屏幕回调初始化；这可能影响后续 `gc_enable`，
-  尚未读取运行时回调指针或确认其实际失败点。
+  已有上述状态时序证据，但仍未确认具体失败指令。
   尚不确定具体失败指令或故障类型，也没有运行时加密 provider 失败证据。
 - [相近设备案例](related-bring-up.md)记录了 Surface Duo 2 同阶段的加密 provider 问题，
   以及 SM8250 小米 10 至尊版的验证边界。均不是 T970 根因的证据。
-- BOOT 最近刷入的是 `vcattach-enable-before` 诊断镜像，已确认自动复位；
+- 修复准备：以 `t970-console-bootstrap.patch` 替换旧绕过补丁，恢复控制台建立，
+  并在其前先调用 `PE_init_printf(FALSE)`。旧内核保存在本机忽略目录
+  `out/step7/baseline-console-skip/`；新内核 `bfb50a1a…` 已编译、链接、预链接通过，
+  最终机器码确认先装输出回调再无条件建立控制台。`PE_init_printf(TRUE)` 返回点待实机验证。
+  旧状态探针固定到原内核哈希，更换内核后拒绝运行是预期行为。
+- BOOT 最近刷入的是 `console-state` 诊断镜像（`670e78ee…`），已报告约 4 秒复位；
   原始 BOOT 恢复待完成，后续镜像以 `evidence/bring-up/runtime/*/flash.json` 回执为准。
 - 以下为 ds 交接当时的状态、命令和待办，保留作历史基线；当前进展以本节及适配记录为准。
 

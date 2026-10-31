@@ -213,7 +213,8 @@ def main():
         scripts = base / 'scripts'
         if not scripts.is_dir():
             continue
-        for path in sorted(p for p in scripts.rglob('*') if p.is_file() and '__pycache__' not in p.parts):
+        for path in sorted(p for p in scripts.rglob('*')
+                           if p.is_file() and '__pycache__' not in p.parts and p.name != '.DS_Store'):
             staged = tree / 'scripts' / path.relative_to(scripts)
             require(staged.is_file(), 'tree/scripts is missing ' + str(path.relative_to(scripts)))
             require(staged.read_bytes() == path.read_bytes(),

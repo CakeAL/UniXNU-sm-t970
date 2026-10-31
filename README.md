@@ -10,7 +10,8 @@
 本轮机主确认 `idle_thread_create` 和 `sched_startup` 返回后探针复位，
 `PE_init_iokit` 调用前探针复位，其内部 `InitIOKit` 调用前探针未复位，
 `PE_init_printf` 返回也未确认，但已确认进入其调用的 `vcattach` 并通过最早的锁初始化，
-已确认到达 `gc_enable` 调用前而未确认其返回，正检查控制台初始化状态。
+已确认到达 `gc_enable` 调用前而未确认其返回；状态探针约 4 秒复位支持控制台未初始化、
+`PE_putc` 为空。恢复必要初始化的修复版已通过主机构建，待实机验证。
 根卷／用户态、SMP 和外设功能仍未完成，具体来源与验证等级见 `porting.toml`。
 
 两个仓库并列放置，普通构建命令在主仓库执行：
@@ -23,7 +24,7 @@ vsc/
 
 - `board.toml`：格式 2，`name/kit=sm-t970`，SM8250 和 iPadOS profile，完整五组件选择。
 - `feeds.toml` / `unixnu.lock`：固定 SoC 和组件来源；固件及嵌套子模块固定在 `package/firmware/inputs.json`。
-- `configs/sm-t970_defconfig` / `patches/xnu/series`：设备配置、实验性早期控制台补丁及继承的配置／补丁。
+- `configs/sm-t970_defconfig` / `patches/xnu/series`：设备配置、控制台初始化顺序修复及继承的配置／补丁。
 - `dts/`：诊断用低地址 DRAM 包络、30 个静态保留区、CPU0 及禁用的板级外设资源。
 - `package/firmware/`：T970 配置、DSC/FDF、内存／配置库、44 个厂商模块包装和 UniXNU 接入。
 - `proprietary-files.txt`：130 份资产的来源与 SHA256；二进制留在本机忽略目录。

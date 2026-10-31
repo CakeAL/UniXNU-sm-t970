@@ -60,6 +60,8 @@ procedure = [
   "Run python3.14 ../UniXNU-sm-t970/scripts/check-platform.py --unixnu . to compare DT/ADT bindings with the captured hardware.",
 ]
 findings = [
+  "check-build-config.py now excludes .DS_Store from script-content comparison, matching its existing source-cleanliness policy. Host metadata from framework and device can share that filename; real script bytes remain checked.",
+  "Replaced the experimental skip-console patch with t970-console-bootstrap.patch: arm_init now always installs PE_init_printf(FALSE) before PE_create_console, restoring callback and console/lock setup rather than continuing with uninitialized console state. Kernel rebuild and prelink passed; the final Mach-O has adjacent unconditional PE_init_printf(FALSE) and PE_create_console calls. Device return checkpoint remains pending.",
   "Committed-source isolated probe build passed at 6a3ae24fba8bc4cb44dcdb0898b92582751a36b9; board defaults and source kernel hashes are unchanged.",
   "Step 7 continuation preserves the handed-off minimal boot configuration and removes persistent entry-probe settings from board.toml. scripts/build-entry-probe.py supplies one in-memory probe override and writes a new ignored artifact directory per experiment.",
   "All seven local Step 3 repository requirements passed at 18d3a77cd98f47ee42aa1f95d6584d22c3a13a18; source pins and template files are complete and the example marker is removed. Runtime milestones remain separate.",
@@ -219,6 +221,7 @@ components = [
   "ArmCpu",
 ]
 paths = [
+  "evidence/bring-up/runtime/console-state/**",
   "evidence/bring-up/runtime/vcattach-enable-before/**",
   "evidence/bring-up/runtime/vcattach-enable-return/**",
   "evidence/bring-up/runtime/vcattach-lock-return/**",
@@ -246,6 +249,11 @@ procedure = [
   "Collect /proc/cpuinfo, online/present CPU lists, cpufreq policies, /proc/interrupts and the live DT using the inventory script.",
 ]
 findings = [
+  "Human timing of about four seconds for console-state image 670e78ee17a752fc297dc6537a0c98d0074d8d191c599aa065804bd9ae6cb341 supports gc_initialized low bit 0 and PE_putc NULL before gc_enable. This supports missing console initialization under the experimental skip patch, but does not identify the exact faulting instruction.",
+  "Replaced the experimental skip-console patch with t970-console-bootstrap.patch: arm_init now always installs PE_init_printf(FALSE) before PE_create_console, restoring callback and console/lock setup rather than continuing with uninitialized console state. Kernel rebuild and prelink passed; the final Mach-O has adjacent unconditional PE_init_printf(FALSE) and PE_create_console calls. Device return checkpoint remains pending.",
+  "Uploaded console-state BOOT image 670e78ee17a752fc297dc6537a0c98d0074d8d191c599aa065804bd9ae6cb341, using patched Heimdall, exit 0. Measured reset timing and original BOOT restoration are pending. Upload and host tests do not establish runtime gc_initialized or PE_putc values.",
+  "The console-state FAT kernel was independently extracted; the complete 112-byte state code SHA256 matches its generator report. All six host tests passed, including ARM64 execution of the four timing codes and read-only checks. This does not establish tablet state or timing.",
+  "Prepared isolated _gc_enable before-call image 670e78ee17a752fc297dc6537a0c98d0074d8d191c599aa065804bd9ae6cb341; the FAT kernel was independently extracted and its branch at 0xfffffff0073c4968 matches the intended probe. Device result is pending.",
   "Added an opt-in, hash-pinned console-state diagnostic copy at the confirmed gc_enable call site. It reads gc_initialized and PE_putc without invoking gc_enable, encodes their combination as 4/14/24/34-second terminal waits, and rejects unknown input kernels. This is not text logging or a device state result.",
   "The user confirmed the gc_enable before-call reset (59dc0bb6944b0295ee20191e85d3add62439ccb21b854a7dc7e02a439ecd7ee9), whereas its after-return probe did not reset. The unconfirmed path is inside gc_enable. Next diagnostic reads gc_initialized and PE_putc at that known reachable call site; no runtime NULL value is claimed yet.",
   "User observation for _gc_enable before-call image 59dc0bb6944b0295ee20191e85d3add62439ccb21b854a7dc7e02a439ecd7ee9: automatic reset observed; checkpoint reached.",
@@ -295,9 +303,13 @@ limits = [
   "CPU0 diagnostic execution is observed; full platform matching and runtime interrupt handling are not verified.",
 ]
 next_action = [
-  "Read gc_initialized and PE_putc at the confirmed gc_enable call site to test the missing console-initialization hypothesis.",
+  "With restored console setup, test PE_init_printf(TRUE) return inside PE_init_iokit using a fresh isolated image.",
 ]
 evidence = [
+  { kind = "device", reference = "evidence/bring-up/runtime/console-state/device-result.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/console-state/boot.img --no-reboot", result = "Human timing of about four seconds for console-state image 670e78ee17a752fc297dc6537a0c98d0074d8d191c599aa065804bd9ae6cb341 supports gc_initialized low bit 0 and PE_putc NULL before gc_enable. This supports missing console initialization under the experimental skip patch, but does not identify the exact faulting instruction.", revision = "923b3500bd58cca08462256e7f5d5f8f921da284" },
+  { kind = "device", reference = "evidence/bring-up/runtime/console-state/flash.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/console-state/boot.img --no-reboot", result = "Uploaded console-state BOOT image 670e78ee17a752fc297dc6537a0c98d0074d8d191c599aa065804bd9ae6cb341, using patched Heimdall, exit 0. Measured reset timing and original BOOT restoration are pending. Upload and host tests do not establish runtime gc_initialized or PE_putc values.", revision = "923b3500bd58cca08462256e7f5d5f8f921da284" },
+  { kind = "host", reference = "evidence/bring-up/runtime/console-state/host-tests.json", command = "PATH=/opt/homebrew/opt/llvm/bin:/opt/homebrew/opt/lld/bin:$PATH .cache/probe-test-venv/bin/python -m unittest discover -s tests -v", result = "Six tests passed, including ARM64 execution of four console state codes with simulated counter and no memory writes; unknown source kernel rejected.", revision = "923b3500bd58cca08462256e7f5d5f8f921da284" },
+  { kind = "host", reference = "evidence/bring-up/runtime/console-state/probe.json", command = "python3.14 scripts/build-entry-probe.py --target _gc_enable --before --console-state --function _vcattach --occurrence 1 --delay 6 --output out/step7/probes/console-state", result = "Prepared isolated _gc_enable before-call image 670e78ee17a752fc297dc6537a0c98d0074d8d191c599aa065804bd9ae6cb341; the FAT kernel was independently extracted and its branch at 0xfffffff0073c4968 matches the intended probe. Device result is pending.", revision = "923b3500bd58cca08462256e7f5d5f8f921da284" },
   { kind = "device", reference = "evidence/bring-up/runtime/vcattach-enable-before/device-result.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/vcattach-enable-before/boot.img --no-reboot", result = "User observation for _gc_enable before-call image 59dc0bb6944b0295ee20191e85d3add62439ccb21b854a7dc7e02a439ecd7ee9: automatic reset observed; checkpoint reached.", revision = "6865a5b53f5eba8bf9c9d68250433ea93458ea0d" },
   { kind = "device", reference = "evidence/bring-up/runtime/vcattach-enable-before/flash.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/vcattach-enable-before/boot.img --no-reboot", result = "Uploaded the isolated gc_enable before-call probe inside vcattach, image 59dc0bb6944b0295ee20191e85d3add62439ccb21b854a7dc7e02a439ecd7ee9, using patched Heimdall, exit 0. Human checkpoint feedback and original BOOT restoration are pending; transfer does not establish execution.", revision = "6865a5b53f5eba8bf9c9d68250433ea93458ea0d" },
   { kind = "host", reference = "evidence/bring-up/runtime/vcattach-enable-before/probe.json", command = "python3.14 scripts/build-entry-probe.py --target _gc_enable --before --function _vcattach --occurrence 1 --delay 6 --output out/step7/probes/vcattach-enable-before", result = "Prepared isolated _gc_enable before-call image 59dc0bb6944b0295ee20191e85d3add62439ccb21b854a7dc7e02a439ecd7ee9; the FAT kernel was independently extracted and its branch at 0xfffffff0073c4968 matches the intended probe. Device result is pending.", revision = "6865a5b53f5eba8bf9c9d68250433ea93458ea0d" },
@@ -452,7 +464,8 @@ id = "display"
 status = "planned"
 components = []
 paths = [
-  "patches/xnu/t970-skip-early-console.patch",
+  "evidence/bring-up/runtime/console-state/**",
+  "patches/xnu/t970-console-bootstrap.patch",
   "evidence/adb-2026-11-01/display.txt",
 ]
 inputs = [
@@ -467,6 +480,8 @@ procedure = [
   "Collect DRM modes, panel type and brightness limits; read only display-selection tokens from /proc/cmdline and match the selected S6TUUM3 node in the live DT.",
 ]
 findings = [
+  "Human timing of about four seconds for console-state image 670e78ee17a752fc297dc6537a0c98d0074d8d191c599aa065804bd9ae6cb341 supports gc_initialized low bit 0 and PE_putc NULL before gc_enable. This supports missing console initialization under the experimental skip patch, but does not identify the exact faulting instruction.",
+  "Replaced the experimental skip-console patch with t970-console-bootstrap.patch: arm_init now always installs PE_init_printf(FALSE) before PE_create_console, restoring callback and console/lock setup rather than continuing with uninitialized console state. Kernel rebuild and prelink passed; the final Mach-O has adjacent unconditional PE_init_printf(FALSE) and PE_create_console calls. Device return checkpoint remains pending.",
   "The handed-off t970-skip-early-console.patch keeps PE_create_console/PE_init_printf opt-in via t970-console as an experimental workaround. It does not prove an Apple-console hang; the latest user result places the unobserved checkpoint before initialize_screen.",
   "The live DT contains many alternative panels; the boot selector identifies S6TUUM3 rather than the S6TUUM2 candidate.",
   "DRM mode geometry is landscape while wm and touch coordinates are portrait; display/input orientation must be mapped explicitly.",
@@ -480,9 +495,10 @@ limits = [
   "Framebuffer physical address, stride, pixel format and UEFI GOP handoff are not verified by the mode list.",
 ]
 next_action = [
-  "First isolate the earlier bootstrap-thread boundary; keep the console patch experimental until an entry/return checkpoint or kernel log establishes the actual console behavior.",
+  "Verify PE_init_printf(TRUE) return with the restored early console setup; later text rendering, GOP geometry and userland presentation remain unverified.",
 ]
 evidence = [
+  { kind = "device", reference = "evidence/bring-up/runtime/console-state/device-result.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/console-state/boot.img --no-reboot", result = "Human timing of about four seconds for console-state image 670e78ee17a752fc297dc6537a0c98d0074d8d191c599aa065804bd9ae6cb341 supports gc_initialized low bit 0 and PE_putc NULL before gc_enable. This supports missing console initialization under the experimental skip patch, but does not identify the exact faulting instruction.", revision = "923b3500bd58cca08462256e7f5d5f8f921da284" },
   { kind = "device", reference = "evidence/adb-2026-11-01/display.txt", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Saved DRM modes, SDC_801417 panel type, brightness limits and Android geometry.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },
   { kind = "device", reference = "evidence/adb-2026-11-01/display_boot.txt", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "The filtered Android command line selects S6TUUM3_AMSA24VU01_WQXGA.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },
   { kind = "device", reference = "evidence/adb-2026-11-01/live-device-tree.dts", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "The selected panel's timing, link and DCS control inputs are preserved.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },
@@ -691,6 +707,7 @@ components = [
   "XnuPrelink",
 ]
 paths = [
+  "evidence/bring-up/runtime/console-state/**",
   "evidence/bring-up/runtime/vcattach-enable-before/**",
   "evidence/bring-up/runtime/vcattach-enable-return/**",
   "evidence/bring-up/runtime/vcattach-lock-return/**",
@@ -731,6 +748,11 @@ procedure = [
   "Read BuildManifest.plist from the local IPSW using Python zipfile and plistlib to identify its OS version, build and product types.",
 ]
 findings = [
+  "Human timing of about four seconds for console-state image 670e78ee17a752fc297dc6537a0c98d0074d8d191c599aa065804bd9ae6cb341 supports gc_initialized low bit 0 and PE_putc NULL before gc_enable. This supports missing console initialization under the experimental skip patch, but does not identify the exact faulting instruction.",
+  "Replaced the experimental skip-console patch with t970-console-bootstrap.patch: arm_init now always installs PE_init_printf(FALSE) before PE_create_console, restoring callback and console/lock setup rather than continuing with uninitialized console state. Kernel rebuild and prelink passed; the final Mach-O has adjacent unconditional PE_init_printf(FALSE) and PE_create_console calls. Device return checkpoint remains pending.",
+  "Uploaded console-state BOOT image 670e78ee17a752fc297dc6537a0c98d0074d8d191c599aa065804bd9ae6cb341, using patched Heimdall, exit 0. Measured reset timing and original BOOT restoration are pending. Upload and host tests do not establish runtime gc_initialized or PE_putc values.",
+  "The console-state FAT kernel was independently extracted; the complete 112-byte state code SHA256 matches its generator report. All six host tests passed, including ARM64 execution of the four timing codes and read-only checks. This does not establish tablet state or timing.",
+  "Prepared isolated _gc_enable before-call image 670e78ee17a752fc297dc6537a0c98d0074d8d191c599aa065804bd9ae6cb341; the FAT kernel was independently extracted and its branch at 0xfffffff0073c4968 matches the intended probe. Device result is pending.",
   "Added an opt-in, hash-pinned console-state diagnostic copy at the confirmed gc_enable call site. It reads gc_initialized and PE_putc without invoking gc_enable, encodes their combination as 4/14/24/34-second terminal waits, and rejects unknown input kernels. This is not text logging or a device state result.",
   "The user confirmed the gc_enable before-call reset (59dc0bb6944b0295ee20191e85d3add62439ccb21b854a7dc7e02a439ecd7ee9), whereas its after-return probe did not reset. The unconfirmed path is inside gc_enable. Next diagnostic reads gc_initialized and PE_putc at that known reachable call site; no runtime NULL value is claimed yet.",
   "Uploaded the isolated gc_enable before-call probe inside vcattach, image 59dc0bb6944b0295ee20191e85d3add62439ccb21b854a7dc7e02a439ecd7ee9, using patched Heimdall, exit 0. Human checkpoint feedback and original BOOT restoration are pending; transfer does not establish execution.",
@@ -783,6 +805,10 @@ next_action = [
   "Build the isolated idle_thread_create after-return payload/image, verify the BOOT size and hashes, then use the confirmed recovery path for a single checkpoint test.",
 ]
 evidence = [
+  { kind = "device", reference = "evidence/bring-up/runtime/console-state/device-result.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/console-state/boot.img --no-reboot", result = "Human timing of about four seconds for console-state image 670e78ee17a752fc297dc6537a0c98d0074d8d191c599aa065804bd9ae6cb341 supports gc_initialized low bit 0 and PE_putc NULL before gc_enable. This supports missing console initialization under the experimental skip patch, but does not identify the exact faulting instruction.", revision = "923b3500bd58cca08462256e7f5d5f8f921da284" },
+  { kind = "device", reference = "evidence/bring-up/runtime/console-state/flash.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/console-state/boot.img --no-reboot", result = "Uploaded console-state BOOT image 670e78ee17a752fc297dc6537a0c98d0074d8d191c599aa065804bd9ae6cb341, using patched Heimdall, exit 0. Measured reset timing and original BOOT restoration are pending. Upload and host tests do not establish runtime gc_initialized or PE_putc values.", revision = "923b3500bd58cca08462256e7f5d5f8f921da284" },
+  { kind = "host", reference = "evidence/bring-up/runtime/console-state/host-tests.json", command = "PATH=/opt/homebrew/opt/llvm/bin:/opt/homebrew/opt/lld/bin:$PATH .cache/probe-test-venv/bin/python -m unittest discover -s tests -v", result = "Six tests passed, including ARM64 execution of four console state codes with simulated counter and no memory writes; unknown source kernel rejected.", revision = "923b3500bd58cca08462256e7f5d5f8f921da284" },
+  { kind = "host", reference = "evidence/bring-up/runtime/console-state/probe.json", command = "python3.14 scripts/build-entry-probe.py --target _gc_enable --before --console-state --function _vcattach --occurrence 1 --delay 6 --output out/step7/probes/console-state", result = "Prepared isolated _gc_enable before-call image 670e78ee17a752fc297dc6537a0c98d0074d8d191c599aa065804bd9ae6cb341; the FAT kernel was independently extracted and its branch at 0xfffffff0073c4968 matches the intended probe. Device result is pending.", revision = "923b3500bd58cca08462256e7f5d5f8f921da284" },
   { kind = "device", reference = "evidence/bring-up/runtime/vcattach-enable-before/flash.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/vcattach-enable-before/boot.img --no-reboot", result = "Uploaded the isolated gc_enable before-call probe inside vcattach, image 59dc0bb6944b0295ee20191e85d3add62439ccb21b854a7dc7e02a439ecd7ee9, using patched Heimdall, exit 0. Human checkpoint feedback and original BOOT restoration are pending; transfer does not establish execution.", revision = "6865a5b53f5eba8bf9c9d68250433ea93458ea0d" },
   { kind = "host", reference = "evidence/bring-up/runtime/vcattach-enable-before/probe.json", command = "python3.14 scripts/build-entry-probe.py --target _gc_enable --before --function _vcattach --occurrence 1 --delay 6 --output out/step7/probes/vcattach-enable-before", result = "Prepared isolated _gc_enable before-call image 59dc0bb6944b0295ee20191e85d3add62439ccb21b854a7dc7e02a439ecd7ee9; the FAT kernel was independently extracted and its branch at 0xfffffff0073c4968 matches the intended probe. Device result is pending.", revision = "6865a5b53f5eba8bf9c9d68250433ea93458ea0d" },
   { kind = "device", reference = "evidence/bring-up/runtime/vcattach-enable-return/flash.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/vcattach-enable-return/boot.img --no-reboot", result = "Uploaded the isolated gc_enable after-return probe inside vcattach, image a914135de89584e944eca643528b296043bc38efa323563153e0898f74db6737, using patched Heimdall, exit 0. Human checkpoint feedback and original BOOT restoration are pending; transfer does not establish execution.", revision = "6865a5b53f5eba8bf9c9d68250433ea93458ea0d" },
@@ -844,6 +870,12 @@ procedure = [
   "Run python3 scripts/collect-adb-inventory.py --root --output evidence/<new-capture>; review per-command stderr, checksums, GPT CRC results and DT sanitization before updating this record.",
 ]
 findings = [
+  "check-build-config.py now excludes .DS_Store from script-content comparison, matching its existing source-cleanliness policy. Host metadata from framework and device can share that filename; real script bytes remain checked.",
+  "Human timing of about four seconds for console-state image 670e78ee17a752fc297dc6537a0c98d0074d8d191c599aa065804bd9ae6cb341 supports gc_initialized low bit 0 and PE_putc NULL before gc_enable. This supports missing console initialization under the experimental skip patch, but does not identify the exact faulting instruction.",
+  "Replaced the experimental skip-console patch with t970-console-bootstrap.patch: arm_init now always installs PE_init_printf(FALSE) before PE_create_console, restoring callback and console/lock setup rather than continuing with uninitialized console state. Kernel rebuild and prelink passed; the final Mach-O has adjacent unconditional PE_init_printf(FALSE) and PE_create_console calls. Device return checkpoint remains pending.",
+  "Uploaded console-state BOOT image 670e78ee17a752fc297dc6537a0c98d0074d8d191c599aa065804bd9ae6cb341, using patched Heimdall, exit 0. Measured reset timing and original BOOT restoration are pending. Upload and host tests do not establish runtime gc_initialized or PE_putc values.",
+  "The console-state FAT kernel was independently extracted; the complete 112-byte state code SHA256 matches its generator report. All six host tests passed, including ARM64 execution of the four timing codes and read-only checks. This does not establish tablet state or timing.",
+  "Prepared isolated _gc_enable before-call image 670e78ee17a752fc297dc6537a0c98d0074d8d191c599aa065804bd9ae6cb341; the FAT kernel was independently extracted and its branch at 0xfffffff0073c4968 matches the intended probe. Device result is pending.",
   "Added an opt-in, hash-pinned console-state diagnostic copy at the confirmed gc_enable call site. It reads gc_initialized and PE_putc without invoking gc_enable, encodes their combination as 4/14/24/34-second terminal waits, and rejects unknown input kernels. This is not text logging or a device state result.",
   "The user confirmed the gc_enable before-call reset (59dc0bb6944b0295ee20191e85d3add62439ccb21b854a7dc7e02a439ecd7ee9), whereas its after-return probe did not reset. The unconfirmed path is inside gc_enable. Next diagnostic reads gc_initialized and PE_putc at that known reachable call site; no runtime NULL value is claimed yet.",
   "User observation for _gc_enable before-call image 59dc0bb6944b0295ee20191e85d3add62439ccb21b854a7dc7e02a439ecd7ee9: automatic reset observed; checkpoint reached.",
@@ -901,9 +933,13 @@ limits = [
   "ADB inputs and BOOT-only reset checkpoints are archived. Original BOOT restoration is pending; UART, usable UEFI log export and XNU fault capture remain unverified.",
 ]
 next_action = [
-  "Use a read-only state probe at the confirmed gc_enable call site to distinguish gc_initialized and PE_putc state via widely separated reset delays; keep exact image hashes and restore BOOT after diagnosis.",
+  "Test PE_init_printf(TRUE) return with the repaired initialization ordering; preserve the old diagnostic kernel and verify every new image hash before use.",
 ]
 evidence = [
+  { kind = "device", reference = "evidence/bring-up/runtime/console-state/device-result.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/console-state/boot.img --no-reboot", result = "Human timing of about four seconds for console-state image 670e78ee17a752fc297dc6537a0c98d0074d8d191c599aa065804bd9ae6cb341 supports gc_initialized low bit 0 and PE_putc NULL before gc_enable. This supports missing console initialization under the experimental skip patch, but does not identify the exact faulting instruction.", revision = "923b3500bd58cca08462256e7f5d5f8f921da284" },
+  { kind = "device", reference = "evidence/bring-up/runtime/console-state/flash.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/console-state/boot.img --no-reboot", result = "Uploaded console-state BOOT image 670e78ee17a752fc297dc6537a0c98d0074d8d191c599aa065804bd9ae6cb341, using patched Heimdall, exit 0. Measured reset timing and original BOOT restoration are pending. Upload and host tests do not establish runtime gc_initialized or PE_putc values.", revision = "923b3500bd58cca08462256e7f5d5f8f921da284" },
+  { kind = "host", reference = "evidence/bring-up/runtime/console-state/host-tests.json", command = "PATH=/opt/homebrew/opt/llvm/bin:/opt/homebrew/opt/lld/bin:$PATH .cache/probe-test-venv/bin/python -m unittest discover -s tests -v", result = "Six tests passed, including ARM64 execution of four console state codes with simulated counter and no memory writes; unknown source kernel rejected.", revision = "923b3500bd58cca08462256e7f5d5f8f921da284" },
+  { kind = "host", reference = "evidence/bring-up/runtime/console-state/probe.json", command = "python3.14 scripts/build-entry-probe.py --target _gc_enable --before --console-state --function _vcattach --occurrence 1 --delay 6 --output out/step7/probes/console-state", result = "Prepared isolated _gc_enable before-call image 670e78ee17a752fc297dc6537a0c98d0074d8d191c599aa065804bd9ae6cb341; the FAT kernel was independently extracted and its branch at 0xfffffff0073c4968 matches the intended probe. Device result is pending.", revision = "923b3500bd58cca08462256e7f5d5f8f921da284" },
   { kind = "source", reference = "scripts/console-state-probe.py", result = "Read-only state probe checks original kernel hash, symbols, call site and padding; delays and input limitations documented in docs/bring-up.md." },
   { kind = "source", reference = "tests/test_console_state_probe.py", result = "ARM64 execution tests cover four runtime states, full-width non-NULL pointers and no memory writes; unknown kernels are rejected before output." },
   { kind = "device", reference = "evidence/bring-up/runtime/vcattach-enable-before/device-result.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/vcattach-enable-before/boot.img --no-reboot", result = "User observation for _gc_enable before-call image 59dc0bb6944b0295ee20191e85d3add62439ccb21b854a7dc7e02a439ecd7ee9: automatic reset observed; checkpoint reached.", revision = "6865a5b53f5eba8bf9c9d68250433ea93458ea0d" },
