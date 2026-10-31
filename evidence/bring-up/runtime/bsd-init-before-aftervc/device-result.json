@@ -1,0 +1,16 @@
+{
+  "device": "SM-T970 / gts7xlwifi",
+  "image_sha256": "fa16c47d00672197d38069b6d5bed24ea930f9b4eb576e9448aee766f1a3c1a1",
+  "image_source_revision": "3b6bf20330333e5246a8365d94ae7478fb7061cb",
+  "probe": {
+    "function": "_kernel_bootstrap_thread",
+    "target": "_bsd_init",
+    "occurrence": 1,
+    "position": "before-call",
+    "reset_delay_seconds": 0
+  },
+  "observation_source": "Human reply in this chat",
+  "observation": "\u7acb\u523b\u590d\u4f4d",
+  "result": "Reached the call to bsd_init in kernel_bootstrap_thread; the XNU startup chain from arm_init through the bootstrap thread is complete.",
+  "limits": "This checkpoint proves execution reaches bsd_init. It does not prove vfs_mountroot, storage access or userspace."
+}

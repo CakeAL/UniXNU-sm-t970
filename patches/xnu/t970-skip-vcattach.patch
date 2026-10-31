@@ -1,0 +1,29 @@
+--- a/pexpert/gen/pe_gen.c	2026-11-01 07:27:46
++++ b/pexpert/gen/pe_gen.c	2026-11-01 07:27:46
+@@ -131,9 +131,26 @@
+ 
+ extern void console_write_char(char);
+ 
++static void
++t970_null_putc(char c)
++{
++	(void)c;
++}
++
+ void
+ PE_init_printf(boolean_t vm_initialized)
+ {
++	unsigned int t970_novc = 0;
++
++	/*
++	 * T970 diagnostic: vcattach() spins inside gc_enable before the console
++	 * exists. Keep PE_putc valid but discard output instead.
++	 */
++	if (PE_parse_boot_argn("t970-novc", &t970_novc, sizeof(t970_novc))) {
++		PE_putc = t970_null_putc;
++		return;
++	}
++
+ 	if (!vm_initialized) {
+ 		PE_putc = console_write_char;
+ 	} else {

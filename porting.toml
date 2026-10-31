@@ -93,6 +93,7 @@ findings = [
   "Step 7 local inputs are configured outside version control: the IPSW lives at ../ipsw per the requirements rule, kernelcache.decompressed matches the profile pin f18b4df8..., the accepted trust-cache bundle 7416ca4f... is referenced from the framework build directory, and the platform seed is the local test value 0x534d543937303031.",
   "board.toml now points the OS layer of patch_series at device:patches/xnu/os-series so the two required XnuPrelink ABI patches still apply while zzz-boot-progress.patch, which requires sheng's XNU_SHENG_PMGR hook, is omitted. The applied set is 60 patches.",
   "The measured boot partition is 71303168 bytes, so board.toml [payload] size_mib dropped from 192 to 56; the 192 MiB payload could never be flashed. 56 MiB holds the 51.9 MB prelinked kernel plus ADT and trust cache with about 8 MB margin.",
+  "board.toml [payload] now passes t970-novc and enables panic_screen for the bring-up images; both are diagnostic defaults that must be revisited once a real console exists.",
 ]
 completion = [
   "A board.toml with matching device identity resolves the selected SoC and OS profiles and pinned sources.",
@@ -873,6 +874,7 @@ findings = [
   "The full host build chain now completes at this commit: kernel.macho 51908608 bytes b3f9ab34..., payload.img 201326592 bytes a4a0bac8..., boot.img 205320192 bytes 28f3bb9f... and the 3145728-byte FD 4691d86c.... boot.json reports header v2 with ramdisk_bytes 201326592, the captured firmware DTB hash and the built FD hash; payload.json reports the kernel, generated ADT and accepted trust cache.",
   "The build required a two-pass kernel flow (bootstrap compile records, archives, final link/prelink) and a python3 with tomllib on PATH for the archive scripts. No device write or boot was attempted; restore dumps stay in ignored storage.",
   "With the 56 MiB payload the rebuilt boot.img is 62713856 bytes (payload.img 58720256, sha256 a87d42da...; boot.img sha256 d61f416a...) and fits the 68 MiB boot partition. Odin AP tars for the test image and the Magisk restore image were generated in ignored storage; no flash has been performed.",
+  "Added t970-skip-video.patch (initialize_screen guarded by t970-novc) and t970-skip-vcattach.patch (PE_init_printf TRUE path uses a null output callback under t970-novc), and changed t970-console-bootstrap.patch to skip PE_create_console under t970-novc. These are diagnostic bypasses, not a replacement console.",
 ]
 completion = [
   "The selected profile's inputs produce a kernel, payload and a boot image matching the SM-T970 boot path.",
@@ -1030,6 +1032,7 @@ findings = [
   "The Step 5 checkers share scripts/fdt.py for structural FDT parsing, so the firmware blob and the board DTB are read the same way. The checker also scans the built FV when present and requires the five UniXNU/DarwinBoot modules.",
   "scripts/collect-storage-inputs.py derives the UFS inventory from the captured live DT and GPT, cross-checks every UFS clock/reset ID against the kona gcc/rpmh headers, and records the header hashes; it enables nothing and needs no device.",
   "scripts/prepare-trust-cache.py reproduces the accepted trust-cache bundle from the StaticTrustCache DER payload, runs the framework's original-system-trust builder and rejects a bundle whose SHA-256 is not in the OS profile allow-list.",
+  "Bypassing PE_init_printf(TRUE) (which calls vcattach) with a null PE_putc under t970-novc resolved the console spin: PE_init_iokit returned (probe f32a04c0, ~6 s reset) and the bootstrap thread reached bsd_init (probe fa16c47d, immediate reset) on kernel d862c992. The same PE_init_iokit checkpoint had not reset on the earlier console-skip kernel.",
 ]
 completion = [
   "Every claimed UniXNU milestone has matching source/image revisions, a reproducible command and accessible firmware/kernel logs.",
@@ -1098,4 +1101,6 @@ evidence = [
   { kind = "host", reference = "evidence/build-config/check.log", command = "python3.14 scripts/check-build-config.py --unixnu ../UniXNU", revision = "8055073ce9a05fa60624decae4b8c74b1a544746", result = "PASS: independent patch-series resolution matches status, every module matches its pin and lock entry, and the assembled tree links drivers/kits/refer/patches/scripts to those exact sources." },
   { kind = "host", reference = "evidence/hardware-description/check.log", command = "python3.14 scripts/check-hardware-description.py --unixnu ../UniXNU", revision = "7b71e1e9ad1dd16a70e31e2fe536dd09c340200f", result = "PASS: the Step 5 checker rebuilt the board DTS and ADT, compared both tree inputs and scanned the built volume; the platform checker also passed at the same commit." },
   { kind = "host", reference = "evidence/bring-up/README.md", command = "python3.14 scripts/prepare-trust-cache.py", revision = "0d8fb9d0a14630f878a173241059f7687aa6b134", result = "PASS: prepare-trust-cache.py derives the version-2 static module from the StaticTrustCache DER payload, rebuilds the original static+system bundle and rejects any bundle outside the profile allow-list." },
+  { kind = "device", reference = "evidence/bring-up/runtime/iokit-return-aftervc/device-result.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/iokit-return-aftervc/boot.img --no-reboot", result = "Kernel d862c992 with the vcattach bypass: PE_init_iokit return probe f32a04c0 reset after about 6 seconds, proving the call returns. This does not prove later stages.", revision = "3b6bf20" },
+  { kind = "device", reference = "evidence/bring-up/runtime/bsd-init-before-aftervc/device-result.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/bsd-init-before-aftervc/boot.img --no-reboot", result = "Kernel d862c992: the bsd_init call-before probe fa16c47d reset immediately, proving the bootstrap thread reaches bsd_init. Root mounting and storage are not exercised.", revision = "3b6bf20" },
 ]

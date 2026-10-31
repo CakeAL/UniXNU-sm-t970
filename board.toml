@@ -39,9 +39,10 @@ volume = "T970"
 size_mib = 56
 loader = "firmware"
 title = "UniXNU SM-T970 platform bootstrap"
-kernel_args = ["-v", "cpus=1"]
+kernel_args = ["-v", "cpus=1", "t970-novc"]
 # Adds Tools -> Advanced Logger to the generated menu (porting/log-capture).
 tools = true
+panic_screen = true
 
 [payload.adt]
 # Match the loader's existing 256 MiB default explicitly. Allocation still uses

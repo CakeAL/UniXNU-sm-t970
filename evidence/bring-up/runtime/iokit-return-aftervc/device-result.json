@@ -1,0 +1,16 @@
+{
+  "device": "SM-T970 / gts7xlwifi",
+  "image_sha256": "f32a04c05d069881e97ad7075f168155c4408abe5457c7eab2ec8ddf89a3ee50",
+  "image_source_revision": "3b6bf20330333e5246a8365d94ae7478fb7061cb",
+  "probe": {
+    "function": "_kernel_bootstrap_thread",
+    "target": "_PE_init_iokit",
+    "occurrence": 1,
+    "position": "after-return",
+    "reset_delay_seconds": 6
+  },
+  "observation_source": "Human reply in this chat",
+  "observation": "\u7ea6 6 \u79d2\u590d\u4f4d",
+  "result": "PE_init_iokit returned on kernel d862c992; the vcattach bypass resolved the earlier spin and the bootstrap thread continued toward bsd_init.",
+  "limits": "This checkpoint proves the repaired PE_init_iokit call returns. It does not prove later bootstrap stages or root mounting."
+}

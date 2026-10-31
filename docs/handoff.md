@@ -48,6 +48,20 @@
   原始 BOOT 恢复待完成，后续镜像以 `evidence/bring-up/runtime/*/flash.json` 回执为准。
 - 以下为 ds 交接当时的状态、命令和待办，保留作历史基线；当前进展以本节及适配记录为准。
 
+## 最新里程碑（本轮）
+
+`PE_init_printf(TRUE)` 内部就是 `vcattach()`，跳过 `initialize_screen` 挡不住。新增
+`t970-skip-vcattach.patch`，在 `t970-novc` 下把 `PE_putc` 换成丢弃输出的空回调：
+
+- 内核 `d862c992…`：`PE_init_iokit` 返回后探针 `f32a04c0…` 约 6 秒复位（旧内核
+  `4131d5b1…` 的同点探针 `9b0f8f68…` 是不复位的）。
+- 同一内核：`bsd_init` 调用前探针 `fa16c47d…` **立刻复位**。
+
+结论：**UEFI→菜单→DarwinBoot→arm_init→引导线程→bsd_init 已全部走通**；
+`vcattach`/`gc_enable` 自旋是控制台问题，已用诊断旁路绕过（不是正式修复）。
+下一关是 `bsd_init` 内的根卷挂载：没有 UFS 驱动，预期 panic 或静默停住。
+设备当前 BOOT 是诊断镜像，原始 BOOT 仍待恢复。
+
 ## 总体现状
 
 - 第 1–5 步已完成并提交；第 6 步只完成存储（UFS）输入采集与实现判定，驱动未移植；
