@@ -11,6 +11,7 @@ from pathlib import Path
 import struct
 import subprocess
 import sys
+import tomllib
 
 
 def require(condition, message):
@@ -60,20 +61,42 @@ def main():
     sys.path.insert(0, str(framework / 'scripts'))
     from unixnu.cli import parser as cli_parser
     from unixnu.config import Context
-    from unixnu import devicetree as dt, feeds, kernel, patches
+    from unixnu import components, devicetree as dt, feeds, kernel, patches
 
+    review_path = device / 'evidence/shared-support/selection.json'
+    review = json.loads(review_path.read_text())
+    require(git(framework, 'rev-parse', 'HEAD') == review['framework']['revision'],
+            'UniXNU checkout differs from the reviewed framework revision')
+    for profile in (review['arch'], review['os']):
+        require(hashlib.sha256((framework / profile['path']).read_bytes()).hexdigest() == profile['sha256'],
+                'Reviewed profile changed: ' + profile['path'])
     ctx = Context(cli_parser().parse_args(['status', '-D', str(device), '--json']))
+    require(ctx.board['board']['os_profile'] == review['os']['name'], 'OS profile differs from selection review')
+    require(ctx.soc.source['commit'] == review['soc']['revision'], 'SoC pin differs from selection review')
     modules = feeds.resolve(ctx)
     selected = {spec['id']: spec for spec in ctx.component_specs}
     require(set(selected) == {'ArmDTPlatform', 'ArmCpu', 'SoftwareAES', 'XnuPrelink', 'DarwinBoot'},
             'Unexpected bootstrap component selection')
     versions = {}
+    reviewed_components = {c['id']: c for c in review['components']}
+    require(set(selected) == set(reviewed_components), 'Components differ from selection review')
+    declared = {(s['kind'], s['name']): s for s in
+                tomllib.loads((device / 'feeds.toml').read_text())['source']}
     for name, spec in selected.items():
+        source = declared[(spec['kind'], name)]
+        require(source['commit'] == reviewed_components[name]['revision'], name + ': pin differs from selection review')
+        require(source['commit'] == spec['revision'], name + ': device feed differs from reviewed catalog')
+        require(components.repository_identity(source['git']) == components.repository_identity(spec['repository']),
+                name + ': device feed repository differs from reviewed catalog')
+        require(not spec.get('os_abi') or ctx.board['board']['os_profile'] in spec['os_abi'],
+                name + ': selected OS profile is outside the declared component ABI scope')
         module = modules[(spec['kind'], name)]
         require(module.path is not None, name + ': source unavailable; run unixnu fetch')
         revision = git(module.path, 'rev-parse', 'HEAD')
         require(revision == spec['revision'], name + ': checkout differs from selected source pin')
         require(not git(module.path, 'status', '--porcelain', '--', '.'), name + ': source is modified')
+        for filename in spec.get('source_files', []):
+            require((module.path / filename).is_file(), name + ': declared source file missing: ' + filename)
         versions[name] = revision
     require(git(ctx.soc.path, 'rev-parse', 'HEAD') == ctx.soc.source['commit'], 'SoC source pin mismatch')
     require(not git(ctx.soc.path, 'status', '--porcelain'), 'SoC source is modified')
@@ -139,7 +162,8 @@ def main():
     require(decoded['/arm-io/intc']['redistributor-stride'] == struct.pack('<Q', 0x20000), 'ADT GIC stride mismatch')
 
     tracked_inputs = ['board.toml', 'feeds.toml', 'configs/sm-t970_defconfig', 'dts/sm-t970.dts',
-                      'dts/sm-t970-reserved.dtsi', 'scripts/check-platform.py', 'unixnu.lock']
+                      'dts/sm-t970-reserved.dtsi', 'scripts/check-platform.py', 'unixnu.lock',
+                      'evidence/shared-support/selection.json']
     git(device, 'ls-files', '--error-unmatch', *tracked_inputs)
     require(not git(device, 'diff', '--name-only', 'HEAD', '--', *tracked_inputs),
             'Commit the platform inputs before archiving a verification report')
@@ -148,6 +172,8 @@ def main():
               'committed_platform_inputs': True,
               'unixnu_revision': git(framework, 'rev-parse', 'HEAD'),
               'soc_revision': git(ctx.soc.path, 'rev-parse', 'HEAD'), 'components': versions,
+              'component_device_pins_match_catalog': True,
+              'component_os_abi_scope_matches': True,
               'enabled_cpu_affinities': [0], 'timebase_hz': 19200000,
               'candidate_dram_base': hex(span[0][0]), 'candidate_dram_size': hex(span[0][1]),
               'static_reservations': len(actual), 'patch_count': len(selected_patches),

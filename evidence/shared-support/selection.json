@@ -1,0 +1,148 @@
+{
+  "selection_snapshot_version": 1,
+  "scope": "Step 2: minimal single-core platform selection; UEFI and peripheral adaptation remain pending.",
+  "framework": {
+    "repository": "https://github.com/UniXNU/UniXNU",
+    "revision": "04b4e558bcded5213c2d802984862dc062f28257"
+  },
+  "arch": {
+    "path": "profiles/arch/arm64/profile.toml",
+    "sha256": "9c3c54fbbb2ffd732fd270a3b79e569cd48ec5dc087f764889e29e88981a115c",
+    "name": "arm64",
+    "page_size": 4096
+  },
+  "soc": {
+    "name": "sm8250",
+    "repository": "https://github.com/FFT-infra/UniXNU-sm8250-common",
+    "revision": "166235ec2480ff0992627b7aafa15c65ce6b4efa",
+    "hardware_description_basis": {
+      "repository": "https://github.com/torvalds/linux",
+      "revision": "5b0764a53235d3c77e1ed674e836e1b3fe1a4b1f"
+    }
+  },
+  "os": {
+    "path": "profiles/os/ipados-17.7.11-21H461/profile.toml",
+    "sha256": "d3ccc104e5a986794fa9716f388e3622bd0f4c26d29a05ecd41769343893ad30",
+    "name": "ipados-17.7.11-21H461",
+    "darwin": "23.6.0",
+    "xnu_version": "10063.141.1",
+    "xnu_revision": "d8b80295118ef25ac3a784134bcf95cd8e88109f",
+    "driverkit_tag": "xnu-10063.121.3",
+    "trustcache_tag": "xnu-8796.101.5",
+    "abi": [
+      "IOGPUFamily",
+      "IOHIDFamily-2031.120.4",
+      "IOMobileGraphicsFamily"
+    ],
+    "ipsw_product": "iPad7,1",
+    "ipsw_build": "21H461",
+    "kernelcache_sha256": "f18b4df865405f2a287b84977d7aca745e056d656d9fc9df1662970ce2969de7",
+    "reuse_existing_profile": true,
+    "private_abi_verified_on_t970": false
+  },
+  "components": [
+    {
+      "id": "ArmDTPlatform",
+      "kind": "driver",
+      "repository": "https://github.com/UniXNU/ArmDTPlatform.git",
+      "revision": "417ff95d6a6e8607ddea9309ec45c3bfd4a67c60",
+      "hardware": [
+        "ARM64"
+      ],
+      "os_abi": [
+        "ipados-17.7.11-21H461"
+      ],
+      "board_dependencies": [],
+      "dependencies": [],
+      "build_stage": "kernel",
+      "build": [
+        "build-arm-driver.py",
+        "ArmDTPlatform"
+      ],
+      "outputs": [
+        "build/armdt-platform/libArmDTPlatform.a"
+      ]
+    },
+    {
+      "id": "ArmCpu",
+      "kind": "driver",
+      "repository": "https://github.com/UniXNU/ArmCpu.git",
+      "revision": "9066b53bbc82e92a98ec44a11dd50fd13eaf1a1b",
+      "hardware": [
+        "ARM GICv3",
+        "ARM generic timer"
+      ],
+      "os_abi": [
+        "ipados-17.7.11-21H461"
+      ],
+      "board_dependencies": [],
+      "dependencies": [],
+      "build_stage": "kernel",
+      "build": [
+        "build-arm-driver.py",
+        "ArmCpu"
+      ],
+      "outputs": [
+        "build/armcpu/libArmCpu.a"
+      ]
+    },
+    {
+      "id": "SoftwareAES",
+      "kind": "driver",
+      "repository": "https://github.com/UniXNU/SoftwareAES.git",
+      "revision": "4a45326da5c2cd6fe6813d79ee43db20805628af",
+      "hardware": [
+        "XNU AES routines"
+      ],
+      "os_abi": [
+        "ipados-17.7.11-21H461"
+      ],
+      "board_dependencies": [],
+      "dependencies": [],
+      "build_stage": "kernel",
+      "build": [
+        "build-arm-driver.py",
+        "SoftwareAES"
+      ],
+      "outputs": [
+        "build/software-aes/libSoftwareAES.a"
+      ]
+    },
+    {
+      "id": "XnuPrelink",
+      "kind": "kit",
+      "repository": "https://github.com/UniXNU/XnuPrelink.git",
+      "revision": "f876e3ee62e18fc06653dd75ed7dafcfb3950ac0",
+      "hardware": [],
+      "os_abi": [],
+      "board_dependencies": [],
+      "dependencies": [],
+      "build_stage": "prelink",
+      "build": [],
+      "outputs": []
+    },
+    {
+      "id": "DarwinBoot",
+      "kind": "driver",
+      "repository": "https://github.com/UniXNU/DarwinBoot.git",
+      "revision": "3325e352d7df68a9f9ad74832ed94a6acbbd7390",
+      "hardware": [
+        "ARM64 UEFI"
+      ],
+      "os_abi": [],
+      "board_dependencies": [],
+      "dependencies": [],
+      "build_stage": "firmware",
+      "build": [],
+      "outputs": []
+    }
+  ],
+  "uefi": {
+    "selected": false,
+    "candidate_evidence": "evidence/shared-support/uefi-candidate.json",
+    "reason": "No T970 platform/config was found in the reviewed upstream directories; r8q is reference only."
+  },
+  "device_configuration": "board.toml",
+  "device_sources": "feeds.toml",
+  "boot_enabled": false
+}
