@@ -22,6 +22,10 @@ Both trees were clean when the commands ran.
   separate DTB, empty ramdisk). `fd_sha256` and `dtb_sha256` match the built FD
   and the captured firmware FDT.
 
+`unixnu payload` was probed at this commit: it stops only at
+`kernel/kernel.macho` ("run unixnu build kernel"), so the hardware-description
+side of the payload is satisfied and the missing XNU build is the next input.
+
 Limits: the ADT uses artificial identity 1; no payload/initrd exists and no
 kernel was built. Nothing was written to the tablet or booted. The firmware FD
 digest changes between builds (EDK embeds build metadata); the module set and
