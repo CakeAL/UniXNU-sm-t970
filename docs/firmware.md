@@ -67,7 +67,7 @@ PATH=/opt/homebrew/opt/llvm/bin:/opt/homebrew/opt/lld/bin:$PATH python3.14 scrip
 | tags | `0x1e00000` |
 | DTB | `0x1f00000` |
 
-主仓库 `7ebc585543fd1a89e1d47d17442899ab61978f9a` 已增加该布局的支持及字节校验。
+主仓库 `194aae294c1107e791f4f74b2be371a391ac6bc4` 已增加该布局的支持、upstream BootShim 的完整 image_size 校正及字节校验。
 固件检查镜像可以使用 `--ramdisk none`；它没有 XNU payload，不代表 iPadOS 引导镜像。
 Samsung 原厂环境未证明支持 `fastboot boot`，本阶段不执行重启或分区写入。
 

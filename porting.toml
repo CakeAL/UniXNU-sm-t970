@@ -51,6 +51,7 @@ procedure = [
   "Run python3.14 ../UniXNU-sm-t970/scripts/check-platform.py --unixnu . to compare DT/ADT bindings with the captured hardware.",
 ]
 findings = [
+  "The final reviewed framework commit is 194aae294c1107e791f4f74b2be371a391ac6bc4; in addition to v2/raw packing it normalizes the upstream shim image_size to include the 112-byte shim while preserving the firmware copy size. Eight regression cases pass.",
   "Step 3 completion replaces the initial staging audit: real T970 firmware config/DSC/FDF/FD inputs now exist; stock asset hashes, disabled peripheral descriptions and exact firmware source pins are recorded. board.example is removed to enable host builds; hardware boot remains unverified.",
   "The framework pin advances to 7ebc585543fd1a89e1d47d17442899ab61978f9a for tested raw-kernel/Android-v2 separate-DTB packing. The component catalog, ARM64/OS profile hashes, SoC and all five component pins are unchanged.",
   "The official examples/device structure is present, retaining the existing hardware inventory and scripts. Board-specific names replace the template identity.",
@@ -570,6 +571,7 @@ procedure = [
   "Read BuildManifest.plist from the local IPSW using Python zipfile and plistlib to identify its OS version, build and product types.",
 ]
 findings = [
+  "Actual bootimg invocation exposed the pinned upstream BootShim declaring only FD_SIZE in ARM64 image_size. The shared packer now normalizes the header with strict base/size checks; a real header-v2 raw-kernel/separate-DTB firmware-only image packs and unpacks successfully.",
   "The board package now contains a real T970 firmware overlay and build integration; its vendor assets stay local. Kernel board patch series remains empty.",
   "The shared packer now supports observed raw kernel/header-v2/separate-DTB layout, validates DTB/ramdisk addresses and byte content, and has seven passing regression cases. XNU payload inputs are still a later stage.",
   "A second boot-header capture confirms header v2, header_size=1660, page_size=4096, DTB address=0x1f00000, boot DTB bytes=1580275, and separate recovery DTBO geometry. Source boot is Magisk-modified.",

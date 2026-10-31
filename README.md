@@ -33,7 +33,7 @@ UFS、GPU、触控、音频、无线等 XNU 外设组件未启用。DTS 不替�
 ## 检查与构建
 
 需要 Python 3.11+（本机 `python3.14`）、git、dtc、LLVM/lld、Xcode 或对应 Linux 工具链。
-主仓库固定为 `7ebc585543fd1a89e1d47d17442899ab61978f9a`，SoC 固定为
+主仓库固定为 `194aae294c1107e791f4f74b2be371a391ac6bc4`，SoC 固定为
 `166235ec2480ff0992627b7aafa15c65ce6b4efa`。历史第 2 步快照仍保留其原始版本。
 
 ```sh

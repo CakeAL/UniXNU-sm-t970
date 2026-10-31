@@ -28,7 +28,7 @@
   本机配置／忽略目录；主机测试用身份 `1`，不作为启动输入。
 - 当前组件：`ArmDTPlatform`、`ArmCpu`、`SoftwareAES`、`XnuPrelink`、`DarwinBoot`。
   SoC／组件／架构／OS 输入继续按选型快照核对。
-- 主仓库从原审计提交推进到 `7ebc585543fd1a89e1d47d17442899ab61978f9a`，仅增加
+- 主仓库从原审计提交推进到 `194aae294c1107e791f4f74b2be371a391ac6bc4`，仅增加
   经过测试的 raw kernel／Android v2 独立 DTB 打包支持；组件与内核补丁选择不变。
 - 空板级 XNU series 仍有效。板级 package 现在提供实际 T970 固件 overlay；未声明已有
   XNU 存储、输入、GPU、网络、音频或电源服务。

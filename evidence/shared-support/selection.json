@@ -3,9 +3,9 @@
   "scope": "Step 2: minimal single-core platform selection; UEFI and peripheral adaptation remain pending.",
   "framework": {
     "repository": "https://github.com/UniXNU/UniXNU",
-    "revision": "7ebc585543fd1a89e1d47d17442899ab61978f9a",
+    "revision": "194aae294c1107e791f4f74b2be371a391ac6bc4",
     "previous_reviewed_revision": "04b4e558bcded5213c2d802984862dc062f28257",
-    "advance_reason": "Device-repository completion adds tested raw-kernel/Android-v2 separate-DTB packing; catalog, arch/OS profiles and kernel patch selection are unchanged."
+    "advance_reason": "Tested raw-kernel/Android-v2 separate-DTB packing and upstream BootShim ARM64 image-size normalization. Catalog, architecture/OS profiles and kernel patch order remain unchanged."
   },
   "arch": {
     "path": "profiles/arch/arm64/profile.toml",
