@@ -3,5 +3,5 @@
 == payload
 == kernel args: -v cpus=1
 + /opt/homebrew/bin/dtc -I dts -O dtb -o {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/device-tree/hardware.dtb -i {unixnu}/out/feeds/UniXNU-sm8250-common-a7c5a8ff/dts {device}/dts/sm-t970.dts
-== payload: {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/payload/payload.img (192 MiB)
+== payload: {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/payload/payload.img (56 MiB)
 == next: run ./unixnu bootimg to pack this payload into the boot image

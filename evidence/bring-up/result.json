@@ -1,6 +1,6 @@
 {
-  "scope": "Step 7 host build chain for SM-T970; no device write and no boot",
-  "device_revision": "0d8fb9d0a14630f878a173241059f7687aa6b134",
+  "scope": "Step 7 host build chain and Odin flash preparation for SM-T970; no device write and no boot",
+  "device_revision": "7a71f6f36f90de36dc04679500e2ea94257bfa88",
   "framework_revision": "194aae294c1107e791f4f74b2be371a391ac6bc4",
   "inputs": {
     "ipsw": {
@@ -26,7 +26,11 @@
     "omitted": [
       "arch-series zzz-boot-progress.patch"
     ],
-    "reason": "the patch edits the XNU_SHENG_PMGR block that only sheng-platform-power.patch provides; the board series replaces the OS-layer series with patches/xnu/os-series"
+    "reason": "the patch edits the XNU_SHENG_PMGR block that only sheng-platform-power.patch provides; patches/xnu/os-series keeps the two XnuPrelink ABI patches"
+  },
+  "boot_partition": {
+    "bytes": 71303168,
+    "payload_size_mib": 56
   },
   "artifacts": {
     "kernel": {
@@ -34,21 +38,21 @@
       "sha256": "b3f9ab34199b726105ea1a3bb7a86af0734d632e55c989b2bdb254bb85f48f0e"
     },
     "payload": {
-      "bytes": 201326592,
-      "sha256": "a4a0bac8487b288aba2a2f2e244709c24761d9829bdd30c5ef4beefc3ee5c551"
+      "bytes": 58720256,
+      "sha256": "a87d42da70987f70ed81f8ab25ffd530322e69a0b50df60423c426b2bd0a52e0"
     },
     "boot_image": {
-      "bytes": 205320192,
-      "sha256": "28f3bb9f081420d8f6d6d26d91a12315758f0195e114abef598ca12a86a01f9d",
+      "bytes": 62713856,
+      "sha256": "d61f416aad5e5a029edee52674de909ad32030603cf993695db0c75328651388",
       "kernel_sha256": "180f77cc314cee84375e48a43175c59524574c729fa6856a9cecca31fa6bca26",
-      "ramdisk_bytes": 201326592,
+      "ramdisk_bytes": 58720256,
       "header_version": 2,
       "kernel_address": "0x8000",
       "tags_address": "0x1e00000",
       "kernel_compression": "none",
       "dtb_placement": "separate",
-      "image_sha256": "28f3bb9f081420d8f6d6d26d91a12315758f0195e114abef598ca12a86a01f9d",
-      "image_bytes": 205320192,
+      "image_sha256": "d61f416aad5e5a029edee52674de909ad32030603cf993695db0c75328651388",
+      "image_bytes": 62713856,
       "fd_sha256": "4691d86c4c1604ca28f1b97428d930724c270debaa02ed03f3d22f1a68fed7ba",
       "dtb_sha256": "86c14aa305a6cf5db46665f4095d28aadcb1ea5ce9d213cd711641a07504ed1d",
       "shim_bytes": 112,
@@ -61,11 +65,15 @@
     "firmware_dtb": {
       "bytes": 837154,
       "sha256": "86c14aa305a6cf5db46665f4095d28aadcb1ea5ce9d213cd711641a07504ed1d"
+    },
+    "odin_tars": {
+      "test": "out/step7/odin/boot-unixnu.tar",
+      "restore": "out/step7/odin/boot-stock.tar"
     }
   },
   "payload_contents": {
     "kernel_sha256": "b3f9ab34199b726105ea1a3bb7a86af0734d632e55c989b2bdb254bb85f48f0e",
-    "adt_sha256": "8b08b33af6ca0fbd12808978d62aaa0122b867e3fe4381163efe24a4d24277e5",
+    "adt_sha256": "b074543e0ee7ef3277f71c51465373de657f2f2c195c2d8149efff8d917ac48e",
     "trust_cache_sha256": "7416ca4f8377146626bb284e2133c76bee6cb4e3ee0af5d648b186235a7323a7",
     "kernel_args": "-v cpus=1",
     "data_ramdisk_sha256": null
@@ -73,6 +81,7 @@
   "checks": {
     "boot_header_v2": true,
     "ramdisk_bytes_positive": true,
+    "boot_image_fits_partition": true,
     "dtb_matches_input": true,
     "fd_matches_build": true,
     "payload_kernel_matches": true
@@ -80,9 +89,9 @@
   "device_boot": false,
   "limits": [
     "Nothing was written to the tablet; it still runs Android 12 (SP2A.220305.013).",
-    "No UFS driver exists, so a boot would stop at root mount; the payload carries no Data seed.",
+    "No UFS driver exists, so a boot should stop at root mount; the payload carries no Data seed.",
     "The platform seed is a local test value, not a recovered device identity.",
-    "The firmware FD digest changes per build; module presence and image fields are the checked facts."
+    "The 68 MiB boot partition caps the payload at 56 MiB; a larger userland needs another partition."
   ],
   "result": "PASS"
 }
