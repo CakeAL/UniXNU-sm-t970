@@ -93,3 +93,7 @@ A650 渲染后端。T970 的 GMU／SQE 固件已记录哈希，AOP command DB、
 在兄弟目录的 UniXNU 主仓库执行 `python3.14 ./unixnu status --json -D ../UniXNU-sm-t970`，
 再运行本设备 `scripts/check-platform.py` 检查实际提交、OS ABI 声明和 DT／ADT 输入。
 主机验证只确认所选配置范围，不确认设备驱动、固件协议或系统用户态已能工作。
+
+本步主机检查已通过，精确的检查提交和输入哈希见
+`evidence/shared-support/result.json`；配置解析结果与候选证据一同归档在
+`evidence/shared-support/`。官方记录检查器通过全部 13 个部分。

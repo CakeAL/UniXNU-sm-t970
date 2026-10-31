@@ -31,6 +31,7 @@ paths = [
   "evidence/platform-bootstrap/source-snapshots.json",
   "docs/shared-support.md",
   "evidence/shared-support/selection.json",
+  "evidence/shared-support/status.json",
 ]
 inputs = [
   "ADB reports SM-T970, gts7xlwifi, SM8250, board platform kona and hardware qcom.",
@@ -55,6 +56,7 @@ findings = [
   "Step 2 review reuses the existing ARM64, SM8250 and iPadOS 17.7.11 support. The five selected components declare no catalog dependencies; no new OS profile is created.",
   "The SM8250 soc.toml at the chosen revision contains only SoC metadata, despite its README saying it selects ArmCpu/ArmDTPlatform. This board therefore retains the complete explicit component selection.",
   "The platform checker now rejects framework/profile drift and disagreement among reviewed component pins, device feeds, catalog ABI scope and actual clean source checkouts.",
+  "Step 2 verification passed against 25f9797275c93b227585ab4403923da34c4fec19 with explicit six-source feeds and frozen framework/profile inputs. The selected minimal support and pending hardware/ABI work meet the source-selection deliverable.",
 ]
 completion = [
   "A board.toml with matching device identity resolves the selected SoC and OS profiles and pinned sources.",
@@ -76,6 +78,7 @@ evidence = [
   { kind = "host", reference = "evidence/platform-bootstrap/result.json", command = "python3.14 scripts/check-platform.py --unixnu ../UniXNU", revision = "5cab8f372a491af149ce27df02d918f6ac8cddba", result = "PASS: committed source pins and archive/patch plans resolve; CPU0-only DT/ADT bindings match captured CPU/GIC/timer resources and all 30 static reservations. No XNU build or boot is claimed." },
   { kind = "source", reference = "docs/shared-support.md", result = "Step 2 source/version selection, component reuse boundaries and ordered pending hardware/ABI work." },
   { kind = "source", reference = "evidence/shared-support/selection.json", result = "Reviewed framework, architecture, SoC, OS and five-component version snapshot; UEFI remains unselected." },
+  { kind = "host", reference = "evidence/shared-support/result.json", command = "python3.14 scripts/check-platform.py --unixnu ../UniXNU --output out/shared-support-check", revision = "25f9797275c93b227585ab4403923da34c4fec19", result = "PASS: reviewed framework/profile hashes and five device/catalog/checkout component pins agree; declared OS ABI scope, archive/patch plan and CPU0 DT/ADT checks pass. No private ABI or device execution is verified." },
 ]
 
 [[area]]
@@ -569,6 +572,7 @@ findings = [
   "The platform checker verifies CPU affinities, GIC ranges/stride, timer rate, the measured RAM-bank selection, all static reservation reg values and ADT byte order. It does not invoke ADB or produce a boot image.",
   "The committed platform checker produced a PASS report tied to its exact source revision and input file hashes; sanitized resolved configuration and unchanged dtc naming warnings are archived.",
   "Step 2 adds reproducible checks for reviewed framework/profile hashes, explicit device component pins, declared OS ABI scope and source file presence. These checks do not execute driver protocols or validate private ABI layouts.",
+  "Archived the Step 2 PASS report with input hashes and the resolved configuration; historical platform-bootstrap evidence remains bound to its earlier source revision.",
 ]
 completion = [
   "Every claimed UniXNU milestone has matching source/image revisions, a reproducible command and accessible firmware/kernel logs.",
@@ -586,4 +590,5 @@ evidence = [
   { kind = "source", reference = "scripts/check-platform.py", result = "Reproducible host check for pinned sources and captured DT to ADT platform bindings." },
   { kind = "host", reference = "evidence/platform-bootstrap/result.json", command = "python3.14 scripts/check-platform.py --unixnu ../UniXNU", revision = "5cab8f372a491af149ce27df02d918f6ac8cddba", result = "PASS: committed source pins and archive/patch plans resolve; CPU0-only DT/ADT bindings match captured CPU/GIC/timer resources and all 30 static reservations. No XNU build or boot is claimed." },
   { kind = "source", reference = "scripts/check-platform.py", result = "Source pin, profile-hash and declared ABI-scope checks added to the existing platform input validator." },
+  { kind = "host", reference = "evidence/shared-support/result.json", command = "python3.14 scripts/check-platform.py --unixnu ../UniXNU --output out/shared-support-check", revision = "25f9797275c93b227585ab4403923da34c4fec19", result = "PASS: reviewed framework/profile hashes and five device/catalog/checkout component pins agree; declared OS ABI scope, archive/patch plan and CPU0 DT/ADT checks pass. No private ABI or device execution is verified." },
 ]
