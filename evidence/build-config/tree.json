@@ -1,0 +1,22 @@
+{
+  "links": {
+    "drivers/ArmCpu": "{unixnu}/drivers/ArmCpu",
+    "drivers/ArmDTPlatform": "{unixnu}/drivers/ArmDTPlatform",
+    "drivers/DarwinBoot": "{unixnu}/drivers/DarwinBoot",
+    "drivers/NativeAES": "{unixnu}/drivers/SoftwareAES",
+    "drivers/SoftwareAES": "{unixnu}/drivers/SoftwareAES",
+    "kits/NativePrelink": "{unixnu}/kits/XnuPrelink",
+    "kits/XnuPrelink": "{unixnu}/kits/XnuPrelink",
+    "kits/sm-t970": "{device}/package",
+    "refer/AvailabilityVersions": "{unixnu}/out/feeds/AvailabilityVersions-6928d18a",
+    "refer/IOStorageFamily": "{unixnu}/out/feeds/IOStorageFamily-67f9003c",
+    "refer/corecrypto-2023": "{unixnu}/out/feeds/corecrypto-2023-c0651bae",
+    "refer/edk2": "{unixnu}/out/feeds/mu_basecore-8f10084c",
+    "refer/libdispatch": "{unixnu}/out/feeds/libdispatch-d8f167ce",
+    "refer/libplatform": "{unixnu}/out/feeds/libplatform-0f31118b",
+    "refer/libpthread": "{unixnu}/out/feeds/libpthread-9e5201bd",
+    "refer/xnu": "{unixnu}/out/feeds/xnu-b7545ced"
+  },
+  "scripts": 268,
+  "soc_linked": false
+}

@@ -36,6 +36,8 @@ paths = [
   "evidence/shared-support/status.json",
   "docs/device-repository-checklist.md",
   "evidence/firmware-log-exporter/platform.json",
+  "evidence/build-config/result.json",
+  "evidence/build-config/README.md",
 ]
 inputs = [
   "ADB reports SM-T970, gts7xlwifi, SM8250, board platform kona and hardware qcom.",
@@ -94,6 +96,7 @@ evidence = [
   { kind = "host", reference = "evidence/shared-support/result.json", command = "python3.14 scripts/check-platform.py --unixnu ../UniXNU --output out/shared-support-check", revision = "25f9797275c93b227585ab4403923da34c4fec19", result = "PASS: reviewed framework/profile hashes and five device/catalog/checkout component pins agree; declared OS ABI scope, archive/patch plan and CPU0 DT/ADT checks pass. No private ABI or device execution is verified." },
   { kind = "source", reference = "docs/device-repository-checklist.md", result = "Seven-item device repository audit separates completed local structure from pending firmware, hardware-input and example-flag conditions." },
   { kind = "host", reference = "evidence/firmware-log-exporter/platform.json", command = "python3.14 scripts/check-platform.py --unixnu ../UniXNU", revision = "a4112792c2b405d053c8fd215f452b111598b66e", result = "PASS: board.toml tools=true is validated together with the firmware exporter wiring it enables; the tablet has not booted this configuration." },
+  { kind = "host", reference = "evidence/build-config/result.json", command = "python3.14 scripts/check-build-config.py --unixnu ../UniXNU", revision = "8055073ce9a05fa60624decae4b8c74b1a544746", result = "PASS: defconfig/fetch/status/tree resolve the declared arm64/SM8250/iPadOS/board layers, five components, eight archives, 19 modules and 61 patches in order; unixnu.lock records all nine fetched sources; no build_config exists yet." },
 ]
 
 [[area]]
@@ -638,6 +641,10 @@ paths = [
   "evidence/platform-bootstrap/README.md",
   "evidence/shared-support/result.json",
   "evidence/firmware-log-exporter/platform.json",
+  "evidence/build-config/check.log",
+  "evidence/build-config/status.json",
+  "evidence/build-config/tree.json",
+  "evidence/build-config/tree.txt",
 ]
 inputs = [
   "Existing ADB and Magisk su can read the live FDT, physical iomem, input capabilities and primary GPT metadata while SELinux remains Enforcing.",
@@ -683,4 +690,5 @@ evidence = [
   { kind = "source", reference = "scripts/check-platform.py", result = "Source pin, profile-hash and declared ABI-scope checks added to the existing platform input validator." },
   { kind = "host", reference = "evidence/shared-support/result.json", command = "python3.14 scripts/check-platform.py --unixnu ../UniXNU --output out/shared-support-check", revision = "25f9797275c93b227585ab4403923da34c4fec19", result = "PASS: reviewed framework/profile hashes and five device/catalog/checkout component pins agree; declared OS ABI scope, archive/patch plan and CPU0 DT/ADT checks pass. No private ABI or device execution is verified." },
   { kind = "host", reference = "evidence/firmware-log-exporter/platform.json", command = "python3.14 scripts/check-platform.py --unixnu ../UniXNU", revision = "a4112792c2b405d053c8fd215f452b111598b66e", result = "PASS: committed-source platform check now also rejects missing exporter wiring in the DSC/FDF, missing Advanced Logger library mappings or PCDs, a fabricated PcdAdvancedLoggerBase and a false tools flag." },
+  { kind = "host", reference = "evidence/build-config/check.log", command = "python3.14 scripts/check-build-config.py --unixnu ../UniXNU", revision = "8055073ce9a05fa60624decae4b8c74b1a544746", result = "PASS: independent patch-series resolution matches status, every module matches its pin and lock entry, and the assembled tree links drivers/kits/refer/patches/scripts to those exact sources." },
 ]

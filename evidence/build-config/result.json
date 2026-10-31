@@ -1,0 +1,86 @@
+{
+  "scope": "Step 4 host resolution check; no kernel, firmware, payload or device work",
+  "device_revision": "8055073ce9a05fa60624decae4b8c74b1a544746",
+  "unixnu_revision": "194aae294c1107e791f4f74b2be371a391ac6bc4",
+  "configuration": "sm-t970_defconfig",
+  "build_config": null,
+  "profiles": {
+    "arch": "{unixnu}/profiles/arch/arm64",
+    "soc": "{unixnu}/out/feeds/UniXNU-sm8250-common-a7c5a8ff",
+    "os": "{unixnu}/profiles/os/ipados-17.7.11-21H461",
+    "device": "{device}"
+  },
+  "configuration_sources": [
+    "{unixnu}/profiles/arch/arm64/profile.toml",
+    "{unixnu}/out/feeds/UniXNU-sm8250-common-a7c5a8ff/soc.toml",
+    "{unixnu}/profiles/os/ipados-17.7.11-21H461/profile.toml",
+    "{device}/board.toml"
+  ],
+  "components": [
+    "ArmCpu",
+    "ArmDTPlatform",
+    "DarwinBoot",
+    "SoftwareAES",
+    "XnuPrelink"
+  ],
+  "archives": [
+    "build-corecrypto-14.py",
+    "build-corecrypto-14.py --namespace",
+    "component:ArmDTPlatform",
+    "component:ArmCpu",
+    "component:SoftwareAES",
+    "build-software-aes-bindings.py",
+    "build-mockfs-fixture.py",
+    "build-libpthread-kernel.py"
+  ],
+  "patch_count": 61,
+  "patch_groups": {
+    "arch": 56,
+    "soc": 2,
+    "os": 3,
+    "device": 0
+  },
+  "modules": 19,
+  "lock_sources": [
+    "AvailabilityVersions",
+    "IOStorageFamily",
+    "corecrypto-2023",
+    "edk2",
+    "libdispatch",
+    "libplatform",
+    "libpthread",
+    "sm8250",
+    "xnu"
+  ],
+  "tree": "{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree",
+  "tree_links": {
+    "drivers/ArmCpu": "{unixnu}/drivers/ArmCpu",
+    "drivers/ArmDTPlatform": "{unixnu}/drivers/ArmDTPlatform",
+    "drivers/DarwinBoot": "{unixnu}/drivers/DarwinBoot",
+    "drivers/NativeAES": "{unixnu}/drivers/SoftwareAES",
+    "drivers/SoftwareAES": "{unixnu}/drivers/SoftwareAES",
+    "kits/NativePrelink": "{unixnu}/kits/XnuPrelink",
+    "kits/XnuPrelink": "{unixnu}/kits/XnuPrelink",
+    "kits/sm-t970": "{device}/package",
+    "refer/AvailabilityVersions": "{unixnu}/out/feeds/AvailabilityVersions-6928d18a",
+    "refer/IOStorageFamily": "{unixnu}/out/feeds/IOStorageFamily-67f9003c",
+    "refer/corecrypto-2023": "{unixnu}/out/feeds/corecrypto-2023-c0651bae",
+    "refer/edk2": "{unixnu}/out/feeds/mu_basecore-8f10084c",
+    "refer/libdispatch": "{unixnu}/out/feeds/libdispatch-d8f167ce",
+    "refer/libplatform": "{unixnu}/out/feeds/libplatform-0f31118b",
+    "refer/libpthread": "{unixnu}/out/feeds/libpthread-9e5201bd",
+    "refer/xnu": "{unixnu}/out/feeds/xnu-b7545ced"
+  },
+  "tree_scripts": 268,
+  "config_sha256": {
+    "board.toml": "95a8a70ca70f731f3a1d6d586d97bf5fec75abe4c8352f92d3a547879cd18a19",
+    "feeds.toml": "2fedd9d3b2e870368e018046715f5763b029e251155d8f69d0cb2ca0837065c3",
+    "unixnu.lock": "d2b323a121752d8d01e3ad2a3472492a0d17e9d0cdb973248632a475fb219a07",
+    "configs/sm-t970_defconfig": "0cf78eee900094f02034b5034229bdfde1836410dee6a9d9cdd8d13dbb7f5d69"
+  },
+  "result": "PASS",
+  "limits": [
+    "Tree assembly and source pins are host facts; nothing was compiled or booted.",
+    "No unixnu.local.toml build inputs (kernelcache, trust cache, Data seed, unique chip id) exist yet."
+  ]
+}

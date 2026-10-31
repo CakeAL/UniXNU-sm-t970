@@ -1,0 +1,3 @@
+PASS: 61 patches in order {'arch': 56, 'soc': 2, 'os': 3, 'device': 0}; 19 modules resolve to their pins.
+PASS: assembled tree maps drivers, kits, refer, patches and scripts to the pinned sources.
+Report: {device}/out/build-config/result.json
