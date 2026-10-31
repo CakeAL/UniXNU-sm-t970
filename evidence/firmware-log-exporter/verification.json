@@ -1,0 +1,44 @@
+{
+  "scope": "Host build verification of the Advanced Logger exporter wiring; no boot",
+  "device_revision": "a4112792c2b405d053c8fd215f452b111598b66e",
+  "framework_revision": "194aae294c1107e791f4f74b2be371a391ac6bc4",
+  "uefi_revision": "4bd8ae83bf37de41777f19e0777db70f59383a6d",
+  "exporter_ffs_guid": "8d4e7f50-3a2c-4c9a-9e1b-50c4c8472d41",
+  "exporter_count_in_fvmain": 1,
+  "exporter_listed_in_fvmain_inf": true,
+  "fv_files": 92,
+  "fd_bytes": 3145728,
+  "fd_sha256": "94709bbe5b7ecc1a78cb6041889258d9c537b096ae04bce41252ad57f4d8d30a",
+  "platform_result": {
+    "candidate_dram_base": "0x200000000",
+    "candidate_dram_size": "0x80000000",
+    "firmware_log_exporter": {
+      "dsc": true,
+      "fdf": true,
+      "tools_menu": true,
+      "fixed_logger_address": false
+    },
+    "patch_count": 61,
+    "result": "PASS"
+  },
+  "commands": [
+    {
+      "command": "python3.14 scripts/prepare-uefi.py --uefi .cache/uefi-source/Mu-Silicium --extract-dir .cache/stock-inputs/extracted",
+      "exit_code": 0
+    },
+    {
+      "command": "GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=submodule.active GIT_CONFIG_VALUE_0=__no_module_submodules__ PATH=/opt/homebrew/opt/llvm/bin:/opt/homebrew/opt/lld/bin:$PATH python3.14 ../UniXNU/unixnu build firmware -D . --uefi .cache/uefi-source/Mu-Silicium --edk2 .cache/uefi-source/Mu-Silicium/Mu_Basecore --local-module refer:edk2=.cache/uefi-source/Mu-Silicium/Mu_Basecore",
+      "exit_code": 0
+    },
+    {
+      "command": "python3.14 scripts/check-platform.py --unixnu ../UniXNU",
+      "exit_code": 0
+    }
+  ],
+  "result": "PASS",
+  "limits": [
+    "The Tools menu, QR transfer and log contents are untested: no payload/initrd image was built and the tablet still runs Android.",
+    "The SEC phase writes to the hardware port only; the in-memory log starts at DXE Core, where AllocateReservedPages provides the buffer.",
+    "Nothing here verifies GOP, runtime memory handoff or an iPadOS boot."
+  ]
+}
