@@ -32,6 +32,9 @@ vsc/
 [共享支持选择](docs/shared-support.md)。`feeds.toml` 已明确固定五个组件的提交；
 选型快照同时固定主仓库版本和架构／OS profile 哈希。
 
+第 3 步的七项核查见[设备仓库清单](docs/device-repository-checklist.md)。
+目录结构及本地记录要求已满足，固件路径、完整硬件交接和示例标记收尾仍待完成。
+
 只启用 CPU0，UFS、GPU、显示、触控及其他板级外设尚未接入。
 DTS 使用 Android 实测的 `0x180000000 + 0x100000000` 连续内存段进行主机转换检查；
 它尚未与 T970 的 UEFI 可分配内存和固件所有权核对。

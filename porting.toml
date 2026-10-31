@@ -32,6 +32,7 @@ paths = [
   "docs/shared-support.md",
   "evidence/shared-support/selection.json",
   "evidence/shared-support/status.json",
+  "docs/device-repository-checklist.md",
 ]
 inputs = [
   "ADB reports SM-T970, gts7xlwifi, SM8250, board platform kona and hardware qcom.",
@@ -57,6 +58,8 @@ findings = [
   "The SM8250 soc.toml at the chosen revision contains only SoC metadata, despite its README saying it selects ArmCpu/ArmDTPlatform. This board therefore retains the complete explicit component selection.",
   "The platform checker now rejects framework/profile drift and disagreement among reviewed component pins, device feeds, catalog ABI scope and actual clean source checkouts.",
   "Step 2 verification passed against 25f9797275c93b227585ab4403923da34c4fec19 with explicit six-source feeds and frozen framework/profile inputs. The selected minimal support and pending hardware/ABI work meet the source-selection deliverable.",
+  "Step 3 seven-item audit at device configuration 6d3012ab3fbbbb3d4517d1a4ed4ccb87b795a028: all 13 template files are present and tracked; identities, renamed entry paths, three config fragments, four series and eight inherited archive recipes agree. Firmware config/DSC/FD and real handoff inputs remain incomplete.",
+  "The official 13-area record check passes, but the repository does not yet meet every Step 3 completion item. board.example=true is retained; structure validation is not evidence of firmware integration.",
 ]
 completion = [
   "A board.toml with matching device identity resolves the selected SoC and OS profiles and pinned sources.",
@@ -66,7 +69,7 @@ limits = [
   "Apple reference sources and kernelcache/ABI/seed inputs are not fully prepared; no kernel, package, firmware or boot image is built.",
 ]
 next_action = [
-  "Verify the committed Step 2 selection, then continue the device-repository and firmware stages with the recorded UEFI/RAM/ABI work still pending.",
+  "Resolve the Step 3 firmware config/DSC/FD and memory-handoff inputs listed in docs/device-repository-checklist.md; repeat the checklist before removing board.example=true.",
 ]
 evidence = [
   { kind = "source", reference = "log.txt", result = "Archived stock-Android shell output identifies SM-T970, gts7xlwifi and SM8250; it is hardware inventory, not UniXNU verification." },
@@ -79,6 +82,7 @@ evidence = [
   { kind = "source", reference = "docs/shared-support.md", result = "Step 2 source/version selection, component reuse boundaries and ordered pending hardware/ABI work." },
   { kind = "source", reference = "evidence/shared-support/selection.json", result = "Reviewed framework, architecture, SoC, OS and five-component version snapshot; UEFI remains unselected." },
   { kind = "host", reference = "evidence/shared-support/result.json", command = "python3.14 scripts/check-platform.py --unixnu ../UniXNU --output out/shared-support-check", revision = "25f9797275c93b227585ab4403923da34c4fec19", result = "PASS: reviewed framework/profile hashes and five device/catalog/checkout component pins agree; declared OS ABI scope, archive/patch plan and CPU0 DT/ADT checks pass. No private ABI or device execution is verified." },
+  { kind = "source", reference = "docs/device-repository-checklist.md", result = "Seven-item device repository audit separates completed local structure from pending firmware, hardware-input and example-flag conditions." },
 ]
 
 [[area]]
@@ -112,6 +116,7 @@ findings = [
   "The template firmware integration slots are retained as a table with only known package roots; board.example=true prevents treating the staging configuration as boot-ready.",
   "Reviewed Project-Silicium/Mu-Silicium commit 4bd8ae83bf37de41777f19e0777db70f59383a6d: KonaPkg and Samsung r8qPkg exist, but no T970/gts7xlwifi platform/config was found in the inspected upstream directories.",
   "The r8q reference declares Android header v1 and 1080x2400 display geometry, while the T970 inventory reports header v2 and 2800x1752 modes. No reference-board boot parameters or firmware path were adopted.",
+  "Step 3 audit confirms firmware.config, firmware.dsc and firmware.fd are absent. Only package search roots are configured; the known GPU manifest entries are inventory, not a complete enabled-firmware integration.",
 ]
 completion = [
   "A board-specific UEFI image starts reproducibly and produces an accessible boot log.",
@@ -211,6 +216,7 @@ findings = [
   "The candidate high bank does not intersect the captured static reservations. Dynamic size-only reservations and future firmware allocations are not thereby proven safe.",
   "Three dtc naming warnings are retained from the copied static reservations; the actual reg values and original names are preserved.",
   "Host check compared all 30 static reservation reg values, confirmed their non-overlap with the selected measured bank, and decoded the ADT DRAM base/size. Runtime allocations and DMA remain unverified.",
+  "Step 3 audit records the candidate contiguous bank and 30 static reservations as partial DTS input completion. Dynamic reservations, UEFI allocation and full peripheral ownership are still not established.",
 ]
 completion = [
   "The board memory description accounts for physical DRAM banks, firmware reservations and the UEFI-to-XNU handoff regions.",
@@ -523,6 +529,7 @@ findings = [
   "The manifest's product types describe the Apple restore targets; they do not establish SM-T970 compatibility.",
   "The format-2 template layout is in place. The staging example flag deliberately blocks kernel/image builds until the missing firmware and handoff inputs are established.",
   "Step 2 reuses XNU 10063.141.1 / Darwin 23.6.0 and the existing profile kernelcache hash, DriverKit and TrustCache header tags. Source-level ABI scope was reviewed; private ABI and actual prelink remain unverified.",
+  "Step 3 example-gate check invoked build kernel and bootimg against the existing configuration; both returned exit 1 with EXAMPLE device repository before building or packaging. No missing input was replaced with a fabricated path.",
 ]
 completion = [
   "The selected profile's inputs produce a kernel, payload and a boot image matching the SM-T970 boot path.",
