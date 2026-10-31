@@ -1,0 +1,1 @@
+patched kernel.macho: stage 1 blue bar, stage 2 magenta bar, stage 4 reset after call #1 to _arm_usimple_lock_init in _vcattach (at 0xfffffff0073c4894)

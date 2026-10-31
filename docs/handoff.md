@@ -17,11 +17,16 @@
   每轮完整镜像哈希、刷写回执与观察见 `evidence/bring-up/runtime/`。
   `PE_init_iokit` 调用前探针（`458218bd…`）已由机主确认自动复位：
   未通过的路径缩到该调用内部。其内部 `InitIOKit` 调用前探针（`977fd90d…`）
-  未复位，下一处为第一个调用 `PE_init_printf(TRUE)` 返回后。该二进制中它尾调用
-  `vcattach`；尚不确定具体失败指令或故障类型，也没有运行时加密 provider 失败证据。
+  未复位，第一个调用 `PE_init_printf(TRUE)` 返回后探针（`f89deffa…`）也未复位。
+  该二进制中它尾调用 `vcattach`；`vcattach` 中首个无条件调用
+  `arm_usimple_lock_init` 返回后探针（`95ff2c91…`）已复位，确认进入并通过锁初始化。
+  下一处为 `vcattach` 内 `gc_enable` 返回后，区分屏幕启用与日志回放。
+  源码显示跳过 `PE_create_console` 也会跳过屏幕回调初始化；这可能影响后续 `gc_enable`，
+  尚未读取运行时回调指针或确认其实际失败点。
+  尚不确定具体失败指令或故障类型，也没有运行时加密 provider 失败证据。
 - [相近设备案例](related-bring-up.md)记录了 Surface Duo 2 同阶段的加密 provider 问题，
   以及 SM8250 小米 10 至尊版的验证边界。均不是 T970 根因的证据。
-- BOOT 最近刷入的是 `init-iokit-before` 诊断镜像，下一轮 Download Mode 确认待完成；
+- BOOT 最近刷入的是 `vcattach-lock-return` 诊断镜像，已确认复位且机主回到 Download Mode；
   原始 BOOT 恢复待完成，后续镜像以 `evidence/bring-up/runtime/*/flash.json` 回执为准。
 - 以下为 ds 交接当时的状态、命令和待办，保留作历史基线；当前进展以本节及适配记录为准。
 

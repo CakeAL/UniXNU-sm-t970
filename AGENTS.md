@@ -107,4 +107,6 @@ Do not leave a reset probe in board.toml. Use scripts/build-entry-probe.py for
 one checkpoint per ignored output directory; reset-before is immediate, while
 an after-return probe waits its configured delay. Preserve source kernel and
 prior images, and bind every device observation to its image hash.
-Commit each completed step, as requested by the maintainer.
+Commit coherent groups of completed diagnostic work, as requested by the
+maintainer. Keep image preparation, upload receipts and their observations
+together; do not create a separate commit for every small probe action.
