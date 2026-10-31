@@ -735,6 +735,7 @@ procedure = [
   "Run python3 scripts/collect-adb-inventory.py --root --output evidence/<new-capture>; review per-command stderr, checksums, GPT CRC results and DT sanitization before updating this record.",
 ]
 findings = [
+  "The isolated idle_thread_create after-return image (55b7c035...) was uploaded successfully to BOOT with patched Heimdall and --no-reboot. This records the write only; the new checkpoint outcome and restoration are pending the user startup/observation.",
   "The isolated idle-return artifacts are archived with source hashes and the exact call site; the original Magisk BOOT backup still matches 6f49af2f77ae0e55b4f76b29b0e0491ff0228c42ae97ba0533b97631483566fc.",
   "Probe control flow was checked against both the generator and the current kernel disassembly. reset-before ignores the delay and immediately issues PSCI SYSTEM_RESET. A new after-return idle_thread_create probe is the next discriminating test; physical source images and restore hashes are recorded.",
   "Three source-patch preparation tests passed (apply/repeat, reject changed patch, preserve unknown local edits); an additional test used all four actual upstream SEC preimages and checked idempotence.",
@@ -763,6 +764,7 @@ next_action = [
   "Record whether the isolated after-return idle_thread_create probe resets after six seconds, then choose the next bootstrap-thread boundary.",
 ]
 evidence = [
+  { kind = "device", reference = "evidence/bring-up/runtime/idle-return/flash.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/idle-return/boot.img --no-reboot", result = "The isolated idle_thread_create after-return image (55b7c035...) was uploaded successfully to BOOT with patched Heimdall and --no-reboot. This records the write only; the new checkpoint outcome and restoration are pending the user startup/observation.", revision = "6a3ae24fba8bc4cb44dcdb0898b92582751a36b9" },
   { kind = "host", reference = "evidence/bring-up/runtime/idle-return/probe.json", command = "python3.14 scripts/build-entry-probe.py --target _idle_thread_create --delay 6 --output out/step7/probes/idle-return", result = "The isolated idle-return artifacts are archived with source hashes and the exact call site; the original Magisk BOOT backup still matches 6f49af2f77ae0e55b4f76b29b0e0491ff0228c42ae97ba0533b97631483566fc.", revision = "6a3ae24fba8bc4cb44dcdb0898b92582751a36b9" },
   { kind = "host", reference = "evidence/device-repository/platform.log", command = "python3.14 scripts/check-platform.py --unixnu ../UniXNU", result = "The completed Step 3 archive ties actual commands, source hashes, platform checks, normal firmware compilation and boot-image round-trip to clean committed device/framework revisions.", revision = "18d3a77cd98f47ee42aa1f95d6584d22c3a13a18" },
   { kind = "source", reference = "scripts/collect-adb-inventory.py", result = "Read-only collection commands, binary transport checks, primary GPT CRC validation and DT sanitization implementation." },
