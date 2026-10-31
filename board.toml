@@ -34,7 +34,7 @@ DEVICE_MODEL = "sm-t970"
 
 [payload]
 volume = "T970"
-size_mib = 192
+size_mib = 56
 loader = "firmware"
 title = "UniXNU SM-T970 platform bootstrap"
 kernel_args = ["-v", "cpus=1"]

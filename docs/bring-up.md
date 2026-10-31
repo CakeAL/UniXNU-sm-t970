@@ -54,8 +54,8 @@ SHA256 `da88460e…`），写入框架期望的 `static-trustcache.bin`，调用
 | 产物 | 大小 | SHA256 |
 | --- | --- | --- |
 | `kernel/kernel.macho` | 51908608 | `b3f9ab34199b726105ea1a3bb7a86af0734d632e55c989b2bdb254bb85f48f0e` |
-| `payload/payload.img` | 201326592 | `a4a0bac8487b288aba2a2f2e244709c24761d9829bdd30c5ef4beefc3ee5c551` |
-| `boot.img` | 205320192 | `28f3bb9f081420d8f6d6d26d91a12315758f0195e114abef598ca12a86a01f9d` |
+| `payload/payload.img` | 58720256 | `a87d42da70987f70ed81f8ab25ffd530322e69a0b50df60423c426b2bd0a52e0` |
+| `boot.img` | 62713856 | `d61f416aad5e5a029edee52674de909ad32030603cf993695db0c75328651388` |
 | `SILICIUM_UEFI.fd` | 3145728 | `4691d86c4c1604ca28f1b97428d930724c270debaa02ed03f3d22f1a68fed7ba` |
 
 顺序：`ipsw fetch` → `build kernel` → `build package` → `build payload` →
@@ -64,12 +64,37 @@ SHA256 `da88460e…`），写入框架期望的 `static-trustcache.bin`，调用
 
 ## 验证
 
-- `boot.json`：header v2、`ramdisk_bytes` 201326592、separate DTB，`dtb_sha256` 等于采集的
+- `boot.json`：header v2、`ramdisk_bytes` 58720256、separate DTB，`dtb_sha256` 等于采集的
   固件 FDT（`86c14aa3…`），`fd_sha256` 等于本次构建的 FD。
 - `payload.json`：`kernel_sha256` 等于 `kernel.macho`，包含生成的 ADT 与已接受的
   trust cache（`7416ca4f…`）。
-- 镜像内含 BootShim + 3 MiB FD + 192 MiB payload，`kernel_address 0x8000`、
+- 镜像内含 BootShim + 3 MiB FD + 56 MiB payload，`kernel_address 0x8000`、
   `tags 0x1e00000`、DTB 独立放置。
+
+## 刷入测试（Odin）
+
+T970 的 boot 分区实测 **71303168 字节（68 MiB）**。payload 必须收进这个上限，
+`board.toml [payload] size_mib` 因此从 192 改为 56：内核 51.9 MB 加 ADT 与 trust cache
+约 52 MB，镜像 62713856 字节，余量约 8 MB。再大的 payload 需要另找存放分区。
+
+已生成 Odin 用的 AP 包（`out/step7/odin/`，被忽略目录）：
+
+| 文件 | 用途 |
+| --- | --- |
+| `boot-unixnu.tar` / `.tar.md5` | 本次测试镜像 |
+| `boot-stock.tar` / `.tar.md5` | 刷回当前 Magisk 25.2 状态 |
+
+步骤：
+
+1. 平板关机，按住 **Vol Down + Power** 并接 USB，出现警告后按 **Vol Up** 进入下载模式。
+2. 打开 Odin（Mac 版），只保留 `F. Reset Time`（`Auto Reboot` 可选），AP 选择 `boot-unixnu.tar`。
+3. 确认 ID:COM 出现设备后 Start；通过 Odin 日志 `PASS` 或设备自动重启判断完成。
+4. 预期：首先出现 UEFI/UniXNU 菜单（可用 **Tools → Advanced Logger** 扫码抓固件日志）；
+   选择启动项后 DarwinBoot 交接内核；因没有 UFS 驱动与 Data seed，最终应停在 root mount 或
+   panic 屏幕，这是本阶段的预期停止点。
+5. 记录屏幕照片、菜单项、最后一条日志；如无显示或卡死，长按 Power 强制重启。
+
+恢复：同一流程刷 `boot-stock.tar`，或按需刷官方固件（`HOME_CSC` 保数据）。
 
 ## 设备侧
 

@@ -76,6 +76,7 @@ findings = [
   "Step 4 ran defconfig/fetch/status/tree. unixnu fetch rewrote unixnu.lock with all nine resolved sources (eight Apple/EDK references plus sm8250 at 166235ec...), and status resolves arch arm64/4KiB, the pinned SM8250 feed, the iPadOS profile and this board.toml in that order; 19 modules and 61 patches (56 arch, 2 SoC, 3 OS, 0 board) agree with the declared series, and build_config is empty because no unixnu.local.toml exists yet.",
   "Step 7 local inputs are configured outside version control: the IPSW lives at ../ipsw per the requirements rule, kernelcache.decompressed matches the profile pin f18b4df8..., the accepted trust-cache bundle 7416ca4f... is referenced from the framework build directory, and the platform seed is the local test value 0x534d543937303031.",
   "board.toml now points the OS layer of patch_series at device:patches/xnu/os-series so the two required XnuPrelink ABI patches still apply while zzz-boot-progress.patch, which requires sheng's XNU_SHENG_PMGR hook, is omitted. The applied set is 60 patches.",
+  "The measured boot partition is 71303168 bytes, so board.toml [payload] size_mib dropped from 192 to 56; the 192 MiB payload could never be flashed. 56 MiB holds the 51.9 MB prelinked kernel plus ADT and trust cache with about 8 MB margin.",
 ]
 completion = [
   "A board.toml with matching device identity resolves the selected SoC and OS profiles and pinned sources.",
@@ -647,6 +648,7 @@ findings = [
   "tools=true only changes the generated menu; the payload/initrd image was not built because XNU kernel and Apple payload inputs are still absent, so the Tools entry and QR export remain unverified on an image.",
   "The full host build chain now completes at this commit: kernel.macho 51908608 bytes b3f9ab34..., payload.img 201326592 bytes a4a0bac8..., boot.img 205320192 bytes 28f3bb9f... and the 3145728-byte FD 4691d86c.... boot.json reports header v2 with ramdisk_bytes 201326592, the captured firmware DTB hash and the built FD hash; payload.json reports the kernel, generated ADT and accepted trust cache.",
   "The build required a two-pass kernel flow (bootstrap compile records, archives, final link/prelink) and a python3 with tomllib on PATH for the archive scripts. No device write or boot was attempted; restore dumps stay in ignored storage.",
+  "With the 56 MiB payload the rebuilt boot.img is 62713856 bytes (payload.img 58720256, sha256 a87d42da...; boot.img sha256 d61f416a...) and fits the 68 MiB boot partition. Odin AP tars for the test image and the Magisk restore image were generated in ignored storage; no flash has been performed.",
 ]
 completion = [
   "The selected profile's inputs produce a kernel, payload and a boot image matching the SM-T970 boot path.",
