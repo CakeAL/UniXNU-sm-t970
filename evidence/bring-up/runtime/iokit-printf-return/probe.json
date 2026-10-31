@@ -1,0 +1,23 @@
+{
+  "device_revision": "569499d1e4b607779c3fbdbf8d9cf624e08a0e0a",
+  "framework_revision": "194aae294c1107e791f4f74b2be371a391ac6bc4",
+  "probe": {
+    "function": "_PE_init_iokit",
+    "target": "_PE_init_printf",
+    "occurrence": 1,
+    "position": "after-return",
+    "reset_delay_seconds": 6
+  },
+  "board_sha256": "9d129fa9b34d72bc93aa160b3978f940a8ce445dd979cb176bd28879ef4fb672",
+  "source_kernel_sha256": "4131d5b15cccc0a6a1697ba19e0cb59a3caced16ac09e6a8ee1823e296956444",
+  "firmware_sha256": "515105d758a9d61078dffce5012db0754a71cec351a1bb34b30ee791196b5690",
+  "firmware_dtb_sha256": "86c14aa305a6cf5db46665f4095d28aadcb1ea5ce9d213cd711641a07504ed1d",
+  "boot_sha256": "f89deffaac554e9569d8848852fce5cb233aedf841acb99f11fbd8b32d0a86a4",
+  "boot_bytes": 62713856,
+  "boot_partition_bytes": 71303168,
+  "hardware_tested": false,
+  "note": "Probe modifies a payload copy only; no flash or reboot performed",
+  "checked_call_site": "0xfffffff00794a01c",
+  "checked_callee": "0xfffffff007949224",
+  "payload_kernel_extracted_and_matched": true
+}

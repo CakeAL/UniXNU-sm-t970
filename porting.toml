@@ -219,6 +219,7 @@ components = [
   "ArmCpu",
 ]
 paths = [
+  "evidence/bring-up/runtime/iokit-printf-return/**",
   "evidence/bring-up/runtime/init-iokit-before/**",
   "evidence/bring-up/runtime/iokit-before/**",
   "evidence/bring-up/runtime/iokit-return/**",
@@ -242,6 +243,7 @@ procedure = [
   "Collect /proc/cpuinfo, online/present CPU lists, cpufreq policies, /proc/interrupts and the live DT using the inventory script.",
 ]
 findings = [
+  "Prepared isolated _PE_init_printf after-return image f89deffaac554e9569d8848852fce5cb233aedf841acb99f11fbd8b32d0a86a4; the FAT kernel was independently extracted and its branch at 0xfffffff00794a01c matches the intended probe. Device result is pending.",
   "The InitIOKit before-call probe inside PE_init_iokit did not reset (977fd90de02e3643beaa01082bca713381c6449f8bccecb46fb0ca5a86aa4270). PE_init_iokit entry is confirmed by the earlier probe, so the next boundary is its first call PE_init_printf(TRUE), which tail-calls vcattach in this exact binary. No crypto-provider failure is established.",
   "User observation for _InitIOKit before-call image 977fd90de02e3643beaa01082bca713381c6449f8bccecb46fb0ca5a86aa4270: no automatic reset observed; checkpoint not established.",
   "Uploaded the isolated InitIOKit before-call probe inside PE_init_iokit, image 977fd90de02e3643beaa01082bca713381c6449f8bccecb46fb0ca5a86aa4270, using patched Heimdall, exit 0. Human checkpoint feedback and original BOOT restoration are pending; transfer does not establish execution.",
@@ -277,6 +279,7 @@ next_action = [
   "Test after PE_init_printf returns inside PE_init_iokit; its InitIOKit before-call checkpoint was not observed.",
 ]
 evidence = [
+  { kind = "host", reference = "evidence/bring-up/runtime/iokit-printf-return/probe.json", command = "python3.14 scripts/build-entry-probe.py --target _PE_init_printf --function _PE_init_iokit --occurrence 1 --delay 6 --output out/step7/probes/iokit-printf-return", result = "Prepared isolated _PE_init_printf after-return image f89deffaac554e9569d8848852fce5cb233aedf841acb99f11fbd8b32d0a86a4; the FAT kernel was independently extracted and its branch at 0xfffffff00794a01c matches the intended probe. Device result is pending.", revision = "569499d1e4b607779c3fbdbf8d9cf624e08a0e0a" },
   { kind = "device", reference = "evidence/bring-up/runtime/init-iokit-before/device-result.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/init-iokit-before/boot.img --no-reboot", result = "User observation for _InitIOKit before-call image 977fd90de02e3643beaa01082bca713381c6449f8bccecb46fb0ca5a86aa4270: no automatic reset observed; checkpoint not established.", revision = "96a155bb0394bdfd25cf9c3cea4aa05e5252ade1" },
   { kind = "device", reference = "evidence/bring-up/runtime/init-iokit-before/flash.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/init-iokit-before/boot.img --no-reboot", result = "Uploaded the isolated InitIOKit before-call probe inside PE_init_iokit, image 977fd90de02e3643beaa01082bca713381c6449f8bccecb46fb0ca5a86aa4270, using patched Heimdall, exit 0. Human checkpoint feedback and original BOOT restoration are pending; transfer does not establish execution.", revision = "96a155bb0394bdfd25cf9c3cea4aa05e5252ade1" },
   { kind = "host", reference = "evidence/bring-up/runtime/init-iokit-before/probe.json", command = "python3.14 scripts/build-entry-probe.py --target _InitIOKit --before --function _PE_init_iokit --occurrence 1 --delay 6 --output out/step7/probes/init-iokit-before", result = "Prepared isolated _InitIOKit before-call image 977fd90de02e3643beaa01082bca713381c6449f8bccecb46fb0ca5a86aa4270; the FAT kernel was independently extracted and its branch at 0xfffffff00794a390 matches the intended probe. Device result is pending.", revision = "96a155bb0394bdfd25cf9c3cea4aa05e5252ade1" },
@@ -658,6 +661,7 @@ components = [
   "XnuPrelink",
 ]
 paths = [
+  "evidence/bring-up/runtime/iokit-printf-return/**",
   "evidence/bring-up/runtime/init-iokit-before/**",
   "evidence/bring-up/runtime/iokit-before/**",
   "evidence/bring-up/runtime/iokit-return/**",
@@ -694,6 +698,7 @@ procedure = [
   "Read BuildManifest.plist from the local IPSW using Python zipfile and plistlib to identify its OS version, build and product types.",
 ]
 findings = [
+  "Prepared isolated _PE_init_printf after-return image f89deffaac554e9569d8848852fce5cb233aedf841acb99f11fbd8b32d0a86a4; the FAT kernel was independently extracted and its branch at 0xfffffff00794a01c matches the intended probe. Device result is pending.",
   "The InitIOKit before-call probe inside PE_init_iokit did not reset (977fd90de02e3643beaa01082bca713381c6449f8bccecb46fb0ca5a86aa4270). PE_init_iokit entry is confirmed by the earlier probe, so the next boundary is its first call PE_init_printf(TRUE), which tail-calls vcattach in this exact binary. No crypto-provider failure is established.",
   "Uploaded the isolated InitIOKit before-call probe inside PE_init_iokit, image 977fd90de02e3643beaa01082bca713381c6449f8bccecb46fb0ca5a86aa4270, using patched Heimdall, exit 0. Human checkpoint feedback and original BOOT restoration are pending; transfer does not establish execution.",
   "Prepared isolated _InitIOKit before-call image 977fd90de02e3643beaa01082bca713381c6449f8bccecb46fb0ca5a86aa4270; the FAT kernel was independently extracted and its branch at 0xfffffff00794a390 matches the intended probe. Device result is pending.",
@@ -733,6 +738,7 @@ next_action = [
   "Build the isolated idle_thread_create after-return payload/image, verify the BOOT size and hashes, then use the confirmed recovery path for a single checkpoint test.",
 ]
 evidence = [
+  { kind = "host", reference = "evidence/bring-up/runtime/iokit-printf-return/probe.json", command = "python3.14 scripts/build-entry-probe.py --target _PE_init_printf --function _PE_init_iokit --occurrence 1 --delay 6 --output out/step7/probes/iokit-printf-return", result = "Prepared isolated _PE_init_printf after-return image f89deffaac554e9569d8848852fce5cb233aedf841acb99f11fbd8b32d0a86a4; the FAT kernel was independently extracted and its branch at 0xfffffff00794a01c matches the intended probe. Device result is pending.", revision = "569499d1e4b607779c3fbdbf8d9cf624e08a0e0a" },
   { kind = "device", reference = "evidence/bring-up/runtime/init-iokit-before/flash.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/init-iokit-before/boot.img --no-reboot", result = "Uploaded the isolated InitIOKit before-call probe inside PE_init_iokit, image 977fd90de02e3643beaa01082bca713381c6449f8bccecb46fb0ca5a86aa4270, using patched Heimdall, exit 0. Human checkpoint feedback and original BOOT restoration are pending; transfer does not establish execution.", revision = "96a155bb0394bdfd25cf9c3cea4aa05e5252ade1" },
   { kind = "host", reference = "evidence/bring-up/runtime/init-iokit-before/probe.json", command = "python3.14 scripts/build-entry-probe.py --target _InitIOKit --before --function _PE_init_iokit --occurrence 1 --delay 6 --output out/step7/probes/init-iokit-before", result = "Prepared isolated _InitIOKit before-call image 977fd90de02e3643beaa01082bca713381c6449f8bccecb46fb0ca5a86aa4270; the FAT kernel was independently extracted and its branch at 0xfffffff00794a390 matches the intended probe. Device result is pending.", revision = "96a155bb0394bdfd25cf9c3cea4aa05e5252ade1" },
   { kind = "device", reference = "evidence/bring-up/runtime/iokit-before/flash.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/iokit-before/boot.img --no-reboot", result = "Uploaded the isolated PE_init_iokit before-call BOOT image 458218bd4e846aad1408daea717d2263aa86d94ae8dac2a364f0c507a12b2421 using patched Heimdall, exit 0. Human checkpoint feedback and original BOOT restoration are pending; transfer does not establish execution.", revision = "823c3db8eaa3ffcfe00cf3bac360db394fb58740" },
@@ -786,6 +792,7 @@ procedure = [
   "Run python3 scripts/collect-adb-inventory.py --root --output evidence/<new-capture>; review per-command stderr, checksums, GPT CRC results and DT sanitization before updating this record.",
 ]
 findings = [
+  "Prepared isolated _PE_init_printf after-return image f89deffaac554e9569d8848852fce5cb233aedf841acb99f11fbd8b32d0a86a4; the FAT kernel was independently extracted and its branch at 0xfffffff00794a01c matches the intended probe. Device result is pending.",
   "The InitIOKit before-call probe inside PE_init_iokit did not reset (977fd90de02e3643beaa01082bca713381c6449f8bccecb46fb0ca5a86aa4270). PE_init_iokit entry is confirmed by the earlier probe, so the next boundary is its first call PE_init_printf(TRUE), which tail-calls vcattach in this exact binary. No crypto-provider failure is established.",
   "User observation for _InitIOKit before-call image 977fd90de02e3643beaa01082bca713381c6449f8bccecb46fb0ca5a86aa4270: no automatic reset observed; checkpoint not established.",
   "Uploaded the isolated InitIOKit before-call probe inside PE_init_iokit, image 977fd90de02e3643beaa01082bca713381c6449f8bccecb46fb0ca5a86aa4270, using patched Heimdall, exit 0. Human checkpoint feedback and original BOOT restoration are pending; transfer does not establish execution.",
@@ -829,6 +836,7 @@ next_action = [
   "Test PE_init_printf return inside PE_init_iokit, then inspect vcattach or subsequent printf/boot-property paths according to the result; retain image hashes and restore BOOT after diagnosis.",
 ]
 evidence = [
+  { kind = "host", reference = "evidence/bring-up/runtime/iokit-printf-return/probe.json", command = "python3.14 scripts/build-entry-probe.py --target _PE_init_printf --function _PE_init_iokit --occurrence 1 --delay 6 --output out/step7/probes/iokit-printf-return", result = "Prepared isolated _PE_init_printf after-return image f89deffaac554e9569d8848852fce5cb233aedf841acb99f11fbd8b32d0a86a4; the FAT kernel was independently extracted and its branch at 0xfffffff00794a01c matches the intended probe. Device result is pending.", revision = "569499d1e4b607779c3fbdbf8d9cf624e08a0e0a" },
   { kind = "device", reference = "evidence/bring-up/runtime/init-iokit-before/device-result.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/init-iokit-before/boot.img --no-reboot", result = "User observation for _InitIOKit before-call image 977fd90de02e3643beaa01082bca713381c6449f8bccecb46fb0ca5a86aa4270: no automatic reset observed; checkpoint not established.", revision = "96a155bb0394bdfd25cf9c3cea4aa05e5252ade1" },
   { kind = "device", reference = "evidence/bring-up/runtime/init-iokit-before/flash.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/init-iokit-before/boot.img --no-reboot", result = "Uploaded the isolated InitIOKit before-call probe inside PE_init_iokit, image 977fd90de02e3643beaa01082bca713381c6449f8bccecb46fb0ca5a86aa4270, using patched Heimdall, exit 0. Human checkpoint feedback and original BOOT restoration are pending; transfer does not establish execution.", revision = "96a155bb0394bdfd25cf9c3cea4aa05e5252ade1" },
   { kind = "host", reference = "evidence/bring-up/runtime/init-iokit-before/probe.json", command = "python3.14 scripts/build-entry-probe.py --target _InitIOKit --before --function _PE_init_iokit --occurrence 1 --delay 6 --output out/step7/probes/init-iokit-before", result = "Prepared isolated _InitIOKit before-call image 977fd90de02e3643beaa01082bca713381c6449f8bccecb46fb0ca5a86aa4270; the FAT kernel was independently extracted and its branch at 0xfffffff00794a390 matches the intended probe. Device result is pending.", revision = "96a155bb0394bdfd25cf9c3cea4aa05e5252ade1" },
