@@ -186,6 +186,7 @@ procedure = [
   "Collect /proc/cpuinfo, online/present CPU lists, cpufreq policies, /proc/interrupts and the live DT using the inventory script.",
 ]
 findings = [
+  "The first-boot DRAM window now excludes the entire observed camera CMA allocation window; CPU0-only topology and the disabled peripheral policy are unchanged.",
   "The board now includes disabled measured peripheral declarations alongside the unchanged CPU0-only topology; the checker compares their GIC interrupt cell translation without enabling peripheral drivers.",
   "Core identity differs in Affinity1 (0x100 steps); retaining only the lowest MPIDR byte would lose the recorded core distinction.",
   "Android's three frequency policies are not automatically the cluster layout required by the selected XNU profile.",
@@ -228,7 +229,7 @@ inputs = [
   "Applications SMMU: 0x15000000 + 0x100000; GPU SMMU: 0x03da0000 + 0x10000. Both declare qcom,qsmmu-v500.",
 ]
 configuration = [
-  "DTS describes the measured contiguous high bank 0x180000000+0x100000000 and all 30 static reservations. Other physical banks remain in stock evidence.",
+  "DTS describes the measured-bank subrange 0x200000000+0x80000000 (2 GiB), excluding the complete camera CMA allocation window, and all 30 static reservations. Other DRAM remains in stock evidence.",
   "The firmware overlay supplies the original low-memory configuration/stack/FD map. No XNU DMA device or dynamic Android CMA allocator is enabled.",
 ]
 procedure = [
@@ -236,6 +237,7 @@ procedure = [
   "Capture root-readable /proc/iomem and the live DT, then compare physical memory and reserved-memory reg values.",
 ]
 findings = [
+  "Committed-source checking found camera_mem_region allows allocations in 0x180000000+0x80000000. The first-boot DRAM window is therefore narrowed to the remaining measured subrange 0x200000000+0x80000000 (2 GiB), outside all 13 original dynamic-pool allocation windows. The checker verifies containment in a real bank rather than demanding the entire bank.",
   "The completed repository supplies the candidate bank and static reservations, and checks every original dynamic-pool allocation window and all 45 XBL platform regions against that bank. The firmware overlay owns its low-memory heap/FD/stack; real UEFI allocation still needs runtime evidence.",
   "The stock XBL describes 45 platform regions, including low-memory firmware heaps/FD/stack. Its DDR descriptors do not intersect the candidate high handoff bank. This is a static source comparison, not a GetMemoryMap result.",
   "MemTotal describes memory exposed to the running Android kernel; it does not establish installed DRAM capacity, physical banks or firmware reservations.",
@@ -620,6 +622,7 @@ procedure = [
   "Run python3 scripts/collect-adb-inventory.py --root --output evidence/<new-capture>; review per-command stderr, checksums, GPT CRC results and DT sanitization before updating this record.",
 ]
 findings = [
+  "The strengthened dynamic-pool check caught an overlap with camera_mem_region that static-reservation-only checks missed. It now verifies the reduced 2 GiB window against all original pool bounds and measured-bank containment.",
   "The platform checker now additionally compares seven disabled controller register/IRQ descriptions, the touch/pen addresses and firmware names, dynamic reserved-pool windows and 45 original XBL regions. None is a runtime or DMA test.",
   "On this Magisk setup, exec-out through su inserted CR bytes into binary output; shell -T returned an FDT whose length matches its header. The collector verifies this before decoding.",
   "The sanitized DTS omits /chosen and identifying properties; the selected display token is captured separately. It is an input reference, not a ready-to-flash board DTB.",

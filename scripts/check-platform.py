@@ -130,7 +130,9 @@ def main():
     memory = next(n for n in tree.children if n.strings('device_type') == ['memory'])
     live_memory = next(n for n in live.children if n.strings('device_type') == ['memory'])
     span = dt.registers(memory)
-    require(len(span) == 1 and span[0] in dt.registers(live_memory), 'Handoff bank is not a measured contiguous bank')
+    require(len(span) == 1 and any(base <= span[0][0] and span[0][0] + span[0][1] <= base + size
+                                  for base, size in dt.registers(live_memory)),
+            'Handoff window is not contained in a measured contiguous bank')
     reserved = next(n for n in tree.children if n.name == 'reserved-memory')
     live_reserved = next(n for n in live.children if n.name == 'reserved-memory')
     expected = {n.name: n.properties['reg'] for n in live_reserved.children if 'reg' in n.properties}

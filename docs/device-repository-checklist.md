@@ -11,7 +11,7 @@
 | 1. `board.toml` | 设备名／kit、SM8250、OS profile、DTS 和固件 config／DSC／FD 均有具体输入。五组件及 8 条继承归档配方完整；T970 DSC/FDF 与配置存在并已编译出 3 MiB FD。 | UEFI 实机入口、GOP 与内存交接。 |
 | 2. `feeds.toml` | SoC URL／完整提交和五组件固定版本已填写，`board.soc`、`soc_source`、DTS include 一致；固件及嵌套子模块提交另有精确清单。 | 发布后的远端可获取性及 CI。 |
 | 3. 名称、配置和补丁 | `sm-t970_defconfig`、`device:dts/sm-t970.dts` 与真实文件一致；三个配置片段和四层 series 解析出 61 个补丁。 | XNU 编译和预链接。 |
-| 4. DTS | 实测连续高 RAM、30 个静态保留区、CPU0 和禁用外设输入已填写。检查原厂动态池分配窗口和 XBL 区域与高 RAM 不相交；对照实机 DT 核对七组控制器范围和 IRQ。 | 实际 UEFI 分配、DMA 所有权；外设启用前的时钟／电源／ABI 实现。 |
+| 4. DTS | 实测高 RAM 中排除相机 CMA 窗口后的 2 GiB 子区间、30 个静态保留区、CPU0 和禁用外设输入已填写。检查原厂动态池分配窗口和 XBL 区域与高 RAM 不相交；对照实机 DT 核对七组控制器范围和 IRQ。 | 实际 UEFI 分配、DMA 所有权；外设启用前的时钟／电源／ABI 实现。 |
 | 5. 固件清单 | 共 130 项来源与 SHA256：43 份文件系统资产、3 份本机内核 builtin 固件、84 份候选 UEFI 的 PE32／DEPEX／RAW 输入。触控／笔／键盘已通过重定位表解析补齐。 | 未启用的无线 board-data 变体选择、驱动消费接口和加载验证。 |
 | 6. 记录及模板文件 | 身份一致，13 个部分覆盖五组件及依赖，归属路径指向实际文件；README、AGENTS、工作流、忽略规则和 `local.toml.example` 保留。package 具有实际固件代码／配方。 | 远端 CI、公开发布和设备页面同步。 |
 | 7. 示例标记 | 必要占位输入已经替换，已移除 `board.example = true`，允许正常主机构建／打包。 | 该标记不代表固件或 iPadOS 已通过实机验证。 |
