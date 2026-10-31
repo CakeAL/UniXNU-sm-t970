@@ -334,6 +334,8 @@ findings = [
   "Step 6 storage inventory resolves the UFS controller (0x1d84000+0x3000 and ICE 0x1d90000+0x8000), QMP PHY v4 (0x1d87000+0xe000), all nine clock names to kona IDs (UFS_PHY_AXI 167, AGGRE_UFS_PHY_AXI 6, UFS_PHY_AHB 166, UNIPRO 179, ICE 170, TX/RX symbol clocks, RPMH_CXO 0), reset core_reset=GCC_UFS_PHY_BCR(33) and every regulator phandle; the stock UFS node has no iommus property.",
   "ShengUfs is not selected: it is scoped to the SM8550 controller with a 0x1d80000/0x2000 PHY, SM8550 clock policy, a fixed apps-SMMU stream 0x60 and sheng userdata LBAs. The T970 controller base matches but the PHY window, ICE block, SMMU ownership and userdata geometry do not.",
   "No SM8250/kona UFS implementation exists in the reviewed repositories: the shared SoC DTSI only declares disabled ufs/ufsphy nodes, and the SM8250 pipa port carries only package/SmmuBypass.h. UFS therefore stays disabled; storage remains planned pending a real driver port.",
+  "Reviewed the SM8250 ports on unixnu.com/zh/devices: umi (Mi 10) has Native UFS, both root volumes and writable Data with launchd running; alioth (Redmi K40) marks storage device-verified using a device fork FFT-infra/NativeUfs-alioth pinned through feeds.toml; kebab reaches an HFS root; pipa is still stuck at root mount.",
+  "The shared technique is firmware state takeover, not cold init: NativeUfs reads GCC gating and link state without writing clocks/reset/PHY, plans the two SM8250 UFS streams 0x0e0 and 0x4e0 from SMR/S2CR readback, and publishes a per-device userdata window. T970 uses the same controller 0x1d84000 and PHY 0x1d87000, so the umi/alioth driver is the concrete base for this port instead of ShengUfs SM8550 constants.",
 ]
 completion = [
   "UFS reads return correct capacity, GPT and known blocks under XNU; the chosen root mounts and writes persist only inside the allocated Data region.",
@@ -342,7 +344,7 @@ limits = [
   "No storage writes, repartitioning, XNU UFS driver, root mounting or persistence tests were performed; backup GPT copies and filesystem contents were not read.",
 ]
 next_action = [
-  "Port or adopt an SM8250 (qcom,ufshc + QMP PHY v4 at 0x1d87000+0xe000) UFS driver using the resolved UFS_PHY clock/reset IDs, then determine SMMU/ICE ownership and recompute the userdata window from the measured GPT before enabling any storage component.",
+  "Base the T970 UFS port on the umi/alioth NativeUfs forks (firmware state takeover, SM8250 streams 0x0e0/0x4e0), pin a device fork in feeds.toml, probe read-only first, then publish the root volume using the measured userdata window.",
 ]
 evidence = [
   { kind = "device", reference = "evidence/adb-2026-11-01/storage.txt", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Saved device model, revision, block geometry, partition sizes and by-name mappings.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },
