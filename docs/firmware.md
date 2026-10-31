@@ -71,6 +71,34 @@ PATH=/opt/homebrew/opt/llvm/bin:/opt/homebrew/opt/lld/bin:$PATH python3.14 scrip
 固件检查镜像可以使用 `--ramdisk none`；它没有 XNU payload，不代表 iPadOS 引导镜像。
 Samsung 原厂环境未证明支持 `fastboot boot`，本阶段不执行重启或分区写入。
 
+## 两个设备树输入
+
+第 5 步要求两个用途明确的树输入，二者不能互换：
+
+| 输入 | 来源 | 用途 | 核对 |
+| --- | --- | --- | --- |
+| 板级 DTS `dts/sm-t970.dts` | 本仓库 | `unixnu payload` 生成 `kernel.macho.adt` | `check-platform.py`／`check-hardware-description.py` 编译并解码 ADT |
+| 固件 FDT | 设备 `/sys/firmware/fdt`（只读） | `unixnu bootimg --dtb` | `capture-firmware-dtb.py` 记录尺寸、SHA256 与脱敏摘要 |
+
+实测固件 FDT 为 837154 字节（SHA256 `86c14aa305a6cf5db46665f4095d28aadcb1ea5ce9d213cd711641a07504ed1d`），
+4533 个节点、43 个 reserved-memory 条目，`/chosen` 带 `bootargs`、`kaslr-seed` 和 initrd 范围。
+它包含设备身份与启动状态，因此整包只留在忽略目录；提交的报告只保存哈希、结构、
+内存区间和不含身份值的属性名。
+
+两次独立采集得到同一份字节，可作为来源可复现的依据。板级 DTS 只有 memory、
+静态保留区和禁用的外设节点，没有 `/chosen`；检查器会拒绝“两者相同”或“板级 DTS 带 `/chosen`”。
+
+```sh
+python3.14 scripts/capture-firmware-dtb.py --output out/firmware-inputs/firmware.dtb \
+    --compare out/firmware-inputs/previous.dtb
+python3.14 scripts/check-hardware-description.py --unixnu ../UniXNU
+```
+
+检查内容：固件 FDT 的完整交接结构；板级 DTS 编译出的 ADT 中 `/chosen`（DRAM 区间）、
+`/cpus/cpu0`（亲和性、19.2 MHz）和 `/arm-io/intc`（寄存器、步长）；固件 DSC/FDF 中的
+UniXNU、UniXNUDxe、RamDiskDxe、DarwinBoot、AdvancedLogDxe，以及基础配置中的
+DiskIo／FAT／Unicode collation；若已构建，还会扫描卷内 GUID。
+
 ## 固件日志导出器
 
 第 5 步要求首次启动时能从菜单导出固件日志。本板已按

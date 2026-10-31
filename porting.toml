@@ -156,6 +156,8 @@ findings = [
   "AdvancedLoggerLib is mapped for SEC (PeilessArm), DXE_CORE, DXE_DRIVER, DXE_RUNTIME_DRIVER, UEFI_DRIVER and UEFI_APPLICATION, with AdvancedLoggerHdwPortLib over SerialPortLib and BaseDebugLibAdvancedLogger only in DEBUG. PcdAdvancedLoggerBase stays 0, so the DXE Core library reserves the 4 MiB buffer instead of a fabricated fixed address; SEC and DEBUG screen output still reach FrameBufferSerialPortLib.",
   "A DEBUG rebuild with the exporter produced a 3145728-byte FD containing 92 FV files, including the exporter GUID, and FVMAIN.inf lists it. The earlier 91-file, 6108b542... FD is superseded.",
   "Committed-source rebuild with the exporter produced a 3145728-byte FD (sha256 94709bbe5b7ecc1a78cb6041889258d9c537b096ae04bce41252ad57f4d8d30a) whose FV holds 92 files and the exporter FFS.",
+  "Step 5 records the two tree inputs as distinct artifacts. The bootloader FDT captured read-only from /sys/firmware/fdt is 837154 bytes (86c14aa3...) with 4533 nodes, 43 reserved-memory entries and a /chosen carrying bootargs, kaslr-seed and initrd range; two captures are byte-identical. The blob stays in ignored storage because /chosen holds identity and boot state; only hashes, structure, memory ranges and property names are archived.",
+  "scripts/check-hardware-description.py rebuilds the board DTS and ADT with artificial identity 1, checks dram-base/size, CPU0 affinity and 19.2 MHz timebase, GIC registers and stride, rejects a firmware DTB equal to the board build or a board DTS carrying /chosen, and checks the firmware DSC/FDF plus the pinned base configuration for DiskIo, FAT and Unicode collation.",
 ]
 completion = [
   "A board-specific UEFI image starts reproducibly and produces an accessible boot log.",
@@ -670,6 +672,7 @@ findings = [
   "Archived the Step 2 PASS report with input hashes and the resolved configuration; historical platform-bootstrap evidence remains bound to its earlier source revision.",
   "check-platform.py now rejects a missing exporter in DSC/FDF, missing AdvancedLoggerAccessLib/QrEncoderLib/HdwPortLib/PeilessArm/DXE_CORE mappings, a fabricated PcdAdvancedLoggerBase, or board [payload] tools other than true. It also ignores untracked *.DS_Store when verifying pinned component checkouts.",
   "scripts/check-build-config.py independently re-resolves the four patch series and compares them with status, re-checks every module checkout and unixnu.lock pin, and verifies the assembled tree links drivers/kits/refer to those exact sources, kits/sm-t970 to this package directory, and tree/scripts to the merged framework/SoC/device copies. Two framework behaviours are checked rather than assumed: SoC sources are deliberately not linked into tree/refer, and the feed cache may be a symlink to the same pinned checkout.",
+  "The Step 5 checkers share scripts/fdt.py for structural FDT parsing, so the firmware blob and the board DTB are read the same way. The checker also scans the built FV when present and requires the five UniXNU/DarwinBoot modules.",
 ]
 completion = [
   "Every claimed UniXNU milestone has matching source/image revisions, a reproducible command and accessible firmware/kernel logs.",

@@ -46,6 +46,7 @@ python3.14 ./unixnu status --json -D ../UniXNU-sm-t970
 python3.14 ./unixnu tree -D ../UniXNU-sm-t970
 python3.14 ../UniXNU-sm-t970/scripts/check-platform.py --unixnu .
 python3.14 ../UniXNU-sm-t970/scripts/check-build-config.py --unixnu .
+python3.14 ../UniXNU-sm-t970/scripts/check-hardware-description.py --unixnu .
 python3.14 scripts/porting-record.py check --device ../UniXNU-sm-t970
 ```
 
