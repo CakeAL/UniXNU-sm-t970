@@ -42,6 +42,31 @@
 因此**不选择 ShengUfs**；把它的 SM8550 常量直接套到 T970 会写错 PHY 窗口、时钟与
 SMMU 所有权。存储部分保持 `planned`。
 
+## 同 SoC 设备的做法
+
+查过 [设备列表](https://unixnu.com/zh/devices/) 与各设备记录（2026-11-01）：
+
+| 设备 | 存储结果 | 做法 |
+| --- | --- | --- |
+| umi（小米 10，SM8250） | Native UFS，OS/SystemOS 根卷与可写 Data，launchd 运行；ST FTS 触摸可用 | 仓库内自带 `UmiNativeUfsHost.inc`／`UmiSmmuTakeover.h`，双 stream `0x0e0`／`0x4e0`，固件状态接管 |
+| alioth（Redmi K40，SM8250） | 存储 `device-verified`（UFS root、锁屏、触摸） | `feeds.toml` 把 `ShengUfs` 固定到设备 fork `FFT-infra/NativeUfs-alioth`，构建时 `--local-module driver:ShengUfs=...`；控制器 `0x1d84000`、PHY `0x1d87000` |
+| kebab（一加 8T，SM8250） | HFS 根卷 + 静态 EL0 测试 init | 自建 UFS 路径 |
+| pipa（小米平板 6，SM8250） | 停在 `Failed to mount root device` | 存储尚未集成 |
+
+共同点：
+
+1. 不直接改目录里的 ShengUfs，而是按[设备仓库规范](https://unixnu.com/zh/porting/device-repository)在
+   `feeds.toml` 固定设备 fork（组件 ID 仍是 `ShengUfs`），构建时用 `--local-module` 指向工作副本。
+2. **固件状态接管**：只读 GCC 门控与链路状态，不写时钟、复位、PHY 或 QMP 序列；alioth 的
+   `GccUfs.h` 明确写着 “No write is performed by NativeUfs yet”。
+3. **SMMU 双 stream**：SM8250 UFS 使用 `0x0e0` 和 `0x4e0`；先读 SMR/S2CR，复用最后一个空闲
+   context，不沿用 sheng 的 `0x60`。
+4. userdata 几何逐设备实测，Data 经 RamBlock 发布。
+
+对 T970 的直接影响：alioth/umi 的控制器基址 `0x1d84000` 与 PHY 基址 `0x1d87000` 都和本机一致，
+因此不需要 ShengUfs 的 SM8550 PHY 常量；以 umi 的 NativeUfs 为起点，替换 stream、
+userdata 窗口并保留固件接管，是可行且已有实机验证先例的路线。
+
 ## 继续实现所需工作
 
 1. 把控制器初始化移植为 `qcom,ufshc` + QMP PHY v4（`0x1d87000+0xe000`）的序列，
