@@ -1,0 +1,21 @@
+{
+  "scope": "Continuation of handed-off early kernel diagnosis; prior milestones are attributed to the handoff, not independently replayed here",
+  "device": "SM-T970 / gts7xlwifi",
+  "handoff_revision": "197aceda5cec63cb1512632eeb80e5a892d88619",
+  "last_probe": {
+    "function": "_kernel_bootstrap_thread",
+    "target": "_initialize_screen",
+    "before": true
+  },
+  "last_host_boot_image_sha256": "af12917499b5943173d9031fcef9a95f045c8dfbedaeafe348b132b24c6acdc0",
+  "restore_boot_sha256": "6f49af2f77ae0e55b4f76b29b0e0491ff0228c42ae97ba0533b97631483566fc",
+  "host_probe_log": "out/payload-probe18.log and logs/payload-patch.log",
+  "actual_before_probe_behavior": "Immediate PSCI SYSTEM_RESET at the call site; reset_delay=6 is not used by reset-before",
+  "user_observation": "一直停留，没有自动重启",
+  "interpretation": "The reset-before initialize_screen checkpoint was not observed. This does not establish a hang inside initialize_screen.",
+  "next_checkpoint": "After return from idle_thread_create; the handed-off positive result only covered its call entry.",
+  "limits": [
+    "Exact contents of the currently flashed BOOT were not read back.",
+    "Earlier menu/MMU/thread milestones are reported by docs/handoff.md; no runtime screenshots or full kernel logs are newly available."
+  ]
+}

@@ -6,7 +6,7 @@ schema_version = 1
 name = "sm-t970"
 soc = "SM8250"
 os_profile = "ipados-17.7.11-21H461"
-summary = "Samsung Galaxy Tab S7+ Wi-Fi (SM-T970, gts7xlwifi, SM8250). Android hardware inventory and a single-core platform bootstrap configuration targeting iPadOS 17.7.11 (21H461); no XNU build or UEFI/device boot is verified."
+summary = "SM-T970/gts7xlwifi SM8250 CPU0/initrd bring-up: host kernel/payload/firmware/image builds complete; handed-off UEFI and early kernel checkpoints, with bootstrap-thread diagnosis still pending. No root-volume, userland or peripheral milestone is claimed."
 
 [[area]]
 id = "configuration"
@@ -15,6 +15,7 @@ components = [
   "ArmDTPlatform",
 ]
 paths = [
+  "docs/handoff.md",
   "evidence/device-repository/result.json",
   "docs/firmware.md",
   "porting.toml",
@@ -58,6 +59,7 @@ procedure = [
   "Run python3.14 ../UniXNU-sm-t970/scripts/check-platform.py --unixnu . to compare DT/ADT bindings with the captured hardware.",
 ]
 findings = [
+  "Step 7 continuation preserves the handed-off minimal boot configuration and removes persistent entry-probe settings from board.toml. scripts/build-entry-probe.py supplies one in-memory probe override and writes a new ignored artifact directory per experiment.",
   "All seven local Step 3 repository requirements passed at 18d3a77cd98f47ee42aa1f95d6584d22c3a13a18; source pins and template files are complete and the example marker is removed. Runtime milestones remain separate.",
   "The final reviewed framework commit is 194aae294c1107e791f4f74b2be371a391ac6bc4; in addition to v2/raw packing it normalizes the upstream shim image_size to include the 112-byte shim while preserving the firmware copy size. Eight regression cases pass.",
   "Step 3 completion replaces the initial staging audit: real T970 firmware config/DSC/FDF/FD inputs now exist; stock asset hashes, disabled peripheral descriptions and exact firmware source pins are recorded. board.example is removed to enable host builds; hardware boot remains unverified.",
@@ -86,7 +88,7 @@ limits = [
   "Apple kernelcache/private ABI, trust-cache, Data seed and XNU image compilation remain separate later-stage work.",
 ]
 next_action = [
-  "Run and archive the committed platform/firmware/Android-v2 packing checks, then continue Step 4 and first-boot preparation.",
+  "Continue Step 7 with an isolated, versioned checkpoint image and record the actual user-observed device result.",
 ]
 evidence = [
   { kind = "host", reference = "evidence/device-repository/result.json", command = "python3.14 scripts/check-platform.py --unixnu ../UniXNU", result = "All seven local Step 3 repository requirements passed at 18d3a77cd98f47ee42aa1f95d6584d22c3a13a18; source pins and template files are complete and the example marker is removed. Runtime milestones remain separate.", revision = "18d3a77cd98f47ee42aa1f95d6584d22c3a13a18" },
@@ -153,6 +155,7 @@ procedure = [
   "Collect selected boot properties, the live DT and the first 4096 bytes of boot/recovery with the inventory script; only parsed header fields are saved.",
 ]
 findings = [
+  "The handed-off runtime workaround excludes TzDxe, PILDxe and PILProxyDxe from DSC/FDF dispatch: the handoff reports TEE and missing-UFS partition assertions before the menu. The SEC x0 HOB patch is now hash-checked and automatically prepared. These reports do not certify TEE/PIL functionality.",
   "Handoff follow-up: prepare-uefi.py now applies or recognizes the SEC x0-to-HOB patch using its exact patch hash and four pre/postimage hashes; clean upstream application and a second idempotent run passed. The cached Mu source modifications are therefore reproducible rather than implicit workspace state.",
   "The normal unixnu build firmware command passed on committed sources; the 3 MiB FD contains all four UniXNU/DarwinBoot modules plus DiskIo, FAT and Unicode collation (7 checked modules among 91 FV files).",
   "A T970-specific overlay selects the pinned Kona support, original numeric configuration and a nonoverlapping 44-region map derived from the stock 45-region map; Android SEC LOG scratch is omitted because it overlaps FV/FD/stack and Mu would halt on it.",
@@ -182,7 +185,7 @@ limits = [
   "A host-built T970-specific candidate is now selected; it is not an upstream-certified or device-verified T970 port.",
 ]
 next_action = [
-  "Capture UEFI runtime memory/GOP/initrd results and a recoverable launch procedure before claiming a hardware milestone.",
+  "Build the current minimal dispatch firmware with the automatically applied SEC patch, then capture runtime logs before claiming broader firmware services.",
 ]
 evidence = [
   { kind = "host", reference = "evidence/device-repository/firmware.log", command = "GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=submodule.active GIT_CONFIG_VALUE_0=__no_module_submodules__ PATH=/opt/homebrew/opt/llvm/bin:/opt/homebrew/opt/lld/bin:$PATH python3.14 ../UniXNU/unixnu build firmware -D . --uefi .cache/uefi-source/Mu-Silicium --edk2 .cache/uefi-source/Mu-Silicium/Mu_Basecore --local-module refer:edk2=.cache/uefi-source/Mu-Silicium/Mu_Basecore", result = "The normal unixnu build firmware command passed on committed sources; the 3 MiB FD contains all four UniXNU/DarwinBoot modules plus DiskIo, FAT and Unicode collation (7 checked modules among 91 FV files).", revision = "18d3a77cd98f47ee42aa1f95d6584d22c3a13a18" },
@@ -227,6 +230,7 @@ procedure = [
   "Collect /proc/cpuinfo, online/present CPU lists, cpufreq policies, /proc/interrupts and the live DT using the inventory script.",
 ]
 findings = [
+  "The user confirms the handed-off reset-before initialize_screen probe did not reset. That probe resets immediately at the call site, so the next test isolates whether idle_thread_create returns; no conclusion about initialize_screen internals is drawn.",
   "The first-boot DRAM window now excludes the entire observed camera CMA allocation window; CPU0-only topology and the disabled peripheral policy are unchanged.",
   "The board now includes disabled measured peripheral declarations alongside the unchanged CPU0-only topology; the checker compares their GIC interrupt cell translation without enabling peripheral drivers.",
   "Core identity differs in Affinity1 (0x100 steps); retaining only the lowest MPIDR byte would lose the recorded core distinction.",
@@ -279,6 +283,8 @@ procedure = [
   "Capture root-readable /proc/iomem and the live DT, then compare physical memory and reserved-memory reg values.",
 ]
 findings = [
+  "The handed-off diagnostic DTS uses the 0x80000000+0x80000000 ADT envelope to include the reported DarwinBoot window at 0xc0000000. It is explicitly tagged as firmware-envelope in the board checker, with a 256 MiB owned-window request matching the pinned loader default. Reserved holes are retained and not declared free.",
+  "The pinned DarwinBoot AllocateWindow uses only EfiConventionalMemory and AllocatePages; boot_args.MemorySize and MemorySizeActual describe that allocation, not all 2 GiB of the envelope. The checker retains strict bank/non-overlap checks for physical-bank mode and reports the envelope overlaps separately; actual per-boot EFI allocation remains a runtime measurement.",
   "The committed-source platform check passed with a 2 GiB measured-bank subrange, 30 static reservations, all 13 stock dynamic-pool windows, 45 stock XBL regions and seven disabled peripheral ranges.",
   "Committed-source checking found camera_mem_region allows allocations in 0x180000000+0x80000000. The first-boot DRAM window is therefore narrowed to the remaining measured subrange 0x200000000+0x80000000 (2 GiB), outside all 13 original dynamic-pool allocation windows. The checker verifies containment in a real bank rather than demanding the entire bank.",
   "The completed repository supplies the candidate bank and static reservations, and checks every original dynamic-pool allocation window and all 45 XBL platform regions against that bank. The firmware overlay owns its low-memory heap/FD/stack; real UEFI allocation still needs runtime evidence.",
@@ -300,7 +306,7 @@ limits = [
   "Removing board.example completes the concrete input configuration; it does not make the candidate RAM bank device-verified.",
 ]
 next_action = [
-  "Reconcile saved /memory, reserved-memory and iomem ranges, then reserve explicit UEFI and XNU handoff allocations without reclaiming firmware-owned regions.",
+  "Capture the actual owned-window physical base/size and EFI memory map on the next observable boot; do not reclaim the rest of the ADT envelope.",
 ]
 evidence = [
   { kind = "host", reference = "evidence/device-repository/platform.json", command = "python3.14 scripts/check-platform.py --unixnu ../UniXNU", result = "The committed-source platform check passed with a 2 GiB measured-bank subrange, 30 static reservations, all 13 stock dynamic-pool windows, 45 stock XBL regions and seven disabled peripheral ranges.", revision = "18d3a77cd98f47ee42aa1f95d6584d22c3a13a18" },
@@ -370,6 +376,7 @@ id = "display"
 status = "planned"
 components = []
 paths = [
+  "patches/xnu/t970-skip-early-console.patch",
   "evidence/adb-2026-11-01/display.txt",
 ]
 inputs = [
@@ -384,6 +391,7 @@ procedure = [
   "Collect DRM modes, panel type and brightness limits; read only display-selection tokens from /proc/cmdline and match the selected S6TUUM3 node in the live DT.",
 ]
 findings = [
+  "The handed-off t970-skip-early-console.patch keeps PE_create_console/PE_init_printf opt-in via t970-console as an experimental workaround. It does not prove an Apple-console hang; the latest user result places the unobserved checkpoint before initialize_screen.",
   "The live DT contains many alternative panels; the boot selector identifies S6TUUM3 rather than the S6TUUM2 candidate.",
   "DRM mode geometry is landscape while wm and touch coordinates are portrait; display/input orientation must be mapped explicitly.",
   "At capture time DPMS was Off and brightness was zero; this records Android runtime state, not a display failure.",
@@ -396,7 +404,7 @@ limits = [
   "Framebuffer physical address, stride, pixel format and UEFI GOP handoff are not verified by the mode list.",
 ]
 next_action = [
-  "Use the selected S6TUUM3 resources to establish a T970 UEFI framebuffer and capture its actual address, stride and pixel format.",
+  "First isolate the earlier bootstrap-thread boundary; keep the console patch experimental until an entry/return checkpoint or kernel log establishes the actual console behavior.",
 ]
 evidence = [
   { kind = "device", reference = "evidence/adb-2026-11-01/display.txt", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Saved DRM modes, SDC_801417 panel type, brightness limits and Android geometry.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },
@@ -638,6 +646,7 @@ procedure = [
   "Read BuildManifest.plist from the local IPSW using Python zipfile and plistlib to identify its OS version, build and product types.",
 ]
 findings = [
+  "The previously uncommitted board console patch is now part of the declared series, for 61 total patches (56 arch, 2 SoC, 2 OS, 1 board). Isolated probe generation reuses the built source kernel and firmware, patches only a payload copy, checks the measured BOOT size limit and leaves board defaults untouched.",
   "The required Mu SEC entry-argument HOB integration is now versioned in package/firmware/patches and inputs.json, independently of the currently retained runtime probe.",
   "The normal bootimg command produced a 3993600-byte header-v2/raw-kernel/separate-DTB firmware-only check image and verified its sections and load addresses. Ramdisk is empty; no XNU kernel/payload or device boot is claimed.",
   "Actual bootimg invocation exposed the pinned upstream BootShim declaring only FD_SIZE in ARM64 image_size. The shared packer now normalizes the header with strict base/size checks; a real header-v2 raw-kernel/separate-DTB firmware-only image packs and unpacks successfully.",
@@ -663,7 +672,7 @@ limits = [
   "The selected profile kernelcache SHA256 f18b4df865405f2a287b84977d7aca745e056d656d9fc9df1662970ce2969de7 has not been checked against a locally extracted/decompressed kernelcache.",
 ]
 next_action = [
-  "Archive the firmware-only packed-image check, then prepare actual XNU kernelcache, trust-cache, Data seed and ABI inputs against the selected IPSW.",
+  "Build the isolated idle_thread_create after-return payload/image, verify the BOOT size and hashes, then use the confirmed recovery path for a single checkpoint test.",
 ]
 evidence = [
   { kind = "host", reference = "evidence/device-repository/boot.json", command = "PATH=/opt/homebrew/opt/llvm/bin:/opt/homebrew/opt/lld/bin:$PATH python3.14 ../UniXNU/unixnu bootimg -D . --uefi .cache/uefi-source/Mu-Silicium --fd .cache/uefi-source/Mu-Silicium/Build/gts7xlwifiPkg/DEBUG_CLANGPDB/FV/SILICIUM_UEFI.fd --dtb out/uefi-candidate/firmware.dtb --ramdisk none --output out/uefi-candidate/boot.img", result = "The normal bootimg command produced a 3993600-byte header-v2/raw-kernel/separate-DTB firmware-only check image and verified its sections and load addresses. Ramdisk is empty; no XNU kernel/payload or device boot is claimed.", revision = "18d3a77cd98f47ee42aa1f95d6584d22c3a13a18" },
@@ -679,6 +688,7 @@ id = "diagnostics"
 status = "implemented"
 components = []
 paths = [
+  "evidence/bring-up/runtime/**",
   "tests/**",
   "evidence/device-repository/platform.log",
   "scripts/**",
@@ -710,6 +720,7 @@ procedure = [
   "Run python3 scripts/collect-adb-inventory.py --root --output evidence/<new-capture>; review per-command stderr, checksums, GPT CRC results and DT sanitization before updating this record.",
 ]
 findings = [
+  "Probe control flow was checked against both the generator and the current kernel disassembly. reset-before ignores the delay and immediately issues PSCI SYSTEM_RESET. A new after-return idle_thread_create probe is the next discriminating test; physical source images and restore hashes are recorded.",
   "Three source-patch preparation tests passed (apply/repeat, reject changed patch, preserve unknown local edits); an additional test used all four actual upstream SEC preimages and checked idempotence.",
   "The completed Step 3 archive ties actual commands, source hashes, platform checks, normal firmware compilation and boot-image round-trip to clean committed device/framework revisions.",
   "The strengthened dynamic-pool check caught an overlap with camera_mem_region that static-reservation-only checks missed. It now verifies the reduced 2 GiB window against all original pool bounds and measured-bank containment.",
@@ -733,7 +744,7 @@ limits = [
   "ADB evidence tooling and input snapshots are archived at device commit 54fafba28ae100130a1d21bf0936983ab632c782. No device-verified UniXNU milestone is claimed; recovery, UART, UEFI log export and XNU crash capture remain untested.",
 ]
 next_action = [
-  "Document and validate the board-specific recovery/logging path before a UEFI test; keep future image hashes and source revisions beside its boot log.",
+  "Record whether the isolated after-return idle_thread_create probe resets after six seconds, then choose the next bootstrap-thread boundary.",
 ]
 evidence = [
   { kind = "host", reference = "evidence/device-repository/platform.log", command = "python3.14 scripts/check-platform.py --unixnu ../UniXNU", result = "The completed Step 3 archive ties actual commands, source hashes, platform checks, normal firmware compilation and boot-image round-trip to clean committed device/framework revisions.", revision = "18d3a77cd98f47ee42aa1f95d6584d22c3a13a18" },

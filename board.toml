@@ -19,6 +19,8 @@ patch_series = ["arch:patches/xnu/series", "soc:patches/xnu/series", "device:pat
 [device_tree]
 source = "device:dts/sm-t970.dts"
 include_dirs = ["soc:dts"]
+# Board-checker policy: this ADT span is an envelope, not a free-RAM pool.
+memory_policy = "firmware-envelope"
 
 [firmware]
 # Stage package/firmware with scripts/prepare-uefi.py first. Inputs are filled
@@ -42,6 +44,9 @@ kernel_args = ["-v", "cpus=1"]
 tools = true
 
 [payload.adt]
+# Match the loader's existing 256 MiB default explicitly. Allocation still uses
+# EfiConventionalMemory, never the complete DTS envelope or reserved holes.
+owned_memory_size = "0x10000000"
 # Supply the board's identity seed through --unique-chip-id.
 # OS identity seed from the selected iPad7,1 profile, not the Qualcomm SoC ID.
 chip_id = "8011"

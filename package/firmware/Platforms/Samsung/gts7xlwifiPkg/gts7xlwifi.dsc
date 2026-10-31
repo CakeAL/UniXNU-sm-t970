@@ -111,8 +111,10 @@
   gts7xlwifiPkg/Drivers/MacDxe/MacDxe.inf
   gts7xlwifiPkg/Drivers/Muic/Muic.inf
   gts7xlwifiPkg/Drivers/NpaDxe/NpaDxe.inf
-  gts7xlwifiPkg/Drivers/PILDxe/PILDxe.inf
-  gts7xlwifiPkg/Drivers/PILProxyDxe/PILProxyDxe.inf
+  # PIL needs partition access; no UFS driver yet. Excluded for bring-up.
+  #  gts7xlwifiPkg/Drivers/PILDxe/PILDxe.inf
+  # PIL needs partition access; no UFS driver yet. Excluded for bring-up.
+  #  gts7xlwifiPkg/Drivers/PILProxyDxe/PILProxyDxe.inf
   gts7xlwifiPkg/Drivers/PdcDxe/PdcDxe.inf
   gts7xlwifiPkg/Drivers/PlatformInfoDxeDriver/PlatformInfoDxeDriver.inf
   gts7xlwifiPkg/Drivers/PmicDxe/PmicDxe.inf
@@ -127,7 +129,8 @@
   gts7xlwifiPkg/Drivers/SmemDxe/SmemDxe.inf
   gts7xlwifiPkg/Drivers/SubPmic/SubPmic.inf
   gts7xlwifiPkg/Drivers/TsensDxe/TsensDxe.inf
-  gts7xlwifiPkg/Drivers/TzDxe/TzDxe.inf
+  # TzDxe asserts in QseeComDxe (EFI_DEVICE_ERROR) before the menu; excluded for bring-up.
+  #  gts7xlwifiPkg/Drivers/TzDxe/TzDxe.inf
   gts7xlwifiPkg/Drivers/ULogDxe/ULogDxe.inf
   gts7xlwifiPkg/Drivers/UsbPwrCtrlDxe/UsbPwrCtrlDxe.inf
   gts7xlwifiPkg/Drivers/VcsDxe/VcsDxe.inf

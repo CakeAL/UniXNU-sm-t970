@@ -5,10 +5,10 @@
 
 ## 当前结果
 
-第 3 步的设备仓库输入已补齐，范围为 **CPU0／initrd 平台引导**。
-配置、来源、补丁、归档和 DTS／ADT 可在主机检查，T970 UEFI 候选已实际编译。
-`board.example` 已移除，允许主机构建；这不表示新 UEFI、XNU 或 iPadOS 已在平板启动。
-实机启动、GOP／内存交接、SMP 和外设功能仍按 `porting.toml` 分别记录验证等级。
+当前继续第 7 步的 **CPU0／initrd 早期引导诊断**。主机构建链已打通；据 ds 交接，
+设备已进入 UniXNU 菜单、挂载 payload 并交接 XNU，曾用探针确认 MMU 开启。
+本轮机主确认 `initialize_screen` 调用前探针未复位；尚未定位到具体阻塞函数。
+根卷／用户态、SMP 和外设功能仍未完成，具体来源与验证等级见 `porting.toml`。
 
 两个仓库并列放置，普通构建命令在主仓库执行：
 
@@ -20,8 +20,8 @@ vsc/
 
 - `board.toml`：格式 2，`name/kit=sm-t970`，SM8250 和 iPadOS profile，完整五组件选择。
 - `feeds.toml` / `unixnu.lock`：固定 SoC 和组件来源；固件及嵌套子模块固定在 `package/firmware/inputs.json`。
-- `configs/sm-t970_defconfig` / `patches/xnu/series`：设备配置与空的板级补丁序列；继承配置和 61 个补丁已核对。
-- `dts/`：实测连续高内存段、30 个静态保留区、CPU0 及禁用的板级外设资源。
+- `configs/sm-t970_defconfig` / `patches/xnu/series`：设备配置、实验性早期控制台补丁及继承的配置／补丁。
+- `dts/`：诊断用低地址 DRAM 包络、30 个静态保留区、CPU0 及禁用的板级外设资源。
 - `package/firmware/`：T970 配置、DSC/FDF、内存／配置库、44 个厂商模块包装和 UniXNU 接入。
 - `proprietary-files.txt`：130 份资产的来源与 SHA256；二进制留在本机忽略目录。
 - 固件日志导出器已接入（`AdvancedLogDxe` → **Tools → Advanced Logger**）；
@@ -67,4 +67,5 @@ XNU 内核和完整 payload 构建还需 Apple 原始 kernelcache、信任与 Da
 - [原厂 ADB 与固件来源证据](evidence/README.md)
 - [移植步骤](https://unixnu.com/zh/porting/steps)、[驱动适配](https://unixnu.com/zh/porting/drivers)
 
-本阶段仅进行 ADB 读取和主机构建／打包，没有重启、刷写、分区调整或设备寄存器操作。
+交接已包含 BOOT 刷写测试历史；当前机主反馈与下一轮定位见 [交接更新](docs/handoff.md)。
+原始恢复镜像、固件 FDT 和每轮测试镜像均保留在本机忽略目录，未划分 Data 或启用存储驱动。

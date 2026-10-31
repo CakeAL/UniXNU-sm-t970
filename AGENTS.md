@@ -86,8 +86,10 @@ brightness, buttons, Wi-Fi, DSP, battery and CPU frequency in the porting record
 ## SM-T970 current scope
 
 Use Python 3.11+ (python3.14 on this host). Preserve the existing evidence and
-its revisions. The current DTS enables CPU0 only and uses a measured high RAM
-bank as a host-conversion candidate. The completed repository inputs no longer
+its revisions. The current DTS enables CPU0 only and uses the handed-off low
+DRAM envelope for diagnosis. Its reserved holes are not free RAM; DarwinBoot
+allocates the separate 256 MiB owned window from EFI conventional memory.
+The completed repository inputs no longer
 carry board.example: this permits host builds and does not certify boot readiness.
 Track runtime UEFI allocation, GOP and actual launch results separately in the
 record; do not mark them device-verified from a host build. Do not enable UFS,
@@ -101,4 +103,8 @@ Hardware DTB/host-check ADT are not the stock firmware DTB. Keep private firmwar
 DTBs, extracted binaries, identity seeds and generated images in ignored storage.
 The staged vendor UFS/USB DMA dispatch remains absent from the CPU0 initrd image.
 Build/pack checks do not authorize overwriting a tablet partition.
+Do not leave a reset probe in board.toml. Use scripts/build-entry-probe.py for
+one checkpoint per ignored output directory; reset-before is immediate, while
+an after-return probe waits its configured delay. Preserve source kernel and
+prior images, and bind every device observation to its image hash.
 Commit each completed step, as requested by the maintainer.

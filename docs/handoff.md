@@ -3,6 +3,18 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
+## 接手后的更新
+
+- 本轮机主确认：最后的 `initialize_screen` 探针一直停留，没有复位。
+  已核对代码：它是 **reset-before，立即复位**，不是等待 6 秒；因此不能据此认定
+  `initialize_screen` 内部卡住。机主反馈与镜像哈希见
+  `evidence/bring-up/runtime/handoff-observation.json`。
+- SEC 补丁已在 `ac1ca14` 接入准备工具；固定补丁和四个文件的前／后像哈希，
+  干净源码应用、重复执行及保留未知修改的检查均通过，不再依赖缓存的手工修改。
+- 重置探针从默认 `board.toml` 移出。下一轮用 `scripts/build-entry-probe.py`
+  独立生成 `idle_thread_create` **返回之后**的探针；之前只确认到达调用前，不能当作已经返回。
+- 以下为 ds 交接当时的状态、命令和待办，保留作历史基线；当前进展以本节及适配记录为准。
+
 ## 总体现状
 
 - 第 1–5 步已完成并提交；第 6 步只完成存储（UFS）输入采集与实现判定，驱动未移植；

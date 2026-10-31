@@ -6,7 +6,8 @@
   INF MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
 
   INF gts7xlwifiPkg/Drivers/ScmDxe/ScmDxe.inf
-  INF gts7xlwifiPkg/Drivers/TzDxe/TzDxe.inf
+  # TzDxe asserts in QseeComDxe (EFI_DEVICE_ERROR) before the menu; excluded for bring-up.
+  #  INF gts7xlwifiPkg/Drivers/TzDxe/TzDxe.inf
 
   INF MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
   INF MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
@@ -86,7 +87,9 @@
   INF gts7xlwifiPkg/Drivers/Chg/Chg.inf
   INF gts7xlwifiPkg/Drivers/SubPmic/SubPmic.inf
   INF gts7xlwifiPkg/Drivers/Redriver/Redriver.inf
-  INF gts7xlwifiPkg/Drivers/PILDxe/PILDxe.inf
-  INF gts7xlwifiPkg/Drivers/PILProxyDxe/PILProxyDxe.inf
+  # PIL needs partition access; no UFS driver yet. Excluded for bring-up.
+  #  INF gts7xlwifiPkg/Drivers/PILDxe/PILDxe.inf
+  # PIL needs partition access; no UFS driver yet. Excluded for bring-up.
+  #  INF gts7xlwifiPkg/Drivers/PILProxyDxe/PILProxyDxe.inf
   INF gts7xlwifiPkg/Drivers/SPSSDxe/SPSSDxe.inf
   INF gts7xlwifiPkg/Drivers/ShmBridgeDxe/ShmBridgeDxe.inf

@@ -132,18 +132,37 @@ def main():
     memory = next(n for n in tree.children if n.strings('device_type') == ['memory'])
     live_memory = next(n for n in live.children if n.strings('device_type') == ['memory'])
     span = dt.registers(memory)
-    require(len(span) == 1 and any(base <= span[0][0] and span[0][0] + span[0][1] <= base + size
-                                  for base, size in dt.registers(live_memory)),
-            'Handoff window is not contained in a measured contiguous bank')
+    memory_policy = ctx.board['device_tree'].get('memory_policy', 'physical-bank')
+    require(memory_policy in ('physical-bank', 'firmware-envelope'), 'Unknown board memory policy')
+    require(len(span) == 1, 'Exactly one ADT DRAM span is required')
+    if memory_policy == 'physical-bank':
+        require(any(base <= span[0][0] and span[0][0] + span[0][1] <= base + size
+                    for base, size in dt.registers(live_memory)),
+                'Handoff window is not contained in a measured contiguous bank')
+    else:
+        # The loader sets boot_args.MemorySize/MemorySizeActual to its separately
+        # allocated conventional-memory window, not to this ADT envelope.
+        require(span[0] == (0x80000000, 0x80000000), 'Unexpected T970 diagnostic DRAM envelope')
+        require(int(str(ctx.board['payload']['adt'].get('owned_memory_size', '0')), 0) == 0x10000000,
+                'T970 envelope requires the explicit 256 MiB owned-window request')
+        require(any(base <= 0xc0000000 and 0xd0000000 <= base + size
+                    for base, size in dt.registers(live_memory)),
+                'Reported initial owned window is outside measured DRAM')
     reserved = next(n for n in tree.children if n.name == 'reserved-memory')
     live_reserved = next(n for n in live.children if n.name == 'reserved-memory')
     expected = {n.name: n.properties['reg'] for n in live_reserved.children if 'reg' in n.properties}
     actual = {n.name: n.properties['reg'] for n in reserved.children if 'reg' in n.properties}
     require(actual == expected, 'Static firmware reservation changed or was lost')
+    overlapping_static = []
     for node in reserved.children:
         for base, size in dt.registers(node):
-            require(base + size <= span[0][0] or span[0][0] + span[0][1] <= base,
-                    'Candidate handoff bank overlaps a static firmware reservation')
+            if not (base + size <= span[0][0] or span[0][0] + span[0][1] <= base):
+                overlapping_static.append(node.name)
+                require(memory_policy == 'firmware-envelope',
+                        'Candidate handoff bank overlaps a static firmware reservation')
+            if memory_policy == 'firmware-envelope':
+                require(base + size <= 0xc0000000 or 0xd0000000 <= base,
+                        'Reported owned-window candidate overlaps a static reservation')
     dynamic = []
     for node in live_reserved.children:
         if 'reg' in node.properties or 'size' not in node.properties:
@@ -152,14 +171,18 @@ def main():
         require(cells and len(cells) % 4 == 0, 'Unbounded stock dynamic pool: ' + node.name)
         for i in range(0, len(cells), 4):
             base, size = dt.number(cells[i:i + 2]), dt.number(cells[i + 2:i + 4])
-            require(base + size <= span[0][0] or span[0][0] + span[0][1] <= base,
+            require(memory_policy == 'firmware-envelope' or
+                    base + size <= span[0][0] or span[0][0] + span[0][1] <= base,
                     'Candidate bank intersects a stock dynamic pool allocation window')
         dynamic.append(node.name)
     stock_boot = json.loads((device / 'evidence/device-inputs/boot-firmware.json').read_text())
     for region in stock_boot['platform_config']['regions']:
-        require(region['base'] + region['size'] <= span[0][0] or
+        require(memory_policy == 'firmware-envelope' or region['base'] + region['size'] <= span[0][0] or
                 span[0][0] + span[0][1] <= region['base'],
                 'Candidate bank overlaps a stock XBL platform region: ' + region['name'])
+        if memory_policy == 'firmware-envelope':
+            require(region['base'] + region['size'] <= 0xc0000000 or 0xd0000000 <= region['base'],
+                    'Reported owned-window candidate overlaps an XBL region')
     # Board overrides must preserve observed ranges; Linux has three-cell GIC
     # descriptors while the selected shared UniXNU binding adds an affinity cell.
     peripheral_pairs = [('ufshc@1d84000', 'ufshc@1d84000'),
@@ -194,6 +217,9 @@ def main():
     for path in ('/chosen', '/cpus', '/arm-io', '/defaults', '/options'):
         require(path in decoded, 'Platform expert node missing: ' + path)
     chosen = decoded['/chosen']
+    if memory_policy == 'firmware-envelope':
+        require(chosen.get('darwinboot-memory-size') == struct.pack('<Q', 0x10000000),
+                'ADT did not carry the explicit owned-window request')
     require(struct.unpack('<QQ', chosen['dram-base'] + chosen['dram-size']) == span[0], 'ADT DRAM encoding mismatch')
     require(len(chosen['nvram-proxy-data']) == 8192, 'NVRAM proxy missing')
     require(decoded['/cpus/cpu0']['reg'] == struct.pack('<I', 0), 'ADT boot affinity encoding mismatch')
@@ -242,6 +268,9 @@ def main():
               'component_os_abi_scope_matches': True,
               'enabled_cpu_affinities': [0], 'timebase_hz': 19200000,
               'candidate_dram_base': hex(span[0][0]), 'candidate_dram_size': hex(span[0][1]),
+              'memory_policy': memory_policy,
+              'envelope_static_reservations': overlapping_static,
+              'owned_memory_size': ctx.board['payload'].get('adt', {}).get('owned_memory_size'),
               'static_reservations': len(actual), 'patch_count': len(selected_patches),
               'stock_dynamic_pool_windows_checked': dynamic,
               'stock_xbl_regions_checked': len(stock_boot['platform_config']['regions']),
@@ -251,7 +280,7 @@ def main():
               'patch_order': [p.name for p in selected_patches], 'archive_recipe_count': len(archive_plan),
               'input_sha256': {p: hashlib.sha256((device / p).read_bytes()).hexdigest() for p in tracked_inputs},
               'result': 'PASS', 'boot_enabled': not ctx.example,
-              'limits': ['RAM bank is not verified against a T970 UEFI allocation map.',
+              'limits': ['ADT envelope/physical-bank policy is not a new UEFI allocation-map observation; firmware-owned holes are not free RAM.',
                          'Host-check ADT uses artificial identity 1 and must not be used to boot.',
                          'No peripheral DMA, XNU driver execution or SMP test is claimed.']}
     (output / 'result.json').write_text(json.dumps(report, indent=2) + '\n')

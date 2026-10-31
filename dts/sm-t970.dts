@@ -5,14 +5,13 @@
     model = "Samsung Galaxy Tab S7+ Wi-Fi (SM-T970)";
     compatible = "samsung,gts7xlwifi", "qcom,sm8250";
 
-    // Subrange of measured /memory reg[1] (0x180000000 + 0x100000000).
-    // camera_mem_region may allocate 0x180000000..0x200000000; exclude its
-    // entire window and keep the remaining 2 GiB for the first handoff.
-    // UEFI allocatable memory and all firmware ownership still require checking.
-    // This is a host-conversion fixture, not a verified boot-time memory map.
-    memory@200000000 {
+    // DarwinBoot allocates the kernel window from UEFI conventional memory; on
+    // this board that window lands at 0xC0000000. The ADT envelope must contain
+    // it, so describe the low 2 GiB span the way the SM-T733 port does: reserved
+    // holes stay inside the span and DarwinBoot only claims conventional memory.
+    memory@80000000 {
         device_type = "memory";
-        reg = <2 0 0 0x80000000>;
+        reg = <0 0x80000000 0 0x80000000>;
     };
 };
 

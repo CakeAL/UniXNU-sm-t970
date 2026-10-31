@@ -1,6 +1,7 @@
 # 首次启动构建（第 7 步）
 
-本页记录 SM-T970 的内核、payload 与启动镜像在主机上的完整构建链，以及设备侧尚未执行的部分。
+本页最初记录主机构建链；后续设备测试已推进到早期引导线程，最新状态见
+[交接更新](handoff.md)与 `evidence/bring-up/runtime/`。下列产物表保留原始提交的构建结果。
 证据在 [evidence/bring-up](../evidence/bring-up/README.md)。
 
 ## 本地输入
@@ -98,7 +99,8 @@ T970 的 boot 分区实测 **71303168 字节（68 MiB）**。payload 必须收�
 
 ## 设备侧
 
-**没有刷写、没有重启**，平板仍运行 Android 12（`SP2A.220305.013`）。
+本节原始构建快照当时未刷写。后续 ds 已执行 BOOT 测试；交接报告设备进入菜单并交接
+内核。不能再把“平板仍运行 Android”当作当前状态，当前 BOOT 据交接由测试镜像占用。
 恢复镜像已从设备只读导出到 `out/device-backup/`：`boot.img`（68 MB，Magisk 25.2 补丁版）、
 `dtbo.img`（10 MB）、`vbmeta.img`（64 KB），可用 Odin 刷回。
 
@@ -110,3 +112,21 @@ SM-T970 没有 fastboot，测试路径是 Odin 刷 boot（Android v2 格式，�
 1. 需要机主确认后，用 Odin 单次刷入 `boot.img`，按[启动验证顺序](../evidence/bring-up/README.md)
    记录固件、菜单、加载器和内核观测。
 2. 按[存储分析](storage.md)移植 SM8250 UFS 驱动，才能越过 root mount。
+
+
+## 当前定位方法
+
+一次只改变一个检查点，默认板级配置不保存复位探针。例：
+
+```sh
+PATH=$PWD/.cache/bin:/opt/homebrew/opt/llvm/bin:/opt/homebrew/opt/lld/bin:$PATH \
+python3.14 scripts/build-entry-probe.py --target _idle_thread_create --delay 6 --output out/step7/probes/idle-return
+```
+
+新目录中保存独立 payload、boot.img、日志和 probe.json；原始 kernel.macho 与 board.toml
+不变。`--before` 表示到达调用点时立即复位，不使用延时；默认表示调用返回后再等待 6 秒。
+没有复位只能记作“检查点未观察到”，不能直接证明被测函数内部阻塞。
+
+当前 DTS 是 ADT 的低地址包络。它包含固件保留洞，不是 2 GiB 可用内存池；DarwinBoot
+单独通过 EFI conventional memory 分配 256 MiB，并把该大小写入 boot_args。检查器会报告
+包络中的保留区，但并不把这些地址标记为空闲；每次实际分配仍需运行时日志验证。

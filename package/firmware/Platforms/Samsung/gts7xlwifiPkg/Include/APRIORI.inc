@@ -43,7 +43,8 @@ APRIORI DXE {
 
   INF FatPkg/EnhancedFatDxe/Fat.inf
 
-  INF gts7xlwifiPkg/Drivers/TzDxe/TzDxe.inf
+  # TzDxe asserts in QseeComDxe (EFI_DEVICE_ERROR) before the menu; excluded for bring-up.
+  #  INF gts7xlwifiPkg/Drivers/TzDxe/TzDxe.inf
 
   INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
 
@@ -61,8 +62,10 @@ APRIORI DXE {
   INF SiliciumPkg/Drivers/SimpleFbDxe/SimpleFbDxe.inf
 !endif
 
-  INF gts7xlwifiPkg/Drivers/PILProxyDxe/PILProxyDxe.inf
-  INF gts7xlwifiPkg/Drivers/PILDxe/PILDxe.inf
+  # PIL needs partition access; no UFS driver yet. Excluded for bring-up.
+  #  INF gts7xlwifiPkg/Drivers/PILProxyDxe/PILProxyDxe.inf
+  # PIL needs partition access; no UFS driver yet. Excluded for bring-up.
+  #  INF gts7xlwifiPkg/Drivers/PILDxe/PILDxe.inf
   INF gts7xlwifiPkg/Drivers/SPSSDxe/SPSSDxe.inf
 !if $(USE_CUSTOM_DISPLAY_DRIVER) == 1
   INF gts7xlwifiPkg/Drivers/CPRDxe/CPRDxe.inf
