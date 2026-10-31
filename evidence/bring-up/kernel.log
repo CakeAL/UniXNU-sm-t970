@@ -1,0 +1,986 @@
+Restored 0 omitted public headers from Apple; blob hashes verified
+            C++ KernelConfigTables.cpo
+clang++: warning: no such include directory: '{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/libsa' [-Wmissing-include-dirs]
+     LDFILELIST iokit
+             CC startup.o
+             CC prng_random.o
+clang: warning: no such include directory: '{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/libsa' [-Wmissing-include-dirs]
+clang: warning: no such include directory: '{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/libsa' [-Wmissing-include-dirs]
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.c:85:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/processor.h:82:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/sched.h:77:
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/bits.h:274:21: warning: cast from 'void (*)(vm_allocation_site_t *)' (aka 'void (*)(struct vm_allocation_site *)') to 'typeof (__zone_site_register(&site)) (*)(const void *)' (aka 'void (*)(const void *)') converts to incompatible function type [-Wcast-function-type-strict]
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/prng/prng_random.c:33:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/machine/machine_cpu.h:34:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/arm/machine_cpu.h:35:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/arm/cpu_data_internal.h:40:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/processor.h:82:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/sched.h:77:
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/bits.h:274:21: warning: cast from 'void (*)(vm_allocation_site_t *)' (aka 'void (*)(struct vm_allocation_site *)') to 'typeof (__zone_site_register(&site)) (*)(const void *)' (aka 'void (*)(const void *)') converts to incompatible function type [-Wcast-function-type-strict]
+  274 |         return (bitmap_t *)kalloc_data(BITMAP_SIZE(nbits), Z_WAITOK_ZERO);
+      |                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  274 |         return (bitmap_t *)kalloc_data(BITMAP_SIZE(nbits), Z_WAITOK_ZERO);
+      |                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/kalloc.h:512:2: note: expanded from macro 'kalloc_data'
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/kalloc.h:512:2: note: expanded from macro 'kalloc_data'
+  512 |         kheap_alloc(KHEAP_DATA_BUFFERS, size, flags)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  512 |         kheap_alloc(KHEAP_DATA_BUFFERS, size, flags)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/kalloc.h:503:44: note: expanded from macro 'kheap_alloc'
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/kalloc.h:503:44: note: expanded from macro 'kheap_alloc'
+  503 |         kheap_alloc_tag(kalloc_heap, size, flags, VM_ALLOC_SITE_TAG())
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~
+  503 |         kheap_alloc_tag(kalloc_heap, size, flags, VM_ALL{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/zalloc.h:2540:2:OC_S note: expanded from macro 'VM_ALLOC_SITE_TAG'
+ITE_TAG())
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~
+ 2540 |         STARTUP_ARG(ZALLOC, ST{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/zalloc.h:2540:2: note: expanded from macro 'VM_ALLOC_SITE_TAG'ARTUP_RANK_MIDDLE, __zone_site_regi
+ster, &site);   \
+      |         ^
+note: (skipping 2 expansions in backtrace; use -fmacro-backtrace-limit=0 to see all)
+ 2540 |         STARTUP_A{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.h:757:12: note: expanded from macro '__STARTUP1'
+RG(ZALLOC, STARTUP_RANK_MIDDLE, __zone_site_register, &site);   \
+      |         ^
+note: (skipping 2 expansions in backtrace; use -fmacro-backtrace-limit=0 to see all)
+  757 |             rank, __STARTUP_FUNC_CAST(func, a), b, \
+      |                   ^
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.h:757:12: note: expanded from macro '__STARTUP1'
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.h:748:6: note: expanded from macro '__STARTUP_FUNC_CAST'
+  757 |             rank, __STARTUP  748 |             (typeof(func(a))(*)(co_FUNC_CASnst voiT(func,d *)) a), b, \
+      |                   ^
+f{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.h:748:6: note: expanded from macro '__STARTUP_FUNC_CAST'
+  748 |            unc
+      |             ^
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/kalloc.h:501:63: note: expanded from macro 'kheap_alloc_tag'
+ (typeof(func(a))(*)(const   501 |         __khvoieap_ad *lloc(kalloc_heap, size,))func __zone_f
+      |             ^
+l{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/kalloc.h:501:63: note: expanded from macro 'kheap_alloc_tag'
+ags_mix_tag(flags, itag), NULL)
+      |                                                                      ^~~~
+  501 |         __kheap_alloc(kalloc_heap, size, __zone_flags_mix_tag(flags, itag), In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.c:85:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/processor.h:82:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/sched.h:77:
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/bits.h:271:1: warning: function 'bitmap_alloc' might be an allocator wrapper [-Wallocator-wrappers]
+NULL)
+      |                                                                      ^~~~
+  271 | bitmap_alloc(uint nbits)
+      | ^
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/bits.h:274:In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/prng/prng_random.c:33:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/machine/machine_cpu.h:34:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/arm/machine_cpu.h:35:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/arm/cpu_data_internal.h:40:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/processor.h:82:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/sched.h:77:
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/bits.h:271:2: note: value obtained from allocator call is returned here
+1:  274 warning: function 'bitmap_alloc' might be an allocator wrapper [-Wallocator-wrappers]
+  271 |         ret | burn itmap(bitmap__allt *)kalloc(uioc_data(Bnt nbITMAP_SitIZE(ns)
+      | bits), Z^
+_WAITOK_{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/bits.h:ZE274:2: note: value obtained from allocator call is returned here
+RO  274 |         retur);
+      |         ^
+n (bitmap_t *)kalloc_data(BITMAP_SIZE(nbits), Z_WAITOK_ZERO);
+      |         ^
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/prng/prng_random.c:33:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/machine/machine_cpu.h:34:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/arm/machine_cpu.h:35:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/arm/cpu_data_internal.h:46:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/arm/thread.h:84:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/thread_kernel_state.h:31:
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/vm/vm_kern.h:841:29: warning: bitwise operation between different enumeration types ('kmr_flags_t' and 'kmem_flags_t') [-Wenum-enum-conversion]
+  841 | __attribute__((diagnose_if(!KMEM_REALLOC_FLAGS_VALID(flags),
+      |                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/vm/vm_kern.h:793:27: note: expanded from macro 'KMEM_REALLOC_FLAGS_VALID'
+  793 |         (((flags) & (KMR_KOBJECT | KMEM_GUARD_LAST | KMEM_KASAN_GUARD | KMR_DATA)) == KMR_DATA || ((flags) & KMR_FREEOLD))
+      |                      ~~~~~~~~~~~ ^ ~~~~~~~~~~~~~~~
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.c:87:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/sched_prim.h:76:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/thread.h:98:
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/vm/vm_kern.h:841:29: warning: bitwise operation between different enumeration types ('kmr_flags_t' and 'kmem_flags_t') [-Wenum-enum-conversion]
+  841 | __attribute__((diagnose_if(!KMEM_REALLOC_FLAGS_VALID(flags),
+      |                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/vm/vm_kern.h:793:27: note: expanded from macro 'KMEM_REALLOC_FLAGS_VALID'
+  793 |         (((flags) & (KMR_KOBJECT | KMEM_GUARD_LAST | KMEM_KASAN_GUARD | KMR_DATA)) == KMR_DATA || ((flags) & KMR_FREEOLD))
+      |                      ~~~~~~~~~~~ ^ ~~~~~~~~~~~~~~~
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.c:87:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/sched_prim.h:76:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/prng/prng_random.c:33:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/machine/machine_cpu.h:34:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/arm/machine_cpu.h:35:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/arm/cpu_data_internal.h:In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/thread.h:122:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/task.h:129:
+47:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/arm/pmap.h:46:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/arm/pmap/pmap.h:232In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/ipc/ipc_port.h:91:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/ipc/ipc_space.h:92:
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/ipc/ipc_entry.h:131:1:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/thread.h:: warning: cast from 'void (*)(vm_allocation_site_t *)' (aka 'void (*)(struct vm_allocation_site *)') to 'typeof (__zone_site_register(&site)) (*)(const void *)' (aka 'void (*)(const void *)') converts to incompatible function type [-Wcast-function-type-strict]122:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/task.h:129:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/ipc/ipc_port.h:91:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/ipc/ipc_space.h:92:
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/ipc/ipc_entry.h:131:1:
+ warning: cast from 'void (*)(vm_allocation_site_t *)' (aka 'void (*)(struct vm_allocation_site *)') to 'typeof (__zone_site_register(&site)) (*)(const void *)' (aka 'void (*)(const void *)') converts to incompatible function type [-Wcast-function-type-strict]
+  131 | KALLOC_ARRAY_TYPE_DECL(ipc  131 | KALLOC_AR_entry_table,RAY_T structYPE_D ipc_entry);
+ECL(i      | pc^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+_entr{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/kalloc.h:950:2: note: expanded from macro 'KALLOC_ARRAY_TYPE_DECL'
+y_table,  950 stru |         KALLOC_ct DISPATCH(KALLOC_ipAc_entry);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+RRAY_TYPE_DECL, ##__VA_ARGS__)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/kalloc.h:950:2: note: expanded from macro 'KALLOC_ARRAY_TYPE_DECL'
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/kalloc.h:1461:2: note: expanded from macro 'KALLOC_DISPATCH'
+  950 |         KALLOC_DISPATCH(KALLOC_ARRAY_TYPE_DECL, ##__VA_ARGS__)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 1461 |         KALLOC_DISPATCH1(base, KALLOC_COUNT_ARGS(__VA_ARGS__), ##__VA_ARGS__)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/kalloc.h:1461:2: note: expanded from macro 'KALLOC_DISPATCH'
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/kalloc.h:1459:40: note: expanded from macro 'KALLOC_DISPATCH1'
+ 1461 |         KALLOC_ 1459 | #define KALLOC_DISPATCH1(base, N, ...) __CONCAT(base, N)DIS(__VAPATCH1(b_ARGSas__)
+      e, KALLOC_C|                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+note: (skipping 6 expansions in backtrace; use -fmacro-backtrace-limit=0 to see all)
+O{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.h:764:2: note: expanded from macro '__STARTUP_ARG'
+UNT_ARGS(__VA_ARGS__), ##__VA_ARGS__)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  764 |         __STARTUP1(name, line, subsystem, rank, func, arg, arg)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.h:757:12: note: expanded from macro '__STARTUP1'
+  757 |             rank, __STARTUP_FUNC_CAST(func, a), b, \
+      {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/kalloc.h:1459:40: note: expanded from macro 'KALLOC_DISPATCH1'
+|                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 1459{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.h:748:6: note: expanded from macro '__STARTUP_FUNC_CAST' | #define KALLOC_DISPATCH1(base, N, ...) __CONCAT(base, N)(__VA_ARGS__)
+      |                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+note: (skipping 6 expansions in backtrace; use -fmacro-backtrace-limit=0 to see all)
+  {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.h:764:2: note: expanded from macro '__STARTUP_ARG'
+748 |             (typeof(func(a))(*)(const v  764 |         __STAoid *))func
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+RTUP1(name, line, subsystem, rank, func, arg, arg)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.h:757:12: note: expanded from macro '__STARTUP1'
+  757 |             rank, __STARTUP_FUNC_CAST(func, a), b, \
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.c:87:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/sched_prim.h:76:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/thread.h:122:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/task.h:129:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/ipc/ipc_port.h:91:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/ipc/ipc_space.h:92:
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/ipc/ipc_entry.h{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.h:748:6: note: expanded from macro '__STARTUP_FUNC_CAST'
+:131:1: warning: cast from 'void (*)(vm_allocation_site_t *)' (aka 'void (*)(struct vm_allocation_site *)') to 'typeof (__zone_site_register(&site)) (*)(const void *)' (aka 'void (*)(const void *)') converts to incompatible function type [-Wcast-function-type-strict]
+  748 |             (typeof(func(a))(*)(const   131 | KALLOC_ARRAY_TYPE_DECL(ipc_entry_table, struct ipc_entry);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void *))func
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/kalloc.h:950:2: note: expanded from macro 'KALLOC_ARRAY_TYPE_DECL'
+  950 |         KALLOC_DISPATCH(KALLOC_ARRAY_TYPE_DECL, ##__VA_ARGS__)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/kalloc.h:1461:2: note: expanded from macro 'KALLOC_DISPATCH'
+ 1461 |         KALLOC_DISPATCH1(base, KALLOC_COUNT_ARGS(__In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/prng/prng_random.c:33:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/machine/machine_cpu.h:34:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/arm/machine_cpu.h:35:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/arm/cpu_data_internal.h:47:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/arm/pmap.h:46:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/arm/pmap/pmap.h:232:
+VA_ARGS_In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/thread.h:122:
+In file included from _), ##__VA_ARGS{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/task.h:129:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/ipc/ipc_port.h:91:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/ipc/ipc_space.h:__92:
+)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/ipc/ipc_entry.h:131:1{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/kalloc.h:1459:40::  note: expanded from macro 'KALLOC_DISPATCH1'
+warning: cast from 'void (*)(vm_allocation_site_t *)' (aka 'void (*)(struct vm_allocation_site *)') to 'typeof (__zone_site_register(&site)) (*)(const void *)' (aka 'void (*)(const void *)') converts to incompatible function type [-Wcast-function-type-strict]
+ 1459 | #d  131efine KALLO | KALLOC_DISPATC_ARRCH1(AYbase_TYPE, N, _DECL(...) __CONCAipc_eT(base,ntry_tab N)(__VA_Ale, struct ipc_entry);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+R{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/kalloc.h:950:2: note: expanded from macro 'KALLOC_ARRAY_TYPE_DECL'
+GS__)
+      |                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  950 |         KALLOC_DISPATCnote: (skipping 6 expansions in backtrace; use -fmacro-backtrace-limit=0 to see all)
+H(KALLO{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.h:764:2C_ARR: note: expanded from macro '__STARTUP_ARG'
+AY_TYPE_DEC  764 |         __L, ##__VASTARTUP1(_ARGSna__)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+me{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/kalloc.h:1461:, line, 2: note: expanded from macro 'KALLOC_DISPATCH'
+su 1461 |         bsystKALLOCem, r_DISPanATCHk, fu1(base, KALnc, aLOC_rg, arCOUNT_ARg)
+      | GS(        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+__VA_ARGS__), ##__VA_AR{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.h:757:12GS__): note: expanded from macro '__STARTUP1'
+
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  757 |          {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/kalloc.h:1459:40:    rank, __STARTUnote: expanded from macro 'KALLOC_DISPATCH1'
+P_ 1459FUNC_C | #define KALLOC_DISPATCH1(base, N, ...) __CONCAT(base, N)(__VA_ARGS__)
+      |                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+AST(func, a), b, \
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+note: {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.h:748:6: note: expanded from macro '__STARTUP_FUNC_CAST'
+(skipping 6 expansions in backtrace; use -fmacro-backtrace-limit=0 to see all)
+  {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.h:764:2: note: expanded from macro '__STARTUP_ARG'
+748 |             (typeof(func(a))(*)(const void *))func
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  764 |         __STARTUP1(name, line, subsystem, rank, func, arg, arg)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.h:757:12: note: expanded from macro '__STARTUP1'
+  757 |             rank, __STARTUP_FUNC_CAST(func, a), b, \
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.h:748:6: note: expanded from macro '__STARTUP_FUNC_CAST'
+  748 |             (typeof(func(a))(*)(const void *))func
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.c:87:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/sched_prim.h:76:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/thread.h:122:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/task.h:129:
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/ipc/ipc_port.h:117:1: warning: cast from 'void (*)(vm_allocation_site_t *)' (aka 'void (*)(struct vm_allocation_site *)') to 'typeof (__zone_site_register(&site)) (*)(const void *)' (aka 'void (*)(const void *)') converts to incompatible function type [-Wcast-function-type-strict]
+  117 | KALLOC_ARRAY_TYPE_DECL(ipc_port_request_table, struct ipc_port_request);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/kalloc.h:950:2: note: expanded from macro 'KALLOC_ARRAY_TYPE_DECL'
+  950 |         KALLOC_DISPATCH(KALLOC_ARRAY_TYPE_DECL, ##__VA_ARGS__)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/prng/prng_random.c:33:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/machine/machine_cpu.h:34:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/arm/machine_cpu.h:35:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/arm/cpu_data_internal.h:47:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/arm/pmap.h:46:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/arm/pmap/pmap.h:232:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/thread.h:122:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/task.h:129:
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/ipc/ipc_port.h:{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/kalloc.h:1461:2:117:1:  note: expanded from macro 'KALLOC_DISPATCH'
+warning: cast from 'void (*)(vm_allocation_site_t *)' (aka 'void (*)(struct vm_allocation_site *)') to 'typeof (__zone_site_register(&site)) (*)(const void *)' (aka 'void (*)(const void *)') converts to incompatible function type [-Wcast-function-type-strict] 1461 |         KALLOC
+_DISPATCH1(  117 | KALLbase, KALLOC_AROC_COUNT_ARAY_TYRGS(__VPE_DEA_ARCL(ipGS__), c_por##__VA_t_request_table, struct ipc_port_request);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+AR{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/kalloc.h:950:2: note: expanded from macro 'KALLOC_ARRAY_TYPE_DECL'
+GS__)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  950 |         KALLOC_DISPATCH(KALLOC_ARRAY_TYPE_DECL, ##__VA_ARGS__)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/kalloc.h:1461:2: note: expanded from macro 'KALLOC_DISPATCH'
+ 1461 |         KALLOC_DISPATCH1(base, KALLOC_COUNT_ARGS(__VA_ARGS_{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/kalloc.h:_), #1459:40: note: expanded from macro 'KALLOC_DISPATCH1'
+#__VA_AR 1459 | #defiGSne__ KAL)
+      | LOC_DISP        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ATCH1(b{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/kalloc.h:ase, 1459:40: N, ...) __CONnote: expanded from macro 'KALLOC_DISPATCH1'
+CAT(bas 1459 | #de, N)(_efine_VA_ARGS__ KALLOC_DISPATCH1(bas)
+      |                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+e, N, ...) __CONCAT(base, N)(__VA_ARGS__)
+      |                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+note: (skipping 6 expansions in backtrace; use -fmacro-backtrace-limit=0 to see all)
+note: (skipping 6 expansions in backtrace; use -fmacro-backtrace-limit=0 to see all)
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.h{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.h:764:2: note: expanded from macro '__STARTUP_ARG'
+:764:2: note: expanded from macro '__STARTUP_ARG'
+  764 |         __STARTUP1(name, line, subsystem  764 |         __STARTUP1(name, line, subsystem, rank, func, arg, arg)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+, rank, func, arg, arg)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.h:757:12: note: expanded from macro '__STARTUP1'
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.h:757:12: note: expanded from macro '__STARTUP1'
+  757 |             rank, __STARTUP_FUNC_C  757 |             rank, __STARTUP_FUNC_CAST(func, a), b, \AST(func, a), b, \
+      |
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.h:748:6: note: expanded from macro '__STARTUP_FUNC_CAST'
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.h:748:6: note: expanded from macro '__STARTUP_FUNC_CAST'
+  748 |             (typeof(func(a)  748 |             (typeof(f)(*)(const void unc(a*))func
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+))(*)(const void *))func
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.c:87:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/sched_prim.h:76:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/thread.h:122:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/task.h:129:
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/ipc/ipc_port.h:117:1: warning: cast from 'void (*)(vm_allocation_site_t *)' (aka 'void (*)(struct vm_allocation_site *)') to 'typeof (__zone_site_register(&site)) (*)(const void *)' (aka 'void (*)(const void *)') converts to incompatible function type [-Wcast-function-type-strict]
+  117 | In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/prng/prng_random.cKALLOC_ARRAY_TYPE_DECL(ipc_port_reque:33:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/machine/machine_cpu.h:34:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/arm/machine_cpu.h:35:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/arm/cpu_data_internal.h:47:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/arm/pmap.h:46:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/arm/pmap/pmap.hst_table:232:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/thread.h:122:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/task.h:129:
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/ipc/ipc_port.h:117:1: warning: cast from 'void (*)(vm_allocation_site_t *)' (aka 'void (*)(struct vm_allocation_site *)') to 'typeof (__zone_site_register(&site)) (*)(const void *)' (aka 'void (*)(const void *)') converts to incompatible function type [-Wcast-function-type-strict]
+,  117 struct ipc_port_request);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ | KALLOC_ARRAY_TYPE_DECL(ipc_port_request{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/kalloc.h:950:2: note: expanded from macro 'KALLOC_ARRAY_TYPE_DECL'
+_table, struct ipc_port_request);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  950 |         KALLOC_DISPATCH({unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/kalloc.h:950:2: note: expanded from macro 'KALLOC_ARRAY_TYPE_DECL'
+KALLOC_ARRAY_TYPE_DECL, ##__VA_ARGS__)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  950 |         KALLOC_DISPATCH(KALLOC_ARRAY_TYPE_DECL, ##__VA_ARGS__)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/kalloc.h:1461:2: note: expanded from macro 'KALLOC_DISPATCH'
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/kalloc.h:1461:2: note: expanded from macro 'KALLOC_DISPATCH'
+ 1461 |         KALLOC_DISPATCH1(base, KALLOC_COUNT_ARGS(__VA_ARGS__), ##__VA_ARG 1461 |         KALLS__)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OC_DISPATCH1(base, {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/kalloc.h:1459:40: note: expanded from macro 'KALLOC_DISPATCH1'
+KALLOC_COUNT_ARGS(__VA_ARGS__), ##__VA_ARGS__)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/kalloc.h:1459:40: note: expanded from macro 'KALLOC_DISPATCH1'
+1459 | #define KALLOC_DISPATCH1(base, N, ...) __CONCAT(base, N)(__VA_ARGS__)
+      |                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 1459 | #note: (skipping 6 expansions in backtrace; use -fmacro-backtrace-limit=0 to see all)
+define KALLOC_DISPATCH1(base, N, ...) __CONCAT(base, N)(__VA_{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.h:764:2: ARGS__)
+      |                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+note: (skipping 6 expansions in backtrace; use -fmacro-backtrace-limit=0 to see all)
+note: expanded from macro '__STARTUP_ARG'
+  764 |         __STARTUP1(name, line, subsystem, rank, func, arg, arg)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.h:764:2: note: expanded from macro '__STARTUP_ARG'
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.h:757:12:  764 |         __STARTUP1(nam note: expanded from macro '__STARTUP1'
+e, line, subsystem, rank,   757 |             rank, __STARTUP_FUNC_CAST(func, arg,func arg)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+, a), b, \
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.h:757:12: note: expanded from macro '__STARTUP1'
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.h:748:6  757 |             rank, __STARTUP_FUNC_CAST(func, a), b, \
+      : note: expanded from macro '__STARTUP_FUNC_CAST'|                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  748 |             (typeof(func(a))(*)(const void *))func
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.h:748:6: note: expanded from macro '__STARTUP_FUNC_CAST'
+  748 |             (typeof(func(a))(*)(const void *))func
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.c:111:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/vm/vm_map.h:92:
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/vm/vm_object.h:661:53: warning: format specifies type 'unsigned int' but the argument has type 'int' [-Wformat]
+  661 |         assertf(object->purgable == value, "0x%x != 0x%x", value, object->purgable);
+      |                                               ~~           ^~~~~
+      |                                               %x
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/assert.h:99:124: note: expanded from macro 'assertf'
+   99 |         (__builtin_expect(!!((ex)), 1L) ? (void)0 : __Panic("%s:%d Assertion failed: %s : " fmt, __FILE_NAME__, __LINE__, # ex, ##args))
+      |                                                                                             ~~~                                   ^~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/assert.h:86:46: note: expanded from macro '__Panic'
+   86 | #define __Panic(fmt, args...) (panic)(fmt, ##args)
+      |                                       ~~~    ^~~~
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.c:111:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/vm/vm_map.h:92:
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/vm/vm_object.h:661:60: warning: format specifies type 'unsigned int' but the argument has type 'int' [-Wformat]
+  661 |         assertf(object->purgable == value, "0x%x != 0x%x", value, object->purgable);
+      |                                                       ~~          ^~~~~~~~~~~~~~~~
+      |                                                       %x
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/assert.h:99:124: note: expanded from macro 'assertf'
+   99 |         (__builtin_expect(!!((ex)), 1L) ? (void)0 : __Panic("%s:%d Assertion failed: %s : " fmt, __FILE_NAME__, __LINE__, # ex, ##args))
+      |                                                                                             ~~~                                   ^~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/assert.h:86:46: note: expanded from macro '__Panic'
+   86 | #define __Panic(fmt, args...) (panic)(fmt, ##args)
+      |                                       ~~~    ^~~~
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.c:111:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/vm/vm_map.h:92:
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/vm/vm_object.h:750:60: warning: format specifies type 'unsigned int' but the argument has type 'int' [-Wformat]
+  750 |         assertf(object->no_pager_reason == value, "0x%x != 0x%x", value, object->no_pager_reason);
+      |                                                      ~~           ^~~~~
+      |                                                      %x
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/assert.h:99:124: note: expanded from macro 'assertf'
+   99 |         (__builtin_expect(!!((ex)), 1L) ? (void)0 : __Panic("%s:%d Assertion failed: %s : " fmt, __FILE_NAME__, __LINE__, # ex, ##args))
+      |                                                                                             ~~~                                   ^~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/assert.h:86:46: note: expanded from macro '__Panic'
+   86 | #define __Panic(fmt, args...) (panic)(fmt, ##args)
+      |                                       ~~~    ^~~~
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.c:111:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/vm/vm_map.h:92:
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/vm/vm_object.h:750:67: warning: format specifies type 'unsigned int' but the argument has type 'int' [-Wformat]
+  750 |         assertf(object->no_pager_reason == value, "0x%x != 0x%x", value, object->no_pager_reason);
+      |                                                              ~~          ^~~~~~~~~~~~~~~~~~~~~~~
+      |                                                              %x
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/assert.h:99:124: note: expanded from macro 'assertf'
+   99 |         (__builtin_expect(!!((ex)), 1L) ? (void)0 : __Panic("%s:%d Assertion failed: %s : " fmt, __FILE_NAME__, __LINE__, # ex, ##args))
+      |                                                                                             ~~~                                   ^~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/assert.h:86:46: note: expanded from macro '__Panic'
+   86 | #define __Panic(fmt, args...) (panic)(fmt, ##args)
+      |                                       ~~~    ^~~~
+7 warnings generated.
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.c:219:1: warning: cast from 'void (*)(const struct startup_tunable_spec *)' to 'typeof (kernel_startup_tunable_init(&__startup_TUNABLES_spec_startup_debug)) (*)(const void *)' (aka 'void (*)(const void *)') converts to incompatible function type [-Wcast-function-type-strict]
+  219 | TUNABLE(startup_debug_t, startup_debug, "startup_debug", 0);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.h:247:2: note: expanded from macro 'TUNABLE'
+  247 |         __TUNABLE(type_t, var, boot_arg)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.h:711:2: note: expanded from macro '__TUNABLE'
+  711 |         __STARTUP_ARG(var, __LINE__, TUNABLES, STARTUP_RANK_FIRST, \
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  712 |             kernel_startup_tunable_init, &__startup_TUNABLES_spec_ ## var)
+      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.h:764:2: note: expanded from macro '__STARTUP_ARG'
+  764 |         __STARTUP1(name, line, subsystem, rank, func, arg, arg)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.h:757:12: note: expanded from macro '__STARTUP1'
+  757 |             rank, __STARTUP_FUNC_CAST(func, a), b, \
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.h:748:6: note: expanded from macro '__STARTUP_FUNC_CAST'
+  748 |             (typeof(func(a))(*)(const void *))func
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.c:406:8: warning: format specifies type 'int' but the argument has underlying type 'uint32_t' (aka 'unsigned int') [-Wformat]
+  405 |                         kprintf("%s[%d, rank %d]: %p(%p)\n", __func__,
+      |                                     ~~
+      |                                     %u
+  406 |                             cur->subsystem, cur->rank, cur->func, cur->arg);
+      |                             ^~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.c:406:24: warning: format specifies type 'int' but the argument has underlying type 'uint32_t' (aka 'unsigned int') [-Wformat]
+  405 |                         kprintf("%s[%d, rank %d]: %p(%p)\n", __func__,
+      |                                              ~~
+      |                                              %u
+  406 |                             cur->subsystem, cur->rank, cur->func, cur->arg);
+      |                                             ^~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.c:417:47: warning: format specifies type 'int' but the argument has underlying type 'uint32_t' (aka 'unsigned int') [-Wformat]
+  417 |                 kprintf("%s: reached phase %d\n", __func__, upto);
+      |                                            ~~               ^~~~
+      |                                            %u
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.c:571:32: warning: cast from 'void (*)(void)' to 'thread_continue_t' (aka 'void (*)(void *, int)') converts to incompatible function type [-Wcast-function-type-strict]
+  571 |         result = kernel_thread_create((thread_continue_t)kernel_bootstrap_thread, NULL, MAXPRI_KERNEL, &thread);
+      |                                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.c:574:44: warning: format specifies type 'unsigned int' but the argument has type 'kern_return_t' (aka 'int') [-Wformat]
+  574 |                 panic("kernel_bootstrap: result = %08X", result);
+      |                                                   ~~~~   ^~~~~~
+      |                                                   %08X
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/debug.h:597:27: note: expanded from macro 'panic'
+  597 |         (panic)(ex " @%s:%d", ## __VA_ARGS__, __FILE_NAME__, __LINE__); \
+      |                 ~~               ^~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/startup.c:790:62: warning: format specifies type 'unsigned int' but the argument has type 'kern_return_t' (aka 'int') [-Wformat]
+  790 |                 panic("kernel_do_post: Tests failed with result = 0x%08x", result);
+      |                                                                     ~~~~   ^~~~~~
+      |                                                                     %08x
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/osfmk/kern/debug.h:597:27: note: expanded from macro 'panic'
+  597 |         (panic)(ex " @%s:%d", ## __VA_ARGS__, __FILE_NAME__, __LINE__); \
+      |                 ~~               ^~~~~~~~~~~
+18 warnings generated.
+     LDFILELIST osfmk
+             CC vfs_conf.o
+             CC ubc_subr.o
+clang: warning: no such include directory: '{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/libsa' [-Wmissing-include-dirs]
+clang: warning: no such include directory: '{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/libsa' [-Wmissing-include-dirs]
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/kern/ubc_subr.c:41:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/sys/systm.h:108:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/sys/vm.h:136:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/thread.h:98:
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/vm/vm_kern.h:841:29: warning: bitwise operation between different enumeration types ('kmr_flags_t' and 'kmem_flags_t') [-Wenum-enum-conversion]
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/vfs/vfs_conf.c:71:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/sys/systm.h:108:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/sys/vm.h:136:
+In file included from {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/thread.h:98:
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/vm/vm_kern.h:841:29: warning: bitwise operation between different enumeration types ('kmr_flags_t' and 'kmem_flags_t') [-Wenum-enum-conversion]
+  841 | __a  841 | __attribute__((diagnttribute__((diagnose_if(!KMEM_REALLOC_FLAGS_VALID(flags),
+      |                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ose_if(!KMEM_REALLOC_FLAGS_VALID(flags),
+      |                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/vm/vm_kern.h:793:27: note: expanded from macro 'KMEM_REALLOC_FLAGS_VALID'
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/vm/vm_kern.h:793:27: note: expanded from macro 'KMEM_REALLOC_FLAGS_VALID'
+  793 |         (((flags) & (KMR_KOBJECT |   793 |         ((KMEM_GU(flags) & (KMR_KOBJECT | KMEM_GUARD_LAST | KMEM_KASAN_GUARD | KMR_DATA)) == KMR_DATA || ((flags) & KMR_FREEOLD))
+      |                      ~~~~~~~~~~~ ^ ~~~~~~~~~~~~~~~
+ARD_LAST | KMEM_KASAN_GUARD | KMR_DATA)) == KMR_DATA || ((flags) & KMR_FREEOLD))
+      |                      ~~~~~~~~~~~ ^ ~~~~~~~~~~~~~~~
+1 warning generated.
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/kern/ubc_subr.c:116:1: warning: cast from 'void (*)(struct zone_create_startup_spec *)' to 'typeof (zone_create_startup(&__startup_zone_spec_ubc_info_zone)) (*)(const void *)' (aka 'void (*)(const void *)') converts to incompatible function type [-Wcast-function-type-strict]
+  116 | ZONE_DEFINE_TYPE(ubc_info_zone, "ubc_info zone", struct ubc_info,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  117 |     ZC_ZFREE_CLEARMEM);
+      |     ~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/zalloc.h:1759:2: note: expanded from macro 'ZONE_DEFINE_TYPE'
+ 1759 |         ZONE_DEFINE(var, name, sizeof(type_t), flags); \
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/zalloc.h:1743:2: note: expanded from macro 'ZONE_DEFINE'
+ 1743 |         STARTUP_ARG(ZALLOC, STARTUP_RANK_FOURTH, zone_create_startup, \
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 1744 |             &__startup_zone_spec_ ## var)
+      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:224:2: note: expanded from macro 'STARTUP_ARG'
+  224 |         __STARTUP_ARG(func, __LINE__, subsystem, rank, func, arg)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:764:2: note: expanded from macro '__STARTUP_ARG'
+  764 |         __STARTUP1(name, line, subsystem, rank, func, arg, arg)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:757:12: note: expanded from macro '__STARTUP1'
+  757 |             rank, __STARTUP_FUNC_CAST(func, a), b, \
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:748:6: note: expanded from macro '__STARTUP_FUNC_CAST'
+  748 |             (typeof(func(a))(*)(const void *))func
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/kern/ubc_subr.c:125:1: warning: cast from 'void (*)(struct zone_create_startup_spec *)' to 'typeof (zone_create_startup(&__startup_zone_spec_126)) (*)(const void *)' (aka 'void (*)(const void *)') converts to incompatible function type [-Wcast-function-type-strict]
+  125 | ZONE_DEFINE_ID(ZONE_ID_CS_BLOB, "cs_blob zone", struct cs_blob,
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  126 |     ZC_READONLY | ZC_ZFREE_CLEARMEM);
+      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/zalloc.h:1776:2: note: expanded from macro 'ZONE_DEFINE_ID'
+ 1776 |         ZONE_INIT(NULL, name, sizeof(type_t), flags, zid, NULL)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/zalloc.h:1794:2: note: expanded from macro 'ZONE_INIT'
+ 1794 |         __ZONE_INIT(__LINE__, var, name, size, flags, desired_zid, extra_setup)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/zalloc.h:2509:2: note: expanded from macro '__ZONE_INIT'
+ 2509 |         __ZONE_INIT1(ns, var, name, size, flags, zid, setup) \
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+note: (skipping 2 expansions in backtrace; use -fmacro-backtrace-limit=0 to see all)
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:764:2: note: expanded from macro '__STARTUP_ARG'
+  764 |         __STARTUP1(name, line, subsystem, rank, func, arg, arg)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:757:12: note: expanded from macro '__STARTUP1'
+  757 |             rank, __STARTUP_FUNC_CAST(func, a), b, \
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:748:6: note: expanded from macro '__STARTUP_FUNC_CAST'
+  748 |             (typeof(func(a))(*)(const void *))func
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/kern/ubc_subr.c:176:13: warning: cast from 'void (*)(SHA1_CTX *)' (aka 'void (*)(struct sha1_ctxt *)') to 'cs_md_init' (aka 'void (*)(void *)') converts to incompatible function type [-Wcast-function-type-strict]
+  176 |         .cs_init = (cs_md_init)SHA1Init,
+      |                    ^~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/kern/ubc_subr.c:177:15: warning: cast from 'void (*)(SHA1_CTX *, const void *, size_t)' (aka 'void (*)(struct sha1_ctxt *, const void *, unsigned long)') to 'cs_md_update' (aka 'void (*)(void *, const void *, unsigned long)') converts to incompatible function type [-Wcast-function-type-strict]
+  177 |         .cs_update = (cs_md_update)SHA1Update,
+      |                      ^~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/kern/ubc_subr.c:178:14: warning: cast from 'void (*)(void *, SHA1_CTX *)' (aka 'void (*)(void *, struct sha1_ctxt *)') to 'cs_md_final' (aka 'void (*)(void *, void *)') converts to incompatible function type [-Wcast-function-type-strict]
+  178 |         .cs_final = (cs_md_final)SHA1Final,
+      |                     ^~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/kern/ubc_subr.c:185:13: warning: cast from 'void (*)(SHA256_CTX *)' to 'cs_md_init' (aka 'void (*)(void *)') converts to incompatible function type [-Wcast-function-type-strict]
+  185 |         .cs_init = (cs_md_init)SHA256_Init,
+      |                    ^~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/kern/ubc_subr.c:186:15: warning: cast from 'void (*)(SHA256_CTX *, const void *, size_t)' (aka 'void (*)(SHA256_CTX *, const void *, unsigned long)') to 'cs_md_update' (aka 'void (*)(void *, const void *, unsigned long)') converts to incompatible function type [-Wcast-function-type-strict]
+  186 |         .cs_update = (cs_md_update)SHA256_Update,
+      |                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/kern/ubc_subr.c:187:14: warning: cast from 'void (*)(void *, SHA256_CTX *)' to 'cs_md_final' (aka 'void (*)(void *, void *)') converts to incompatible function type [-Wcast-function-type-strict]
+  187 |         .cs_final = (cs_md_final)SHA256_Final,
+      |                     ^~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/kern/ubc_subr.c:193:13: warning: cast from 'void (*)(SHA256_CTX *)' to 'cs_md_init' (aka 'void (*)(void *)') converts to incompatible function type [-Wcast-function-type-strict]
+  193 |         .cs_init = (cs_md_init)SHA256_Init,
+      |                    ^~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/kern/ubc_subr.c:194:15: warning: cast from 'void (*)(SHA256_CTX *, const void *, size_t)' (aka 'void (*)(SHA256_CTX *, const void *, unsigned long)') to 'cs_md_update' (aka 'void (*)(void *, const void *, unsigned long)') converts to incompatible function type [-Wcast-function-type-strict]
+  194 |         .cs_update = (cs_md_update)SHA256_Update,
+      |                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/kern/ubc_subr.c:195:14: warning: cast from 'void (*)(void *, SHA256_CTX *)' to 'cs_md_final' (aka 'void (*)(void *, void *)') converts to incompatible function type [-Wcast-function-type-strict]
+  195 |         .cs_final = (cs_md_final)SHA256_Final,
+      |                     ^~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/kern/ubc_subr.c:201:13: warning: cast from 'void (*)(SHA384_CTX *)' (aka 'void (*)(struct SHA512_CTX *)') to 'cs_md_init' (aka 'void (*)(void *)') converts to incompatible function type [-Wcast-function-type-strict]
+  201 |         .cs_init = (cs_md_init)SHA384_Init,
+      |                    ^~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/kern/ubc_subr.c:202:15: warning: cast from 'void (*)(SHA384_CTX *, const void *, size_t)' (aka 'void (*)(struct SHA512_CTX *, const void *, unsigned long)') to 'cs_md_update' (aka 'void (*)(void *, const void *, unsigned long)') converts to incompatible function type [-Wcast-function-type-strict]
+  202 |         .cs_update = (cs_md_update)SHA384_Update,
+      |                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/kern/ubc_subr.c:203:14: warning: cast from 'void (*)(void *, SHA384_CTX *)' (aka 'void (*)(void *, struct SHA512_CTX *)') to 'cs_md_final' (aka 'void (*)(void *, void *)') converts to incompatible function type [-Wcast-function-type-strict]
+  203 |         .cs_final = (cs_md_final)SHA384_Final,
+      |                     ^~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/kern/ubc_subr.c:298:10: warning: format specifies type 'int' but the argument has type 'uint32_t' (aka 'unsigned int') [-Wformat]
+  297 |                                         printf("CODE SIGNING: unordered Scatter, prev base %d, cur base %d\n",
+      |                                                                                            ~~
+      |                                                                                            %u
+  298 |                                             sbase, new_base);
+      |                                             ^~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/kern/ubc_subr.c:298:17: warning: format specifies type 'int' but the argument has type 'uint32_t' (aka 'unsigned int') [-Wformat]
+  297 |                                         printf("CODE SIGNING: unordered Scatter, prev base %d, cur base %d\n",
+      |                                                                                                         ~~
+      |                                                                                                         %u
+  298 |                                             sbase, new_base);
+      |                                                    ^~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/kern/ubc_subr.c:593:102: warning: format specifies type 'unsigned int' but the argument has type 'int' [-Wformat]
+  593 |                                         printf("CodeDirectory type %d rank %d at slot 0x%x index %d\n", candidate->hashType, (int)rank, (int)type, (int)n);
+      |                                                                                         ~~                                              ^~~~~~~~~
+      |                                                                                         %x
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/kern/ubc_subr.c:600:81: warning: format specifies type 'int' but the argument has type 'unsigned int' [-Wformat]
+  600 |                                                 printf("using CodeDirectory type %d (rank %d)\n", (int)best_cd->hashType, best_rank);
+      |                                                                                           ~~                              ^~~~~~~~~
+      |                                                                                           %u
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/kern/ubc_subr.c:2112:19: warning: variable 'uip' set but not used [-Wunused-but-set-variable]
+ 2112 |         struct ubc_info *uip;
+      |                          ^
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/kern/ubc_subr.c:3066:1: warning: cast from 'void (*)(struct sysctl_oid *)' to 'typeof (sysctl_register_oid_early(&sysctl__vm_cs_blob_count)) (*)(const void *)' (aka 'void (*)(const void *)') converts to incompatible function type [-Wcast-function-type-strict]
+ 3066 | SYSCTL_UINT(_vm, OID_AUTO, cs_blob_count, CTLFLAG_RD | CTLFLAG_LOCKED, &cs_blob_count, 0, "Current number of code signature blobs");
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/sys/sysctl.h:486:2: note: expanded from macro 'SYSCTL_UINT'
+  486 |         SYSCTL_OID(parent, nbr, name, CTLTYPE_INT|access, \
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  487 |             ptr, val, sysctl_handle_int, "IU", descr); \
+      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/sys/sysctl.h:416:2: note: expanded from macro 'SYSCTL_OID'
+  416 |         __STARTUP_ARG(sysctl_##parent, _##name,                                 \
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  417 |             SYSCTL, STARTUP_RANK_SECOND, sysctl_register_oid_early,             \
+      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  418 |             &sysctl_##parent##_##name)
+      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:764:2: note: expanded from macro '__STARTUP_ARG'
+  764 |         __STARTUP1(name, line, subsystem, rank, func, arg, arg)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:757:12: note: expanded from macro '__STARTUP1'
+  757 |             rank, __STARTUP_FUNC_CAST(func, a), b, \
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:748:6: note: expanded from macro '__STARTUP_FUNC_CAST'
+  748 |             (typeof(func(a))(*)(const void *))func
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/kern/ubc_subr.c:3067:1: warning: cast from 'void (*)(struct sysctl_oid *)' to 'typeof (sysctl_register_oid_early(&sysctl__vm_cs_blob_size)) (*)(const void *)' (aka 'void (*)(const void *)') converts to incompatible function type [-Wcast-function-type-strict]
+ 3067 | SYSCTL_ULONG(_vm, OID_AUTO, cs_blob_size, CTLFLAG_RD | CTLFLAG_LOCKED, &cs_blob_size, "Current size of all code signature blobs");
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/sys/sysctl.h:500:2: note: expanded from macro 'SYSCTL_ULONG'
+  500 |         SYSCTL_OID(parent, nbr, name, CTLTYPE_INT|access, \
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  501 |             ptr, 0, sysctl_handle_long, "LU", descr); \
+      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/sys/sysctl.h:416:2: note: expanded from macro 'SYSCTL_OID'
+  416 |         __STARTUP_ARG(sysctl_##parent, _##name,                                 \
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  417 |             SYSCTL, STARTUP_RANK_SECOND, sysctl_register_oid_early,             \
+      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  418 |             &sysctl_##parent##_##name)
+      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:764:2: note: expanded from macro '__STARTUP_ARG'
+  764 |         __STARTUP1(name, line, subsystem, rank, func, arg, arg)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:757:12: note: expanded from macro '__STARTUP1'
+  757 |             rank, __STARTUP_FUNC_CAST(func, a), b, \
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:748:6: note: expanded from macro '__STARTUP_FUNC_CAST'
+  748 |             (typeof(func(a))(*)(const void *))func
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/kern/ubc_subr.c:3068:1: warning: cast from 'void (*)(struct sysctl_oid *)' to 'typeof (sysctl_register_oid_early(&sysctl__vm_cs_blob_count_peak)) (*)(const void *)' (aka 'void (*)(const void *)') converts to incompatible function type [-Wcast-function-type-strict]
+ 3068 | SYSCTL_UINT(_vm, OID_AUTO, cs_blob_count_peak, CTLFLAG_RD | CTLFLAG_LOCKED, &cs_blob_count_peak, 0, "Peak number of code signature blobs");
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/sys/sysctl.h:486:2: note: expanded from macro 'SYSCTL_UINT'
+  486 |         SYSCTL_OID(parent, nbr, name, CTLTYPE_INT|access, \
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  487 |             ptr, val, sysctl_handle_int, "IU", descr); \
+      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/sys/sysctl.h:416:2: note: expanded from macro 'SYSCTL_OID'
+  416 |         __STARTUP_ARG(sysctl_##parent, _##name,                                 \
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  417 |             SYSCTL, STARTUP_RANK_SECOND, sysctl_register_oid_early,             \
+      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  418 |             &sysctl_##parent##_##name)
+      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:764:2: note: expanded from macro '__STARTUP_ARG'
+  764 |         __STARTUP1(name, line, subsystem, rank, func, arg, arg)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:757:12: note: expanded from macro '__STARTUP1'
+  757 |             rank, __STARTUP_FUNC_CAST(func, a), b, \
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:748:6: note: expanded from macro '__STARTUP_FUNC_CAST'
+  748 |             (typeof(func(a))(*)(const void *))func
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/kern/ubc_subr.c:3069:1: warning: cast from 'void (*)(struct sysctl_oid *)' to 'typeof (sysctl_register_oid_early(&sysctl__vm_cs_blob_size_peak)) (*)(const void *)' (aka 'void (*)(const void *)') converts to incompatible function type [-Wcast-function-type-strict]
+ 3069 | SYSCTL_ULONG(_vm, OID_AUTO, cs_blob_size_peak, CTLFLAG_RD | CTLFLAG_LOCKED, &cs_blob_size_peak, "Peak size of code signature blobs");
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/sys/sysctl.h:500:2: note: expanded from macro 'SYSCTL_ULONG'
+  500 |         SYSCTL_OID(parent, nbr, name, CTLTYPE_INT|access, \
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  501 |             ptr, 0, sysctl_handle_long, "LU", descr); \
+      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/sys/sysctl.h:416:2: note: expanded from macro 'SYSCTL_OID'
+  416 |         __STARTUP_ARG(sysctl_##parent, _##name,                                 \
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  417 |             SYSCTL, STARTUP_RANK_SECOND, sysctl_register_oid_early,             \
+      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  418 |             &sysctl_##parent##_##name)
+      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:764:2: note: expanded from macro '__STARTUP_ARG'
+  764 |         __STARTUP1(name, line, subsystem, rank, func, arg, arg)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:757:12: note: expanded from macro '__STARTUP1'
+  757 |             rank, __STARTUP_FUNC_CAST(func, a), b, \
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:748:6: note: expanded from macro '__STARTUP_FUNC_CAST'
+  748 |             (typeof(func(a))(*)(const void *))func
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/kern/ubc_subr.c:3070:1: warning: cast from 'void (*)(struct sysctl_oid *)' to 'typeof (sysctl_register_oid_early(&sysctl__vm_cs_blob_size_max)) (*)(const void *)' (aka 'void (*)(const void *)') converts to incompatible function type [-Wcast-function-type-strict]
+ 3070 | SYSCTL_ULONG(_vm, OID_AUTO, cs_blob_size_max, CTLFLAG_RD | CTLFLAG_LOCKED, &cs_blob_size_max, "Size of biggest code signature blob");
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/sys/sysctl.h:500:2: note: expanded from macro 'SYSCTL_ULONG'
+  500 |         SYSCTL_OID(parent, nbr, name, CTLTYPE_INT|access, \
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  501 |             ptr, 0, sysctl_handle_long, "LU", descr); \
+      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/sys/sysctl.h:416:2: note: expanded from macro 'SYSCTL_OID'
+  416 |         __STARTUP_ARG(sysctl_##parent, _##name,                                 \
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  417 |             SYSCTL, STARTUP_RANK_SECOND, sysctl_register_oid_early,             \
+      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  418 |             &sysctl_##parent##_##name)
+      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:764:2: note: expanded from macro '__STARTUP_ARG'
+  764 |         __STARTUP1(name, line, subsystem, rank, func, arg, arg)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:757:12: note: expanded from macro '__STARTUP1'
+  757 |             rank, __STARTUP_FUNC_CAST(func, a), b, \
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:748:6: note: expanded from macro '__STARTUP_FUNC_CAST'
+  748 |             (typeof(func(a))(*)(const void *))func
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/kern/ubc_subr.c:5061:7: warning: format specifies type 'unsigned long long' but the argument has type 'off_t' (aka 'long long') [-Wformat]
+ 5057 |                     "range 0x%llx:0x%llx flags 0x%x\n",
+      |                              ~~~~
+      |                              %llx
+ 5058 |                     proc_getpid(p), p->p_comm,
+ 5059 |                     blob_ro->csb_cpu_type == -1 ? "detached" : "embedded",
+ 5060 |                     name,
+ 5061 |                     blob_ro->csb_base_offset + blob_ro->csb_start_offset,
+      |                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/kern/ubc_subr.c:5062:7: warning: format specifies type 'unsigned long long' but the argument has type 'off_t' (aka 'long long') [-Wformat]
+ 5057 |                     "range 0x%llx:0x%llx flags 0x%x\n",
+      |                                     ~~~~
+      |                                     %llx
+ 5058 |                     proc_getpid(p), p->p_comm,
+ 5059 |                     blob_ro->csb_cpu_type == -1 ? "detached" : "embedded",
+ 5060 |                     name,
+ 5061 |                     blob_ro->csb_base_offset + blob_ro->csb_start_offset,
+ 5062 |                     blob_ro->csb_base_offset + blob_ro->csb_end_offset,
+      |                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/kern/ubc_subr.c:5813:11: warning: cast from 'void (*)(vm_allocation_site_t *)' (aka 'void (*)(struct vm_allocation_site *)') to 'typeof (__zone_site_register(&site)) (*)(const void *)' (aka 'void (*)(const void *)') converts to incompatible function type [-Wcast-function-type-strict]
+ 5813 |         buffer = kalloc_data(CS_NATIVE4K_CHUNK, Z_WAITOK);
+      |                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/kalloc.h:512:2: note: expanded from macro 'kalloc_data'
+  512 |         kheap_alloc(KHEAP_DATA_BUFFERS, size, flags)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/kalloc.h:503:44: note: expanded from macro 'kheap_alloc'
+  503 |         kheap_alloc_tag(kalloc_heap, size, flags, VM_ALLOC_SITE_TAG())
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/zalloc.h:2540:2: note: expanded from macro 'VM_ALLOC_SITE_TAG'
+ 2540 |         STARTUP_ARG(ZALLOC, STARTUP_RANK_MIDDLE, __zone_site_register, &site);   \
+      |         ^
+note: (skipping 2 expansions in backtrace; use -fmacro-backtrace-limit=0 to see all)
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:757:12: note: expanded from macro '__STARTUP1'
+  757 |             rank, __STARTUP_FUNC_CAST(func, a), b, \
+      |                   ^
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:748:6: note: expanded from macro '__STARTUP_FUNC_CAST'
+  748 |             (typeof(func(a))(*)(const void *))func
+      |             ^
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/kalloc.h:501:63: note: expanded from macro 'kheap_alloc_tag'
+  501 |         __kheap_alloc(kalloc_heap, size, __zone_flags_mix_tag(flags, itag), NULL)
+      |                                                                      ^~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/kern/ubc_subr.c:6087:8: warning: cast from 'void (*)(const struct startup_tunable_spec *)' to 'typeof (kernel_startup_tunable_init(&__startup_TUNABLES_spec_cs_text_fixup_arg0)) (*)(const void *)' (aka 'void (*)(const void *)') converts to incompatible function type [-Wcast-function-type-strict]
+ 6087 | static TUNABLE_STR(cs_text_fixup_arg0, 160, "text-fixup0", "");
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:301:2: note: expanded from macro 'TUNABLE_STR'
+  301 |         __TUNABLE_STR(var, boot_arg)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:723:2: note: expanded from macro '__TUNABLE_STR'
+  723 |         __STARTUP_ARG(var, __LINE__, TUNABLES, STARTUP_RANK_FIRST, \
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  724 |             kernel_startup_tunable_init, &__startup_TUNABLES_spec_ ## var)
+      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:764:2: note: expanded from macro '__STARTUP_ARG'
+  764 |         __STARTUP1(name, line, subsystem, rank, func, arg, arg)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:757:12: note: expanded from macro '__STARTUP1'
+  757 |             rank, __STARTUP_FUNC_CAST(func, a), b, \
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:748:6: note: expanded from macro '__STARTUP_FUNC_CAST'
+  748 |             (typeof(func(a))(*)(const void *))func
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/kern/ubc_subr.c:6088:8: warning: cast from 'void (*)(const struct startup_tunable_spec *)' to 'typeof (kernel_startup_tunable_init(&__startup_TUNABLES_spec_cs_text_fixup_arg1)) (*)(const void *)' (aka 'void (*)(const void *)') converts to incompatible function type [-Wcast-function-type-strict]
+ 6088 | static TUNABLE_STR(cs_text_fixup_arg1, 160, "text-fixup1", "");
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:301:2: note: expanded from macro 'TUNABLE_STR'
+  301 |         __TUNABLE_STR(var, boot_arg)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:723:2: note: expanded from macro '__TUNABLE_STR'
+  723 |         __STARTUP_ARG(var, __LINE__, TUNABLES, STARTUP_RANK_FIRST, \
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  724 |             kernel_startup_tunable_init, &__startup_TUNABLES_spec_ ## var)
+      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:764:2: note: expanded from macro '__STARTUP_ARG'
+  764 |         __STARTUP1(name, line, subsystem, rank, func, arg, arg)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:757:12: note: expanded from macro '__STARTUP1'
+  757 |             rank, __STARTUP_FUNC_CAST(func, a), b, \
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:748:6: note: expanded from macro '__STARTUP_FUNC_CAST'
+  748 |             (typeof(func(a))(*)(const void *))func
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/kern/ubc_subr.c:6089:8: warning: cast from 'void (*)(const struct startup_tunable_spec *)' to 'typeof (kernel_startup_tunable_init(&__startup_TUNABLES_spec_cs_text_fixup_arg2)) (*)(const void *)' (aka 'void (*)(const void *)') converts to incompatible function type [-Wcast-function-type-strict]
+ 6089 | static TUNABLE_STR(cs_text_fixup_arg2, 160, "text-fixup2", "");
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:301:2: note: expanded from macro 'TUNABLE_STR'
+  301 |         __TUNABLE_STR(var, boot_arg)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:723:2: note: expanded from macro '__TUNABLE_STR'
+  723 |         __STARTUP_ARG(var, __LINE__, TUNABLES, STARTUP_RANK_FIRST, \
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  724 |             kernel_startup_tunable_init, &__startup_TUNABLES_spec_ ## var)
+      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:764:2: note: expanded from macro '__STARTUP_ARG'
+  764 |         __STARTUP1(name, line, subsystem, rank, func, arg, arg)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:757:12: note: expanded from macro '__STARTUP1'
+  757 |             rank, __STARTUP_FUNC_CAST(func, a), b, \
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:748:6: note: expanded from macro '__STARTUP_FUNC_CAST'
+  748 |             (typeof(func(a))(*)(const void *))func
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/kern/ubc_subr.c:6090:8: warning: cast from 'void (*)(const struct startup_tunable_spec *)' to 'typeof (kernel_startup_tunable_init(&__startup_TUNABLES_spec_cs_text_fixup_arg3)) (*)(const void *)' (aka 'void (*)(const void *)') converts to incompatible function type [-Wcast-function-type-strict]
+ 6090 | static TUNABLE_STR(cs_text_fixup_arg3, 160, "text-fixup3", "");
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:301:2: note: expanded from macro 'TUNABLE_STR'
+  301 |         __TUNABLE_STR(var, boot_arg)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:723:2: note: expanded from macro '__TUNABLE_STR'
+  723 |         __STARTUP_ARG(var, __LINE__, TUNABLES, STARTUP_RANK_FIRST, \
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  724 |             kernel_startup_tunable_init, &__startup_TUNABLES_spec_ ## var)
+      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:764:2: note: expanded from macro '__STARTUP_ARG'
+  764 |         __STARTUP1(name, line, subsystem, rank, func, arg, arg)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:757:12: note: expanded from macro '__STARTUP1'
+  757 |             rank, __STARTUP_FUNC_CAST(func, a), b, \
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:748:6: note: expanded from macro '__STARTUP_FUNC_CAST'
+  748 |             (typeof(func(a))(*)(const void *))func
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/kern/ubc_subr.c:6091:8: warning: cast from 'void (*)(const struct startup_tunable_spec *)' to 'typeof (kernel_startup_tunable_init(&__startup_TUNABLES_spec_cs_text_fixup_arg4)) (*)(const void *)' (aka 'void (*)(const void *)') converts to incompatible function type [-Wcast-function-type-strict]
+ 6091 | static TUNABLE_STR(cs_text_fixup_arg4, 160, "text-fixup4", "");
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:301:2: note: expanded from macro 'TUNABLE_STR'
+  301 |         __TUNABLE_STR(var, boot_arg)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:723:2: note: expanded from macro '__TUNABLE_STR'
+  723 |         __STARTUP_ARG(var, __LINE__, TUNABLES, STARTUP_RANK_FIRST, \
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  724 |             kernel_startup_tunable_init, &__startup_TUNABLES_spec_ ## var)
+      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:764:2: note: expanded from macro '__STARTUP_ARG'
+  764 |         __STARTUP1(name, line, subsystem, rank, func, arg, arg)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:757:12: note: expanded from macro '__STARTUP1'
+  757 |             rank, __STARTUP_FUNC_CAST(func, a), b, \
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:748:6: note: expanded from macro '__STARTUP_FUNC_CAST'
+  748 |             (typeof(func(a))(*)(const void *))func
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/kern/ubc_subr.c:6092:8: warning: cast from 'void (*)(const struct startup_tunable_spec *)' to 'typeof (kernel_startup_tunable_init(&__startup_TUNABLES_spec_cs_text_fixup_arg5)) (*)(const void *)' (aka 'void (*)(const void *)') converts to incompatible function type [-Wcast-function-type-strict]
+ 6092 | static TUNABLE_STR(cs_text_fixup_arg5, 160, "text-fixup5", "");
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:301:2: note: expanded from macro 'TUNABLE_STR'
+  301 |         __TUNABLE_STR(var, boot_arg)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:723:2: note: expanded from macro '__TUNABLE_STR'
+  723 |         __STARTUP_ARG(var, __LINE__, TUNABLES, STARTUP_RANK_FIRST, \
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  724 |             kernel_startup_tunable_init, &__startup_TUNABLES_spec_ ## var)
+      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:764:2: note: expanded from macro '__STARTUP_ARG'
+  764 |         __STARTUP1(name, line, subsystem, rank, func, arg, arg)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:757:12: note: expanded from macro '__STARTUP1'
+  757 |             rank, __STARTUP_FUNC_CAST(func, a), b, \
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:748:6: note: expanded from macro '__STARTUP_FUNC_CAST'
+  748 |             (typeof(func(a))(*)(const void *))func
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/kern/ubc_subr.c:6093:8: warning: cast from 'void (*)(const struct startup_tunable_spec *)' to 'typeof (kernel_startup_tunable_init(&__startup_TUNABLES_spec_cs_text_fixup_arg6)) (*)(const void *)' (aka 'void (*)(const void *)') converts to incompatible function type [-Wcast-function-type-strict]
+ 6093 | static TUNABLE_STR(cs_text_fixup_arg6, 160, "text-fixup6", "");
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:301:2: note: expanded from macro 'TUNABLE_STR'
+  301 |         __TUNABLE_STR(var, boot_arg)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:723:2: note: expanded from macro '__TUNABLE_STR'
+  723 |         __STARTUP_ARG(var, __LINE__, TUNABLES, STARTUP_RANK_FIRST, \
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  724 |             kernel_startup_tunable_init, &__startup_TUNABLES_spec_ ## var)
+      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:764:2: note: expanded from macro '__STARTUP_ARG'
+  764 |         __STARTUP1(name, line, subsystem, rank, func, arg, arg)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:757:12: note: expanded from macro '__STARTUP1'
+  757 |             rank, __STARTUP_FUNC_CAST(func, a), b, \
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:748:6: note: expanded from macro '__STARTUP_FUNC_CAST'
+  748 |             (typeof(func(a))(*)(const void *))func
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/kern/ubc_subr.c:6094:8: warning: cast from 'void (*)(const struct startup_tunable_spec *)' to 'typeof (kernel_startup_tunable_init(&__startup_TUNABLES_spec_cs_text_fixup_arg7)) (*)(const void *)' (aka 'void (*)(const void *)') converts to incompatible function type [-Wcast-function-type-strict]
+ 6094 | static TUNABLE_STR(cs_text_fixup_arg7, 160, "text-fixup7", "");
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:301:2: note: expanded from macro 'TUNABLE_STR'
+  301 |         __TUNABLE_STR(var, boot_arg)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:723:2: note: expanded from macro '__TUNABLE_STR'
+  723 |         __STARTUP_ARG(var, __LINE__, TUNABLES, STARTUP_RANK_FIRST, \
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  724 |             kernel_startup_tunable_init, &__startup_TUNABLES_spec_ ## var)
+      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:764:2: note: expanded from macro '__STARTUP_ARG'
+  764 |         __STARTUP1(name, line, subsystem, rank, func, arg, arg)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:757:12: note: expanded from macro '__STARTUP1'
+  757 |             rank, __STARTUP_FUNC_CAST(func, a), b, \
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:748:6: note: expanded from macro '__STARTUP_FUNC_CAST'
+  748 |             (typeof(func(a))(*)(const void *))func
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/kern/ubc_subr.c:6206:1: warning: cast from 'void (*)(void)' to 'typeof (cs_text_fixup_init()) (*)(const void *)' (aka 'void (*)(const void *)') converts to incompatible function type [-Wcast-function-type-strict]
+ 6206 | STARTUP(EARLY_BOOT, STARTUP_RANK_MIDDLE, cs_text_fixup_init);
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:215:2: note: expanded from macro 'STARTUP'
+  215 |         __STARTUP(func, __LINE__, subsystem, rank, func)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:761:2: note: expanded from macro '__STARTUP'
+  761 |         __STARTUP1(name, line, subsystem, rank, func, , NULL)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:757:12: note: expanded from macro '__STARTUP1'
+  757 |             rank, __STARTUP_FUNC_CAST(func, a), b, \
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:748:6: note: expanded from macro '__STARTUP_FUNC_CAST'
+  748 |             (typeof(func(a))(*)(const void *))func
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/xnu-work/bsd/kern/ubc_subr.c:6530:28: warning: cast from 'void (*)(vm_allocation_site_t *)' (aka 'void (*)(struct vm_allocation_site *)') to 'typeof (__zone_site_register(&site)) (*)(const void *)' (aka 'void (*)(const void *)') converts to incompatible function type [-Wcast-function-type-strict]
+ 6530 |                         target_bitmap = (char*) kalloc_data((vm_size_t)bitmap_size, Z_WAITOK | Z_ZERO);
+      |                                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/kalloc.h:512:2: note: expanded from macro 'kalloc_data'
+  512 |         kheap_alloc(KHEAP_DATA_BUFFERS, size, flags)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/kalloc.h:503:44: note: expanded from macro 'kheap_alloc'
+  503 |         kheap_alloc_tag(kalloc_heap, size, flags, VM_ALLOC_SITE_TAG())
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/zalloc.h:2540:2: note: expanded from macro 'VM_ALLOC_SITE_TAG'
+ 2540 |         STARTUP_ARG(ZALLOC, STARTUP_RANK_MIDDLE, __zone_site_register, &site);   \
+      |         ^
+note: (skipping 2 expansions in backtrace; use -fmacro-backtrace-limit=0 to see all)
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:757:12: note: expanded from macro '__STARTUP1'
+  757 |             rank, __STARTUP_FUNC_CAST(func, a), b, \
+      |                   ^
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/startup.h:748:6: note: expanded from macro '__STARTUP_FUNC_CAST'
+  748 |             (typeof(func(a))(*)(const void *))func
+      |             ^
+{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/EXPORT_HDRS/osfmk/kern/kalloc.h:501:63: note: expanded from macro 'kheap_alloc_tag'
+  501 |         __kheap_alloc(kalloc_heap, size, __zone_flags_mix_tag(flags, itag), NULL)
+      |                                                                      ^~~~
+38 warnings generated.
+     LDFILELIST bsd
+             LD mach.development.bcm2837.unstripped.noctf
+ld: warning: -new_linker is obsolete
+ld: warning: search path '{unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/.cache/fakeroot/usr/local/lib/kernel/platform' not found
+ld: warning: -segment_order should list all segments, __PRELINK_TEXT is missing
+ld: warning: -segment_order should list all segments, __PRELINK_INFO is missing
+ld: warning: -segment_order should list all segments, __PLK_TEXT_EXEC is missing
+ld: warning: -segment_order should list all segments, __PRELINK_DATA is missing
+ld: warning: -segment_order should list all segments, __PLK_DATA_CONST is missing
+ld: warning: -segment_order should list all segments, __PLK_LLVM_COV is missing
+ld: warning: -segment_order should list all segments, __PLK_LINKEDIT is missing
+ld: warning: -segment_order should list all segments, __LINKINFO is missing
+ld: warning: -segment_order of __LINKEDIT is ignored, the segment must be ordered last
+       DSYMUTIL mach.development.bcm2837.dSYM
+warning: ignoring unknown option: --minimize
+          STRIP mach.development.bcm2837
+        LIBTOOL mach.development.bcm2837.a
+built kernel at {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837//mach.development.bcm2837
+libtool: warning: 'exclaves_conclave.o' has no symbols
+libtool: warning: 'exclaves_driverkit.o' has no symbols
+libtool: warning: 'exclaves_frame_mint.o' has no symbols
+libtool: warning: 'exclaves_inspection.o' has no symbols
+libtool: warning: 'exclaves_log.o' has no symbols
+libtool: warning: 'exclaves_memory.o' has no symbols
+libtool: warning: 'exclaves_panic.o' has no symbols
+libtool: warning: 'exclaves_resource.o' has no symbols
+libtool: warning: 'exclaves_shared_memory.o' has no symbols
+libtool: warning: 'exclaves_storage.o' has no symbols
+libtool: warning: 'exclaves_tests.o' has no symbols
+libtool: warning: 'ptrauth_data_tests.o' has no symbols
+libtool: warning: 'pmap_cs.o' has no symbols
+libtool: warning: 'pmap_iommu.o' has no symbols
+libtool: warning: 'iofilter_asm.o' has no symbols
+libtool: warning: 'iofilter.o' has no symbols
+libtool: warning: 'gxf_exceptions.o' has no symbols
+libtool: warning: 'pinst.o' has no symbols
+libtool: warning: 'platform_tests_asm.o' has no symbols
+libtool: warning: 'net_stubs.o' has no symbols
+libtool: warning: 'classq_util.o' has no symbols
+libtool: warning: 'key_debug.o' has no symbols
+libtool: warning: 'txm.o' has no symbols
+libtool: warning: 'ppl.o' has no symbols
+libtool: warning: 'sysv_shm.o' has no symbols
+libtool: warning: 'sysv_sem.o' has no symbols
+libtool: warning: 'sysv_msg.o' has no symbols
+libtool: warning: 'ptrauth_data_tests_sysctl.o' has no symbols
+libtool: warning: 'readonly_proc_tests_sysctl.o' has no symbols
+libtool: warning: 'skywalk_stubs.o' has no symbols
+libtool: warning: 'cpu_copy_in_cksum_gen.o' has no symbols
+libtool: warning: 'ctrr_test_sysctl.o' has no symbols
+libtool: warning: 'IOCommandQueue.cpo' has no symbols
+libtool: warning: 'TestIODeviceMemoryRosetta.cpo' has no symbols
+libtool: warning: 'AppleARMSMP.cpo' has no symbols
+libtool: warning: 'hwtrace_multbuf.o' has no symbols
+libtool: warning: 'panic_trace.o' has no symbols

@@ -1,0 +1,7 @@
+== submodules {unixnu}
+== tree {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree
+== firmware: Mu-Silicium
+== firmware: initializing submodules of the Mu-Silicium checkout
++ git -C {device}/.cache/uefi-source/Mu-Silicium submodule update --init --depth 1 -- Common/Mu Common/Mu_OEM_Sample
++ build -p gts7xlwifiPkg/gts7xlwifi.dsc -a AARCH64 -b DEBUG -t CLANGPDB -n 10 -D FD_BASE=0x9fc00000 -D FD_SIZE=0x300000 -D FD_BLOCKS=768 -D DEVICE_MODEL=sm-t970
+== firmware: {device}/.cache/uefi-source/Mu-Silicium/Build/gts7xlwifiPkg/DEBUG_CLANGPDB/FV/SILICIUM_UEFI.fd

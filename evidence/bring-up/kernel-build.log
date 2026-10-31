@@ -1,0 +1,23 @@
+== submodules {unixnu}
+== tree {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree
+== kernel: XNU
+== kernel: archive-01-build-corecrypto-14
++ python3 {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/scripts/build-corecrypto-14.py
+== kernel: archive-02-build-corecrypto-14
++ python3 {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/scripts/build-corecrypto-14.py --namespace
+== kernel: component-ArmDTPlatform
++ python3 {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/scripts/build-arm-driver.py ArmDTPlatform
+== kernel: component-ArmCpu
++ python3 {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/scripts/build-arm-driver.py ArmCpu
+== kernel: component-SoftwareAES
++ python3 {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/scripts/build-arm-driver.py SoftwareAES
+== kernel: archive-06-build-software-aes-bindings
++ python3 {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/scripts/build-software-aes-bindings.py
+== kernel: archive-07-build-mockfs-fixture
++ python3 {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/scripts/build-mockfs-fixture.py
+== kernel: archive-08-build-libpthread-kernel
++ python3 {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/scripts/build-libpthread-kernel.py
++ bash {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/scripts/build-xnu-4k-baseline.sh
+== kernel: prelink
++ python3 {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/kits/XnuPrelink/emit_prelink.py --kernel {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/tree/build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/mach.development.bcm2837.unstripped.noctf --prelinked {unixnu}/out/ipsw/21H461/kernelcache.decompressed --slide=-0x1000000 --output {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/kernel/kernel.macho --root com.apple.AppleFSCompression.AppleFSCompressionTypeZlib --root com.apple.driver.AppleARMPlatform --root com.apple.driver.AppleARMWatchdogTimer --root com.apple.driver.AppleAudioClockLibs --root com.apple.driver.AppleEffaceableStorage --root com.apple.driver.AppleIISController --root com.apple.driver.AppleM2ScalerCSCDriver --root com.apple.driver.AppleMobileFileIntegrity --root com.apple.driver.ApplePMGR --root com.apple.driver.IODARTFamily --root com.apple.filesystems.apfs --root com.apple.iokit.CoreAnalyticsFamily --root com.apple.iokit.IOAVFamily --root com.apple.iokit.IOAudio2Family --root com.apple.iokit.IOCECFamily --root com.apple.iokit.IOCryptoAcceleratorFamily --root com.apple.iokit.IOGPUFamily --root com.apple.iokit.IOHDCPFamily --root com.apple.iokit.IOMobileGraphicsFamily --root com.apple.iokit.IOReportFamily --root com.apple.iokit.IOSlowAdaptiveClockingFamily --root com.apple.iokit.IOStorageFamily --root com.apple.iokit.IOSurface --root com.apple.kec.Libm --root com.apple.kec.corecrypto --root com.apple.kext.AppleMatch --root com.apple.kext.CoreTrust --root com.apple.security.AppleImage4 --root com.apple.security.sandbox --root com.apple.iokit.IOHIDFamily --root com.apple.iokit.IOHIDEventDriver --early-security-init com.apple.driver.AppleMobileFileIntegrity=0xfffffff005ab4ae0
+== kernel: {unixnu}/out/sm-t970/ipados-17.7.11-21H461/sm-t970/kernel/kernel.macho sha256 b3f9ab34199b726105ea1a3bb7a86af0734d632e55c989b2bdb254bb85f48f0e

@@ -39,6 +39,8 @@ paths = [
   "evidence/build-config/result.json",
   "evidence/build-config/README.md",
   "docs/bring-up.md",
+  "evidence/bring-up/result.json",
+  "evidence/bring-up/README.md",
 ]
 inputs = [
   "ADB reports SM-T970, gts7xlwifi, SM8250, board platform kona and hardware qcom.",
@@ -100,6 +102,7 @@ evidence = [
   { kind = "source", reference = "docs/device-repository-checklist.md", result = "Seven-item device repository audit separates completed local structure from pending firmware, hardware-input and example-flag conditions." },
   { kind = "host", reference = "evidence/firmware-log-exporter/platform.json", command = "python3.14 scripts/check-platform.py --unixnu ../UniXNU", revision = "a4112792c2b405d053c8fd215f452b111598b66e", result = "PASS: board.toml tools=true is validated together with the firmware exporter wiring it enables; the tablet has not booted this configuration." },
   { kind = "host", reference = "evidence/build-config/result.json", command = "python3.14 scripts/check-build-config.py --unixnu ../UniXNU", revision = "8055073ce9a05fa60624decae4b8c74b1a544746", result = "PASS: defconfig/fetch/status/tree resolve the declared arm64/SM8250/iPadOS/board layers, five components, eight archives, 19 modules and 61 patches in order; unixnu.lock records all nine fetched sources; no build_config exists yet." },
+  { kind = "host", reference = "evidence/bring-up/result.json", command = "python3.14 scripts/prepare-trust-cache.py", revision = "0d8fb9d0a14630f878a173241059f7687aa6b134", result = "PASS: kernelcache.decompressed matches the profile pin, the rebuilt two-module trust-cache bundle 7416ca4f... is accepted by the OS profile, and the local platform seed is used only for this image." },
 ]
 
 [[area]]
@@ -608,6 +611,15 @@ paths = [
   "patches/xnu/**",
   "evidence/hardware-description/boot.json",
   "evidence/hardware-description/pack.log",
+  "evidence/bring-up/result.json",
+  "evidence/bring-up/boot.json",
+  "evidence/bring-up/payload.json",
+  "evidence/bring-up/kernel.log",
+  "evidence/bring-up/kernel-build.log",
+  "evidence/bring-up/package-build.log",
+  "evidence/bring-up/payload-build.log",
+  "evidence/bring-up/firmware.log",
+  "evidence/bring-up/pack.log",
 ]
 inputs = [
   "Local archive: ipsw/iPad_Pro_HFR_17.7.11_21H461_Restore.ipsw.",
@@ -652,6 +664,7 @@ evidence = [
   { kind = "source", reference = "evidence/ipsw-21H461-manifest.json", result = "Saved IPSW manifest version/build/product types, archive byte size and manifest SHA256." },
   { kind = "source", reference = "board.toml", result = "Explicit component selection, four ordered patch series and pending firmware integration." },
   { kind = "host", reference = "evidence/hardware-description/boot.json", command = "PATH=/opt/homebrew/opt/llvm/bin:/opt/homebrew/opt/lld/bin:$PATH python3.14 ../UniXNU/unixnu bootimg -D . --uefi .cache/uefi-source/Mu-Silicium --fd .cache/uefi-source/Mu-Silicium/Build/gts7xlwifiPkg/DEBUG_CLANGPDB/FV/SILICIUM_UEFI.fd --dtb out/firmware-inputs/firmware.dtb --ramdisk none --output out/hardware-description/boot.img", revision = "7b71e1e9ad1dd16a70e31e2fe536dd09c340200f", result = "PASS: a firmware-only Android v2 image (3993600 bytes, separate DTB, empty ramdisk) was packed with fd_sha256 and dtb_sha256 matching the built FD and captured firmware FDT. No payload exists yet." },
+  { kind = "host", reference = "evidence/bring-up/result.json", command = "PATH=.cache/bin:$PATH /opt/homebrew/bin/python3.14 ./unixnu build kernel -D ../UniXNU-sm-t970; PATH=.cache/bin:/opt/homebrew/opt/llvm/bin:$PATH /opt/homebrew/bin/python3.14 ./unixnu build package -D ../UniXNU-sm-t970; PATH=.cache/bin:$PATH /opt/homebrew/bin/python3.14 ./unixnu build payload -D ../UniXNU-sm-t970; PATH=/opt/homebrew/opt/llvm/bin:/opt/homebrew/opt/lld/bin:$PATH /opt/homebrew/bin/python3.14 ./unixnu bootimg -D . --uefi .cache/uefi-source/Mu-Silicium --fd .cache/uefi-source/Mu-Silicium/Build/gts7xlwifiPkg/DEBUG_CLANGPDB/FV/SILICIUM_UEFI.fd --dtb out/firmware-inputs/firmware.dtb --ramdisk ../UniXNU/out/sm-t970/ipados-17.7.11-21H461/sm-t970/payload/payload.img --output out/step7/boot.img", revision = "0d8fb9d0a14630f878a173241059f7687aa6b134", result = "PASS: kernel.macho b3f9ab34..., payload.img a4a0bac8... and boot.img 28f3bb9f... were built; boot.json reports header v2, ramdisk_bytes 201326592, the built FD hash and the captured firmware DTB hash; payload.json matches the kernel and the accepted trust cache. No device write or boot." },
 ]
 
 [[area]]
@@ -725,4 +738,5 @@ evidence = [
   { kind = "host", reference = "evidence/firmware-log-exporter/platform.json", command = "python3.14 scripts/check-platform.py --unixnu ../UniXNU", revision = "a4112792c2b405d053c8fd215f452b111598b66e", result = "PASS: committed-source platform check now also rejects missing exporter wiring in the DSC/FDF, missing Advanced Logger library mappings or PCDs, a fabricated PcdAdvancedLoggerBase and a false tools flag." },
   { kind = "host", reference = "evidence/build-config/check.log", command = "python3.14 scripts/check-build-config.py --unixnu ../UniXNU", revision = "8055073ce9a05fa60624decae4b8c74b1a544746", result = "PASS: independent patch-series resolution matches status, every module matches its pin and lock entry, and the assembled tree links drivers/kits/refer/patches/scripts to those exact sources." },
   { kind = "host", reference = "evidence/hardware-description/check.log", command = "python3.14 scripts/check-hardware-description.py --unixnu ../UniXNU", revision = "7b71e1e9ad1dd16a70e31e2fe536dd09c340200f", result = "PASS: the Step 5 checker rebuilt the board DTS and ADT, compared both tree inputs and scanned the built volume; the platform checker also passed at the same commit." },
+  { kind = "host", reference = "evidence/bring-up/README.md", command = "python3.14 scripts/prepare-trust-cache.py", revision = "0d8fb9d0a14630f878a173241059f7687aa6b134", result = "PASS: prepare-trust-cache.py derives the version-2 static module from the StaticTrustCache DER payload, rebuilds the original static+system bundle and rejects any bundle outside the profile allow-list." },
 ]
