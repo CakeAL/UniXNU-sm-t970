@@ -4,5 +4,4 @@ t970-console-bootstrap.patch
 t970-skip-vcattach.patch
 t970-smmu-dump.patch
 t970-owner-mount-status.patch
-t970-owner-cache-dir.patch
 t970-carrier-counters.patch

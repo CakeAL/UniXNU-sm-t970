@@ -23,12 +23,11 @@ CONFIG_XNU_OWNER_ROOT_AUDIT=y
 CONFIG_XNU_OWNER_ROOT_TRUST=y
 # launchd needs the dyld shared cache: mount the SystemOS window as the owner cache carrier
 # and let dyld start from it (volume UUID 8846FE78 is that window's policy UUID).
-# dyld resolves the cache at /System/Library/Caches/com.apple.dyld, so compose the SystemOS
-# volume as a union over / and let the owner carrier authorise that location.
+# Mount the SystemOS cryptex at /private/preboot and let dyld read DYLD_SHARED_CACHE_DIR;
+# the owner carrier authorises that mount for the signed SystemOS volume.
 CONFIG_XNU_OWNER_CACHE_MOUNT=y
 CONFIG_XNU_OWNER_CACHE_STARTUP=y
 CONFIG_XNU_OWNER_CACHE_CARRIER=y
-CONFIG_XNU_OWNER_UNION_SYSTEMOS=y
 # iPadOS signs code in 16 KiB pages; this 4 KiB kernel only accepts the shared cache
 # through the signature hash cache (fcntl(92) would otherwise return 85 EBADEXEC).
 CONFIG_XNU_NATIVE_CS_HASH_CACHE=y
