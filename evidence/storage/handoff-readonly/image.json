@@ -1,0 +1,25 @@
+{
+  "device_revision": "58bdac8ab42ee268ec0aee2b1102a3bc58020bcb",
+  "framework_revision": "194aae294c1107e791f4f74b2be371a391ac6bc4",
+  "command": "python3.14 scripts/build-smmu-report.py --mode handoff --kernel-build out/step7/ufs-handoff-kernel.json --output out/step7/probes/ufs-handoff-readonly",
+  "kernel_sha256": "147f8d3bc6b8c35990a83f304f5eab1b3654d69ba5b9a1ef1747a5d31602f34a",
+  "payload_kernel_sha256": "31663d294b40cf6c04eede33da3da967a57d4c14e191ab486756d26b551c116a",
+  "firmware_sha256": "515105d758a9d61078dffce5012db0754a71cec351a1bb34b30ee791196b5690",
+  "firmware_dtb_sha256": "86c14aa305a6cf5db46665f4095d28aadcb1ea5ce9d213cd711641a07504ed1d",
+  "payload_sha256": "24cd089e6c017c10f9eea2bb8008f50a247b8f03c3c73a15c7eeab0cbd07bdbc",
+  "boot_sha256": "933a5d776edb2500be5c268b93e64f2cfec53fee6e12cebbb39869a8d7050deb",
+  "boot_bytes": 62713856,
+  "boot_partition_bytes": 71303168,
+  "kernel_args": [
+    "-v",
+    "cpus=1",
+    "t970-novc",
+    "sheng-pmgr=2",
+    "t970-ufs-handoff=1"
+  ],
+  "independent_fat_check": true,
+  "independent_fd_check": true,
+  "mode": "handoff",
+  "hardware_tested": false,
+  "flash_performed": false
+}

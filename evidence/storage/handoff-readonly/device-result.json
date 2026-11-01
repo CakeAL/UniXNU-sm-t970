@@ -1,0 +1,522 @@
+{
+  "device": "sm-t970",
+  "boot_sha256": "933a5d776edb2500be5c268b93e64f2cfec53fee6e12cebbb39869a8d7050deb",
+  "source_revision": "58bdac8ab42ee268ec0aee2b1102a3bc58020bcb",
+  "observation_source": "Owner confirmed title and END marker; values manually transcribed from the photograph attached to this chat. Repeated visible default entries expanded in screen.txt.",
+  "photo": {
+    "filename": "IMG_20261101_162522.jpg",
+    "local_source_available": false,
+    "sha256": null,
+    "note": "The attachment is visible in the conversation, but its supplied local path does not exist; no photo file hash has been invented."
+  },
+  "checkpoint_reached": true,
+  "end_marker": "END slots=87",
+  "gcc": {
+    "gdsc": "0xf822f000",
+    "axi": "0x00000221",
+    "ahb": "0x00000001",
+    "unipro": "0x00000221",
+    "ice": "0x00000221",
+    "aggre": "0x00000001",
+    "aux": "0x00000001",
+    "tx": "0x00000001",
+    "rx0": "0x00000001",
+    "rx1": "0x00000001"
+  },
+  "hc_state": 1,
+  "hci": {
+    "cap": "0x1587031f",
+    "version": "0x00000300",
+    "hce": "0x00000001",
+    "hcs": "0x0000010f",
+    "is": "0x00000400",
+    "utrlba": "0x000000009b296000",
+    "utrlrsr": "0x00000001",
+    "utrldbr": "0x00000000",
+    "utmrlrsr": "0x00000001",
+    "utmrldbr": "0x00000000"
+  },
+  "smmu": {
+    "sCR0": "0x002d0406",
+    "ID0": "0x4c017e57",
+    "ID1": "0x6000004a",
+    "ID2": "0x00005111",
+    "sGFSR": "0x00000000",
+    "groups": 87,
+    "scanned": 87,
+    "valid": 1,
+    "context_banks": 74,
+    "context_offset": "0x80000"
+  },
+  "stream_slots": [
+    {
+      "slot": 0,
+      "smr": "0x000004a0",
+      "s2cr": "0x00020000"
+    },
+    {
+      "slot": 1,
+      "smr": "0x000000c0",
+      "s2cr": "0x00020001"
+    },
+    {
+      "slot": 2,
+      "smr": "0x000004e0",
+      "s2cr": "0x00020002"
+    },
+    {
+      "slot": 3,
+      "smr": "0x000000e0",
+      "s2cr": "0x00020003"
+    },
+    {
+      "slot": 4,
+      "smr": "0x84020820",
+      "s2cr": "0x00000004"
+    },
+    {
+      "slot": 5,
+      "smr": "0x00000000",
+      "s2cr": "0x00000000"
+    },
+    {
+      "slot": 6,
+      "smr": "0x00000000",
+      "s2cr": "0x00000000"
+    },
+    {
+      "slot": 7,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 8,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 9,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 10,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 11,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 12,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 13,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 14,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 15,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 16,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 17,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 18,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 19,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 20,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 21,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 22,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 23,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 24,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 25,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 26,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 27,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 28,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 29,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 30,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 31,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 32,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 33,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 34,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 35,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 36,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 37,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 38,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 39,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 40,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 41,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 42,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 43,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 44,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 45,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 46,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 47,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 48,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 49,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 50,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 51,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 52,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 53,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 54,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 55,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 56,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 57,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 58,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 59,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 60,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 61,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 62,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 63,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 64,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 65,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 66,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 67,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 68,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 69,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 70,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 71,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 72,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 73,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 74,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 75,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 76,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 77,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 78,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 79,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 80,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 81,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 82,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 83,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 84,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 85,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    },
+    {
+      "slot": 86,
+      "smr": "0x00000000",
+      "s2cr": "0x000200ff"
+    }
+  ],
+  "interpretation": {
+    "controller_registers_read": true,
+    "hce_enabled": true,
+    "device_present": true,
+    "request_lists_ready": true,
+    "queue_run_stop_bits_set": true,
+    "transfer_and_task_doorbells_zero": true,
+    "interrupt_status": "UIC_COMMAND_COMPL set; not cleared by this diagnostic.",
+    "protected_display_mapping": {
+      "slot": 4,
+      "sid": "0x0820",
+      "mask": "0x0402",
+      "bank": 4,
+      "target_dts_binding": "smmu_sde_unsec / iommus = <0x47 0x820 0x402>",
+      "source": "evidence/adb-2026-11-01/live-device-tree.dts"
+    },
+    "inactive_candidate_residue": [
+      {
+        "slot": 2,
+        "sid": "0x04e0"
+      },
+      {
+        "slot": 3,
+        "sid": "0x00e0"
+      }
+    ]
+  },
+  "limits": [
+    "HCI ready bits and idle doorbells do not prove DMA, SCSI completion or root-volume reads.",
+    "Inactive SMR ID fields are not active mappings or proof of the actual T970 UFS route.",
+    "The sole valid slot matches the captured display binding and must be preserved.",
+    "No SMR/S2CR writes, context changes, queue commands, PHY initialization or SCM calls occurred in this diagnostic."
+  ],
+  "next_measurement": "Qualify SMR ID-field writability on one strictly checked invalid zero slot, restore it, keep VALID clear and S2CR untouched; protect the display mapping and refuse if preconditions change."
+}

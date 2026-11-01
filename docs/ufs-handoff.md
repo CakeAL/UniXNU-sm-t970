@@ -48,3 +48,26 @@ python3.14 scripts/build-smmu-report.py --mode handoff \
 打包工具拒绝缺少关键头文件哈希的记录，并独立检查 FAT 内核／参数、BOOT 内 FD
 和已测分区容量。它不会刷写。后续使用本机补丁版 Heimdall 仅刷 BOOT，并将回执与
 机主观察绑定到成品哈希；本轮不再次写 USERDATA。
+
+## 本轮观察：933a5d77…
+
+机主已确认完整标题和 `END slots=87`。转录／结构化记录见
+`evidence/storage/handoff-readonly/screen.txt` 与 `device-result.json`。
+照片在本次对话可见，但给定本机路径不存在，故没有虚构照片文件哈希。
+
+- GCC：GDSCR=`f822f000`，AXI/UniPro/ICE=`00000221`，AHB 及其他所列分支=`1`。
+- HCI：CAP=`1587031f`，VER=`00000300`，HCE=`1`，HCS=`0000010f`，IS=`00000400`。
+- UTRLBA=`9b296000`；transfer/task 两个 run-stop 位均为 1，两个 doorbell 均为 0。
+- SMMU：87 个槽完整显示，只有槽 `04` 的 VALID=1：`84020820/00000004`。
+  SID=`0820`、mask=`0402` 与原厂 DT 的 `smmu_sde_unsec` 绑定完全对应；CB4 必须保留。
+- 槽 `02/03` 的 SMR 分别留有 `000004e0/000000e0`，但 VALID=0；不是可复用的活动 UFS 映射。
+  槽 `07..56` 为无效 SMR=0、S2CR=`000200ff`，其中 `56` 是本次报告范围的最后一槽。
+
+HCS 的 device-present、两个 list-ready、UIC-ready 位均设置，IS 为 UIC command complete。
+在这份固定 FD 的交接点，供电／总线时钟检查与控制器读取均已通过；这不证明当前 DMA 可达性、
+SCSI 完成、PHY 全部状态或根卷读取，不应仅为补足假设而重播 PHY／固件初始化。
+位定义依据 [Linux v6.12 ufshci.h](https://github.com/torvalds/linux/blob/v6.12/include/ufs/ufshci.h)。
+
+下一项测量是一个严格前提下的无效 SMR ID 字段写回测试：仅选已确认无效的零槽，VALID 始终为 0，
+不写 S2CR、不触碰活动显示槽，测试后恢复并校验。结果只用于区分该字段是否接受写入；
+即使失败也不直接推断 TZ 永久锁定，更不启动 UFS 命令。

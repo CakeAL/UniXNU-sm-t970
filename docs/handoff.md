@@ -3,7 +3,7 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
-## 下一轮：SM8250 只读交接快照（主机构建完成）
+## 当前：SM8250 只读交接快照（实机观察已完成）
 
 - 参数为 `t970-ufs-handoff=1`，预期标题 `T970 UFS handoff RO (no writes)`。
 - 修正内核时钟诊断表，删除 SM8550 独立 mem-PHY GDSC 读取；UEFI 原型保持原样且不执行。
@@ -11,8 +11,19 @@
   通过保守前提检查才只读 HCI／队列。未采样的 HCI 默认零值需结合 HCstate 解读。
 - 内核 `147f8d3bc6b8c35990a83f304f5eab1b3654d69ba5b9a1ef1747a5d31602f34a`
   编译、链接、预链接通过，构建期间输入哈希不变。11 项主机测试通过，包括最大表格排版。
-- 继续使用 FD `515105d7…`；下一步打包核验并只刷 BOOT。刷写及实机结果以
-  `evidence/storage/handoff-readonly/` 后续回执为准，不能把下文已通过的旧快照当成本轮结果。
+- 代码提交 `58bdac8`，仍使用 FD `515105d7…`。成品 BOOT
+  `933a5d776edb2500be5c268b93e64f2cfec53fee6e12cebbb39869a8d7050deb`，
+  62,713,856 字节，独立 FAT／参数／FD 核验和 DT/ADT 检查通过。
+- 2026-11-01 16:24（Asia/Shanghai），检测 Download Mode 后仅刷 BOOT，
+  Heimdall exit 0 / `BOOT upload successful`，`--no-reboot`；机主已给出完整画面。
+  `evidence/storage/handoff-readonly/` 保存准备与回执，不得沿用旧快照的实机结论。
+- 实机读数：GCC 检查通过、HCstate=1，HCE=1、HCS=0x10f、IS=0x400；
+  UTRLBA=0x9b296000，两类队列 RSR=1、doorbell=0，END slots=87。
+- 唯一有效槽 04：SMR=0x84020820、S2CR=4，与原厂显示 iommus SID 0x820／mask 0x402 对应；
+  保留此槽与 CB4。02/03 的 0x4e0／0xe0 仅为无效字段，不能直接当作活动 UFS 路由。
+- 本轮原始照片在对话可见，但本机给定路径不存在；已记录可见转录，照片文件哈希留空。
+- 下一步拟核查单个无效 SMR 的 ID 字段写入并恢复，保持 VALID=0、S2CR 不变；
+  目前尚未执行任何这样的写入，不把已有 HCI ready 状态当作 DMA／根卷通过。
 - 范围、格式及复现：[交接快照](ufs-handoff.md)。本轮不进行 UFS 命令、DMA 或 USERDATA 写入。
 
 ## 当前接手核查（从 47b113f 继续）
