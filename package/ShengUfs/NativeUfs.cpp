@@ -2342,7 +2342,7 @@ static dev_t gCacheProbeDevice = NODEV;
 static char gCacheProbePath[64];
 static char gCacheProbeText[240];
 
-extern "C" void native_ufs_cache_probe (void)
+static void runCacheProbe (void)
 {
   static const char cacheUuid[] = "8846FE78-2910-4297-AF97-D59BB6F8FC16";
   gCacheProbeDevice = NODEV;
@@ -2385,6 +2385,9 @@ extern "C" void native_ufs_cache_probe (void)
 
 extern "C" const char *native_ufs_cache_probe_text (void)
 {
+  // The publisher runs on its own thread, so a probe taken at publication time can precede the
+  // media it reports on. Recompute here: the caller is the mount failure, long after publication.
+  if (gHost.ready) runCacheProbe ();
   return gCacheProbeText[0] ? gCacheProbeText : "probe=unset";
 }
 
@@ -3366,7 +3369,7 @@ bool NativeUfs::start (IOService *provider)
              windows[0], offset[0], bytes[0], windows[1], offset[1], bytes[1],
              windows[2], offset[2], bytes[2], windows[3], offset[3], bytes[3]);
     }
-    native_ufs_cache_probe ();
+    runCacheProbe ();
     return true;
   }
   if (rootMode && !probe) {
