@@ -10,6 +10,15 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 
 
 class SmmuReportTests(unittest.TestCase):
+    def test_combined_fields_preserve_dma_permissions(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            executable = pathlib.Path(temporary) / 'fields-test'
+            subprocess.run(['clang++', '-std=c++17', '-Wall', '-Wextra', '-Werror',
+                            '-Wno-unused-function', '-I', str(ROOT / 'package/ShengUfs'),
+                            str(ROOT / 'tests/cpp/t970-smmu-fields.cpp'), '-o', str(executable)], check=True)
+            result = subprocess.run([str(executable)], text=True, capture_output=True, check=True)
+            self.assertIn('PASS: field qualification', result.stdout)
+
     def test_smr_id_field_guard_and_restore(self):
         with tempfile.TemporaryDirectory() as temporary:
             executable = pathlib.Path(temporary) / 'smr-id-test'

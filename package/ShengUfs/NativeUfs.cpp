@@ -38,6 +38,7 @@ extern const uint8_t verified_root_key[];
 #include "T970SmmuReport.h"
 #include "T970UfsHandoff.h"
 #include "T970SmrIdTest.h"
+#include "T970SmmuFields.h"
 #include "WholeUserdataRoot.h"
 #include "WholeUserdataDisk.h"
 
@@ -2485,13 +2486,14 @@ static void mediaReportThread (void *, wait_result_t)
 
 bool NativeUfs::start (IOService *provider)
 {
-  unsigned retiredWriteScan = 0, smmuReport = 0, handoffReport = 0, smrIdTest = 0;
+  unsigned retiredWriteScan = 0, smmuReport = 0, handoffReport = 0, smrIdTest = 0, fieldTest = 0;
   if (PE_parse_boot_argn ("t970-ufs-writable-smr", &retiredWriteScan, sizeof (retiredWriteScan)) && retiredWriteScan) {
     panic ("T970: writable SMR scan retired; use t970-smmu-report=1");
   }
   PE_parse_boot_argn ("t970-smr-id-test", &smrIdTest, sizeof (smrIdTest));
   PE_parse_boot_argn ("t970-ufs-handoff", &handoffReport, sizeof (handoffReport));
-  if ((handoffReport == 1 || smrIdTest == 1) &&
+  PE_parse_boot_argn ("t970-smmu-fields", &fieldTest, sizeof (fieldTest));
+  if ((handoffReport == 1 || smrIdTest == 1 || fieldTest == 1) &&
       OSDynamicCast (IOPlatformExpertDevice, provider)) {
     OSSharedPtr<IOMemoryMap> smmuMap, gccMap, hcMap;
     uintptr_t smmu = mapPhys (0x15000000ULL, 0x100000, smmuMap);
@@ -2508,6 +2510,17 @@ bool NativeUfs::start (IOService *provider)
         else h.state = 2;
       }
     } else h.state = 3;
+    if (fieldTest == 1) {
+      const auto p = t970_fields::run (r, c, h,
+        [smmu](unsigned off) { return read32 (smmu, off); },
+        [smmu](unsigned off, uint32_t value) {
+          write32 (smmu, off, value);
+          __asm__ volatile ("dsb sy" ::: "memory");
+        });
+      static char fieldsText[1800];
+      if (!t970_fields::format (fieldsText, sizeof (fieldsText), p, r, c, h)) panic ("T970 SMMU fields: format overflow");
+      panic ("%s", fieldsText);
+    }
     if (smrIdTest == 1) {
       const auto p = t970_smr::run (r, c, h,
         [smmu](unsigned off) { return read32 (smmu, off); },

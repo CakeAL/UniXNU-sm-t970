@@ -11,7 +11,8 @@
 实机已确认读到 87 组匹配配置、74 个 context bank，三个候选 SID 均未匹配。
 未提交 UFS 命令或挂载根卷；已按[同类设备对照](docs/ufs-reference-comparison.md)修正时钟诊断，
 [完整只读交接快照](docs/ufs-handoff.md)已确认 HCI ready、队列 doorbell 为零，
-唯一有效 stream 与显示对应。下一轮是[单个无效 SMR 的 ID 字段测试](docs/smr-id-test.md)，不建立活动映射。
+唯一有效 stream 与显示对应。已实机确认[无效 SMR 的 ID 字段](docs/smr-id-test.md)可写且恢复成功；
+当前继续[合并核查 VALID、S2CR 和 context 状态](docs/smmu-fields.md)，不建立可访问内存的 DMA 路由。
 
 两个仓库并列放置，普通构建命令在主仓库执行：
 

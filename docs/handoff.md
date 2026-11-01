@@ -3,7 +3,17 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
-## 当前：单个无效 SMR 的 ID 字段测试（实机通过）
+## 当前准备：合并 SMMU 字段与 context 只读核查
+
+- 上轮 ID 字段接受／恢复已通过；新参数 `t970-smmu-fields=1`，预期标题
+  `T970 SMMU fields (no UFS commands)`，范围见 [合并核查](smmu-fields.md)。
+- 复用 ID 守卫；VALID 只在 FAULT 和默认未匹配 fault 策略下测试；S2CR 仅在 SMR=0
+  时测试及恢复，必要时尝试有界的 Qualcomm FAULT 恢复方式。全程不开放 DMA 路由。
+- 成功恢复后只读 CB0/1/2/3/4/73 状态；不写 context、不改显示映射、不启动队列／命令。
+- 13 项主机测试通过，内核 `53e9e68c0d64a73f12ddc7ccb2a316dc1661120fe6f114d975cff7b80c27e197`
+  编译、链接、预链接通过，输入哈希稳定。继续使用 FD `515105d7…`，尚待打包及实机观察。
+
+## 前轮：单个无效 SMR 的 ID 字段测试（实机通过）
 
 - 参数 `t970-smr-id-test=1`；范围见 [单槽测试](smr-id-test.md)。这是带两个临时 SMR
   字段写入的测试，不是只读快照。只写槽 56 的无效 ID 字段为 a5，再恢复零；

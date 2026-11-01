@@ -1,0 +1,39 @@
+{
+  "baseline_boot_sha256": "ee45890ab4875987b0e3376b095a64a5d58f1b23177c96b9ea4a996cd8ba9031",
+  "slot_hex": "56",
+  "allowed_write_offsets": [
+    "0x958",
+    "0xd58"
+  ],
+  "smr_write_values": [
+    "0x000000a5",
+    "0x00000000",
+    "0x800000a5"
+  ],
+  "s2cr_write_values": [
+    "0x00000000",
+    "0x000200ff",
+    "0x000100ff"
+  ],
+  "maximum_writes": 8,
+  "invariants": [
+    "VALID set only with FAULT S2CR and unmatched-fault global policy.",
+    "All S2CR writes require SMR=0.",
+    "No context, clock, global, queue or storage writes.",
+    "Existing display slot04/CB4 preserved; context operations read-only.",
+    "Restore and compare full scanned stream state before reading contexts."
+  ],
+  "context_reads_decimal": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    73
+  ],
+  "references": [
+    "https://github.com/torvalds/linux/blob/v6.12/drivers/iommu/arm/arm-smmu/arm-smmu.h",
+    "https://github.com/torvalds/linux/blob/v6.12/drivers/iommu/arm/arm-smmu/arm-smmu-qcom.c"
+  ],
+  "device_tested": false
+}
