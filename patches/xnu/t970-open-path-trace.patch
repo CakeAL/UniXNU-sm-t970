@@ -1,0 +1,53 @@
+--- a/bsd/kern/kern_exit.c
++++ b/bsd/kern/kern_exit.c
+@@ -1864,3 +1864,8 @@
+ 	proc_crash_coredump(p);
+ 
++	/* Record which dyld-related paths pid 1 opens, so a "no dylib cache" report can be told
++	 * apart from a path that never existed. */
++	extern char native_owner_open_paths[3][96];
++	extern int native_owner_open_path_count;
++
+ 	sync(p, (void *)NULL, (int *)NULL);
+@@ -1879,7 +1884,9 @@
+-		panic_with_options(0, NULL, DEBUGGER_OPTION_INITPROC_PANIC, "%s %s -- exit reason namespace %d subcode 0x%llx description: %." LAUNCHD_PANIC_REASON_STRING_MAXLEN "s carrier acc=%lu rej=%lu uuidmatch=%d media=%d",
++		panic_with_options(0, NULL, DEBUGGER_OPTION_INITPROC_PANIC, "%s %s -- exit reason namespace %d subcode 0x%llx description: %." LAUNCHD_PANIC_REASON_STRING_MAXLEN "s carrier acc=%lu rej=%lu uuidmatch=%d media=%d open0=%s open1=%s open2=%s opens=%d",
+ 		    ((proc_getcsflags(p) & CS_KILLED) ? "CS_KILLED" : ""),
+ 		    prefix_str, p->p_exit_reason->osr_namespace, p->p_exit_reason->osr_code,
+ 		    exit_reason_desc ? exit_reason_desc : "none",
+ 		    native_owner_cache_carrier_accepts, native_owner_cache_carrier_rejects,
+-		    native_verified_block_root_uuid_match, native_verified_block_root_media_matches);
++		    native_verified_block_root_uuid_match, native_verified_block_root_media_matches,
++		    native_owner_open_paths[0], native_owner_open_paths[1], native_owner_open_paths[2],
++		    native_owner_open_path_count);
+ 	}
+--- a/bsd/vfs/vfs_syscalls.c
++++ b/bsd/vfs/vfs_syscalls.c
+@@ -5131,2 +5131,18 @@
++char native_owner_open_paths[3][96];
++int native_owner_open_path_count;
++
++void
++native_owner_record_open_path(const char *path)
++{
++	if (!path || native_owner_open_path_count >= 3) {
++		return;
++	}
++	if (!strnstr(path, "dyld", 96) && !strnstr(path, "libSystem", 96)) {
++		return;
++	}
++	strlcpy(native_owner_open_paths[native_owner_open_path_count], path, 96);
++	native_owner_open_path_count++;
++}
++
+ int
+ open_nocancel(__unused proc_t p, struct open_nocancel_args *uap,
+@@ -5136,2 +5152,8 @@
+ {
++	{
++		char path[96];
++		if (copyinstr(uap->path, path, sizeof(path), NULL) == 0) {
++			native_owner_record_open_path(path);
++		}
++	}
+ 	return openat_internal(vfs_context_current(), uap->path, uap->flags,
