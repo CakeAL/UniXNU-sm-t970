@@ -1,0 +1,16 @@
+T970 SMMU fields (no UFS commands)
+stage=4 idStage=5 idAccepted=1 idRestore=1
+VALID tested=1 accepted=1 observed=800000a5 smrFinal=00000000
+S2CR tested=1 accepted=1 observed=00000000 directRestore=000200ff
+fallbackUsed=0 fallbackRead=00000000 s2crFinal=000200ff
+allRestored=1 mappingsUnchanged=1 gfsrAfter=00000000 contexts=6
+snapshot cr0=002d0406 id0=4c017e57 id1=6000004a id2=00005111 gf=00000000
+GCC map=1 gdsc=f822f000 axi=00000221 ahb=00000001 HC=1 hce=00000001 hcs=0000010f db=00000000 tmDb=00000000
+display04=84020820/00000004 slot56before=00000000/000200ff
+CB0 cbar=000100ff cba2r=00000001 sctlr=000000e0 fsr=00000400
+CB1 cbar=000100ff cba2r=00000001 sctlr=000000e0 fsr=00000400
+CB2 cbar=000100ff cba2r=00000001 sctlr=000000e0 fsr=00000400
+CB3 cbar=000100ff cba2r=00000001 sctlr=000000e0 fsr=00000400
+CB4 cbar=0001f000 cba2r=00000001 sctlr=000000e0 fsr=00000400
+CB73 cbar=00000000 cba2r=00000000 sctlr=3ab3a706 fsr=00000000
+END SMMU fields

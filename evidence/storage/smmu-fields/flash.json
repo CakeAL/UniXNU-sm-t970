@@ -1,0 +1,16 @@
+{
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/smmu-fields/boot.img --no-reboot",
+  "started_at": "2026-11-01T08:59:59.114729+00:00",
+  "finished_at": "2026-11-01T09:00:05.578038+00:00",
+  "exit_code": 0,
+  "boot_sha256": "cfbd84ba34fc03b50661b46c9e22fe59c43ba651bca6967da49f1df1ec373e75",
+  "heimdall_sha256": "75337a7c6ad9a5e18c0730fa474c81133587cc04cbe08dd3f270c860128a6c6f",
+  "device_revision": "7ee2918e7bafdc76d62225675c4bcaebd14e5753",
+  "partition": "BOOT",
+  "no_reboot": true,
+  "device_observation_pending": false,
+  "userdata_written": false,
+  "raw_log_sha256": "3d7067ddef62ae1b69296715e09da49d2c59c135adf690a71dfafb217e9fdf2c",
+  "log_normalization": "Trailing blank lines omitted; exact log retained at out/step7/probes/smmu-fields/flash.raw.log",
+  "device_observation": "device-result.json"
+}

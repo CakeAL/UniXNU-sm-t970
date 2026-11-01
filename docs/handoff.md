@@ -3,7 +3,7 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
-## 当前准备：合并 SMMU 字段与 context 只读核查
+## 当前：合并 SMMU 字段核查（实机写回及恢复通过）
 
 - 上轮 ID 字段接受／恢复已通过；新参数 `t970-smmu-fields=1`，预期标题
   `T970 SMMU fields (no UFS commands)`，范围见 [合并核查](smmu-fields.md)。
@@ -11,7 +11,17 @@
   时测试及恢复，必要时尝试有界的 Qualcomm FAULT 恢复方式。全程不开放 DMA 路由。
 - 成功恢复后只读 CB0/1/2/3/4/73 状态；不写 context、不改显示映射、不启动队列／命令。
 - 13 项主机测试通过，内核 `53e9e68c0d64a73f12ddc7ccb2a316dc1661120fe6f114d975cff7b80c27e197`
-  编译、链接、预链接通过，输入哈希稳定。继续使用 FD `515105d7…`，尚待打包及实机观察。
+  编译、链接、预链接通过，输入哈希稳定。继续使用 FD `515105d7…`。
+- 代码提交 `7ee2918`，BOOT `cfbd84ba34fc03b50661b46c9e22fe59c43ba651bca6967da49f1df1ec373e75`，
+  62,713,856 字节，独立封装和 DT/ADT 检查通过。2026-11-01 17:00（Asia/Shanghai）
+  仅刷 BOOT，Heimdall exit 0，`--no-reboot`。机主已提供完整结束画面。
+- 实测 stage4，ID/VALID/S2CR accepted 均为1；VALID=800000a5，S2CR=0，
+  直接恢复200ff成功，fallbackUsed=0。allRestored/mappingsUnchanged=1，GFSR=0。
+- CB0..3：CBAR=100ff、CBA2R=1、SCTLR=e0、FSR=400；显示CB4：CBAR=1f000，
+  其余三项相同。CB73：CBAR/CBA2R=0、SCTLR=3ab3a706、FSR=0。
+  CB73不可仅凭M=0当空闲bank；CB0..4已有配置，且FSR无操作前基线，不能归因于本次测试。
+- 下一步核对独占 bypass context 的命令/DMA测试方案；保留显示CB4、排除未确认CB73，
+  不再把本轮字段写回成功当作实际读盘通过。
 
 ## 前轮：单个无效 SMR 的 ID 字段测试（实机通过）
 

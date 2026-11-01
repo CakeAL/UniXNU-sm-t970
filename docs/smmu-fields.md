@@ -52,3 +52,24 @@ python3.14 scripts/build-smmu-report.py --mode fields \
 ```
 
 仍复用固定 FD `515105d7…`；新的 BOOT 单独核验并归档，不再次写 USERDATA。
+
+## 实机结果：cfbd84ba…
+
+机主照片确认 stage=4，ID、VALID、S2CR 的 accepted 均为 1。
+VALID 读回 `800000a5`，S2CR 读回 `0`；恢复后 SMR=0、S2CR=`200ff`。
+`allRestored=1`、`mappingsUnchanged=1`、`gfsrAfter=0`，显示映射保持不变。
+直接 FAULT 恢复成功，fallbackUsed=0；本轮没有验证或观察到 Qualcomm 特殊恢复 quirk。
+
+| CB | CBAR | CBA2R | SCTLR | FSR |
+| --- | --- | --- | --- | --- |
+| 0～3 | `000100ff` | `00000001` | `000000e0` | `00000400` |
+| 4（显示） | `0001f000` | `00000001` | `000000e0` | `00000400` |
+| 73 | `00000000` | `00000000` | `3ab3a706` | `00000000` |
+
+CB0～4 已有配置，SCTLR.M=0 只说明读出的翻译开关位未设置，不能单独证明 context 无主。
+CB73 的读数不是已验证的干净 context，不能照搬其他设备“使用最后一个 bank”的选择。
+CB0～4 的 FSR 没有本轮操作前基线，不能把 `400` 归因于本次测试；GFSR 为零也不代表所有 FSR 为零。
+原始转录、照片可用性和镜像绑定见 `evidence/storage/smmu-fields/device-result.json`。
+
+下一步核对独占 bypass context 与有界命令测试方案，保留显示 CB4，排除未确认的 CB73。
+这些字段检查通过后仍需独立验证 DMA、命令完成和已知数据块读取。

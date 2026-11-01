@@ -1,0 +1,98 @@
+{
+  "device": "sm-t970",
+  "boot_sha256": "cfbd84ba34fc03b50661b46c9e22fe59c43ba651bca6967da49f1df1ec373e75",
+  "source_revision": "7ee2918e7bafdc76d62225675c4bcaebd14e5753",
+  "observation_source": "Owner confirmed stage4/restoration/global fault values; remaining values manually transcribed from the attached photograph.",
+  "photo": {
+    "filename": "IMG_20261101_170139.jpg",
+    "local_source_available": false,
+    "sha256": null,
+    "note": "Attachment visible in conversation; supplied local file absent, so photo hash remains unknown."
+  },
+  "stage": 4,
+  "id_stage": 5,
+  "id_accepted": true,
+  "id_restore": true,
+  "valid_tested": true,
+  "valid_accepted": true,
+  "valid_observed": "0x800000a5",
+  "smr_final": "0x00000000",
+  "s2cr_tested": true,
+  "s2cr_accepted": true,
+  "s2cr_observed": "0x00000000",
+  "direct_restore": "0x000200ff",
+  "fallback_used": false,
+  "fallback_read": "0x00000000",
+  "s2cr_final": "0x000200ff",
+  "all_restored": true,
+  "mappings_unchanged": true,
+  "gfsr_after": "0x00000000",
+  "contexts_read": 6,
+  "contexts": [
+    {
+      "bank": 0,
+      "cbar": "0x000100ff",
+      "cba2r": "0x00000001",
+      "sctlr": "0x000000e0",
+      "fsr": "0x00000400"
+    },
+    {
+      "bank": 1,
+      "cbar": "0x000100ff",
+      "cba2r": "0x00000001",
+      "sctlr": "0x000000e0",
+      "fsr": "0x00000400"
+    },
+    {
+      "bank": 2,
+      "cbar": "0x000100ff",
+      "cba2r": "0x00000001",
+      "sctlr": "0x000000e0",
+      "fsr": "0x00000400"
+    },
+    {
+      "bank": 3,
+      "cbar": "0x000100ff",
+      "cba2r": "0x00000001",
+      "sctlr": "0x000000e0",
+      "fsr": "0x00000400"
+    },
+    {
+      "bank": 4,
+      "cbar": "0x0001f000",
+      "cba2r": "0x00000001",
+      "sctlr": "0x000000e0",
+      "fsr": "0x00000400"
+    },
+    {
+      "bank": 73,
+      "cbar": "0x00000000",
+      "cba2r": "0x00000000",
+      "sctlr": "0x3ab3a706",
+      "fsr": "0x00000000"
+    }
+  ],
+  "snapshot": {
+    "sCR0": "0x002d0406",
+    "ID0": "0x4c017e57",
+    "ID1": "0x6000004a",
+    "ID2": "0x00005111",
+    "GFSR": "0x00000000",
+    "display_smr": "0x84020820",
+    "display_s2cr": "0x00000004",
+    "HCstate": 1,
+    "HCE": "0x00000001",
+    "HCS": "0x0000010f",
+    "doorbell": 0,
+    "task_doorbell": 0
+  },
+  "conclusion": "ID, VALID under FAULT, and inactive S2CR fields accepted the tested values and restored exactly. Direct FAULT restore succeeded; no fallback was needed.",
+  "limits": [
+    "No context write or DMA/UFS command was performed.",
+    "CB0..4 contain existing configuration; context visibility and SCTLR.M=0 do not prove ownership.",
+    "CB73 SCTLR=3ab3a706 is not a verified clean/free context and must not be selected merely because it is the last bank.",
+    "CB0..4 FSR=400 has no before-test context baseline, so it cannot be attributed to this test; GFSR=0 does not mean every context fault register is zero.",
+    "No evidence for the Qualcomm FAULT-write quirk in this run; fallbackRead=0 is an unused default."
+  ],
+  "next_action": "Review a bounded transport plan using an exclusive, fully validated bypass context, preserving display CB4 and avoiding unqualified CB73; keep command and DMA validation separate from field writeback."
+}
