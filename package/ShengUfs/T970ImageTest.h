@@ -13,19 +13,37 @@ static const Sample samples[] = {
   {"SystemOS middle", 4857088, 32, {0xfb, 0x99, 0xd8, 0x5d, 0xe6, 0xd0, 0xad, 0x26, 0x07, 0xd3, 0xfd, 0xec, 0x42, 0x3f, 0x35, 0xc5, 0x53, 0xbd, 0xcb, 0xc6, 0x5c, 0x04, 0x84, 0xf3, 0xaf, 0xfc, 0xa8, 0x1e, 0x0d, 0x84, 0xc6, 0xa8}},
   {"SystemOS last", 5260256, 32, {0xfa, 0x43, 0x23, 0x9b, 0xce, 0xe7, 0xb9, 0x7c, 0xa6, 0x2f, 0x00, 0x7c, 0xc6, 0x84, 0x87, 0x56, 0x0a, 0x39, 0xe1, 0x9f, 0x74, 0xf3, 0xdd, 0xe7, 0x48, 0x6d, 0xb3, 0xf9, 0x8d, 0xf8, 0xe4, 0x71}},
 };
-struct Result { unsigned sample = 0, reads = 0; bool success = false; uint8_t observed[32] = {}; };
-template <class Port> static Result run(Port &p) {
+struct Result {
+  unsigned sample = 0, reads = 0, matchMask = 0, repeatMask = 0, zeroMask = 0;
+  bool success = false, completed = false;
+  uint8_t observed[32] = {}, digests[7][32] = {};
+};
+template <class Port> static Result run(Port &p, bool survey = false) {
   Result r;
   for (unsigned i = 0; i < sizeof(samples)/sizeof(samples[0]); ++i) {
-    r.sample = i; const auto &s = samples[i];
+    r.sample = i; const auto &s = samples[i]; bool matched = true, repeated = true, zero = true;
     for (unsigned repeat = 0; repeat < 2; ++repeat) {
       if (!p.healthy()) return r;
       ++r.reads;
       if (!p.read(s.lba, s.blocks) || !p.healthy()) return r;
       p.sha(p.data(), s.blocks*4096, r.observed);
-      for (unsigned j = 0; j < 32; ++j) if(r.observed[j] != s.digest[j]) return r;
+      for (unsigned j = 0; j < 32; ++j) {
+        if (r.observed[j] != s.digest[j]) matched = false;
+        if (repeat && r.observed[j] != r.digests[i][j]) repeated = false;
+        r.digests[i][j] = r.observed[j];
+      }
+      // The real adapter exposes the complete returned data length. The
+      // host model supplies its classification without simulating DMA bytes.
+      zero = zero && p.allZero(s.blocks*4096);
+      if (!matched && !survey) return r;
     }
+    if (matched) r.matchMask |= 1U << i;
+    if (repeated) r.repeatMask |= 1U << i;
+    if (zero) r.zeroMask |= 1U << i;
+    if (!repeated) return r; // Content differences may be investigated; unstable reads stop.
   }
-  r.success = true; return r;
+  r.completed = true;
+  r.success = r.matchMask == 0x7f && r.repeatMask == 0x7f;
+  return r;
 }
 } // namespace t970_image

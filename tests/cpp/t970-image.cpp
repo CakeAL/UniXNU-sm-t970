@@ -13,16 +13,24 @@ struct Port {
    assert(lba>=2969600&&lba+blocks-1<=62458874&&blocks<=32);
    ++calls;if(mode==1&&calls==4){poisoned=true;return false;}return true;
  }
+ bool allZero(unsigned){return mode==4;}
  const uint8_t *data(){return dummy;}
  void sha(const uint8_t *,unsigned bytes,uint8_t out[32]){
   assert(bytes==t970_image::samples[current].blocks*4096);
   memcpy(out,t970_image::samples[current].digest,32);
   if(mode==2&&calls==3)out[0]^=1;
   if(mode==3&&calls==2)out[31]^=1;
+  if(mode==4)out[0]^=1;
  }
 };
 int main(){for(unsigned mode=0;mode<4;++mode){Port p;p.mode=mode;auto r=t970_image::run(p);
  if(mode==0)assert(r.success&&r.reads==14&&p.calls==14);
  else assert(!r.success&&p.calls<=4);
  if(mode==1)assert(p.poisoned&&p.calls==4);
- }puts("PASS: image sample sequence, mismatch refusal, timeout quarantine");}
+ }
+ for(unsigned mode=1;mode<5;++mode){Port p;p.mode=mode;auto r=t970_image::run(p,true);
+  if(mode==1)assert(!r.completed&&p.calls==4);
+  if(mode==2||mode==3)assert(!r.completed); // Repeat instability stops.
+  if(mode==4)assert(r.completed&&!r.success&&r.reads==14&&r.repeatMask==127&&r.matchMask==0&&r.zeroMask==127);
+ }
+ puts("PASS: image sample sequence, mismatch refusal, timeout quarantine");}

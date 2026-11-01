@@ -3,7 +3,16 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
-## 当前：根镜像样本核对（manifest读回全零，继续只读调查）
+## 当前：根镜像全样本只读调查（主机构建通过，待封装／实测）
+
+- 参数仍为 `t970-ufs-image=1`，新标题 `T970 UFS root image survey`；见 [调查解释](ufs-survey.md)。
+- 7个原样本各读2次；预期哈希不符继续记录实际摘要，传输错误或重复不一致立即停。
+  输出matchMask/repeatMask/zeroMask，不把completed当作样本匹配。
+- 18项测试、配置检查、内核构建及预链接通过，输入稳定；内核
+  `3e657c8fc7f385a287715e3ee516b3001d32d6bf1ec42d52cc13206ec92f1839`。本轮尚未刷写，继续使用FD `515105d7…`。
+- 未重新生成旧稀疏成品，未写USERDATA。当前仍安装首个manifest严格比较探针。
+
+## 前轮：根镜像样本核对（manifest读回全零，继续只读调查）
 
 - 参数 `t970-ufs-image=1`；见 [样本范围](ufs-image.md)。复用NOP和GPT前提，
   对manifest及OS/SystemOS各3个128KiB样本分别读2次，对照源镜像SHA256。

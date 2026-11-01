@@ -2587,6 +2587,9 @@ bool NativeUfs::start (IOService *provider)
             void sha (const uint8_t *bytes, unsigned count, uint8_t out[32]) {
               SHA256_CTX context;SHA256_Init(&context);SHA256_Update(&context,bytes,count);SHA256_Final(out,&context);
             }
+            bool allZero (unsigned count) {
+              const uint8_t *bytes=data();for(unsigned i=0;i<count;++i)if(bytes[i])return false;return true;
+            }
             uint32_t sense () { return gRootDiagnostic.sense; }
             const uint8_t *data () { return gHost.virt+kDataOffset; }
             uint32_t crc (const uint8_t *data, unsigned bytes, bool header) { return rootCrc32(data,bytes,header); }
@@ -2595,17 +2598,24 @@ bool NativeUfs::start (IOService *provider)
           const auto data = t970_read::run(reader,workspace);
           if (imageTest == 1) {
             if (!data.geometry || !reader.healthy()) panic ("T970 UFS image: GPT prerequisite failed stage=%u",data.stage);
-            const auto image=t970_image::run(reader);
-            panic ("T970 UFS root image readback (no storage writes)\n"
-              "success=%u sample=%u name=%s reads=%u healthy=%u poisoned=%u\n"
-              "GPT=1 manifestAndSamples=%u repeatEach=2 maxBlocks=32\n"
-              "observedSHA=%08x%08x%08x%08x%08x%08x%08x%08x\n"
-              "result=%x ocs=%x scsi=%x sense=%x protocol=%u residual=%u\n"
-              "HC db=%x IS=%x SMMU gf=%x fsr=%x\n"
-              "retained=1 routesRetained=1 noPublication=1\nEND UFS image",
-              unsigned(image.success),image.sample,t970_image::samples[image.sample].name,image.reads,unsigned(reader.healthy()),unsigned(gHost.poisoned),unsigned(image.success),
-              loadBe32(image.observed),loadBe32(image.observed+4),loadBe32(image.observed+8),loadBe32(image.observed+12),loadBe32(image.observed+16),loadBe32(image.observed+20),loadBe32(image.observed+24),loadBe32(image.observed+28),
-              gRootDiagnostic.result,gRootDiagnostic.ocs,gRootDiagnostic.scsi,gRootDiagnostic.sense,gRootDiagnostic.protocol,gRootDiagnostic.residual,
+            const auto image=t970_image::run(reader,true);
+            static char survey[1600];
+            int used=snprintf(survey,sizeof(survey),
+              "T970 UFS root image survey (no writes)\n"
+              "completed=%u matched=%u sample=%u reads=%u healthy=%u poisoned=%u\n"
+              "matchMask=%02x repeatMask=%02x zeroMask=%02x (bits0..6)\n",
+              unsigned(image.completed),unsigned(image.success),image.sample,image.reads,unsigned(reader.healthy()),unsigned(gHost.poisoned),
+              image.matchMask,image.repeatMask,image.zeroMask);
+            if(used<0 || unsigned(used)>=sizeof(survey))panic("UFS survey format overflow");
+            for(unsigned i=0;i<=image.sample && i<7;++i) {
+              const uint8_t *hash=image.digests[i];
+              int n=snprintf(survey+used,sizeof(survey)-used,"%u %s %08x%08x%08x%08x%08x%08x%08x%08x\n",i,t970_image::samples[i].name,
+                loadBe32(hash),loadBe32(hash+4),loadBe32(hash+8),loadBe32(hash+12),loadBe32(hash+16),loadBe32(hash+20),loadBe32(hash+24),loadBe32(hash+28));
+              if(n<0 || unsigned(n)>=sizeof(survey)-unsigned(used))panic("UFS survey format overflow");used+=n;
+            }
+            panic ("%sresult=%x ocs=%x scsi=%x sense=%x protocol=%u residual=%u\n"
+              "db=%x IS=%x gf=%x fsr=%x retained=1 noPublication=1\nEND UFS survey",
+              survey,gRootDiagnostic.result,gRootDiagnostic.ocs,gRootDiagnostic.scsi,gRootDiagnostic.sense,gRootDiagnostic.protocol,gRootDiagnostic.residual,
               read32(gHost.hc,0x58),read32(gHost.hc,0x20),read32(smmu,0x48),read32(smmu,0x80058));
           }
           panic ("T970 UFS read-only LUN0 (no storage writes)\n"
