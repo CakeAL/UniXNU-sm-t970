@@ -48,6 +48,13 @@
   原始 BOOT 恢复待完成，后续镜像以 `evidence/bring-up/runtime/*/flash.json` 回执为准。
 - 以下为 ds 交接当时的状态、命令和待办，保留作历史基线；当前进展以本节及适配记录为准。
 
+## SMMU 诊断（本轮）
+
+`t970-smmu-dump` 在 `arm_init` 末尾转储 apps_smmu：IDR0 `0x002d0405`，固件共配置 **26 个 stream**，
+没有 `0x0060`。驱动随后规划 **bank 73 / slot 86** 并写 SMR，写后读回 0（`act=0`）。
+这更像 **SMMU 未开时钟/未上电或被 TZ 锁定**，而不是单纯少了 stream id。
+下一步：在驱动里先使能 apps_smmu 的 GCC GDSC/时钟，或改用固件已配置的 stream（需从 26 条中确认 UFS 的那条）。
+
 ## UFS 进展（userdata 已写入）
 
 - **userdata 已完整写入**：`scripts/encode-userdata-sparse.py` 把 8.7 GiB 镜像切成三段 sparse，

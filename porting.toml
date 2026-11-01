@@ -100,6 +100,7 @@ findings = [
   "feeds.toml now pins the SM8250 UFS fork and unixnu.lock records it, but no component selects it; board.toml and sm-t970_defconfig remain in their buildable pre-UFS state.",
   "board.toml now carries the measured T970 [userdata] geometry and the root-volume UUID for the ADT; the UFS component selection, storage archives and native-ufs boot arguments used for the size measurement were reverted so the default build stays inside the BOOT partition.",
   "board.toml selects ShengUfs and VirtioMmioBlock, adds the empty-policy VerifiedRoot archive entry, and boots with sheng-pmgr=2, native-ufs-root=1 and no stream override (default 0x60); sm-t970_defconfig enables CONFIG_XNU_NATIVE_UFS and CONFIG_XNU_VERIFIED_ROOT_PROBE. The temporary MassStorage boot-option firmware patch was reverted.",
+  "board.toml now passes t970-smmu-dump=1 together with native-ufs-root=1 for the SMMU table diagnostic; the flag only triggers the arm_init dump and must be removed once the UFS stream is resolved.",
 ]
 completion = [
   "A board.toml with matching device identity resolves the selected SoC and OS profiles and pinned sources.",
@@ -498,6 +499,7 @@ findings = [
   "The VerifiedRoot path cannot fit this board: the OS+SystemOS policy bundle embeds a 47 MiB block-hash table in the kernel (kernel.macho 125374464 bytes) and the packed boot image measured 138211328 bytes against the 71303168-byte BOOT partition. CONFIG_XNU_NATIVE_UFS and CONFIG_XNU_VERIFIED_ROOT_PROBE are therefore left off; the next storage step is a T970 device-side UFS publication path that does not embed the verified-root hash table.",
   "Provisioned the T970 userdata partition without Odin: scripts/encode-userdata-sparse.py encodes one contiguous segment of userdata-root.img as an Android sparse image whose DONT_CARE chunks leave the rest of the partition untouched, so three segments of ~2.8-3.1 GB each fit Heimdall's 4 GiB single-file protocol limit. All three uploads reported USERDATA upload successful.",
   "Enabled ShengUfs on the alioth fork with the empty-policy VerifiedRoot archive (19 KB, native policy count zero) and single default stream sid 0x0060. The kernel links and boots (kernel a981a22d, boot image c38d09f7). The driver reaches the SMMU setup but the SMR write for bank 73 slot 86 reads back zero, so UFS publication still fails at NativeUfs.cpp:455; the firmware-configured stream id or SMMU ownership is not yet identified.",
+  "A t970-smmu-dump boot-argument diagnostic in arm_init (patches/xnu/t970-smmu-dump.patch) dumps the firmware-configured apps_smmu table before IOKit starts: IDR0 0x002d0405 and 26 valid SMR entries, none with SID 0x0060. The alioth driver then plans bank 73 slot 86 and its SMR write reads back zero, which points at SMMU power/clock or secure ownership rather than a missing stream id.",
 ]
 completion = [
   "UFS reads return correct capacity, GPT and known blocks under XNU; the chosen root mounts and writes persist only inside the allocated Data region.",
@@ -517,6 +519,7 @@ evidence = [
   { kind = "source", reference = "scripts/collect-storage-inputs.py", result = "Deterministic collector for the UFS inventory; verified to produce the same JSON twice." },
   { kind = "device", reference = "evidence/bring-up/runtime/userdata-sparse/flash.json", command = ".cache/heimdall/build/bin/heimdall flash --USERDATA out/step7/userdata-segN.bin --no-reboot", result = "Three sparse segments of the 9382658048-byte image uploaded successfully with exit 0; the DONT_CARE encoding keeps each transfer below 4 GiB and leaves unwritten ranges intact.", revision = "d07a7ed5e3d474b801ad328266718e11aed2550c" },
   { kind = "device", reference = "evidence/bring-up/runtime/ufs-smmu-stream/device-result.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/boot-single-stream.img --no-reboot", result = "Kernel a981a22d with single default stream 0x0060 panics at NativeUfs.cpp:455: SMR write off=958 exp=80000060 act=0. The controller is bound but its SMMU stream cannot be programmed.", revision = "d07a7ed5e3d474b801ad328266718e11aed2550c" },
+  { kind = "device", reference = "evidence/bring-up/runtime/t970-smmu-table/device-result.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/boot-smmudump.img --no-reboot", result = "The dump shows IDR0 0x002d0405 and 26 configured streams (the visible subset is recorded) with no stream 0x0060; the SMR write in the later UFS path reads back zero.", revision = "1ad4d2516482a2f0b21f19cbfbb85a62e5b56ee1" },
 ]
 
 [[area]]
@@ -894,6 +897,7 @@ findings = [
   "Final console diagnostic patch set for this revision: t970-console-bootstrap calls PE_initialize_console under t970-novc so vinfo and the framebuffer mapping exist for the panic screen, and the t970-skip-video patch (which skipped gc_initialize and left VCPUTC's ticket lock uninitialized) is removed. t970-skip-vcattach keeps PE_putc a null writer.",
   "scripts/build-owner-systemos-policy.py signs and fully verifies the raw Cryptex1,SystemOS member (806400 blocks, b4908cde) against the same owner anchor; it is the missing SystemOS half the framework's --include-systemos bundle needs.",
   "Added scripts/build-verified-root-empty.py (real VerifiedRoot crypto with a zero-length policy table, 19 KB archive, fixed at link time) and scripts/build-ufs-stubs.py with package/UfsStubs.c. The VerifiedRoot probe archive with the 47 MiB hash table stays out of the kernel because it does not fit the 68 MiB BOOT partition.",
+  "patches/xnu/t970-smmu-dump.patch is appended to the device series after the console and vcattach patches; it targets the end of arm_init (before machine_startup) so it stays clear of the console hunks.",
 ]
 completion = [
   "The selected profile's inputs produce a kernel, payload and a boot image matching the SM-T970 boot path.",
@@ -1058,6 +1062,7 @@ findings = [
   "scripts/build-storage-bindings.py and scripts/data/native-storage-original-bindings.S are kept as the audited absolute-address binding for the original IOStorageFamily symbols; they are not referenced by any enabled archive entry.",
   "scripts/build-owner-systemos-policy.py is host-only qualification: it mounts the raw SystemOS member read-only, signs a manifest with the local owner anchor and verifies all 806400 blocks through the real C/RSA host dylib; no hardware or storage publication is claimed.",
   "A sparse DONT_CARE segment is the working way to write a partition larger than 4 GiB through Heimdall: the bootloader expands the sparse image and skips the untouched chunks, and a 1 MiB manifest-only segment was accepted before the three full segments were attempted.",
+  "The SMMU dump is a guarded arm_init diagnostic (t970-smmu-dump=1) that maps 0x15000000 and reports the valid SMR/S2CR entries on the panic screen; it is a bring-up probe, not a UFS fix, and it leaves normal boots untouched.",
 ]
 completion = [
   "Every claimed UniXNU milestone has matching source/image revisions, a reproducible command and accessible firmware/kernel logs.",

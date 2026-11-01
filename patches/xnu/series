@@ -2,3 +2,4 @@ sheng-platform-power.patch
 # Board patch paths, one per line in application order.
 t970-console-bootstrap.patch
 t970-skip-vcattach.patch
+t970-smmu-dump.patch

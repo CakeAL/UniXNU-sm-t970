@@ -1,0 +1,122 @@
+{
+  "device": "SM-T970 / gts7xlwifi",
+  "boot_image_sha256": "06d00833be62455f1edad951600e23831ef8374c8793cd5a03b0df70b3358a61",
+  "boot_image_bytes": 62713856,
+  "source_kernel_sha256": "922a3c9fc847f64231fa1aa49be24f9f65c112685698a880cef3d3b50b19402d",
+  "observation_source": "Human photograph of the panic screen",
+  "panic": "T970 SMMU idr=002d0405 found=26 ... @arm_init.c:705",
+  "streams_observed": [
+    {
+      "slot": 4,
+      "smr": "84020820",
+      "s2cr": "00000004"
+    },
+    {
+      "slot": 103,
+      "smr": "80000064",
+      "s2cr": "00010300"
+    },
+    {
+      "slot": 104,
+      "smr": "80000044",
+      "s2cr": "00010300"
+    },
+    {
+      "slot": 105,
+      "smr": "800005e8",
+      "s2cr": "00010300"
+    },
+    {
+      "slot": 106,
+      "smr": "800105e4",
+      "s2cr": "00010300"
+    },
+    {
+      "slot": 107,
+      "smr": "80010400",
+      "s2cr": "00010300"
+    },
+    {
+      "slot": 108,
+      "smr": "800005a4",
+      "s2cr": "00010300"
+    },
+    {
+      "slot": 109,
+      "smr": "8000180b",
+      "s2cr": "0000034b"
+    },
+    {
+      "slot": 110,
+      "smr": "8400104b",
+      "s2cr": "0000034b"
+    },
+    {
+      "slot": 111,
+      "smr": "84000823",
+      "s2cr": "00000351"
+    },
+    {
+      "slot": 112,
+      "smr": "84002122",
+      "s2cr": "00000352"
+    },
+    {
+      "slot": 113,
+      "smr": "84000202",
+      "s2cr": "00000353"
+    },
+    {
+      "slot": 114,
+      "smr": "80030100",
+      "s2cr": "00000354"
+    },
+    {
+      "slot": 115,
+      "smr": "80030104",
+      "s2cr": "00000355"
+    },
+    {
+      "slot": 116,
+      "smr": "8000058b",
+      "s2cr": "00000358"
+    },
+    {
+      "slot": 121,
+      "smr": "840010a8",
+      "s2cr": "00000357"
+    },
+    {
+      "slot": 122,
+      "smr": "840010a4",
+      "s2cr": "00000357"
+    },
+    {
+      "slot": 123,
+      "smr": "840410a3",
+      "s2cr": "00000357"
+    },
+    {
+      "slot": 124,
+      "smr": "84001088",
+      "s2cr": "00000357"
+    },
+    {
+      "slot": 125,
+      "smr": "84001084",
+      "s2cr": "00000357"
+    },
+    {
+      "slot": 126,
+      "smr": "84041083",
+      "s2cr": "00000357"
+    },
+    {
+      "slot": 127,
+      "smr": "840010c0",
+      "s2cr": "00000358"
+    }
+  ],
+  "result": "The firmware configured 26 SMMU streams, none matching 0x0060. The driver then planned bank 73 slot 86, which does not correspond to an implemented context bank on this SMMU, and the SMR write read back zero.",
+  "limits": "The dump is truncated to the first ~700 characters, so a few of the 26 entries are not visible. It does not by itself establish whether the SMMU is unclocked, secure, or simply addressed with the wrong geometry."
+}

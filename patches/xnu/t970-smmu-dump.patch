@@ -1,0 +1,41 @@
+--- a/osfmk/arm/arm_init.c	2026-11-01 09:25:37
++++ b/osfmk/arm/arm_init.c	2026-11-01 09:25:37
+@@ -653,6 +653,38 @@
+ 	 * against string vulnerabilities
+ 	 */
+ 	__stack_chk_guard &= ~(0xFFULL << 8);
++
++	/*
++	 * T970 diagnostic: dump the SMMU stream table before any IOKit driver
++	 * runs, so the firmware-configured UFS stream id is visible even when the
++	 * UFS driver later panics on its own SMR write.
++	 */
++	{
++		unsigned int t970_smmu_dump = 0;
++		if (PE_parse_boot_argn("t970-smmu-dump", &t970_smmu_dump, sizeof(t970_smmu_dump))) {
++			vm_offset_t base = ml_io_map_wcomb(0x15000000ULL, 0xd0000);
++			if (!base) {
++				panic("T970 SMMU dump: map failed");
++			}
++			char line[900];
++			int used = 0;
++			unsigned int found = 0;
++			for (unsigned int index = 0; index < 128; index++) {
++				uint32_t smr = *(volatile uint32_t *)(base + 0x800 + 4 * index);
++				uint32_t s2cr = *(volatile uint32_t *)(base + 0xc00 + 4 * index);
++				if (!(smr & 0x80000000)) {
++					continue;
++				}
++				found++;
++				if (used < 700) {
++					used += snprintf(line + used, sizeof(line) - used,
++					    " [%u]%08x/%08x", index, smr, s2cr);
++				}
++			}
++			panic("T970 SMMU idr=%08x found=%u%s", *(volatile uint32_t *)(base + 0x0), found, line);
++		}
++	}
++
+ 	machine_startup(args);
+ }
+ 
