@@ -16,6 +16,9 @@ CONFIG_XNU_VERIFIED_ROOT_PROBE=y
 # read-only root: the audit records the decision and the trust switch lets it pass.
 # The owner-root trust switch requires the verified block storage personality.
 CONFIG_XNU_NATIVE_VIRTIO_BLOCK=y
+# The verified-block symbols only exist when the driver is compiled with NATIVE_VERIFIED_BLOCK,
+# which puts its archive beside the plain build.
+CONFIG_XNU_NATIVE_VIRTIO_BLOCK_ARCHIVE="{tree}/build/virtio-block-local/libVirtioMmioBlock.a"
 CONFIG_XNU_OWNER_ROOT_AUDIT=y
 CONFIG_XNU_OWNER_ROOT_TRUST=y
 CONFIG_XNU_VERIFIED_ROOT_ARCHIVE="{tree}/build/verified-root-empty/libVerifiedRootProbe.a"

@@ -61,6 +61,12 @@ assembly.write_text('.data\n.balign 8\n'
                     '.globl _verified_root_policy_count\n_verified_root_policy_count:\n  .quad 0\n'
                     '.globl _verified_root_key\n_verified_root_key:\n  .byte '
                     + ','.join(str(b) for b in anchor) + '\n'
+                    # The virtio personality still references the single-manifest form; this board
+                    # publishes through the UFS policy table instead, so the symbols stay empty and
+                    # that path remains fail-closed.
+                    '.data\n.balign 8\n'
+                    '.globl _verified_root_manifest\n_verified_root_manifest:\n  .quad 0\n'
+                    '.globl _verified_root_manifest_bytes\n_verified_root_manifest_bytes:\n  .quad 0\n'
                     '.text\n'
                     '.globl _native_verified_policy_count_set\n'
                     '_native_verified_policy_count_set:\n'

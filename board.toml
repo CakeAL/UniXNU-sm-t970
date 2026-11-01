@@ -12,7 +12,7 @@ kit = "sm-t970"
 include = ["ArmDTPlatform", "ArmCpu", "SoftwareAES", "VirtioMmioBlock", "XnuPrelink", "DarwinBoot"]
 
 [kernel]
-archives = ["build-corecrypto-14.py", "build-corecrypto-14.py --namespace", "component:ArmDTPlatform", "component:ArmCpu", "component:SoftwareAES", "build-verified-root-empty.py", "component:VirtioMmioBlock", "zz-build-shengufs-local.py", "build-storage-bindings.py --component NativeUfs --archive libShengUfs.a --directory build/sheng-ufs", "build-ufs-stubs.py", "build-software-aes-bindings.py", "build-platform-power.py", "build-mockfs-fixture.py", "build-libpthread-kernel.py"]
+archives = ["build-corecrypto-14.py", "build-corecrypto-14.py --namespace", "component:ArmDTPlatform", "component:ArmCpu", "component:SoftwareAES", "build-verified-root-empty.py", "component:VirtioMmioBlock", "zz-build-virtio-block-local.py", "zz-build-shengufs-local.py", "build-storage-bindings.py --component NativeUfs --archive libShengUfs.a --directory build/sheng-ufs", "build-ufs-stubs.py", "build-software-aes-bindings.py", "build-platform-power.py", "build-mockfs-fixture.py", "build-libpthread-kernel.py"]
 defconfig = "sm-t970_defconfig"
 config_fragments = ["arch:configs/common.config", "soc:configs/sm8250.config", "os:configs/ipados.config"]
 patch_series = ["arch:patches/xnu/series", "soc:patches/xnu/series", "device:patches/xnu/os-series", "device:patches/xnu/series"]
