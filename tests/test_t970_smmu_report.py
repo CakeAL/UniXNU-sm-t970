@@ -10,6 +10,15 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 
 
 class SmmuReportTests(unittest.TestCase):
+    def test_nop_route_gates_and_failure_retention(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            executable = pathlib.Path(temporary) / 'nop-test'
+            subprocess.run(['clang++', '-std=c++17', '-Wall', '-Wextra', '-Werror',
+                            '-Wno-unused-function', '-I', str(ROOT / 'package/ShengUfs'),
+                            str(ROOT / 'tests/cpp/t970-nop.cpp'), '-o', str(executable)], check=True)
+            result = subprocess.run([str(executable)], text=True, capture_output=True, check=True)
+            self.assertIn('PASS: NOP route gates', result.stdout)
+
     def test_preflight_bounds_and_route_refusal(self):
         with tempfile.TemporaryDirectory() as temporary:
             executable = pathlib.Path(temporary) / 'preflight-test'

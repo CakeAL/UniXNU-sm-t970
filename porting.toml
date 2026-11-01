@@ -15,6 +15,8 @@ components = [
   "ArmDTPlatform",
 ]
 paths = [
+  "docs/ufs-nop.md",
+  "evidence/storage/ufs-nop/**",
   "docs/ufs-preflight.md",
   "evidence/storage/ufs-preflight/**",
   "docs/smmu-fields.md",
@@ -136,6 +138,7 @@ next_action = ["Continue with audited SM8250 storage inputs and isolated images;
 evidence = [
   { kind = "device", reference = "evidence/storage/smmu-fields/device-result.json", revision = "7ee2918e7bafdc76d62225675c4bcaebd14e5753", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/smmu-fields/boot.img --no-reboot", result = "Owner photo confirms tested stream fields accepted and restored, display mapping preserved; context states are observations, not ownership or DMA qualification." },
   { kind = "device", reference = "evidence/storage/ufs-preflight/device-result.json", revision = "c0c13db843b72306db42c4ac3aa953698768e6f0", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-preflight/boot.img --no-reboot", result = "Owner photo confirms ownedOK=1, planOK=1 and END, contiguous buffer inside actual boot_args memory; no stream activation or DMA command performed." },
+  { kind = "source", reference = "docs/ufs-nop.md", result = "One-shot bounded NOP experiment: owned DMA, idle queue takeover, exact two-SID candidates and preserved existing context/display; no SCSI, storage write, cancel or retry. Hardware pending." },
   { kind = "source", reference = "docs/ufs-preflight.md", result = "Zero-command preflight checks actual boot_args owned DMA bounds and reads candidate CB0 without modifying queues, mappings or context state; hardware preflight passed; command/DMA validation remains pending." },
   { kind = "source", reference = "docs/smmu-fields.md", result = "Combined field tests keep temporary VALID rules at FAULT and all S2CR updates inactive; bounded restoration and context-read limits are explicit." },
   { kind = "device", reference = "evidence/storage/smr-id-test/device-result.json", revision = "41d99e612894ec559c9f6503310290e8b97f7b6b", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/smr-id-test/boot.img --no-reboot", result = "Owner confirmation/photo: ID a5 accepted, restored zero, S2CR and checked mappings unchanged, no new GFSR. No active-route or DMA qualification." },
@@ -449,6 +452,8 @@ id = "memory"
 status = "implemented"
 components = []
 paths = [
+  "docs/ufs-nop.md",
+  "evidence/storage/ufs-nop/**",
   "docs/ufs-preflight.md",
   "evidence/storage/ufs-preflight/**",
   "docs/smmu-fields.md",
@@ -521,6 +526,7 @@ next_action = [
 evidence = [
   { kind = "device", reference = "evidence/storage/smmu-fields/device-result.json", revision = "7ee2918e7bafdc76d62225675c4bcaebd14e5753", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/smmu-fields/boot.img --no-reboot", result = "Owner photo confirms tested stream fields accepted and restored, display mapping preserved; context states are observations, not ownership or DMA qualification." },
   { kind = "device", reference = "evidence/storage/ufs-preflight/device-result.json", revision = "c0c13db843b72306db42c4ac3aa953698768e6f0", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-preflight/boot.img --no-reboot", result = "Owner photo confirms ownedOK=1, planOK=1 and END, contiguous buffer inside actual boot_args memory; no stream activation or DMA command performed." },
+  { kind = "source", reference = "docs/ufs-nop.md", result = "One-shot bounded NOP experiment: owned DMA, idle queue takeover, exact two-SID candidates and preserved existing context/display; no SCSI, storage write, cancel or retry. Hardware pending." },
   { kind = "source", reference = "docs/ufs-preflight.md", result = "Zero-command preflight checks actual boot_args owned DMA bounds and reads candidate CB0 without modifying queues, mappings or context state; hardware preflight passed; command/DMA validation remains pending." },
   { kind = "source", reference = "docs/smmu-fields.md", result = "Combined field tests keep temporary VALID rules at FAULT and all S2CR updates inactive; bounded restoration and context-read limits are explicit." },
   { kind = "device", reference = "evidence/storage/smr-id-test/device-result.json", revision = "41d99e612894ec559c9f6503310290e8b97f7b6b", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/smr-id-test/boot.img --no-reboot", result = "Owner confirmation/photo: ID a5 accepted, restored zero, S2CR and checked mappings unchanged, no new GFSR. No active-route or DMA qualification." },
@@ -545,6 +551,8 @@ id = "storage"
 status = "planned"
 components = ["ShengUfs", "VirtioMmioBlock", "VerifiedRoot"]
 paths = [
+  "docs/ufs-nop.md",
+  "evidence/storage/ufs-nop/**",
   "docs/ufs-preflight.md",
   "evidence/storage/ufs-preflight/**",
   "docs/smmu-fields.md",
@@ -623,6 +631,7 @@ next_action = ["Review an exclusive bypass-context and bounded command/DMA test 
 evidence = [
   { kind = "device", reference = "evidence/storage/smmu-fields/device-result.json", revision = "7ee2918e7bafdc76d62225675c4bcaebd14e5753", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/smmu-fields/boot.img --no-reboot", result = "Owner photo confirms tested stream fields accepted and restored, display mapping preserved; context states are observations, not ownership or DMA qualification." },
   { kind = "device", reference = "evidence/storage/ufs-preflight/device-result.json", revision = "c0c13db843b72306db42c4ac3aa953698768e6f0", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-preflight/boot.img --no-reboot", result = "Owner photo confirms ownedOK=1, planOK=1 and END, contiguous buffer inside actual boot_args memory; no stream activation or DMA command performed." },
+  { kind = "source", reference = "docs/ufs-nop.md", result = "One-shot bounded NOP experiment: owned DMA, idle queue takeover, exact two-SID candidates and preserved existing context/display; no SCSI, storage write, cancel or retry. Hardware pending." },
   { kind = "source", reference = "docs/ufs-preflight.md", result = "Zero-command preflight checks actual boot_args owned DMA bounds and reads candidate CB0 without modifying queues, mappings or context state; hardware preflight passed; command/DMA validation remains pending." },
   { kind = "source", reference = "docs/smmu-fields.md", result = "Combined field tests keep temporary VALID rules at FAULT and all S2CR updates inactive; bounded restoration and context-read limits are explicit." },
   { kind = "device", reference = "evidence/storage/smr-id-test/device-result.json", revision = "41d99e612894ec559c9f6503310290e8b97f7b6b", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/smr-id-test/boot.img --no-reboot", result = "Owner confirmation/photo: ID a5 accepted, restored zero, S2CR and checked mappings unchanged, no new GFSR. No active-route or DMA qualification." },
@@ -917,6 +926,8 @@ components = [
   "XnuPrelink",
 ]
 paths = [
+  "docs/ufs-nop.md",
+  "evidence/storage/ufs-nop/**",
   "docs/ufs-preflight.md",
   "evidence/storage/ufs-preflight/**",
   "docs/smmu-fields.md",
@@ -1067,6 +1078,7 @@ next_action = ["Review an exclusive bypass-context and bounded command/DMA test 
 evidence = [
   { kind = "device", reference = "evidence/storage/smmu-fields/device-result.json", revision = "7ee2918e7bafdc76d62225675c4bcaebd14e5753", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/smmu-fields/boot.img --no-reboot", result = "Owner photo confirms tested stream fields accepted and restored, display mapping preserved; context states are observations, not ownership or DMA qualification." },
   { kind = "device", reference = "evidence/storage/ufs-preflight/device-result.json", revision = "c0c13db843b72306db42c4ac3aa953698768e6f0", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-preflight/boot.img --no-reboot", result = "Owner photo confirms ownedOK=1, planOK=1 and END, contiguous buffer inside actual boot_args memory; no stream activation or DMA command performed." },
+  { kind = "source", reference = "docs/ufs-nop.md", result = "One-shot bounded NOP experiment: owned DMA, idle queue takeover, exact two-SID candidates and preserved existing context/display; no SCSI, storage write, cancel or retry. Hardware pending." },
   { kind = "source", reference = "docs/ufs-preflight.md", result = "Zero-command preflight checks actual boot_args owned DMA bounds and reads candidate CB0 without modifying queues, mappings or context state; hardware preflight passed; command/DMA validation remains pending." },
   { kind = "source", reference = "docs/smmu-fields.md", result = "Combined field tests keep temporary VALID rules at FAULT and all S2CR updates inactive; bounded restoration and context-read limits are explicit." },
   { kind = "device", reference = "evidence/storage/smr-id-test/device-result.json", revision = "41d99e612894ec559c9f6503310290e8b97f7b6b", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/smr-id-test/boot.img --no-reboot", result = "Owner confirmation/photo: ID a5 accepted, restored zero, S2CR and checked mappings unchanged, no new GFSR. No active-route or DMA qualification." },
@@ -1119,6 +1131,8 @@ id = "diagnostics"
 status = "implemented"
 components = []
 paths = [
+  "docs/ufs-nop.md",
+  "evidence/storage/ufs-nop/**",
   "docs/ufs-preflight.md",
   "evidence/storage/ufs-preflight/**",
   "docs/smmu-fields.md",
@@ -1268,6 +1282,7 @@ next_action = ["Review an exclusive bypass-context and bounded command/DMA test 
 evidence = [
   { kind = "device", reference = "evidence/storage/smmu-fields/device-result.json", revision = "7ee2918e7bafdc76d62225675c4bcaebd14e5753", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/smmu-fields/boot.img --no-reboot", result = "Owner photo confirms tested stream fields accepted and restored, display mapping preserved; context states are observations, not ownership or DMA qualification." },
   { kind = "device", reference = "evidence/storage/ufs-preflight/device-result.json", revision = "c0c13db843b72306db42c4ac3aa953698768e6f0", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-preflight/boot.img --no-reboot", result = "Owner photo confirms ownedOK=1, planOK=1 and END, contiguous buffer inside actual boot_args memory; no stream activation or DMA command performed." },
+  { kind = "source", reference = "docs/ufs-nop.md", result = "One-shot bounded NOP experiment: owned DMA, idle queue takeover, exact two-SID candidates and preserved existing context/display; no SCSI, storage write, cancel or retry. Hardware pending." },
   { kind = "source", reference = "docs/ufs-preflight.md", result = "Zero-command preflight checks actual boot_args owned DMA bounds and reads candidate CB0 without modifying queues, mappings or context state; hardware preflight passed; command/DMA validation remains pending." },
   { kind = "source", reference = "docs/smmu-fields.md", result = "Combined field tests keep temporary VALID rules at FAULT and all S2CR updates inactive; bounded restoration and context-read limits are explicit." },
   { kind = "device", reference = "evidence/storage/smr-id-test/device-result.json", revision = "41d99e612894ec559c9f6503310290e8b97f7b6b", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/smr-id-test/boot.img --no-reboot", result = "Owner confirmation/photo: ID a5 accepted, restored zero, S2CR and checked mappings unchanged, no new GFSR. No active-route or DMA qualification." },

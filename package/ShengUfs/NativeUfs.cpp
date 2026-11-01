@@ -41,6 +41,7 @@ extern const uint8_t verified_root_key[];
 #include "T970SmrIdTest.h"
 #include "T970SmmuFields.h"
 #include "T970TransportPreflight.h"
+#include "T970NopTest.h"
 #include "WholeUserdataRoot.h"
 #include "WholeUserdataDisk.h"
 
@@ -2488,15 +2489,16 @@ static void mediaReportThread (void *, wait_result_t)
 
 bool NativeUfs::start (IOService *provider)
 {
-  unsigned retiredWriteScan = 0, smmuReport = 0, handoffReport = 0, smrIdTest = 0, fieldTest = 0, preflight = 0;
+  unsigned retiredWriteScan = 0, smmuReport = 0, handoffReport = 0, smrIdTest = 0, fieldTest = 0, preflight = 0, nopTest = 0;
   if (PE_parse_boot_argn ("t970-ufs-writable-smr", &retiredWriteScan, sizeof (retiredWriteScan)) && retiredWriteScan) {
     panic ("T970: writable SMR scan retired; use t970-smmu-report=1");
   }
   PE_parse_boot_argn ("t970-smr-id-test", &smrIdTest, sizeof (smrIdTest));
   PE_parse_boot_argn ("t970-ufs-handoff", &handoffReport, sizeof (handoffReport));
   PE_parse_boot_argn ("t970-smmu-fields", &fieldTest, sizeof (fieldTest));
+  PE_parse_boot_argn ("t970-ufs-nop", &nopTest, sizeof (nopTest));
   PE_parse_boot_argn ("t970-ufs-preflight", &preflight, sizeof (preflight));
-  if ((handoffReport == 1 || smrIdTest == 1 || fieldTest == 1 || preflight == 1) &&
+  if ((handoffReport == 1 || smrIdTest == 1 || fieldTest == 1 || preflight == 1 || nopTest == 1) &&
       OSDynamicCast (IOPlatformExpertDevice, provider)) {
     OSSharedPtr<IOMemoryMap> smmuMap, gccMap, hcMap;
     uintptr_t smmu = mapPhys (0x15000000ULL, 0x100000, smmuMap);
@@ -2513,7 +2515,7 @@ bool NativeUfs::start (IOService *provider)
         else h.state = 2;
       }
     } else h.state = 3;
-    if (preflight == 1) {
+    if (preflight == 1 || nopTest == 1) {
       const auto *args = static_cast<const boot_args *> (PE_state.bootArgs);
       if (!args) panic ("T970 UFS preflight: no boot args");
       const uint64_t ownedBase = args->physBase, ownedBytes = args->memSize;
@@ -2531,6 +2533,46 @@ bool NativeUfs::start (IOService *provider)
       IOByteCount contiguous = 0;
       const uint64_t dma = allocation->getPhysicalSegment (0, &contiguous, kIOMemoryMapperNone);
       const bool owned = t970_preflight::ownsDma (ownedBase, ownedBytes, dma, kDmaBytes, contiguous);
+      if (nopTest == 1) {
+        if (!owned) panic ("T970 UFS NOP refused: DMA outside owned memory");
+        gHost.hc = hcMap->getVirtualAddress ();
+        gHost.smmu = smmu; gHost.cb = smmu + 0x80000;
+        gHost.dma = allocation; gHost.phys = dma;
+        gHost.virt = static_cast<uint8_t *> (allocation->getBytesNoCopy ());
+        if (!gHost.virt) panic ("T970 UFS NOP refused: no DMA virtual address");
+        bzero (gHost.virt, kDmaBytes); cacheCivac (gHost.virt, kDmaBytes);
+        gRootDiagnosticEnabled = true;
+        struct Port {
+          uintptr_t smmu;
+          uint32_t smmuRead (unsigned off) { return read32 (smmu, off); }
+          void smmuWrite (unsigned off, uint32_t value) {
+            write32 (smmu, off, value); __asm__ volatile ("dsb sy" ::: "memory");
+          }
+          uint32_t hcRead (unsigned off) { return read32 (gHost.hc, off); }
+          void hcWrite (unsigned off, uint32_t value) { hostWrite (off, value); }
+          bool wait (unsigned off, uint32_t mask, uint32_t value) { return hostWaitRegister (off, mask, value); }
+          bool nop () { return hostNop () == kIOReturnSuccess; }
+          bool submitted () { return gRootDiagnostic.command != 0; }
+        } port {smmu};
+        const auto result = t970_nop::run (port, r, c, h, owned, dma);
+        // Terminal diagnostic: never free/reuse DMA or roll back live routes.
+        // A timed-out command may still own the allocation. Restart via firmware.
+        panic ("T970 UFS single NOP (no SCSI/storage writes)\n"
+          "stage=%u submitted=%u success=%u protected=%u poisoned=%u\n"
+          "dma=%llx bytes=%x ownedOK=%u retained=1 routesRetained=1\n"
+          "result=%08x ocs=%x response=%08x protocol=%u polls=%u\n"
+          "HC hce=%x hcs=%x db=%x tmDb=%x IS=%x rsr=%x\n"
+          "SMMU gf=%x fsrBefore=%x fsrAfter=%x syn=%x far=%08x%08x\n"
+          "SMR55=%08x/%08x SMR56=%08x/%08x display=%08x/%08x\n"
+          "CB0=%x/%x/%x CB4 protected; CB73 untouched\nEND UFS NOP",
+          result.stage, unsigned(result.submitted), unsigned(result.success), unsigned(result.protectedUnchanged), unsigned(gHost.poisoned),
+          dma, kDmaBytes, unsigned(owned), gRootDiagnostic.result, gRootDiagnostic.ocs,
+          gRootDiagnostic.response, gRootDiagnostic.protocol, gRootDiagnostic.polls,
+          read32(gHost.hc,0x34), read32(gHost.hc,0x30), read32(gHost.hc,0x58), read32(gHost.hc,0x78), read32(gHost.hc,0x20), read32(gHost.hc,0x60),
+          read32(smmu,0x48), fsr, read32(smmu,0x80058), read32(smmu,0x54), read32(smmu,0x80064), read32(smmu,0x80060),
+          read32(smmu,0x954),read32(smmu,0xd54),read32(smmu,0x958),read32(smmu,0xd58),read32(smmu,0x810),read32(smmu,0xc10),
+          read32(smmu,0x1000),read32(smmu,0x1800),read32(smmu,0x80000));
+      }
       panic ("T970 UFS preflight (no MMIO writes)\n"
              "ownedBase=%llx ownedBytes=%llx dma=%llx bytes=%x contiguous=%llx ownedOK=%u\n"
              "candidateCB=0 cbar=%08x cba2r=%08x sctlr=%08x fsr=%08x planOK=%u\n"

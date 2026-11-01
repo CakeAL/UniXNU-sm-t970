@@ -3,7 +3,18 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
-## 当前：UFS 零命令预检（实机通过，未执行 DMA）
+## 当前：单次 UFS NOP（主机构建通过，待封装／实测）
+
+- 参数 `t970-ufs-nop=1`；范围与阶段见 [单次NOP](ufs-nop.md)。
+- 自有连续 DMA、实际 boot_args 范围核验，空 transfer/task 队列停用，两个精确 SID
+  候选安装到槽55/56、CB0保持原配置；保护显示CB4，CB73不动。
+- 仅尝试一次 NOP OUT/IN，复用已测试生产命令／200ms轮询。不发Query/SCSI，
+  不改PHY／时钟，不读取分区。故障／超时不取消、不重试、不回收DMA、不回滚路由。
+- 15项主机测试、配置检查、内核编译／链接／预链接通过，构建输入稳定；内核 SHA256
+  `3a0881f9595ae54efae62b2884e311d1aee0934208d239fd93a385facf6303be`。仍使用 FD `515105d7…`。
+- 目前未刷入本轮镜像，设备仍安装下述已通过的零命令预检镜像。
+
+## 前轮：UFS 零命令预检（实机通过，未执行 DMA）
 
 - 参数 `t970-ufs-preflight=1`；见 [预检范围](ufs-preflight.md)。
 - 读取实际 ARM64 boot_args physBase/memSize，分配连续 0x22000 字节缓冲并检查归属；

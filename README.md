@@ -13,7 +13,8 @@
 [完整只读交接快照](docs/ufs-handoff.md)已确认 HCI ready、队列 doorbell 为零，
 唯一有效 stream 与显示对应。已实机确认[无效 SMR 的 ID 字段](docs/smr-id-test.md)可写且恢复成功；
 [合并核查 VALID、S2CR](docs/smmu-fields.md)已确认接受及恢复；
-当前准备[零命令预检](docs/ufs-preflight.md)，核对实际内存归属，不建立 DMA 路由。
+[零命令预检](docs/ufs-preflight.md)已确认实际内存归属；
+当前准备[单次 NOP 测试](docs/ufs-nop.md)，DMA 与存储读取尚未验证。
 
 两个仓库并列放置，普通构建命令在主仓库执行：
 
