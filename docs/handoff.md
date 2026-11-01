@@ -3,7 +3,18 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
-## 当前：合并 SMMU 字段核查（实机写回及恢复通过）
+## 当前：UFS 零命令预检（内核构建通过，待封装／实测）
+
+- 参数 `t970-ufs-preflight=1`；见 [预检范围](ufs-preflight.md)。
+- 读取实际 ARM64 boot_args physBase/memSize，分配连续 0x22000 字节缓冲并检查归属；
+  不采用 DTS DRAM 包络。不写 MMIO，不切队列／stream／context，不提交 UFS 命令。
+- 读取候选 CB0，要求保持已观测原配置、没有有效 NS stream 引用；保护显示 CB4，排除 CB73。
+  e0/4e0 仍只是残留字段候选，预检通过不等于资源独占、DMA 或读盘通过。
+- 14 项主机测试、配置检查及内核编译／预链接通过，构建输入稳定；内核 SHA256
+  `af32f5a5f221fe01b94d404cc37861b024c09903e012b4b76031da737aeb9ece`。继续使用 FD `515105d7…`。
+- 打包与实机结果尚未产生；当前已安装镜像仍为下述合并字段探针。
+
+## 前轮：合并 SMMU 字段核查（实机写回及恢复通过）
 
 - 上轮 ID 字段接受／恢复已通过；新参数 `t970-smmu-fields=1`，预期标题
   `T970 SMMU fields (no UFS commands)`，范围见 [合并核查](smmu-fields.md)。

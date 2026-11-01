@@ -26,7 +26,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--unixnu', type=Path, default=device.parent / 'UniXNU')
     parser.add_argument('--output', type=Path, required=True)
-    parser.add_argument('--mode', choices=['smmu', 'handoff', 'smr-id', 'fields'], default='smmu')
+    parser.add_argument('--mode', choices=['smmu', 'handoff', 'smr-id', 'fields', 'preflight'], default='smmu')
     parser.add_argument('--kernel-build', type=Path, default=device / 'out/step7/ufs-readonly-kernel-final.json')
     options = parser.parse_args()
     framework, output = options.unixnu.resolve(), options.output.resolve()
@@ -36,16 +36,18 @@ def main():
     kernel_build = json.loads(options.kernel_build.read_text())
     require(kernel_build.get('exit_code') == 0 and kernel_build.get('source_inputs_unchanged_during_build'),
             'Require a successful kernel build with stable source inputs')
-    if options.mode in ['handoff', 'smr-id', 'fields']:
+    if options.mode in ['handoff', 'smr-id', 'fields', 'preflight']:
         for name in ['package/ShengUfs/GccUfs.h', 'package/ShengUfs/T970UfsHandoff.h',
                      'package/ShengUfs/T970SmmuReport.h', 'package/ShengUfs/NativeUfs.cpp']:
             require(name in kernel_build['source_inputs_sha256'], 'Missing diagnostic input hash: ' + name)
-    if options.mode in ['smr-id', 'fields']:
+    if options.mode in ['smr-id', 'fields', 'preflight']:
         require('package/ShengUfs/T970SmrIdTest.h' in kernel_build['source_inputs_sha256'],
                 'Missing bounded SMR test input hash')
     if options.mode == 'fields':
         require('package/ShengUfs/T970SmmuFields.h' in kernel_build['source_inputs_sha256'],
                 'Missing field qualification input hash')
+    if options.mode == 'preflight':
+        require('package/ShengUfs/T970TransportPreflight.h' in kernel_build['source_inputs_sha256'], 'Missing preflight input hash')
     for name, digest in kernel_build['source_inputs_sha256'].items():
         require(sha(device / name) == digest, 'Kernel input changed: ' + name)
     sys.path.insert(0, str(framework / 'scripts'))
@@ -63,7 +65,7 @@ def main():
     kernel = ctx.work / 'kernel/kernel.macho'
     require(sha(kernel) == kernel_build['kernel_sha256'], 'Kernel differs from final build')
     mode_arg = {'handoff': 't970-ufs-handoff=1', 'smmu': 't970-smmu-report=1',
-                'smr-id': 't970-smr-id-test=1', 'fields': 't970-smmu-fields=1'}[options.mode]
+                'smr-id': 't970-smr-id-test=1', 'fields': 't970-smmu-fields=1', 'preflight': 't970-ufs-preflight=1'}[options.mode]
     arguments = ['-v', 'cpus=1', 't970-novc', 'sheng-pmgr=2', mode_arg]
     spec = ctx.board['payload']
     require(spec['kernel_args'] == arguments and spec.get('panic_screen') is True and

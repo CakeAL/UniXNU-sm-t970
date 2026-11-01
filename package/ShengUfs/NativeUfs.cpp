@@ -30,6 +30,7 @@ extern const uint8_t verified_root_key[];
 #include <libkern/c++/OSString.h>
 #include <libkern/libkern.h>
 #include <pexpert/pexpert.h>
+#include <pexpert/arm64/boot.h>
 #include <kern/debug.h>
 #include "GccUfs.h"
 #include "RootDiagnostics.h"
@@ -39,6 +40,7 @@ extern const uint8_t verified_root_key[];
 #include "T970UfsHandoff.h"
 #include "T970SmrIdTest.h"
 #include "T970SmmuFields.h"
+#include "T970TransportPreflight.h"
 #include "WholeUserdataRoot.h"
 #include "WholeUserdataDisk.h"
 
@@ -2486,14 +2488,15 @@ static void mediaReportThread (void *, wait_result_t)
 
 bool NativeUfs::start (IOService *provider)
 {
-  unsigned retiredWriteScan = 0, smmuReport = 0, handoffReport = 0, smrIdTest = 0, fieldTest = 0;
+  unsigned retiredWriteScan = 0, smmuReport = 0, handoffReport = 0, smrIdTest = 0, fieldTest = 0, preflight = 0;
   if (PE_parse_boot_argn ("t970-ufs-writable-smr", &retiredWriteScan, sizeof (retiredWriteScan)) && retiredWriteScan) {
     panic ("T970: writable SMR scan retired; use t970-smmu-report=1");
   }
   PE_parse_boot_argn ("t970-smr-id-test", &smrIdTest, sizeof (smrIdTest));
   PE_parse_boot_argn ("t970-ufs-handoff", &handoffReport, sizeof (handoffReport));
   PE_parse_boot_argn ("t970-smmu-fields", &fieldTest, sizeof (fieldTest));
-  if ((handoffReport == 1 || smrIdTest == 1 || fieldTest == 1) &&
+  PE_parse_boot_argn ("t970-ufs-preflight", &preflight, sizeof (preflight));
+  if ((handoffReport == 1 || smrIdTest == 1 || fieldTest == 1 || preflight == 1) &&
       OSDynamicCast (IOPlatformExpertDevice, provider)) {
     OSSharedPtr<IOMemoryMap> smmuMap, gccMap, hcMap;
     uintptr_t smmu = mapPhys (0x15000000ULL, 0x100000, smmuMap);
@@ -2510,6 +2513,32 @@ bool NativeUfs::start (IOService *provider)
         else h.state = 2;
       }
     } else h.state = 3;
+    if (preflight == 1) {
+      const auto *args = static_cast<const boot_args *> (PE_state.bootArgs);
+      if (!args) panic ("T970 UFS preflight: no boot args");
+      const uint64_t ownedBase = args->physBase, ownedBytes = args->memSize;
+      const uint32_t cbar = read32 (smmu, 0x1000), cba2r = read32 (smmu, 0x1800);
+      const uint32_t sctlr = read32 (smmu, 0x80000), fsr = read32 (smmu, 0x80058);
+      const bool plan = t970_preflight::candidate (r, cbar, cba2r, sctlr);
+      if (!plan || !t970_ufs::canReadController (c) || h.state != 1 || !(h.hce & 1) || (h.hcs & 15) != 15 || h.doorbell || h.tmDoorbell)
+        panic ("T970 UFS preflight: refused plan=%u HC=%u db=%x tmDb=%x CB0=%x/%x/%x", unsigned(plan), h.state, h.doorbell, h.tmDoorbell, cbar, cba2r, sctlr);
+      // Keep the allocation alive for the diagnostic stop. No hardware sees it.
+      static IOBufferMemoryDescriptor *allocation;
+      allocation = IOBufferMemoryDescriptor::inTaskWithOptions (kernel_task,
+        static_cast<IOOptionBits>(kIODirectionInOut) | static_cast<IOOptionBits>(kIOMemoryPhysicallyContiguous) |
+        static_cast<IOOptionBits>(kIOMemoryMapperNone), kDmaBytes, 4096);
+      if (!allocation) panic ("T970 UFS preflight: allocation failed");
+      IOByteCount contiguous = 0;
+      const uint64_t dma = allocation->getPhysicalSegment (0, &contiguous, kIOMemoryMapperNone);
+      const bool owned = t970_preflight::ownsDma (ownedBase, ownedBytes, dma, kDmaBytes, contiguous);
+      panic ("T970 UFS preflight (no MMIO writes)\n"
+             "ownedBase=%llx ownedBytes=%llx dma=%llx bytes=%x contiguous=%llx ownedOK=%u\n"
+             "candidateCB=0 cbar=%08x cba2r=%08x sctlr=%08x fsr=%08x planOK=%u\n"
+             "candidate SID=e0/4e0 slots=55/56; CB4 protected; CB73 excluded\n"
+             "HC=%u hce=%x hcs=%x db=%x tmDb=%x\nEND UFS preflight",
+             ownedBase, ownedBytes, dma, kDmaBytes, static_cast<uint64_t>(contiguous), unsigned(owned),
+             cbar, cba2r, sctlr, fsr, unsigned(plan), h.state, h.hce, h.hcs, h.doorbell, h.tmDoorbell);
+    }
     if (fieldTest == 1) {
       const auto p = t970_fields::run (r, c, h,
         [smmu](unsigned off) { return read32 (smmu, off); },
