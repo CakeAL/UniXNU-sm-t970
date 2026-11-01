@@ -63,3 +63,10 @@ python3.14 scripts/write-root-image-adb.py --serial <actual-serial> \
 执行blockdev --flushbufs清理目标块缓存，再读取完整确切长度核对SHA256。
 Recovery自带dd的iflag=direct会报EINVAL，已实际验证改用缓存清理＋count_bytes的通道。
 任何写入、缓存清理、读取、长度或摘要错误都停止，不自动重试或挂载根卷。
+
+## 本次写入结果
+
+通过临时BOOT root ADB完成连续原始写入，write/read exit均0。写后sync及BLKFLSBUF成功，
+完整9,382,658,048字节读回SHA256=fd43ee7035ce185ce4215ac93fdc006fd784a54b3b7442e21457c226cbe03093，
+与源精确一致，见 `evidence/storage/root-rewrite/receipt.json`。未使用Odin或分段sparse，原Recovery未改。
+接下来重启至XNU调查镜像进行跨启动样本确认；根卷挂载仍单独验证。

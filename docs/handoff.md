@@ -3,7 +3,7 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
-## 当前：root ADB通道通过，准备完整镜像写入及读回
+## 当前：完整根镜像已重写并通过整段读回，准备XNU交叉核验
 
 - 机主要求“你能直接刷么”，已授权继续完成当前完整根镜像部署；仍先验证通道。
 - OdinMac本机也封装Heimdall，不作为独立大文件通道。准备官方Recovery派生的BOOT临时镜像，
@@ -18,7 +18,12 @@
 - Linux清理块缓存后manifest仍读回全零，与XNU诊断一致。自带dd的direct模式EINVAL，
   改用sync+成功BLKFLSBUF再按确切字节数读取，已资格验证4096字节数据通道。
 - 准备scripts/write-root-image-adb.py连续写完整fd43ee70…镜像，再清理块缓存并读回完整长度SHA256。
-  脚本需--write显式执行，型号／几何／挂载和源hash检查失败不会写入。尚未执行本次USERDATA写入。
+  已按机主指令执行本次USERDATA写入：write exit0、sync及BLKFLSBUF成功，read exit0。
+- 9,382,658,048字节全部读回，SHA256精确匹配源镜像
+  `fd43ee7035ce185ce4215ac93fdc006fd784a54b3b7442e21457c226cbe03093`。
+  回执／日志在 `evidence/storage/root-rewrite/`。仅重写镜像长度，未改分区表／Recovery。
+- 下一步自动回Download Mode，重刷已审阅的c404ce26…UFS survey BOOT并自动启动，待屏幕确认7样本全部匹配。
+  根设备发布／文件系统挂载仍未启用。
 - 原厂BOOT和UFS调查BOOT均保留；当前运行临时Linux root ADB。
 
 ## 前轮：根镜像调查完成（传输一致，部署内容不完整）

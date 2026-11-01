@@ -1,0 +1,31 @@
+PASS: root ADB identity, partition geometry and quiescent mounts
+Writing 1482686464/9382658048 bytes
+Writing 2925527040/9382658048 bytes
+Writing 4340056064/9382658048 bytes
+Writing 5915017216/9382658048 bytes
+Writing 7464812544/9382658048 bytes
+Writing 9041870848/9382658048 bytes
+Write, sync and block cache flush completed; reading entire image back
+Verifying 415236096/9382658048 bytes
+Verifying 818937856/9382658048 bytes
+Verifying 1229979648/9382658048 bytes
+Verifying 1630535680/9382658048 bytes
+Verifying 2037383168/9382658048 bytes
+Verifying 2447376384/9382658048 bytes
+Verifying 2851078144/9382658048 bytes
+Verifying 3266314240/9382658048 bytes
+Verifying 3676307456/9382658048 bytes
+Verifying 4088397824/9382658048 bytes
+Verifying 4502585344/9382658048 bytes
+Verifying 4911529984/9382658048 bytes
+Verifying 5326766080/9382658048 bytes
+Verifying 5717884928/9382658048 bytes
+Verifying 6123683840/9382658048 bytes
+Verifying 6526337024/9382658048 bytes
+Verifying 6934233088/9382658048 bytes
+Verifying 7344226304/9382658048 bytes
+Verifying 7757365248/9382658048 bytes
+Verifying 8169455616/9382658048 bytes
+Verifying 8577351680/9382658048 bytes
+Verifying 8991539200/9382658048 bytes
+PASS: complete USERDATA image readback matches exact source SHA256

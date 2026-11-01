@@ -1,0 +1,29 @@
+{
+  "scope": "Authorized exact-image USERDATA overwrite and full readback",
+  "started_at": "2026-11-01T10:21:48.546629+00:00",
+  "script_sha256": "9feab046bf0513772b9736cd3ff436a86a37ae7709336a4542c955cdd07e1e7d",
+  "source_sha256": "fd43ee7035ce185ce4215ac93fdc006fd784a54b3b7442e21457c226cbe03093",
+  "image_bytes": 9382658048,
+  "target": "/dev/block/sda36",
+  "partition": "USERDATA",
+  "userdata_written": true,
+  "boot_written": false,
+  "recovery_written": false,
+  "write_exit_code": 0,
+  "read_exit_code": 0,
+  "readback_sha256": "fd43ee7035ce185ce4215ac93fdc006fd784a54b3b7442e21457c226cbe03093",
+  "verified": true,
+  "write_command": [
+    "adb",
+    "-s",
+    "<selected-device>",
+    "shell",
+    "-T",
+    "dd of=/dev/block/sda36 bs=1048576 && sync"
+  ],
+  "bytes_sent": 9382658048,
+  "readback_cache_method": "sync then successful BLKFLSBUF on unmounted target; direct flag unsupported by this recovery dd",
+  "finished_at": "2026-11-01T10:31:43.079496+00:00",
+  "readback_bytes": 9382658048,
+  "source_revision": "1279f18d459adfbf3551567046967a001dbcaf6c"
+}
