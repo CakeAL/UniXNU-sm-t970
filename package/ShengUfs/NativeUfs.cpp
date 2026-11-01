@@ -2351,7 +2351,8 @@ static void runCacheProbe (void)
                                                            gCacheProbePath, sizeof (gCacheProbePath));
   // Census of the media that carries the cache UUID: how many there are, and what each one reports,
   // so a refused lookup can be told apart from a missing media or an authorizer disagreement.
-  unsigned found = 0, whole = 0, named = 0, authorized = 0;
+  unsigned found = 0, whole = 0, named = 0, authorized = 0, detail = 0;
+  char gCacheProbeDetail[128] = {};
   OSDictionary *matching = IOService::serviceMatching ("IOMedia");
   OSDictionary *properties = OSDictionary::withCapacity (1);
   OSString *wanted = OSString::withCString (cacheUuid);
@@ -2369,7 +2370,15 @@ static void runCacheProbe (void)
         if (!mjr || !mnr) continue;
         ++named;
         const dev_t device = makedev (mjr->unsigned32BitValue (), mnr->unsigned32BitValue ());
-        if (native_verified_block_root_authorized (device)) ++authorized;
+        const bool allowed = native_verified_block_root_authorized (device) != 0;
+        if (allowed) ++authorized;
+        if (detail < 3) {
+          OSString *bsdName = OSDynamicCast (OSString, media->getProperty (kIOBSDNameKey));
+          const bool isWhole = OSDynamicCast (IOMedia, media) && static_cast<IOMedia *> (media)->isWhole ();
+          int used = snprintf (gCacheProbeDetail + detail * 40, 40, "m%u=%s/w%u/a%u", detail,
+                               bsdName ? bsdName->getCStringNoCopy () : "-", isWhole ? 1 : 0, allowed ? 1 : 0);
+          if (used > 0 && used < 40) ++detail;
+        }
       }
       iterator->release ();
     }
@@ -2378,9 +2387,10 @@ static void runCacheProbe (void)
   OSSafeReleaseNULL (properties);
   OSSafeReleaseNULL (matching);
   snprintf (gCacheProbeText, sizeof (gCacheProbeText),
-            "probe=%d dev=%x path=%s media=%u whole=%u named=%u authorized=%u",
+            "probe=%d dev=%x path=%s media=%u whole=%u named=%u authorized=%u %s",
             gCacheProbeResult, static_cast<unsigned> (gCacheProbeDevice),
-            gCacheProbePath[0] ? gCacheProbePath : "-", found, whole, named, authorized);
+            gCacheProbePath[0] ? gCacheProbePath : "-", found, whole, named, authorized,
+            gCacheProbeDetail);
 }
 
 extern "C" const char *native_ufs_cache_probe_text (void)
