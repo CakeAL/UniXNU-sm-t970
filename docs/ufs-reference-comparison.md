@@ -63,7 +63,8 @@ T970 的原厂 DT 使用 kona GCC。三星设备内核的 `gcc-kona.c`、Linux v
 本地 `package/ShengUfs/GccUfs.h` 仍是 SM8550 诊断表，UEFI `BoardInit.c` 也保留了
 其中四项旧宏。不过当前 `BoardInit.c` 已跳过 GCC 写入，这些宏没有被它引用；
 不能据此认定已证实某次复位原因。只读 SMMU 镜像不执行这两处时钟操作。
-本次只记录差异，没有更改默认 SID、启动传输或刷写新固件。
+对照当时只记录差异；随后已按[只读交接快照](ufs-handoff.md)修正内核诊断表。
+UEFI 的旧宏保持不变、未被新镜像执行；没有更改默认 SID、启动传输或刷写新固件。
 
 ## 对下一步的约束
 

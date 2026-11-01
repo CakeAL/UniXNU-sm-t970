@@ -3,6 +3,18 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
+## 下一轮：SM8250 只读交接快照（主机构建完成）
+
+- 参数为 `t970-ufs-handoff=1`，预期标题 `T970 UFS handoff RO (no writes)`。
+- 修正内核时钟诊断表，删除 SM8550 独立 mem-PHY GDSC 读取；UEFI 原型保持原样且不执行。
+- 显示完整、有界的原始 SMR/S2CR 表及正确的 SM8250 GCC 状态；只有 GDSC/AXI/AHB
+  通过保守前提检查才只读 HCI／队列。未采样的 HCI 默认零值需结合 HCstate 解读。
+- 内核 `147f8d3bc6b8c35990a83f304f5eab1b3654d69ba5b9a1ef1747a5d31602f34a`
+  编译、链接、预链接通过，构建期间输入哈希不变。11 项主机测试通过，包括最大表格排版。
+- 继续使用 FD `515105d7…`；下一步打包核验并只刷 BOOT。刷写及实机结果以
+  `evidence/storage/handoff-readonly/` 后续回执为准，不能把下文已通过的旧快照当成本轮结果。
+- 范围、格式及复现：[交接快照](ufs-handoff.md)。本轮不进行 UFS 命令、DMA 或 USERDATA 写入。
+
 ## 当前接手核查（从 47b113f 继续）
 
 - 当前任务是 UFS／SMMU，而非下面早期控制台定位的历史阶段；根卷挂载失败见

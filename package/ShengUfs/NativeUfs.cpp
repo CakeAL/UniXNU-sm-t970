@@ -36,6 +36,7 @@ extern const uint8_t verified_root_key[];
 #include "TransferPoll.h"
 #include "SmmuTakeover.h"
 #include "T970SmmuReport.h"
+#include "T970UfsHandoff.h"
 #include "WholeUserdataRoot.h"
 #include "WholeUserdataDisk.h"
 
@@ -285,28 +286,15 @@ static void requireDualStreamReuse (unsigned probe, unsigned rootMode, const cha
 
 void NativeUfs::inspect (void)
 {
-  OSSharedPtr<IOMemoryMap> gccMap, memPhyMap, hcMap;
+  OSSharedPtr<IOMemoryMap> gccMap, hcMap;
   uintptr_t gcc = mapPhys (GCC_BASE + 0x77000, 0x1000, gccMap);
-  uintptr_t memPhy = mapPhys (GCC_BASE + 0x9e000, 0x1000, memPhyMap);
-  if (!gcc || !memPhy) {
-    panic ("NATIVE_UFS inspect: GCC map failed gcc=%p memphy=%p", (void *) gcc, (void *) memPhy);
+  if (!gcc) {
+    panic ("NATIVE_UFS inspect: GCC map failed");
   }
-  uint32_t gdsc = read32 (gcc, GCC_UFS_PHY_GDSCR - 0x77000);
-  uint32_t axi = read32 (gcc, GCC_UFS_PHY_AXI_ENABLE - 0x77000);
-  uint32_t ahb = read32 (gcc, GCC_UFS_PHY_AHB_ENABLE - 0x77000);
-  uint32_t unipro = read32 (gcc, GCC_UFS_PHY_UNIPRO_CORE_ENABLE - 0x77000);
-  uint32_t txs = read32 (gcc, GCC_UFS_PHY_TX_SYMBOL0_ENABLE - 0x77000);
-  uint32_t rxs = read32 (gcc, GCC_UFS_PHY_RX_SYMBOL0_ENABLE - 0x77000);
-  uint32_t aux = read32 (gcc, GCC_UFS_PHY_PHY_AUX_ENABLE - 0x77000);
-  uint32_t memGdsc = read32 (memPhy, 0);
-  // GDSCR bit31 PWR_ON; CBCR bit31 CLK_OFF.
-  bool powered = (gdsc & 0x80000000U) != 0;
-  // Hardware 2026-10-17: AXI running, AHB enabled but CLK_OFF (bit31). With bit1 (HW gating)
-  // set the branch wakes on access, so enable bits, not CLK_OFF, gate the read-only probe.
-  bool busClocks = !(axi & 0x80000000U) && (ahb & 0x1U) && (axi & 0x1U);
+  const auto clocks = t970_ufs::collectClocks ([gcc](unsigned off) { return read32 (gcc, off); });
   uint32_t cap = 0, ver = 0, hcs = 0, hce = 0, utrlba = 0, is = 0;
   unsigned readHc = 0;
-  if (powered && busClocks) {
+  if (t970_ufs::canReadController (clocks)) {
     uintptr_t hc = mapPhys (UFS_HC_BASE, UFS_HC_SIZE, hcMap);
     if (hc) {
       cap = read32 (hc, 0x00);
@@ -319,12 +307,13 @@ void NativeUfs::inspect (void)
     }
   }
   panic ("NATIVE_UFS inspect\n"
-         "gdsc=%08x memphygdsc=%08x\n"
+         "gdsc=%08x (SM8250, no separate mem-PHY GDSC read)\n"
          "axi=%08x ahb=%08x unipro=%08x\n"
          "txsym=%08x rxsym=%08x aux=%08x\n"
          "hc_read=%u cap=%08x ver=%08x\n"
          "is=%08x hcs=%08x hce=%08x utrlba=%08x",
-         gdsc, memGdsc, axi, ahb, unipro, txs, rxs, aux, readHc, cap, ver, is, hcs, hce, utrlba);
+         clocks.gdsc, clocks.axi, clocks.ahb, clocks.unipro, clocks.tx, clocks.rx0, clocks.aux,
+         readHc, cap, ver, is, hcs, hce, utrlba);
 }
 
 // Adopt the controller the firmware left running (native-ufs-probe=3) and issue
@@ -2495,9 +2484,30 @@ static void mediaReportThread (void *, wait_result_t)
 
 bool NativeUfs::start (IOService *provider)
 {
-  unsigned retiredWriteScan = 0, smmuReport = 0;
+  unsigned retiredWriteScan = 0, smmuReport = 0, handoffReport = 0;
   if (PE_parse_boot_argn ("t970-ufs-writable-smr", &retiredWriteScan, sizeof (retiredWriteScan)) && retiredWriteScan) {
     panic ("T970: writable SMR scan retired; use t970-smmu-report=1");
+  }
+  if (PE_parse_boot_argn ("t970-ufs-handoff", &handoffReport, sizeof (handoffReport)) && handoffReport == 1 &&
+      OSDynamicCast (IOPlatformExpertDevice, provider)) {
+    OSSharedPtr<IOMemoryMap> smmuMap, gccMap, hcMap;
+    uintptr_t smmu = mapPhys (0x15000000ULL, 0x100000, smmuMap);
+    if (!smmu) panic ("T970 UFS handoff RO: SMMU map failed");
+    const auto r = t970_smmu::collect ([smmu](unsigned off) { return read32 (smmu, off); }, 0x100000);
+    uintptr_t gcc = mapPhys (GCC_BASE + 0x77000, 0x1000, gccMap);
+    t970_ufs::Clocks c;
+    t970_ufs::Controller h;
+    if (gcc) {
+      c = t970_ufs::collectClocks ([gcc](unsigned off) { return read32 (gcc, off); });
+      if (t970_ufs::canReadController (c)) {
+        uintptr_t hc = mapPhys (UFS_HC_BASE, UFS_HC_SIZE, hcMap);
+        if (hc) h = t970_ufs::collectController (c, [hc](unsigned off) { return read32 (hc, off); });
+        else h.state = 2;
+      }
+    } else h.state = 3;
+    static char text[3600]; // Entire bounded table fits the panic formatter's 4000-byte string limit.
+    if (!t970_ufs::format (text, sizeof (text), r, c, h)) panic ("T970 UFS handoff RO: format overflow");
+    panic ("%s", text); // No transport setup, queue writes, PHY/SCM calls or root access.
   }
   if (PE_parse_boot_argn ("t970-smmu-report", &smmuReport, sizeof (smmuReport)) && smmuReport == 1 &&
       OSDynamicCast (IOPlatformExpertDevice, provider)) {

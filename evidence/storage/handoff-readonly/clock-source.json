@@ -1,0 +1,46 @@
+{
+  "repository": "LineageOS/android_kernel_samsung_sm8250",
+  "revision": "ad129ac77e9d871770d61f7bd219a836d7f35b74",
+  "path": "drivers/clk/qcom/gcc-kona.c",
+  "target_mapping": "Captured T970 DT clock-controller@100000 selects kona GCC; UFS clock IDs and supply GDSC are recorded in evidence/storage/board-inputs.json.",
+  "gdscr": "0x77004",
+  "clocks": {
+    "GCC_UFS_PHY_AXI_ENABLE": {
+      "source_symbol": "gcc_ufs_phy_axi_clk",
+      "offset": "0x77010"
+    },
+    "GCC_UFS_PHY_AHB_ENABLE": {
+      "source_symbol": "gcc_ufs_phy_ahb_clk",
+      "offset": "0x77018"
+    },
+    "GCC_UFS_PHY_UNIPRO_CORE_ENABLE": {
+      "source_symbol": "gcc_ufs_phy_unipro_core_clk",
+      "offset": "0x7705c"
+    },
+    "GCC_UFS_PHY_ICE_CORE_ENABLE": {
+      "source_symbol": "gcc_ufs_phy_ice_core_clk",
+      "offset": "0x77064"
+    },
+    "GCC_UFS_PHY_PHY_AUX_ENABLE": {
+      "source_symbol": "gcc_ufs_phy_phy_aux_clk",
+      "offset": "0x7709c"
+    },
+    "GCC_UFS_PHY_TX_SYMBOL0_ENABLE": {
+      "source_symbol": "gcc_ufs_phy_tx_symbol_0_clk",
+      "offset": "0x7701c"
+    },
+    "GCC_UFS_PHY_RX_SYMBOL0_ENABLE": {
+      "source_symbol": "gcc_ufs_phy_rx_symbol_0_clk",
+      "offset": "0x77020"
+    },
+    "GCC_UFS_PHY_RX_SYMBOL1_ENABLE": {
+      "source_symbol": "gcc_ufs_phy_rx_symbol_1_clk",
+      "offset": "0x770b8"
+    },
+    "GCC_AGGRE_UFS_PHY_AXI_ENABLE": {
+      "source_symbol": "gcc_aggre_ufs_phy_axi_clk",
+      "offset": "0x770cc"
+    }
+  },
+  "limits": "Source-level offsets; this is not a new device measurement or permission to program clocks."
+}

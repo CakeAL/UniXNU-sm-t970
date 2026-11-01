@@ -15,6 +15,8 @@ components = [
   "ArmDTPlatform",
 ]
 paths = [
+  "docs/ufs-handoff.md",
+  "evidence/storage/handoff-readonly/**",
   "evidence/bring-up/runtime/idle-return/probe.json",
   "docs/handoff.md",
   "evidence/device-repository/result.json",
@@ -60,6 +62,7 @@ procedure = [
   "Run python3.14 ../UniXNU-sm-t970/scripts/check-platform.py --unixnu . to compare DT/ADT bindings with the captured hardware.",
 ]
 findings = [
+  "Prepared t970-ufs-handoff=1: corrected board-local SM8250 clock diagnostics from Samsung gcc-kona.c, removed SM8550-only memory-PHY GDSC reads, capture all bounded raw SMR/S2CR slots and guarded read-only HCI/queue state. No clock, PHY, SCM, SMMU, DMA or queue writes; use the exact tested baseline FD. Host and device results remain separate.",
   "User confirmed and photographed the expected T970 SMMUv2 RO stop for BOOT 7f729c2a: sCR0=002d0406 ID0=4c017e57 ID1=6000004a ID2=00005111 GFSR=0; 87 groups scanned, 74 context banks, no candidate match for 0060/00e0/04e0. MMIO observation is confirmed; SMR writability, actual UFS routing, DMA and root reads are not.",
   "Resumed at 47b113f. New default diagnostic t970-smmu-report=1 reads the measured SMMUv2 window before any controller/queue/DMA/root setup and stops on a labeled panic. It retires the unflashed all-slot write scan, separates sCR0 from ID0/1/2, honors EXIDS, and does not treat ignored writes or prior SCM markers as proof that secure-world routes are exhausted.",
   "Uploaded deliberate after-MMU BRK control 150ed5ff9d73d81b17d3f6d32e609b9a9e42fdfe0397da7c5eea7d62f7ce7b4d, using patched Heimdall, exit 0. The device reset at about 50 seconds, matching the reviewed BRK path; original BOOT restoration is still pending. C startup and console behavior are not exercised.",
@@ -117,6 +120,7 @@ limits = [
 ]
 next_action = ["Continue with audited SM8250 storage inputs and isolated images; retain exact source/image hashes and hardware observations."]
 evidence = [
+  { kind = "source", reference = "docs/ufs-handoff.md", result = "Bounded read-only handoff scope, clock-source corrections, conservative HCI gate and full-table display interpretation." },
   { kind = "device", reference = "evidence/storage/readonly-smmu/device-result.json", revision = "23d54b9960b64179dcff36702723305c9d0b6003", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-smmu-readonly-final/boot.img --no-reboot", result = "Owner confirmation and photo transcription bind the expected read-only diagnostic stop to BOOT 7f729c2a; no UFS transfer or root success claimed." },
   { kind = "source", reference = "evidence/storage/readonly-smmu/audit.json", result = "Bounded read-only diagnostic scope and limits of prior secure-ownership/SCM conclusions; no new device result claimed." },
   { kind = "device", reference = "evidence/bring-up/runtime/after-mmu-brk-control/flash.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/after-mmu-brk-control/boot.img --no-reboot", result = "Uploaded deliberate after-MMU BRK control 150ed5ff9d73d81b17d3f6d32e609b9a9e42fdfe0397da7c5eea7d62f7ce7b4d, using patched Heimdall, exit 0. The device reset at about 50 seconds, matching the reviewed BRK path; original BOOT restoration is still pending. C startup and console behavior are not exercised.", revision = "fc4828781445ebab36819d6cdad8a2eddde82435" },
@@ -152,6 +156,8 @@ components = [
   "DarwinBoot",
 ]
 paths = [
+  "docs/ufs-handoff.md",
+  "evidence/storage/handoff-readonly/**",
   "docs/ufs-reference-comparison.md",
   "evidence/storage/readonly-smmu/**",
   "evidence/bring-up/runtime/idle-return/firmware.log",
@@ -194,6 +200,7 @@ procedure = [
   "Collect selected boot properties, the live DT and the first 4096 bytes of boot/recovery with the inventory script; only parsed header fields are saved.",
 ]
 findings = [
+  "Prepared t970-ufs-handoff=1: corrected board-local SM8250 clock diagnostics from Samsung gcc-kona.c, removed SM8550-only memory-PHY GDSC reads, capture all bounded raw SMR/S2CR slots and guarded read-only HCI/queue state. No clock, PHY, SCM, SMMU, DMA or queue writes; use the exact tested baseline FD. Host and device results remain separate.",
   "User confirmed and photographed the expected T970 SMMUv2 RO stop for BOOT 7f729c2a: sCR0=002d0406 ID0=4c017e57 ID1=6000004a ID2=00005111 GFSR=0; 87 groups scanned, 74 context banks, no candidate match for 0060/00e0/04e0. MMIO observation is confirmed; SMR writability, actual UFS routing, DMA and root reads are not.",
   "Prepared BOOT 7f729c2a6ee8ee11b6eb5d4ff7ec23171b261854151578e36737d866a62391e2 from source 23d54b9 and kernel cca9bbb8. Independent FAT/kernel/arguments and packed FD checks passed, as did nine host tests and CPU0 DT/ADT checks. Patched Heimdall uploaded BOOT only with exit 0; device screen/register observation is pending. This is not a UFS/DMA/root-volume success.",
   "Resumed at 47b113f. New default diagnostic t970-smmu-report=1 reads the measured SMMUv2 window before any controller/queue/DMA/root setup and stops on a labeled panic. It retires the unflashed all-slot write scan, separates sCR0 from ID0/1/2, honors EXIDS, and does not treat ignored writes or prior SCM markers as proof that secure-world routes are exhausted.",
@@ -233,6 +240,7 @@ limits = [
 ]
 next_action = ["Audit T970 handoff against the public T733 vendor integration and umi inherited-state path using T970-owned inputs; old experimental SCM/PHY conclusions are not qualified."]
 evidence = [
+  { kind = "source", reference = "docs/ufs-handoff.md", result = "Bounded read-only handoff scope, clock-source corrections, conservative HCI gate and full-table display interpretation." },
   { kind = "source", reference = "docs/ufs-reference-comparison.md", result = "Pinned T733/umi/cas comparison, firmware prerequisites, clock-offset mismatch and next measurement scope; no new hardware programming." },
   { kind = "device", reference = "evidence/storage/readonly-smmu/device-result.json", revision = "23d54b9960b64179dcff36702723305c9d0b6003", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-smmu-readonly-final/boot.img --no-reboot", result = "Owner confirmation and photo transcription bind the expected read-only diagnostic stop to BOOT 7f729c2a; no UFS transfer or root success claimed." },
   { kind = "source", reference = "evidence/storage/readonly-smmu/audit.json", result = "Bounded read-only diagnostic scope and limits of prior secure-ownership/SCM conclusions; no new device result claimed." },
@@ -417,6 +425,8 @@ id = "memory"
 status = "implemented"
 components = []
 paths = [
+  "docs/ufs-handoff.md",
+  "evidence/storage/handoff-readonly/**",
   "package/ShengUfs/T970SmmuReport.h",
   "package/ShengUfs/SmmuTakeover.h",
   "evidence/bring-up/runtime/idle-return/platform.json",
@@ -442,6 +452,7 @@ procedure = [
   "Capture root-readable /proc/iomem and the live DT, then compare physical memory and reserved-memory reg values.",
 ]
 findings = [
+  "Prepared t970-ufs-handoff=1: corrected board-local SM8250 clock diagnostics from Samsung gcc-kona.c, removed SM8550-only memory-PHY GDSC reads, capture all bounded raw SMR/S2CR slots and guarded read-only HCI/queue state. No clock, PHY, SCM, SMMU, DMA or queue writes; use the exact tested baseline FD. Host and device results remain separate.",
   "User confirmed and photographed the expected T970 SMMUv2 RO stop for BOOT 7f729c2a: sCR0=002d0406 ID0=4c017e57 ID1=6000004a ID2=00005111 GFSR=0; 87 groups scanned, 74 context banks, no candidate match for 0060/00e0/04e0. MMIO observation is confirmed; SMR writability, actual UFS routing, DMA and root reads are not.",
   "Resumed at 47b113f. New default diagnostic t970-smmu-report=1 reads the measured SMMUv2 window before any controller/queue/DMA/root setup and stops on a labeled panic. It retires the unflashed all-slot write scan, separates sCR0 from ID0/1/2, honors EXIDS, and does not treat ignored writes or prior SCM markers as proof that secure-world routes are exhausted.",
   "Current platform checks passed in explicit firmware-envelope mode with the 256 MiB ADT owned-window request. Reserved holes are reported, not reclaimed; per-boot allocation-map capture is still pending.",
@@ -471,6 +482,7 @@ next_action = [
   "Capture the actual owned-window physical base/size and EFI memory map on the next observable boot; do not reclaim the rest of the ADT envelope.",
 ]
 evidence = [
+  { kind = "source", reference = "docs/ufs-handoff.md", result = "Bounded read-only handoff scope, clock-source corrections, conservative HCI gate and full-table display interpretation." },
   { kind = "device", reference = "evidence/storage/readonly-smmu/device-result.json", revision = "23d54b9960b64179dcff36702723305c9d0b6003", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-smmu-readonly-final/boot.img --no-reboot", result = "Owner confirmation and photo transcription bind the expected read-only diagnostic stop to BOOT 7f729c2a; no UFS transfer or root success claimed." },
   { kind = "source", reference = "evidence/storage/readonly-smmu/audit.json", result = "Bounded read-only diagnostic scope and limits of prior secure-ownership/SCM conclusions; no new device result claimed." },
   { kind = "host", reference = "evidence/bring-up/runtime/idle-return/platform.json", command = "python3.14 scripts/build-entry-probe.py --target _idle_thread_create --delay 6 --output out/step7/probes/idle-return", result = "Current platform checks passed in explicit firmware-envelope mode with the 256 MiB ADT owned-window request. Reserved holes are reported, not reclaimed; per-boot allocation-map capture is still pending.", revision = "6a3ae24fba8bc4cb44dcdb0898b92582751a36b9" },
@@ -489,6 +501,8 @@ id = "storage"
 status = "planned"
 components = ["ShengUfs", "VirtioMmioBlock", "VerifiedRoot"]
 paths = [
+  "docs/ufs-handoff.md",
+  "evidence/storage/handoff-readonly/**",
   "docs/ufs-reference-comparison.md",
   "package/ShengUfs/**",
   "evidence/storage/readonly-smmu/**",
@@ -511,6 +525,7 @@ procedure = [
   "Read block sysfs and by-name links; read each LUN's primary GPT header and entry array and validate their CRC32 values without writing any block device.",
 ]
 findings = [
+  "Prepared t970-ufs-handoff=1: corrected board-local SM8250 clock diagnostics from Samsung gcc-kona.c, removed SM8550-only memory-PHY GDSC reads, capture all bounded raw SMR/S2CR slots and guarded read-only HCI/queue state. No clock, PHY, SCM, SMMU, DMA or queue writes; use the exact tested baseline FD. Host and device results remain separate.",
   "Compared current T733 (SM7325) and umi (SM8250) public sources and maintainer-reported hardware results. T970 still inherits SM8550 clock diagnostic offsets; Samsung gcc-kona.c and umi agree on different SM8250 offsets. Current BoardInit skips GCC writes, so this is not proof of a reset cause. Public T733 firmware integration exists; no foreign SID or firmware was applied.",
   "User confirmed and photographed the expected T970 SMMUv2 RO stop for BOOT 7f729c2a: sCR0=002d0406 ID0=4c017e57 ID1=6000004a ID2=00005111 GFSR=0; 87 groups scanned, 74 context banks, no candidate match for 0060/00e0/04e0. MMIO observation is confirmed; SMR writability, actual UFS routing, DMA and root reads are not.",
   "Prepared BOOT 7f729c2a6ee8ee11b6eb5d4ff7ec23171b261854151578e36737d866a62391e2 from source 23d54b9 and kernel cca9bbb8. Independent FAT/kernel/arguments and packed FD checks passed, as did nine host tests and CPU0 DT/ADT checks. Patched Heimdall uploaded BOOT only with exit 0; device screen/register observation is pending. This is not a UFS/DMA/root-volume success.",
@@ -546,8 +561,9 @@ completion = [
 limits = [
   "No storage writes, repartitioning, XNU UFS driver, root mounting or persistence tests were performed; backup GPT copies and filesystem contents were not read.",
 ]
-next_action = ["Audit SM8250 clock diagnostic offsets, then capture the bounded full stream table and guarded UFS power/controller/queue state before selecting any SID or programming SMMU/DMA."]
+next_action = ["Build and independently verify the isolated handoff report, then capture its exact-hash device screen including the complete stream table and END marker. Do not infer DMA or root-volume success from register access."]
 evidence = [
+  { kind = "source", reference = "docs/ufs-handoff.md", result = "Bounded read-only handoff scope, clock-source corrections, conservative HCI gate and full-table display interpretation." },
   { kind = "source", reference = "docs/ufs-reference-comparison.md", result = "Pinned T733/umi/cas comparison, firmware prerequisites, clock-offset mismatch and next measurement scope; no new hardware programming." },
   { kind = "device", reference = "evidence/storage/readonly-smmu/device-result.json", revision = "23d54b9960b64179dcff36702723305c9d0b6003", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-smmu-readonly-final/boot.img --no-reboot", result = "Owner confirmation and photo transcription bind the expected read-only diagnostic stop to BOOT 7f729c2a; no UFS transfer or root success claimed." },
   { kind = "source", reference = "evidence/storage/readonly-smmu/audit.json", result = "Bounded read-only diagnostic scope and limits of prior secure-ownership/SCM conclusions; no new device result claimed." },
@@ -834,6 +850,8 @@ components = [
   "XnuPrelink",
 ]
 paths = [
+  "docs/ufs-handoff.md",
+  "evidence/storage/handoff-readonly/**",
   "evidence/storage/readonly-smmu/**",
   "evidence/bring-up/runtime/after-mmu-brk-control/**",
   "evidence/bring-up/runtime/console-create-guarded/**",
@@ -879,6 +897,7 @@ procedure = [
   "Read BuildManifest.plist from the local IPSW using Python zipfile and plistlib to identify its OS version, build and product types.",
 ]
 findings = [
+  "Prepared t970-ufs-handoff=1: corrected board-local SM8250 clock diagnostics from Samsung gcc-kona.c, removed SM8550-only memory-PHY GDSC reads, capture all bounded raw SMR/S2CR slots and guarded read-only HCI/queue state. No clock, PHY, SCM, SMMU, DMA or queue writes; use the exact tested baseline FD. Host and device results remain separate.",
   "User confirmed and photographed the expected T970 SMMUv2 RO stop for BOOT 7f729c2a: sCR0=002d0406 ID0=4c017e57 ID1=6000004a ID2=00005111 GFSR=0; 87 groups scanned, 74 context banks, no candidate match for 0060/00e0/04e0. MMIO observation is confirmed; SMR writability, actual UFS routing, DMA and root reads are not.",
   "Prepared BOOT 7f729c2a6ee8ee11b6eb5d4ff7ec23171b261854151578e36737d866a62391e2 from source 23d54b9 and kernel cca9bbb8. Independent FAT/kernel/arguments and packed FD checks passed, as did nine host tests and CPU0 DT/ADT checks. Patched Heimdall uploaded BOOT only with exit 0; device screen/register observation is pending. This is not a UFS/DMA/root-volume success.",
   "Resumed at 47b113f. New default diagnostic t970-smmu-report=1 reads the measured SMMUv2 window before any controller/queue/DMA/root setup and stops on a labeled panic. It retires the unflashed all-slot write scan, separates sCR0 from ID0/1/2, honors EXIDS, and does not treat ignored writes or prior SCM markers as proof that secure-world routes are exhausted.",
@@ -963,8 +982,9 @@ limits = [
   "The IPSW is a local external input; its selected manifest fields are archived, but no complete image build is recorded.",
   "The selected profile kernelcache SHA256 f18b4df865405f2a287b84977d7aca745e056d656d9fc9df1662970ce2969de7 has not been checked against a locally extracted/decompressed kernelcache.",
 ]
-next_action = ["Preserve verified BOOT 7f729c2a and its exact baseline FD. Prepare the next isolated diagnostic only after the SM8250 input audit and independently verify its packed inputs."]
+next_action = ["Build and independently verify the isolated handoff report, then capture its exact-hash device screen including the complete stream table and END marker. Do not infer DMA or root-volume success from register access."]
 evidence = [
+  { kind = "source", reference = "docs/ufs-handoff.md", result = "Bounded read-only handoff scope, clock-source corrections, conservative HCI gate and full-table display interpretation." },
   { kind = "device", reference = "evidence/storage/readonly-smmu/device-result.json", revision = "23d54b9960b64179dcff36702723305c9d0b6003", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-smmu-readonly-final/boot.img --no-reboot", result = "Owner confirmation and photo transcription bind the expected read-only diagnostic stop to BOOT 7f729c2a; no UFS transfer or root success claimed." },
   { kind = "source", reference = "evidence/storage/readonly-smmu/audit.json", result = "Bounded read-only diagnostic scope and limits of prior secure-ownership/SCM conclusions; no new device result claimed." },
   { kind = "device", reference = "evidence/bring-up/runtime/after-mmu-brk-control/flash.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/after-mmu-brk-control/boot.img --no-reboot", result = "Uploaded deliberate after-MMU BRK control 150ed5ff9d73d81b17d3f6d32e609b9a9e42fdfe0397da7c5eea7d62f7ce7b4d, using patched Heimdall, exit 0. The device reset at about 50 seconds, matching the reviewed BRK path; original BOOT restoration is still pending. C startup and console behavior are not exercised.", revision = "fc4828781445ebab36819d6cdad8a2eddde82435" },
@@ -1011,6 +1031,8 @@ id = "diagnostics"
 status = "implemented"
 components = []
 paths = [
+  "docs/ufs-handoff.md",
+  "evidence/storage/handoff-readonly/**",
   "docs/ufs-reference-comparison.md",
   "evidence/storage/readonly-smmu/**",
   "evidence/bring-up/runtime/**",
@@ -1045,6 +1067,7 @@ procedure = [
   "Run python3 scripts/collect-adb-inventory.py --root --output evidence/<new-capture>; review per-command stderr, checksums, GPT CRC results and DT sanitization before updating this record.",
 ]
 findings = [
+  "Prepared t970-ufs-handoff=1: corrected board-local SM8250 clock diagnostics from Samsung gcc-kona.c, removed SM8550-only memory-PHY GDSC reads, capture all bounded raw SMR/S2CR slots and guarded read-only HCI/queue state. No clock, PHY, SCM, SMMU, DMA or queue writes; use the exact tested baseline FD. Host and device results remain separate.",
   "User confirmed and photographed the expected T970 SMMUv2 RO stop for BOOT 7f729c2a: sCR0=002d0406 ID0=4c017e57 ID1=6000004a ID2=00005111 GFSR=0; 87 groups scanned, 74 context banks, no candidate match for 0060/00e0/04e0. MMIO observation is confirmed; SMR writability, actual UFS routing, DMA and root reads are not.",
   "Prepared BOOT 7f729c2a6ee8ee11b6eb5d4ff7ec23171b261854151578e36737d866a62391e2 from source 23d54b9 and kernel cca9bbb8. Independent FAT/kernel/arguments and packed FD checks passed, as did nine host tests and CPU0 DT/ADT checks. Patched Heimdall uploaded BOOT only with exit 0; device screen/register observation is pending. This is not a UFS/DMA/root-volume success.",
   "Removed a copied BRK-success sentence from 33 unrelated host evidence entries and 33 unrelated findings. Their source JSON artifacts and device observations are preserved; successful 50-second BRK results remain attributed only to after-mmu-brk-control.",
@@ -1139,8 +1162,9 @@ completion = [
 limits = [
   "ADB inputs and BOOT-only reset checkpoints are archived. Original BOOT restoration is pending; UART, usable UEFI log export and XNU fault capture remain unverified.",
 ]
-next_action = ["Use the now-observed panic display for one bounded hardware-state snapshot; retain raw registers and distinguish missing matches from actual stream contents. No new BRK timing inference is needed for this observation."]
+next_action = ["Build and independently verify the isolated handoff report, then capture its exact-hash device screen including the complete stream table and END marker. Do not infer DMA or root-volume success from register access."]
 evidence = [
+  { kind = "source", reference = "docs/ufs-handoff.md", result = "Bounded read-only handoff scope, clock-source corrections, conservative HCI gate and full-table display interpretation." },
   { kind = "source", reference = "docs/ufs-reference-comparison.md", result = "Pinned T733/umi/cas comparison, firmware prerequisites, clock-offset mismatch and next measurement scope; no new hardware programming." },
   { kind = "device", reference = "evidence/storage/readonly-smmu/device-result.json", revision = "23d54b9960b64179dcff36702723305c9d0b6003", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-smmu-readonly-final/boot.img --no-reboot", result = "Owner confirmation and photo transcription bind the expected read-only diagnostic stop to BOOT 7f729c2a; no UFS transfer or root success claimed." },
   { kind = "source", reference = "evidence/storage/readonly-smmu/audit.json", result = "Bounded read-only diagnostic scope and limits of prior secure-ownership/SCM conclusions; no new device result claimed." },

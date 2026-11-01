@@ -8,12 +8,18 @@ struct Match {
   unsigned count = 0, slot = 0xffffffffU;
   uint32_t smr = 0, s2cr = 0;
 };
+struct Stream {
+  uint32_t smr = 0, s2cr = 0;
+  bool valid = false;
+};
 struct Report {
   uint32_t scr0 = 0, id0 = 0, id1 = 0, id2 = 0, gfsr = 0;
   unsigned pageShift = 0, banks = 0, stage2Banks = 0, groups = 0, scanned = 0;
   uint64_t contextOffset = 0;
   bool identityValid = false, streamMatching = false, stage1 = false, geometryValid = false, extendedIds = false;
   Match candidate[3]; // Candidate SIDs only: 0x60, 0xe0 and 0x4e0 are not board routing proof.
+  Stream streams[128]; // Raw slots, including invalid entries; bounded by scanned.
+  unsigned valid = 0;
 };
 template <class Read>
 static Report collect(Read read, uint64_t mappedBytes)
@@ -45,8 +51,11 @@ static Report collect(Read read, uint64_t mappedBytes)
     if (static_cast<uint64_t>(s2crOffset) + 4 > mappedBytes) break;
     ++r.scanned;
     uint32_t smr = read(smrOffset);
-    uint32_t s2cr = r.extendedIds ? read(s2crOffset) : 0;
-    if (!(r.extendedIds ? s2cr & (1U << 10) : smr & 0x80000000U)) continue;
+    uint32_t s2cr = read(s2crOffset);
+    const bool valid = (r.extendedIds ? s2cr & (1U << 10) : smr & 0x80000000U) != 0;
+    r.streams[index] = {smr, s2cr, valid};
+    if (!valid) continue;
+    ++r.valid;
     uint32_t mask = (smr >> 16) & (r.extendedIds ? 0xffff : 0x7fff);
     for (unsigned candidate = 0; candidate < 3; ++candidate) {
       if (((smr ^ candidates[candidate]) & 0xffffU & ~mask) != 0) continue;
@@ -54,7 +63,7 @@ static Report collect(Read read, uint64_t mappedBytes)
       if (!match.count) {
         match.slot = index;
         match.smr = smr;
-        match.s2cr = r.extendedIds ? s2cr : read(s2crOffset);
+        match.s2cr = s2cr;
       }
       ++match.count;
     }

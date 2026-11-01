@@ -26,12 +26,18 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--unixnu', type=Path, default=device.parent / 'UniXNU')
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--mode', choices=['smmu', 'handoff'], default='smmu')
+    parser.add_argument('--kernel-build', type=Path, default=device / 'out/step7/ufs-readonly-kernel-final.json')
     options = parser.parse_args()
     framework, output = options.unixnu.resolve(), options.output.resolve()
     require(not output.exists(), 'Choose a new output directory')
     require(subprocess.run(['git', '-C', str(device), 'check-ignore', str(output / 'boot.img')],
                            capture_output=True).returncode == 0, 'Output must be Git-ignored')
-    kernel_build = json.loads((device / 'out/step7/ufs-readonly-kernel-final.json').read_text())
+    kernel_build = json.loads(options.kernel_build.read_text())
+    if options.mode == 'handoff':
+        for name in ['package/ShengUfs/GccUfs.h', 'package/ShengUfs/T970UfsHandoff.h',
+                     'package/ShengUfs/T970SmmuReport.h', 'package/ShengUfs/NativeUfs.cpp']:
+            require(name in kernel_build['source_inputs_sha256'], 'Missing diagnostic input hash: ' + name)
     for name, digest in kernel_build['source_inputs_sha256'].items():
         require(sha(device / name) == digest, 'Kernel input changed: ' + name)
     sys.path.insert(0, str(framework / 'scripts'))
@@ -48,7 +54,8 @@ def main():
             'Firmware DTB changed')
     kernel = ctx.work / 'kernel/kernel.macho'
     require(sha(kernel) == kernel_build['kernel_sha256'], 'Kernel differs from final build')
-    arguments = ['-v', 'cpus=1', 't970-novc', 'sheng-pmgr=2', 't970-smmu-report=1']
+    mode_arg = 't970-ufs-handoff=1' if options.mode == 'handoff' else 't970-smmu-report=1'
+    arguments = ['-v', 'cpus=1', 't970-novc', 'sheng-pmgr=2', mode_arg]
     spec = ctx.board['payload']
     require(spec['kernel_args'] == arguments and spec.get('panic_screen') is True and
             not any(key.startswith('entry_probe_reset_') for key in spec),
@@ -96,7 +103,7 @@ def main():
               'payload_sha256': sha(image), 'boot_sha256': sha(boot), 'boot_bytes': len(data),
               'boot_partition_bytes': sizes[0], 'kernel_args': arguments,
               'independent_fat_check': True, 'independent_fd_check': True,
-              'hardware_tested': False, 'flash_performed': False}
+              'mode': options.mode, 'hardware_tested': False, 'flash_performed': False}
     (output / 'report.json').write_text(json.dumps(report, indent=2) + '\n')
     print(json.dumps(report, indent=2))
 
