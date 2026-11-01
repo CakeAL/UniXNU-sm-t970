@@ -1359,6 +1359,100 @@ static bool hostBringUpHandoff (const char **why)
   }
   return hostProveTransport (why, true);
 }
+
+#if defined(NATIVE_VERIFIED_BLOCK) && NATIVE_VERIFIED_BLOCK
+// Owner policy carrier. The two windows need 47,481,664 + 25,805,344 bytes of signed block hashes,
+// against a 71,303,168-byte BOOT partition, so the envelopes cannot be linked into the kernel. They
+// live in a fixed userdata region after the root image (which ends at LBA 5260288) and the kernel
+// links only the owner public-key anchor: vr_open authenticates each envelope before its entry is
+// added, so no window can publish against bytes the owner did not sign.
+constexpr uint64_t kOwnerPolicyLbaOS = 5505024ULL;        // 21 GiB into the userdata partition
+constexpr uint64_t kOwnerPolicyLbaSystemOS = 5516624ULL;  // 8 blocks past the OS envelope
+constexpr uint64_t kOwnerPolicyHeaderBytes = 160, kOwnerPolicySignatureBytes = 384;
+
+static bool readOwnerEnvelope (uint64_t lba, uint64_t expectedImageBytes, const char **why,
+                               uint8_t **outBytes, uint64_t *outLength)
+{
+  uint8_t header[4096];
+  if (hostRead4k (0, lba, 1, header) != kIOReturnSuccess) {
+    *why = "policy header read";
+    return false;
+  }
+  uint32_t headerBytes = 0, blockBytes = 0;
+  uint64_t imageBytes = 0, blocks = 0;
+  memcpy (&headerBytes, header + 12, 4);
+  memcpy (&blockBytes, header + 16, 4);
+  memcpy (&imageBytes, header + 24, 8);
+  memcpy (&blocks, header + 32, 8);
+  if (memcmp (header, "VROOT01\0", 8) || headerBytes != kOwnerPolicyHeaderBytes ||
+      blockBytes != 4096 || !blocks || blocks > 0x400000) {
+    *why = "policy header format";
+    return false;
+  }
+  if (imageBytes != expectedImageBytes) {
+    *why = "policy capacity";
+    return false;
+  }
+  const uint64_t length = kOwnerPolicyHeaderBytes + kOwnerPolicySignatureBytes + blocks * 32;
+  const uint64_t totalBlocks = (length + 4095) / 4096;
+  vm_size_t allocation = round_page (static_cast<vm_size_t> (length));
+  if (allocation < length) {
+    *why = "policy length";
+    return false;
+  }
+  vm_offset_t address = 0;
+  if (kmem_alloc (kernel_map, &address, allocation, static_cast<kma_flags_t> (KMA_KOBJECT | KMA_DATA),
+                  VM_KERN_MEMORY_SECURITY) != KERN_SUCCESS || !address) {
+    *why = "policy allocation";
+    return false;
+  }
+  uint8_t *bytes = reinterpret_cast<uint8_t *> (address);
+  for (uint64_t at = 0; at < totalBlocks;) {
+    const uint32_t chunk = static_cast<uint32_t> (totalBlocks - at > 32 ? 32 : totalBlocks - at);
+    if (hostRead4k (0, lba + at, chunk, bytes + at * 4096) != kIOReturnSuccess) {
+      *why = "policy read";
+      return false;
+    }
+    at += chunk;
+  }
+  *outBytes = bytes;
+  *outLength = length;
+  return true;
+}
+
+// Fills the linked policy table from the two signed envelopes. Both must authenticate before any
+// entry is added, so a single bad envelope leaves publication fail-closed.
+static bool installOwnerPolicyCarrier (const char **why)
+{
+  static const struct { uint64_t lba, imageBytes; } envelope[2] = {
+    { kOwnerPolicyLbaOS, 6077580800ULL },
+    { kOwnerPolicyLbaSystemOS, 3303014400ULL },
+  };
+  NativeVerifiedBlockPolicy *table =
+    const_cast<NativeVerifiedBlockPolicy *> (verified_root_policies);
+  uint64_t *count = const_cast<uint64_t *> (&verified_root_policy_count);
+  for (unsigned index = 0; index < 2; ++index) {
+    uint8_t *bytes = nullptr;
+    uint64_t length = 0;
+    if (!readOwnerEnvelope (envelope[index].lba, envelope[index].imageBytes, why, &bytes, &length)) {
+      return false;
+    }
+    struct vr_view view = {};
+    const int status = vr_open (bytes, length, verified_root_key, 1, &vr_xnu_crypto, &view);
+    gRootDiagnostic.verify = static_cast<uint32_t> (status);
+    if (status != VR_OK || view.image_bytes != envelope[index].imageBytes ||
+        kOwnerPolicyHeaderBytes + kOwnerPolicySignatureBytes + view.block_count * 32 != length) {
+      *why = "policy signature";
+      return false;
+    }
+    table[index].manifest = bytes;
+    table[index].manifestBytes = length;
+    *count = index + 1;
+  }
+  gRootDiagnostic.policyCount = 2;
+  return true;
+}
+#endif
 }
 
 namespace {
@@ -3118,6 +3212,14 @@ bool NativeUfs::start (IOService *provider)
              gRootDiagnostic.cbar, gRootDiagnostic.cba2r, gRootDiagnostic.sctlr,
              gRootDiagnostic.smr, gRootDiagnostic.s2cr, gRootDiagnostic.gfsr,
              gRootDiagnostic.fsr, gRootDiagnostic.dma, kDmaBytes);
+    }
+    const char *policyWhy = "";
+    if (!installOwnerPolicyCarrier (&policyWhy)) {
+      panic ("T970 UFS publish: owner policy carrier: %s\n"
+             "stage=%s policies=%llu verify=%08x\ndma=%llx lbaOS=%llx lbaSystemOS=%llx",
+             policyWhy, gRootDiagnostic.stage, gRootDiagnostic.policyCount,
+             gRootDiagnostic.verify, gRootDiagnostic.dma,
+             static_cast<uint64_t> (kOwnerPolicyLbaOS), static_cast<uint64_t> (kOwnerPolicyLbaSystemOS));
     }
     RootLayout *layout = static_cast<RootLayout *> (IOMalloc (sizeof (RootLayout)));
     if (!layout) panic ("T970 UFS publish: no layout buffer");

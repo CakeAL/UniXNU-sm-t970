@@ -104,3 +104,26 @@ w1 SystemOS off=16a600000 size=c4e00000
 manifest 放进 userdata 镜像之后的固定区（镜像止于 LBA 5,260,288），启动时经同一 handoff
 通道读入并 RSA 校验，再填 `verified_root_policies`；内核体积不变。
 ```
+## 策略载体（out-of-kernel）
+
+`BOOT` 装不下 73,287,008 字节的块哈希表，因此两份 owner manifest 放在 userdata 里，内核只链
+owner 公钥锚：
+
+| 内容 | 分区内 LBA | 块数 | 字节 |
+| --- | --- | --- | --- |
+| OS 包络 | 5,505,024（21 GiB） | 11,593 | 47,481,664 |
+| SystemOS 包络 | 5,516,624 | 6,301 | 25,805,344 |
+
+根镜像止于 LBA 5,260,288，两段包络落在其后的空闲区（止于 5,522,925）。内核里
+`kOwnerPolicyLbaOS`／`kOwnerPolicyLbaSystemOS` 是这两个常量。
+
+加载顺序（`installOwnerPolicyCarrier`）：读包络头（`VROOT01`、160/4096、`image_bytes` 必须等于
+该窗口容量）→ 按 `544 + 32 × block_count` 读满 → `vr_open` 用链入的 owner 公钥做 RSA 校验 →
+两条都通过才写 `verified_root_policies`／`verified_root_policy_count`。任一条失败即 panic，一个
+窗口也不发布。
+
+`scripts/build-owner-root-manifests.py` 负责 host 侧：从 sparse 段流式读出两个窗口（不落 9.4 GB
+文件）、用 `kits/VerifiedRoot/tools/manifest.py` 签名、再用真实 C（`vr_host_open` + 抽样块
+`vr_host_block`）验签。卷 UUID 取自设备/镜像事实：OS `04769D26-2CA0-4825-B443-E2E5F88300F2`
+（ADT 根匹配），SystemOS `8846FE78-2910-4297-AF97-D59BB6F8FC16`（挂载 cryptex 得到的卷 UUID，
+与内核 `XNU_OWNER_CACHE_VOLUME_UUID` 一致）。

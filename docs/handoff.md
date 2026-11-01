@@ -36,6 +36,11 @@ handoff 准入、调查版 NOP、正式 manifest/GPT 读取、窗口计划全部
 - SystemOS：`0x16a600000`，3,303,014,400 字节（806,400 块，哈希表 25,804,800）
 - 合计哈希表 73,285,920 字节，加两份 manifest 约 73.3 MB → **不能进内核**（BOOT 68 MiB）
 
+**策略载体已实现（主机侧 + 内核侧）**：`scripts/build-owner-root-manifests.py` 从 sparse 段流式
+签名两个窗口（OS 11,593 块 / 47,481,664 字节，SystemOS 6,301 块 / 25,805,344 字节），并用真实 C
+验签通过；内核 `installOwnerPolicyCarrier` 从 LBA 5,505,024 / 5,516,624 读入、`vr_open` 校验后填
+策略表。下一步是把两份包络写进 userdata 并刷发布镜像。
+
 **下一步**：manifest 放到 userdata 镜像之后的固定区（镜像止于 LBA 5,260,288，LBA 5,505,024
 起留 18,000 块），启动时用同一 handoff 通道读入、用编译进内核的 owner 公钥做 RSA 校验，再填
 `verified_root_policies`；每块读取仍按策略校验。

@@ -6,6 +6,7 @@ verified_root_policy_count is zero so configureVerification returns before it
 reads the key or calls vr_open. Root verification is disabled by policy data,
 not approximated by stubs, and the 47 MiB signed hash table is not linked.
 """
+import importlib.util
 import json
 import subprocess
 from pathlib import Path
@@ -45,25 +46,24 @@ for source in (FW / 'kits/VerifiedRoot/src/verified_root.c', FW / 'kits/Verified
     if result.returncode:
         raise SystemExit(result.stderr[-3000:])
     objects.append(obj)
+# The policy table starts empty and is filled at boot from the signed envelopes in userdata (see
+# scripts/build-owner-root-manifests.py): 73,287,008 bytes of block hashes cannot fit the BOOT
+# partition, so the kernel links only the owner public-key anchor and authenticates each envelope
+# with vr_open. The table and its count therefore live in .data, not .text.
+spec = importlib.util.spec_from_file_location('verified_manifest', FW / 'kits/VerifiedRoot/tools/manifest.py')
+manifest = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(manifest)
+anchor = manifest.public_anchor(FW / 'build/verified-root-host/keys/owner-public.pem')
+assert len(anchor) == 395, 'Unexpected owner key anchor length'
 assembly = out / 'empty-policies.S'
-assembly.write_text('''.text
-.balign 8
-.globl _verified_root_policies
-_verified_root_policies:
-  .quad 0
-.globl _verified_root_policy_count
-_verified_root_policy_count:
-  .quad 0
-.globl _verified_root_key
-_verified_root_key:
-  .space 395
-.globl _native_verified_root_probe
-_native_verified_root_probe:
-  ret
-.globl _native_verified_root_checkpoint
-_native_verified_root_checkpoint:
-  ret
-''')
+assembly.write_text('.data\n.balign 8\n'
+                    '.globl _verified_root_policies\n_verified_root_policies:\n  .space 64\n'
+                    '.globl _verified_root_policy_count\n_verified_root_policy_count:\n  .quad 0\n'
+                    '.globl _verified_root_key\n_verified_root_key:\n  .byte '
+                    + ','.join(str(b) for b in anchor) + '\n'
+                    '.text\n'
+                    '.globl _native_verified_root_probe\n_native_verified_root_probe:\n  ret\n'
+                    '.globl _native_verified_root_checkpoint\n_native_verified_root_checkpoint:\n  ret\n')
 asm_obj = out / 'empty-policies.o'
 sdk = subprocess.check_output(['xcrun', '--sdk', 'iphoneos', '--show-sdk-path'], text=True).strip()
 subprocess.run(['xcrun', 'clang', '-target', 'arm64-apple-ios17.0', '-isysroot', sdk, '-c',
