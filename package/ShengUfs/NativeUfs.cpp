@@ -2352,7 +2352,7 @@ static void runCacheProbe (void)
   // Census of the media that carries the cache UUID: how many there are, and what each one reports,
   // so a refused lookup can be told apart from a missing media or an authorizer disagreement.
   unsigned found = 0, whole = 0, named = 0, authorized = 0, detail = 0;
-  char gCacheProbeDetail[128] = {};
+  char gCacheProbeDetail[112] = {};
   OSDictionary *matching = IOService::serviceMatching ("IOMedia");
   OSDictionary *properties = OSDictionary::withCapacity (1);
   OSString *wanted = OSString::withCString (cacheUuid);
@@ -2375,9 +2375,9 @@ static void runCacheProbe (void)
         if (detail < 3) {
           OSString *bsdName = OSDynamicCast (OSString, media->getProperty (kIOBSDNameKey));
           const bool isWhole = OSDynamicCast (IOMedia, media) && static_cast<IOMedia *> (media)->isWhole ();
-          int used = snprintf (gCacheProbeDetail + detail * 40, 40, "m%u=%s/w%u/a%u", detail,
+          int used = snprintf (gCacheProbeDetail + detail * 24, 24, "m%u=%s,%u,%u", detail,
                                bsdName ? bsdName->getCStringNoCopy () : "-", isWhole ? 1 : 0, allowed ? 1 : 0);
-          if (used > 0 && used < 40) ++detail;
+          if (used > 0) ++detail;
         }
       }
       iterator->release ();
