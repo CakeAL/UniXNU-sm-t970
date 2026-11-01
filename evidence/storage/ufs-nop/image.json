@@ -1,0 +1,25 @@
+{
+  "device_revision": "3f47470efbd92626a1282c72dd70caf1390a65c2",
+  "framework_revision": "194aae294c1107e791f4f74b2be371a391ac6bc4",
+  "command": "python3.14 scripts/build-smmu-report.py --mode nop --kernel-build out/step7/ufs-nop-kernel.json --output out/step7/probes/ufs-nop",
+  "kernel_sha256": "3a0881f9595ae54efae62b2884e311d1aee0934208d239fd93a385facf6303be",
+  "payload_kernel_sha256": "6603b1c74db4ee9717a366f8d768e521b59f98508979c4fd1059b763e67d64c4",
+  "firmware_sha256": "515105d758a9d61078dffce5012db0754a71cec351a1bb34b30ee791196b5690",
+  "firmware_dtb_sha256": "86c14aa305a6cf5db46665f4095d28aadcb1ea5ce9d213cd711641a07504ed1d",
+  "payload_sha256": "76851e56c02d97613028fbd89e292d44e98be54a3868343f67f169b32ae89b57",
+  "boot_sha256": "fb2be3f41f04fc4d89131818223a9f223245cd1273c17dfa3868ece17bc0b20b",
+  "boot_bytes": 62713856,
+  "boot_partition_bytes": 71303168,
+  "kernel_args": [
+    "-v",
+    "cpus=1",
+    "t970-novc",
+    "sheng-pmgr=2",
+    "t970-ufs-nop=1"
+  ],
+  "independent_fat_check": true,
+  "independent_fd_check": true,
+  "mode": "nop",
+  "hardware_tested": false,
+  "flash_performed": false
+}

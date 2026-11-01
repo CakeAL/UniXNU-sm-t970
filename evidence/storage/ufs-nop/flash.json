@@ -1,0 +1,16 @@
+{
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-nop/boot.img --no-reboot",
+  "started_at": "2026-11-01T09:28:21.241415+00:00",
+  "finished_at": "2026-11-01T09:28:27.621634+00:00",
+  "exit_code": 0,
+  "boot_sha256": "fb2be3f41f04fc4d89131818223a9f223245cd1273c17dfa3868ece17bc0b20b",
+  "heimdall_sha256": "75337a7c6ad9a5e18c0730fa474c81133587cc04cbe08dd3f270c860128a6c6f",
+  "device_revision": "3f47470efbd92626a1282c72dd70caf1390a65c2",
+  "partition": "BOOT",
+  "no_reboot": true,
+  "device_observation_pending": false,
+  "userdata_written": false,
+  "raw_log_sha256": "3d7067ddef62ae1b69296715e09da49d2c59c135adf690a71dfafb217e9fdf2c",
+  "log_normalization": "Trailing blank lines omitted; exact log retained at out/step7/probes/ufs-nop/flash.raw.log",
+  "device_observation": "device-result.json"
+}

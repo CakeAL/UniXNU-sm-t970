@@ -3,7 +3,7 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
-## 当前：单次 UFS NOP（主机构建通过，待封装／实测）
+## 当前：单次 UFS NOP（实机往返通过，尚未读盘）
 
 - 参数 `t970-ufs-nop=1`；范围与阶段见 [单次NOP](ufs-nop.md)。
 - 自有连续 DMA、实际 boot_args 范围核验，空 transfer/task 队列停用，两个精确 SID
@@ -12,7 +12,17 @@
   不改PHY／时钟，不读取分区。故障／超时不取消、不重试、不回收DMA、不回滚路由。
 - 15项主机测试、配置检查、内核编译／链接／预链接通过，构建输入稳定；内核 SHA256
   `3a0881f9595ae54efae62b2884e311d1aee0934208d239fd93a385facf6303be`。仍使用 FD `515105d7…`。
-- 目前未刷入本轮镜像，设备仍安装下述已通过的零命令预检镜像。
+- 代码提交 `3f47470`；独立封装核验及DT/ADT检查通过；BOOT
+  `fb2be3f41f04fc4d89131818223a9f223245cd1273c17dfa3868ece17bc0b20b`，62,713,856字节。
+- 检测Download Mode后仅刷BOOT，Heimdall exit0 / BOOT upload successful，`--no-reboot`。
+  当前安装单次NOP镜像，机主已提供完整结束画面。
+- 实测stage=6、submitted/success/protected=1、poisoned=0；result=0、OCS=0、
+  response=20000001、protocol=0、polls=2。DMA=c47cd000、bytes=22000、ownedOK=1。
+- HCE=1、HCS=10f、两类doorbell=0、IS=400、RSR=1；GFSR=0，CB0 FSR前后均400。
+  两条候选映射已读回，显示槽及CB0保持预期，CB73未改。缓冲／路由保留到重启。
+- 这证明一次NOP命令及响应的DMA往返；两SID同时安装，不能据此判断各自是否都使用。
+  尚未测试SCSI数据、LUN容量、块读取或长期稳定性。下一步有界识别LUN及数据输入验证。
+- 准备／上传／实测完整记录位于 `evidence/storage/ufs-nop/`。
 
 ## 前轮：UFS 零命令预检（实机通过，未执行 DMA）
 

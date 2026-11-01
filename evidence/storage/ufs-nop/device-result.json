@@ -1,0 +1,59 @@
+{
+  "device": "sm-t970",
+  "boot_sha256": "fb2be3f41f04fc4d89131818223a9f223245cd1273c17dfa3868ece17bc0b20b",
+  "source_revision": "3f47470efbd92626a1282c72dd70caf1390a65c2",
+  "observation_source": "Manually transcribed from owner photograph attached in this conversation.",
+  "photo": {
+    "filename": "IMG_20261101_173320.jpg",
+    "local_source_available": true,
+    "sha256": "2e2001c4e25bd5c835999da4a3174007f8881cc13443262493a0993c395e481d"
+  },
+  "title": "T970 UFS single NOP (no SCSI/storage writes)",
+  "stage": 6,
+  "submitted": true,
+  "success": true,
+  "protected": true,
+  "poisoned": false,
+  "dma": "0xc47cd000",
+  "buffer_bytes": "0x22000",
+  "owned_ok": true,
+  "buffer_retained": true,
+  "routes_retained": true,
+  "result": "0x00000000",
+  "ocs": 0,
+  "response_word": "0x20000001",
+  "protocol_error": 0,
+  "polls": 2,
+  "controller": {
+    "hce": "0x1",
+    "hcs": "0x10f",
+    "doorbell": 0,
+    "task_doorbell": 0,
+    "is": "0x400",
+    "run_stop": 1
+  },
+  "smmu": {
+    "gfsr": "0x0",
+    "fsr_before": "0x400",
+    "fsr_after": "0x400",
+    "global_syn1": "0x0",
+    "slot55_smr": "0x800000e0",
+    "slot55_s2cr": "0x0",
+    "slot56_smr": "0x800004e0",
+    "slot56_s2cr": "0x0",
+    "display_smr": "0x84020820",
+    "display_s2cr": "0x4",
+    "cb0_cbar": "0x100ff",
+    "cb0_cba2r": "0x1",
+    "cb0_sctlr": "0xe0"
+  },
+  "end_marker_seen": true,
+  "conclusion": "One NOP OUT/IN completed successfully through the experimental DMA path; OCS and protocol checks passed, protected state unchanged, no global fault and no CB0 FSR change.",
+  "limits": [
+    "No SCSI data payload, LUN identification, capacity, partition or block read was tested.",
+    "Both candidate routes were installed together; this does not identify which SID carried the successful transfer or prove both were exercised.",
+    "A single successful NOP does not establish sustained transport stability or root-volume readiness.",
+    "FAR is not interpreted as a new fault because GFSR and CB0 FSR showed no new error."
+  ],
+  "next_action": "Bounded LUN identification and capacity/data-in validation, followed by known-block reads and comparison with captured GPT geometry. No storage writes."
+}

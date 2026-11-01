@@ -33,3 +33,12 @@ FSR=400是先前原始观测，比较前后变化，不把 GFSR=0当所有contex
 超时后控制器可能仍持有DMA内存，不能再使用该缓冲。下一次操作须重新进入固件／Download Mode。
 `routesRetained=1` 表示不执行回滚策略，并不保证失败前已安装了全部路由，需看stage和原始值。
 固定使用已测试 FD 515105d7…；根卷挂载仍未启用。
+
+## 实机结果
+
+BOOT `fb2be3f4…` 的机主照片确认 `stage=6 submitted=1 success=1 protected=1`，
+`poisoned=0`，OCS=0、response=20000001、protocol=0、polls=2。
+GFSR=0、CB0 FSR前后均400，显示映射仍为84020820/4。
+一次NOP及其响应完成DMA往返；两候选SID同时安装，不能声称已分别验证两条stream。
+数据传输、读盘、重复稳定性和根卷均未通过；下一步识别LUN并验证数据输入。
+完整转录见 `evidence/storage/ufs-nop/device-result.json`。
