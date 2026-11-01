@@ -31,4 +31,7 @@ CONFIG_XNU_OWNER_CACHE_CARRIER=y
 # iPadOS signs code in 16 KiB pages; this 4 KiB kernel only accepts the shared cache
 # through the signature hash cache (fcntl(92) would otherwise return 85 EBADEXEC).
 CONFIG_XNU_NATIVE_CS_HASH_CACHE=y
+# Kryo implements PAN and SCTLR_EL1 leaves SPAN clear, so every exception entry sets
+# PSTATE.PAN; only the PAN build clears it around copyin/copyout.
+CONFIG_XNU_NATIVE_PAN=y
 CONFIG_XNU_VERIFIED_ROOT_ARCHIVE="{tree}/build/verified-root-empty/libVerifiedRootProbe.a"
