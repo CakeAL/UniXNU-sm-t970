@@ -215,6 +215,7 @@ findings = [
   "The board package now carries Sm8250UfsPhyTables.h, the extracted SM8250 QMP UFS PHY register sequences, but the platform DSC still does not build any UFS DXE; no firmware image has been rebuilt or booted with it.",
   "The T970 firmware now builds Samsung UfsDxe plus a board PlatformUfsLib: the SM8250 QMP UFS PHY sequences are replayed after mapping GCC, PHY, controller and ICE windows into the UEFI page tables. On hardware the stage markers reach the final green pair (PHY replay and PCS ready), then the device falls back to the Samsung bootloader warning screen before XNU starts.",
   "GCC block writes hang the non-secure bus, so the board library skips them and relies on ABL's existing UFS power; the workspace marker sequence (magenta/orange/cyan/teal/yellow/orange/purple/blue/deep blue/green/green) is the reproducible evidence path for this bring-up.",
+  "The board PlatformUfsLib now also issues QCOM_SCM_SVC_MP / MP_RESTORE_SEC_CFG over SMC (0x02000000 | (svc<<8) | cmd, arginfo 2) after the PHY succeeds. On hardware the first call (device_id 0) returns non-zero (red marker) and the second does not complete, so the secure monitor does not restore the UFS SMMU configuration through this interface.",
 ]
 completion = [
   "A board-specific UEFI image starts reproducibly and produces an accessible boot log.",
@@ -245,6 +246,7 @@ evidence = [
   { kind = "host", reference = "evidence/hardware-description/result.json", command = "python3.14 scripts/check-hardware-description.py --unixnu ../UniXNU", revision = "7b71e1e9ad1dd16a70e31e2fe536dd09c340200f", result = "PASS: firmware FDT and board DTS builds are distinct inputs; ADT carries the consumed DRAM, CPU0 and GIC resources; DSC/FDF and the pinned base configuration carry the required modules." },
   { kind = "host", reference = "evidence/hardware-description/firmware.log", command = "GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=submodule.active GIT_CONFIG_VALUE_0=__no_module_submodules__ PATH=/opt/homebrew/opt/llvm/bin:/opt/homebrew/opt/lld/bin:$PATH python3.14 ../UniXNU/unixnu build firmware -D . --uefi .cache/uefi-source/Mu-Silicium --edk2 .cache/uefi-source/Mu-Silicium/Mu_Basecore --local-module refer:edk2=.cache/uefi-source/Mu-Silicium/Mu_Basecore", revision = "7b71e1e9ad1dd16a70e31e2fe536dd09c340200f", result = "PASS: the normal build firmware command produced a 3145728-byte FD at this commit; the FV contains all eight required modules among 92 files." },
   { kind = "device", reference = "evidence/bring-up/runtime/ufs-firmware-dma/device-result.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/boot-ufsfull.img --no-reboot", result = "UEFI PHY bring-up reaches its final success markers, then the board returns to the bootloader warning page instead of booting XNU.", revision = "2c4c832bf1c833d4ead52036c6c9502af0f8568b" },
+  { kind = "device", reference = "evidence/bring-up/runtime/ufs-scm/device-result.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/boot-scm.img --no-reboot", result = "The SCM restore_sec_cfg probe ends with a red status marker; the first call fails and the second never returns a result.", revision = "d477f7d426aa32e2b74c1e40b9f506ad77ea2c8f" },
 ]
 
 [[area]]
@@ -515,6 +517,7 @@ findings = [
   "Kernel-side SMMU programming is therefore not a viable path on this board: the storage driver needs the firmware to leave a bypass stream for UFS, which is what the alioth/T733 firmware does and what the Mu-Silicium T970 build does not.",
   "Keeping the SMMU map but disabling SMMU programming (t970-ufs-no-smmu=1) moves the failure past the SMMU panics and into an unexplained self-reset before console output. That is consistent with the driver's unbounded UFS completion loops waiting on DMA that the firmware stream mapping does not cover; kernel-side SMMU bypass alone is not sufficient.",
   "Route B started: scripts/gen-ufs-phy-tables.py extracts the SM8250 QMP UFS PHY sequences from the Linux driver into package/firmware/.../PlatformUfsLib/Sm8250UfsPhyTables.h (SM8150 base tables plus the SM8250 HS-G4 overlays, 24/6/34/7 and 1/21/2 entries). Wiring PlatformUfsLib and the Samsung UfsDxe is the next step and no firmware behaviour has changed yet.",
+  "Both non-secure routes to a usable UFS SMMU context are now exhausted: kernel writes to the SMR are ignored, UEFI firmware PHY bring-up succeeds but UFS DMA still resets the board, and QCOM_SCM restore_sec_cfg is not provided by this platform's secure monitor.",
 ]
 completion = [
   "UFS reads return correct capacity, GPT and known blocks under XNU; the chosen root mounts and writes persist only inside the allocated Data region.",
@@ -924,6 +927,7 @@ findings = [
   "The generated PHY table header and its generator live under package/firmware/Platforms/Samsung/gts7xlwifiPkg/Library/PlatformUfsLib/ with a GPL-2.0 provenance comment; docs/firmware-ufs-plan.md records the remaining work.",
   "package/firmware carries PlatformUfsLib (BoardInit.c, PlatformUfsLib.inf, Sm8250UfsPhyTables.h), DSC/FDF entries for UfsDxe, and a single merged UfsDxe source patch (ChipInfo tolerance plus 0x9ff80004 stage words). The firmware staging must run scripts/prepare-uefi.py from a reset checkout because same-file patches cannot overlap.",
   "patches/xnu/t970-smmu-dump.patch now carries the t970-ufs-status probe that maps 0x9ff80000 and panics with the firmware stage word; it is the kernel half of the firmware visibility path.",
+  "PlatformUfsLib now links ArmSmcLib, ArmMmuLib-free DxeServicesTableLib and BaseMemoryLib; the SCM prototype lives in BoardInit.c next to the PHY replay and is selected by the same DSC/FDF entries.",
 ]
 completion = [
   "The selected profile's inputs produce a kernel, payload and a boot image matching the SM-T970 boot path.",
@@ -1095,6 +1099,7 @@ findings = [
   "The no-SMMU path keeps the SMMU IO mapping because hostBringUp dereferences it after the call; an earlier version that skipped mapPhys crashed with a null-pointer data abort (FAR=0), recorded here so the distinction between our patch bug and SMMU behaviour stays clear.",
   "scripts/gen-ufs-phy-tables.py is a host-only generator: it downloads the pinned Linux QMP UFS driver headers, resolves the QSERDES/PHY register defines and writes the C tables; it is reproducible from scratch and does not touch the device.",
   "The firmware bring-up uses GOP colour markers at fixed x positions plus a 0x9ff80004 stage word read back by the arm_init probe; both are diagnostic-only and the current image still resets before XNU can report the stage word.",
+  "The SCM probe is a board-side diagnostic in PlatformUfsLib: it issues a single fast SMC with the Qualcomm SIP owner and reports the return code through GOP markers; it does not change the SMMU or UFS state itself.",
 ]
 completion = [
   "Every claimed UniXNU milestone has matching source/image revisions, a reproducible command and accessible firmware/kernel logs.",

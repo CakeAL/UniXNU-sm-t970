@@ -12,13 +12,16 @@
 [Packages]
   MdePkg/MdePkg.dec
   SamsungPkg/SamsungPkg.dec
+  ArmPkg/ArmPkg.dec
 
 [LibraryClasses]
   DebugLib
+  BaseMemoryLib
   IoLib
   TimerLib
   UefiBootServicesTableLib
   DxeServicesTableLib
+  ArmSmcLib
   UfsCalAdapterLib
 
 [Protocols]

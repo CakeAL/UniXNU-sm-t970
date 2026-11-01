@@ -9,9 +9,11 @@
 #include <Library/IoLib.h>
 #include <Library/TimerLib.h>
 #include <Library/DebugLib.h>
+#include <Library/BaseMemoryLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Protocol/GraphicsOutput.h>
 #include <Library/DxeServicesTableLib.h>
+#include <Library/ArmSmcLib.h>
 #include <Library/PlatformUfsLib.h>
 
 #include "Sm8250UfsPhyTables.h"
@@ -31,6 +33,26 @@
 #define UFS_PCS_READY_BIT  BIT0
 #define T970_UFS_STATUS    0x9FF80000ULL
 #define T970_UFS_MAGIC     0x54393730U
+
+STATIC
+UINT64
+ScmCall (
+  IN UINT64  Service,
+  IN UINT64  Command,
+  IN UINT64  Arg0,
+  IN UINT64  Arg1
+  )
+{
+  ARM_SMC_ARGS  Args;
+
+  ZeroMem (&Args, sizeof (Args));
+  Args.Arg0 = 0x02000000ULL | (((Service & 0xff) << 8) | (Command & 0xff));
+  Args.Arg1 = 2;
+  Args.Arg2 = Arg0;
+  Args.Arg3 = Arg1;
+  ArmCallSmc (&Args);
+  return Args.Arg0;
+}
 
 STATIC
 VOID
@@ -136,6 +158,16 @@ UfsBoardInit (
     return Status;
   }
   MmioWrite32 (T970_UFS_STATUS + 4, 0x30);
+  Marker (16, 16, 16, 620);
+
+  /* Ask the secure world to hand the UFS SMMU configuration back. */
+  UINT64 ScmZero = ScmCall (0x0c, 0x02, 0, 0);
+  UINT64 ScmOne  = ScmCall (0x0c, 0x02, 1, 0);
+  Marker (ScmZero == 0 ? 0 : 255, ScmZero == 0 ? 255 : 0, ScmZero == 0 ? 0 : 0, 660);
+  Marker (ScmOne == 0 ? 0 : 255, ScmOne == 0 ? 255 : 0, ScmOne == 0 ? 0 : 0, 700);
+  MmioWrite32 (T970_UFS_STATUS + 8, (UINT32)ScmZero);
+  MmioWrite32 (T970_UFS_STATUS + 12, (UINT32)ScmOne);
+
   Marker (0, 255, 0, 610);
   return EFI_SUCCESS;
 }

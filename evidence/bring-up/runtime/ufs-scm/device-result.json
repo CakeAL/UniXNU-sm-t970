@@ -1,0 +1,9 @@
+{
+  "device": "SM-T970 / gts7xlwifi",
+  "boot_image_sha256": "cc4045d7390e5f333c983acc65561621d52ec675f05ee6e5175cfb8d1d77670c",
+  "boot_image_bytes": 62713856,
+  "observation_source": "Human report in this chat",
+  "observation": "Marker sequence ends with a red block after the two green PHY-success blocks: the first qcom_scm_restore_sec_cfg call with device_id 0 returned a non-zero status and nothing follows.",
+  "result": "The board firmware issues QCOM_SCM_SVC_MP/MP_RESTORE_SEC_CFG through SMC after PHY bring-up; the first call reports failure and the second does not complete. The secure monitor does not hand the UFS SMMU configuration back through this interface on this platform.",
+  "limits": "Only device_id 0 and 1 were tried, without the call-availability query. A different device id or the newer SMMU_PROGRAM service could still behave differently; none of that is tested."
+}
