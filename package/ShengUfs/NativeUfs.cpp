@@ -2336,10 +2336,11 @@ bool NativeUfsBlock::signedVolumeUuid (char out[37]) const
 // that lookup fails the panic cannot say why, so the driver resolves it itself once root is published
 // and exposes the result. Nothing here changes publication or authorization decisions.
 extern "C" int native_verified_block_volume_device (const char *uuid, dev_t *device, char *path, size_t size);
+extern "C" int native_verified_block_root_authorized (dev_t device);
 static int gCacheProbeResult;
 static dev_t gCacheProbeDevice = NODEV;
 static char gCacheProbePath[64];
-static char gCacheProbeText[160];
+static char gCacheProbeText[240];
 
 extern "C" void native_ufs_cache_probe (void)
 {
@@ -2348,8 +2349,38 @@ extern "C" void native_ufs_cache_probe (void)
   gCacheProbePath[0] = 0;
   gCacheProbeResult = native_verified_block_volume_device (cacheUuid, &gCacheProbeDevice,
                                                            gCacheProbePath, sizeof (gCacheProbePath));
-  snprintf (gCacheProbeText, sizeof (gCacheProbeText), "probe=%d dev=%x path=%s", gCacheProbeResult,
-            static_cast<unsigned> (gCacheProbeDevice), gCacheProbePath[0] ? gCacheProbePath : "-");
+  // Census of the media that carries the cache UUID: how many there are, and what each one reports,
+  // so a refused lookup can be told apart from a missing media or an authorizer disagreement.
+  unsigned found = 0, whole = 0, named = 0, authorized = 0;
+  OSDictionary *matching = IOService::serviceMatching ("IOMedia");
+  OSDictionary *properties = OSDictionary::withCapacity (1);
+  OSString *wanted = OSString::withCString (cacheUuid);
+  if (matching && properties && wanted && properties->setObject ("UUID", wanted) &&
+      matching->setObject ("IOPropertyMatch", properties)) {
+    OSIterator *iterator = IOService::getMatchingServices (matching);
+    if (iterator) {
+      while (IOService *media = OSDynamicCast (IOService, iterator->getNextObject ())) {
+        ++found;
+        if (IOMedia *entry = OSDynamicCast (IOMedia, media)) {
+          if (entry->isWhole ()) ++whole;
+        }
+        OSNumber *mjr = OSDynamicCast (OSNumber, media->getProperty (kIOBSDMajorKey));
+        OSNumber *mnr = OSDynamicCast (OSNumber, media->getProperty (kIOBSDMinorKey));
+        if (!mjr || !mnr) continue;
+        ++named;
+        const dev_t device = makedev (mjr->unsigned32BitValue (), mnr->unsigned32BitValue ());
+        if (native_verified_block_root_authorized (device)) ++authorized;
+      }
+      iterator->release ();
+    }
+  }
+  OSSafeReleaseNULL (wanted);
+  OSSafeReleaseNULL (properties);
+  OSSafeReleaseNULL (matching);
+  snprintf (gCacheProbeText, sizeof (gCacheProbeText),
+            "probe=%d dev=%x path=%s media=%u whole=%u named=%u authorized=%u",
+            gCacheProbeResult, static_cast<unsigned> (gCacheProbeDevice),
+            gCacheProbePath[0] ? gCacheProbePath : "-", found, whole, named, authorized);
 }
 
 extern "C" const char *native_ufs_cache_probe_text (void)
