@@ -50,3 +50,13 @@ python3.14 scripts/build-smmu-report.py --mode smr-id \
 ```
 
 保留已测 `515105d7…` FD，只准备新的 BOOT；传输及机主观察与成品哈希一起归档。
+
+## 实机结果（ee45890a…）
+
+机主反馈与照片确认：stage=5，before=0、observed=a5、restored=0，
+S2CR 前后均为 200ff，idAccepted/restoreOK/mappingsUnchanged 均为 1，GFSR 前后为零。
+显示槽 04 保持 84020820/4。完整转录和镜像关联见
+`evidence/storage/smr-id-test/device-result.json` 与 `screen.txt`。
+
+这一测量确认本轮固件交接条件下 SMR[56] 的无效 ID 字段接受写入；不证明 VALID、
+S2CR、context 或 DMA 可用，也不将早期固件实验中的失败归结为已确定的安全锁。

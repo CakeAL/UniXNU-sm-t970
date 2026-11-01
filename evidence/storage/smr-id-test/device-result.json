@@ -1,0 +1,51 @@
+{
+  "device": "sm-t970",
+  "boot_sha256": "ee45890ab4875987b0e3376b095a64a5d58f1b23177c96b9ea4a996cd8ba9031",
+  "source_revision": "41d99e612894ec559c9f6503310290e8b97f7b6b",
+  "observation_source": "Owner confirmed stage=5, restoreOK=1 and mappingsUnchanged=1; all fields manually transcribed from the attached photograph.",
+  "photo": {
+    "filename": "IMG_20261101_164309.jpg",
+    "local_source_available": false,
+    "sha256": null,
+    "note": "Attachment visible in conversation; supplied local path absent. No photo file hash invented."
+  },
+  "stage": 5,
+  "slot_hex": "56",
+  "offset": "0x958",
+  "test_word": "0x000000a5",
+  "before": "0x00000000",
+  "observed": "0x000000a5",
+  "restored": "0x00000000",
+  "s2cr_before": "0x000200ff",
+  "s2cr_after": "0x000200ff",
+  "id_accepted": true,
+  "restore_ok": true,
+  "mappings_unchanged": true,
+  "gfsr_before": "0x00000000",
+  "gfsr_after": "0x00000000",
+  "hc_state": 1,
+  "hce": "0x00000001",
+  "hcs": "0x0000010f",
+  "transfer_doorbell": 0,
+  "task_doorbell": 0,
+  "display_slot04": {
+    "smr": "0x84020820",
+    "s2cr": "0x00000004"
+  },
+  "snapshot": {
+    "ID0": "0x4c017e57",
+    "ID1": "0x6000004a",
+    "ID2": "0x00005111",
+    "sCR0": "0x002d0406",
+    "sGFSR": "0x00000000",
+    "valid": 1,
+    "scanned": 87
+  },
+  "conclusion": "Inactive SMR[56] ID bits accepted a5 and restored zero; full checked mapping state was unchanged. This disproves blanket read-only claims for this measured register field.",
+  "limits": [
+    "VALID stayed clear. VALID-bit, S2CR and context-bank writability remain unqualified.",
+    "No UFS/SCSI/DMA or root-volume test occurred.",
+    "Result belongs to this exact baseline FD and BOOT; it does not retroactively prove behavior under earlier firmware experiments."
+  ],
+  "next_action": "Combine guarded VALID-under-FAULT and inactive S2CR field qualification with bounded read-only context-state capture; restore all tested stream words and preserve display slot 04/CB4."
+}

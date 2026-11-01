@@ -1,0 +1,10 @@
+T970 SMR ID test (VALID stays zero)
+stage=5 slot=56 off=958 test=000000a5
+before=00000000 observed=000000a5 restored=00000000
+s2crBefore=000200ff s2crAfter=000200ff
+idAccepted=1 restoreOK=1 mappingsUnchanged=1
+gfsrBefore=00000000 gfsrAfter=00000000
+HCstate=1 hce=00000001 hcs=0000010f db=00000000 tmDb=00000000
+snapshot id0=4c017e57 id1=6000004a id2=00005111 cr0=002d0406 gf=00000000
+snapshot display04=84020820/00000004 valid=1 slots=87
+END SMR ID test

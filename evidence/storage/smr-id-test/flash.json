@@ -1,0 +1,16 @@
+{
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/smr-id-test/boot.img --no-reboot",
+  "started_at": "2026-11-01T08:41:41.696411+00:00",
+  "finished_at": "2026-11-01T08:41:48.107588+00:00",
+  "exit_code": 0,
+  "boot_sha256": "ee45890ab4875987b0e3376b095a64a5d58f1b23177c96b9ea4a996cd8ba9031",
+  "heimdall_sha256": "75337a7c6ad9a5e18c0730fa474c81133587cc04cbe08dd3f270c860128a6c6f",
+  "device_revision": "41d99e612894ec559c9f6503310290e8b97f7b6b",
+  "partition": "BOOT",
+  "no_reboot": true,
+  "device_observation_pending": false,
+  "userdata_written": false,
+  "raw_log_sha256": "3d7067ddef62ae1b69296715e09da49d2c59c135adf690a71dfafb217e9fdf2c",
+  "log_normalization": "Trailing blank lines omitted; exact log retained at out/step7/probes/smr-id-test/flash.raw.log",
+  "device_observation": "device-result.json"
+}

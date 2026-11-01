@@ -3,7 +3,7 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
-## 下一轮：单个无效 SMR 的 ID 字段测试（主机构建完成）
+## 当前：单个无效 SMR 的 ID 字段测试（实机通过）
 
 - 参数 `t970-smr-id-test=1`；范围见 [单槽测试](smr-id-test.md)。这是带两个临时 SMR
   字段写入的测试，不是只读快照。只写槽 56 的无效 ID 字段为 a5，再恢复零；
@@ -12,10 +12,16 @@
   全部匹配状态。stage<5 表示拒绝，stage=5 后仍须检查恢复和保护字段。
 - 内核 `d455be28e526ef9b6276e4347901d2551012e2c86632b3a30f2952cb19455431`
   编译、链接、预链接通过，输入稳定。12 项主机测试通过，含 18 个保护／恢复场景。
-- 实机测试尚未进行；继续使用 FD `515105d7…`，下一步打包核验并只刷 BOOT。
-  旧快照的 HCI ready 不能代替本轮寄存器写回／恢复结果。
+- 代码提交 `41d99e6`，继续使用 FD `515105d7…`。BOOT
+  `ee45890ab4875987b0e3376b095a64a5d58f1b23177c96b9ea4a996cd8ba9031`，
+  62,713,856 字节，独立封装核验、DT/ADT 检查通过。
+- 2026-11-01 16:41（Asia/Shanghai），仅刷 BOOT，Heimdall exit 0，`--no-reboot`。
+  机主照片确认 stage=5、observed=a5、restored=0，idAccepted/restoreOK/mappingsUnchanged 均为 1，
+  GFSR 前后为零，S2CR 保持 200ff，显示槽仍为 84020820/4。
+- 本次只证明无效 SMR 的 ID 字段可写且恢复检查通过，不能再笼统说 SMMU 整体只读。
+  VALID、S2CR、context 和 DMA 尚未验证；下一轮合并核查剩余字段，保持显示映射不变。
 
-## 当前：SM8250 只读交接快照（实机观察已完成）
+## 上一轮：SM8250 只读交接快照（实机观察已完成）
 
 - 参数为 `t970-ufs-handoff=1`，预期标题 `T970 UFS handoff RO (no writes)`。
 - 修正内核时钟诊断表，删除 SM8550 独立 mem-PHY GDSC 读取；UEFI 原型保持原样且不执行。

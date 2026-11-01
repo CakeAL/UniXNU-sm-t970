@@ -1,0 +1,25 @@
+{
+  "device_revision": "41d99e612894ec559c9f6503310290e8b97f7b6b",
+  "framework_revision": "194aae294c1107e791f4f74b2be371a391ac6bc4",
+  "command": "python3.14 scripts/build-smmu-report.py --mode smr-id --kernel-build out/step7/smr-id-kernel.json --output out/step7/probes/smr-id-test",
+  "kernel_sha256": "d455be28e526ef9b6276e4347901d2551012e2c86632b3a30f2952cb19455431",
+  "payload_kernel_sha256": "6b1c6b4dd6806873972b56a68ec7b01b0fdddf51a729e84a52302434fc9de6ce",
+  "firmware_sha256": "515105d758a9d61078dffce5012db0754a71cec351a1bb34b30ee791196b5690",
+  "firmware_dtb_sha256": "86c14aa305a6cf5db46665f4095d28aadcb1ea5ce9d213cd711641a07504ed1d",
+  "payload_sha256": "46778992227715e839a9e36d92eb6960ffc058c1a5bb7d1fe4500727d510eade",
+  "boot_sha256": "ee45890ab4875987b0e3376b095a64a5d58f1b23177c96b9ea4a996cd8ba9031",
+  "boot_bytes": 62713856,
+  "boot_partition_bytes": 71303168,
+  "kernel_args": [
+    "-v",
+    "cpus=1",
+    "t970-novc",
+    "sheng-pmgr=2",
+    "t970-smr-id-test=1"
+  ],
+  "independent_fat_check": true,
+  "independent_fd_check": true,
+  "mode": "smr-id",
+  "hardware_tested": false,
+  "flash_performed": false
+}
