@@ -2327,6 +2327,17 @@ bool NativeUfsBlock::signedVolumeUuid (char out[37]) const
 }
 
 // Called from the root authorization query in NativeVirtioBlock: -1 when `provider` is not a
+// bsd_init asks this after mounting root: the volume is not Apple-sealed, so the owner binds the
+// mounted media instead. A UFS window only answers yes when it authenticated against a signed
+// policy and its signed volume UUID is the ADT root UUID; the framework's mount path still requires
+// the mount to be read-only, so a writable volume never passes here.
+volatile int native_ufs_owner_root_authorized = 0;
+extern "C" int native_verified_block_root_authorized (dev_t device)
+{
+  (void) device;
+  return native_ufs_owner_root_authorized;
+}
+
 // UFS window, otherwise 1 if its signed volume UUID equals `uuid`, else 0.
 extern "C" int native_ufs_block_authenticates (IOService *provider, const char *uuid, uint8_t *digest)
 {
@@ -2344,6 +2355,11 @@ bool NativeUfsBlock::start (IOService *provider)
     return false;
   }
   online = true;
+  char rootUuid[37];
+  if (signedVolumeUuid (rootUuid) &&
+      !strcmp (rootUuid, "04769D26-2CA0-4825-B443-E2E5F88300F2")) {
+    native_ufs_owner_root_authorized = 1;
+  }
   registerService ();
   return true;
 }

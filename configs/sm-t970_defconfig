@@ -14,8 +14,6 @@ CONFIG_XNU_NATIVE_UFS=y
 CONFIG_XNU_VERIFIED_ROOT_PROBE=y
 # The root volume is not Apple-sealed, so bsd_init must accept an owner-authenticated
 # read-only root: the audit records the decision and the trust switch lets it pass.
-# Verified block storage supplies the mounted-media binding the owner-root trust switch needs.
-CONFIG_XNU_NATIVE_VIRTIO_BLOCK=y
 CONFIG_XNU_OWNER_ROOT_AUDIT=y
 CONFIG_XNU_OWNER_ROOT_TRUST=y
 CONFIG_XNU_VERIFIED_ROOT_ARCHIVE="{tree}/build/verified-root-empty/libVerifiedRootProbe.a"
