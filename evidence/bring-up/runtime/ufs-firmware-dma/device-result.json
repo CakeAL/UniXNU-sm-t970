@@ -1,0 +1,9 @@
+{
+  "device": "SM-T970 / gts7xlwifi",
+  "boot_image_sha256": "e54138c43bc1091c941b661f8411740be31dab4b7f40ee35648b886b4e7ae7ff",
+  "boot_image_bytes": 62713856,
+  "observation_source": "Human photograph / report in this chat",
+  "observation": "The PHY stage markers reach the final green pair, then the device returns to the Samsung bootloader warning screen.",
+  "result": "UEFI PlatformUfsLib completes the QMP UFS PHY replay and reports PCS ready, but the firmware resets before the kernel runs: the bootloader warning page replaces the marker screen. The remaining firmware-side UFS accesses are controller registers and DMA, consistent with the secure SMMU blocking DMA rather than the PHY.",
+  "limits": "The reset is not captured by any log; the DMA/SMMU explanation is inferred from the earlier kernel-side evidence. It does not prove the reset address."
+}

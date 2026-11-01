@@ -79,8 +79,13 @@
   # QCOM Libraries
   #
   ConfigurationMapLib|gts7xlwifiPkg/Library/ConfigurationMapLib/ConfigurationMapLib.inf
+  PlatformUfsLib|gts7xlwifiPkg/Library/PlatformUfsLib/PlatformUfsLib.inf
+  UfsCalAdapterLib|SamsungPkg/Library/UfsCalAdapterLib/UfsCalAdapterLib.inf
 
 [Components]
+  gts7xlwifiPkg/Library/PlatformUfsLib/PlatformUfsLib.inf
+  SamsungPkg/Library/UfsCalAdapterLib/UfsCalAdapterLib.inf
+  SamsungPkg/Drivers/UfsDxe/UfsDxe.inf
   #
   # ACPI Tables
   #

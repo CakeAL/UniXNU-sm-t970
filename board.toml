@@ -29,7 +29,7 @@ memory_policy = "firmware-envelope"
 config = "gts7xlwifi"
 dsc = "gts7xlwifiPkg/gts7xlwifi.dsc"
 fd = "Build/gts7xlwifiPkg/{target}_CLANGPDB/FV/SILICIUM_UEFI.fd"
-packages = ["{uefi}", "{uefi}/Platforms/Samsung", "{uefi}/Common/Mu", "{uefi}/Common/Mu_OEM_Sample", "{uefi}/Silicon/Qualcomm", "{uefi}/Silicon/Silicium", "{tree}/package", "{tree}/drivers/DarwinBoot", "{edk2}"]
+packages = ["{uefi}", "{uefi}/Platforms/Samsung", "{uefi}/Common/Mu", "{uefi}/Common/Mu_OEM_Sample", "{uefi}/Silicon/Qualcomm", "{uefi}/Silicon/Samsung", "{uefi}/Silicon/Silicium", "{tree}/package", "{tree}/drivers/DarwinBoot", "{edk2}"]
 submodules = ["Common/Mu", "Common/Mu_OEM_Sample"]
 
 [firmware.defines]
@@ -40,7 +40,7 @@ volume = "T970"
 size_mib = 56
 loader = "firmware"
 title = "UniXNU SM-T970 platform bootstrap"
-kernel_args = ["-v", "cpus=1", "t970-novc", "sheng-pmgr=2", "native-ufs-root=1", "t970-ufs-no-smmu=1"]
+kernel_args = ["-v", "cpus=1", "t970-novc", "sheng-pmgr=2", "native-ufs-root=1", "t970-ufs-status=1"]
 # Adds Tools -> Advanced Logger to the generated menu (porting/log-capture).
 tools = true
 panic_screen = true

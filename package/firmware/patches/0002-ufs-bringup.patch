@@ -1,0 +1,36 @@
+--- a/Silicon/Samsung/SamsungPkg/Drivers/UfsDxe/UfsDxe.c
++++ b/Silicon/Samsung/SamsungPkg/Drivers/UfsDxe/UfsDxe.c
+@@ -1416,8 +1416,8 @@
+ 
+   Status = gBS->LocateProtocol (&gEfiChipInfoProtocolGuid, NULL, (VOID *)&mChipInfoProtocol);
+   if (EFI_ERROR (Status)) {
+-    DEBUG ((EFI_D_ERROR, "Failed to Locate Chip Info Protocol! Status = %r\n", Status));
+-    return Status;
++    DEBUG ((EFI_D_WARN, "Chip Info Protocol missing (%r); continuing\n", Status));
++    mChipInfoProtocol = NULL;
+   }
+ 
+   if (!Ufs) {
+@@ -1426,12 +1426,14 @@
+   }
+ 
+   Status = UfsInitHost(Ufs);
++  *(volatile UINT32 *)0x9FF80004 = EFI_ERROR (Status) ? 0x4f : 0x42;
+   if (EFI_ERROR(Status)) {
+     DEBUG((EFI_D_ERROR, "Failed to initialize UFS host\n"));
+     return Status;
+   }
+ 
+   Status = UfsInitInterface(Ufs);
++  *(volatile UINT32 *)0x9FF80004 = EFI_ERROR (Status) ? 0x5f : 0x51;
+   if (EFI_ERROR(Status)) {
+     DEBUG((EFI_D_ERROR, "Failed to initialize UFS interface\n"));
+     return Status;
+@@ -1443,6 +1445,7 @@
+ 
+   for (UINT32 Lun = 0; Lun < 8; Lun++)
+   {
++    *(volatile UINT32 *)0x9FF80004 = 0x60 + Lun;
+     UINT64 BlkCnt;
+     UINT32 BlkSize;
+     UFS_LUN_DEV *Dev = AllocateZeroPool(sizeof(UFS_LUN_DEV));

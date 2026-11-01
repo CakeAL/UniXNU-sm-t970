@@ -1,30 +1,24 @@
---- a/osfmk/arm/arm_init.c	2026-11-01 09:47:38
-+++ b/osfmk/arm/arm_init.c	2026-11-01 09:47:38
-@@ -653,6 +653,30 @@
+--- a/osfmk/arm/arm_init.c	2026-11-01 10:18:19
++++ b/osfmk/arm/arm_init.c	2026-11-01 10:18:19
+@@ -653,6 +653,24 @@
  	 * against string vulnerabilities
  	 */
  	__stack_chk_guard &= ~(0xFFULL << 8);
 +
 +	/*
-+	 * T970 diagnostic: learn whether apps_smmu accepts writes at all. GFSR is
-+	 * write-1-to-clear, so a successful write reads back zero; an unchanged
-+	 * value means the block is locked, unclocked or not the SMMU.
++	 * T970 diagnostic: report the UEFI UFS bring-up status word that the
++	 * board PlatformUfsLib writes at 0x9ff80000, before any storage driver
++	 * runs. The panic screen is the only output channel on this board.
 +	 */
 +	{
-+		unsigned int t970_smmu_write = 0;
-+		if (PE_parse_boot_argn("t970-smmu-write", &t970_smmu_write, sizeof(t970_smmu_write))) {
-+			vm_offset_t base = ml_io_map_wcomb(0x15000000ULL, 0xd0000);
-+			if (!base) {
-+				panic("T970 SMMU write: map failed");
++		unsigned int t970_ufs_status = 0;
++		if (PE_parse_boot_argn("t970-ufs-status", &t970_ufs_status, sizeof(t970_ufs_status))) {
++			vm_offset_t st = ml_io_map_wcomb(0x9FF80000ULL, 0x1000);
++			if (!st) {
++				panic("T970 UFS status: map failed");
 +			}
-+			uint32_t idr_a = *(volatile uint32_t *)(base + 0x0);
-+			uint32_t idr_b = *(volatile uint32_t *)(base + 0x0);
-+			uint32_t gfsr_before = *(volatile uint32_t *)(base + 0x24);
-+			*(volatile uint32_t *)(base + 0x24) = 0xffffffffU;
-+			__asm__ volatile ("dsb sy" ::: "memory");
-+			uint32_t gfsr_after = *(volatile uint32_t *)(base + 0x24);
-+			panic("T970 SMMU write idr_a=%08x idr_b=%08x gfsr_before=%08x gfsr_after=%08x",
-+			    idr_a, idr_b, gfsr_before, gfsr_after);
++			panic("T970 UFS status magic=%08x status=%08x",
++			    *(volatile uint32_t *)(st + 0x0), *(volatile uint32_t *)(st + 0x4));
 +		}
 +	}
 +

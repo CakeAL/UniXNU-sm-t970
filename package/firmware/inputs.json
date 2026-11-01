@@ -631,6 +631,16 @@
           "after_sha256": "d566278282c5f2b6274663a2f92414d228f2d91ca2c79fa54ae08269f0a493a3"
         }
       }
+    },
+    {
+      "path": "patches/0002-ufs-bringup.patch",
+      "sha256": "fc0f91bf24427601dc9f0c205a6363de9f24b9ee619c2ce44fe07ccbf7a0f90d",
+      "files": {
+        "Silicon/Samsung/SamsungPkg/Drivers/UfsDxe/UfsDxe.c": {
+          "before_sha256": "f6198191ce7527872b9cf0b87299c7de9e6fb12035264a7530fa117be5c79de6",
+          "after_sha256": "fcaa77c007c34435b178dc28161d8c0551b4579b4e40ec3af9260247d5efc445"
+        }
+      }
     }
   ]
 }
