@@ -28,6 +28,7 @@ CONFIG_XNU_OWNER_ROOT_TRUST=y
 CONFIG_XNU_OWNER_CACHE_MOUNT=y
 CONFIG_XNU_OWNER_CACHE_STARTUP=y
 CONFIG_XNU_OWNER_CACHE_CARRIER=y
+CONFIG_XNU_OWNER_UNION_SYSTEMOS=y
 # iPadOS signs code in 16 KiB pages; this 4 KiB kernel only accepts the shared cache
 # through the signature hash cache (fcntl(92) would otherwise return 85 EBADEXEC).
 CONFIG_XNU_NATIVE_CS_HASH_CACHE=y
