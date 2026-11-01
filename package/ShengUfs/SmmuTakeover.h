@@ -76,9 +76,9 @@ template <class Read>
 static UfsSmmuReuse reuseUfsSmmuStream(uint16_t stream, Read read)
 {
   UfsSmmuReuse r;
-  uint32_t idr0 = read(0x0), idr1 = read(0x4), idr2 = read(0x8);
-  unsigned count = 1U << ((idr0 & 0x3f) + 1);
-  unsigned banks = 1U << (((idr1 >> 0) & 0x3f) + 1);
+  uint32_t idr0 = read(0x20), idr1 = read(0x24), idr2 = read(0x28);
+  unsigned count = idr0 & 0xff;
+  unsigned banks = idr1 & 0xff;
   unsigned pages = 1U << (((idr1 >> 28) & 7) + 1);
   if (!(idr0 & (1U << 30)) || !(idr2 & (1U << 12))) {
     r.error = "SMMU AArch64 stage 1 unsupported"; return r;
@@ -147,8 +147,8 @@ template <class Read>
 static UfsSmmuPlan planUfsSmmuBank(uint16_t stream, uint64_t dma, uint64_t bytes, Read read, unsigned bankFromTop)
 {
   UfsSmmuPlan p;
-  uint32_t idr0 = read(0x0), idr2 = read(0x8);
-  unsigned count = 1U << ((idr0 & 0x3f) + 1);
+  uint32_t idr0 = read(0x20), idr2 = read(0x28);
+  unsigned count = idr0 & 0xff;
   if (!(idr0 & (1U << 30)) || !(idr2 & (1U << 12))) {
     p.error = "SMMU AArch64 stage 1 unsupported"; return p;
   }
@@ -158,8 +158,8 @@ static UfsSmmuPlan planUfsSmmuBank(uint16_t stream, uint64_t dma, uint64_t bytes
       p.error = "DMA exceeds SMMU address width"; return p;
     }
   }
-  uint32_t idr1 = read(0x4);
-  unsigned banks = 1U << (((idr1 >> 0) & 0x3f) + 1);
+  uint32_t idr1 = read(0x24);
+  unsigned banks = idr1 & 0xff;
   p.pages = 1U << (((idr1 >> 28) & 7) + 1);
   if ((idr1 >> 31) || !count || p.pages > 128 || banks < 2 || banks > 128 ||
       (p.pages + banks) * 4096 > 0xd0000) {

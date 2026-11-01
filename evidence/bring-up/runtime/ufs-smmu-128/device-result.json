@@ -1,0 +1,10 @@
+{
+  "device": "SM-T970 / gts7xlwifi",
+  "boot_image_sha256": "a12cc611793588cc238b3fc114da91b1d0fb789f68dd0783429d5066a3ce63e9",
+  "boot_image_bytes": 62713856,
+  "source_kernel_sha256": "4ad53adbb5b7ac04b83e0ed06579669f06ce071c5c1cc3a5ef83c63094ffa1b0",
+  "observation_source": "Human photograph of the panic screen",
+  "panic": "NATIVE_UFS auto stream: no reusable exact stream among 128 slots @NativeUfs.cpp:424",
+  "result": "With the Linux-validated SMMU model (IDR0/1/2 at 0x20/0x24/0x28) and a scan of all 128 stream slots, none of the firmware streams is reusable: the SMR write to create a bypass context reads back zero and the firmware streams are not in the bypass shape the driver requires.",
+  "limits": "Does not prove the SMMU is secure; consistent with it. The secure/non-secure split would need vendor documentation or a secure-world call to confirm."
+}

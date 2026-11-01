@@ -48,6 +48,15 @@
   原始 BOOT 恢复待完成，后续镜像以 `evidence/bring-up/runtime/*/flash.json` 回执为准。
 - 以下为 ds 交接当时的状态、命令和待办，保留作历史基线；当前进展以本节及适配记录为准。
 
+## SMMU 归属的结论
+
+Linux `arm-smmu.h` 证实 IDR 在 `0x20/0x24/0x28`（原驱动偏移正确）。恢复该模型并扫描全部 128 个 slot 后：
+
+- 固件的 128 条 stream 里没有一条符合“bypass + 单引用 + AArch64”的复用条件；
+- 新建 bypass context 的 SMR 写入仍读回 0。
+
+两者合起来说明 **secure world（ABL/TZ）掌握着 stream 寄存器**，非安全世界只能读 IDR。内核侧无法自行配置 SMMU；需要固件为 UFS 留下 bypass stream（alioth/T733 的固件正是这么做的）。
+
 ## SMMU 模型的最终判断
 
 - `GFSR`（0x24）写入无效 → SMMU 寄存器**被锁**，不能新建 bypass context；

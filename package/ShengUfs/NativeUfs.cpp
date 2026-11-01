@@ -406,9 +406,7 @@ static void smmuBypassStream (uint16_t stream, OSSharedPtr<IOMemoryMap> &keep, u
     [smmu](unsigned offset) { return read32 (smmu, offset); });
   unsigned t970_auto = 0;
   if (reuse.error && PE_parse_boot_argn ("t970-ufs-auto-stream", &t970_auto, sizeof (t970_auto))) {
-    uint32_t idr0 = read32 (smmu, 0x0);
-    unsigned count = 1U << ((idr0 & 0x3f) + 1);
-    if (count > 128) count = 128;
+    unsigned count = 128;
     for (unsigned index = 0; index < count; ++index) {
       uint32_t smr = read32 (smmu, 0x800 + 4 * index);
       if (!(smr & 0x80000000U) || ((smr >> 16) & 0x7fff)) continue;
@@ -423,6 +421,7 @@ static void smmuBypassStream (uint16_t stream, OSSharedPtr<IOMemoryMap> &keep, u
         return;
       }
     }
+    panic ("NATIVE_UFS auto stream: no reusable exact stream among 128 slots");
   }
   if (!reuse.error) {
     report[0] = reuse.slot | (reuse.bank << 16);
