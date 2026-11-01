@@ -3,3 +3,4 @@ sheng-platform-power.patch
 t970-console-bootstrap.patch
 t970-skip-vcattach.patch
 t970-smmu-dump.patch
+t970-owner-mount-status.patch
