@@ -16,7 +16,8 @@
 [零命令预检](docs/ufs-preflight.md)已确认实际内存归属；
 [单次 NOP 测试](docs/ufs-nop.md)已完成一次命令／响应 DMA 往返；
 [LUN0只读数据核验](docs/ufs-read.md)已通过容量、重复GPT头和分区项CRC；
-当前准备[根镜像样本核对](docs/ufs-image.md)，持续稳定性及根卷挂载尚未验证。
+[根镜像调查](docs/ufs-survey.md)确认非零SystemOS样本匹配、重复读取一致，
+同时发现manifest与OS样本为零，旧根镜像部署不完整；持续稳定性及根卷挂载尚未验证。
 
 两个仓库并列放置，普通构建命令在主仓库执行：
 

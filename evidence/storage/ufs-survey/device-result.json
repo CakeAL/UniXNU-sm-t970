@@ -1,0 +1,95 @@
+{
+  "device": "sm-t970",
+  "boot_sha256": "c404ce262b69cb7bc0af22dc5da866506c7c3faf3cdfc824971f2b311d46b2b4",
+  "source_revision": "09bff63bce93e62bd0990d93c21faa97a50e6c37",
+  "observation_source": "Owner photo manually transcribed; digest strings confirmed against independently computed all-zero digests and exact host expectations.",
+  "photo": {
+    "filename": "IMG_20261101_175623.jpg",
+    "local_source_available": true,
+    "sha256": "b20d90ef277c75c2a4eedd46630ef14db19ba6d6b946c5871e5895c8daf0bdf8"
+  },
+  "completed": true,
+  "matched": false,
+  "sample": 6,
+  "reads": 14,
+  "healthy": true,
+  "poisoned": false,
+  "match_mask": "0x60",
+  "repeat_mask": "0x7f",
+  "zero_mask": "0x5f",
+  "samples": [
+    {
+      "index": 0,
+      "name": "manifest",
+      "observed_sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+      "matches_expected": false,
+      "repeat_identical": true,
+      "all_zero": true
+    },
+    {
+      "index": 1,
+      "name": "OS first",
+      "observed_sha256": "fa43239bcee7b97ca62f007cc68487560a39e19f74f3dde7486db3f98df8e471",
+      "matches_expected": false,
+      "repeat_identical": true,
+      "all_zero": true
+    },
+    {
+      "index": 2,
+      "name": "OS middle",
+      "observed_sha256": "fa43239bcee7b97ca62f007cc68487560a39e19f74f3dde7486db3f98df8e471",
+      "matches_expected": false,
+      "repeat_identical": true,
+      "all_zero": true
+    },
+    {
+      "index": 3,
+      "name": "OS last",
+      "observed_sha256": "fa43239bcee7b97ca62f007cc68487560a39e19f74f3dde7486db3f98df8e471",
+      "matches_expected": false,
+      "repeat_identical": true,
+      "all_zero": true
+    },
+    {
+      "index": 4,
+      "name": "SystemOS first",
+      "observed_sha256": "fa43239bcee7b97ca62f007cc68487560a39e19f74f3dde7486db3f98df8e471",
+      "matches_expected": false,
+      "repeat_identical": true,
+      "all_zero": true
+    },
+    {
+      "index": 5,
+      "name": "SystemOS middle",
+      "observed_sha256": "fb99d85de6d0ad2607d3fdec423f35c553bdcbc65c0484f3affca81e0d84c6a8",
+      "matches_expected": true,
+      "repeat_identical": true,
+      "all_zero": false
+    },
+    {
+      "index": 6,
+      "name": "SystemOS last",
+      "observed_sha256": "fa43239bcee7b97ca62f007cc68487560a39e19f74f3dde7486db3f98df8e471",
+      "matches_expected": true,
+      "repeat_identical": true,
+      "all_zero": true
+    }
+  ],
+  "result": 0,
+  "ocs": 0,
+  "scsi": 0,
+  "sense": 0,
+  "protocol": 0,
+  "residual": 0,
+  "doorbell": 0,
+  "is_status": "0x400",
+  "gfsr": 0,
+  "fsr": "0x400",
+  "end_marker_seen": true,
+  "conclusion": "All samples read consistently. Only SystemOS middle and last match expectations; last is itself zero. SystemOS middle is a matching nonzero 128KiB sample. Manifest/OS samples/SystemOS first are zero, so the prior image is not complete.",
+  "limits": [
+    "No proof of why the target zeroed or failed to preserve earlier ranges; DONT_CARE behavior remains unqualified.",
+    "A matching nonzero sample plus valid GPT provides concrete data-path evidence, not complete root-image correctness or sustained workload validation."
+  ],
+  "next_action": "Prepare a verified complete-image deployment method that avoids relying on unqualified sparse DONT_CARE preservation; no further SMMU change justified by this mismatch."
+}

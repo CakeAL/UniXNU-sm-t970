@@ -3,14 +3,23 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
-## 当前：根镜像全样本只读调查（主机构建通过，待封装／实测）
+## 当前：根镜像调查完成（传输一致，部署内容不完整）
 
 - 参数仍为 `t970-ufs-image=1`，新标题 `T970 UFS root image survey`；见 [调查解释](ufs-survey.md)。
 - 7个原样本各读2次；预期哈希不符继续记录实际摘要，传输错误或重复不一致立即停。
   输出matchMask/repeatMask/zeroMask，不把completed当作样本匹配。
 - 18项测试、配置检查、内核构建及预链接通过，输入稳定；内核
   `3e657c8fc7f385a287715e3ee516b3001d32d6bf1ec42d52cc13206ec92f1839`。本轮尚未刷写，继续使用FD `515105d7…`。
-- 未重新生成旧稀疏成品，未写USERDATA。当前仍安装首个manifest严格比较探针。
+- 代码提交 `09bff63`，独立封装与DT/ADT检查通过；BOOT
+  `c404ce262b69cb7bc0af22dc5da866506c7c3faf3cdfc824971f2b311d46b2b4`，62,713,856字节。
+- 已检测Download Mode后仅上传BOOT，Heimdall exit0，`--no-reboot`；等待机主画面及三个mask。
+  未重新生成旧稀疏成品，未写USERDATA。回执／实测在 `evidence/storage/ufs-survey/`。
+- 照片确认completed1、matched0、reads14、healthy1、poisoned0；matchMask60、repeatMask7f、zeroMask5f。
+  7样本两次完全一致；manifest、OS首中尾、SystemOS首尾均零。SystemOS中部128KiB与源文件精确匹配；
+  SystemOS尾部源样本本就为零，所以matchMask还包含bit6，不能算作第二个非零匹配。
+- 所有传输／SCSI／协议错误为0，GFSR0、FSR400。当前根镜像内容不完整，不能启用挂载。
+  编码错误及未验证的分段DONT_CARE保留行为须解决；不凭这些结果继续改SMMU。
+- 下一步准备完整镜像写入后读回校验的部署方式；没有新的USERDATA写入授权时仅准备与检查。
 
 ## 前轮：根镜像样本核对（manifest读回全零，继续只读调查）
 

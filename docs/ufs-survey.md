@@ -10,3 +10,11 @@ zeroMask表示两次返回的所有字节均零。bit0=manifest，bit1..3=OS首�
 
 调查仍不写存储、不发布根设备。不把全零／不符直接归因于SMMU／DMA；此前GPT与命令状态均通过。
 历史分段编码错误已单独修复并保留旧成品与审计，新版不能证明旧USERDATA已经正确。
+
+## 实机结果
+
+BOOT c404ce26…：completed1、matched0、reads14、healthy1、poisoned0，
+matchMask=60、repeatMask=7f、zeroMask=5f。SystemOS中部非零128KiB与源完全匹配；
+SystemOS尾部也匹配但本就是零，其他样本均为零。传输状态全部无错误。
+这证明有限次真实数据读取一致，同时否定此前根镜像完整部署的假设。
+具体导致早期区域清零的机制尚未确认，不把推测记录为已验证根因。
