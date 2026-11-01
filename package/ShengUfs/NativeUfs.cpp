@@ -1369,6 +1369,8 @@ static bool hostBringUpHandoff (const char **why)
 // The kernel addresses LUN 0 with disk-absolute LBAs (the root layout's userdataFirst is 2969600),
 // while the recovery channel wrote partition-relative offsets 5505024 and 5516624, so the carrier is
 // read at the sum. Getting this wrong reads an unrelated block and fails the header format check.
+extern "C" void native_verified_policy_count_set (uint64_t);
+static uint64_t gCarrierCountSeen, gCarrierTable0Seen, gCarrierBytes1Seen;
 constexpr uint64_t kOwnerPolicyPartitionLba = 2969600ULL;
 constexpr uint64_t kOwnerPolicyLbaOS = kOwnerPolicyPartitionLba + 5505024ULL;
 constexpr uint64_t kOwnerPolicyLbaSystemOS = kOwnerPolicyPartitionLba + 5516624ULL;
@@ -1440,7 +1442,7 @@ static bool installOwnerPolicyCarrier (const char **why)
   };
   NativeVerifiedBlockPolicy *table =
     const_cast<NativeVerifiedBlockPolicy *> (verified_root_policies);
-  uint64_t *count = const_cast<uint64_t *> (&verified_root_policy_count);
+  uint64_t *count = const_cast<uint64_t *> (&verified_root_policy_count);  // addressed for read-back only
   for (unsigned index = 0; index < 2; ++index) {
     uint8_t *bytes = nullptr;
     uint64_t length = 0;
@@ -1457,8 +1459,16 @@ static bool installOwnerPolicyCarrier (const char **why)
     }
     table[index].manifest = bytes;
     table[index].manifestBytes = length;
-    *count = index + 1;
+    // A store through a const object is undefined behaviour and clang drops it, which is why the
+    // count stayed zero while the pointers stuck. The setter lives in assembly so the write is
+    // opaque to the optimiser.
+    native_verified_policy_count_set (index + 1);
   }
+  // Read the symbols back: a write that the verifier cannot see would otherwise look identical to
+  // a carrier that never ran, and the publication stop prints these values.
+  gCarrierCountSeen = *reinterpret_cast<volatile uint64_t *> (count);
+  gCarrierTable0Seen = reinterpret_cast<uint64_t> (table[0].manifest);
+  gCarrierBytes1Seen = table[1].manifestBytes;
   gRootDiagnostic.policyCount = 2;
   return true;
 }
@@ -2209,11 +2219,15 @@ bool NativeUfsBlock::configureVerification ()
   // Select the one policy whose signed image size equals this window; two matches are refused.
   const uint8_t *manifest = nullptr;
   uint64_t manifestBytes = 0;
-  if (!verified_root_policy_count || verified_root_policy_count > 16) {
+  // The table is filled at boot from the signed envelopes, so the count must be a real load:
+  // an extern const declared elsewhere would otherwise be folded to its link-time zero.
+  const uint64_t policyCount = *reinterpret_cast<const volatile uint64_t *> (&verified_root_policy_count);
+  gRootDiagnostic.policyCount = policyCount;
+  if (!policyCount || policyCount > 16) {
     gRootDiagnostic.stage = "policy count invalid";
     return false;
   }
-  for (uint64_t index = 0; index < verified_root_policy_count; ++index) {
+  for (uint64_t index = 0; index < policyCount; ++index) {
     const NativeVerifiedBlockPolicy &policy = verified_root_policies[index];
     if (!policy.manifest || policy.manifestBytes < VR_HEADER_BYTES + VR_SIGNATURE_BYTES) {
       gRootDiagnostic.stage = "policy envelope invalid";
@@ -3252,6 +3266,7 @@ bool NativeUfs::start (IOService *provider)
              "stage=%s phase=%u window=%u bytes=%llx\n"
              "userdata=%llx..%llx image=%llx manifest=%u magic=%08x %08x\n"
              "windows=%u prepared=%u published=%u policies=%llu verify=%08x\n"
+             "carrier count=%llu table0=%llx bytes1=%llx\n"
              "w0 %s off=%llx size=%llx\n"
              "w1 %s off=%llx size=%llx\n"
              "w2 %s off=%llx size=%llx\n"
@@ -3260,6 +3275,7 @@ bool NativeUfs::start (IOService *provider)
              gRootDiagnostic.windowBytes, first, last, imageBytes, manifest, magic0, magic1,
              count, gRootDiagnostic.prepared, native_ufs_blocks_published,
              gRootDiagnostic.policyCount, gRootDiagnostic.verify,
+             gCarrierCountSeen, gCarrierTable0Seen, gCarrierBytes1Seen,
              windows[0], offset[0], bytes[0], windows[1], offset[1], bytes[1],
              windows[2], offset[2], bytes[2], windows[3], offset[3], bytes[3]);
     }
