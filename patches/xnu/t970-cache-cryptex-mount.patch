@@ -1,0 +1,27 @@
+--- a/bsd/kern/kern_exec.c
++++ b/bsd/kern/kern_exec.c
+@@ -7060,7 +7060,10 @@
+ 	const char *mountpoint = "/";
+ #else
+-	const char *mountpoint = "/private/preboot";
++	/* iPadOS keeps the OS cryptex at /System/Cryptexes/OS: the OS volume carries that directory
++	 * empty and dyld resolves /System/Cryptexes/OS/System/Library/Caches/com.apple.dyld inside it,
++	 * so the signed SystemOS window belongs on that mount point rather than /private/preboot. */
++	const char *mountpoint = "/System/Cryptexes/OS";
+ #endif
+ #if !defined(XNU_OWNER_UNION_SYSTEMOS) || !XNU_OWNER_UNION_SYSTEMOS
+-	const char *environment = "DYLD_SHARED_CACHE_DIR=/private/preboot/System/Library/Caches/com.apple.dyld";
++	const char *environment = "DYLD_SHARED_CACHE_DIR=/System/Cryptexes/OS/System/Library/Caches/com.apple.dyld";
+ #endif
+--- a/bsd/vm/vm_unix.c
++++ b/bsd/vm/vm_unix.c
+@@ -2245,7 +2245,8 @@
+ #else
+ 	const char *cache_uuid = "8846FE78-2910-4297-AF97-D59BB6F8FC16";
+ #endif
+-	const char *directory = "/private/preboot/System/Library/Caches/com.apple.dyld";
++	/* Same layout as the mount: the cache is authorised under the cryptex mount point. */
++	const char *directory = "/System/Cryptexes/OS/System/Library/Caches/com.apple.dyld";
+ 	vnode_t expected_parent = NULLVP, device_vnode;
+ 	dev_t root_device = NODEV, cache_device = NODEV, expected = NODEV;
+ 	char device_path[64];

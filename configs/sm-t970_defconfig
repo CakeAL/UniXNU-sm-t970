@@ -25,13 +25,12 @@ CONFIG_XNU_OWNER_ROOT_TRUST=y
 # and let dyld start from it (volume UUID 8846FE78 is that window's policy UUID).
 # Mount the SystemOS cryptex at /private/preboot and let dyld read DYLD_SHARED_CACHE_DIR;
 # the owner carrier authorises that mount for the signed SystemOS volume.
+# The OS volume carries an empty /System/Cryptexes/OS; the signed SystemOS window mounts there
+# and the owner carrier authorises the shared cache under that mount point.
 CONFIG_XNU_OWNER_CACHE_MOUNT=y
 CONFIG_XNU_OWNER_CACHE_STARTUP=y
-# The T733 port (a working iPadOS target on a Snapdragon tablet) enables the boot
-# manifest together with the cache startup; the shared-region binding is set up there.
 CONFIG_XNU_OWNER_BOOT_MANIFEST=y
 CONFIG_XNU_OWNER_CACHE_CARRIER=y
-CONFIG_XNU_OWNER_UNION_SYSTEMOS=y
 # iPadOS signs code in 16 KiB pages; this 4 KiB kernel only accepts the shared cache
 # through the signature hash cache (fcntl(92) would otherwise return 85 EBADEXEC).
 CONFIG_XNU_NATIVE_CS_HASH_CACHE=y
