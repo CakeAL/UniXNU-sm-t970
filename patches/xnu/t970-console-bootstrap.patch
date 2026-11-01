@@ -1,5 +1,5 @@
---- a/osfmk/arm/arm_init.c	2026-11-01 07:24:18
-+++ b/osfmk/arm/arm_init.c	2026-11-01 07:24:18
+--- a/osfmk/arm/arm_init.c	2026-11-01 07:48:59
++++ b/osfmk/arm/arm_init.c	2026-11-01 07:48:59
 @@ -574,11 +574,22 @@
  		(void)switch_to_serial_console(); /* Switch into serial mode from video console */
  		disableConsoleOutput = FALSE;     /* Allow printfs to happen */
@@ -10,15 +10,15 @@
 +	/* Install the output callback before console setup can emit text. */
  	PE_init_printf(FALSE);
  
-+	/*
-+	 * T970 diagnostic: the Apple video console path spins inside
-+	 * check_for_panic_log/gc_enable before the console exists, and a panic on
-+	 * that path is silent. Skip all console setup when the boot argument is
-+	 * present; the panic screen remains the only output channel.
-+	 */
 +	{
-+		unsigned int novc = 0;
-+		if (!PE_parse_boot_argn("t970-novc", &novc, sizeof(novc))) {
++		unsigned int t970_novc = 0;
++		if (PE_parse_boot_argn("t970-novc", &t970_novc, sizeof(t970_novc))) {
++			/*
++			 * T970 diagnostic: skip the generic console but still fill vinfo
++			 * and map the framebuffer, which the panic screen reads.
++			 */
++			PE_initialize_console(&PE_state.video, kPEGraphicsMode);
++		} else {
 +			PE_create_console();
 +		}
 +	}

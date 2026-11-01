@@ -549,6 +549,7 @@ findings = [
   "DRM mode geometry is landscape while wm and touch coordinates are portrait; display/input orientation must be mapped explicitly.",
   "At capture time DPMS was Off and brightness was zero; this records Android runtime state, not a display failure.",
   "GopFramebuffer is deferred at Step 2 because the T970 UEFI GOP handoff and display power callbacks have not been established.",
+  "The bring-up console patch populates vinfo and maps the UEFI framebuffer only so the panic screen can draw text; no display driver, panel init or XNU framebuffer integration is implemented and display remains planned.",
 ]
 completion = [
   "A known image has correct geometry and colors, followed by working userland presentation and brightness control.",
@@ -879,6 +880,7 @@ findings = [
   "With the 56 MiB payload the rebuilt boot.img is 62713856 bytes (payload.img 58720256, sha256 a87d42da...; boot.img sha256 d61f416a...) and fits the 68 MiB boot partition. Odin AP tars for the test image and the Magisk restore image were generated in ignored storage; no flash has been performed.",
   "Added t970-skip-video.patch (initialize_screen guarded by t970-novc) and t970-skip-vcattach.patch (PE_init_printf TRUE path uses a null output callback under t970-novc), and changed t970-console-bootstrap.patch to skip PE_create_console under t970-novc. These are diagnostic bypasses, not a replacement console.",
   "Ported the marble-milacy PMGR placeholder: package/ShengPlatformPower.cpp and scripts/build-platform-power.py build the 340-slot original ApplePMGR ABI bridge from the shared 21H461 kernelcache; the framework sheng-platform-power.patch is in the device series and board archives now include build-platform-power.py. The builder's audit passed unchanged-AMFI read/OR/write and original provider dispatch.",
+  "Final console diagnostic patch set for this revision: t970-console-bootstrap calls PE_initialize_console under t970-novc so vinfo and the framebuffer mapping exist for the panic screen, and the t970-skip-video patch (which skipped gc_initialize and left VCPUTC's ticket lock uninitialized) is removed. t970-skip-vcattach keeps PE_putc a null writer.",
 ]
 completion = [
   "The selected profile's inputs produce a kernel, payload and a boot image matching the SM-T970 boot path.",
