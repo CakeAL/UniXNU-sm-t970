@@ -1,6 +1,6 @@
 --- a/bsd/kern/kern_exec.c
 +++ b/bsd/kern/kern_exec.c
-@@ -8181,7 +8181,20 @@
+@@ -8181,7 +8181,18 @@
  	user_addr_t init_envp = USER_ADDR_NULL;
  #if defined(XNU_OWNER_CACHE_MOUNT) && XNU_OWNER_CACHE_MOUNT
  	int cache_error = native_owner_cache_prepare(p, (user_addr_t)scratch_addr, &init_envp);
@@ -8,10 +8,8 @@
 +	{
 +		extern const char *native_ufs_cache_probe_text(void);
 +		extern int vnode_lookup(const char *, int, vnode_t *, vfs_context_t);
-+		/* The carrier can report success while dyld still finds nothing, so look the cache file up
-+		 * through the composed root and report the mount and the lookup together. */
 +		vnode_t cache_file = NULLVP;
-+		int lookup = vnode_lookup("/System/Library/Caches/com.apple.dyld/dyld_shared_cache_arm64",
++		int lookup = vnode_lookup("/private/preboot/System/Library/Caches/com.apple.dyld/dyld_shared_cache_arm64",
 +		    0, &cache_file, vfs_context_kernel());
 +		if (cache_file) vnode_put(cache_file);
 +		panic("offline owner cache: mount=%d stage=%d auth=%d mstatus=%d dev=%x path=%s lookup=%d %s",
