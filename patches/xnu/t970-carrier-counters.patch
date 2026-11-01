@@ -1,0 +1,20 @@
+--- a/bsd/kern/kern_exit.c
++++ b/bsd/kern/kern_exit.c
+@@ -1869,6 +1869,15 @@
+ 	} else {
+-		panic_with_options(0, NULL, DEBUGGER_OPTION_INITPROC_PANIC, "%s %s -- exit reason namespace %d subcode 0x%llx description: %." LAUNCHD_PANIC_REASON_STRING_MAXLEN "s",
++		/* dyld reports "no dylib cache" both when it never found the cache file and
++		 * when the shared region refused to map it, so report the counters that tell
++		 * those two cases apart. */
++		extern unsigned long native_owner_cache_carrier_accepts;
++		extern unsigned long native_owner_cache_carrier_rejects;
++		extern volatile int native_verified_block_root_uuid_match;
++		extern volatile int native_verified_block_root_media_matches;
++		panic_with_options(0, NULL, DEBUGGER_OPTION_INITPROC_PANIC, "%s %s -- exit reason namespace %d subcode 0x%llx description: %." LAUNCHD_PANIC_REASON_STRING_MAXLEN "s carrier acc=%lu rej=%lu uuidmatch=%d media=%d",
+ 		    ((proc_getcsflags(p) & CS_KILLED) ? "CS_KILLED" : ""),
+ 		    prefix_str, p->p_exit_reason->osr_namespace, p->p_exit_reason->osr_code,
+-		    exit_reason_desc ? exit_reason_desc : "none");
++		    exit_reason_desc ? exit_reason_desc : "none",
++		    native_owner_cache_carrier_accepts, native_owner_cache_carrier_rejects,
++		    native_verified_block_root_uuid_match, native_verified_block_root_media_matches);
+ 	}
