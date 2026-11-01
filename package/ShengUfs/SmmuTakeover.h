@@ -40,14 +40,18 @@ struct UfsSmmuConfigDiagnostic {
 template <class Read>
 static unsigned collectUfsSmmuStreams(Read read, UfsSmmuStreamEntry *entries, unsigned capacity)
 {
-  unsigned count = (1U << ((read(0x0) & 0x3f) + 1));
+  const uint32_t id0 = read(0x20);
+  if (!(id0 & (1U << 27))) return 0; // SMMUv2 ID0.SMS, not sCR0.
+  unsigned count = id0 & 0xff;
+  const bool extended = (id0 & (1U << 8)) && (read(0x0) & (1U << 3));
   if (count > 128) count = 128;
   unsigned valid = 0;
   for (unsigned index = 0; index < count; ++index) {
     uint32_t smr = read(0x800 + 4 * index);
-    if (!(smr & 0x80000000U)) continue;
+    uint32_t s2cr = extended ? read(0xc00 + 4 * index) : 0;
+    if (!(extended ? s2cr & (1U << 10) : smr & 0x80000000U)) continue;
     if (entries && valid < capacity) {
-      entries[valid] = {index, smr, read(0xc00 + 4 * index)};
+      entries[valid] = {index, smr, extended ? s2cr : read(0xc00 + 4 * index)};
     }
     ++valid;
   }
@@ -142,7 +146,7 @@ static unsigned ufsSmmuAddressBits(unsigned code)
     default: return 0;
   }
 }
-// One attempt with a given context bank (counted from the top). The caller falls back to lower banks when this one is held by another stream.
+// Try stage-1-capable context banks, skipping the ID1.NUMS2CB stage-2-only prefix.
 template <class Read>
 static UfsSmmuPlan planUfsSmmuBank(uint16_t stream, uint64_t dma, uint64_t bytes, Read read, unsigned bankFromTop)
 {
@@ -166,13 +170,15 @@ static UfsSmmuPlan planUfsSmmuBank(uint16_t stream, uint64_t dma, uint64_t bytes
     p.error = "unsupported SMMU geometry"; return p;
   }
   if (count > 128) count = 128; // Firmware's reliably accessible groups only.
-  if (bankFromTop >= banks - 1) {p.error = "no free context bank"; return p;}
-  p.bank = banks - 1 - bankFromTop;
+  unsigned stage2Only = (idr1 >> 16) & 0xff;
+  if (stage2Only > banks) {p.error = "invalid SMMU context geometry"; return p;}
+  if (stage2Only + bankFromTop >= banks) {p.error = "no free context bank"; return p;}
+  p.bank = stage2Only + bankFromTop;
   unsigned matches = 0;
   for (unsigned i = 0; i < count; ++i) {
     uint32_t smr = read(0x800 + 4 * i);
     if (!(smr & 0x80000000U)) {
-      if (!p.reuse) p.slot = i;
+      if (!p.reuse && p.slot == 0xffffffffU) p.slot = i;
       continue;
     }
     uint32_t s2cr = read(0xc00 + 4 * i);
@@ -201,8 +207,8 @@ static UfsSmmuPlan planUfsSmmuBank(uint16_t stream, uint64_t dma, uint64_t bytes
   return p;
 }
 
-// The UFS stream's context bank: the top bank first. A stream mapping left behind by an earlier run (or by another OS that used the SMMU before a
-// warm reset) can still point another stream at that bank; rather than refuse to boot, the next banks down are tried, each held to the same checks
+// A stream mapping left behind by an earlier run can still point another stream
+// at a candidate bank; the next stage-1-capable banks are tried with the same checks
 // (no other valid stream maps it, translation off). Any other refusal (a conflicting mapping of our own stream, no free group, unsupported geometry)
 // is final and is reported as the first attempt saw it.
 template <class Read>

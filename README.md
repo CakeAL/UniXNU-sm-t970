@@ -5,16 +5,10 @@
 
 ## 当前结果
 
-当前继续第 7 步的 **CPU0／initrd 早期引导诊断**。主机构建链已打通；据 ds 交接，
-设备已进入 UniXNU 菜单、挂载 payload 并交接 XNU，曾用探针确认 MMU 开启。
-本轮机主确认 `idle_thread_create` 和 `sched_startup` 返回后探针复位，
-`PE_init_iokit` 调用前探针复位，其内部 `InitIOKit` 调用前探针未复位，
-`PE_init_printf` 返回也未确认，但已确认进入其调用的 `vcattach` 并通过最早的锁初始化，
-已确认到达 `gc_enable` 调用前而未确认其返回；状态探针约 4 秒复位支持控制台未初始化、
-`PE_putc` 为空。恢复必要初始化的修复版主机构建通过，但实机返回检查点仍未触发；
-`PE_create_console` 返回及异常分类镜像在 60 秒内均未观察到复位，
-正在用 MMU 后 BRK 正控制验证诊断通道，尚不确认具体停止点。
-根卷／用户态、SMP 和外设功能仍未完成，具体来源与验证等级见 `porting.toml`。
+交接中的设备记录已到达 `bsd_init`／根卷挂载，当前回到第 6 步的 **UFS／SMMU 适配**。
+已有 USERDATA 根镜像写入回执，但 UFS DMA 与根卷挂载尚未通过；用户态、SMP 和外设仍未完成。
+本轮先做[只读 SMMU 核查](docs/smmu-readonly.md)，报告原始寄存器与候选 SID，
+不提交 UFS 命令、不挂载根卷，也不执行逐槽写入探测。实机结果与构建结果分开记录。
 
 两个仓库并列放置，普通构建命令在主仓库执行：
 
@@ -34,9 +28,9 @@ vsc/
   主机证据见[验证记录](evidence/firmware-log-exporter/README.md)，屏幕菜单与二维码尚未验证。
 - [porting.toml](porting.toml)：13 个部分的适配范围、实现和验证证据。
 
-当前选择 `ArmDTPlatform`、`ArmCpu`、`SoftwareAES`、`XnuPrelink`、`DarwinBoot`；
-UFS、GPU、触控、音频、无线等 XNU 外设组件未启用。DTS 不替代尚未实现的时钟、
-电源、DMA／SMMU 和 OS ABI 接口。
+显式组件为 `ArmDTPlatform`、`ArmCpu`、`SoftwareAES`、`XnuPrelink`、`DarwinBoot`；
+archive 还接入了设备内 UFS 实验副本、空策略 VerifiedRoot 与 PMGR 占位实现。
+这些构建输入不等于功能验证通过；GPU、触控、音频、无线尚未适配。
 
 ## 检查与构建
 

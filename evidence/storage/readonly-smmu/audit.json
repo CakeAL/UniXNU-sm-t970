@@ -1,0 +1,28 @@
+{
+  "incoming_revision": "47b113f61329b0633725b7a559ef1e6f1273ce91",
+  "incoming_experiment_device_tested": false,
+  "observation_source": "User reply: \u8fd8\u6ca1\u5237; interpreted only for the incoming uncommitted experiment.",
+  "changes": [
+    "Retired all-slot SMR write scan; obsolete argument now panics before controller access.",
+    "Read-only report runs before transport/queue/DMA/root setup and terminates in a diagnostic panic.",
+    "Collector uses SMMUv2 ID0 at 0x20 instead of sCR0 at 0; handles SMS and EXIDS.",
+    "Context-bank candidate starts at ID1.NUMS2CB rather than a guessed bank 1; takeover remains unverified."
+  ],
+  "limits": [
+    "No inference of permanent secure-world ownership from ignored SMR writes.",
+    "Current BoardInit.c calls both SCM functions before the first result marker, so that marker alone cannot identify a nonreturning second call.",
+    "SCM call availability and ABI convention must be qualified before restoring configuration; no such secure-world call is made by this diagnostic.",
+    "Candidate SIDs 0x60/0xe0/0x4e0 are hypotheses, not board routing proof."
+  ],
+  "reference_sources": [
+    "https://github.com/torvalds/linux/blob/v6.12/drivers/iommu/arm/arm-smmu/arm-smmu.h",
+    "https://github.com/torvalds/linux/blob/v6.12/drivers/iommu/arm/arm-smmu/arm-smmu.c",
+    "https://github.com/torvalds/linux/blob/v6.12/drivers/firmware/qcom/qcom_scm.c",
+    "https://github.com/torvalds/linux/blob/v6.12/drivers/firmware/qcom/qcom_scm-smc.c"
+  ],
+  "record_corrections": {
+    "unrelated_host_evidence_summaries": 33,
+    "unrelated_findings": 33,
+    "scope": "Removed copied BRK 50-second success assertions from unrelated image summaries; original artifacts and genuine BRK result remain unchanged."
+  }
+}

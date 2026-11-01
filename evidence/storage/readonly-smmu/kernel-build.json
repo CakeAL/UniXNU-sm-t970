@@ -1,0 +1,18 @@
+{
+  "device": "sm-t970",
+  "command": "GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=submodule.active GIT_CONFIG_VALUE_0=__no_module_submodules__ PATH=$PWD/.cache/bin:/opt/homebrew/opt/llvm/bin:/opt/homebrew/opt/lld/bin:$PATH python3.14 ../UniXNU/unixnu build kernel -D .",
+  "exit_code": 0,
+  "source_inputs_sha256": {
+    "board.toml": "92f48168dd93edb63f5ebfaa4a04152655bc8f024610a05ab09bd3ac7f8bf70b",
+    "package/ShengUfs/NativeUfs.cpp": "869331a5c5d04e67b40515fc15a03353c4495ed018bee78d7b8dba54282d5478",
+    "package/ShengUfs/SmmuTakeover.h": "d0cad1704c1c29b970eb56393512e0abdae820b73c8954d6871b6399117b9745",
+    "package/ShengUfs/T970SmmuReport.h": "2aa8e2c224f44c966b1cc4b1a4021e5143ad58bb07b1047c6bceae012bb0ed2e",
+    "scripts/zz-build-shengufs-local.py": "3ef8205aa03ea8db4e621dd4060bc509d50106d6dad47c920fe9ca38be63f7cc",
+    "configs/sm-t970_defconfig": "aa5ac403f7613ac717986bffaa53c33514627e588fa6e5995ab046a173652fc0",
+    "patches/xnu/series": "7d7c5e041771213ae79096d3534544e84ab36172d48c3107310675ebb94d29da"
+  },
+  "source_inputs_unchanged_during_build": true,
+  "kernel_sha256": "cca9bbb8e99320caebf044f71f635da6396435c60a28b9d82ecd3f73e7750dd0",
+  "kernel_bytes": 52056064,
+  "device_tested": false
+}

@@ -1,0 +1,9 @@
+{
+  "source_boot_sha256": "150ed5ff9d73d81b17d3f6d32e609b9a9e42fdfe0397da7c5eea7d62f7ce7b4d",
+  "source_boot_revision": "fc4828781445ebab36819d6cdad8a2eddde82435",
+  "fd_sha256": "515105d758a9d61078dffce5012db0754a71cec351a1bb34b30ee791196b5690",
+  "fd_bytes": 3145728,
+  "kernel_page_offset": 4096,
+  "shim_bytes": 112,
+  "note": "Exact tested CPU0/initrd FD; no UfsDxe dispatch or later PlatformUfsLib SCM/PHY experiment."
+}

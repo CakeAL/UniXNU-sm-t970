@@ -106,8 +106,16 @@ def main():
     archive_plan = kernel.archive_plan(ctx)
     require(ctx.config.get('XNU_ARMCPU') and ctx.config.get('XNU_ARM_DT_PLATFORM'),
             'Select the defconfig before checking platform bindings')
-    require(not ctx.config.get('XNU_NATIVE_UFS') and not ctx.config.get('XNU_NATIVE_ADRENO'),
-            'Board-dependent storage/GPU paths must remain disabled')
+    require(not ctx.config.get('XNU_NATIVE_ADRENO'),
+            'Board-dependent GPU path must remain disabled')
+    if ctx.config.get('XNU_NATIVE_UFS'):
+        arguments = ctx.board.get('payload', {}).get('kernel_args', [])
+        require('t970-smmu-report=1' in arguments and
+                not any(arg.split('=', 1)[0].startswith(('native-ufs-', 't970-ufs-'))
+                        for arg in arguments),
+                'This platform check allows UFS code only for the bounded read-only SMMU report')
+        require('zz-build-shengufs-local.py' in ctx.board['kernel']['archives'],
+                'Read-only report must use the reviewed local UFS archive')
 
     hardware = dt.compile_hardware(ctx)
     tree = dt.read_fdt(hardware.read_bytes())

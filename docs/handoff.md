@@ -3,6 +3,25 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
+## 当前接手核查（从 47b113f 继续）
+
+- 当前任务是 UFS／SMMU，而非下面早期控制台定位的历史阶段；根卷挂载失败见
+  `evidence/bring-up/runtime/pmgr-bridge/device-result.json`。
+- 接手时 `board.toml`、`NativeUfs.cpp`、`SmmuTakeover.h` 有未提交改动，
+  已原样保存在 `.cache/handoff-ufs-resume/`。机主确认这组实验尚未刷入。
+- 接手的逐槽 SMR 写入探测已撤出新路径；旧参数被拒绝。bank 递增候选从
+  ID1.NUMS2CB 的边界开始，不假定 bank 1 可用；该接管算法仍没有实机 DMA 通过证据。
+- 本轮 `t970-smmu-report=1` 只读 SMMUv2 原始 ID／控制寄存器与有限候选匹配，
+  主动 panic 显示后停止，不进入控制器和根卷路径。候选 SID 不是板级路由确认。
+- 旧证据不能证明 SMMU 已永久被 TZ 锁定，也不能证明 SCM 所有路线不可用。
+  尤其 SCM 结果标记发生在两个调用之后，不能由一个红块推出第二个调用没返回。
+- 本轮固件复用精确哈希 `515105d7…` 的已测试 CPU0/initrd FD，不执行后来的 UFS PHY／SCM 原型。
+  原型源码仍保留。复现与原始寄存器定义见 [只读核查](smmu-readonly.md)。
+- USERDATA 已有 OS/SystemOS 实验镜像；本轮不再次写入。旧 BOOT 备份只恢复 BOOT，
+  不代表恢复 Android 用户数据。最近实际刷入的镜像需以刷写回执和机主反馈为准。
+- 以下各节保留不同阶段的交接历史；涉及“无路可走／安全世界掌管”等判断，
+  以上述证据边界及新只读测量为准。
+
 ## 接手后的更新
 
 - 本轮机主确认：最后的 `initialize_screen` 探针一直停留，没有复位。

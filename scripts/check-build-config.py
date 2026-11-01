@@ -107,7 +107,8 @@ def main():
             os_profile['kernel']['prelink']['kernelcache_sha256'],
             'prelink kernelcache hash differs from the OS profile')
     archives = resolved['kernel']['archives']
-    require(len(archives) == 8, 'unexpected archive recipe count')
+    require(archives == board_toml['kernel']['archives'],
+            'resolved archive recipes differ from the board declaration or its order')
     for entry in archives:
         if entry.startswith('component:'):
             require(entry.split(':', 1)[1] in board_toml['components']['include'],

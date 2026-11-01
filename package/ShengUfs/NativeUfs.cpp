@@ -35,6 +35,7 @@ extern const uint8_t verified_root_key[];
 #include "RootDiagnostics.h"
 #include "TransferPoll.h"
 #include "SmmuTakeover.h"
+#include "T970SmmuReport.h"
 #include "WholeUserdataRoot.h"
 #include "WholeUserdataDisk.h"
 
@@ -2494,6 +2495,31 @@ static void mediaReportThread (void *, wait_result_t)
 
 bool NativeUfs::start (IOService *provider)
 {
+  unsigned retiredWriteScan = 0, smmuReport = 0;
+  if (PE_parse_boot_argn ("t970-ufs-writable-smr", &retiredWriteScan, sizeof (retiredWriteScan)) && retiredWriteScan) {
+    panic ("T970: writable SMR scan retired; use t970-smmu-report=1");
+  }
+  if (PE_parse_boot_argn ("t970-smmu-report", &smmuReport, sizeof (smmuReport)) && smmuReport == 1 &&
+      OSDynamicCast (IOPlatformExpertDevice, provider)) {
+    OSSharedPtr<IOMemoryMap> keep;
+    // Measured apps-smmu@15000000 reg window from the T970 stock device tree.
+    uintptr_t smmu = mapPhys (0x15000000ULL, 0x100000, keep);
+    if (!smmu) panic ("T970 SMMUv2 RO: map failed");
+    const t970_smmu::Report r = t970_smmu::collect (
+      [smmu](unsigned offset) { return read32 (smmu, offset); }, 0x100000);
+    panic ("T970 SMMUv2 RO base=15000000\n"
+           "SCR0@00=%08x ID0@20=%08x ID1@24=%08x ID2@28=%08x GFSR@48=%08x\n"
+           "idOK=%u SMS=%u EXID=%u S1=%u pageShift=%u CB=%u S2CB=%u CBoff=%llx geomOK=%u groups=%u scanned=%u\n"
+           "SID0060 n=%u slot=%u smr=%08x s2cr=%08x\n"
+           "SID00e0 n=%u slot=%u smr=%08x s2cr=%08x\n"
+           "SID04e0 n=%u slot=%u smr=%08x s2cr=%08x",
+           r.scr0, r.id0, r.id1, r.id2, r.gfsr,
+           unsigned(r.identityValid), unsigned(r.streamMatching), unsigned(r.extendedIds), unsigned(r.stage1), r.pageShift,
+           r.banks, r.stage2Banks, static_cast<unsigned long long>(r.contextOffset), unsigned(r.geometryValid), r.groups, r.scanned,
+           r.candidate[0].count, r.candidate[0].slot, r.candidate[0].smr, r.candidate[0].s2cr,
+           r.candidate[1].count, r.candidate[1].slot, r.candidate[1].smr, r.candidate[1].s2cr,
+           r.candidate[2].count, r.candidate[2].slot, r.candidate[2].smr, r.candidate[2].s2cr);
+  }
   unsigned probe = 0, rootMode = 0, wholeUserdataRoot = 0;
   PE_parse_boot_argn ("native-ufs-probe", &probe, sizeof (probe));
   PE_parse_boot_argn ("native-ufs-root", &rootMode, sizeof (rootMode));
