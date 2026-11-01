@@ -3,7 +3,16 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
-## 当前：单次 UFS NOP（实机往返通过，尚未读盘）
+## 当前：LUN0只读数据核验（主机构建通过，待封装／实测）
+
+- 参数 `t970-ufs-read=1`；见 [只读数据范围](ufs-read.md)。先用已通过NOP入口建立实验队列。
+- INQUIRY、READ CAPACITY、重复GPT头及最多4块分区项，核验CRC和本机userdata边界。
+  不访问userdata内容，不写存储。最多一次已完成UNIT ATTENTION重试，超时／协议错误不重试。
+- 16项主机测试、配置检查、内核构建／预链接通过，输入哈希稳定；内核
+  `3956c0e72d9682024623e477555f804e469df767052e16f03a1864ab2c4b5bc5`。仍使用FD `515105d7…`。
+- 当前设备仍安装已通过的NOP镜像；本轮尚未刷写／实测。
+
+## 前轮：单次 UFS NOP（实机往返通过，尚未读盘）
 
 - 参数 `t970-ufs-nop=1`；范围与阶段见 [单次NOP](ufs-nop.md)。
 - 自有连续 DMA、实际 boot_args 范围核验，空 transfer/task 队列停用，两个精确 SID

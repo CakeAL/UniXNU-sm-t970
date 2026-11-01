@@ -42,6 +42,7 @@ extern const uint8_t verified_root_key[];
 #include "T970SmmuFields.h"
 #include "T970TransportPreflight.h"
 #include "T970NopTest.h"
+#include "T970ReadTest.h"
 #include "WholeUserdataRoot.h"
 #include "WholeUserdataDisk.h"
 
@@ -2489,16 +2490,17 @@ static void mediaReportThread (void *, wait_result_t)
 
 bool NativeUfs::start (IOService *provider)
 {
-  unsigned retiredWriteScan = 0, smmuReport = 0, handoffReport = 0, smrIdTest = 0, fieldTest = 0, preflight = 0, nopTest = 0;
+  unsigned retiredWriteScan = 0, smmuReport = 0, handoffReport = 0, smrIdTest = 0, fieldTest = 0, preflight = 0, nopTest = 0, readTest = 0;
   if (PE_parse_boot_argn ("t970-ufs-writable-smr", &retiredWriteScan, sizeof (retiredWriteScan)) && retiredWriteScan) {
     panic ("T970: writable SMR scan retired; use t970-smmu-report=1");
   }
   PE_parse_boot_argn ("t970-smr-id-test", &smrIdTest, sizeof (smrIdTest));
   PE_parse_boot_argn ("t970-ufs-handoff", &handoffReport, sizeof (handoffReport));
   PE_parse_boot_argn ("t970-smmu-fields", &fieldTest, sizeof (fieldTest));
+  PE_parse_boot_argn ("t970-ufs-read", &readTest, sizeof (readTest));
   PE_parse_boot_argn ("t970-ufs-nop", &nopTest, sizeof (nopTest));
   PE_parse_boot_argn ("t970-ufs-preflight", &preflight, sizeof (preflight));
-  if ((handoffReport == 1 || smrIdTest == 1 || fieldTest == 1 || preflight == 1 || nopTest == 1) &&
+  if ((handoffReport == 1 || smrIdTest == 1 || fieldTest == 1 || preflight == 1 || nopTest == 1 || readTest == 1) &&
       OSDynamicCast (IOPlatformExpertDevice, provider)) {
     OSSharedPtr<IOMemoryMap> smmuMap, gccMap, hcMap;
     uintptr_t smmu = mapPhys (0x15000000ULL, 0x100000, smmuMap);
@@ -2515,7 +2517,7 @@ bool NativeUfs::start (IOService *provider)
         else h.state = 2;
       }
     } else h.state = 3;
-    if (preflight == 1 || nopTest == 1) {
+    if (preflight == 1 || nopTest == 1 || readTest == 1) {
       const auto *args = static_cast<const boot_args *> (PE_state.bootArgs);
       if (!args) panic ("T970 UFS preflight: no boot args");
       const uint64_t ownedBase = args->physBase, ownedBytes = args->memSize;
@@ -2533,7 +2535,7 @@ bool NativeUfs::start (IOService *provider)
       IOByteCount contiguous = 0;
       const uint64_t dma = allocation->getPhysicalSegment (0, &contiguous, kIOMemoryMapperNone);
       const bool owned = t970_preflight::ownsDma (ownedBase, ownedBytes, dma, kDmaBytes, contiguous);
-      if (nopTest == 1) {
+      if (nopTest == 1 || readTest == 1) {
         if (!owned) panic ("T970 UFS NOP refused: DMA outside owned memory");
         gHost.hc = hcMap->getVirtualAddress ();
         gHost.smmu = smmu; gHost.cb = smmu + 0x80000;
@@ -2555,6 +2557,48 @@ bool NativeUfs::start (IOService *provider)
           bool submitted () { return gRootDiagnostic.command != 0; }
         } port {smmu};
         const auto result = t970_nop::run (port, r, c, h, owned, dma);
+        if (readTest == 1) {
+          if (!result.success || !result.protectedUnchanged || read32(smmu,0x48) || read32(smmu,0x80058)!=fsr)
+            panic ("T970 UFS read: NOP prerequisite failed stage=%u", result.stage);
+          struct ReadPort {
+            uintptr_t smmu; uint32_t fsr;
+            bool healthy () {
+              return !gHost.poisoned && !read32(smmu,0x48) && read32(smmu,0x80058)==fsr &&
+                read32(smmu,0x810)==0x84020820 && read32(smmu,0xc10)==4 &&
+                read32(smmu,0x1000)==0x100ff && read32(smmu,0x1800)==1 && read32(smmu,0x80000)==0xe0 &&
+                read32(smmu,0x954)==0x800000e0 && !read32(smmu,0xd54) &&
+                read32(smmu,0x958)==0x800004e0 && !read32(smmu,0xd58) &&
+                !(read32(gHost.hc,0x20)&kUfsFatalStatus) && !read32(gHost.hc,0x58) && !read32(gHost.hc,0x78);
+            }
+            bool command (const uint8_t *cdb, unsigned length, unsigned bytes) {
+              if (!healthy ()) return false;
+              // Previous request completed before any new CPU write to DMA.
+              bzero(gHost.virt+kDataOffset, kDataMax);
+              uint32_t scsi=0xffff;
+              return hostScsi(0,cdb,length,true,bytes,1000000,&scsi)==kIOReturnSuccess;
+            }
+            uint32_t sense () { return gRootDiagnostic.sense; }
+            const uint8_t *data () { return gHost.virt+kDataOffset; }
+            uint32_t crc (const uint8_t *data, unsigned bytes, bool header) { return rootCrc32(data,bytes,header); }
+          } reader {smmu,fsr};
+          static uint8_t workspace[20480];
+          const auto data = t970_read::run(reader,workspace);
+          panic ("T970 UFS read-only LUN0 (no storage writes)\n"
+            "stage=%u commands=%u UA=%u healthy=%u poisoned=%u\n"
+            "inquiry=%u vendor=%s product=%s\n"
+            "capacity=%u lastLba=%u blockBytes=%u\n"
+            "header=%u repeat=%u entries=%u geometry=%u count=%u\n"
+            "headerCRC=%08x entriesCRC=%08x userdata=%llu..%llu\n"
+            "result=%x ocs=%x scsi=%x sense=%x protocol=%u residual=%u\n"
+            "HC hce=%x hcs=%x db=%x IS=%x SMMU gf=%x fsr=%x\n"
+            "dma=%llx retained=1 routesRetained=1\nEND UFS read-only",
+            data.stage,data.commands,data.unitAttentions,unsigned(reader.healthy()),unsigned(gHost.poisoned),
+            unsigned(data.inquiry),data.vendor,data.product,unsigned(data.capacity),data.lastLba,data.blockBytes,
+            unsigned(data.header),unsigned(data.repeat),unsigned(data.entries),unsigned(data.geometry),data.entryCount,
+            data.headerCrc,data.entriesCrc,data.userdataFirst,data.userdataLast,
+            gRootDiagnostic.result,gRootDiagnostic.ocs,gRootDiagnostic.scsi,gRootDiagnostic.sense,gRootDiagnostic.protocol,gRootDiagnostic.residual,
+            read32(gHost.hc,0x34),read32(gHost.hc,0x30),read32(gHost.hc,0x58),read32(gHost.hc,0x20),read32(smmu,0x48),read32(smmu,0x80058),dma);
+        }
         // Terminal diagnostic: never free/reuse DMA or roll back live routes.
         // A timed-out command may still own the allocation. Restart via firmware.
         panic ("T970 UFS single NOP (no SCSI/storage writes)\n"

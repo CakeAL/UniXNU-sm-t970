@@ -1,0 +1,3 @@
+PASS: 64 patches in order {'arch': 56, 'soc': 2, 'device': 4}; 19 modules resolve to their pins.
+PASS: assembled tree maps drivers, kits, refer, patches and scripts to the pinned sources.
+Report: /Users/cakeal/vsc/UniXNU-sm-t970/out/build-config/result.json
