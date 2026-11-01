@@ -48,6 +48,20 @@
   原始 BOOT 恢复待完成，后续镜像以 `evidence/bring-up/runtime/*/flash.json` 回执为准。
 - 以下为 ds 交接当时的状态、命令和待办，保留作历史基线；当前进展以本节及适配记录为准。
 
+## AMFI/PMGR 关卡
+
+`bsd_init` 之后的真实失败（内核 `80cc00ad…`，镜像 `041fcf8c…`）：
+
+```
+"AMFI: No PMGR?\n" @ConfigurationSettings.cpp:235
+```
+
+即未修改的 AMFI 需要 **ApplePMGR provider**。参考 marble-milacy：用板级
+`ShengPlatformPower.cpp`（`build-platform-power.py` 生成受保护的 ApplePMGR 占位 nub，
+`CONFIG_XNU_SHENG_PMGR=y` + `sheng-pmgr=2`）即可越过；它依赖同一个 21H461
+kernelcache（`f18b4df8…`），ABI 地址可复用。此前的“控制台卡死”实际是
+`gc_enable` 对未初始化 ticket lock 的 panic（`gc_initialize` 被跳过），已修复。
+
 ## 最新里程碑（本轮）
 
 `PE_init_printf(TRUE)` 内部就是 `vcattach()`，跳过 `initialize_screen` 挡不住。新增

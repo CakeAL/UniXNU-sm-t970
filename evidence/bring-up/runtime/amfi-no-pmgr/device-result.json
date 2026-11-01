@@ -1,0 +1,18 @@
+{
+  "device": "SM-T970 / gts7xlwifi",
+  "image_sha256": "041fcf8c9c8d8f747559d64f68d19a8082b89329725ba9b25e862a4d58ae9104",
+  "image_source_revision": "bc4430176041894825acd3731151ef265db8430d",
+  "observation_source": "Human photograph of the panic screen",
+  "panic": "AMFI: No PMGR?\\n @ ConfigurationSettings.cpp:235",
+  "frames": [
+    "fffffff004ac9420",
+    "fffffff004aaed08",
+    "fffffff004aaeaac",
+    "fffffff004ab865c",
+    "fffffff0072d46b8",
+    "fffffff0072d5c98",
+    "fffffff0073f34a4"
+  ],
+  "result": "Kernel text output works; XNU reaches AMFI and panics because no ApplePMGR provider is published.",
+  "limits": "This establishes the AMFI/PMGR blocker only. It does not qualify any PMGR implementation, root mounting or storage."
+}

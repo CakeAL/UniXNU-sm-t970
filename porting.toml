@@ -95,6 +95,7 @@ findings = [
   "The measured boot partition is 71303168 bytes, so board.toml [payload] size_mib dropped from 192 to 56; the 192 MiB payload could never be flashed. 56 MiB holds the 51.9 MB prelinked kernel plus ADT and trust cache with about 8 MB margin.",
   "board.toml [payload] now passes t970-novc and enables panic_screen for the bring-up images; both are diagnostic defaults that must be revisited once a real console exists.",
   "The diagnostic tree at commit 66abd1f carries the t970-novc boot argument, panic_screen and the three console-bypass patches; the checkpoint evidence revisions name that commit in full.",
+  "The diagnostic kernel still boots with t970-novc and panic_screen. The next config change is the PMGR bridge: CONFIG_XNU_SHENG_PMGR=y, a build-platform-power.py archive entry and a sheng-pmgr=2 boot argument, following the marble-milacy reference that targets the same 21H461 kernelcache.",
 ]
 completion = [
   "A board.toml with matching device identity resolves the selected SoC and OS profiles and pinned sources.",
@@ -1034,6 +1035,7 @@ findings = [
   "scripts/collect-storage-inputs.py derives the UFS inventory from the captured live DT and GPT, cross-checks every UFS clock/reset ID against the kona gcc/rpmh headers, and records the header hashes; it enables nothing and needs no device.",
   "scripts/prepare-trust-cache.py reproduces the accepted trust-cache bundle from the StaticTrustCache DER payload, runs the framework's original-system-trust builder and rejects a bundle whose SHA-256 is not in the OS profile allow-list.",
   "Bypassing PE_init_printf(TRUE) (which calls vcattach) with a null PE_putc under t970-novc resolved the console spin: PE_init_iokit returned (probe f32a04c0, ~6 s reset) and the bootstrap thread reached bsd_init (probe fa16c47d, immediate reset) on kernel d862c992. The same PE_init_iokit checkpoint had not reset on the earlier console-skip kernel.",
+  "Restoring gc_initialize fixed the invalid ticket-lock panic: with vinfo populated and the lock initialized, the panic screen renders text and the kernel reaches bsd_init. Removing the forced panic then exposed the real next blocker: unmodified AMFI panics with 'AMFI: No PMGR?' at ConfigurationSettings.cpp:235 because no ApplePMGR provider is published. Image 041fcf8c, kernel 80cc00ad.",
 ]
 completion = [
   "Every claimed UniXNU milestone has matching source/image revisions, a reproducible command and accessible firmware/kernel logs.",
@@ -1104,4 +1106,5 @@ evidence = [
   { kind = "host", reference = "evidence/bring-up/README.md", command = "python3.14 scripts/prepare-trust-cache.py", revision = "0d8fb9d0a14630f878a173241059f7687aa6b134", result = "PASS: prepare-trust-cache.py derives the version-2 static module from the StaticTrustCache DER payload, rebuilds the original static+system bundle and rejects any bundle outside the profile allow-list." },
   { kind = "device", reference = "evidence/bring-up/runtime/iokit-return-aftervc/device-result.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/iokit-return-aftervc/boot.img --no-reboot", result = "Kernel d862c992 with the vcattach bypass: PE_init_iokit return probe f32a04c0 reset after about 6 seconds, proving the call returns. This does not prove later stages.", revision = "66abd1f108015dd654a35fc786a0fe3104da6da7" },
   { kind = "device", reference = "evidence/bring-up/runtime/bsd-init-before-aftervc/device-result.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/bsd-init-before-aftervc/boot.img --no-reboot", result = "Kernel d862c992: the bsd_init call-before probe fa16c47d reset immediately, proving the bootstrap thread reaches bsd_init. Root mounting and storage are not exercised.", revision = "66abd1f108015dd654a35fc786a0fe3104da6da7" },
+  { kind = "device", reference = "evidence/bring-up/runtime/amfi-no-pmgr/device-result.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/boot.img --no-reboot", result = "Kernel 80cc00ad renders a text panic: AMFI: No PMGR? at ConfigurationSettings.cpp:235. This is the first real kernel failure with working text output; it identifies the missing ApplePMGR provider, not a storage issue.", revision = "bc4430176041894825acd3731151ef265db8430d" },
 ]
