@@ -25,7 +25,7 @@ python3.14 scripts/check-recovery-storage.py --serial <actual-serial> \
 若是原Android的已有Magisk shell，用`--su`，但数据分区必须未挂载才可能就绪。
 检查限定SM-T970、原sda36、243668070400字节、4096块大小及无data／metadata挂载。
 检查只读取信息，不会执行写入。通过检查也不等于获准覆写。
-当前仅保留BOOT诊断刷写范围；再次写USERDATA须在具体恢复环境及完整命令可审阅后确认。
+机主随后要求直接完成当前镜像刷写；现已启动BOOT临时root ADB并通过检查，按以下完整写回方案执行。
 
 写回后仍需用现有UFS调查镜像验证manifest和系统样本，然后处理持久驱动与验证策略接入。
 两份验证策略共73,287,008字节，主机zlib9测得68,794,405字节，压缩后仍不能与内核一起
@@ -50,3 +50,16 @@ python3.14 scripts/package-odin-userdata.py \
 推荐原生Windows的正常三星USB连接；Whisky下的大文件／USB支持没有资格验证。
 即使Odin显示PASS，也必须完整读回或至少先运行既有UFS调查确认内容，不能沿用旧回执假设。
 此处只准备包，没有通过Whisky／Odin写入设备。
+
+## 连续写入与完整读回
+
+```sh
+python3.14 scripts/write-root-image-adb.py --serial <actual-serial> \
+  --image ../UniXNU/out/sm-t970/ipados-17.7.11-21H461/sm-t970/userdata/userdata-root.img \
+  --output out/step7/root-rewrite --write
+```
+
+源固定fd43ee70…、9,382,658,048字节。仅打开已核对的/dev/block/sda36，写后sync，
+执行blockdev --flushbufs清理目标块缓存，再读取完整确切长度核对SHA256。
+Recovery自带dd的iflag=direct会报EINVAL，已实际验证改用缓存清理＋count_bytes的通道。
+任何写入、缓存清理、读取、长度或摘要错误都停止，不自动重试或挂载根卷。

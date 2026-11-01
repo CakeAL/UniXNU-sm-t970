@@ -3,7 +3,7 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
-## 当前：临时root ADB通道资格验证（主机准备通过，待BOOT测试）
+## 当前：root ADB通道通过，准备完整镜像写入及读回
 
 - 机主要求“你能直接刷么”，已授权继续完成当前完整根镜像部署；仍先验证通道。
 - OdinMac本机也封装Heimdall，不作为独立大文件通道。准备官方Recovery派生的BOOT临时镜像，
@@ -11,7 +11,15 @@
 - 20项测试通过；BOOT42,930,176字节，SHA256
   `e67fe744d4ee9e2be7a0ab906d47a064b7409cc1a4db4c7eecaacaae9519a721`。
   原内核gzip往返及全部ramdisk条目检查通过；三星目标gzip／USB路径尚未实测。
-- 本轮尚未刷入临时BOOT；当前已安装下述UFS调查镜像。原厂BOOT和UFS调查BOOT均保留。
+- 临时BOOT已上传并自动重启，Heimdall exit0；ADB recovery模式可用，uid0、SM-T970。
+  sda36容量243668070400、逻辑块4096、运行时设备号259:42，data／metadata未挂载；Recovery菜单程序未运行。
+- 原RECOVERY已备份到忽略路径out/device-backup/recovery.img，86,888,448字节，SHA256
+  `3b6df60e4aff4506b8a3f0e20111d1b5fb4053ee82170a5132999ac590ac28cb`，未改Recovery分区。
+- Linux清理块缓存后manifest仍读回全零，与XNU诊断一致。自带dd的direct模式EINVAL，
+  改用sync+成功BLKFLSBUF再按确切字节数读取，已资格验证4096字节数据通道。
+- 准备scripts/write-root-image-adb.py连续写完整fd43ee70…镜像，再清理块缓存并读回完整长度SHA256。
+  脚本需--write显式执行，型号／几何／挂载和源hash检查失败不会写入。尚未执行本次USERDATA写入。
+- 原厂BOOT和UFS调查BOOT均保留；当前运行临时Linux root ADB。
 
 ## 前轮：根镜像调查完成（传输一致，部署内容不完整）
 

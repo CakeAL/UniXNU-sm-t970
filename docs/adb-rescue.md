@@ -22,4 +22,5 @@ python3.14 scripts/build-adb-rescue.py \
 
 先只验证设备、root shell、实际块设备与挂载状态。只有运行时检查通过后才连续传输完整原始镜像，
 写后同步并读回完整长度核验SHA256。不再使用DONT_CARE分段，也不把上传成功当作镜像正确。
-目前尚未证明本临时镜像启动或ADB可用。
+实机已通过gzip内核启动与root ADB；型号、分区和挂载检查通过，原厂Recovery已读出备份。
+见evidence/storage/adb-rescue/device-result.json。尚未由该环境写入USERDATA。

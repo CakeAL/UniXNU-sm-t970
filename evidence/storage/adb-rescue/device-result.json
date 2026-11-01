@@ -1,0 +1,27 @@
+{
+  "boot_sha256": "e67fe744d4ee9e2be7a0ab906d47a064b7409cc1a4db4c7eecaacaae9519a721",
+  "source_revision": "433b57cb6ce4d25b6246914a686c5a09e750a993",
+  "hardware_boot_verified": true,
+  "gzip_kernel_boot_verified": true,
+  "adb_root_available": true,
+  "model": "SM-T970",
+  "identity": "uid=0(root) gid=0(root) groups=0(root),1004(input),1007(log),1011(adb),1015(sdcard_rw),1028(sdcard_r),1078(ext_data_rw),1079(ext_obb_rw),3001(net_bt_admin),3002(net_bt),3003(inet),3006(net_bw_stats),3009(readproc),3011(uhid),3012(readtracefs) context=u:r:su:s0",
+  "target": "/dev/block/sda36",
+  "userdata_bytes": "243668070400",
+  "logical_block_bytes": "4096",
+  "major_minor": "259:42",
+  "data_metadata_unmounted": true,
+  "recovery_service_running": false,
+  "original_recovery_backup": {
+    "partition": "RECOVERY",
+    "bytes": 86888448,
+    "sha256": "3b6df60e4aff4506b8a3f0e20111d1b5fb4053ee82170a5132999ac590ac28cb",
+    "read_exit_code": 0,
+    "device_written": false
+  },
+  "linux_manifest_sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+  "block_cache_flush_succeeded": true,
+  "toybox_direct_read": "O_DIRECT failed EINVAL; use successful BLKFLSBUF then exact-byte read instead",
+  "exact_byte_read_qualified": true,
+  "userdata_written_by_rescue": false
+}

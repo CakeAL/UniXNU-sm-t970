@@ -1,0 +1,16 @@
+{
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/recovery-candidate/adb-rescue-boot.img",
+  "started_at": "2026-11-01T10:15:47.685507+00:00",
+  "finished_at": "2026-11-01T10:15:53.581828+00:00",
+  "exit_code": 0,
+  "boot_sha256": "e67fe744d4ee9e2be7a0ab906d47a064b7409cc1a4db4c7eecaacaae9519a721",
+  "heimdall_sha256": "75337a7c6ad9a5e18c0730fa474c81133587cc04cbe08dd3f270c860128a6c6f",
+  "device_revision": "433b57cb6ce4d25b6246914a686c5a09e750a993",
+  "partition": "BOOT",
+  "no_reboot": false,
+  "device_observation_pending": false,
+  "userdata_written": false,
+  "recovery_written": false,
+  "raw_log_sha256": "9444c78c31b36cde7b0d1661246231ba2eccd1ead6e463813143c99eba452aee",
+  "device_observation": "device-result.json"
+}
