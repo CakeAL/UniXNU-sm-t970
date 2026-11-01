@@ -1366,8 +1366,12 @@ static bool hostBringUpHandoff (const char **why)
 // live in a fixed userdata region after the root image (which ends at LBA 5260288) and the kernel
 // links only the owner public-key anchor: vr_open authenticates each envelope before its entry is
 // added, so no window can publish against bytes the owner did not sign.
-constexpr uint64_t kOwnerPolicyLbaOS = 5505024ULL;        // 21 GiB into the userdata partition
-constexpr uint64_t kOwnerPolicyLbaSystemOS = 5516624ULL;  // 8 blocks past the OS envelope
+// The kernel addresses LUN 0 with disk-absolute LBAs (the root layout's userdataFirst is 2969600),
+// while the recovery channel wrote partition-relative offsets 5505024 and 5516624, so the carrier is
+// read at the sum. Getting this wrong reads an unrelated block and fails the header format check.
+constexpr uint64_t kOwnerPolicyPartitionLba = 2969600ULL;
+constexpr uint64_t kOwnerPolicyLbaOS = kOwnerPolicyPartitionLba + 5505024ULL;
+constexpr uint64_t kOwnerPolicyLbaSystemOS = kOwnerPolicyPartitionLba + 5516624ULL;
 constexpr uint64_t kOwnerPolicyHeaderBytes = 160, kOwnerPolicySignatureBytes = 384;
 
 static bool readOwnerEnvelope (uint64_t lba, uint64_t expectedImageBytes, const char **why,
@@ -1386,6 +1390,12 @@ static bool readOwnerEnvelope (uint64_t lba, uint64_t expectedImageBytes, const 
   memcpy (&blocks, header + 32, 8);
   if (memcmp (header, "VROOT01\0", 8) || headerBytes != kOwnerPolicyHeaderBytes ||
       blockBytes != 4096 || !blocks || blocks > 0x400000) {
+    memcpy (&gRootDiagnostic.magic0, header, 4);
+    memcpy (&gRootDiagnostic.magic1, header + 4, 4);
+    gRootDiagnostic.cap = headerBytes;
+    gRootDiagnostic.version = blockBytes;
+    gRootDiagnostic.windowBytes = imageBytes;
+    gRootDiagnostic.policyCount = blocks;
     *why = "policy header format";
     return false;
   }

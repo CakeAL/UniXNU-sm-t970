@@ -1,0 +1,12 @@
+{
+  "device": "sm-t970",
+  "revision": "e94e099",
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-publish5/boot.img",
+  "boot_sha256": "7f3cdd8d4934e8774fdfe523e79e882cc38abbe4c480efd8592e6dfeb1a5e7b0",
+  "boot_bytes": 62713856,
+  "kernel_sha256": "6d3ab2c76fddaa75c9c432d92412389a5cac35a6de01a7d609cb4bc17edff876",
+  "partition": "BOOT only; userdata carrier already verified at LBA 5505024/5516624",
+  "result": "flashed from recovery ADB after adb reboot download; device rebooted into the carrier image",
+  "device_result": "pending owner screen report",
+  "time": "2026-11-01T20:04:33+08:00"
+}
