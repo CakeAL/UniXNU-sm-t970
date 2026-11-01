@@ -211,6 +211,7 @@ findings = [
   "Step 5 records the two tree inputs as distinct artifacts. The bootloader FDT captured read-only from /sys/firmware/fdt is 837154 bytes (86c14aa3...) with 4533 nodes, 43 reserved-memory entries and a /chosen carrying bootargs, kaslr-seed and initrd range; two captures are byte-identical. The blob stays in ignored storage because /chosen holds identity and boot state; only hashes, structure, memory ranges and property names are archived.",
   "scripts/check-hardware-description.py rebuilds the board DTS and ADT with artificial identity 1, checks dram-base/size, CPU0 affinity and 19.2 MHz timebase, GIC registers and stride, rejects a firmware DTB equal to the board build or a board DTS carrying /chosen, and checks the firmware DSC/FDF plus the pinned base configuration for DiskIo, FAT and Unicode collation.",
   "The payload command was probed at the Step 5 commit: it reaches the payload step and stops only at the missing kernel/kernel.macho, so the board DTS/ADT and OS-profile side is not the blocker; the XNU kernel build is the next required input.",
+  "The board package now carries Sm8250UfsPhyTables.h, the extracted SM8250 QMP UFS PHY register sequences, but the platform DSC still does not build any UFS DXE; no firmware image has been rebuilt or booted with it.",
 ]
 completion = [
   "A board-specific UEFI image starts reproducibly and produces an accessible boot log.",
@@ -509,6 +510,7 @@ findings = [
   "Restoring the Linux-validated SMMU model (IDR at 0x20/0x24/0x28, NUMSMRG/NUMCB geometry) showed the vendored driver's original offsets were correct; the failure is that no firmware stream is reusable and an SMR write for a new bypass context reads back zero. This is consistent with the secure world owning the stream registers on T970.",
   "Kernel-side SMMU programming is therefore not a viable path on this board: the storage driver needs the firmware to leave a bypass stream for UFS, which is what the alioth/T733 firmware does and what the Mu-Silicium T970 build does not.",
   "Keeping the SMMU map but disabling SMMU programming (t970-ufs-no-smmu=1) moves the failure past the SMMU panics and into an unexplained self-reset before console output. That is consistent with the driver's unbounded UFS completion loops waiting on DMA that the firmware stream mapping does not cover; kernel-side SMMU bypass alone is not sufficient.",
+  "Route B started: scripts/gen-ufs-phy-tables.py extracts the SM8250 QMP UFS PHY sequences from the Linux driver into package/firmware/.../PlatformUfsLib/Sm8250UfsPhyTables.h (SM8150 base tables plus the SM8250 HS-G4 overlays, 24/6/34/7 and 1/21/2 entries). Wiring PlatformUfsLib and the Samsung UfsDxe is the next step and no firmware behaviour has changed yet.",
 ]
 completion = [
   "UFS reads return correct capacity, GPT and known blocks under XNU; the chosen root mounts and writes persist only inside the allocated Data region.",
@@ -915,6 +917,7 @@ findings = [
   "patches/xnu/t970-smmu-dump.patch now carries the t970-smmu-write probe (IDR stability read plus a GFSR write-1-to-clear readback) instead of the stream table dump; it is a guarded arm_init diagnostic only.",
   "package/ShengUfs now follows the Linux-validated SMMU layout again (IDR 0x20/0x24/0x28, NUMSMRG/NUMCB) and carries the 128-slot auto-stream scan; the local archive remains the active build input.",
   "package/ShengUfs/NativeUfs.cpp adds t970-ufs-no-smmu=1, which still maps the SMMU window (the caller dereferences it) but skips every SMMU write; the earlier early-return variant crashed in hostBringUp and is not kept.",
+  "The generated PHY table header and its generator live under package/firmware/Platforms/Samsung/gts7xlwifiPkg/Library/PlatformUfsLib/ with a GPL-2.0 provenance comment; docs/firmware-ufs-plan.md records the remaining work.",
 ]
 completion = [
   "The selected profile's inputs produce a kernel, payload and a boot image matching the SM-T970 boot path.",
@@ -1084,6 +1087,7 @@ findings = [
   "The GFSR write probe (write 0xffffffff, read back unchanged) and the IDR0-bit30 rejection together classify the T970 SMMU as write-locked with a non-SM8550 register model; both are arm_init/planner diagnostics, not storage fixes.",
   "The 128-slot auto-stream scan is a driver-side diagnostic: it reads every SMR, skips masked and non-exact entries, and only accepts a stream whose context already passes the bypass checks; it never writes the SMMU.",
   "The no-SMMU path keeps the SMMU IO mapping because hostBringUp dereferences it after the call; an earlier version that skipped mapPhys crashed with a null-pointer data abort (FAR=0), recorded here so the distinction between our patch bug and SMMU behaviour stays clear.",
+  "scripts/gen-ufs-phy-tables.py is a host-only generator: it downloads the pinned Linux QMP UFS driver headers, resolves the QSERDES/PHY register defines and writes the C tables; it is reproducible from scratch and does not touch the device.",
 ]
 completion = [
   "Every claimed UniXNU milestone has matching source/image revisions, a reproducible command and accessible firmware/kernel logs.",
