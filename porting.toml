@@ -712,6 +712,7 @@ findings = [
   "Route B started: scripts/gen-ufs-phy-tables.py extracts the SM8250 QMP UFS PHY sequences from the Linux driver into package/firmware/.../PlatformUfsLib/Sm8250UfsPhyTables.h (SM8150 base tables plus the SM8250 HS-G4 overlays, 24/6/34/7 and 1/21/2 entries). Wiring PlatformUfsLib and the Samsung UfsDxe is the next step and no firmware behaviour has changed yet.",
   "Both non-secure routes to a usable UFS SMMU context are now exhausted: kernel writes to the SMR are ignored, UEFI firmware PHY bring-up succeeds but UFS DMA still resets the board, and QCOM_SCM restore_sec_cfg is not provided by this platform's secure monitor.",
   "The UEFI image survey (t970-ufs-image=1) completed on hardware after the full userdata rewrite: 14 UFS reads, healthy=1, poisoned=0, and all seven manifest/OS/SystemOS samples matched (matchMask=0x7f). It reuses the firmware SMMU handoff context (CB0 0x100ff, SCTLR 0xe0, existing SMR entries) and stops with noPublication=1, so no block device or root is published.",
+  "The working UFS reads reuse the firmware handoff state rather than a driver-created SMMU context: CB0 with cbar=0x100ff, cba2r=1, sctlr=0xe0 and the firmware SMR entries for SID 0x0e0/0x4e0 in slots 55/56, with the DMA buffer inside the owned window. This is the configuration the root publication must reuse.",
 ]
 completion = [
   "UFS reads return correct capacity, GPT and known blocks under XNU; the chosen root mounts and writes persist only inside the allocated Data region.",

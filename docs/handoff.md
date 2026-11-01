@@ -3,6 +3,19 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
+## 关键发现：UFS 已经通了
+
+survey 镜像（`c404ce26…`）的 7 个样本全部匹配、14 次读零错误，靠的不是新建 SMMU 上下文，而是
+**复用固件留下的 handoff 状态**：
+
+- SMMU CB0：`cbar=0x100ff`、`cba2r=0x1`、`sctlr=0xe0`；
+- 固件已配好的 stream：SID `0x0e0` / `0x4e0`，slot 55/56（`smr=800004e0` 等）；
+- DMA 缓冲分配在 DarwinBoot owned window 内（preflight 强制）。
+
+之前所有失败都在“驱动自己建 SMR/CB”这条路上。**下一步只剩发布**：用这套已验证的
+gHost（smmu/CB0/streams/DMA）走 `NativeUfsWholeUserdataBlock`/`NativeUfsBlock`，把
+userdata 的 OS 窗口发布成 IOMedia（UUID 匹配 ADT 的 `04769D26…`），让 APFS 挂根。
+
 ## 当前：完整根镜像已重写并通过整段读回，XNU交叉核验BOOT已启动
 
 - 机主要求“你能直接刷么”，已授权继续完成当前完整根镜像部署；仍先验证通道。
