@@ -23,9 +23,8 @@ CONFIG_XNU_OWNER_ROOT_AUDIT=y
 CONFIG_XNU_OWNER_ROOT_TRUST=y
 # launchd needs the dyld shared cache: mount the SystemOS window as the owner cache carrier
 # and let dyld start from it (volume UUID 8846FE78 is that window's policy UUID).
-# The shared cache lives in the SystemOS cryptex; compose it as a union over / before launchd
-# starts (the sirius record shows this is what makes dyld find the cache).
+# The shared cache lives in the SystemOS cryptex. Mount it at /private/preboot instead of
+# composing a union over /, and let dyld read DYLD_SHARED_CACHE_DIR from there.
 CONFIG_XNU_OWNER_CACHE_MOUNT=y
 CONFIG_XNU_OWNER_CACHE_STARTUP=y
-CONFIG_XNU_OWNER_UNION_SYSTEMOS=y
 CONFIG_XNU_VERIFIED_ROOT_ARCHIVE="{tree}/build/verified-root-empty/libVerifiedRootProbe.a"
