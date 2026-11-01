@@ -48,6 +48,12 @@
   原始 BOOT 恢复待完成，后续镜像以 `evidence/bring-up/runtime/*/flash.json` 回执为准。
 - 以下为 ds 交接当时的状态、命令和待办，保留作历史基线；当前进展以本节及适配记录为准。
 
+## no-SMMU 实验
+
+保持 SMMU 映射但不写寄存器（`t970-ufs-no-smmu=1`）可以越过 SMMU 相关 panic，但随后停在
+magenta 条并自动复位、无控制台输出；与驱动里无超时的 UFS 完成等待一致，即**固件的 stream
+映射不覆盖我们的 DMA 缓冲**。内核侧绕过 SMMU 不足以让 UFS 工作。
+
 ## SMMU 归属的结论
 
 Linux `arm-smmu.h` 证实 IDR 在 `0x20/0x24/0x28`（原驱动偏移正确）。恢复该模型并扫描全部 128 个 slot 后：

@@ -1,0 +1,10 @@
+{
+  "device": "SM-T970 / gts7xlwifi",
+  "boot_image_sha256": "f54a9eaa6ea632e09ae89a319cad02712d9361d83dd9eb0f96c6050177ce737a",
+  "boot_image_bytes": 62713856,
+  "source_kernel_sha256": "4cf05a5810df88a5403849801049a91264fc6cfb3a3cc3d567f144883a23c038",
+  "observation_source": "Human report in this chat",
+  "observation": "Stuck at the magenta bar, then the device reset itself.",
+  "result": "With t970-ufs-no-smmu=1 the driver keeps the SMMU mapping alive but no longer writes the SMMU; it passes the earlier SMMU panics and then stops before any console output, followed by a self-reset. The unbounded UFS completion loops are consistent with a DMA fault: the firmware stream mapping does not cover the driver buffer.",
+  "limits": "The reset is not captured by the panic screen, so the stall point is inferred from the code path, not read from a frame. It does not by itself prove the SMMU fault, only that bypassing SMMU setup is not sufficient."
+}

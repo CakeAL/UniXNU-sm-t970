@@ -402,6 +402,12 @@ static void smmuBypassStream (uint16_t stream, OSSharedPtr<IOMemoryMap> &keep, u
   if (!smmu) {
     panic ("NATIVE_UFS smmu: map failed");
   }
+  unsigned t970_no_smmu = 0;
+  if (PE_parse_boot_argn ("t970-ufs-no-smmu", &t970_no_smmu, sizeof (t970_no_smmu))) {
+    /* Keep the mapping alive for the caller, but leave the firmware's SMMU state alone. */
+    report[0] = report[1] = report[2] = 0;
+    return;
+  }
   UfsSmmuReuse reuse = reuseUfsSmmuStream (stream,
     [smmu](unsigned offset) { return read32 (smmu, offset); });
   unsigned t970_auto = 0;

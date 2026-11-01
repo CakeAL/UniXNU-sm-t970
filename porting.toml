@@ -103,6 +103,7 @@ findings = [
   "board.toml now passes t970-smmu-dump=1 together with native-ufs-root=1 for the SMMU table diagnostic; the flag only triggers the arm_init dump and must be removed once the UFS stream is resolved.",
   "board.toml keeps native-ufs-root=1 with the default stream (no override) and selects component:ShengUfs only; the temporary MassStorage, smmu-dump and local-archive experiments are not part of the default boot path.",
   "The build currently selects the board-local ShengUfs archive (component removed, zz-build-shengufs-local.py), enables CONFIG_XNU_NATIVE_UFS/VERIFIED_ROOT_PROBE and boots with native-ufs-root=1 plus t970-ufs-auto-stream=1. The kernel links and produces a 62.7 MB boot image.",
+  "board.toml passes t970-ufs-no-smmu=1 for the last experiment; it is a diagnostic switch alongside native-ufs-root=1 and does not enable any storage publication.",
 ]
 completion = [
   "A board.toml with matching device identity resolves the selected SoC and OS profiles and pinned sources.",
@@ -507,6 +508,7 @@ findings = [
   "The vendored ShengUfs copy with IDR at 0x0/0x4/0x8 and an auto-reuse scan of every exact stream still fails: the planner rejects the block with 'SMMU AArch64 stage 1 unsupported' because IDR0 bit 30 is clear on T970. The alioth/SM8550 SMMU register model therefore does not describe SM8250 apps_smmu; a correct SM8250 SMMU implementation (or firmware-side stream setup) is required before UFS can publish the partition.",
   "Restoring the Linux-validated SMMU model (IDR at 0x20/0x24/0x28, NUMSMRG/NUMCB geometry) showed the vendored driver's original offsets were correct; the failure is that no firmware stream is reusable and an SMR write for a new bypass context reads back zero. This is consistent with the secure world owning the stream registers on T970.",
   "Kernel-side SMMU programming is therefore not a viable path on this board: the storage driver needs the firmware to leave a bypass stream for UFS, which is what the alioth/T733 firmware does and what the Mu-Silicium T970 build does not.",
+  "Keeping the SMMU map but disabling SMMU programming (t970-ufs-no-smmu=1) moves the failure past the SMMU panics and into an unexplained self-reset before console output. That is consistent with the driver's unbounded UFS completion loops waiting on DMA that the firmware stream mapping does not cover; kernel-side SMMU bypass alone is not sufficient.",
 ]
 completion = [
   "UFS reads return correct capacity, GPT and known blocks under XNU; the chosen root mounts and writes persist only inside the allocated Data region.",
@@ -529,6 +531,7 @@ evidence = [
   { kind = "device", reference = "evidence/bring-up/runtime/t970-smmu-table/device-result.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/boot-smmudump.img --no-reboot", result = "The dump shows IDR0 0x002d0405 and 26 configured streams (the visible subset is recorded) with no stream 0x0060; the SMR write in the later UFS path reads back zero.", revision = "1ad4d2516482a2f0b21f19cbfbb85a62e5b56ee1" },
   { kind = "device", reference = "evidence/bring-up/runtime/ufs-smmu-aarch64/device-result.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/boot-autostream.img --no-reboot", result = "Kernel 975e0186 with the vendored driver panics at NativeUfs.cpp:442: SMMU AArch64 stage 1 unsupported (IDR0 bit 30 clear).", revision = "0c691088c4ffba48c4394026fd64b5312777f7d7" },
   { kind = "device", reference = "evidence/bring-up/runtime/ufs-smmu-128/device-result.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/boot-auto128.img --no-reboot", result = "Kernel 4ad53adb scans all 128 SMMU slots and finds no reusable exact stream; the SMR bypass write still reads back zero.", revision = "445bb3fc51b07d96e4ac1dcf4539b8874fd60f73" },
+  { kind = "device", reference = "evidence/bring-up/runtime/ufs-nosmmu/device-result.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/boot-nosmmu2.img --no-reboot", result = "Kernel 4cf05a58 with t970-ufs-no-smmu=1 stalls at the magenta bar and self-resets before any console output.", revision = "026fae4cfb0fccc08e9d5c77204009b972fc6b46" },
 ]
 
 [[area]]
@@ -911,6 +914,7 @@ findings = [
   "package/ShengUfs is now the active driver copy: SmmuTakeover.h reads IDR0/1/2 at 0x0/0x4/0x8 with log2 geometry and NativeUfs.cpp adds the t970-ufs-auto-stream reuse scan; scripts/zz-build-shengufs-local.py builds the archive and must run after any component build to avoid duplicate objects.",
   "patches/xnu/t970-smmu-dump.patch now carries the t970-smmu-write probe (IDR stability read plus a GFSR write-1-to-clear readback) instead of the stream table dump; it is a guarded arm_init diagnostic only.",
   "package/ShengUfs now follows the Linux-validated SMMU layout again (IDR 0x20/0x24/0x28, NUMSMRG/NUMCB) and carries the 128-slot auto-stream scan; the local archive remains the active build input.",
+  "package/ShengUfs/NativeUfs.cpp adds t970-ufs-no-smmu=1, which still maps the SMMU window (the caller dereferences it) but skips every SMMU write; the earlier early-return variant crashed in hostBringUp and is not kept.",
 ]
 completion = [
   "The selected profile's inputs produce a kernel, payload and a boot image matching the SM-T970 boot path.",
@@ -1079,6 +1083,7 @@ findings = [
   "scripts/zz-build-shengufs-local.py is a host-only builder for the vendored driver; it was exercised to confirm the local archive compiles and links, and it is not part of the enabled archive list.",
   "The GFSR write probe (write 0xffffffff, read back unchanged) and the IDR0-bit30 rejection together classify the T970 SMMU as write-locked with a non-SM8550 register model; both are arm_init/planner diagnostics, not storage fixes.",
   "The 128-slot auto-stream scan is a driver-side diagnostic: it reads every SMR, skips masked and non-exact entries, and only accepts a stream whose context already passes the bypass checks; it never writes the SMMU.",
+  "The no-SMMU path keeps the SMMU IO mapping because hostBringUp dereferences it after the call; an earlier version that skipped mapPhys crashed with a null-pointer data abort (FAR=0), recorded here so the distinction between our patch bug and SMMU behaviour stays clear.",
 ]
 completion = [
   "Every claimed UniXNU milestone has matching source/image revisions, a reproducible command and accessible firmware/kernel logs.",
