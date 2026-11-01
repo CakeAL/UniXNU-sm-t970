@@ -1,6 +1,6 @@
 {
   "scope": "Host configuration and DT/ADT checks only; no kernel compilation or device boot",
-  "device_source_revision": "9732292cdaac38c783a0777c4bd286a490562a0d",
+  "device_source_revision": "9bb65cda3dc51387d04b0b74065e61c35ce0821d",
   "committed_platform_inputs": true,
   "unixnu_revision": "194aae294c1107e791f4f74b2be371a391ac6bc4",
   "soc_revision": "166235ec2480ff0992627b7aafa15c65ce6b4efa",
