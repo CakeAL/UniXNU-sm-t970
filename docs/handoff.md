@@ -3,7 +3,15 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
-## 当前：LUN0只读数据核验（实机通过，继续根镜像读回）
+## 当前：根镜像样本核对（主机构建通过，待封装／实测）
+
+- 参数 `t970-ufs-image=1`；见 [样本范围](ufs-image.md)。复用NOP和GPT前提，
+  对manifest及OS/SystemOS各3个128KiB样本分别读2次，对照源镜像SHA256。
+- 17项主机测试、精确源镜像／7样本常量核验、配置检查、内核构建通过，输入稳定；内核
+  `2d35ad10fa101cd03108f97fd106e6855bac7a16234d823102fe394969664875`。仍使用FD `515105d7…`。
+- 不写存储／不发布根设备；本轮尚未刷写。当前设备安装下述已通过的GPT读盘镜像。
+
+## 前轮：LUN0只读数据核验（实机通过，继续根镜像读回）
 
 - 参数 `t970-ufs-read=1`；见 [只读数据范围](ufs-read.md)。先用已通过NOP入口建立实验队列。
 - INQUIRY、READ CAPACITY、重复GPT头及最多4块分区项，核验CRC和本机userdata边界。

@@ -1,0 +1,47 @@
+{
+  "source_image_sha256": "fd43ee7035ce185ce4215ac93fdc006fd784a54b3b7442e21457c226cbe03093",
+  "samples": [
+    {
+      "name": "manifest",
+      "lba": 2969600,
+      "blocks": 1,
+      "sha256": "bc908a6cf66491055077798550660f40128bfe6dce2fdc0db56e6af96511208d"
+    },
+    {
+      "name": "OS first",
+      "lba": 2969856,
+      "blocks": 32,
+      "sha256": "c5af2aea2e76b44797eff9fe687a49a9c227121d5e544a10f05dedf577570168"
+    },
+    {
+      "name": "OS middle",
+      "lba": 3711748,
+      "blocks": 32,
+      "sha256": "6681d29cec7298ae8dd9d198a43068fbde50fa48a8712787785146c6427437dd"
+    },
+    {
+      "name": "OS last",
+      "lba": 4453608,
+      "blocks": 32,
+      "sha256": "4ba4fdc81270726945a6bf47e40d15208bcd938835703f5b2c5a05d7fc34670b"
+    },
+    {
+      "name": "SystemOS first",
+      "lba": 4453888,
+      "blocks": 32,
+      "sha256": "6d87df818cce52c07b922f00d05b13f30152b486508ac8943d43838d56debb13"
+    },
+    {
+      "name": "SystemOS middle",
+      "lba": 4857088,
+      "blocks": 32,
+      "sha256": "fb99d85de6d0ad2607d3fdec423f35c553bdcbc65c0484f3affca81e0d84c6a8"
+    },
+    {
+      "name": "SystemOS last",
+      "lba": 5260256,
+      "blocks": 32,
+      "sha256": "fa43239bcee7b97ca62f007cc68487560a39e19f74f3dde7486db3f98df8e471"
+    }
+  ]
+}

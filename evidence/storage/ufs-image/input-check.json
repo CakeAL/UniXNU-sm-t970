@@ -1,0 +1,7 @@
+{
+  "source_image_sha256": "fd43ee7035ce185ce4215ac93fdc006fd784a54b3b7442e21457c226cbe03093",
+  "matches_prior_flash_source": true,
+  "samples_verified": 7,
+  "kernel_expectations_match": true,
+  "device_verified": false
+}
