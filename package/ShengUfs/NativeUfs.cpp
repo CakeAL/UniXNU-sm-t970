@@ -2350,6 +2350,32 @@ bool NativeUfsBlock::start (IOService *provider)
   }
   online = true;
   registerService ();
+#if defined(NATIVE_VERIFIED_BLOCK) && NATIVE_VERIFIED_BLOCK
+  // The owner paths resolve a volume by the UUID its policy signed: bsd_init's cache mount asks
+  // native_verified_block_volume_device() for it and the verified-block personality walks IOMedia
+  // looking for exactly this property, so the published whole media must carry it.
+  char identity[37];
+  if (signedVolumeUuid (identity)) {
+    OSString *uuid = OSString::withCString (identity);
+    for (unsigned tick = 0; uuid && tick < 50; ++tick) {
+      bool tagged = false;
+      OSDictionary *matching = IOService::serviceMatching ("IOMedia");
+      OSIterator *iterator = matching ? IOService::getMatchingServices (matching) : nullptr;
+      if (iterator) {
+        while (IOMedia *media = OSDynamicCast (IOMedia, iterator->getNextObject ())) {
+          if (!media->isWhole () || !ufsHasAncestor (media, this)) continue;
+          media->setProperty ("UUID", uuid);
+          tagged = true;
+        }
+        iterator->release ();
+      }
+      OSSafeReleaseNULL (matching);
+      if (tagged) break;
+      IOSleep (10);
+    }
+    OSSafeReleaseNULL (uuid);
+  }
+#endif
   return true;
 }
 
