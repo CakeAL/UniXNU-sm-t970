@@ -3,7 +3,7 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
-## 当前：UFS 零命令预检（内核构建通过，待封装／实测）
+## 当前：UFS 零命令预检（实机通过，未执行 DMA）
 
 - 参数 `t970-ufs-preflight=1`；见 [预检范围](ufs-preflight.md)。
 - 读取实际 ARM64 boot_args physBase/memSize，分配连续 0x22000 字节缓冲并检查归属；
@@ -12,7 +12,15 @@
   e0/4e0 仍只是残留字段候选，预检通过不等于资源独占、DMA 或读盘通过。
 - 14 项主机测试、配置检查及内核编译／预链接通过，构建输入稳定；内核 SHA256
   `af32f5a5f221fe01b94d404cc37861b024c09903e012b4b76031da737aeb9ece`。继续使用 FD `515105d7…`。
-- 打包与实机结果尚未产生；当前已安装镜像仍为下述合并字段探针。
+- 代码提交 `c0c13db`；独立 FAT／内核／参数／FD 核验及 DT/ADT 检查通过。
+- BOOT `2eebaa44e3661f1370324d099a13324c63996eaca026242140d467de054ebf73`，
+  62,713,856 字节，已检测 Download Mode 后仅刷 BOOT，Heimdall exit 0，`--no-reboot`。
+- 机主照片确认 END、ownedOK=1、planOK=1。ownedBase=c007c000、ownedBytes=10000000，
+  dma=c47d2000，bytes/contiguous=22000；缓冲完整落在实际交接范围内。
+- CB0=100ff/1/e0，FSR=400；HC=1、HCE=1、HCS=10f、两类 doorbell=0。
+  本轮没有 MMIO 写入或 DMA，不能将预检结果当成 NOP／读盘成功。
+- 下一步准备有界命令传输，保护显示 CB4、保持候选 context 原配置，超时保留 DMA 缓冲。
+  准备／上传／观察记录位于 `evidence/storage/ufs-preflight/`。
 
 ## 前轮：合并 SMMU 字段核查（实机写回及恢复通过）
 

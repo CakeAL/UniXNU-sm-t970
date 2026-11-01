@@ -1,0 +1,51 @@
+{
+  "device": "sm-t970",
+  "boot_sha256": "2eebaa44e3661f1370324d099a13324c63996eaca026242140d467de054ebf73",
+  "source_revision": "c0c13db843b72306db42c4ac3aa953698768e6f0",
+  "observation_source": "Manually transcribed from the owner photograph attached in this conversation.",
+  "photo": {
+    "filename": "IMG_20261101_171935.jpg",
+    "local_source_available": true,
+    "sha256": "f4c14168b489f1029f3da33944868b65c5ec00f3073b866e99bc2387b54b0c5b"
+  },
+  "title": "T970 UFS preflight (no MMIO writes)",
+  "owned_base": "0xc007c000",
+  "owned_bytes": "0x10000000",
+  "dma": "0xc47d2000",
+  "buffer_bytes": "0x22000",
+  "contiguous_bytes": "0x22000",
+  "owned_ok": true,
+  "plan_ok": true,
+  "candidate_context": {
+    "bank": 0,
+    "cbar": "0x000100ff",
+    "cba2r": "0x00000001",
+    "sctlr": "0x000000e0",
+    "fsr": "0x00000400"
+  },
+  "candidate_sids": [
+    "0xe0",
+    "0x4e0"
+  ],
+  "candidate_slots": [
+    "0x55",
+    "0x56"
+  ],
+  "display_cb4_protected": true,
+  "cb73_excluded": true,
+  "controller": {
+    "state": 1,
+    "hce": "0x1",
+    "hcs": "0x10f",
+    "doorbell": 0,
+    "task_doorbell": 0
+  },
+  "end_marker_seen": true,
+  "conclusion": "Allocated contiguous buffer lies within actual boot_args physBase/memSize and read-only candidate-state gates passed.",
+  "limits": [
+    "No MMIO write, stream activation, queue takeover or UFS command was performed.",
+    "Candidate context and SID checks do not prove firmware resource ownership or successful DMA.",
+    "CB0 FSR remains 0x400, matching the earlier observation; it is not zero."
+  ],
+  "next_action": "Prepare a bounded command transport that preserves display CB4 and existing context configuration, validates route changes, and retains DMA buffers on timeout."
+}

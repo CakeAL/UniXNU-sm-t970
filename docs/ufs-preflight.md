@@ -15,3 +15,11 @@
 
 预期标题 `T970 UFS preflight`，检查 ownedOK、planOK、实际地址及 END。
 即使均为1，也只确认可进入有界命令测试，仍未证明 DMA 或根卷可读。
+
+## 实机结果
+
+BOOT `2eebaa44…` 的机主照片确认 `ownedOK=1`、`planOK=1` 及 END。
+实际范围 `0xc007c000 + 0x10000000`；连续缓冲 `0xc47d2000 + 0x22000`
+完全在其中。CB0 保持 `100ff/1/e0`，FSR 仍为 `400`；HCE=1、HCS=10f、
+两类 doorbell=0。完整转录见 `evidence/storage/ufs-preflight/device-result.json`。
+这仅完成内存和候选状态预检，尚未激活路由、提交命令或证明 DMA。
