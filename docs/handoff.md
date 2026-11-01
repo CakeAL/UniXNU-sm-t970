@@ -3,7 +3,17 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
-## 当前：根镜像调查完成（传输一致，部署内容不完整）
+## 当前：临时root ADB通道资格验证（主机准备通过，待BOOT测试）
+
+- 机主要求“你能直接刷么”，已授权继续完成当前完整根镜像部署；仍先验证通道。
+- OdinMac本机也封装Heimdall，不作为独立大文件通道。准备官方Recovery派生的BOOT临时镜像，
+  不改原Recovery；见 [ADB通道](adb-rescue.md)。Recovery菜单服务禁用，不含自动写盘命令。
+- 20项测试通过；BOOT42,930,176字节，SHA256
+  `e67fe744d4ee9e2be7a0ab906d47a064b7409cc1a4db4c7eecaacaae9519a721`。
+  原内核gzip往返及全部ramdisk条目检查通过；三星目标gzip／USB路径尚未实测。
+- 本轮尚未刷入临时BOOT；当前已安装下述UFS调查镜像。原厂BOOT和UFS调查BOOT均保留。
+
+## 前轮：根镜像调查完成（传输一致，部署内容不完整）
 
 - 参数仍为 `t970-ufs-image=1`，新标题 `T970 UFS root image survey`；见 [调查解释](ufs-survey.md)。
 - 7个原样本各读2次；预期哈希不符继续记录实际摘要，传输错误或重复不一致立即停。

@@ -1,0 +1,23 @@
+{
+  "source_recovery_sha256": "2f5bbdfccba07af0524d3695f00977d3fcfc2eac994a7491e15cd15462f4bbd8",
+  "source_kernel_sha256": "a4f468db044a0e635cfe18fe215b52b3a6a3261aa1455ab02a868fedac038803",
+  "boot_sha256": "e67fe744d4ee9e2be7a0ab906d47a064b7409cc1a4db4c7eecaacaae9519a721",
+  "boot_bytes": 42930176,
+  "boot_partition_bytes": 71303168,
+  "source_dtb_sha256": "740a196c7e9907d0bf0f13943355064548ab4cc08c9fa0519b8930ca9db837da",
+  "source_dtbo_sha256": "519ea3d95dab57cbfa637fd54ecbaaa0e1176c7eabc39cf131275324b1c4523d",
+  "changed_ramdisk_files": [
+    "prop.default",
+    "system/etc/init/hw/init.rc"
+  ],
+  "recovery_service_disabled": true,
+  "root_adb_usb_only": true,
+  "header_version": 2,
+  "kernel_compression": "gzip",
+  "kernel_roundtrip_verified": true,
+  "ramdisk_roundtrip_verified": true,
+  "recovery_partition_written": false,
+  "userdata_written": false,
+  "hardware_boot_verified": false,
+  "limitation": "BOOT-only rescue candidate: gzip loader path and init/USB startup require device qualification; source official recovery preserved"
+}
