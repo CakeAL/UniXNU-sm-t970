@@ -48,6 +48,20 @@
   原始 BOOT 恢复待完成，后续镜像以 `evidence/bring-up/runtime/*/flash.json` 回执为准。
 - 以下为 ds 交接当时的状态、命令和待办，保留作历史基线；当前进展以本节及适配记录为准。
 
+## 启动链完成（最新）
+
+PMGR 占位（`ShengPlatformPower.cpp` + `build-platform-power.py`，`CONFIG_XNU_SHENG_PMGR=y`、
+`sheng-pmgr=2`）编译并通过 ABI 审计后，内核 `d4914c03…` 的实测结果为：
+
+```
+Failed to mount root device @IOKitBSDInit.cpp:984
+frames fffffff007a13d5c fffffff007925b50 fffffff0076b1d58 fffffff00798d588 fffffff0073f34a4
+```
+
+即 **UEFI → 菜单 → DarwinBoot → arm_init → 引导线程 → bsd_init → AMFI/PMGR → IOKit 根卷挂载**
+全部走通；失败原因是没有 UFS 驱动。下一步是第 6 步的存储移植（见 `docs/storage.md`），
+不再属于启动链问题。设备 BOOT 仍是诊断镜像，原始 BOOT 待恢复。
+
 ## AMFI/PMGR 关卡
 
 `bsd_init` 之后的真实失败（内核 `80cc00ad…`，镜像 `041fcf8c…`）：

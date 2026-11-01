@@ -1,0 +1,18 @@
+{
+  "device": "SM-T970 / gts7xlwifi",
+  "image_source_revision": "1267235c98af2fa94156cf007095e6482c0e7dbf",
+  "source_kernel_sha256": "d4914c0309cad766b4a54c4d4fc5d7c583e24cca93b6d21ade8a22e58496cf93",
+  "boot_image_sha256": "55ee06b7c4088a0ec1f65ad1784d0c8c765f8c98888f483a06ae1b4191071272",
+  "boot_image_bytes": 62713856,
+  "observation_source": "Human photograph of the panic screen",
+  "panic": "Failed to mount root device @IOKitBSDInit.cpp:984",
+  "frames": [
+    "fffffff007a13d5c",
+    "fffffff007925b50",
+    "fffffff0076b1d58",
+    "fffffff00798d588",
+    "fffffff0073f34a4"
+  ],
+  "result": "The ApplePMGR placeholder satisfied unchanged AMFI: boot proceeds past AMFI and reaches IOKit root-device mounting, which fails because no UFS driver exists.",
+  "limits": "Establishes the PMGR bridge and the root-device blocker only. No storage, userspace, display or input is verified."
+}

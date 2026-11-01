@@ -12,6 +12,7 @@ kit = "sm-t970"
 include = ["ArmDTPlatform", "ArmCpu", "SoftwareAES", "XnuPrelink", "DarwinBoot"]
 
 [kernel]
+archives = ["build-corecrypto-14.py", "build-corecrypto-14.py --namespace", "component:ArmDTPlatform", "component:ArmCpu", "component:SoftwareAES", "build-software-aes-bindings.py", "build-platform-power.py", "build-mockfs-fixture.py", "build-libpthread-kernel.py"]
 defconfig = "sm-t970_defconfig"
 config_fragments = ["arch:configs/common.config", "soc:configs/sm8250.config", "os:configs/ipados.config"]
 patch_series = ["arch:patches/xnu/series", "soc:patches/xnu/series", "device:patches/xnu/os-series", "device:patches/xnu/series"]
@@ -39,7 +40,7 @@ volume = "T970"
 size_mib = 56
 loader = "firmware"
 title = "UniXNU SM-T970 platform bootstrap"
-kernel_args = ["-v", "cpus=1", "t970-novc"]
+kernel_args = ["-v", "cpus=1", "t970-novc", "sheng-pmgr=2"]
 # Adds Tools -> Advanced Logger to the generated menu (porting/log-capture).
 tools = true
 panic_screen = true
