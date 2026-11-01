@@ -25,3 +25,10 @@ poisoned=0、manifestAndSamples=1。失败时sample/name指出当前样本，obs
 成功仅证明manifest和这些样本与源镜像一致、有限次较大读取完成，不代表9.38GB全部
 内容均正确，不代表所有者签名策略通过，也不等于根卷可挂载。后续仍需持续驱动接管、
 验证策略／体积限制及块设备发布／文件系统接入。
+
+## 首轮实机结果
+
+BOOT c92ee883… 在manifest处停止：success0、reads1、healthy1、poisoned0，
+所有传输错误字段为0。observedSHA为4096零字节的摘要ad7facb2…，与源manifest不同。
+不能推断其余根镜像内容；下一轮继续只读调查，禁止用此结果声称镜像匹配或自动重刷。
+历史写入／编码审计见 `evidence/storage/userdata-write-audit/audit.json`。

@@ -1,0 +1,23 @@
+test_all_four_runtime_states (test_console_state_probe.ExecutionTests.test_all_four_runtime_states) ... ok
+test_boolean_mask_and_full_width_pointer (test_console_state_probe.ExecutionTests.test_boolean_mask_and_full_width_pointer) ... ok
+test_unknown_kernel_is_not_patched (test_console_state_probe.InputTests.test_unknown_kernel_is_not_patched) ... ok
+test_each_fault_terminal (test_early_fault_probe.ExecutionTests.test_each_fault_terminal) ... ok
+test_reject_unknown_kernel_without_writing (test_early_fault_probe.InputTests.test_reject_unknown_kernel_without_writing) ... ok
+test_apply_and_repeat (test_prepare_uefi.SourcePatchTests.test_apply_and_repeat) ... ok
+test_changed_patch_is_rejected_before_write (test_prepare_uefi.SourcePatchTests.test_changed_patch_is_rejected_before_write) ... ok
+test_unknown_local_edit_is_preserved (test_prepare_uefi.SourcePatchTests.test_unknown_local_edit_is_preserved) ... ok
+test_combined_fields_preserve_dma_permissions (test_t970_smmu_report.SmmuReportTests.test_combined_fields_preserve_dma_permissions) ... ok
+test_handoff_gates_and_full_table_display (test_t970_smmu_report.SmmuReportTests.test_handoff_gates_and_full_table_display) ... ok
+test_image_readback_sequence (test_t970_smmu_report.SmmuReportTests.test_image_readback_sequence) ... ok
+test_nop_route_gates_and_failure_retention (test_t970_smmu_report.SmmuReportTests.test_nop_route_gates_and_failure_retention) ... ok
+test_preflight_bounds_and_route_refusal (test_t970_smmu_report.SmmuReportTests.test_preflight_bounds_and_route_refusal) ... ok
+test_read_sequence_and_gpt_validation (test_t970_smmu_report.SmmuReportTests.test_read_sequence_and_gpt_validation) ... ok
+test_register_model_and_bounded_reads (test_t970_smmu_report.SmmuReportTests.test_register_model_and_bounded_reads) ... ok
+test_sm8250_clock_offsets_against_recorded_target_source (test_t970_smmu_report.SmmuReportTests.test_sm8250_clock_offsets_against_recorded_target_source) ... ok
+test_smr_id_field_guard_and_restore (test_t970_smmu_report.SmmuReportTests.test_smr_id_field_guard_and_restore) ... ok
+test_nonzero_segment_reads_its_own_first_chunk (test_userdata_sparse.SparseTests.test_nonzero_segment_reads_its_own_first_chunk) ... ok
+
+----------------------------------------------------------------------
+Ran 18 tests in 11.611s
+
+OK

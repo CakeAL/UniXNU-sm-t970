@@ -1,0 +1,14 @@
+{
+  "scope": "Read-only audit; no new USERDATA writes",
+  "original_summary": "evidence/bring-up/runtime/userdata-sparse/flash.json",
+  "archived_seg0_log": "Initial handshake failure; successful retry was omitted from old archive.",
+  "successful_retry_raw_sha256": "fac35178759bee4585bc6605b715266a42f5038074f09e1114bd78f073608176",
+  "successful_retry_log": "flash-seg0-retry.log",
+  "segment1_first_written_offset": 3127902208,
+  "segment2_first_written_offset": 6255804416,
+  "first_chunk_actual": "Both later segments contain source offset0 (SHNGROOT) as their first RAW chunk, instead of bytes at their segment offset.",
+  "encoder_cause": "src.read at pos==start did not seek after preceding DONT_CARE chunks.",
+  "other_limit": "DONT_CARE preservation across separate target flashes has not been qualified. Upload success does not prove reconstructed partition bytes.",
+  "device_observation": "evidence/storage/ufs-image/device-result.json",
+  "corrective_scope": "Fix encoder and regression test; preserve old sparse artifacts; do not regenerate or flash USERDATA automatically."
+}

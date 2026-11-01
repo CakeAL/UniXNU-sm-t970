@@ -3,13 +3,23 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
-## 当前：根镜像样本核对（主机构建通过，待封装／实测）
+## 当前：根镜像样本核对（manifest读回全零，继续只读调查）
 
 - 参数 `t970-ufs-image=1`；见 [样本范围](ufs-image.md)。复用NOP和GPT前提，
   对manifest及OS/SystemOS各3个128KiB样本分别读2次，对照源镜像SHA256。
 - 17项主机测试、精确源镜像／7样本常量核验、配置检查、内核构建通过，输入稳定；内核
   `2d35ad10fa101cd03108f97fd106e6855bac7a16234d823102fe394969664875`。仍使用FD `515105d7…`。
-- 不写存储／不发布根设备；本轮尚未刷写。当前设备安装下述已通过的GPT读盘镜像。
+- 代码提交 `0c20e6d`；独立封装与DT/ADT核验通过，BOOT
+  `c92ee8831053d8aa13a5ce8022fa9632cd6f8b6d3ad10b83ad8c4aff6092d80c`，62,713,856字节。
+- 已检测Download Mode并仅上传BOOT，Heimdall exit0，`--no-reboot`。当前安装本轮镜像，
+  机主照片确认success0、sample0=manifest、reads1、healthy1、poisoned0，GPT通过。
+- observedSHA=ad7facb2…，恰为4096字节零块；预期manifest为bc908a6c…。
+  SCSI/OCS/protocol/residual均0，GFSR0／FSR400。其余样本尚未尝试，不能归因于UFS故障。
+- 旧归档seg0保存了失败尝试；本地找到flash-seg0b.log成功重试，已补充审计，不能断言第0段从未成功。
+- 编码器已确认错误：后两段首个RAW块在跳过DONT_CARE后没有seek，错误复制源offset0。
+  修复仅影响以后生成；原稀疏文件保持不变。分段刷写DONT_CARE是否保留旧内容也未实测。
+  见 `evidence/storage/userdata-write-audit/audit.json`。未再次写USERDATA。
+- 回执／实测在 `evidence/storage/ufs-image/`。下一轮读取所有样本及重复值，内容不符继续记录，传输错误停止。
 
 ## 前轮：LUN0只读数据核验（实机通过，继续根镜像读回）
 

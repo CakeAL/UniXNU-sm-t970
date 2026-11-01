@@ -15,6 +15,9 @@ components = [
   "ArmDTPlatform",
 ]
 paths = [
+  "evidence/storage/userdata-write-audit/**",
+  "tests/test_userdata_sparse.py",
+  "scripts/encode-userdata-sparse.py",
   "docs/ufs-image.md",
   "evidence/storage/ufs-image/**",
   "docs/ufs-read.md",
@@ -144,6 +147,8 @@ evidence = [
   { kind = "device", reference = "evidence/storage/ufs-preflight/device-result.json", revision = "c0c13db843b72306db42c4ac3aa953698768e6f0", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-preflight/boot.img --no-reboot", result = "Owner photo confirms ownedOK=1, planOK=1 and END, contiguous buffer inside actual boot_args memory; no stream activation or DMA command performed." },
   { kind = "device", reference = "evidence/storage/ufs-nop/device-result.json", revision = "3f47470efbd92626a1282c72dd70caf1390a65c2", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-nop/boot.img --no-reboot", result = "Owner photo confirms stage6, submitted/success/protected=1, OCS0 and valid NOP response; GFSR0 and unchanged CB0 FSR. One NOP DMA round-trip only; SCSI data and block reads unverified." },
   { kind = "device", reference = "evidence/storage/ufs-read/device-result.json", revision = "fa9a0e6b0945a912daebeb44ca927df8ce0b1064", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-read/boot.img --no-reboot", result = "Owner photo confirms stage6 with INQUIRY, capacity, repeated GPT header, entry CRC and captured userdata geometry passed; SCSI/OCS/protocol/residual zero. Root image and sustained I/O pending." },
+  { kind = "device", reference = "evidence/storage/ufs-image/device-result.json", revision = "0c20e6db3eff4ca7750b3180007210b57c8ae367", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-image/boot.img --no-reboot", result = "Manifest read completed without protocol error but hash equals 4096 zero bytes; strict test stopped before remaining samples. Root image matching not established." },
+  { kind = "source", reference = "evidence/storage/userdata-write-audit/audit.json", result = "Recovered successful seg0 retry; confirmed later sparse segment first-chunk seek bug and fixed encoder with regression test. DONT_CARE target preservation remains unqualified; no new USERDATA writes." },
   { kind = "source", reference = "docs/ufs-image.md", result = "Read-only manifest and six 128KiB OS/SystemOS samples, each repeated and SHA256 compared against exact prior source image. No writes, publication or filesystem mount; hardware pending." },
   { kind = "source", reference = "docs/ufs-read.md", result = "Bounded LUN0 INQUIRY/capacity/GPT data-in test, repeated header, CRC and captured userdata geometry comparison; no storage write, timeout retry or root mount. Hardware GPT/data-in test passed; root image readback pending." },
   { kind = "source", reference = "docs/ufs-nop.md", result = "One-shot bounded NOP experiment: owned DMA, idle queue takeover, exact two-SID candidates and preserved existing context/display; no SCSI, storage write, cancel or retry. Single NOP hardware round-trip passed; data/block reads pending." },
@@ -460,6 +465,9 @@ id = "memory"
 status = "implemented"
 components = []
 paths = [
+  "evidence/storage/userdata-write-audit/**",
+  "tests/test_userdata_sparse.py",
+  "scripts/encode-userdata-sparse.py",
   "docs/ufs-image.md",
   "evidence/storage/ufs-image/**",
   "docs/ufs-read.md",
@@ -540,6 +548,8 @@ evidence = [
   { kind = "device", reference = "evidence/storage/ufs-preflight/device-result.json", revision = "c0c13db843b72306db42c4ac3aa953698768e6f0", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-preflight/boot.img --no-reboot", result = "Owner photo confirms ownedOK=1, planOK=1 and END, contiguous buffer inside actual boot_args memory; no stream activation or DMA command performed." },
   { kind = "device", reference = "evidence/storage/ufs-nop/device-result.json", revision = "3f47470efbd92626a1282c72dd70caf1390a65c2", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-nop/boot.img --no-reboot", result = "Owner photo confirms stage6, submitted/success/protected=1, OCS0 and valid NOP response; GFSR0 and unchanged CB0 FSR. One NOP DMA round-trip only; SCSI data and block reads unverified." },
   { kind = "device", reference = "evidence/storage/ufs-read/device-result.json", revision = "fa9a0e6b0945a912daebeb44ca927df8ce0b1064", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-read/boot.img --no-reboot", result = "Owner photo confirms stage6 with INQUIRY, capacity, repeated GPT header, entry CRC and captured userdata geometry passed; SCSI/OCS/protocol/residual zero. Root image and sustained I/O pending." },
+  { kind = "device", reference = "evidence/storage/ufs-image/device-result.json", revision = "0c20e6db3eff4ca7750b3180007210b57c8ae367", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-image/boot.img --no-reboot", result = "Manifest read completed without protocol error but hash equals 4096 zero bytes; strict test stopped before remaining samples. Root image matching not established." },
+  { kind = "source", reference = "evidence/storage/userdata-write-audit/audit.json", result = "Recovered successful seg0 retry; confirmed later sparse segment first-chunk seek bug and fixed encoder with regression test. DONT_CARE target preservation remains unqualified; no new USERDATA writes." },
   { kind = "source", reference = "docs/ufs-image.md", result = "Read-only manifest and six 128KiB OS/SystemOS samples, each repeated and SHA256 compared against exact prior source image. No writes, publication or filesystem mount; hardware pending." },
   { kind = "source", reference = "docs/ufs-read.md", result = "Bounded LUN0 INQUIRY/capacity/GPT data-in test, repeated header, CRC and captured userdata geometry comparison; no storage write, timeout retry or root mount. Hardware GPT/data-in test passed; root image readback pending." },
   { kind = "source", reference = "docs/ufs-nop.md", result = "One-shot bounded NOP experiment: owned DMA, idle queue takeover, exact two-SID candidates and preserved existing context/display; no SCSI, storage write, cancel or retry. Single NOP hardware round-trip passed; data/block reads pending." },
@@ -567,6 +577,9 @@ id = "storage"
 status = "planned"
 components = ["ShengUfs", "VirtioMmioBlock", "VerifiedRoot"]
 paths = [
+  "evidence/storage/userdata-write-audit/**",
+  "tests/test_userdata_sparse.py",
+  "scripts/encode-userdata-sparse.py",
   "docs/ufs-image.md",
   "evidence/storage/ufs-image/**",
   "docs/ufs-read.md",
@@ -653,6 +666,8 @@ evidence = [
   { kind = "device", reference = "evidence/storage/ufs-preflight/device-result.json", revision = "c0c13db843b72306db42c4ac3aa953698768e6f0", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-preflight/boot.img --no-reboot", result = "Owner photo confirms ownedOK=1, planOK=1 and END, contiguous buffer inside actual boot_args memory; no stream activation or DMA command performed." },
   { kind = "device", reference = "evidence/storage/ufs-nop/device-result.json", revision = "3f47470efbd92626a1282c72dd70caf1390a65c2", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-nop/boot.img --no-reboot", result = "Owner photo confirms stage6, submitted/success/protected=1, OCS0 and valid NOP response; GFSR0 and unchanged CB0 FSR. One NOP DMA round-trip only; SCSI data and block reads unverified." },
   { kind = "device", reference = "evidence/storage/ufs-read/device-result.json", revision = "fa9a0e6b0945a912daebeb44ca927df8ce0b1064", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-read/boot.img --no-reboot", result = "Owner photo confirms stage6 with INQUIRY, capacity, repeated GPT header, entry CRC and captured userdata geometry passed; SCSI/OCS/protocol/residual zero. Root image and sustained I/O pending." },
+  { kind = "device", reference = "evidence/storage/ufs-image/device-result.json", revision = "0c20e6db3eff4ca7750b3180007210b57c8ae367", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-image/boot.img --no-reboot", result = "Manifest read completed without protocol error but hash equals 4096 zero bytes; strict test stopped before remaining samples. Root image matching not established." },
+  { kind = "source", reference = "evidence/storage/userdata-write-audit/audit.json", result = "Recovered successful seg0 retry; confirmed later sparse segment first-chunk seek bug and fixed encoder with regression test. DONT_CARE target preservation remains unqualified; no new USERDATA writes." },
   { kind = "source", reference = "docs/ufs-image.md", result = "Read-only manifest and six 128KiB OS/SystemOS samples, each repeated and SHA256 compared against exact prior source image. No writes, publication or filesystem mount; hardware pending." },
   { kind = "source", reference = "docs/ufs-read.md", result = "Bounded LUN0 INQUIRY/capacity/GPT data-in test, repeated header, CRC and captured userdata geometry comparison; no storage write, timeout retry or root mount. Hardware GPT/data-in test passed; root image readback pending." },
   { kind = "source", reference = "docs/ufs-nop.md", result = "One-shot bounded NOP experiment: owned DMA, idle queue takeover, exact two-SID candidates and preserved existing context/display; no SCSI, storage write, cancel or retry. Single NOP hardware round-trip passed; data/block reads pending." },
@@ -950,6 +965,9 @@ components = [
   "XnuPrelink",
 ]
 paths = [
+  "evidence/storage/userdata-write-audit/**",
+  "tests/test_userdata_sparse.py",
+  "scripts/encode-userdata-sparse.py",
   "docs/ufs-image.md",
   "evidence/storage/ufs-image/**",
   "docs/ufs-read.md",
@@ -1108,6 +1126,8 @@ evidence = [
   { kind = "device", reference = "evidence/storage/ufs-preflight/device-result.json", revision = "c0c13db843b72306db42c4ac3aa953698768e6f0", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-preflight/boot.img --no-reboot", result = "Owner photo confirms ownedOK=1, planOK=1 and END, contiguous buffer inside actual boot_args memory; no stream activation or DMA command performed." },
   { kind = "device", reference = "evidence/storage/ufs-nop/device-result.json", revision = "3f47470efbd92626a1282c72dd70caf1390a65c2", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-nop/boot.img --no-reboot", result = "Owner photo confirms stage6, submitted/success/protected=1, OCS0 and valid NOP response; GFSR0 and unchanged CB0 FSR. One NOP DMA round-trip only; SCSI data and block reads unverified." },
   { kind = "device", reference = "evidence/storage/ufs-read/device-result.json", revision = "fa9a0e6b0945a912daebeb44ca927df8ce0b1064", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-read/boot.img --no-reboot", result = "Owner photo confirms stage6 with INQUIRY, capacity, repeated GPT header, entry CRC and captured userdata geometry passed; SCSI/OCS/protocol/residual zero. Root image and sustained I/O pending." },
+  { kind = "device", reference = "evidence/storage/ufs-image/device-result.json", revision = "0c20e6db3eff4ca7750b3180007210b57c8ae367", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-image/boot.img --no-reboot", result = "Manifest read completed without protocol error but hash equals 4096 zero bytes; strict test stopped before remaining samples. Root image matching not established." },
+  { kind = "source", reference = "evidence/storage/userdata-write-audit/audit.json", result = "Recovered successful seg0 retry; confirmed later sparse segment first-chunk seek bug and fixed encoder with regression test. DONT_CARE target preservation remains unqualified; no new USERDATA writes." },
   { kind = "source", reference = "docs/ufs-image.md", result = "Read-only manifest and six 128KiB OS/SystemOS samples, each repeated and SHA256 compared against exact prior source image. No writes, publication or filesystem mount; hardware pending." },
   { kind = "source", reference = "docs/ufs-read.md", result = "Bounded LUN0 INQUIRY/capacity/GPT data-in test, repeated header, CRC and captured userdata geometry comparison; no storage write, timeout retry or root mount. Hardware GPT/data-in test passed; root image readback pending." },
   { kind = "source", reference = "docs/ufs-nop.md", result = "One-shot bounded NOP experiment: owned DMA, idle queue takeover, exact two-SID candidates and preserved existing context/display; no SCSI, storage write, cancel or retry. Single NOP hardware round-trip passed; data/block reads pending." },
@@ -1163,6 +1183,9 @@ id = "diagnostics"
 status = "implemented"
 components = []
 paths = [
+  "evidence/storage/userdata-write-audit/**",
+  "tests/test_userdata_sparse.py",
+  "scripts/encode-userdata-sparse.py",
   "docs/ufs-image.md",
   "evidence/storage/ufs-image/**",
   "docs/ufs-read.md",
@@ -1320,6 +1343,8 @@ evidence = [
   { kind = "device", reference = "evidence/storage/ufs-preflight/device-result.json", revision = "c0c13db843b72306db42c4ac3aa953698768e6f0", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-preflight/boot.img --no-reboot", result = "Owner photo confirms ownedOK=1, planOK=1 and END, contiguous buffer inside actual boot_args memory; no stream activation or DMA command performed." },
   { kind = "device", reference = "evidence/storage/ufs-nop/device-result.json", revision = "3f47470efbd92626a1282c72dd70caf1390a65c2", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-nop/boot.img --no-reboot", result = "Owner photo confirms stage6, submitted/success/protected=1, OCS0 and valid NOP response; GFSR0 and unchanged CB0 FSR. One NOP DMA round-trip only; SCSI data and block reads unverified." },
   { kind = "device", reference = "evidence/storage/ufs-read/device-result.json", revision = "fa9a0e6b0945a912daebeb44ca927df8ce0b1064", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-read/boot.img --no-reboot", result = "Owner photo confirms stage6 with INQUIRY, capacity, repeated GPT header, entry CRC and captured userdata geometry passed; SCSI/OCS/protocol/residual zero. Root image and sustained I/O pending." },
+  { kind = "device", reference = "evidence/storage/ufs-image/device-result.json", revision = "0c20e6db3eff4ca7750b3180007210b57c8ae367", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-image/boot.img --no-reboot", result = "Manifest read completed without protocol error but hash equals 4096 zero bytes; strict test stopped before remaining samples. Root image matching not established." },
+  { kind = "source", reference = "evidence/storage/userdata-write-audit/audit.json", result = "Recovered successful seg0 retry; confirmed later sparse segment first-chunk seek bug and fixed encoder with regression test. DONT_CARE target preservation remains unqualified; no new USERDATA writes." },
   { kind = "source", reference = "docs/ufs-image.md", result = "Read-only manifest and six 128KiB OS/SystemOS samples, each repeated and SHA256 compared against exact prior source image. No writes, publication or filesystem mount; hardware pending." },
   { kind = "source", reference = "docs/ufs-read.md", result = "Bounded LUN0 INQUIRY/capacity/GPT data-in test, repeated header, CRC and captured userdata geometry comparison; no storage write, timeout retry or root mount. Hardware GPT/data-in test passed; root image readback pending." },
   { kind = "source", reference = "docs/ufs-nop.md", result = "One-shot bounded NOP experiment: owned DMA, idle queue takeover, exact two-SID candidates and preserved existing context/display; no SCSI, storage write, cancel or retry. Single NOP hardware round-trip passed; data/block reads pending." },

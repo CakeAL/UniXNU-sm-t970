@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Encode one contiguous segment of the userdata image as an Android sparse file.
 
-Chunks outside the segment become DONT_CARE so the bootloader leaves the existing
-partition content alone; the encoded file is only as large as the segment, which
+Chunks outside the segment become DONT_CARE. Preservation of existing partition
+content across separate flashes is bootloader-specific and remains unqualified.
+The encoded file is only as large as the segment, which
 keeps each Heimdall upload below its 4 GiB single-file limit.
 """
 import argparse
@@ -39,10 +40,8 @@ def main():
         while pos < size:
             length = min(CHUNK, size - pos)
             if start <= pos < end:
-                data = src.read(length) if pos == start else None
-                if data is None:
-                    src.seek(pos)
-                    data = src.read(length)
+                src.seek(pos)
+                data = src.read(length)
                 if len(data) != length:
                     raise SystemExit('short read')
                 if data == zeroes[:length]:

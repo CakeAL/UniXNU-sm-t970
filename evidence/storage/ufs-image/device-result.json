@@ -1,0 +1,37 @@
+{
+  "device": "sm-t970",
+  "boot_sha256": "c92ee8831053d8aa13a5ce8022fa9632cd6f8b6d3ad10b83ad8c4aff6092d80c",
+  "source_revision": "0c20e6db3eff4ca7750b3180007210b57c8ae367",
+  "observation_source": "Owner photo, manually transcribed",
+  "photo": {
+    "filename": "IMG_20261101_174908.jpg",
+    "local_source_available": true,
+    "sha256": "370d5922bccd92488bbd17bfa7067528a7c362d6c4da749e684d5ee47ace6131"
+  },
+  "success": false,
+  "sample": 0,
+  "name": "manifest",
+  "reads": 1,
+  "healthy": true,
+  "poisoned": false,
+  "gpt_passed": true,
+  "observed_sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+  "expected_sha256": "bc908a6cf66491055077798550660f40128bfe6dce2fdc0db56e6af96511208d",
+  "observed_is_zero_block": true,
+  "result": 0,
+  "ocs": 0,
+  "scsi": 0,
+  "sense": 0,
+  "protocol": 0,
+  "residual": 0,
+  "doorbell": 0,
+  "is_status": "0x400",
+  "gfsr": 0,
+  "fsr": "0x400",
+  "conclusion": "Successful read returned a block whose SHA256 equals 4096 zero bytes, not the expected source-image manifest.",
+  "limits": [
+    "Remaining OS/SystemOS samples were not attempted because strict comparison stopped at first mismatch.",
+    "No direct evidence yet whether cause is prior flashing, target wipe behavior, or another data-path issue."
+  ],
+  "next_action": "Read-only survey all samples, including repeats, without stopping solely on content mismatch."
+}
