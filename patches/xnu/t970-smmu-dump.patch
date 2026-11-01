@@ -1,14 +1,14 @@
---- a/osfmk/arm/arm_init.c	2026-11-01 09:25:37
-+++ b/osfmk/arm/arm_init.c	2026-11-01 09:25:37
-@@ -653,6 +653,38 @@
+--- a/osfmk/arm/arm_init.c	2026-11-01 09:35:17
++++ b/osfmk/arm/arm_init.c	2026-11-01 09:35:17
+@@ -653,6 +653,40 @@
  	 * against string vulnerabilities
  	 */
  	__stack_chk_guard &= ~(0xFFULL << 8);
 +
 +	/*
-+	 * T970 diagnostic: dump the SMMU stream table before any IOKit driver
-+	 * runs, so the firmware-configured UFS stream id is visible even when the
-+	 * UFS driver later panics on its own SMR write.
++	 * T970 diagnostic: dump the SMMU identity and stream table before any
++	 * IOKit driver runs. Both the standard IDR block and the 0x20 block the
++	 * UFS driver reads are printed so a geometry mismatch is visible.
 +	 */
 +	{
 +		unsigned int t970_smmu_dump = 0;
@@ -32,7 +32,9 @@
 +					    " [%u]%08x/%08x", index, smr, s2cr);
 +				}
 +			}
-+			panic("T970 SMMU idr=%08x found=%u%s", *(volatile uint32_t *)(base + 0x0), found, line);
++			panic("T970 SMMU idr=%08x idr20=%08x idr24=%08x idr28=%08x found=%u%s",
++			    *(volatile uint32_t *)(base + 0x0), *(volatile uint32_t *)(base + 0x20),
++			    *(volatile uint32_t *)(base + 0x24), *(volatile uint32_t *)(base + 0x28), found, line);
 +		}
 +	}
 +

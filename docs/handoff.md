@@ -48,6 +48,14 @@
   原始 BOOT 恢复待完成，后续镜像以 `evidence/bring-up/runtime/*/flash.json` 回执为准。
 - 以下为 ds 交接当时的状态、命令和待办，保留作历史基线；当前进展以本节及适配记录为准。
 
+## 下一步的根因（固件不给 UFS 上电）
+
+- 固件 `gts7xlwifi.dsc` 仍写着 `no UFS driver yet. Excluded for bring-up`；
+- alioth `ShengUfs` 的 `hostBringUp` 只做控制器映射，**不初始化 PHY/时钟/SMMU**，假设固件已完成；
+- T970 上 SMMU 的 SMR 写入不生效（读回 0），IDR 读数在两次启动间变化，说明 **apps_smmu 未被固件上电/配置**；
+- 已在 `package/ShengUfs/` 保留 vendor 副本（IDR 偏移改为 0x0/0x4/0x8）和 `zz-build-shengufs-local.py`，但默认 archive 仍只用 `component:ShengUfs`。
+- 结论：要过 UFS，需要**固件侧 UFS/PHY/SMMU 上电**（T733 的固件做了这件事，但仓库不公开），或在驱动里补齐 T970 的 PHY/时钟/SMMU 初始化。
+
 ## SMMU 诊断（本轮）
 
 `t970-smmu-dump` 在 `arm_init` 末尾转储 apps_smmu：IDR0 `0x002d0405`，固件共配置 **26 个 stream**，
