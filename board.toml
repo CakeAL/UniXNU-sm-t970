@@ -46,6 +46,7 @@ tools = true
 panic_screen = true
 
 [payload.adt]
+root_match_volume_uuid = "04769D26-2CA0-4825-B443-E2E5F88300F2"
 # Match the loader's existing 256 MiB default explicitly. Allocation still uses
 # EfiConventionalMemory, never the complete DTS envelope or reserved holes.
 owned_memory_size = "0x10000000"
@@ -53,3 +54,13 @@ owned_memory_size = "0x10000000"
 # OS identity seed from the selected iPad7,1 profile, not the Qualcomm SoC ID.
 chip_id = "8011"
 unique_chip_id = "required"
+
+[userdata]
+# T970 GPT: userdata LBA 2969600..62458874, logical block 4096.
+first_lba = 2969600
+last_lba = 62458874
+lba_bytes = 4096
+windows = [
+  { name = "OS", component = "OS" },
+  { name = "SystemOS", component = "Cryptex1,SystemOS" },
+]

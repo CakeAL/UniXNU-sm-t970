@@ -98,6 +98,7 @@ findings = [
   "The diagnostic kernel still boots with t970-novc and panic_screen. The next config change is the PMGR bridge: CONFIG_XNU_SHENG_PMGR=y, a build-platform-power.py archive entry and a sheng-pmgr=2 boot argument, following the marble-milacy reference that targets the same 21H461 kernelcache.",
   "Enabled CONFIG_XNU_SHENG_PMGR=y in sm-t970_defconfig, added the PMGR archive and sheng-pmgr=2 boot argument, and regenerated .config before the kernel build.",
   "feeds.toml now pins the SM8250 UFS fork and unixnu.lock records it, but no component selects it; board.toml and sm-t970_defconfig remain in their buildable pre-UFS state.",
+  "board.toml now carries the measured T970 [userdata] geometry and the root-volume UUID for the ADT; the UFS component selection, storage archives and native-ufs boot arguments used for the size measurement were reverted so the default build stays inside the BOOT partition.",
 ]
 completion = [
   "A board.toml with matching device identity resolves the selected SoC and OS profiles and pinned sources.",
@@ -492,6 +493,8 @@ findings = [
   "The shared technique is firmware state takeover, not cold init: NativeUfs reads GCC gating and link state without writing clocks/reset/PHY, plans the two SM8250 UFS streams 0x0e0 and 0x4e0 from SMR/S2CR readback, and publishes a per-device userdata window. T970 uses the same controller 0x1d84000 and PHY 0x1d87000, so the umi/alioth driver is the concrete base for this port instead of ShengUfs SM8550 constants.",
   "Started the SM8250 UFS port by pinning feeds.toml ShengUfs to FFT-infra/NativeUfs-alioth@ab54059 (device-verified storage fork, streams 0x0e0/0x4e0). The component compiled; the kernel link then required the original IOStorageFamily absolute bindings (scripts/build-storage-bindings.py plus scripts/data/native-storage-original-bindings.S, both stored here) and the VerifiedRoot vr_* archive.",
   "Enabling the driver is blocked on two inputs that do not exist yet: the signed VerifiedRoot policy archive (build-verified-root-probe.py needs the OS-volume verification bundle, not just the IPSW) and a sheng userdata manifest that findRootLayout accepts; the T970 GPT is an Android layout. The integration is therefore prepared but disabled; CONFIG_XNU_NATIVE_UFS stays off and board components/archives are unchanged.",
+  "Built the T970 userdata-root image from the 21H461 IPSW with the board GPT geometry (LBA 2969600..62458874, 4096-byte blocks): OS e5634d04 at 0x100000 and SystemOS b4908cde at 0x16a600000, image fd43ee70, 9382658048 bytes. Added [userdata] and payload.adt root_match_volume_uuid 04769D26-2CA0-4825-B443-E2E5F88300F2.",
+  "The VerifiedRoot path cannot fit this board: the OS+SystemOS policy bundle embeds a 47 MiB block-hash table in the kernel (kernel.macho 125374464 bytes) and the packed boot image measured 138211328 bytes against the 71303168-byte BOOT partition. CONFIG_XNU_NATIVE_UFS and CONFIG_XNU_VERIFIED_ROOT_PROBE are therefore left off; the next storage step is a T970 device-side UFS publication path that does not embed the verified-root hash table.",
 ]
 completion = [
   "UFS reads return correct capacity, GPT and known blocks under XNU; the chosen root mounts and writes persist only inside the allocated Data region.",
@@ -884,6 +887,7 @@ findings = [
   "Added t970-skip-video.patch (initialize_screen guarded by t970-novc) and t970-skip-vcattach.patch (PE_init_printf TRUE path uses a null output callback under t970-novc), and changed t970-console-bootstrap.patch to skip PE_create_console under t970-novc. These are diagnostic bypasses, not a replacement console.",
   "Ported the marble-milacy PMGR placeholder: package/ShengPlatformPower.cpp and scripts/build-platform-power.py build the 340-slot original ApplePMGR ABI bridge from the shared 21H461 kernelcache; the framework sheng-platform-power.patch is in the device series and board archives now include build-platform-power.py. The builder's audit passed unchanged-AMFI read/OR/write and original provider dispatch.",
   "Final console diagnostic patch set for this revision: t970-console-bootstrap calls PE_initialize_console under t970-novc so vinfo and the framebuffer mapping exist for the panic screen, and the t970-skip-video patch (which skipped gc_initialize and left VCPUTC's ticket lock uninitialized) is removed. t970-skip-vcattach keeps PE_putc a null writer.",
+  "scripts/build-owner-systemos-policy.py signs and fully verifies the raw Cryptex1,SystemOS member (806400 blocks, b4908cde) against the same owner anchor; it is the missing SystemOS half the framework's --include-systemos bundle needs.",
 ]
 completion = [
   "The selected profile's inputs produce a kernel, payload and a boot image matching the SM-T970 boot path.",
@@ -1046,6 +1050,7 @@ findings = [
   "Restoring gc_initialize fixed the invalid ticket-lock panic: with vinfo populated and the lock initialized, the panic screen renders text and the kernel reaches bsd_init. Removing the forced panic then exposed the real next blocker: unmodified AMFI panics with 'AMFI: No PMGR?' at ConfigurationSettings.cpp:235 because no ApplePMGR provider is published. Image 041fcf8c, kernel 80cc00ad.",
   "With sheng-pmgr=2 and the PMGR bridge linked, unchanged AMFI passes and the kernel reaches IOKit root-device mounting: panic 'Failed to mount root device @IOKitBSDInit.cpp:984' (kernel d4914c03, image see evidence). This is the expected storage blocker, not a startup-chain failure.",
   "scripts/build-storage-bindings.py and scripts/data/native-storage-original-bindings.S are kept as the audited absolute-address binding for the original IOStorageFamily symbols; they are not referenced by any enabled archive entry.",
+  "scripts/build-owner-systemos-policy.py is host-only qualification: it mounts the raw SystemOS member read-only, signs a manifest with the local owner anchor and verifies all 806400 blocks through the real C/RSA host dylib; no hardware or storage publication is claimed.",
 ]
 completion = [
   "Every claimed UniXNU milestone has matching source/image revisions, a reproducible command and accessible firmware/kernel logs.",

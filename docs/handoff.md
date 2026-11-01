@@ -48,6 +48,16 @@
   原始 BOOT 恢复待完成，后续镜像以 `evidence/bring-up/runtime/*/flash.json` 回执为准。
 - 以下为 ds 交接当时的状态、命令和待办，保留作历史基线；当前进展以本节及适配记录为准。
 
+## UFS 的硬约束（本轮结论）
+
+- 已生成 T970 的 `userdata-root.img`（OS `e5634d04…` @0x100000、SystemOS `b4908cde…` @0x16a600000，
+  共 9,382,658,048 字节），并把 `[userdata]` 几何与根卷 UUID 写进 `board.toml`。
+- verified-root 路线**装不下**：OS+SystemOS 的块哈希表约 47 MiB 嵌进内核后，`kernel.macho` 为
+  125,374,464 字节，实测打包镜像 **138,211,328 字节**，而 BOOT 分区只有 **71,303,168 字节（68 MiB）**。
+- 因此 `CONFIG_XNU_NATIVE_UFS` 与 `CONFIG_XNU_VERIFIED_ROOT_PROBE` 保持关闭；下一步需要
+  **T970 板级 UFS 发布路径**：复用 alioth 驱动，但不嵌入 verified-root 哈希表，改为直接发布
+  userdata 分区/根窗口，适配 68 MiB 启动分区。
+
 ## UFS 移植现状（已准备，未启用）
 
 - 已把 `feeds.toml` 的 `ShengUfs` 指向 `FFT-infra/NativeUfs-alioth@ab54059`（SM8250、device-verified），
