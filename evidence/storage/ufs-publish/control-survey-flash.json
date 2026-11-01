@@ -1,0 +1,11 @@
+{
+  "device": "sm-t970",
+  "purpose": "control: re-flash the image that last reached its panic screen",
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-survey/boot.img --no-reboot",
+  "boot_sha256": "c404ce262b69cb7bc0af22dc5da866506c7c3faf3cdfc824971f2b311d46b2b4",
+  "boot_bytes": 62713856,
+  "exit_code": 0,
+  "result": "BOOT upload successful; device left in Download Mode",
+  "device_result": "pending owner reboot and screen photo",
+  "context": "After BOOT 899f2969 stopped at the magenta bar and reset, this control separates a code regression from a device or payload change."
+}

@@ -28,6 +28,20 @@ DMA、走和调查版相同的 NOP/上电/TUR 序列。它**不写** SMMU、不�
 `GFSR`/`CB0 FSR` 基线，NOP、上电、TUR 各阶段后必须与基线一致，出现新故障即拒绝。
 这和调查版每次读取前后做的比较是同一种判断，不再依赖某个 boot 的寄存器快照。
 
+## handoff bring-up 复刻调查版的准入与 NOP
+
+第一版手写序列在实机卡死（magenta 条后自复位，见下），因此 bring-up 改为**逐字复刻调查版**：
+
+1. 采集 `t970_smmu::collect`、`t970_ufs::collectClocks`、`t970_ufs::collectController`；
+2. 同样的准入：`t970_preflight::candidate()`、`canReadController()`、`HCE/HCS`、门铃为零；
+3. `t970_preflight::ownsDma()` 保证 DMA 在 owned window；
+4. 直接跑调查版的 `t970_nop::run`（含它自己的 `0x60=0` 停队列、`0x50/0x54=dma`、
+   `0x60=1` 起队列、SMR/S2CR park、以及一次有界 NOP 和逐项保护状态校验）；
+5. `run` 成功后只做上电查询与 TUR，不再重复 NOP。
+
+失败时 panic 会带上 `stage`、`nopStage`（调查版的结果阶段 0–6）、`CB0` 三元组、`smr/s2cr`、
+`gfsr/fsr` 和 DMA 地址，正好对应调查版 `Result.stage` 的语义。
+
 ## 请求列表必须接管（第一条实机结论）
 
 `t970-ufs-publish=1` 的第一版（BOOT `11a1d635`）停在 magenta 条、没有任何 panic 文本。

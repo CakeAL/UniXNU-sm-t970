@@ -1105,7 +1105,7 @@ static void hostWrite (unsigned offset, uint32_t value)
 // `why` receives a short reason on failure.
 // t970-ufs-publish=1 borrows the firmware handoff translation instead of building one.
 static bool gHandoffTransport = false;
-static bool hostProveTransport (const char **why);
+static bool hostProveTransport (const char **why, bool identityProven = false);
 static bool hostBringUpHandoff (const char **why);
 static bool hostBringUp (const char **why)
 {
@@ -1176,7 +1176,7 @@ static bool hostBringUp (const char **why)
 // Prove the transport and wake LUN 0. Both bring-up paths end here: NOP OUT first, then the power
 // mode the firmware left, START STOP UNIT when the device is parked, and TEST UNIT READY until it
 // answers. Nothing here writes storage.
-static bool hostProveTransport (const char **why)
+static bool hostProveTransport (const char **why, bool identityProven)
 {
   // The 400 fault this board records in CB0 predates the kernel (it belongs to an earlier
   // master), so the check is drift, not zero: no new global or context fault may appear while
@@ -1194,13 +1194,15 @@ static bool hostProveTransport (const char **why)
     *why = reason;
     return false;
   };
-  gRootDiagnostic.stage = "NOP OUT";
-  // NOP OUT proves the transport before touching the SCSI layer.
-  if (hostNop () != kIOReturnSuccess) {
-    return refuse ("NOP OUT");
-  }
-  if (faulted ()) {
-    return refuse ("NOP OUT faulted the SMMU");
+  if (!identityProven) {
+    gRootDiagnostic.stage = "NOP OUT";
+    // NOP OUT proves the transport before touching the SCSI layer.
+    if (hostNop () != kIOReturnSuccess) {
+      return refuse ("NOP OUT");
+    }
+    if (faulted ()) {
+      return refuse ("NOP OUT faulted the SMMU");
+    }
   }
   uint32_t power = 0;
   gRootDiagnostic.stage = "power mode query";
@@ -1261,35 +1263,58 @@ static bool hostBringUpHandoff (const char **why)
   if (gHost.ready) {
     return true;
   }
+  // Publication runs the survey's own admission sequence, in the same order and with the same
+  // gates, instead of a hand-written variant: a fresh SMMU report, the controller clocks and an
+  // idle queue, an owned DMA buffer, and then the reviewed NOP state machine that parks the two
+  // board SIDs, takes the request list over and issues exactly one bounded NOP. The kernel never
+  // builds an SMMU context of its own on this board (the secure world ignores those writes), and
+  // the survey proved this path end to end, including its SCSI reads.
   gRootDiagnostic.stage = "handoff maps";
-  gHost.hc = mapPhys (UFS_HC_BASE, UFS_HC_SIZE, gHost.hcMap);
-  gHost.smmu = mapPhys (0x15000000ULL, 0x100000, gHost.smmuMap);
-  if (!gHost.hc || !gHost.smmu) {
+  OSSharedPtr<IOMemoryMap> gccMap;
+  uintptr_t smmu = mapPhys (0x15000000ULL, 0x100000, gHost.smmuMap);
+  uintptr_t hc = mapPhys (UFS_HC_BASE, UFS_HC_SIZE, gHost.hcMap);
+  uintptr_t gcc = mapPhys (GCC_BASE + 0x77000, 0x1000, gccMap);
+  if (!smmu || !hc) {
     *why = "controller/SMMU map";
     return false;
   }
-  gRootDiagnostic.cbar = read32 (gHost.smmu, 0x1000);
-  gRootDiagnostic.cba2r = read32 (gHost.smmu, 0x1800);
-  gRootDiagnostic.sctlr = read32 (gHost.smmu, 0x80000);
-  gRootDiagnostic.smr = read32 (gHost.smmu, 0x810);
-  gRootDiagnostic.s2cr = read32 (gHost.smmu, 0xc10);
-  gRootDiagnostic.smmuSlot = read32 (gHost.smmu, 0x954);
-  gRootDiagnostic.smmuId1 = read32 (gHost.smmu, 0x958);
-  gRootDiagnostic.gfsr = read32 (gHost.smmu, 0x48);
-  gRootDiagnostic.fsr = read32 (gHost.smmu, 0x80058);
-  if (gRootDiagnostic.cbar != 0x100ff || gRootDiagnostic.cba2r != 1 || gRootDiagnostic.sctlr != 0xe0 ||
-      gRootDiagnostic.gfsr) {
-    // CB0 must still be the active translation and no global fault may be pending; anything else
-    // means this is not a state the survey ever read through.
-    *why = "no active CB0 translation";
-    return false;
+  const t970_smmu::Report r = t970_smmu::collect (
+    [smmu](unsigned off) { return read32 (smmu, off); }, 0x100000);
+  t970_ufs::Clocks c;
+  t970_ufs::Controller h;
+  if (gcc) {
+    c = t970_ufs::collectClocks ([gcc](unsigned off) { return read32 (gcc, off); });
+    if (t970_ufs::canReadController (c)) {
+      h = t970_ufs::collectController (c, [hc](unsigned off) { return read32 (hc, off); });
+    } else {
+      h.state = 2;
+    }
+  } else {
+    h.state = 3;
   }
-  gHost.cb = gHost.smmu + 0x80000;
   const auto *args = static_cast<const boot_args *> (PE_state.bootArgs);
   if (!args) {
     *why = "no boot args";
     return false;
   }
+  const uint64_t ownedBase = args->physBase, ownedBytes = args->memSize;
+  const uint32_t cbar = read32 (smmu, 0x1000), cba2r = read32 (smmu, 0x1800);
+  const uint32_t sctlr = read32 (smmu, 0x80000);
+  gRootDiagnostic.cbar = cbar;
+  gRootDiagnostic.cba2r = cba2r;
+  gRootDiagnostic.sctlr = sctlr;
+  gRootDiagnostic.smr = read32 (smmu, 0x810);
+  gRootDiagnostic.s2cr = read32 (smmu, 0xc10);
+  gRootDiagnostic.gfsr = read32 (smmu, 0x48);
+  gRootDiagnostic.fsr = read32 (smmu, 0x80058);
+  if (!t970_preflight::candidate (r, cbar, cba2r, sctlr) || !t970_ufs::canReadController (c) ||
+      h.state != 1 || !(h.hce & 1) || (h.hcs & 15) != 15 || h.doorbell || h.tmDoorbell) {
+    *why = "handoff admission";
+    return false;
+  }
+  gHost.hc = hc;
+  gHost.smmu = smmu;
+  gHost.cb = smmu + 0x80000;
   gRootDiagnostic.stage = "handoff DMA allocation";
   gHost.dma = IOBufferMemoryDescriptor::inTaskWithOptions (
     kernel_task, static_cast<IOOptionBits> (kIODirectionInOut) | static_cast<IOOptionBits> (kIOMemoryPhysicallyContiguous) |
@@ -1305,24 +1330,34 @@ static bool hostBringUpHandoff (const char **why)
   gHost.phys = gHost.dma->getPhysicalSegment (0, &contiguous, kIOMemoryMapperNone);
   gRootDiagnostic.dma = gHost.phys;
   gRootDiagnostic.contiguous = contiguous;
-  if (!gHost.virt || !gHost.phys || (gHost.phys & 4095) || contiguous < kDmaBytes) {
-    *why = "DMA address/contiguity";
-    return false;
-  }
-  if (!t970_preflight::ownsDma (args->physBase, args->memSize, gHost.phys, kDmaBytes, contiguous)) {
+  if (!gHost.virt || !gHost.phys || (gHost.phys & 4095) || contiguous < kDmaBytes ||
+      !t970_preflight::ownsDma (ownedBase, ownedBytes, gHost.phys, kDmaBytes, contiguous)) {
     *why = "DMA outside the owned window";
     return false;
   }
   bzero (gHost.virt, kDmaBytes);
   cacheCivac (gHost.virt, kDmaBytes);
-  // The request list still belongs to whatever the firmware left there. Ringing the doorbell
-  // without taking it over makes the controller read descriptors from that buffer instead of
-  // ours, which stalls the machine with no console to report it. Stop and re-point it exactly as
-  // the production path does; only the SMMU half of the normal bring-up is skipped.
-  gRootDiagnostic.stage = "handoff request list";
-  if (!hostStopQueue (why)) return false;
-  if (!hostStartQueue (why)) return false;
-  return hostProveTransport (why);
+  gRootDiagnostic.stage = "handoff NOP";
+  struct Port {
+    uintptr_t smmu;
+    uint32_t smmuRead (unsigned off) { return read32 (smmu, off); }
+    void smmuWrite (unsigned off, uint32_t value) {
+      write32 (smmu, off, value);
+      __asm__ volatile ("dsb sy" ::: "memory");
+    }
+    uint32_t hcRead (unsigned off) { return read32 (gHost.hc, off); }
+    void hcWrite (unsigned off, uint32_t value) { hostWrite (off, value); }
+    bool wait (unsigned off, uint32_t mask, uint32_t value) { return hostWaitRegister (off, mask, value); }
+    bool nop () { return hostNop () == kIOReturnSuccess; }
+    bool submitted () { return gRootDiagnostic.command != 0; }
+  } port {smmu};
+  const auto result = t970_nop::run (port, r, c, h, true, gHost.phys);
+  if (!result.success || !result.protectedUnchanged) {
+    gRootDiagnostic.polls = result.stage;
+    *why = "handoff NOP";
+    return false;
+  }
+  return hostProveTransport (why, true);
 }
 }
 
@@ -3077,11 +3112,12 @@ bool NativeUfs::start (IOService *provider)
     const char *why = "handoff bring-up";
     if (!hostBringUp (&why)) {
       panic ("T970 UFS publish: handoff refused: %s\n"
-             "CB0=%x/%x/%x smr=%x s2cr=%x/%x/%x gfsr=%x fsr=%x\ndma=%llx bytes=%x",
-             why, gRootDiagnostic.cbar, gRootDiagnostic.cba2r, gRootDiagnostic.sctlr,
-             gRootDiagnostic.smr, gRootDiagnostic.s2cr, gRootDiagnostic.smmuSlot,
-             gRootDiagnostic.smmuId1, gRootDiagnostic.gfsr, gRootDiagnostic.fsr,
-             gRootDiagnostic.dma, kDmaBytes);
+             "stage=%s nopStage=%u\n"
+             "CB0=%x/%x/%x smr=%x s2cr=%x gfsr=%x fsr=%x\ndma=%llx bytes=%x",
+             why, gRootDiagnostic.stage, gRootDiagnostic.polls,
+             gRootDiagnostic.cbar, gRootDiagnostic.cba2r, gRootDiagnostic.sctlr,
+             gRootDiagnostic.smr, gRootDiagnostic.s2cr, gRootDiagnostic.gfsr,
+             gRootDiagnostic.fsr, gRootDiagnostic.dma, kDmaBytes);
     }
     RootLayout *layout = static_cast<RootLayout *> (IOMalloc (sizeof (RootLayout)));
     if (!layout) panic ("T970 UFS publish: no layout buffer");
