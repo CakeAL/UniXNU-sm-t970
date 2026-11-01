@@ -77,3 +77,30 @@ w0 <name> off=<..> size=<..>
 合计约 71.6 MB，加进内核后 BOOT 镜像会超过 71,303,168 字节的分区上限。空策略表可以启动，
 但按设计不会发布任何窗口。因此本版预期的实机结果是发布停在 owner 校验，并把窗口几何打印
 出来；这两个数就是后续把策略载体移出内核（userdata 固定区 + 运行时 `vr_open`）的输入。
+
+## 实机结果（BOOT `ca021c28`）
+
+调查版序列跑通，发布停在 owner 策略，屏幕原文：
+
+```
+T970 UFS publish: publication stopped
+stage=policy count invalid phase=1 window=0 bytes=16a408600
+userdata=.. image=22f400000 manifest=0 magic=474e4853 544f4f52
+windows=2 prepared=0 published=0 policies=0 verify=ffffffff
+w0 OS off=100000 size=16a408600
+w1 SystemOS off=16a600000 size=c4e00000
+```
+
+`magic=SHNGROOT`、`manifest=0`、`windows=2`、`prepared=0 published=0`：正式读取与窗口计划
+都成立，且 fail-closed 生效——一个窗口也没发布。窗口几何与 host 侧从镜像首块解出的 manifest
+完全一致：
+
+| 窗口 | 偏移 | 字节数 | 4096 块 | 哈希表 |
+| --- | --- | --- | --- | --- |
+| OS | `0x100000` | 6,077,580,800 | 1,483,784 | 47,481,088 |
+| SystemOS | `0x16a600000` | 3,303,014,400 | 806,400 | 25,804,800 |
+
+合计哈希表 73,285,888 字节，加两份 manifest 约 73.3 MB。这就是**下一步签名与载体的输入**：
+manifest 放进 userdata 镜像之后的固定区（镜像止于 LBA 5,260,288），启动时经同一 handoff
+通道读入并 RSA 校验，再填 `verified_root_policies`；内核体积不变。
+```

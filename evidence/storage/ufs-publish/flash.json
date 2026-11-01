@@ -1,13 +1,13 @@
 {
   "device": "sm-t970",
-  "revision": "bcfa18f",
-  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-publish3/boot.img --no-reboot",
-  "boot_sha256": "899f296914a6c2f77a785d92e1deb0dc02673f4eea03a859b1196c86e82eb0df",
+  "revision": "491e568",
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-publish4/boot.img --no-reboot",
+  "boot_sha256": "ca021c287577a02c186914a5572505834ab356a4a2ee3396fe2550c6d9b20b94",
   "boot_bytes": 62713856,
-  "kernel_sha256": "4c59a455cbf35fb9e3bce004fb67c1de206db16ed7feb388225389583fa106ab",
+  "kernel_sha256": "bab1a6ac1c677af8d6165bbe3dcb1bd1e4e53a7cf0e872ce63d781830a22f828",
   "partition": "BOOT only; no USERDATA, RECOVERY or GPT write",
   "exit_code": 0,
-  "result": "BOOT upload successful, session ended; device left in Download Mode (--no-reboot)",
+  "result": "BOOT upload successful; device left in Download Mode",
   "device_result": "pending owner reboot and screen photo",
-  "time": "2026-11-01T19:46:18+08:00"
+  "time": "2026-11-01T19:52:20+08:00"
 }

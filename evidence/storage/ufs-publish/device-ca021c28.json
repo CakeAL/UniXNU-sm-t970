@@ -1,0 +1,43 @@
+{
+  "device": "sm-t970",
+  "boot_sha256": "ca021c287577a02c186914a5572505834ab356a4a2ee3396fe2550c6d9b20b94",
+  "source_revision": "491e568",
+  "observation_source": "Owner photo transcribed by the agent; window geometry independently corroborated from the SHNGROOT manifest at image offset 0 decoded out of the sparse segment.",
+  "photo": {
+    "filename": "2026-11-01-195331.jpg",
+    "source_available": true,
+    "sha256": "67528111b6181d79daebdc272a86f8cf9cca5b5bc6e7ae02df32820bb2cb6d9c"
+  },
+  "panic_text": [
+    "T970 UFS publish: publication stopped",
+    "stage=policy count invalid phase=1 window=0 bytes=16a408600",
+    "userdata=2969600..5f5f0fba image=22f400000 manifest=0 magic=474e4853 544f4f52",
+    "windows=2 prepared=0 published=0 policies=0 verify=ffffffff",
+    "w0 OS off=100000 size=16a408600",
+    "w1 SystemOS off=16a600000 size=c4e00000"
+  ],
+  "host_corroboration": {
+    "manifest_magic": "SHNGROOT",
+    "manifest_version": 1,
+    "manifest_status": 0,
+    "windows": 2,
+    "image_bytes": 9382658048,
+    "os": {
+      "offset": 1048576,
+      "size": 6077580800
+    },
+    "systemos": {
+      "offset": 6079643648,
+      "size": 3303014400
+    }
+  },
+  "reached": [
+    "handoff admission and the survey's NOP state machine succeeded (no refusal text)",
+    "the production manifest/GPT reader found the SHNGROOT manifest and validated it (status 0)",
+    "both windows were planned with the exact host-side geometry"
+  ],
+  "stopped_at": "owner policy: the kernel links an empty VerifiedRoot policy table, so no window is prepared or published (prepared=0 published=0)",
+  "published": false,
+  "root_mounted": false,
+  "hardware_tested": true
+}

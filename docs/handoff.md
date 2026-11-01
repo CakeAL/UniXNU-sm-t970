@@ -16,6 +16,30 @@ survey 镜像（`c404ce26…`）的 7 个样本全部匹配、14 次读零错误
 gHost（smmu/CB0/streams/DMA）走 `NativeUfsWholeUserdataBlock`/`NativeUfsBlock`，把
 userdata 的 OS 窗口发布成 IOMedia（UUID 匹配 ADT 的 `04769D26…`），让 APFS 挂根。
 
+## 发布路径已跑通到 owner 策略（BOOT `ca021c28`）
+
+实机结果（`evidence/storage/ufs-publish/device-ca021c28.json`）：
+
+```
+T970 UFS publish: publication stopped
+stage=policy count invalid phase=1 window=0 bytes=16a408600
+windows=2 prepared=0 published=0 policies=0 verify=ffffffff
+w0 OS off=100000 size=16a408600
+w1 SystemOS off=16a600000 size=c4e00000
+```
+
+handoff 准入、调查版 NOP、正式 manifest/GPT 读取、窗口计划全部通过，停在空策略表；一个窗口
+也没发布（prepared=0 published=0）。窗口几何与 host 侧从镜像首块解出的 SHNGROOT manifest
+逐字节一致：
+
+- OS：`0x100000`，6,077,580,800 字节（1,483,784 块，哈希表 47,481,088）
+- SystemOS：`0x16a600000`，3,303,014,400 字节（806,400 块，哈希表 25,804,800）
+- 合计哈希表 73,285,888 字节，加两份 manifest 约 73.3 MB → **不能进内核**（BOOT 68 MiB）
+
+**下一步**：manifest 放到 userdata 镜像之后的固定区（镜像止于 LBA 5,260,288，LBA 5,505,024
+起留 18,000 块），启动时用同一 handoff 通道读入、用编译进内核的 owner 公钥做 RSA 校验，再填
+`verified_root_policies`；每块读取仍按策略校验。
+
 ## 发布路径已接上固件 handoff（`t970-ufs-publish=1`）
 
 - 新增 `hostBringUpHandoff`，`hostBringUp` 在发布模式下直接走它：只映射 controller/SMMU、
