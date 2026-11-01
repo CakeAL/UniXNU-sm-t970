@@ -1,0 +1,15 @@
+--- a/bsd/vm/vm_unix.c
++++ b/bsd/vm/vm_unix.c
+@@ -2246,7 +2246,11 @@
+ #else
+ 	const char *cache_uuid = "8846FE78-2910-4297-AF97-D59BB6F8FC16";
+ #endif
+-	const char *directory = "/private/preboot/System/Library/Caches/com.apple.dyld";
++	/* iPadOS dyld resolves the cache at /System/Library/Caches/com.apple.dyld (the path is in its
++	 * own strings), so the owner carrier must authorise that location rather than the preboot
++	 * mount point the framework patch assumes. The SystemOS volume is composed as a union over /
++	 * so this path reaches the signed cryptex. */
++	const char *directory = "/System/Library/Caches/com.apple.dyld";
+ 	vnode_t expected_parent = NULLVP, device_vnode;
+ 	dev_t root_device = NODEV, cache_device = NODEV, expected = NODEV;
+ 	char device_path[64];
