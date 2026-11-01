@@ -1,0 +1,24 @@
+{
+  "device": "sm-t970",
+  "boot_sha256": "09d861be5bae5f1f8b157da752857bd649f0ba6487279bc3940df6d242cb126f",
+  "kernel_sha256": "7c994530706302207627fc358c200b9a6b60eb5b8a2176a69bcf70f6f23fe0f5",
+  "source_revision": "c1b724e",
+  "observation_source": "Owner photo transcribed by the agent.",
+  "photo": {
+    "filename": "2026-11-01-202630.jpg",
+    "sha256": "f5336ec9256c15f36d30757615bff1ff4e8d00a994f0a0a5af2bc1a01e4f49fd"
+  },
+  "panic_text": [
+    "initproc failed to start -- exit reason namespace 6 subcode 0x1 description: Library not loaded: /usr/lib/libSystem.B.dylib",
+    "Referenced from: <4B525992-8D39-315E-A51A-DC9433E45B5D> /sbin/launchd",
+    "Reason: tried: '/usr/lib/libSystem.B.dylib' (no such file, no dylib cache)"
+  ],
+  "reached": [
+    "owner root accepted: bsd_init passed the post-mount authentication gate",
+    "launchd was exec'd from the mounted read-only APFS root",
+    "userspace startup began"
+  ],
+  "blocked_at": "dyld has no shared cache, so libSystem resolves neither from the root nor from a cache",
+  "next": "mount the SystemOS window as the owner dyld cache carrier (XNU_OWNER_CACHE_MOUNT/STARTUP/CARRIER)",
+  "hardware_tested": true
+}
