@@ -1,0 +1,26 @@
+{
+  "device": "SM-T970 / gts7xlwifi",
+  "image_source_revision": "d07a7ed5e3d474b801ad328266718e11aed2550c",
+  "image_sha256": "fd43ee7035ce185ce4215ac93fdc006fd784a54b3b7442e21457c226cbe03093",
+  "image_bytes": 9382658048,
+  "segments": [
+    {
+      "path": "userdata-seg0.bin",
+      "sha256": "05583f03fbb0582f7cf04c0f31e5e1e2cfb45d3209b5ffad40bdf54ef6adf5ee",
+      "bytes": 2824972304
+    },
+    {
+      "path": "userdata-seg1.bin",
+      "sha256": "f3deceade67e42c45aaaf0ed49cbc9cdcf4bdd65545f8758799d5cd0c491e82c",
+      "bytes": 3089212448
+    },
+    {
+      "path": "userdata-seg2.bin",
+      "sha256": "8aef66188eb3e2c67d194b9a63099bb1f5d3fd842c3482f555d2895d2eb2e3d4",
+      "bytes": 3009520972
+    }
+  ],
+  "command": ".cache/heimdall/build/bin/heimdall flash --USERDATA out/step7/userdata-segN.bin --no-reboot",
+  "result": "All three sparse segments uploaded successfully (USERDATA upload successful, exit 0); DONT_CARE chunks kept each transfer below the 4 GiB protocol limit.",
+  "restore_state": "userdata contains the OS/SystemOS image; Android data was overwritten as agreed"
+}

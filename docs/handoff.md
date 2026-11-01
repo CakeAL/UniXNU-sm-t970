@@ -48,6 +48,16 @@
   原始 BOOT 恢复待完成，后续镜像以 `evidence/bring-up/runtime/*/flash.json` 回执为准。
 - 以下为 ds 交接当时的状态、命令和待办，保留作历史基线；当前进展以本节及适配记录为准。
 
+## UFS 进展（userdata 已写入）
+
+- **userdata 已完整写入**：`scripts/encode-userdata-sparse.py` 把 8.7 GiB 镜像切成三段 sparse，
+  用 DONT_CARE 跳过非本段内容，每段 <4 GiB，Heimdall 三次 `USERDATA upload successful`。
+- 内核 `a981a22d…`（alioth ShengUfs + 空策略 VerifiedRoot，19 KB）能链接、能启动，单 stream
+  `0x60` 时在 `NativeUfs.cpp:455` panic：`SMR write off=958 exp=80000060 act=0`，
+  即 SMMU 的 stream 写入不生效（固件 SID 不同或 SMMU 被锁）。
+- 下一步：确定 ABL 为 T970 配置的 UFS stream id（或确认 SMMU 只能由固件预配），
+  再决定改 `native-ufs-stream` 还是做板级 SMMU/ICE 配置。
+
 ## UFS 的硬约束（本轮结论）
 
 - 已生成 T970 的 `userdata-root.img`（OS `e5634d04…` @0x100000、SystemOS `b4908cde…` @0x16a600000，

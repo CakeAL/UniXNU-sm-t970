@@ -1,0 +1,10 @@
+{
+  "device": "SM-T970 / gts7xlwifi",
+  "boot_image_sha256": "c38d09f7a3555a7cd37eef0b2bf9acdc1b979ef7ab29f396c84632b729529a69",
+  "boot_image_bytes": 62713856,
+  "source_kernel_sha256": "a981a22d2682114cbeaf2d613bfff60ec861c59a0596b54446e566de0cdbb2a8",
+  "observation_source": "Human photograph of the panic screen",
+  "panic": "NATIVE_UFS smmu: SMR write idx=86 bank=73 step=SMR write off=958 exp=80000060 act=0 @NativeUfs.cpp:455",
+  "result": "With userdata provisioned and a single default stream (sid 0x0060), the driver binds the UFS controller but cannot program its SMMU stream: the SMR write reads back zero.",
+  "limits": "Establishes only that this SMMU register write has no effect for sid 0x0060; it does not prove the SMMU is locked, nor identify the firmware-configured stream id."
+}
