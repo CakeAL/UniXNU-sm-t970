@@ -97,6 +97,7 @@ findings = [
   "The diagnostic tree at commit 66abd1f carries the t970-novc boot argument, panic_screen and the three console-bypass patches; the checkpoint evidence revisions name that commit in full.",
   "The diagnostic kernel still boots with t970-novc and panic_screen. The next config change is the PMGR bridge: CONFIG_XNU_SHENG_PMGR=y, a build-platform-power.py archive entry and a sheng-pmgr=2 boot argument, following the marble-milacy reference that targets the same 21H461 kernelcache.",
   "Enabled CONFIG_XNU_SHENG_PMGR=y in sm-t970_defconfig, added the PMGR archive and sheng-pmgr=2 boot argument, and regenerated .config before the kernel build.",
+  "feeds.toml now pins the SM8250 UFS fork and unixnu.lock records it, but no component selects it; board.toml and sm-t970_defconfig remain in their buildable pre-UFS state.",
 ]
 completion = [
   "A board.toml with matching device identity resolves the selected SoC and OS profiles and pinned sources.",
@@ -489,6 +490,8 @@ findings = [
   "No SM8250/kona UFS implementation exists in the reviewed repositories: the shared SoC DTSI only declares disabled ufs/ufsphy nodes, and the SM8250 pipa port carries only package/SmmuBypass.h. UFS therefore stays disabled; storage remains planned pending a real driver port.",
   "Reviewed the SM8250 ports on unixnu.com/zh/devices: umi (Mi 10) has Native UFS, both root volumes and writable Data with launchd running; alioth (Redmi K40) marks storage device-verified using a device fork FFT-infra/NativeUfs-alioth pinned through feeds.toml; kebab reaches an HFS root; pipa is still stuck at root mount.",
   "The shared technique is firmware state takeover, not cold init: NativeUfs reads GCC gating and link state without writing clocks/reset/PHY, plans the two SM8250 UFS streams 0x0e0 and 0x4e0 from SMR/S2CR readback, and publishes a per-device userdata window. T970 uses the same controller 0x1d84000 and PHY 0x1d87000, so the umi/alioth driver is the concrete base for this port instead of ShengUfs SM8550 constants.",
+  "Started the SM8250 UFS port by pinning feeds.toml ShengUfs to FFT-infra/NativeUfs-alioth@ab54059 (device-verified storage fork, streams 0x0e0/0x4e0). The component compiled; the kernel link then required the original IOStorageFamily absolute bindings (scripts/build-storage-bindings.py plus scripts/data/native-storage-original-bindings.S, both stored here) and the VerifiedRoot vr_* archive.",
+  "Enabling the driver is blocked on two inputs that do not exist yet: the signed VerifiedRoot policy archive (build-verified-root-probe.py needs the OS-volume verification bundle, not just the IPSW) and a sheng userdata manifest that findRootLayout accepts; the T970 GPT is an Android layout. The integration is therefore prepared but disabled; CONFIG_XNU_NATIVE_UFS stays off and board components/archives are unchanged.",
 ]
 completion = [
   "UFS reads return correct capacity, GPT and known blocks under XNU; the chosen root mounts and writes persist only inside the allocated Data region.",
@@ -1042,6 +1045,7 @@ findings = [
   "Bypassing PE_init_printf(TRUE) (which calls vcattach) with a null PE_putc under t970-novc resolved the console spin: PE_init_iokit returned (probe f32a04c0, ~6 s reset) and the bootstrap thread reached bsd_init (probe fa16c47d, immediate reset) on kernel d862c992. The same PE_init_iokit checkpoint had not reset on the earlier console-skip kernel.",
   "Restoring gc_initialize fixed the invalid ticket-lock panic: with vinfo populated and the lock initialized, the panic screen renders text and the kernel reaches bsd_init. Removing the forced panic then exposed the real next blocker: unmodified AMFI panics with 'AMFI: No PMGR?' at ConfigurationSettings.cpp:235 because no ApplePMGR provider is published. Image 041fcf8c, kernel 80cc00ad.",
   "With sheng-pmgr=2 and the PMGR bridge linked, unchanged AMFI passes and the kernel reaches IOKit root-device mounting: panic 'Failed to mount root device @IOKitBSDInit.cpp:984' (kernel d4914c03, image see evidence). This is the expected storage blocker, not a startup-chain failure.",
+  "scripts/build-storage-bindings.py and scripts/data/native-storage-original-bindings.S are kept as the audited absolute-address binding for the original IOStorageFamily symbols; they are not referenced by any enabled archive entry.",
 ]
 completion = [
   "Every claimed UniXNU milestone has matching source/image revisions, a reproducible command and accessible firmware/kernel logs.",

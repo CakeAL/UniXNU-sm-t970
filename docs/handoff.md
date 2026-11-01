@@ -48,6 +48,17 @@
   原始 BOOT 恢复待完成，后续镜像以 `evidence/bring-up/runtime/*/flash.json` 回执为准。
 - 以下为 ds 交接当时的状态、命令和待办，保留作历史基线；当前进展以本节及适配记录为准。
 
+## UFS 移植现状（已准备，未启用）
+
+- 已把 `feeds.toml` 的 `ShengUfs` 指向 `FFT-infra/NativeUfs-alioth@ab54059`（SM8250、device-verified），
+  驱动源码可编译；`scripts/build-storage-bindings.py` + `scripts/data/native-storage-original-bindings.S`
+  解决 `IOBlockStorageDevice`/`IOMedia` 原始符号。
+- 完整链接还缺 **VerifiedRoot `vr_*`**：`build-verified-root-probe.py` 需要 OS 卷验证产物
+  （`build/verified-root-os/verification.json`），不只是 IPSW。
+- 运行还需要 `findRootLayout` 接受的 **sheng userdata manifest**；T970 是 Android GPT，没有该布局。
+- 因此 `board.toml` 的组件/archives、`sm-t970_defconfig` 的 `CONFIG_XNU_NATIVE_UFS` 都保持原样
+  （可构建状态），接入内容作为后续工作保存。
+
 ## 启动链完成（最新）
 
 PMGR 占位（`ShengPlatformPower.cpp` + `build-platform-power.py`，`CONFIG_XNU_SHENG_PMGR=y`、

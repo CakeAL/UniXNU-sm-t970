@@ -35,3 +35,11 @@ name = "DarwinBoot"
 kind = "driver"
 git = "https://github.com/UniXNU/DarwinBoot.git"
 commit = "3325e352d7df68a9f9ad74832ed94a6acbbd7390"
+
+# SM8250 UFS driver fork carrying the two UFS streams (0x0e0/0x4e0); alioth
+# device-verified storage. Replaces the SM8550-scoped catalog ShengUfs.
+[[source]]
+name = "ShengUfs"
+kind = "driver"
+git = "https://github.com/FFT-infra/NativeUfs-alioth"
+commit = "ab5405905a1892da03a9a53e0fa3dcd255d04055"
