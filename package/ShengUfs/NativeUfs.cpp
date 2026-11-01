@@ -2423,24 +2423,36 @@ bool NativeUfsBlock::start (IOService *provider)
   // The owner paths resolve a volume by the UUID its policy signed: bsd_init's cache mount asks
   // native_verified_block_volume_device() for it and the verified-block personality walks IOMedia
   // looking for exactly this property, so the published whole media must carry it.
+  // Exactly one media may carry the signed UUID: the owner cache lookup refuses an ambiguous match.
+  // A window that holds a partition table publishes both a whole and a partition media, and the
+  // reference port mounts the partition node (disk4s1), so the partition wins and the whole media's
+  // copy is removed. With no partition media the whole media keeps it.
   char identity[37];
   if (signedVolumeUuid (identity)) {
     OSString *uuid = OSString::withCString (identity);
-    for (unsigned tick = 0; uuid && tick < 50; ++tick) {
-      bool tagged = false;
+    for (unsigned tick = 0; uuid && tick < 100; ++tick) {
+      IOMedia *whole = nullptr, *partition = nullptr;
       OSDictionary *matching = IOService::serviceMatching ("IOMedia");
       OSIterator *iterator = matching ? IOService::getMatchingServices (matching) : nullptr;
       if (iterator) {
         while (IOMedia *media = OSDynamicCast (IOMedia, iterator->getNextObject ())) {
-          if (!media->isWhole () || !ufsHasAncestor (media, this)) continue;
-          media->setProperty ("UUID", uuid);
-          tagged = true;
+          if (!ufsHasAncestor (media, this)) continue;
+          if (media->isWhole ()) {
+            if (!whole) whole = media;
+          } else if (!partition) {
+            partition = media;
+          }
         }
         iterator->release ();
       }
       OSSafeReleaseNULL (matching);
-      if (tagged) break;
-      IOSleep (10);
+      if (partition) {
+        partition->setProperty ("UUID", uuid);
+        if (whole) whole->setProperty ("UUID", static_cast<OSObject *> (nullptr));
+        break;
+      }
+      if (whole) whole->setProperty ("UUID", uuid);
+      IOSleep (20);
     }
     OSSafeReleaseNULL (uuid);
   }
