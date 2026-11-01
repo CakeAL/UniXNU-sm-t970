@@ -1,0 +1,31 @@
+{
+  "baseline_boot_sha256": "933a5d776edb2500be5c268b93e64f2cfec53fee6e12cebbb39869a8d7050deb",
+  "reference": "https://github.com/LineageOS/android_kernel_samsung_sm8250/blob/ad129ac77e9d871770d61f7bd219a836d7f35b74/drivers/iommu/arm-smmu.c",
+  "reference_function": "arm_smmu_test_smr_masks",
+  "target_slot_hex": "56",
+  "target_offset": "0x958",
+  "original_smr": "0x00000000",
+  "required_s2cr": "0x000200ff",
+  "test_word": "0x000000a5",
+  "restore_word": "0x00000000",
+  "allowed_write_offsets": [
+    "0x958"
+  ],
+  "allowed_write_values": [
+    "0x000000a5",
+    "0x00000000"
+  ],
+  "forbidden_writes": [
+    "VALID=1",
+    "S2CR",
+    "context bank",
+    "global control",
+    "GCC",
+    "PHY",
+    "SCM",
+    "HCI/queue",
+    "storage"
+  ],
+  "device_tested": false,
+  "limits": "Tests only inactive ID bits. Refused or unaccepted write does not identify secure-world ownership; accepted write does not qualify VALID or transport."
+}

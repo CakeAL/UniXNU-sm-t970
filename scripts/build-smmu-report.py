@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Prepare and independently check the bounded SMMU report BOOT; never flash."""
+"""Prepare and independently check a bounded SMMU diagnostic BOOT; never flash."""
 import argparse
 import hashlib
 import json
@@ -26,7 +26,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--unixnu', type=Path, default=device.parent / 'UniXNU')
     parser.add_argument('--output', type=Path, required=True)
-    parser.add_argument('--mode', choices=['smmu', 'handoff'], default='smmu')
+    parser.add_argument('--mode', choices=['smmu', 'handoff', 'smr-id'], default='smmu')
     parser.add_argument('--kernel-build', type=Path, default=device / 'out/step7/ufs-readonly-kernel-final.json')
     options = parser.parse_args()
     framework, output = options.unixnu.resolve(), options.output.resolve()
@@ -34,10 +34,15 @@ def main():
     require(subprocess.run(['git', '-C', str(device), 'check-ignore', str(output / 'boot.img')],
                            capture_output=True).returncode == 0, 'Output must be Git-ignored')
     kernel_build = json.loads(options.kernel_build.read_text())
-    if options.mode == 'handoff':
+    require(kernel_build.get('exit_code') == 0 and kernel_build.get('source_inputs_unchanged_during_build'),
+            'Require a successful kernel build with stable source inputs')
+    if options.mode in ['handoff', 'smr-id']:
         for name in ['package/ShengUfs/GccUfs.h', 'package/ShengUfs/T970UfsHandoff.h',
                      'package/ShengUfs/T970SmmuReport.h', 'package/ShengUfs/NativeUfs.cpp']:
             require(name in kernel_build['source_inputs_sha256'], 'Missing diagnostic input hash: ' + name)
+    if options.mode == 'smr-id':
+        require('package/ShengUfs/T970SmrIdTest.h' in kernel_build['source_inputs_sha256'],
+                'Missing bounded SMR test input hash')
     for name, digest in kernel_build['source_inputs_sha256'].items():
         require(sha(device / name) == digest, 'Kernel input changed: ' + name)
     sys.path.insert(0, str(framework / 'scripts'))
@@ -54,7 +59,8 @@ def main():
             'Firmware DTB changed')
     kernel = ctx.work / 'kernel/kernel.macho'
     require(sha(kernel) == kernel_build['kernel_sha256'], 'Kernel differs from final build')
-    mode_arg = 't970-ufs-handoff=1' if options.mode == 'handoff' else 't970-smmu-report=1'
+    mode_arg = {'handoff': 't970-ufs-handoff=1', 'smmu': 't970-smmu-report=1',
+                'smr-id': 't970-smr-id-test=1'}[options.mode]
     arguments = ['-v', 'cpus=1', 't970-novc', 'sheng-pmgr=2', mode_arg]
     spec = ctx.board['payload']
     require(spec['kernel_args'] == arguments and spec.get('panic_screen') is True and

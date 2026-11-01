@@ -1,0 +1,12 @@
+{
+  "function": "__ZN8t970_smrL3runIZN9NativeUfs5startEP9IOServiceE3$_3ZNS1_5startES3_E3$_4EENS_6ResultERKN9t970_smmu6ReportERKN8t970_ufs6ClocksERKNSB_10ControllerET_T0_",
+  "start": "0xfffffff00797b454",
+  "end": "0xfffffff00797b6e4",
+  "source_kernel_sha256": "d455be28e526ef9b6276e4347901d2551012e2c86632b3a30f2952cb19455431",
+  "purpose": "Review the two fenced writes to the fixed inactive SMR offset; stack/result stores are separate.",
+  "two_fixed_mmio_stores_verified": true,
+  "dsb_after_each_store": true,
+  "test_word": "0x000000a5",
+  "restore_word": "0x00000000",
+  "mmio_offset": "0x958"
+}

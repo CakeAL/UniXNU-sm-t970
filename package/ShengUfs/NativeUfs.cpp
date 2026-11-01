@@ -37,6 +37,7 @@ extern const uint8_t verified_root_key[];
 #include "SmmuTakeover.h"
 #include "T970SmmuReport.h"
 #include "T970UfsHandoff.h"
+#include "T970SmrIdTest.h"
 #include "WholeUserdataRoot.h"
 #include "WholeUserdataDisk.h"
 
@@ -2484,11 +2485,13 @@ static void mediaReportThread (void *, wait_result_t)
 
 bool NativeUfs::start (IOService *provider)
 {
-  unsigned retiredWriteScan = 0, smmuReport = 0, handoffReport = 0;
+  unsigned retiredWriteScan = 0, smmuReport = 0, handoffReport = 0, smrIdTest = 0;
   if (PE_parse_boot_argn ("t970-ufs-writable-smr", &retiredWriteScan, sizeof (retiredWriteScan)) && retiredWriteScan) {
     panic ("T970: writable SMR scan retired; use t970-smmu-report=1");
   }
-  if (PE_parse_boot_argn ("t970-ufs-handoff", &handoffReport, sizeof (handoffReport)) && handoffReport == 1 &&
+  PE_parse_boot_argn ("t970-smr-id-test", &smrIdTest, sizeof (smrIdTest));
+  PE_parse_boot_argn ("t970-ufs-handoff", &handoffReport, sizeof (handoffReport));
+  if ((handoffReport == 1 || smrIdTest == 1) &&
       OSDynamicCast (IOPlatformExpertDevice, provider)) {
     OSSharedPtr<IOMemoryMap> smmuMap, gccMap, hcMap;
     uintptr_t smmu = mapPhys (0x15000000ULL, 0x100000, smmuMap);
@@ -2505,6 +2508,28 @@ bool NativeUfs::start (IOService *provider)
         else h.state = 2;
       }
     } else h.state = 3;
+    if (smrIdTest == 1) {
+      const auto p = t970_smr::run (r, c, h,
+        [smmu](unsigned off) { return read32 (smmu, off); },
+        [smmu](unsigned off, uint32_t value) {
+          write32 (smmu, off, value);
+          __asm__ volatile ("dsb sy" ::: "memory");
+        });
+      panic ("T970 SMR ID test (VALID stays zero)\n"
+             "stage=%u slot=56 off=958 test=000000a5\n"
+             "before=%08x observed=%08x restored=%08x\n"
+             "s2crBefore=%08x s2crAfter=%08x\n"
+             "idAccepted=%u restoreOK=%u mappingsUnchanged=%u\n"
+             "gfsrBefore=%08x gfsrAfter=%08x\n"
+             "HCstate=%u hce=%08x hcs=%08x db=%08x tmDb=%08x\n"
+             "snapshot id0=%08x id1=%08x id2=%08x cr0=%08x gf=%08x\n"
+             "snapshot display04=%08x/%08x valid=%u slots=%u\nEND SMR ID test",
+             p.stage, p.before, p.observed, p.restored, p.s2crBefore, p.s2crAfter,
+             unsigned(p.idAccepted), unsigned(p.restoreOK), unsigned(p.mappingsUnchanged),
+             p.gfsrBefore, p.gfsrAfter, h.state, h.hce, h.hcs, h.doorbell, h.tmDoorbell,
+             r.id0, r.id1, r.id2, r.scr0, r.gfsr,
+             r.streams[4].smr, r.streams[4].s2cr, r.valid, r.scanned);
+    }
     static char text[3600]; // Entire bounded table fits the panic formatter's 4000-byte string limit.
     if (!t970_ufs::format (text, sizeof (text), r, c, h)) panic ("T970 UFS handoff RO: format overflow");
     panic ("%s", text); // No transport setup, queue writes, PHY/SCM calls or root access.

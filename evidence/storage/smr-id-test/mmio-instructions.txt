@@ -1,0 +1,8 @@
+fffffff00797b64c: b90002e9     	str	w9, [x23]
+fffffff00797b650: 528014a9     	mov	w9, #0xa5       ; =165
+fffffff00797b654: b9095ac9     	str	w9, [x22, #0x958]
+fffffff00797b658: d5033f9f     	dsb	sy
+fffffff00797b65c: b9495b09     	ldr	w9, [x24, #0x958]
+fffffff00797b660: b9000ae9     	str	w9, [x23, #0x8]
+fffffff00797b664: b9095adf     	str	wzr, [x22, #0x958]
+fffffff00797b668: d5033f9f     	dsb	sy

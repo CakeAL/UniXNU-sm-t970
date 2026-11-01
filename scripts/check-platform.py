@@ -110,10 +110,10 @@ def main():
             'Board-dependent GPU path must remain disabled')
     if ctx.config.get('XNU_NATIVE_UFS'):
         arguments = ctx.board.get('payload', {}).get('kernel_args', [])
-        require(sum(arg in arguments for arg in ['t970-smmu-report=1', 't970-ufs-handoff=1']) == 1 and
+        require(sum(arg in arguments for arg in ['t970-smmu-report=1', 't970-ufs-handoff=1', 't970-smr-id-test=1']) == 1 and
                 not any(arg != 't970-ufs-handoff=1' and arg.split('=', 1)[0].startswith(('native-ufs-', 't970-ufs-'))
                         for arg in arguments),
-                'This platform check allows UFS code only for the bounded read-only SMMU report')
+                'This platform check allows UFS code only for an isolated bounded diagnostic')
         require('zz-build-shengufs-local.py' in ctx.board['kernel']['archives'],
                 'Read-only report must use the reviewed local UFS archive')
 

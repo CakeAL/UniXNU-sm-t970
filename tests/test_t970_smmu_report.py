@@ -10,6 +10,15 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 
 
 class SmmuReportTests(unittest.TestCase):
+    def test_smr_id_field_guard_and_restore(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            executable = pathlib.Path(temporary) / 'smr-id-test'
+            subprocess.run(['clang++', '-std=c++17', '-Wall', '-Wextra', '-Werror',
+                            '-Wno-unused-function', '-I', str(ROOT / 'package/ShengUfs'),
+                            str(ROOT / 'tests/cpp/t970-smr-id-test.cpp'), '-o', str(executable)], check=True)
+            result = subprocess.run([str(executable)], text=True, capture_output=True, check=True)
+            self.assertIn('PASS: 18', result.stdout)
+
     def test_sm8250_clock_offsets_against_recorded_target_source(self):
         source = json.loads((ROOT / 'evidence/storage/handoff-readonly/clock-source.json').read_text())
         header = (ROOT / 'package/ShengUfs/GccUfs.h').read_text()

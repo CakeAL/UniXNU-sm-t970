@@ -10,7 +10,8 @@
 本轮先做[只读 SMMU 核查](docs/smmu-readonly.md)，报告原始寄存器与候选 SID，
 实机已确认读到 87 组匹配配置、74 个 context bank，三个候选 SID 均未匹配。
 未提交 UFS 命令或挂载根卷；已按[同类设备对照](docs/ufs-reference-comparison.md)修正时钟诊断，
-正准备[完整只读交接快照](docs/ufs-handoff.md)。
+[完整只读交接快照](docs/ufs-handoff.md)已确认 HCI ready、队列 doorbell 为零，
+唯一有效 stream 与显示对应。下一轮是[单个无效 SMR 的 ID 字段测试](docs/smr-id-test.md)，不建立活动映射。
 
 两个仓库并列放置，普通构建命令在主仓库执行：
 
@@ -70,4 +71,4 @@ XNU 内核和完整 payload 构建还需 Apple 原始 kernelcache、信任与 Da
 - [移植步骤](https://unixnu.com/zh/porting/steps)、[驱动适配](https://unixnu.com/zh/porting/drivers)
 
 交接已包含 BOOT 刷写测试历史；当前机主反馈与下一轮定位见 [交接更新](docs/handoff.md)。
-原始恢复镜像、固件 FDT 和每轮测试镜像均保留在本机忽略目录，未划分 Data 或启用存储驱动。
+原始恢复镜像、固件 FDT 和每轮测试镜像保留在本机忽略目录。已有 USERDATA 根镜像写入历史，存储读取与持久 Data 尚未验证。
