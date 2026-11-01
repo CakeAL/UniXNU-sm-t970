@@ -48,6 +48,14 @@
   原始 BOOT 恢复待完成，后续镜像以 `evidence/bring-up/runtime/*/flash.json` 回执为准。
 - 以下为 ds 交接当时的状态、命令和待办，保留作历史基线；当前进展以本节及适配记录为准。
 
+## SMMU 模型的最终判断
+
+- `GFSR`（0x24）写入无效 → SMMU 寄存器**被锁**，不能新建 bypass context；
+- 改用 vendored 驱动（IDR `0x0/0x4/0x8`）+ 自动复用所有 exact stream，仍在
+  `IDR0 bit30` 的 AArch64 检查失败（`SM8550/alioth 模型 ≠ SM8250 apps_smmu`）；
+- 结论：需要**针对 SM8250 的 SMMU 实现**（参考 Linux `arm-smmu-qcom`/SMMU-500 规范，
+  重写 SmmuTakeover 的寄存器模型），或让固件按 SM8250 的方式预先配好 UFS stream。
+
 ## 下一步的根因（固件不给 UFS 上电）
 
 - 固件 `gts7xlwifi.dsc` 仍写着 `no UFS driver yet. Excluded for bring-up`；

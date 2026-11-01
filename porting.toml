@@ -102,6 +102,7 @@ findings = [
   "board.toml selects ShengUfs and VirtioMmioBlock, adds the empty-policy VerifiedRoot archive entry, and boots with sheng-pmgr=2, native-ufs-root=1 and no stream override (default 0x60); sm-t970_defconfig enables CONFIG_XNU_NATIVE_UFS and CONFIG_XNU_VERIFIED_ROOT_PROBE. The temporary MassStorage boot-option firmware patch was reverted.",
   "board.toml now passes t970-smmu-dump=1 together with native-ufs-root=1 for the SMMU table diagnostic; the flag only triggers the arm_init dump and must be removed once the UFS stream is resolved.",
   "board.toml keeps native-ufs-root=1 with the default stream (no override) and selects component:ShengUfs only; the temporary MassStorage, smmu-dump and local-archive experiments are not part of the default boot path.",
+  "The build currently selects the board-local ShengUfs archive (component removed, zz-build-shengufs-local.py), enables CONFIG_XNU_NATIVE_UFS/VERIFIED_ROOT_PROBE and boots with native-ufs-root=1 plus t970-ufs-auto-stream=1. The kernel links and produces a 62.7 MB boot image.",
 ]
 completion = [
   "A board.toml with matching device identity resolves the selected SoC and OS profiles and pinned sources.",
@@ -503,6 +504,7 @@ findings = [
   "A t970-smmu-dump boot-argument diagnostic in arm_init (patches/xnu/t970-smmu-dump.patch) dumps the firmware-configured apps_smmu table before IOKit starts: IDR0 0x002d0405 and 26 valid SMR entries, none with SID 0x0060. The alioth driver then plans bank 73 slot 86 and its SMR write reads back zero, which points at SMMU power/clock or secure ownership rather than a missing stream id.",
   "The firmware DSC still states 'no UFS driver yet', and the ShengUfs hostBringUp only maps the controller: it assumes the boot firmware already powered UFS, the PHY and apps_smmu. On T970 the SMMU stream writes do not stick (SMR reads back zero) and the IDR reads vary between boots, so the driver cannot create the bypass context it needs. The vendored board copy in package/ShengUfs (IDR at 0x0/0x4/0x8 and a 0x820 attempt) is kept for the next step but is not selected in the archive list.",
   "NativeUfs/ShengUfs reuse is not enough for T970 on its own: slot 4 is a wildcard SID mapping (mask 0x402) that the driver refuses, and the firmware-configured UFS stream has not been identified among the 26 entries.",
+  "The vendored ShengUfs copy with IDR at 0x0/0x4/0x8 and an auto-reuse scan of every exact stream still fails: the planner rejects the block with 'SMMU AArch64 stage 1 unsupported' because IDR0 bit 30 is clear on T970. The alioth/SM8550 SMMU register model therefore does not describe SM8250 apps_smmu; a correct SM8250 SMMU implementation (or firmware-side stream setup) is required before UFS can publish the partition.",
 ]
 completion = [
   "UFS reads return correct capacity, GPT and known blocks under XNU; the chosen root mounts and writes persist only inside the allocated Data region.",
@@ -523,6 +525,7 @@ evidence = [
   { kind = "device", reference = "evidence/bring-up/runtime/userdata-sparse/flash.json", command = ".cache/heimdall/build/bin/heimdall flash --USERDATA out/step7/userdata-segN.bin --no-reboot", result = "Three sparse segments of the 9382658048-byte image uploaded successfully with exit 0; the DONT_CARE encoding keeps each transfer below 4 GiB and leaves unwritten ranges intact.", revision = "d07a7ed5e3d474b801ad328266718e11aed2550c" },
   { kind = "device", reference = "evidence/bring-up/runtime/ufs-smmu-stream/device-result.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/boot-single-stream.img --no-reboot", result = "Kernel a981a22d with single default stream 0x0060 panics at NativeUfs.cpp:455: SMR write off=958 exp=80000060 act=0. The controller is bound but its SMMU stream cannot be programmed.", revision = "d07a7ed5e3d474b801ad328266718e11aed2550c" },
   { kind = "device", reference = "evidence/bring-up/runtime/t970-smmu-table/device-result.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/boot-smmudump.img --no-reboot", result = "The dump shows IDR0 0x002d0405 and 26 configured streams (the visible subset is recorded) with no stream 0x0060; the SMR write in the later UFS path reads back zero.", revision = "1ad4d2516482a2f0b21f19cbfbb85a62e5b56ee1" },
+  { kind = "device", reference = "evidence/bring-up/runtime/ufs-smmu-aarch64/device-result.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/boot-autostream.img --no-reboot", result = "Kernel 975e0186 with the vendored driver panics at NativeUfs.cpp:442: SMMU AArch64 stage 1 unsupported (IDR0 bit 30 clear).", revision = "0c691088c4ffba48c4394026fd64b5312777f7d7" },
 ]
 
 [[area]]
@@ -902,6 +905,8 @@ findings = [
   "Added scripts/build-verified-root-empty.py (real VerifiedRoot crypto with a zero-length policy table, 19 KB archive, fixed at link time) and scripts/build-ufs-stubs.py with package/UfsStubs.c. The VerifiedRoot probe archive with the 47 MiB hash table stays out of the kernel because it does not fit the 68 MiB BOOT partition.",
   "patches/xnu/t970-smmu-dump.patch is appended to the device series after the console and vcattach patches; it targets the end of arm_init (before machine_startup) so it stays clear of the console hunks.",
   "package/ShengUfs/ keeps the vendored alioth driver next to the board package; scripts/zz-build-shengufs-local.py compiles it against the kernel ABI and would replace the component archive when enabled. Both are deliberately not selected in the current archive list.",
+  "package/ShengUfs is now the active driver copy: SmmuTakeover.h reads IDR0/1/2 at 0x0/0x4/0x8 with log2 geometry and NativeUfs.cpp adds the t970-ufs-auto-stream reuse scan; scripts/zz-build-shengufs-local.py builds the archive and must run after any component build to avoid duplicate objects.",
+  "patches/xnu/t970-smmu-dump.patch now carries the t970-smmu-write probe (IDR stability read plus a GFSR write-1-to-clear readback) instead of the stream table dump; it is a guarded arm_init diagnostic only.",
 ]
 completion = [
   "The selected profile's inputs produce a kernel, payload and a boot image matching the SM-T970 boot path.",
@@ -1068,6 +1073,7 @@ findings = [
   "A sparse DONT_CARE segment is the working way to write a partition larger than 4 GiB through Heimdall: the bootloader expands the sparse image and skips the untouched chunks, and a 1 MiB manifest-only segment was accepted before the three full segments were attempted.",
   "The SMMU dump is a guarded arm_init diagnostic (t970-smmu-dump=1) that maps 0x15000000 and reports the valid SMR/S2CR entries on the panic screen; it is a bring-up probe, not a UFS fix, and it leaves normal boots untouched.",
   "scripts/zz-build-shengufs-local.py is a host-only builder for the vendored driver; it was exercised to confirm the local archive compiles and links, and it is not part of the enabled archive list.",
+  "The GFSR write probe (write 0xffffffff, read back unchanged) and the IDR0-bit30 rejection together classify the T970 SMMU as write-locked with a non-SM8550 register model; both are arm_init/planner diagnostics, not storage fixes.",
 ]
 completion = [
   "Every claimed UniXNU milestone has matching source/image revisions, a reproducible command and accessible firmware/kernel logs.",

@@ -77,7 +77,7 @@ static UfsSmmuReuse reuseUfsSmmuStream(uint16_t stream, Read read)
 {
   UfsSmmuReuse r;
   uint32_t idr0 = read(0x0), idr1 = read(0x4), idr2 = read(0x8);
-  unsigned count = idr0 & 255;
+  unsigned count = 1U << ((idr0 & 0x3f) + 1);
   unsigned banks = 1U << (((idr1 >> 0) & 0x3f) + 1);
   unsigned pages = 1U << (((idr1 >> 28) & 7) + 1);
   if (!(idr0 & (1U << 30)) || !(idr2 & (1U << 12))) {
@@ -148,7 +148,7 @@ static UfsSmmuPlan planUfsSmmuBank(uint16_t stream, uint64_t dma, uint64_t bytes
 {
   UfsSmmuPlan p;
   uint32_t idr0 = read(0x0), idr2 = read(0x8);
-  unsigned count = idr0 & 255;
+  unsigned count = 1U << ((idr0 & 0x3f) + 1);
   if (!(idr0 & (1U << 30)) || !(idr2 & (1U << 12))) {
     p.error = "SMMU AArch64 stage 1 unsupported"; return p;
   }

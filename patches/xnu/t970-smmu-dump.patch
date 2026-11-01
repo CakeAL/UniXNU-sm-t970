@@ -1,40 +1,30 @@
---- a/osfmk/arm/arm_init.c	2026-11-01 09:35:17
-+++ b/osfmk/arm/arm_init.c	2026-11-01 09:35:17
-@@ -653,6 +653,40 @@
+--- a/osfmk/arm/arm_init.c	2026-11-01 09:47:38
++++ b/osfmk/arm/arm_init.c	2026-11-01 09:47:38
+@@ -653,6 +653,30 @@
  	 * against string vulnerabilities
  	 */
  	__stack_chk_guard &= ~(0xFFULL << 8);
 +
 +	/*
-+	 * T970 diagnostic: dump the SMMU identity and stream table before any
-+	 * IOKit driver runs. Both the standard IDR block and the 0x20 block the
-+	 * UFS driver reads are printed so a geometry mismatch is visible.
++	 * T970 diagnostic: learn whether apps_smmu accepts writes at all. GFSR is
++	 * write-1-to-clear, so a successful write reads back zero; an unchanged
++	 * value means the block is locked, unclocked or not the SMMU.
 +	 */
 +	{
-+		unsigned int t970_smmu_dump = 0;
-+		if (PE_parse_boot_argn("t970-smmu-dump", &t970_smmu_dump, sizeof(t970_smmu_dump))) {
++		unsigned int t970_smmu_write = 0;
++		if (PE_parse_boot_argn("t970-smmu-write", &t970_smmu_write, sizeof(t970_smmu_write))) {
 +			vm_offset_t base = ml_io_map_wcomb(0x15000000ULL, 0xd0000);
 +			if (!base) {
-+				panic("T970 SMMU dump: map failed");
++				panic("T970 SMMU write: map failed");
 +			}
-+			char line[900];
-+			int used = 0;
-+			unsigned int found = 0;
-+			for (unsigned int index = 0; index < 128; index++) {
-+				uint32_t smr = *(volatile uint32_t *)(base + 0x800 + 4 * index);
-+				uint32_t s2cr = *(volatile uint32_t *)(base + 0xc00 + 4 * index);
-+				if (!(smr & 0x80000000)) {
-+					continue;
-+				}
-+				found++;
-+				if (used < 700) {
-+					used += snprintf(line + used, sizeof(line) - used,
-+					    " [%u]%08x/%08x", index, smr, s2cr);
-+				}
-+			}
-+			panic("T970 SMMU idr=%08x idr20=%08x idr24=%08x idr28=%08x found=%u%s",
-+			    *(volatile uint32_t *)(base + 0x0), *(volatile uint32_t *)(base + 0x20),
-+			    *(volatile uint32_t *)(base + 0x24), *(volatile uint32_t *)(base + 0x28), found, line);
++			uint32_t idr_a = *(volatile uint32_t *)(base + 0x0);
++			uint32_t idr_b = *(volatile uint32_t *)(base + 0x0);
++			uint32_t gfsr_before = *(volatile uint32_t *)(base + 0x24);
++			*(volatile uint32_t *)(base + 0x24) = 0xffffffffU;
++			__asm__ volatile ("dsb sy" ::: "memory");
++			uint32_t gfsr_after = *(volatile uint32_t *)(base + 0x24);
++			panic("T970 SMMU write idr_a=%08x idr_b=%08x gfsr_before=%08x gfsr_after=%08x",
++			    idr_a, idr_b, gfsr_before, gfsr_after);
 +		}
 +	}
 +

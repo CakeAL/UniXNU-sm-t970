@@ -1,0 +1,10 @@
+{
+  "device": "SM-T970 / gts7xlwifi",
+  "boot_image_sha256": "cb0b02ebe6ec8c5cfc2f7b8f86da1a4655387d3f3dbaac27b52555afbe5ac207",
+  "boot_image_bytes": 62713856,
+  "source_kernel_sha256": "975e01866fc3bcabafe5e2a43839635ba18d257384f3159b3cfbb5a500eaff1c",
+  "observation_source": "Human photograph of the panic screen",
+  "panic": "NATIVE_UFS smmu: SMMU AArch64 stage 1 unsupported slot=4294967295 smr=0 s2cr=0 @NativeUfs.cpp:442",
+  "result": "With the vendored driver reading IDR0/1/2 at 0x0/0x4/0x8 and auto-reuse scanning every exact SID, the planner rejects the SMMU: IDR0 bit 30 is clear, so the driver cannot conclude AArch64 stage 1 support.",
+  "limits": "This establishes that the SM8550/alioth SMMU model does not match the T970 SM8250 registers; it does not identify the correct SM8250 IDR layout or prove the SMMU unusable by another implementation."
+}

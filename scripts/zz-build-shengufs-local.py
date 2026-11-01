@@ -12,14 +12,20 @@ ROOT = Path(__file__).resolve().parents[1]
 if not (ROOT / 'build/xnu').is_dir():
     FW = ROOT.parent / 'UniXNU'
     ROOT = sorted(FW.glob('out/*/*/*/tree'))[-1]
+else:
+    FW = ROOT.parent / 'UniXNU'
+    if not (FW / 'kits/VerifiedRoot').is_dir():
+        FW = next(p for p in ROOT.parents if (p / 'kits/VerifiedRoot').is_dir())
 out = ROOT / 'build/sheng-ufs'
 out.mkdir(parents=True, exist_ok=True)
+for stale in out.glob('*.o'):
+    stale.unlink()
 package = ROOT / 'kits/sm-t970/ShengUfs'
 recipe = ROOT / 'build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/iokit/DEVELOPMENT/IOPlatformExpert.cpo.json'
 record = json.loads(recipe.read_text().strip().rstrip(','))
 objects = []
 for source in (package / 'NativeUfs.cpp', package / 'NativeUfsBsdRootCore.cpp'):
-    obj = out / (source.stem + '.local.o')
+    obj = out / (source.stem + '.o')
     command, i = [], 0
     arguments = record['arguments']
     while i < len(arguments):
@@ -37,7 +43,7 @@ for source in (package / 'NativeUfs.cpp', package / 'NativeUfsBsdRootCore.cpp'):
             command.append(arg)
         i += 1
     command += ['-I', str(package), '-I', str(ROOT / 'build/storage-abi/include'),
-                '-I', str(ROOT / 'kits/VerifiedRoot/include'), '-I', str(ROOT / 'drivers/VirtioMmioBlock'), '-DNATIVE_VERIFIED_BLOCK=1', '-Wno-error']
+                '-I', str(FW / 'kits/VerifiedRoot/include'), '-I', str(FW / 'drivers/VirtioMmioBlock'), '-DNATIVE_VERIFIED_BLOCK=1', '-Wno-error']
     result = subprocess.run(command, cwd=record['directory'], capture_output=True, text=True)
     (out / (source.stem + '.local.log')).write_text(result.stdout + result.stderr)
     if result.returncode:
