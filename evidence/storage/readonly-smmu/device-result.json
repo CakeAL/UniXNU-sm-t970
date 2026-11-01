@@ -1,0 +1,50 @@
+{
+  "device": "sm-t970",
+  "boot_sha256": "7f729c2a6ee8ee11b6eb5d4ff7ec23171b261854151578e36737d866a62391e2",
+  "source_revision": "23d54b9960b64179dcff36702723305c9d0b6003",
+  "observation_source": "User confirmed T970 SMMUv2 RO and supplied IMG_20261101_155738.jpg in this chat. Registers manually transcribed from that photograph.",
+  "photo": {
+    "filename": "IMG_20261101_155738.jpg",
+    "sha256": "f4b2b188fff82544bc389b6e0d6dada66ce7dd3ba80dd65cf1c3fddb2df9d52f",
+    "private_copy": "out/step7/probes/ufs-smmu-readonly-final/observation/IMG_20261101_155738.jpg"
+  },
+  "checkpoint_reached": true,
+  "diagnostic_stop_expected": true,
+  "registers": {
+    "sCR0": "0x002d0406",
+    "ID0": "0x4c017e57",
+    "ID1": "0x6000004a",
+    "ID2": "0x00005111",
+    "sGFSR": "0x00000000"
+  },
+  "reported_geometry": {
+    "identity_valid": true,
+    "stream_matching": true,
+    "extended_ids_enabled": false,
+    "stage1_supported": true,
+    "page_shift": 12,
+    "context_banks": 74,
+    "stage2_only_banks": 0,
+    "context_offset": "0x80000",
+    "geometry_in_mapping": true,
+    "stream_groups": 87,
+    "scanned": 87
+  },
+  "candidate_matches": {
+    "0x0060": 0,
+    "0x00e0": 0,
+    "0x04e0": 0
+  },
+  "interpretation": {
+    "CLIENTPD": 0,
+    "USFCFG": 1,
+    "unmatched_stream_policy": "fault, per SMMUv2 register semantics; no actual DMA fault was induced in this run"
+  },
+  "limits": [
+    "Candidate absence does not prove the actual T970 UFS SID.",
+    "No matching entry uses slot=0xffffffff as a sentinel; zero smr/s2cr fields are defaults, not a dump of all slots.",
+    "Register reads do not establish writable SMRs, full clock/PHY readiness, secure-world ownership or UFS DMA.",
+    "This run intentionally stopped before UFS controller, queue, command and root-volume operations."
+  ],
+  "next_measurement": "Combine bounded stream-table capture with guarded UFS power/controller/queue state observation before selecting takeover or firmware initialization."
+}

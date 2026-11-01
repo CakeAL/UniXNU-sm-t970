@@ -6,7 +6,7 @@ schema_version = 1
 name = "sm-t970"
 soc = "SM8250"
 os_profile = "ipados-17.7.11-21H461"
-summary = "SM-T970/gts7xlwifi SM8250 CPU0/initrd bring-up: host kernel/payload/firmware/image builds complete; handed-off UEFI and early kernel checkpoints, with bootstrap-thread diagnosis still pending. No root-volume, userland or peripheral milestone is claimed."
+summary = "SM-T970/gts7xlwifi SM8250 CPU0 bring-up: handoff records reach bsd_init/root-mount failure; BOOT 7f729c2a confirms the bounded SMMUv2 read-only report with 87 groups and 74 context banks. UFS DMA, root-volume startup, userland and peripherals remain unverified."
 
 [[area]]
 id = "configuration"
@@ -60,6 +60,7 @@ procedure = [
   "Run python3.14 ../UniXNU-sm-t970/scripts/check-platform.py --unixnu . to compare DT/ADT bindings with the captured hardware.",
 ]
 findings = [
+  "User confirmed and photographed the expected T970 SMMUv2 RO stop for BOOT 7f729c2a: sCR0=002d0406 ID0=4c017e57 ID1=6000004a ID2=00005111 GFSR=0; 87 groups scanned, 74 context banks, no candidate match for 0060/00e0/04e0. MMIO observation is confirmed; SMR writability, actual UFS routing, DMA and root reads are not.",
   "Resumed at 47b113f. New default diagnostic t970-smmu-report=1 reads the measured SMMUv2 window before any controller/queue/DMA/root setup and stops on a labeled panic. It retires the unflashed all-slot write scan, separates sCR0 from ID0/1/2, honors EXIDS, and does not treat ignored writes or prior SCM markers as proof that secure-world routes are exhausted.",
   "Uploaded deliberate after-MMU BRK control 150ed5ff9d73d81b17d3f6d32e609b9a9e42fdfe0397da7c5eea7d62f7ce7b4d, using patched Heimdall, exit 0. The device reset at about 50 seconds, matching the reviewed BRK path; original BOOT restoration is still pending. C startup and console behavior are not exercised.",
   "After-MMU BRK control image prepared and extracted from FAT: BRK word, unchanged PE_create_console call, guard bytes, vector branches and preserved IRQ/FIQ slots verified. Eight host tests passed; hardware BRK delivery and the ~50-second timed reset were observed.",
@@ -114,10 +115,9 @@ limits = [
   "Repository completion and removal of the example marker permit host builds; they do not certify a UEFI launch or an iPadOS boot.",
   "Apple kernelcache/private ABI, trust-cache, Data seed and XNU image compilation remain separate later-stage work.",
 ]
-next_action = [
-  "Continue Step 7 with an isolated, versioned checkpoint image and record the actual user-observed device result.",
-]
+next_action = ["Continue with audited SM8250 storage inputs and isolated images; retain exact source/image hashes and hardware observations."]
 evidence = [
+  { kind = "device", reference = "evidence/storage/readonly-smmu/device-result.json", revision = "23d54b9960b64179dcff36702723305c9d0b6003", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-smmu-readonly-final/boot.img --no-reboot", result = "Owner confirmation and photo transcription bind the expected read-only diagnostic stop to BOOT 7f729c2a; no UFS transfer or root success claimed." },
   { kind = "source", reference = "evidence/storage/readonly-smmu/audit.json", result = "Bounded read-only diagnostic scope and limits of prior secure-ownership/SCM conclusions; no new device result claimed." },
   { kind = "device", reference = "evidence/bring-up/runtime/after-mmu-brk-control/flash.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/after-mmu-brk-control/boot.img --no-reboot", result = "Uploaded deliberate after-MMU BRK control 150ed5ff9d73d81b17d3f6d32e609b9a9e42fdfe0397da7c5eea7d62f7ce7b4d, using patched Heimdall, exit 0. The device reset at about 50 seconds, matching the reviewed BRK path; original BOOT restoration is still pending. C startup and console behavior are not exercised.", revision = "fc4828781445ebab36819d6cdad8a2eddde82435" },
   { kind = "host", reference = "evidence/bring-up/runtime/after-mmu-brk-control/host-tests.json", command = "PATH=/opt/homebrew/opt/llvm/bin:/opt/homebrew/opt/lld/bin:$PATH .cache/probe-test-venv/bin/python -m unittest discover -s tests -v", result = "After-MMU BRK control image prepared and extracted from FAT: BRK word, unchanged PE_create_console call, guard bytes, vector branches and preserved IRQ/FIQ slots verified. Eight host tests passed; hardware BRK delivery and the ~50-second timed reset were observed.", revision = "fc4828781445ebab36819d6cdad8a2eddde82435" },
@@ -152,6 +152,7 @@ components = [
   "DarwinBoot",
 ]
 paths = [
+  "docs/ufs-reference-comparison.md",
   "evidence/storage/readonly-smmu/**",
   "evidence/bring-up/runtime/idle-return/firmware.log",
   "tests/test_prepare_uefi.py",
@@ -193,6 +194,8 @@ procedure = [
   "Collect selected boot properties, the live DT and the first 4096 bytes of boot/recovery with the inventory script; only parsed header fields are saved.",
 ]
 findings = [
+  "User confirmed and photographed the expected T970 SMMUv2 RO stop for BOOT 7f729c2a: sCR0=002d0406 ID0=4c017e57 ID1=6000004a ID2=00005111 GFSR=0; 87 groups scanned, 74 context banks, no candidate match for 0060/00e0/04e0. MMIO observation is confirmed; SMR writability, actual UFS routing, DMA and root reads are not.",
+  "Prepared BOOT 7f729c2a6ee8ee11b6eb5d4ff7ec23171b261854151578e36737d866a62391e2 from source 23d54b9 and kernel cca9bbb8. Independent FAT/kernel/arguments and packed FD checks passed, as did nine host tests and CPU0 DT/ADT checks. Patched Heimdall uploaded BOOT only with exit 0; device screen/register observation is pending. This is not a UFS/DMA/root-volume success.",
   "Resumed at 47b113f. New default diagnostic t970-smmu-report=1 reads the measured SMMUv2 window before any controller/queue/DMA/root setup and stops on a labeled panic. It retires the unflashed all-slot write scan, separates sCR0 from ID0/1/2, honors EXIDS, and does not treat ignored writes or prior SCM markers as proof that secure-world routes are exhausted.",
   "The prepared SEC patch rebuild passed; built FV inspection confirms TzDxe/PILDxe/PILProxyDxe absent and AdvancedLogDxe present.",
   "The handed-off runtime workaround excludes TzDxe, PILDxe and PILProxyDxe from DSC/FDF dispatch: the handoff reports TEE and missing-UFS partition assertions before the menu. The SEC x0 HOB patch is now hash-checked and automatically prepared. These reports do not certify TEE/PIL functionality.",
@@ -228,10 +231,10 @@ limits = [
   "UEFI launch, actual GOP/stride/pixel format, initrd discovery, runtime memory allocations and boot-services exit are untested. The running boot image is Magisk-modified.",
   "A host-built T970-specific candidate is now selected; it is not an upstream-certified or device-verified T970 port.",
 ]
-next_action = [
-  "Build the current minimal dispatch firmware with the automatically applied SEC patch, then capture runtime logs before claiming broader firmware services.",
-]
+next_action = ["Audit T970 handoff against the public T733 vendor integration and umi inherited-state path using T970-owned inputs; old experimental SCM/PHY conclusions are not qualified."]
 evidence = [
+  { kind = "source", reference = "docs/ufs-reference-comparison.md", result = "Pinned T733/umi/cas comparison, firmware prerequisites, clock-offset mismatch and next measurement scope; no new hardware programming." },
+  { kind = "device", reference = "evidence/storage/readonly-smmu/device-result.json", revision = "23d54b9960b64179dcff36702723305c9d0b6003", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-smmu-readonly-final/boot.img --no-reboot", result = "Owner confirmation and photo transcription bind the expected read-only diagnostic stop to BOOT 7f729c2a; no UFS transfer or root success claimed." },
   { kind = "source", reference = "evidence/storage/readonly-smmu/audit.json", result = "Bounded read-only diagnostic scope and limits of prior secure-ownership/SCM conclusions; no new device result claimed." },
   { kind = "host", reference = "evidence/bring-up/runtime/idle-return/firmware.log", command = "python3.14 scripts/build-entry-probe.py --target _idle_thread_create --delay 6 --output out/step7/probes/idle-return", result = "The prepared SEC patch rebuild passed; built FV inspection confirms TzDxe/PILDxe/PILProxyDxe absent and AdvancedLogDxe present.", revision = "6a3ae24fba8bc4cb44dcdb0898b92582751a36b9" },
   { kind = "host", reference = "evidence/device-repository/firmware.log", command = "GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=submodule.active GIT_CONFIG_VALUE_0=__no_module_submodules__ PATH=/opt/homebrew/opt/llvm/bin:/opt/homebrew/opt/lld/bin:$PATH python3.14 ../UniXNU/unixnu build firmware -D . --uefi .cache/uefi-source/Mu-Silicium --edk2 .cache/uefi-source/Mu-Silicium/Mu_Basecore --local-module refer:edk2=.cache/uefi-source/Mu-Silicium/Mu_Basecore", result = "The normal unixnu build firmware command passed on committed sources; the 3 MiB FD contains all four UniXNU/DarwinBoot modules plus DiskIo, FAT and Unicode collation (7 checked modules among 91 FV files).", revision = "18d3a77cd98f47ee42aa1f95d6584d22c3a13a18" },
@@ -439,6 +442,7 @@ procedure = [
   "Capture root-readable /proc/iomem and the live DT, then compare physical memory and reserved-memory reg values.",
 ]
 findings = [
+  "User confirmed and photographed the expected T970 SMMUv2 RO stop for BOOT 7f729c2a: sCR0=002d0406 ID0=4c017e57 ID1=6000004a ID2=00005111 GFSR=0; 87 groups scanned, 74 context banks, no candidate match for 0060/00e0/04e0. MMIO observation is confirmed; SMR writability, actual UFS routing, DMA and root reads are not.",
   "Resumed at 47b113f. New default diagnostic t970-smmu-report=1 reads the measured SMMUv2 window before any controller/queue/DMA/root setup and stops on a labeled panic. It retires the unflashed all-slot write scan, separates sCR0 from ID0/1/2, honors EXIDS, and does not treat ignored writes or prior SCM markers as proof that secure-world routes are exhausted.",
   "Current platform checks passed in explicit firmware-envelope mode with the 256 MiB ADT owned-window request. Reserved holes are reported, not reclaimed; per-boot allocation-map capture is still pending.",
   "The handed-off diagnostic DTS uses the 0x80000000+0x80000000 ADT envelope to include the reported DarwinBoot window at 0xc0000000. It is explicitly tagged as firmware-envelope in the board checker, with a 256 MiB owned-window request matching the pinned loader default. Reserved holes are retained and not declared free.",
@@ -467,6 +471,7 @@ next_action = [
   "Capture the actual owned-window physical base/size and EFI memory map on the next observable boot; do not reclaim the rest of the ADT envelope.",
 ]
 evidence = [
+  { kind = "device", reference = "evidence/storage/readonly-smmu/device-result.json", revision = "23d54b9960b64179dcff36702723305c9d0b6003", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-smmu-readonly-final/boot.img --no-reboot", result = "Owner confirmation and photo transcription bind the expected read-only diagnostic stop to BOOT 7f729c2a; no UFS transfer or root success claimed." },
   { kind = "source", reference = "evidence/storage/readonly-smmu/audit.json", result = "Bounded read-only diagnostic scope and limits of prior secure-ownership/SCM conclusions; no new device result claimed." },
   { kind = "host", reference = "evidence/bring-up/runtime/idle-return/platform.json", command = "python3.14 scripts/build-entry-probe.py --target _idle_thread_create --delay 6 --output out/step7/probes/idle-return", result = "Current platform checks passed in explicit firmware-envelope mode with the 256 MiB ADT owned-window request. Reserved holes are reported, not reclaimed; per-boot allocation-map capture is still pending.", revision = "6a3ae24fba8bc4cb44dcdb0898b92582751a36b9" },
   { kind = "host", reference = "evidence/device-repository/platform.json", command = "python3.14 scripts/check-platform.py --unixnu ../UniXNU", result = "The committed-source platform check passed with a 2 GiB measured-bank subrange, 30 static reservations, all 13 stock dynamic-pool windows, 45 stock XBL regions and seven disabled peripheral ranges.", revision = "18d3a77cd98f47ee42aa1f95d6584d22c3a13a18" },
@@ -484,6 +489,7 @@ id = "storage"
 status = "planned"
 components = ["ShengUfs", "VirtioMmioBlock", "VerifiedRoot"]
 paths = [
+  "docs/ufs-reference-comparison.md",
   "package/ShengUfs/**",
   "evidence/storage/readonly-smmu/**",
   "evidence/adb-2026-11-01/storage.txt",
@@ -505,6 +511,9 @@ procedure = [
   "Read block sysfs and by-name links; read each LUN's primary GPT header and entry array and validate their CRC32 values without writing any block device.",
 ]
 findings = [
+  "Compared current T733 (SM7325) and umi (SM8250) public sources and maintainer-reported hardware results. T970 still inherits SM8550 clock diagnostic offsets; Samsung gcc-kona.c and umi agree on different SM8250 offsets. Current BoardInit skips GCC writes, so this is not proof of a reset cause. Public T733 firmware integration exists; no foreign SID or firmware was applied.",
+  "User confirmed and photographed the expected T970 SMMUv2 RO stop for BOOT 7f729c2a: sCR0=002d0406 ID0=4c017e57 ID1=6000004a ID2=00005111 GFSR=0; 87 groups scanned, 74 context banks, no candidate match for 0060/00e0/04e0. MMIO observation is confirmed; SMR writability, actual UFS routing, DMA and root reads are not.",
+  "Prepared BOOT 7f729c2a6ee8ee11b6eb5d4ff7ec23171b261854151578e36737d866a62391e2 from source 23d54b9 and kernel cca9bbb8. Independent FAT/kernel/arguments and packed FD checks passed, as did nine host tests and CPU0 DT/ADT checks. Patched Heimdall uploaded BOOT only with exit 0; device screen/register observation is pending. This is not a UFS/DMA/root-volume success.",
   "Resumed at 47b113f. New default diagnostic t970-smmu-report=1 reads the measured SMMUv2 window before any controller/queue/DMA/root setup and stops on a labeled panic. It retires the unflashed all-slot write scan, separates sCR0 from ID0/1/2, honors EXIDS, and does not treat ignored writes or prior SCM markers as proof that secure-world routes are exhausted.",
   "Disabled board UFS/PHY reg and interrupt overrides now preserve the exact stock ranges, including ICE. No root/Data policy or XNU storage driver is enabled.",
   "Primary GPT headers and entry-array CRCs passed for all four inspected LUNs; their entries and byte offsets are saved in gpt.json.",
@@ -537,10 +546,10 @@ completion = [
 limits = [
   "No storage writes, repartitioning, XNU UFS driver, root mounting or persistence tests were performed; backup GPT copies and filesystem contents were not read.",
 ]
-next_action = [
-  "Boot the read-only SMMUv2 report with the exact non-UFS baseline FD; capture raw control/ID values and candidate matches before planning any further SCM or DMA change.",
-]
+next_action = ["Audit SM8250 clock diagnostic offsets, then capture the bounded full stream table and guarded UFS power/controller/queue state before selecting any SID or programming SMMU/DMA."]
 evidence = [
+  { kind = "source", reference = "docs/ufs-reference-comparison.md", result = "Pinned T733/umi/cas comparison, firmware prerequisites, clock-offset mismatch and next measurement scope; no new hardware programming." },
+  { kind = "device", reference = "evidence/storage/readonly-smmu/device-result.json", revision = "23d54b9960b64179dcff36702723305c9d0b6003", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-smmu-readonly-final/boot.img --no-reboot", result = "Owner confirmation and photo transcription bind the expected read-only diagnostic stop to BOOT 7f729c2a; no UFS transfer or root success claimed." },
   { kind = "source", reference = "evidence/storage/readonly-smmu/audit.json", result = "Bounded read-only diagnostic scope and limits of prior secure-ownership/SCM conclusions; no new device result claimed." },
   { kind = "device", reference = "evidence/adb-2026-11-01/storage.txt", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Saved device model, revision, block geometry, partition sizes and by-name mappings.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },
   { kind = "device", reference = "evidence/adb-2026-11-01/gpt.json", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Primary GPT header and entry CRCs passed on LUNs 0-3; GUIDs are omitted and partition names/byte ranges are preserved.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },
@@ -870,6 +879,8 @@ procedure = [
   "Read BuildManifest.plist from the local IPSW using Python zipfile and plistlib to identify its OS version, build and product types.",
 ]
 findings = [
+  "User confirmed and photographed the expected T970 SMMUv2 RO stop for BOOT 7f729c2a: sCR0=002d0406 ID0=4c017e57 ID1=6000004a ID2=00005111 GFSR=0; 87 groups scanned, 74 context banks, no candidate match for 0060/00e0/04e0. MMIO observation is confirmed; SMR writability, actual UFS routing, DMA and root reads are not.",
+  "Prepared BOOT 7f729c2a6ee8ee11b6eb5d4ff7ec23171b261854151578e36737d866a62391e2 from source 23d54b9 and kernel cca9bbb8. Independent FAT/kernel/arguments and packed FD checks passed, as did nine host tests and CPU0 DT/ADT checks. Patched Heimdall uploaded BOOT only with exit 0; device screen/register observation is pending. This is not a UFS/DMA/root-volume success.",
   "Resumed at 47b113f. New default diagnostic t970-smmu-report=1 reads the measured SMMUv2 window before any controller/queue/DMA/root setup and stops on a labeled panic. It retires the unflashed all-slot write scan, separates sCR0 from ID0/1/2, honors EXIDS, and does not treat ignored writes or prior SCM markers as proof that secure-world routes are exhausted.",
   "Uploaded deliberate after-MMU BRK control 150ed5ff9d73d81b17d3f6d32e609b9a9e42fdfe0397da7c5eea7d62f7ce7b4d, using patched Heimdall, exit 0. The device reset at about 50 seconds, matching the reviewed BRK path; original BOOT restoration is still pending. C startup and console behavior are not exercised.",
   "After-MMU BRK control image prepared and extracted from FAT: BRK word, unchanged PE_create_console call, guard bytes, vector branches and preserved IRQ/FIQ slots verified. Eight host tests passed; hardware BRK delivery and the ~50-second timed reset were observed.",
@@ -952,10 +963,9 @@ limits = [
   "The IPSW is a local external input; its selected manifest fields are archived, but no complete image build is recorded.",
   "The selected profile kernelcache SHA256 f18b4df865405f2a287b84977d7aca745e056d656d9fc9df1662970ce2969de7 has not been checked against a locally extracted/decompressed kernelcache.",
 ]
-next_action = [
-  "Build the isolated idle_thread_create after-return payload/image, verify the BOOT size and hashes, then use the confirmed recovery path for a single checkpoint test.",
-]
+next_action = ["Preserve verified BOOT 7f729c2a and its exact baseline FD. Prepare the next isolated diagnostic only after the SM8250 input audit and independently verify its packed inputs."]
 evidence = [
+  { kind = "device", reference = "evidence/storage/readonly-smmu/device-result.json", revision = "23d54b9960b64179dcff36702723305c9d0b6003", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-smmu-readonly-final/boot.img --no-reboot", result = "Owner confirmation and photo transcription bind the expected read-only diagnostic stop to BOOT 7f729c2a; no UFS transfer or root success claimed." },
   { kind = "source", reference = "evidence/storage/readonly-smmu/audit.json", result = "Bounded read-only diagnostic scope and limits of prior secure-ownership/SCM conclusions; no new device result claimed." },
   { kind = "device", reference = "evidence/bring-up/runtime/after-mmu-brk-control/flash.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/after-mmu-brk-control/boot.img --no-reboot", result = "Uploaded deliberate after-MMU BRK control 150ed5ff9d73d81b17d3f6d32e609b9a9e42fdfe0397da7c5eea7d62f7ce7b4d, using patched Heimdall, exit 0. The device reset at about 50 seconds, matching the reviewed BRK path; original BOOT restoration is still pending. C startup and console behavior are not exercised.", revision = "fc4828781445ebab36819d6cdad8a2eddde82435" },
   { kind = "host", reference = "evidence/bring-up/runtime/after-mmu-brk-control/host-tests.json", command = "PATH=/opt/homebrew/opt/llvm/bin:/opt/homebrew/opt/lld/bin:$PATH .cache/probe-test-venv/bin/python -m unittest discover -s tests -v", result = "After-MMU BRK control image prepared and extracted from FAT: BRK word, unchanged PE_create_console call, guard bytes, vector branches and preserved IRQ/FIQ slots verified. Eight host tests passed; hardware BRK delivery and the ~50-second timed reset were observed.", revision = "fc4828781445ebab36819d6cdad8a2eddde82435" },
@@ -1001,6 +1011,7 @@ id = "diagnostics"
 status = "implemented"
 components = []
 paths = [
+  "docs/ufs-reference-comparison.md",
   "evidence/storage/readonly-smmu/**",
   "evidence/bring-up/runtime/**",
   "tests/**",
@@ -1034,6 +1045,8 @@ procedure = [
   "Run python3 scripts/collect-adb-inventory.py --root --output evidence/<new-capture>; review per-command stderr, checksums, GPT CRC results and DT sanitization before updating this record.",
 ]
 findings = [
+  "User confirmed and photographed the expected T970 SMMUv2 RO stop for BOOT 7f729c2a: sCR0=002d0406 ID0=4c017e57 ID1=6000004a ID2=00005111 GFSR=0; 87 groups scanned, 74 context banks, no candidate match for 0060/00e0/04e0. MMIO observation is confirmed; SMR writability, actual UFS routing, DMA and root reads are not.",
+  "Prepared BOOT 7f729c2a6ee8ee11b6eb5d4ff7ec23171b261854151578e36737d866a62391e2 from source 23d54b9 and kernel cca9bbb8. Independent FAT/kernel/arguments and packed FD checks passed, as did nine host tests and CPU0 DT/ADT checks. Patched Heimdall uploaded BOOT only with exit 0; device screen/register observation is pending. This is not a UFS/DMA/root-volume success.",
   "Removed a copied BRK-success sentence from 33 unrelated host evidence entries and 33 unrelated findings. Their source JSON artifacts and device observations are preserved; successful 50-second BRK results remain attributed only to after-mmu-brk-control.",
   "Resumed at 47b113f. New default diagnostic t970-smmu-report=1 reads the measured SMMUv2 window before any controller/queue/DMA/root setup and stops on a labeled panic. It retires the unflashed all-slot write scan, separates sCR0 from ID0/1/2, honors EXIDS, and does not treat ignored writes or prior SCM markers as proof that secure-world routes are exhausted.",
   "Uploaded deliberate after-MMU BRK control 150ed5ff9d73d81b17d3f6d32e609b9a9e42fdfe0397da7c5eea7d62f7ce7b4d, using patched Heimdall, exit 0. The device reset at about 50 seconds, matching the reviewed BRK path; original BOOT restoration is still pending. C startup and console behavior are not exercised.",
@@ -1126,10 +1139,10 @@ completion = [
 limits = [
   "ADB inputs and BOOT-only reset checkpoints are archived. Original BOOT restoration is pending; UART, usable UEFI log export and XNU fault capture remain unverified.",
 ]
-next_action = [
-  "Run an after-MMU BRK positive control before relying on missing fault signals; classify only observed timing and preserve exact source/image hashes.",
-]
+next_action = ["Use the now-observed panic display for one bounded hardware-state snapshot; retain raw registers and distinguish missing matches from actual stream contents. No new BRK timing inference is needed for this observation."]
 evidence = [
+  { kind = "source", reference = "docs/ufs-reference-comparison.md", result = "Pinned T733/umi/cas comparison, firmware prerequisites, clock-offset mismatch and next measurement scope; no new hardware programming." },
+  { kind = "device", reference = "evidence/storage/readonly-smmu/device-result.json", revision = "23d54b9960b64179dcff36702723305c9d0b6003", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-smmu-readonly-final/boot.img --no-reboot", result = "Owner confirmation and photo transcription bind the expected read-only diagnostic stop to BOOT 7f729c2a; no UFS transfer or root success claimed." },
   { kind = "source", reference = "evidence/storage/readonly-smmu/audit.json", result = "Bounded read-only diagnostic scope and limits of prior secure-ownership/SCM conclusions; no new device result claimed." },
   { kind = "device", reference = "evidence/bring-up/runtime/after-mmu-brk-control/flash.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/after-mmu-brk-control/boot.img --no-reboot", result = "Uploaded deliberate after-MMU BRK control 150ed5ff9d73d81b17d3f6d32e609b9a9e42fdfe0397da7c5eea7d62f7ce7b4d, using patched Heimdall, exit 0. The device reset at about 50 seconds, matching the reviewed BRK path; original BOOT restoration is still pending. C startup and console behavior are not exercised.", revision = "fc4828781445ebab36819d6cdad8a2eddde82435" },
   { kind = "host", reference = "evidence/bring-up/runtime/after-mmu-brk-control/host-tests.json", command = "PATH=/opt/homebrew/opt/llvm/bin:/opt/homebrew/opt/lld/bin:$PATH .cache/probe-test-venv/bin/python -m unittest discover -s tests -v", result = "After-MMU BRK control image prepared and extracted from FAT: BRK word, unchanged PE_create_console call, guard bytes, vector branches and preserved IRQ/FIQ slots verified. Eight host tests passed; hardware BRK delivery and the ~50-second timed reset were observed.", revision = "fc4828781445ebab36819d6cdad8a2eddde82435" },

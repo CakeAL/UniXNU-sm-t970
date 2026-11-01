@@ -8,7 +8,8 @@
 交接中的设备记录已到达 `bsd_init`／根卷挂载，当前回到第 6 步的 **UFS／SMMU 适配**。
 已有 USERDATA 根镜像写入回执，但 UFS DMA 与根卷挂载尚未通过；用户态、SMP 和外设仍未完成。
 本轮先做[只读 SMMU 核查](docs/smmu-readonly.md)，报告原始寄存器与候选 SID，
-不提交 UFS 命令、不挂载根卷，也不执行逐槽写入探测。实机结果与构建结果分开记录。
+实机已确认读到 87 组匹配配置、74 个 context bank，三个候选 SID 均未匹配。
+未提交 UFS 命令或挂载根卷；下一步依据[同类设备对照](docs/ufs-reference-comparison.md)核查 SM8250 时钟和交接状态。
 
 两个仓库并列放置，普通构建命令在主仓库执行：
 

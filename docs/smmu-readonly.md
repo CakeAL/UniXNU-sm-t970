@@ -55,3 +55,23 @@ python3.14 scripts/build-smmu-report.py --output out/step7/probes/ufs-smmu-reado
 打包工具使用本轮最终内核构建记录约束输入，独立从 FAT 提取内核和参数，再从 BOOT
 提取 FD 核对；任一不符即拒绝。它不执行 USB 命令。
 本轮不写 USERDATA。先前 USERDATA 根镜像写入已有独立回执；恢复 BOOT 不等于恢复旧 Android 数据。
+
+## 本轮实机观察
+
+机主确认 BOOT `7f729c2a…` 出现预期标题，并提供照片。原始转录和照片哈希见
+`evidence/storage/readonly-smmu/screen.txt`、`device-result.json`。
+
+```text
+SCR0=002d0406 ID0=4c017e57 ID1=6000004a ID2=00005111 GFSR=00000000
+SMS=1 EXID=0 S1=1 pageShift=12 CB=74 S2CB=0 CBoff=80000
+groups=87 scanned=87
+SID0060 n=0; SID00e0 n=0; SID04e0 n=0
+```
+
+已确认进入只读路径并读完所报告的 87 组匹配寄存器。`slot=4294967295` 是没有匹配时的
+哨兵值；该行默认的零值并非完整 stream 表内容。sCR0.CLIENTPD=0、USFCFG=1 对应
+客户端未禁用、未匹配 stream 采取 fault 策略；本轮没有触发 DMA，GFSR=0 不等于 DMA 正常。
+
+这仍未确认 T970 的 UFS SID、SMR 写权限、PHY／队列状态或存储读取。
+下一项测量结合[同类设备对照](ufs-reference-comparison.md)核对时钟和固件前提，
+再采集完整 stream 表，避免把候选匹配缺失解释成永久安全锁。

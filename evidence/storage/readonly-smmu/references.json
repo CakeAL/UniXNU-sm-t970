@@ -1,0 +1,106 @@
+{
+  "review_date": "2026-11-01",
+  "scope": "Read-only public-source comparison; no foreign board settings or hardware changes applied.",
+  "sources": [
+    {
+      "repository": "RigoLigoRLC/unixnu-sm-t733",
+      "revision": "dcc9e7f65fb19a8c05514a782dd9759fd7102a43",
+      "paths": [
+        "README.md",
+        "porting.toml",
+        "docs/archive/FORMAT2_2026-10-25.md",
+        "support/Mu-Silicium.rev",
+        "drivers/NativeUfs"
+      ],
+      "result_boundary": "Maintainer-reported runtime counts. Current NativeUfs gitlink is 06b3a102, not the older 063cf4c adaptation marker in support/repositories.json."
+    },
+    {
+      "repository": "RigoLigoRLC/unixnu-nativeufs",
+      "revision": "06b3a102e78c3129b4645416a52ac23f5523f3cb",
+      "paths": [
+        "NativeUfs.cpp",
+        "SmmuTakeover.h",
+        "GccUfs.h"
+      ],
+      "observations": [
+        "adoptAndRead retains a hardware DMA-buffer reset note dated 2026-10-17; it is a test instrument, not the normal transport.",
+        "Controller and stream inputs are supplied for SM7325; they are not T970 board evidence."
+      ]
+    },
+    {
+      "repository": "RigoLigoRLC/unixnu-mu-silicium",
+      "revision": "d511b74f971099e89356b4324dcf1d98c2cee029",
+      "paths": [
+        "Platforms/Samsung/gts7fewifiPkg/Include/Vendor.inc",
+        "Platforms/Samsung/gts7fewifiPkg/Include/DXE.inc",
+        "Platforms/Samsung/gts7fewifiPkg/gts7fewifi.dsc"
+      ],
+      "observations": [
+        "Public firmware integration includes vendor HALIOMMU, clock, SCM and UFSDxe references.",
+        "The referenced PatchedBinaries/UFSDxe.inf is not present in the inspected public directory; no complete vendor binary reproduction is claimed."
+      ]
+    },
+    {
+      "repository": "reAAAq/UniXNU-umi",
+      "revision": "3eb72578597d2ca16471b172d45eddc096a34a04",
+      "paths": [
+        "README.md",
+        "docs/validation.json",
+        "source-lock.json",
+        "package/UmiSmmuTakeover.h",
+        "package/UmiNativeUfsHost.inc",
+        "package/UmiUfsProbe.cpp"
+      ],
+      "observations": [
+        "Maintainer reports root/cryptex, launchd, persistent Data and Hello/Setup; home screen remains unverified.",
+        "Host checks SM8250 clock offsets and owned DMA, then replans two streams after queue quiesce."
+      ]
+    },
+    {
+      "repository": "reAAAq/uefi-umi",
+      "revision": "48bc41218c480519bfd299c22205f44e418df9d0",
+      "paths": [
+        "Platforms/Xiaomi/umiPkg/umi.dsc",
+        "Platforms/Xiaomi/umiPkg/Include/DXE.inc"
+      ],
+      "observations": [
+        "Inherited-state RAM-payload firmware path; different prerequisites from the T733 vendor UFS dispatch."
+      ]
+    },
+    {
+      "repository": "ht94911/UniXNU-cas",
+      "revision": "5cba1411b76170abf027e312afee15669b9541d9",
+      "paths": [
+        "README.md"
+      ],
+      "observations": [
+        "CPU0 early XNU initialization reported; UFS root is still in progress."
+      ]
+    },
+    {
+      "repository": "LineageOS/android_kernel_samsung_sm8250",
+      "revision": "ad129ac77e9d871770d61f7bd219a836d7f35b74",
+      "paths": [
+        "drivers/clk/qcom/gcc-kona.c"
+      ],
+      "observations": [
+        "Samsung SM8250 kernel reference agrees with upstream Linux and umi on AXI/AHB/UniPro/ICE/AUX offsets. Not a new target hardware measurement."
+      ]
+    },
+    {
+      "repository": "torvalds/linux",
+      "revision": "v6.12",
+      "paths": [
+        "drivers/clk/qcom/gcc-sm8250.c",
+        "drivers/iommu/arm/arm-smmu/arm-smmu.h",
+        "drivers/iommu/arm/arm-smmu/arm-smmu.c"
+      ]
+    }
+  ],
+  "local_findings": [
+    "package/ShengUfs/GccUfs.h retains SM8550 diagnostic constants.",
+    "BoardInit.c retains four mismatched unused clock macros but currently skips GCC writes; this is not proof of a hardware-reset cause.",
+    "The observed read-only BOOT does not run the clock diagnostics, PHY initialization or transport."
+  ],
+  "next_action": "Correct and validate SM8250 diagnostic inputs, then combine bounded stream and guarded power/HCI/queue observations before choosing any takeover or firmware change."
+}

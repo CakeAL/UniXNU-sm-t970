@@ -1,0 +1,16 @@
+{
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-smmu-readonly-final/boot.img --no-reboot",
+  "started_at": "2026-11-01T07:55:16.886938+00:00",
+  "finished_at": "2026-11-01T07:55:23.244391+00:00",
+  "exit_code": 0,
+  "boot_sha256": "7f729c2a6ee8ee11b6eb5d4ff7ec23171b261854151578e36737d866a62391e2",
+  "heimdall_sha256": "75337a7c6ad9a5e18c0730fa474c81133587cc04cbe08dd3f270c860128a6c6f",
+  "device_revision": "23d54b9960b64179dcff36702723305c9d0b6003",
+  "partition": "BOOT",
+  "no_reboot": true,
+  "device_observation_pending": false,
+  "userdata_written": false,
+  "device_observation": "device-result.json",
+  "raw_log_sha256": "3d7067ddef62ae1b69296715e09da49d2c59c135adf690a71dfafb217e9fdf2c",
+  "log_normalization": "Trailing blank lines omitted in tracked flash.log; exact log retained at out/step7/probes/ufs-smmu-readonly-final/flash.raw.log"
+}

@@ -1,0 +1,24 @@
+{
+  "device_revision": "23d54b9960b64179dcff36702723305c9d0b6003",
+  "framework_revision": "194aae294c1107e791f4f74b2be371a391ac6bc4",
+  "command": "python3.14 scripts/build-smmu-report.py --output out/step7/probes/ufs-smmu-readonly-final",
+  "kernel_sha256": "cca9bbb8e99320caebf044f71f635da6396435c60a28b9d82ecd3f73e7750dd0",
+  "payload_kernel_sha256": "c89b24fd5416d44528c83bc63584505deb7d9308923df73ba02bc7a9a5903596",
+  "firmware_sha256": "515105d758a9d61078dffce5012db0754a71cec351a1bb34b30ee791196b5690",
+  "firmware_dtb_sha256": "86c14aa305a6cf5db46665f4095d28aadcb1ea5ce9d213cd711641a07504ed1d",
+  "payload_sha256": "615b8b90e2040c74e9f34ccb6d2bb8c245b31d889993fac60e8c1a4b818eb026",
+  "boot_sha256": "7f729c2a6ee8ee11b6eb5d4ff7ec23171b261854151578e36737d866a62391e2",
+  "boot_bytes": 62713856,
+  "boot_partition_bytes": 71303168,
+  "kernel_args": [
+    "-v",
+    "cpus=1",
+    "t970-novc",
+    "sheng-pmgr=2",
+    "t970-smmu-report=1"
+  ],
+  "independent_fat_check": true,
+  "independent_fd_check": true,
+  "hardware_tested": false,
+  "flash_performed": false
+}
