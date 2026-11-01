@@ -1,0 +1,21 @@
+{
+  "scope": "Host package verification only; Odin USB/large-file support and device write/readback pending",
+  "source_image_sha256": "fd43ee7035ce185ce4215ac93fdc006fd784a54b3b7442e21457c226cbe03093",
+  "source_bytes": 9382658048,
+  "compression": "LZ4 legacy",
+  "compressed_bytes": 7100081751,
+  "compressed_sha256": "2ab5f2314a6ef02417d7b794be7cae33b160d79eacb22e400380400ed61c1252",
+  "package_sha256": "99f4dc685297e6c12b054ce5529f66ccf86cd6f4f64f6894ba802767740b2c4d",
+  "package_bytes": 7100088380,
+  "tar_content_md5": "29217353237b509e58526947830a63c9",
+  "tar_format": "ustar",
+  "members": [
+    "userdata.img.lz4"
+  ],
+  "odin_slot": "USERDATA",
+  "target_partition": "userdata",
+  "full_decompression_verified": true,
+  "independent_tar_member_verified": true,
+  "device_written": false,
+  "odin_compatibility_device_verified": false
+}

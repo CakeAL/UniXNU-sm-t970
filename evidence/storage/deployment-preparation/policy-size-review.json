@@ -1,0 +1,19 @@
+{
+  "scope": "Host-only compression measurement; no loading/verification implementation, no device writes",
+  "policies": [
+    {
+      "component": "os",
+      "uncompressed_bytes": 47481664,
+      "zlib9_bytes": 44379187,
+      "sha256": "8fefc15fecc382730c1aeae6154e0eabb195d16bc51099c6095ff1395be43dc2"
+    },
+    {
+      "component": "systemos",
+      "uncompressed_bytes": 25805344,
+      "zlib9_bytes": 24415218,
+      "sha256": "869a186ae40656ff9c3be64080120dc2e648f9307d3efa213d9ed5c2084960b8"
+    }
+  ],
+  "sum_compressed_bytes": 68794405,
+  "sum_uncompressed_bytes": 73287008
+}

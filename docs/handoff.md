@@ -21,6 +21,21 @@
   编码错误及未验证的分段DONT_CARE保留行为须解决；不凭这些结果继续改SMMU。
 - 下一步准备完整镜像写入后读回校验的部署方式；没有新的USERDATA写入授权时仅准备与检查。
 
+### 根镜像修复准备（未写入）
+
+- 机主确认只有三星原厂Recovery。root ADB环境暂未可用；只读检查脚本已准备，
+  从运行时sysfs取得sda36 major:minor来检查挂载，不假定Linux设备号。
+- 官方LineageOS gts7xlwifi 20261029 recovery已下载并核对SHA256
+  `2f5bbdfccba07af0524d3695f00977d3fcfc2eac994a7491e15cd15462f4bbd8`，
+  86,888,448字节符合RECOVERY分区，但超过BOOT；未刷入任何分区。不可直接作为BOOT使用。
+- 机主随后询问Odin及具体镜像，已切换为准备单个完整USERDATA包：
+  `out/step7/odin-userdata/sm-t970-userdata-root.tar.md5`，唯一成员userdata.img.lz4。
+  7,100,088,380字节，LZ4完整解压和tar唯一成员hash核验通过，包SHA256
+  `99f4dc685297e6c12b054ce5529f66ccf86cd6f4f64f6894ba802767740b2c4d`。
+  19项主机测试通过；不使用旧三段sparse，没有执行新的USERDATA写入。
+  准备证据在 `evidence/storage/deployment-preparation/`。
+- Odin截图ID:COM空，Whisky USB支持未验证。需要真正识别设备；上传后还必须读回验证。
+
 ## 前轮：根镜像样本核对（manifest读回全零，继续只读调查）
 
 - 参数 `t970-ufs-image=1`；见 [样本范围](ufs-image.md)。复用NOP和GPT前提，

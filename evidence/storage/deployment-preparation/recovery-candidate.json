@@ -1,0 +1,15 @@
+{
+  "source": "https://download.lineageos.org/api/v2/devices/gts7xlwifi/builds",
+  "image_url": "https://mirrorbits.lineageos.org/full/gts7xlwifi/20261029/recovery.img",
+  "device": "gts7xlwifi / SM-T970",
+  "build": "20261029",
+  "bytes": 86888448,
+  "sha256": "2f5bbdfccba07af0524d3695f00977d3fcfc2eac994a7491e15cd15462f4bbd8",
+  "official_digest_matched": true,
+  "partition_recovery_bytes": 86888448,
+  "partition_boot_bytes": 71303168,
+  "fits_boot": false,
+  "flashed": false,
+  "source_root_adb_rc": "https://github.com/LineageOS/android_bootable_recovery/blob/lineage-24.0/etc/init.rc",
+  "runtime_root_shell_verified": false
+}
