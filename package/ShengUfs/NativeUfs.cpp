@@ -1315,6 +1315,13 @@ static bool hostBringUpHandoff (const char **why)
   }
   bzero (gHost.virt, kDmaBytes);
   cacheCivac (gHost.virt, kDmaBytes);
+  // The request list still belongs to whatever the firmware left there. Ringing the doorbell
+  // without taking it over makes the controller read descriptors from that buffer instead of
+  // ours, which stalls the machine with no console to report it. Stop and re-point it exactly as
+  // the production path does; only the SMMU half of the normal bring-up is skipped.
+  gRootDiagnostic.stage = "handoff request list";
+  if (!hostStopQueue (why)) return false;
+  if (!hostStartQueue (why)) return false;
   return hostProveTransport (why);
 }
 }

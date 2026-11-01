@@ -1,0 +1,17 @@
+{
+  "device": "sm-t970",
+  "boot_sha256": "11a1d6356d2a3689c8049b6a18d38c916c3924f84ae29ec9abfa5583c8b3994b",
+  "source_revision": "908b84f",
+  "observation_source": "Owner report: stuck at the magenta bar, no panic text, no reset observed before the report.",
+  "observation": "Magenta bar only. With t970-novc the only screen output is the last loader bar, so this is a hang rather than a panic stop.",
+  "diagnosis": {
+    "finding": "hostBringUpHandoff ran the command sequence without taking over the request list, so UTRLBA still addressed the firmware buffer and the first doorbell made the controller fetch foreign descriptors.",
+    "evidence": "package/ShengUfs/T970NopTest.h stage 3 halts the queue, writes UTRLBA/UTRLBAU to the owned DMA, then restarts it before its NOP; the survey's reads ran after that sequence.",
+    "fix": "hostBringUpHandoff now calls hostStopQueue and hostStartQueue after allocating the owned DMA and still performs no SMMU write.",
+    "not_established": "No publication attempt was reached and no window was published; the transport itself is unchanged."
+  },
+  "hardware_tested": true,
+  "panic_reached": false,
+  "published": false,
+  "root_mounted": false
+}

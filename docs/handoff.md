@@ -30,6 +30,10 @@ userdata 的 OS 窗口发布成 IOMedia（UUID 匹配 ADT 的 `04769D26…`）�
   仍然 fail-closed：任一窗口不通过就一个也不发布。
 - 发布中止的 panic 会打印 `stage`、窗口数、`prepared/published/policies/verify` 和
   `w0..w3` 的窗口名/偏移/字节数；bring-up 被拒绝时打印 CB0 三元组与两个 stream 值。
+- 第一版 `t970-ufs-publish=1`（BOOT `11a1d635`）实机停在 magenta 条、无 panic 文本：
+  handoff 路径没接管请求列表，控制器仍按固件的 UTRLBA 取描述符，敲门铃即死。已补
+  `hostStopQueue`/`hostStartQueue`（只跳过 SMMU 那一半）。调查版没踩到是因为
+  `t970_nop::run` 自己停/起过队列。
 - 内核侧仍挂空策略表（`verified_root_policy_count=0`），所以本版预期停在 `policy count invalid`。
   这不是回退：策略哈希表若要塞进内核，OS 6.08 GB 约 46.4 MB + SystemOS 3.30 GB 约 25.2 MB，
   合计约 71.6 MB，BOOT 上限只有 71,303,168 字节。**策略载体必须移出内核**：

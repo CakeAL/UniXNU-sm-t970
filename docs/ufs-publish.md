@@ -28,6 +28,18 @@ DMA、走和调查版相同的 NOP/上电/TUR 序列。它**不写** SMMU、不�
 `GFSR`/`CB0 FSR` 基线，NOP、上电、TUR 各阶段后必须与基线一致，出现新故障即拒绝。
 这和调查版每次读取前后做的比较是同一种判断，不再依赖某个 boot 的寄存器快照。
 
+## 请求列表必须接管（第一条实机结论）
+
+`t970-ufs-publish=1` 的第一版（BOOT `11a1d635`）停在 magenta 条、没有任何 panic 文本。
+magenta 条是内核起来后屏幕上最后的加载器画面（`t970-novc` 下 XNU 本身不出字），所以这代表
+**卡死**而不是中止。原因在 handoff 路径少了一步：固件的 UTRLBA 仍指向它自己的请求列表，
+`hostNop` 一旦敲响门铃，控制器就按那个缓冲区里的描述符去取命令，机器直接停住，连 panic 都
+来不及打印。现在 handoff 路径在取完 DMA 后先 `hostStopQueue` / `hostStartQueue`
+把请求列表接管过来（只跳过 SMMU 那一半），再走 NOP/上电/TUR。
+
+调查版之所以没踩到：`t970_nop::run` 自己做了 `hcWrite(0x60,0)` 停队列、写
+`0x50/0x54=dma`、`0x60=1` 起队列这几步，看起来像 SMMU 实验，实际是请求列表接管。
+
 ## 失败时屏幕上能看到什么
 
 bring-up 被拒绝时 panic 打印 `CB0` 三元组、两个 stream 值、`gfsr/fsr` 和 DMA 地址。
