@@ -2332,6 +2332,31 @@ bool NativeUfsBlock::signedVolumeUuid (char out[37]) const
 // policy and its signed volume UUID is the ADT root UUID; the framework's mount path still requires
 // the mount to be read-only, so a writable volume never passes here.
 
+// Cache-carrier probe. bsd_init's union mount resolves the SystemOS volume by its signed UUID; when
+// that lookup fails the panic cannot say why, so the driver resolves it itself once root is published
+// and exposes the result. Nothing here changes publication or authorization decisions.
+extern "C" int native_verified_block_volume_device (const char *uuid, dev_t *device, char *path, size_t size);
+static int gCacheProbeResult;
+static dev_t gCacheProbeDevice = NODEV;
+static char gCacheProbePath[64];
+static char gCacheProbeText[160];
+
+extern "C" void native_ufs_cache_probe (void)
+{
+  static const char cacheUuid[] = "8846FE78-2910-4297-AF97-D59BB6F8FC16";
+  gCacheProbeDevice = NODEV;
+  gCacheProbePath[0] = 0;
+  gCacheProbeResult = native_verified_block_volume_device (cacheUuid, &gCacheProbeDevice,
+                                                           gCacheProbePath, sizeof (gCacheProbePath));
+  snprintf (gCacheProbeText, sizeof (gCacheProbeText), "probe=%d dev=%x path=%s", gCacheProbeResult,
+            static_cast<unsigned> (gCacheProbeDevice), gCacheProbePath[0] ? gCacheProbePath : "-");
+}
+
+extern "C" const char *native_ufs_cache_probe_text (void)
+{
+  return gCacheProbeText[0] ? gCacheProbeText : "probe=unset";
+}
+
 // UFS window, otherwise 1 if its signed volume UUID equals `uuid`, else 0.
 extern "C" int native_ufs_block_authenticates (IOService *provider, const char *uuid, uint8_t *digest)
 {
@@ -3310,6 +3335,7 @@ bool NativeUfs::start (IOService *provider)
              windows[0], offset[0], bytes[0], windows[1], offset[1], bytes[1],
              windows[2], offset[2], bytes[2], windows[3], offset[3], bytes[3]);
     }
+    native_ufs_cache_probe ();
     return true;
   }
   if (rootMode && !probe) {
