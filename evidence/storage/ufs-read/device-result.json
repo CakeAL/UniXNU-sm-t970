@@ -1,0 +1,56 @@
+{
+  "device": "sm-t970",
+  "boot_sha256": "e6c49073395655a947d3f53b31206e268a14cccea895ff18201cc96fd3a577aa",
+  "source_revision": "fa9a0e6b0945a912daebeb44ca927df8ce0b1064",
+  "observation_source": "Owner photograph attached in conversation, manually transcribed.",
+  "photo": {
+    "filename": "IMG_20261101_174331.jpg",
+    "local_source_available": true,
+    "sha256": "c83349c67dcb03ed7bfb36a3dd0fbc34a2fdf882137eb6fa4da4d2f77f2dffb2"
+  },
+  "stage": 6,
+  "commands": 5,
+  "unit_attentions": 0,
+  "healthy": true,
+  "poisoned": false,
+  "inquiry": true,
+  "vendor": "SAMSUNG",
+  "product": "KLUEG8UHDB-C2D1",
+  "capacity": true,
+  "last_lba": 62458879,
+  "block_bytes": 4096,
+  "header": true,
+  "repeat": true,
+  "entries": true,
+  "geometry": true,
+  "entry_count": 40,
+  "header_crc": "0xe5897a71",
+  "entries_crc": "0xa60c0f35",
+  "userdata_first": 2969600,
+  "userdata_last": 62458874,
+  "result": 0,
+  "ocs": 0,
+  "scsi": 0,
+  "sense": 0,
+  "protocol": 0,
+  "residual": 0,
+  "controller": {
+    "hce": 1,
+    "hcs": "0x10f",
+    "doorbell": 0,
+    "is_status": "0x400"
+  },
+  "smmu": {
+    "gfsr": 0,
+    "cb0_fsr": "0x400"
+  },
+  "dma": "0xc45c9000",
+  "end_marker_seen": true,
+  "conclusion": "LUN0 INQUIRY, READ CAPACITY, primary GPT header and repeated identical header, entry array CRC and target userdata geometry passed.",
+  "limits": [
+    "No userdata content or root image was read by this test.",
+    "Two identical header reads are not sustained workload validation.",
+    "No root block device publication or filesystem mount."
+  ],
+  "next_action": "Read root manifest and OS/SystemOS sample blocks, compare hashes against exact image from prior USERDATA flash receipt."
+}

@@ -15,7 +15,8 @@
 [合并核查 VALID、S2CR](docs/smmu-fields.md)已确认接受及恢复；
 [零命令预检](docs/ufs-preflight.md)已确认实际内存归属；
 [单次 NOP 测试](docs/ufs-nop.md)已完成一次命令／响应 DMA 往返；
-当前准备[LUN0只读数据核验](docs/ufs-read.md)；SCSI数据、存储读取和持续稳定性尚未验证。
+[LUN0只读数据核验](docs/ufs-read.md)已通过容量、重复GPT头和分区项CRC；
+根镜像读回、持续稳定性及根卷挂载尚未验证。
 
 两个仓库并列放置，普通构建命令在主仓库执行：
 

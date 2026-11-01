@@ -26,3 +26,10 @@ healthy=1、poisoned=0，最终传输状态无错误。
 实现使用现有 RootCommands.h 的只读 SCSI 入口和 RootLayout.h 的生产 CRC；
 主机状态机测试用 zlib 独立CRC构造数据，并注入超时、UNIT ATTENTION、
 头损坏、重复不一致、分区项损坏、错误块长、越界表和错误userdata边界。
+
+## 实机结果
+
+BOOT e6c49073… 照片确认stage6，5条命令、UA0，所有结果标志及healthy为1，poisoned0。
+LUN0 lastLba=62458879、blockBytes4096；GPT40项，头CRC=e5897a71、项CRC=a60c0f35，
+userdata=2969600..62458874。重复头逐字节一致，SCSI/OCS/protocol/residual均0，GFSR0。
+记录见 `evidence/storage/ufs-read/device-result.json`。尚未读取根镜像或证明长期稳定性。

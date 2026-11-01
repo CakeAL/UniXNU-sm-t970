@@ -3,14 +3,33 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
-## 当前：LUN0只读数据核验（主机构建通过，待封装／实测）
+## 当前：LUN0只读数据核验（实机通过，继续根镜像读回）
 
 - 参数 `t970-ufs-read=1`；见 [只读数据范围](ufs-read.md)。先用已通过NOP入口建立实验队列。
 - INQUIRY、READ CAPACITY、重复GPT头及最多4块分区项，核验CRC和本机userdata边界。
   不访问userdata内容，不写存储。最多一次已完成UNIT ATTENTION重试，超时／协议错误不重试。
 - 16项主机测试、配置检查、内核构建／预链接通过，输入哈希稳定；内核
   `3956c0e72d9682024623e477555f804e469df767052e16f03a1864ab2c4b5bc5`。仍使用FD `515105d7…`。
-- 当前设备仍安装已通过的NOP镜像；本轮尚未刷写／实测。
+- 代码提交 `fa9a0e6`；独立封装与DT/ADT检查通过。BOOT
+  `e6c49073395655a947d3f53b31206e268a14cccea895ff18201cc96fd3a577aa`，62,713,856字节。
+- 检测Download Mode后仅刷BOOT，Heimdall exit0，`--no-reboot`；当前安装只读LUN0镜像。
+  机主已提供完整结束画面，回执与观察在 `evidence/storage/ufs-read/`。
+- stage6、commands5、UA0、healthy1、poisoned0。INQUIRY／capacity／header／repeat／entries／geometry全为1。
+  lastLba=62458879、blockBytes4096、GPT count40、headerCRC=e5897a71、entriesCRC=a60c0f35，
+  userdata=2969600..62458874。result/OCS/SCSI/sense/protocol/residual均0，GFSR0、FSR400。
+- 已证明小规模SCSI数据及GPT读盘；尚未读取userdata内容，未发布根卷或挂载文件系统。
+
+### 后续根镜像接入核查（主机结果）
+
+- 本地userdata-root.img全文件SHA256仍为 `fd43ee70…`，与原USERDATA回执一致；
+  SHNGROOT v1 manifest摘要通过。设备内容仍待读回，不据主机镜像断言写入完整。
+- OS首块物理LUN0 LBA2969856、SystemOS首块LBA4453888；后续先比较manifest及
+  两窗口首块hash，计划留在忽略目录 `out/step7/ufs-read-next-plan.json`。
+- `startRoot`／`startWholeUserdataRoot`仍调用旧hostBringUp，不能在T970原样启用。
+  实验路径的成功尚未迁移到持久驱动／映射生命周期。
+- `NativeUfsBlock::configureVerification`明确拒绝policy_count=0，RootPublication还要求
+  signedVolumeUuid；当前空策略仅使诊断链接，不意味着根窗口能发布。
+  68MiB BOOT限制下的验证策略接入仍需解决，不能直接启用root参数绕过检查。
 
 ## 前轮：单次 UFS NOP（实机往返通过，尚未读盘）
 
