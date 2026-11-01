@@ -147,6 +147,7 @@ findings = [
   "The build currently selects the board-local ShengUfs archive (component removed, zz-build-shengufs-local.py), enables CONFIG_XNU_NATIVE_UFS/VERIFIED_ROOT_PROBE and boots with native-ufs-root=1 plus t970-ufs-auto-stream=1. The kernel links and produces a 62.7 MB boot image.",
   "board.toml passes t970-ufs-no-smmu=1 for the last experiment; it is a diagnostic switch alongside native-ufs-root=1 and does not enable any storage publication.",
   "board.toml adds {uefi}/Silicon/Samsung to [firmware] packages so SamsungPkg resolves; the boot image continues to use the RELEASE firmware target.",
+  "board.toml currently boots with t970-ufs-image=1 (the read-only survey image) and panic_screen; the survey BOOT is c404ce26 and the image source revision is 09bff63.",
 ]
 completion = [
   "A board.toml with matching device identity resolves the selected SoC and OS profiles and pinned sources.",
@@ -567,6 +568,7 @@ findings = [
   "Three dtc naming warnings are retained from the copied static reservations; the actual reg values and original names are preserved.",
   "Host check compared all 30 static reservation reg values, confirmed their non-overlap with the selected measured bank, and decoded the ADT DRAM base/size. Runtime allocations and DMA remain unverified.",
   "Step 3 audit records the candidate contiguous bank and 30 static reservations as partial DTS input completion. Dynamic reservations, UEFI allocation and full peripheral ownership are still not established.",
+  "The UFS survey DMA buffer is allocated from the DarwinBoot owned window (args->physBase/memSize); the preflight refuses any allocation outside it, so the verified reads also confirm the owned-memory window arithmetic on hardware.",
 ]
 completion = [
   "The board memory description accounts for physical DRAM banks, firmware reservations and the UEFI-to-XNU handoff regions.",
@@ -709,6 +711,7 @@ findings = [
   "Keeping the SMMU map but disabling SMMU programming (t970-ufs-no-smmu=1) moves the failure past the SMMU panics and into an unexplained self-reset before console output. That is consistent with the driver's unbounded UFS completion loops waiting on DMA that the firmware stream mapping does not cover; kernel-side SMMU bypass alone is not sufficient.",
   "Route B started: scripts/gen-ufs-phy-tables.py extracts the SM8250 QMP UFS PHY sequences from the Linux driver into package/firmware/.../PlatformUfsLib/Sm8250UfsPhyTables.h (SM8150 base tables plus the SM8250 HS-G4 overlays, 24/6/34/7 and 1/21/2 entries). Wiring PlatformUfsLib and the Samsung UfsDxe is the next step and no firmware behaviour has changed yet.",
   "Both non-secure routes to a usable UFS SMMU context are now exhausted: kernel writes to the SMR are ignored, UEFI firmware PHY bring-up succeeds but UFS DMA still resets the board, and QCOM_SCM restore_sec_cfg is not provided by this platform's secure monitor.",
+  "The UEFI image survey (t970-ufs-image=1) completed on hardware after the full userdata rewrite: 14 UFS reads, healthy=1, poisoned=0, and all seven manifest/OS/SystemOS samples matched (matchMask=0x7f). It reuses the firmware SMMU handoff context (CB0 0x100ff, SCTLR 0xe0, existing SMR entries) and stops with noPublication=1, so no block device or root is published.",
 ]
 completion = [
   "UFS reads return correct capacity, GPT and known blocks under XNU; the chosen root mounts and writes persist only inside the allocated Data region.",
@@ -1188,6 +1191,7 @@ findings = [
   "package/firmware carries PlatformUfsLib (BoardInit.c, PlatformUfsLib.inf, Sm8250UfsPhyTables.h), DSC/FDF entries for UfsDxe, and a single merged UfsDxe source patch (ChipInfo tolerance plus 0x9ff80004 stage words). The firmware staging must run scripts/prepare-uefi.py from a reset checkout because same-file patches cannot overlap.",
   "patches/xnu/t970-smmu-dump.patch now carries the t970-ufs-status probe that maps 0x9ff80000 and panics with the firmware stage word; it is the kernel half of the firmware visibility path.",
   "PlatformUfsLib now links ArmSmcLib, ArmMmuLib-free DxeServicesTableLib and BaseMemoryLib; the SCM prototype lives in BoardInit.c next to the PHY replay and is selected by the same DSC/FDF entries.",
+  "The post-survey evidence records the survey BOOT build (c404ce26 from revision 09bff63) and a zero-byte read log, with userdata_written=false and recovery_written=false for that action.",
 ]
 completion = [
   "The selected profile's inputs produce a kernel, payload and a boot image matching the SM-T970 boot path.",
@@ -1428,6 +1432,7 @@ findings = [
   "scripts/gen-ufs-phy-tables.py is a host-only generator: it downloads the pinned Linux QMP UFS driver headers, resolves the QSERDES/PHY register defines and writes the C tables; it is reproducible from scratch and does not touch the device.",
   "The firmware bring-up uses GOP colour markers at fixed x positions plus a 0x9ff80004 stage word read back by the arm_init probe; both are diagnostic-only and the current image still resets before XNU can report the stage word.",
   "The SCM probe is a board-side diagnostic in PlatformUfsLib: it issues a single fast SMC with the Qualcomm SIP owner and reports the return code through GOP markers; it does not change the SMMU or UFS state itself.",
+  "The survey flash receipt is the device-side confirmation of the read-only UFS path; it is independent of the kernel entry probes and was captured after the full userdata rewrite.",
 ]
 completion = [
   "Every claimed UniXNU milestone has matching source/image revisions, a reproducible command and accessible firmware/kernel logs.",

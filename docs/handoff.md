@@ -3,7 +3,7 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
-## 当前：完整根镜像已重写并通过整段读回，准备XNU交叉核验
+## 当前：完整根镜像已重写并通过整段读回，XNU交叉核验BOOT已启动
 
 - 机主要求“你能直接刷么”，已授权继续完成当前完整根镜像部署；仍先验证通道。
 - OdinMac本机也封装Heimdall，不作为独立大文件通道。准备官方Recovery派生的BOOT临时镜像，
@@ -22,7 +22,9 @@
 - 9,382,658,048字节全部读回，SHA256精确匹配源镜像
   `fd43ee7035ce185ce4215ac93fdc006fd784a54b3b7442e21457c226cbe03093`。
   回执／日志在 `evidence/storage/root-rewrite/`。仅重写镜像长度，未改分区表／Recovery。
-- 下一步自动回Download Mode，重刷已审阅的c404ce26…UFS survey BOOT并自动启动，待屏幕确认7样本全部匹配。
+- 已通过ADB回Download Mode，重新上传已审阅的c404ce26…UFS survey BOOT并自动重启，Heimdall exit0。
+  准备／回执在 `evidence/storage/root-rewrite/post-survey/`；机主在外，待返回后屏幕确认7样本全部匹配。
+  当前设备不再运行Linux ADB，不能把没有ADB设备当作失败。
   根设备发布／文件系统挂载仍未启用。
 - 原厂BOOT和UFS调查BOOT均保留；当前运行临时Linux root ADB。
 
