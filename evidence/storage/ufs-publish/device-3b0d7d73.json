@@ -1,0 +1,37 @@
+{
+  "device": "sm-t970",
+  "boot_sha256": "3b0d7d736d920f4dab6534009f81c0ae1afa5f1281bbe899c7df923dbad24c98",
+  "source_revision": "9d0ffd88fb27005846d23d7ba25a5f8e99411adc",
+  "observation_source": "Owner photo, transcribed by the agent; register strings read directly from the panic screen.",
+  "photo": {
+    "filename": "2026-11-01-193759.jpg",
+    "local_source_available": true,
+    "sha256": "a16ed03724e6bfc0c232e0de280d006869c2852d58fc2abaee8a23a03f8612e5"
+  },
+  "panic_text": [
+    "T970 UFS publish: handoff refused: firmware handoff state changed",
+    "CB0=100ff/1/e0 smr=84020820 s2cr=4/0/0 gfsr=0 fsr=400",
+    "dma=0 bytes=22000 @NativeUfs.cpp:3060"
+  ],
+  "observed": {
+    "cbar": "0x100ff",
+    "cba2r": "0x1",
+    "sctlr": "0xe0",
+    "smr_0x810": "0x84020820",
+    "s2cr_0xc10": "0x4",
+    "smr_0x954": "0x0",
+    "smr_0x958": "0x0",
+    "gfsr": "0x0",
+    "cb0_fsr": "0x400",
+    "dma": "0x0"
+  },
+  "interpretation": [
+    "CB0 is the active translation (0x100ff/0x1/0xe0) and GFSR is zero, so the SMMU is not globally faulted.",
+    "The two SID entries the survey's healthy() expected are absent (0x954/0x958 read zero): they were written by the survey's own NOP test, not left by firmware.",
+    "CB0 FSR=0x400 is a pre-existing fault record, not a new one; requiring zero rejected a state the survey had already read through.",
+    "Conclusion: the snapshot gate was wrong, not the transport. Publication still not reached and no window was published."
+  ],
+  "hardware_tested": true,
+  "published": false,
+  "root_mounted": false
+}

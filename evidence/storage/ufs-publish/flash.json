@@ -1,0 +1,13 @@
+{
+  "device": "sm-t970",
+  "revision": "9d0ffd88fb27005846d23d7ba25a5f8e99411adc",
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-publish/boot.img --no-reboot",
+  "boot_sha256": "3b0d7d736d920f4dab6534009f81c0ae1afa5f1281bbe899c7df923dbad24c98",
+  "boot_bytes": 62713856,
+  "partition": "BOOT only; no USERDATA, RECOVERY or GPT write",
+  "exit_code": 0,
+  "result": "BOOT upload successful, session ended; device left in Download Mode (--no-reboot)",
+  "time": "2026-11-01T19:35:36+08:00",
+  "device_result": "pending owner reboot and screen photo",
+  "note": "First attempt: BOOT 3b0d7d73, owner photo shows the snapshot gate refusing a state the survey had read through."
+}

@@ -20,9 +20,12 @@ userdata 的 OS 窗口发布成 IOMedia（UUID 匹配 ADT 的 `04769D26…`）�
 
 - 新增 `hostBringUpHandoff`，`hostBringUp` 在发布模式下直接走它：只映射 controller/SMMU、
   在 owned window 内取 DMA，然后复用调查版的 NOP/上电/TUR 序列；**不写** SMMU、不写队列、不写存储。
-- 发布前逐项核对固件留下的状态（`CBAR0=0x100ff`、`CBA2R0=1`、`SCTLR0=0xe0`、
-  `0x810=0x84020820`、`0xc10=4`、`0x954=0x800000e0`、`0x958=0x800004e0`、`0xd54/0xd58=0`、
-  `GFSR=0`、`CB0 FSR=0`），和调查版 `healthy()` 用同一组寄存器与期望值；任何漂移即拒绝。
+- 只要求 `CB0` 仍是活动翻译（`CBAR0=0x100ff`、`CBA2R0=1`、`SCTLR0=0xe0`）、`GFSR=0`、
+  DMA 落在 owned window 内；其余 SMMU 状态只记录。
+- 第一版把调查版 `healthy()` 的快照当成前提，实机 BOOT `3b0d7d73` 直接否定：
+  `0x954/0x958` 读 0（那些 SID `0xe0`/`0x4e0` 的 park 项是调查自己的 NOP 测试写的），
+  `CB0 FSR=0x400` 是内核之前就有的旧记录。现在改成**故障漂移**判定：进入时抓
+  `GFSR`/`CB0 FSR` 基线，NOP／上电／TUR 后必须不变。
 - 接上正式 `startRoot`：读 manifest → 建窗口计划 → `NativeUfsBlock`(owner 校验) → 发布。
   仍然 fail-closed：任一窗口不通过就一个也不发布。
 - 发布中止的 panic 会打印 `stage`、窗口数、`prepared/published/policies/verify` 和

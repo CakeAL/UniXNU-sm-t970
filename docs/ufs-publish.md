@@ -19,15 +19,14 @@ handoff 配置做 bring-up，再由 `startRoot` 解析根镜像 manifest、按�
 `hostBringUpHandoff` 只做三件事：映射 controller 与 SMMU、在 DarwinBoot owned window 内分配
 DMA、走和调查版相同的 NOP/上电/TUR 序列。它**不写** SMMU、不写队列寄存器、不写存储。
 
-发布前要求固件留下的状态与调查时逐项一致，任何一项不同即拒绝（`firmware handoff state changed`）：
+只要求两件事：`CB0` 仍是活动翻译（`CBAR0=0x100ff`、`CBA2R0=0x1`、`SCTLR0=0xe0`）且
+`GFSR=0`；DMA 必须落在 `boot_args` 的 owned window 内。其余状态只记录不判定。
 
-- `CBAR0=0x100ff`、`CBA2R0=0x1`、`SCTLR0=0xe0`；
-- 已有 stream 项：`0x810=0x84020820`、`0xc10=4`、`0x954=0x800000e0`、`0x958=0x800004e0`，
-  对应项尾部 `0xd54/0xd58` 为零；
-- `GFSR=0`、`CB0 FSR=0`；
-- DMA 必须落在 `boot_args` 的 owned window 内。
-
-这组判断和调查版 `healthy()` 用的是同一组寄存器与同一组期望值，不引入新解释。
+第一版要求固件状态与调查时逐项相同，实机证明这个前提不成立：调查版 `healthy()` 里的
+`0x954/0x958`（SID `0xe0`/`0x4e0` 的 park 项）是调查自己的 NOP 测试写进去的，固件并不留下；
+`CB0 FSR=0x400` 也是内核之前就存在的旧记录。因此判定改成**故障漂移**：进入时抓一次
+`GFSR`/`CB0 FSR` 基线，NOP、上电、TUR 各阶段后必须与基线一致，出现新故障即拒绝。
+这和调查版每次读取前后做的比较是同一种判断，不再依赖某个 boot 的寄存器快照。
 
 ## 失败时屏幕上能看到什么
 

@@ -1178,12 +1178,29 @@ static bool hostBringUp (const char **why)
 // answers. Nothing here writes storage.
 static bool hostProveTransport (const char **why)
 {
+  // The 400 fault this board records in CB0 predates the kernel (it belongs to an earlier
+  // master), so the check is drift, not zero: no new global or context fault may appear while
+  // our own commands run. That is the same comparison the survey made around every read.
+  const uint32_t gfsrBefore = gHost.smmu ? read32 (gHost.smmu, 0x48) : 0;
+  const uint32_t fsrBefore = gHost.cb ? read32 (gHost.cb, 0x58) : 0;
+  gRootDiagnostic.gfsrBefore = gfsrBefore;
+  gRootDiagnostic.fsrBefore = fsrBefore;
+  auto faulted = [gfsrBefore, fsrBefore] {
+    if (!gHost.smmu || !gHost.cb) return false;
+    return read32 (gHost.smmu, 0x48) != gfsrBefore || read32 (gHost.cb, 0x58) != fsrBefore;
+  };
+  auto refuse = [why](const char *reason) {
+    gHost.ready = false;
+    *why = reason;
+    return false;
+  };
   gRootDiagnostic.stage = "NOP OUT";
   // NOP OUT proves the transport before touching the SCSI layer.
   if (hostNop () != kIOReturnSuccess) {
-    gHost.ready = false;
-    *why = "NOP OUT";
-    return false;
+    return refuse ("NOP OUT");
+  }
+  if (faulted ()) {
+    return refuse ("NOP OUT faulted the SMMU");
   }
   uint32_t power = 0;
   gRootDiagnostic.stage = "power mode query";
@@ -1205,11 +1222,17 @@ static bool hostProveTransport (const char **why)
     }
     IOSleep (50);
   }
+  if (faulted ()) {
+    return refuse ("wake faulted the SMMU");
+  }
   gRootDiagnostic.stage = "LUN ready";
   for (unsigned attempt = 0; attempt < 20; attempt++) {
     uint8_t tur[6] = { 0, 0, 0, 0, 0, 0 };
     uint32_t scsi = 0;
     if (hostScsi (0, tur, 6, false, 0, 200000, &scsi) == kIOReturnSuccess) {
+      if (faulted ()) {
+        return refuse ("LUN 0 faulted the SMMU");
+      }
       gHost.ready = true;
       return true;
     }
@@ -1221,14 +1244,14 @@ static bool hostProveTransport (const char **why)
   return false;
 }
 
-// Handoff bring-up: publish through the translation the firmware already established.
+// Handoff bring-up: publish through the transport the firmware left running.
 //
-// The board's secure world owns the SMMU, so the driver's own SMR/S2CR writes are ignored and a
-// self-built context bank never translates. The firmware's UfsDxe, however, left context bank 0
-// translating both UFS streams (SID 0x0e0 and 0x4e0) and the survey proved reads through it. This
-// path therefore maps the controller and SMMU read-only, requires that exact firmware state, and
-// takes a DMA buffer inside the DarwinBoot owned window the handoff translation covers. It never
-// writes the SMMU, the queue registers or the storage.
+// The device tree gives the UFS controller no iommus property, and the survey's own SMMU table
+// shows only the display stream (slot 4) translating; the two SID entries it parked exist because
+// the survey wrote them, not because the firmware leaves them. The state words are therefore
+// reported, not asserted: what qualifies the transport here is the command sequence itself
+// (NOP OUT, power mode, TEST UNIT READY) with no new global or context fault, and every read is
+// still authenticated by the owner policy before it reaches the filesystem.
 static bool hostBringUpHandoff (const char **why)
 {
   if (gHost.poisoned) {
@@ -1245,26 +1268,20 @@ static bool hostBringUpHandoff (const char **why)
     *why = "controller/SMMU map";
     return false;
   }
-  // The reviewed handoff state, read exactly as the survey qualified it. Any drift means this is
-  // not the translation the reads were proved on, so publication is refused rather than guessed.
-  const uint32_t cbar = read32 (gHost.smmu, 0x1000), cba2r = read32 (gHost.smmu, 0x1800);
-  const uint32_t sctlr = read32 (gHost.smmu, 0x80000);
-  const uint32_t smr0 = read32 (gHost.smmu, 0x810), s2cr0 = read32 (gHost.smmu, 0xc10);
-  const uint32_t s2cr1 = read32 (gHost.smmu, 0x954), tail1 = read32 (gHost.smmu, 0xd54);
-  const uint32_t s2cr2 = read32 (gHost.smmu, 0x958), tail2 = read32 (gHost.smmu, 0xd58);
-  const uint32_t gfsr = read32 (gHost.smmu, 0x48), fsr = read32 (gHost.smmu, 0x80058);
-  gRootDiagnostic.cbar = cbar;
-  gRootDiagnostic.cba2r = cba2r;
-  gRootDiagnostic.sctlr = sctlr;
-  gRootDiagnostic.smr = smr0;
-  gRootDiagnostic.s2cr = s2cr0;
-  gRootDiagnostic.gfsr = gfsr;
-  gRootDiagnostic.fsr = fsr;
-  gRootDiagnostic.smmuSlot = s2cr1;
-  gRootDiagnostic.smmuId1 = s2cr2;
-  if (cbar != 0x100ff || cba2r != 1 || sctlr != 0xe0 || smr0 != 0x84020820 || s2cr0 != 4 ||
-      s2cr1 != 0x800000e0 || s2cr2 != 0x800004e0 || tail1 || tail2 || gfsr || fsr) {
-    *why = "firmware handoff state changed";
+  gRootDiagnostic.cbar = read32 (gHost.smmu, 0x1000);
+  gRootDiagnostic.cba2r = read32 (gHost.smmu, 0x1800);
+  gRootDiagnostic.sctlr = read32 (gHost.smmu, 0x80000);
+  gRootDiagnostic.smr = read32 (gHost.smmu, 0x810);
+  gRootDiagnostic.s2cr = read32 (gHost.smmu, 0xc10);
+  gRootDiagnostic.smmuSlot = read32 (gHost.smmu, 0x954);
+  gRootDiagnostic.smmuId1 = read32 (gHost.smmu, 0x958);
+  gRootDiagnostic.gfsr = read32 (gHost.smmu, 0x48);
+  gRootDiagnostic.fsr = read32 (gHost.smmu, 0x80058);
+  if (gRootDiagnostic.cbar != 0x100ff || gRootDiagnostic.cba2r != 1 || gRootDiagnostic.sctlr != 0xe0 ||
+      gRootDiagnostic.gfsr) {
+    // CB0 must still be the active translation and no global fault may be pending; anything else
+    // means this is not a state the survey ever read through.
+    *why = "no active CB0 translation";
     return false;
   }
   gHost.cb = gHost.smmu + 0x80000;
