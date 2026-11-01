@@ -32,6 +32,8 @@ paths = [
   "tests/test_recovery_storage.py",
   "docs/ufs-survey.md",
   "evidence/storage/ufs-survey/**",
+  "docs/ufs-publish.md",
+  "evidence/storage/ufs-publish/**",
   "docs/ufs-image.md",
   "evidence/storage/ufs-image/**",
   "docs/ufs-read.md",
@@ -504,6 +506,8 @@ paths = [
   "tests/test_recovery_storage.py",
   "docs/ufs-survey.md",
   "evidence/storage/ufs-survey/**",
+  "docs/ufs-publish.md",
+  "evidence/storage/ufs-publish/**",
   "docs/ufs-image.md",
   "evidence/storage/ufs-image/**",
   "docs/ufs-read.md",
@@ -638,6 +642,8 @@ paths = [
   "tests/test_recovery_storage.py",
   "docs/ufs-survey.md",
   "evidence/storage/ufs-survey/**",
+  "docs/ufs-publish.md",
+  "evidence/storage/ufs-publish/**",
   "docs/ufs-image.md",
   "evidence/storage/ufs-image/**",
   "docs/ufs-read.md",
@@ -713,14 +719,17 @@ findings = [
   "Both non-secure routes to a usable UFS SMMU context are now exhausted: kernel writes to the SMR are ignored, UEFI firmware PHY bring-up succeeds but UFS DMA still resets the board, and QCOM_SCM restore_sec_cfg is not provided by this platform's secure monitor.",
   "The UEFI image survey (t970-ufs-image=1) completed on hardware after the full userdata rewrite: 14 UFS reads, healthy=1, poisoned=0, and all seven manifest/OS/SystemOS samples matched (matchMask=0x7f). It reuses the firmware SMMU handoff context (CB0 0x100ff, SCTLR 0xe0, existing SMR entries) and stops with noPublication=1, so no block device or root is published.",
   "The working UFS reads reuse the firmware handoff state rather than a driver-created SMMU context: CB0 with cbar=0x100ff, cba2r=1, sctlr=0xe0 and the firmware SMR entries for SID 0x0e0/0x4e0 in slots 55/56, with the DMA buffer inside the owned window. This is the configuration the root publication must reuse.",
+  "Connected that handoff to the production publication path (t970-ufs-publish=1): hostBringUpHandoff maps the controller and SMMU, takes DMA inside the DarwinBoot owned window, requires the exact reviewed firmware state (CB0 0x100ff/0x1/0xe0, 0x810 0x84020820, 0xc10 4, 0x954 0x800000e0, 0x958 0x800004e0, zero tails, GFSR/FSR zero) and then runs the survey's NOP/power/TUR sequence without writing the SMMU, the queue registers or storage. startRoot keeps every window fail-closed, so a rejected window publishes nothing.",
+  "The kernel still links the empty policy table, and the policy bundle cannot be moved into it: the OS window needs about 46.4 MB of block hashes and SystemOS about 25.2 MB (32 bytes per 4096-byte block), so the packed boot image would exceed the 71303168-byte BOOT partition. The carrier therefore has to move out of the kernel; the planned shape is both manifests in a fixed userdata region after the image, read at boot through the same handoff transport and verified by the compiled-in owner key before the policy table is filled.",
 ]
 completion = [
   "UFS reads return correct capacity, GPT and known blocks under XNU; the chosen root mounts and writes persist only inside the allocated Data region.",
 ]
 limits = [
   "No storage writes, repartitioning, XNU UFS driver, root mounting or persistence tests were performed; backup GPT copies and filesystem contents were not read.",
+  "The publication path is wired but not device-observed in this revision. With the empty policy table it is expected to stop at the owner check rather than publish, and the layout geometry it prints is the input for the out-of-kernel policy carrier; an unverified window is never published.",
 ]
-next_action = ["Review an exclusive bypass-context and bounded command/DMA test plan using the qualified stream fields; preserve display CB4, reject unqualified CB73 and record actual data reads separately."]
+next_action = ["Flash the t970-ufs-publish=1 image and record the publication stop, stage and window geometry, then move both manifests to a fixed userdata region read through the handoff transport so the owner policy can verify the OS window within the BOOT partition limit."]
 evidence = [
   { kind = "device", reference = "evidence/storage/smmu-fields/device-result.json", revision = "7ee2918e7bafdc76d62225675c4bcaebd14e5753", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/smmu-fields/boot.img --no-reboot", result = "Owner photo confirms tested stream fields accepted and restored, display mapping preserved; context states are observations, not ownership or DMA qualification." },
   { kind = "device", reference = "evidence/storage/ufs-preflight/device-result.json", revision = "c0c13db843b72306db42c4ac3aa953698768e6f0", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-preflight/boot.img --no-reboot", result = "Owner photo confirms ownedOK=1, planOK=1 and END, contiguous buffer inside actual boot_args memory; no stream activation or DMA command performed." },
@@ -1049,6 +1058,8 @@ paths = [
   "tests/test_recovery_storage.py",
   "docs/ufs-survey.md",
   "evidence/storage/ufs-survey/**",
+  "docs/ufs-publish.md",
+  "evidence/storage/ufs-publish/**",
   "docs/ufs-image.md",
   "evidence/storage/ufs-image/**",
   "docs/ufs-read.md",
@@ -1289,6 +1300,8 @@ paths = [
   "tests/test_recovery_storage.py",
   "docs/ufs-survey.md",
   "evidence/storage/ufs-survey/**",
+  "docs/ufs-publish.md",
+  "evidence/storage/ufs-publish/**",
   "docs/ufs-image.md",
   "evidence/storage/ufs-image/**",
   "docs/ufs-read.md",

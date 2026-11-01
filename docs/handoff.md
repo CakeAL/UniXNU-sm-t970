@@ -16,6 +16,24 @@ survey 镜像（`c404ce26…`）的 7 个样本全部匹配、14 次读零错误
 gHost（smmu/CB0/streams/DMA）走 `NativeUfsWholeUserdataBlock`/`NativeUfsBlock`，把
 userdata 的 OS 窗口发布成 IOMedia（UUID 匹配 ADT 的 `04769D26…`），让 APFS 挂根。
 
+## 发布路径已接上固件 handoff（`t970-ufs-publish=1`）
+
+- 新增 `hostBringUpHandoff`，`hostBringUp` 在发布模式下直接走它：只映射 controller/SMMU、
+  在 owned window 内取 DMA，然后复用调查版的 NOP/上电/TUR 序列；**不写** SMMU、不写队列、不写存储。
+- 发布前逐项核对固件留下的状态（`CBAR0=0x100ff`、`CBA2R0=1`、`SCTLR0=0xe0`、
+  `0x810=0x84020820`、`0xc10=4`、`0x954=0x800000e0`、`0x958=0x800004e0`、`0xd54/0xd58=0`、
+  `GFSR=0`、`CB0 FSR=0`），和调查版 `healthy()` 用同一组寄存器与期望值；任何漂移即拒绝。
+- 接上正式 `startRoot`：读 manifest → 建窗口计划 → `NativeUfsBlock`(owner 校验) → 发布。
+  仍然 fail-closed：任一窗口不通过就一个也不发布。
+- 发布中止的 panic 会打印 `stage`、窗口数、`prepared/published/policies/verify` 和
+  `w0..w3` 的窗口名/偏移/字节数；bring-up 被拒绝时打印 CB0 三元组与两个 stream 值。
+- 内核侧仍挂空策略表（`verified_root_policy_count=0`），所以本版预期停在 `policy count invalid`。
+  这不是回退：策略哈希表若要塞进内核，OS 6.08 GB 约 46.4 MB + SystemOS 3.30 GB 约 25.2 MB，
+  合计约 71.6 MB，BOOT 上限只有 71,303,168 字节。**策略载体必须移出内核**：
+  计划把两份 manifest 放到 userdata 固定区（镜像之后），启动时经同一 handoff 通道读入并在
+  运行时填充 `verified_root_policies`，仍用编译进内核的 owner 公钥做 RSA 校验。
+  详见 [根设备发布](ufs-publish.md)。
+
 ## 当前：完整根镜像已重写并通过整段读回，XNU交叉核验BOOT已启动
 
 - 机主要求“你能直接刷么”，已授权继续完成当前完整根镜像部署；仍先验证通道。

@@ -1103,8 +1103,15 @@ static void hostWrite (unsigned offset, uint32_t value)
 // Bring the live controller up for reading: map, SMMU pass-through for the UFS stream, take over
 // the request list, wake the device from UFS-PowerDown and wait for LUN 0 to be ready.
 // `why` receives a short reason on failure.
+// t970-ufs-publish=1 borrows the firmware handoff translation instead of building one.
+static bool gHandoffTransport = false;
+static bool hostProveTransport (const char **why);
+static bool hostBringUpHandoff (const char **why);
 static bool hostBringUp (const char **why)
 {
+  if (gHandoffTransport) {
+    return hostBringUpHandoff (why);
+  }
   // A secondary stream is a board-level transport dependency, not an optional
   // diagnostic. Validate both existing mappings before any controller access.
   requireDualStreamReuse (0, 0, "host bring-up");
@@ -1163,6 +1170,14 @@ static bool hostBringUp (const char **why)
     gRootDiagnostic.cba2r = read32 (gHost.smmu, 0x1800 + 4 * (report[0] >> 16));
   }
   if (!hostStartQueue (why)) return false;
+  return hostProveTransport (why);
+}
+
+// Prove the transport and wake LUN 0. Both bring-up paths end here: NOP OUT first, then the power
+// mode the firmware left, START STOP UNIT when the device is parked, and TEST UNIT READY until it
+// answers. Nothing here writes storage.
+static bool hostProveTransport (const char **why)
+{
   gRootDiagnostic.stage = "NOP OUT";
   // NOP OUT proves the transport before touching the SCSI layer.
   if (hostNop () != kIOReturnSuccess) {
@@ -1204,6 +1219,86 @@ static bool hostBringUp (const char **why)
   gHost.ready = false;
   *why = "LUN 0 not ready";
   return false;
+}
+
+// Handoff bring-up: publish through the translation the firmware already established.
+//
+// The board's secure world owns the SMMU, so the driver's own SMR/S2CR writes are ignored and a
+// self-built context bank never translates. The firmware's UfsDxe, however, left context bank 0
+// translating both UFS streams (SID 0x0e0 and 0x4e0) and the survey proved reads through it. This
+// path therefore maps the controller and SMMU read-only, requires that exact firmware state, and
+// takes a DMA buffer inside the DarwinBoot owned window the handoff translation covers. It never
+// writes the SMMU, the queue registers or the storage.
+static bool hostBringUpHandoff (const char **why)
+{
+  if (gHost.poisoned) {
+    *why = "transport quarantined";
+    return false;
+  }
+  if (gHost.ready) {
+    return true;
+  }
+  gRootDiagnostic.stage = "handoff maps";
+  gHost.hc = mapPhys (UFS_HC_BASE, UFS_HC_SIZE, gHost.hcMap);
+  gHost.smmu = mapPhys (0x15000000ULL, 0x100000, gHost.smmuMap);
+  if (!gHost.hc || !gHost.smmu) {
+    *why = "controller/SMMU map";
+    return false;
+  }
+  // The reviewed handoff state, read exactly as the survey qualified it. Any drift means this is
+  // not the translation the reads were proved on, so publication is refused rather than guessed.
+  const uint32_t cbar = read32 (gHost.smmu, 0x1000), cba2r = read32 (gHost.smmu, 0x1800);
+  const uint32_t sctlr = read32 (gHost.smmu, 0x80000);
+  const uint32_t smr0 = read32 (gHost.smmu, 0x810), s2cr0 = read32 (gHost.smmu, 0xc10);
+  const uint32_t s2cr1 = read32 (gHost.smmu, 0x954), tail1 = read32 (gHost.smmu, 0xd54);
+  const uint32_t s2cr2 = read32 (gHost.smmu, 0x958), tail2 = read32 (gHost.smmu, 0xd58);
+  const uint32_t gfsr = read32 (gHost.smmu, 0x48), fsr = read32 (gHost.smmu, 0x80058);
+  gRootDiagnostic.cbar = cbar;
+  gRootDiagnostic.cba2r = cba2r;
+  gRootDiagnostic.sctlr = sctlr;
+  gRootDiagnostic.smr = smr0;
+  gRootDiagnostic.s2cr = s2cr0;
+  gRootDiagnostic.gfsr = gfsr;
+  gRootDiagnostic.fsr = fsr;
+  gRootDiagnostic.smmuSlot = s2cr1;
+  gRootDiagnostic.smmuId1 = s2cr2;
+  if (cbar != 0x100ff || cba2r != 1 || sctlr != 0xe0 || smr0 != 0x84020820 || s2cr0 != 4 ||
+      s2cr1 != 0x800000e0 || s2cr2 != 0x800004e0 || tail1 || tail2 || gfsr || fsr) {
+    *why = "firmware handoff state changed";
+    return false;
+  }
+  gHost.cb = gHost.smmu + 0x80000;
+  const auto *args = static_cast<const boot_args *> (PE_state.bootArgs);
+  if (!args) {
+    *why = "no boot args";
+    return false;
+  }
+  gRootDiagnostic.stage = "handoff DMA allocation";
+  gHost.dma = IOBufferMemoryDescriptor::inTaskWithOptions (
+    kernel_task, static_cast<IOOptionBits> (kIODirectionInOut) | static_cast<IOOptionBits> (kIOMemoryPhysicallyContiguous) |
+    static_cast<IOOptionBits> (kIOMemoryMapperNone),
+    kDmaBytes, 4096);
+  gHost.lock = IOLockAlloc ();
+  if (!gHost.dma || !gHost.lock) {
+    *why = "dma buffer";
+    return false;
+  }
+  gHost.virt = static_cast<uint8_t *> (gHost.dma->getBytesNoCopy ());
+  IOByteCount contiguous = 0;
+  gHost.phys = gHost.dma->getPhysicalSegment (0, &contiguous, kIOMemoryMapperNone);
+  gRootDiagnostic.dma = gHost.phys;
+  gRootDiagnostic.contiguous = contiguous;
+  if (!gHost.virt || !gHost.phys || (gHost.phys & 4095) || contiguous < kDmaBytes) {
+    *why = "DMA address/contiguity";
+    return false;
+  }
+  if (!t970_preflight::ownsDma (args->physBase, args->memSize, gHost.phys, kDmaBytes, contiguous)) {
+    *why = "DMA outside the owned window";
+    return false;
+  }
+  bzero (gHost.virt, kDmaBytes);
+  cacheCivac (gHost.virt, kDmaBytes);
+  return hostProveTransport (why);
 }
 }
 
@@ -2718,9 +2813,10 @@ bool NativeUfs::start (IOService *provider)
            r.candidate[1].count, r.candidate[1].slot, r.candidate[1].smr, r.candidate[1].s2cr,
            r.candidate[2].count, r.candidate[2].slot, r.candidate[2].smr, r.candidate[2].s2cr);
   }
-  unsigned probe = 0, rootMode = 0, wholeUserdataRoot = 0;
+  unsigned probe = 0, rootMode = 0, wholeUserdataRoot = 0, publishRoot = 0;
   PE_parse_boot_argn ("native-ufs-probe", &probe, sizeof (probe));
   PE_parse_boot_argn ("native-ufs-root", &rootMode, sizeof (rootMode));
+  PE_parse_boot_argn ("t970-ufs-publish", &publishRoot, sizeof (publishRoot));
   bool hasWholeUserdataRoot =
     PE_parse_boot_argn ("native-ufs-whole-userdata-root", &wholeUserdataRoot, sizeof (wholeUserdataRoot));
   if (hasWholeUserdataRoot && wholeUserdataRoot > 1) {
@@ -2730,15 +2826,20 @@ bool NativeUfs::start (IOService *provider)
   // The HFS whole-userdata route and the SHNGROOT window route must never
   // publish two root personalities at once. Probes are also exclusive so a
   // diagnostic run cannot be mistaken for a requested root.
-  if (wholeUserdataRoot && (probe || rootMode)) {
-    IOLog ("NativeUfs: native-ufs-whole-userdata-root conflicts with probe=%u root=%u\n",
-           probe, rootMode);
+  if (wholeUserdataRoot && (probe || rootMode || publishRoot)) {
+    IOLog ("NativeUfs: native-ufs-whole-userdata-root conflicts with probe=%u root=%u publish=%u\n",
+           probe, rootMode, publishRoot);
+    return false;
+  }
+  if (publishRoot && (probe || rootMode || wholeUserdataRoot)) {
+    IOLog ("NativeUfs: t970-ufs-publish=%u conflicts with probe=%u root=%u whole-root=%u\n",
+           publishRoot, probe, rootMode, wholeUserdataRoot);
     return false;
   }
   UfsStreamConfig streams = ufsStreams ();
-  IOLog ("NativeUfs: start provider=%s probe=%u root=%u whole-root=%u stream=%04x stream2=%04x\n",
+  IOLog ("NativeUfs: start provider=%s probe=%u root=%u whole-root=%u publish=%u stream=%04x stream2=%04x\n",
          provider && OSDynamicCast (IOPlatformExpertDevice, provider) ? "platform" : "device",
-         probe, rootMode, wholeUserdataRoot, streams.primary, streams.secondary);
+         probe, rootMode, wholeUserdataRoot, publishRoot, streams.primary, streams.secondary);
   native_ufs_probe_requested = probe != 0;
   bool mutatesTransport = (probe >= 3 && probe <= 5) || probe == 9 || probe == 10 ||
                           probe == 11 || probe == 12 || probe == 13 ||
@@ -2748,7 +2849,7 @@ bool NativeUfs::start (IOService *provider)
   }
   // Default: match for observability only, never touch the controller. Hardware work runs once,
   // from the root-device personality; the ufshc nub match stays observation-only.
-  if ((!probe && !rootMode && !wholeUserdataRoot) ||
+  if ((!probe && !rootMode && !wholeUserdataRoot && !publishRoot) ||
       !OSDynamicCast (IOPlatformExpertDevice, provider)) {
     return false;
   }
@@ -2942,6 +3043,54 @@ bool NativeUfs::start (IOService *provider)
       panic ("NATIVE_UFS media report: cannot start the report thread");
     }
     thread_deallocate (thread);
+    return true;
+  }
+  if (publishRoot && !probe) {
+    // Root publication on the firmware handoff transport. The translation is borrowed from the
+    // firmware (see hostBringUpHandoff); publication itself stays fail-closed inside startRoot, so
+    // a window whose owner policy does not verify is never published and nothing mounts.
+    gHandoffTransport = true;
+    const char *why = "handoff bring-up";
+    if (!hostBringUp (&why)) {
+      panic ("T970 UFS publish: handoff refused: %s\n"
+             "CB0=%x/%x/%x smr=%x s2cr=%x/%x/%x gfsr=%x fsr=%x\ndma=%llx bytes=%x",
+             why, gRootDiagnostic.cbar, gRootDiagnostic.cba2r, gRootDiagnostic.sctlr,
+             gRootDiagnostic.smr, gRootDiagnostic.s2cr, gRootDiagnostic.smmuSlot,
+             gRootDiagnostic.smmuId1, gRootDiagnostic.gfsr, gRootDiagnostic.fsr,
+             gRootDiagnostic.dma, kDmaBytes);
+    }
+    RootLayout *layout = static_cast<RootLayout *> (IOMalloc (sizeof (RootLayout)));
+    if (!layout) panic ("T970 UFS publish: no layout buffer");
+    if (!findRootLayout (layout, &why)) panic ("T970 UFS publish: layout: %s", why);
+    static char windows[4][32];
+    uint64_t offset[4] = { 0, 0, 0, 0 }, bytes[4] = { 0, 0, 0, 0 };
+    for (unsigned i = 0; i < 4; ++i) windows[i][0] = 0;
+    for (unsigned i = 0; i < layout->windows && i < 4; ++i) {
+      strlcpy (windows[i], layout->window[i].name, sizeof (windows[i]));
+      offset[i] = layout->window[i].offset;
+      bytes[i] = layout->window[i].size;
+    }
+    const uint64_t first = layout->userdataFirst, last = layout->userdataLast;
+    const uint64_t imageBytes = layout->imageBytes;
+    const uint32_t manifest = layout->manifestStatus, magic0 = layout->magic0, magic1 = layout->magic1;
+    const unsigned count = layout->windows;
+    IOFree (layout, sizeof (RootLayout));
+    if (!startRoot (provider)) {
+      panic ("T970 UFS publish: publication stopped\n"
+             "stage=%s phase=%u window=%u bytes=%llx\n"
+             "userdata=%llx..%llx image=%llx manifest=%u magic=%08x %08x\n"
+             "windows=%u prepared=%u published=%u policies=%llu verify=%08x\n"
+             "w0 %s off=%llx size=%llx\n"
+             "w1 %s off=%llx size=%llx\n"
+             "w2 %s off=%llx size=%llx\n"
+             "w3 %s off=%llx size=%llx",
+             gRootDiagnostic.stage, gRootDiagnostic.publicationPhase, gRootDiagnostic.publicationWindow,
+             gRootDiagnostic.windowBytes, first, last, imageBytes, manifest, magic0, magic1,
+             count, gRootDiagnostic.prepared, native_ufs_blocks_published,
+             gRootDiagnostic.policyCount, gRootDiagnostic.verify,
+             windows[0], offset[0], bytes[0], windows[1], offset[1], bytes[1],
+             windows[2], offset[2], bytes[2], windows[3], offset[3], bytes[3]);
+    }
     return true;
   }
   if (rootMode && !probe) {
