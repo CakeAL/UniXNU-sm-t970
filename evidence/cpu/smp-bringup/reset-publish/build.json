@@ -1,0 +1,30 @@
+{
+  "device_base_revision": "6818219d05c01a9bee1255924e1b38150e5645d1",
+  "framework_revision": "d57d6124305d0694583e3ff7fc68ce34a4b0f091",
+  "kernel_build_exit_code": 0,
+  "kernel_sha256": "39ac7ec2f5a3a11cdb3f272f326c34bf920be2c57e8e792172013ca80e49a3d4",
+  "payload_kernel_sha256": "fc7aac18e9c0e30136ca6f1a55b5014bcdfa3098ee0ab88a6bab0ef9405cdb7f",
+  "boot_sha256": "6fe3e519dd2b4d6414521a8411ba1e48d8c399e060b2df52d7870b0e4a557308",
+  "target_wait_seconds": 10,
+  "helper_host_cases": 6,
+  "linked_entry_cases": 96,
+  "linked_branch_cases": 2,
+  "linked_c_entry_cases": 10,
+  "compiled_publication_calls_verified": true,
+  "compiled_addresses_and_sizes_verified": true,
+  "actual_cache_visibility_fixed": false,
+  "hardware_result_pending": true,
+  "board_default_unchanged": true,
+  "eight_core_not_uploaded": true,
+  "reference": "T733 ArmCpu55cc0617 explicitly cleans sysreg_restore and cpu_ttep before CPU_ON",
+  "compile_guard_correction": "Initial opt-in build6813360b compiled publication out; never flashed. XNU_NATIVE_ARCH_TIMER exists for assembly but not these C units. Switched C helper/call and original C marker to !CONFIG_SPTM. Final actual payload audit requires the option, exact two 8-byte flushes to real symbols before PE_cpu_start, and emulates compiled C marker. Previous missing C4 alone is not entry evidence.",
+  "commands": [
+    "UNIXNU_PMGR_REFERENCE_KERNEL=<original e4632618 kernel> PATH=<python3.14 LLVM lld> python3.14 ../UniXNU/unixnu build kernel -D . --out out/data-bringup",
+    "python3.14 ../UniXNU/unixnu build payload -D . --out out/data-bringup --data-ramdisk out/step7/data-seed-512/data-512.dbr --kernel-arg launchdsuffix=release --kernel-arg t970-disable-watchdogd=1 --kernel-arg t970-runtime-report=10 --kernel-arg t970-smp-publish-state=1",
+    "python3.14 ../UniXNU/unixnu bootimg -D . --out out/data-bringup --uefi .cache/uefi-source/Mu-Silicium --fd out/step7/ufs-readonly-inputs/SILICIUM_UEFI.fd --dtb out/firmware-inputs/firmware.dtb --ramdisk <work>/payload/payload.img --output out/data-bringup/reset-publish-boot.img",
+    "python3.14 scripts/check-data-payload.py --work <work> --boot out/data-bringup/reset-publish-boot.img --seed out/step7/data-seed-512/data-512.dbr --watchdog-policy --runtime-report-seconds 10 --smp-observer --publish-reset-state --output out/data-bringup/reset-publish-base-verified",
+    "PATH=<LLVM> .cache/probe-test-venv/bin/python scripts/check-smp-publish-linked.py --kernel out/data-bringup/reset-publish-base-verified/kernel.macho --output out/data-bringup/reset-publish-packed-linked-check",
+    "python3.14 scripts/prepare-smp.py --cpus 2 --base out/data-bringup/reset-publish-base-verified/boot-partition.img --base-validation out/data-bringup/reset-publish-base-verified/validation.json --hardware-dtb <work>/device-tree/hardware.dtb --output out/data-bringup/smp2-reset-publish"
+  ],
+  "work": "out/data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data"
+}

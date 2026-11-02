@@ -3,6 +3,19 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
+## 最新页表交接对照（2026-11-03）
+
+BOOT6fe3e519已刷入，BOOT-only、exit0正常结束并请求重启；目标等待10秒，2核。
+显式t970-smp-publish-state=1在副核唤醒前清理当前cpu_ttep和sysreg_restore。
+直接依据T733 ArmCpu55cc0617的同类清理；本板上一张36c2f602照片记录CPU1 TTBR1=0、
+主核c4325000。实机是否修复尚待新V行、CPU在线/每核计时器/IPI记录。
+
+此前C标记4被XNU_NATIVE_ARCH_TIMER的C宏条件编译掉，已改为有效的!CONFIG_SPTM。
+首个清理构建也被此条件编译掉，未刷入；最终payload已核对两次清理的真实符号地址/8字节参数、
+平台唤醒前的调用位置，并执行10组实际C入口标记模拟。旧C4缺失不能单独定位入口。
+汇编96组、跳转2组、helper6组和独立payload校验通过，默认CPU0配置与旧镜像保留。
+详见evidence/cpu/smp-bringup/reset-publish和docs/smp-bringup.md。
+
 ## 最新副核诊断（2026-11-02）
 
 最新BOOT36c2f602已刷入（BOOT-only，exit0正常结束并请求重启）：目标10秒，

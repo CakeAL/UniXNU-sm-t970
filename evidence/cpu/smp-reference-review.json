@@ -32,7 +32,17 @@
       "https://github.com/RigoLigoRLC/unixnu-armcpu/blob/55cc0617ea9203e85f1cbbf81ae2669f4fa41645/ArmCpu.cpp"
     ],
     "method": "cpus=8/sheng-smp=1 and custom armcpu-redist-ipi=1; GICR_ISPENDR0 SGI pending writes",
-    "limitation": "Custom fork also changes counters and startup evidence; its switch is not implemented by current T970 catalog ArmCpu and is not adopted."
+    "limitation": "Custom fork also changes counters and startup evidence; its switch is not implemented by current T970 catalog ArmCpu and is not adopted.",
+    "reset_translation_publication": {
+      "source": "https://github.com/RigoLigoRLC/unixnu-armcpu/blob/55cc0617ea9203e85f1cbbf81ae2669f4fa41645/ArmCpu.cpp",
+      "before_cpu_on": [
+        "cleanToMemory(sysreg_restore, 0x1000)",
+        "cleanToMemory(cpu_ttep, sizeof(uint64_t))"
+      ],
+      "directly_matches_current_t970_hypothesis": true,
+      "review_correction": "Initial review focused on SGI/entry counters and missed these two extra clean ranges; full fork comparison now confirms direct precedent.",
+      "same_hardware_symptom_proven": false
+    }
   },
   "t970": {
     "armcpu_revision": "9066b53bbc82e92a98ec44a11dd50fd13eaf1a1b",

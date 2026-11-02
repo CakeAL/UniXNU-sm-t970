@@ -97,7 +97,7 @@
  arm_init_cpu(
  	cpu_data_t      *cpu_data_ptr)
  {
-+#if XNU_NATIVE_ARCH_TIMER
++#if !CONFIG_SPTM
 +	extern volatile uint32_t native_t970_secondary_entry[8][32];
 +	if ((unsigned)cpu_data_ptr->cpu_number < 8) {
 +		native_t970_secondary_entry[cpu_data_ptr->cpu_number][0] = 4;

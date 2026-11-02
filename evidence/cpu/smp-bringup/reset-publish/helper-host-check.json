@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "actual_source": true,
+  "helper_sha256": "2e61320d2308d5a5b8b95d96fc69b3d764ee686125dc39ee3c357a07823ac387",
+  "cases": 6,
+  "live_values_unchanged": true,
+  "cache_ranges_and_order_checked": true,
+  "cache_primitive_mocked": true,
+  "hardware_cache_visibility_verified": false,
+  "result": "PASS: six opt-in cases, two exact cache ranges/order, full-width state unchanged"
+}

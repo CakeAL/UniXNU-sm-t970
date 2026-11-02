@@ -28,5 +28,7 @@
   "cpu1_id": "100",
   "handler": "c320800c",
   "expected_start": "c320800c",
-  "interpretation": "CPU1 reached post-SCTLR/ISB/CPACR milestone9. High-VA milestone10 and C marker4 unseen. Does not distinguish high-VA fetch failure from marker-store visibility/fault."
+  "interpretation": "CPU1 reached post-SCTLR/ISB/CPACR milestone9. High-VA milestone10 and C marker4 unseen. Does not distinguish high-VA fetch failure from marker-store visibility/fault.",
+  "c_entry_marker_available": false,
+  "c_entry_marker_correction": "Later binary audit found C macro disabled marker4 in this image. Do not infer absent C entry from marker4; other assembly milestones and ArmCpu phase counters remain valid."
 }

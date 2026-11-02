@@ -1,0 +1,31 @@
+--- a/osfmk/arm64/cpu.c
++++ b/osfmk/arm64/cpu.c
+@@ -899,6 +899,18 @@
+ }
+ #endif
+ 
++#if !CONFIG_SPTM
++/* Board qualification: publish the live reset translation inputs to PoC. */
++static void
++native_t970_publish_reset_state(void)
++{
++	uint32_t enabled = 0;
++	if (!PE_parse_boot_argn("t970-smp-publish-state", &enabled, sizeof(enabled)) || enabled != 1) return;
++	flush_dcache((vm_offset_t)&cpu_ttep, sizeof(cpu_ttep), FALSE);
++	flush_dcache((vm_offset_t)&sysreg_restore, sizeof(sysreg_restore), FALSE);
++}
++#endif
++
+ kern_return_t
+ cpu_start(int cpu)
+ {
+@@ -937,6 +949,9 @@
+ 
+ 		flush_dcache((vm_offset_t)&CpuDataEntries[cpu], sizeof(cpu_data_entry_t), FALSE);
+ 		flush_dcache((vm_offset_t)cpu_data_ptr, sizeof(cpu_data_t), FALSE);
++#if !CONFIG_SPTM
++		native_t970_publish_reset_state();
++#endif
+ #if CONFIG_SPTM
+ 		/**
+ 		 * On SPTM devices, CTRR is configured entirely by the SPTM. Due to this, this logic

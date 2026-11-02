@@ -1,0 +1,17 @@
+{
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/data-bringup/smp2-reset-publish/boot-partition.img"
+  ],
+  "exit_code": 0,
+  "boot_sha256": "6fe3e519dd2b4d6414521a8411ba1e48d8c399e060b2df52d7870b0e4a557308",
+  "cpus_requested": 2,
+  "target_wait_seconds": 10,
+  "terminal_diagnostic": true,
+  "publish_reset_state_requested": true,
+  "readback_verified": false,
+  "hardware_result_pending": true,
+  "eight_core_not_uploaded": true
+}

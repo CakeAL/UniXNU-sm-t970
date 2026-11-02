@@ -13,3 +13,8 @@ linked-instruction-check仅验证模拟MPIDR/CPU数据下实际链接指令，�
 - mmu-trace：BOOTb44e4108，实机CPU1标记9，尚未观察到高地址标记10。
 
 - trampoline-trace：BOOT36c2f602，高地址入口沿用物理记录指针，捕获实际跳转/返回/基址/TTBR/TCR；实机结果待回报。
+
+- reset-publish：BOOT6fe3e519，按T733经验显式清理cpu_ttep/sysreg_restore，实机结果待回报。
+
+后续二进制检查确认前3版的C入口标记被C宏条件编译掉；不能以C4未见单独判断入口。
+reset-publish已修正并模拟验证实际C标记；汇编阶段记录和ArmCpu计数不受影响。

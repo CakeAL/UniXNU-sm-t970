@@ -1,0 +1,14 @@
+{
+  "kernel_sha256": "fc7aac18e9c0e30136ca6f1a55b5014bcdfa3098ee0ab88a6bab0ef9405cdb7f",
+  "passed": true,
+  "compiled_publication_guard_present": true,
+  "compiled_publication_flushes": 2,
+  "total_cpu_start_flushes": 4,
+  "exact_publication_bytes_each": 8,
+  "compiled_symbol_addresses_checked": true,
+  "publication_before_platform_wake": true,
+  "actual_c_entry_cases": 10,
+  "actual_c_marker_present": true,
+  "cpu_data_mocked": true,
+  "hardware_publication_verified": false
+}

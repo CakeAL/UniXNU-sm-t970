@@ -36,6 +36,8 @@ def main():
                         help='Require the explicit terminal runtime sampler interval (5..300)')
     parser.add_argument('--smp-observer', action='store_true',
                         help='Require per-core counters and the read-only reset-context accessor')
+    parser.add_argument('--publish-reset-state', action='store_true',
+                        help='Require the explicit reset translation-state publication argument')
     args = parser.parse_args()
     require(args.runtime_report_seconds == 0 or 5 <= args.runtime_report_seconds <= 300,
             'Runtime sampler interval must be 5..300 seconds')
@@ -84,6 +86,9 @@ def main():
     expected_args = base_args + (['t970-disable-watchdogd=1'] if args.watchdog_policy else [])
     if args.runtime_report_seconds:
         expected_args += [f't970-runtime-report={args.runtime_report_seconds}']
+    if args.publish_reset_state:
+        expected_args += ['t970-smp-publish-state=1']
+        require(b't970-smp-publish-state\0' in kernel.read_bytes(), 'Kernel lacks publication opt-in')
     require(sorted(entry['args'].split()) == sorted(expected_args), 'Unexpected effective boot arguments')
     require(config['boot']['default'] == 'xnu' and entry['initrd'] == 'Payloads/scratch-data.img',
             'Wrong default entry/Data initrd')
@@ -131,6 +136,7 @@ def main():
     result['runtime_report_target_seconds'] = args.runtime_report_seconds
     result['terminal_diagnostic'] = bool(args.runtime_report_seconds)
     result['smp_observer'] = args.smp_observer
+    result['publish_reset_state_requested'] = args.publish_reset_state
     (out / 'validation.json').write_text(json.dumps(result, indent=2) + '\n')
     print(json.dumps(result, indent=2))
 

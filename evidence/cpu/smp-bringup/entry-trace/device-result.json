@@ -32,5 +32,7 @@
   "ufs_verified_blocks": 186286,
   "springboard_pid": 0,
   "backboard_pid": 0,
-  "runningboard_pid": 0
+  "runningboard_pid": 0,
+  "c_entry_marker_available": false,
+  "c_entry_marker_correction": "Later binary audit found C macro disabled marker4 in this image. Do not infer absent C entry from marker4; other assembly milestones and ArmCpu phase counters remain valid."
 }
