@@ -1,0 +1,31 @@
+{
+  "base_boot_sha256": "2387e904a86fb48ca64aeabe4a91568721d97e18a34fc47f5f3e484e257b44cb",
+  "boot_sha256": "28268af5c13141f96dcd6daa2734c72f3db7f6085fce76e87fd102d2d7a3c4df",
+  "boot_bytes": 71303168,
+  "diagnostic_kernel_sha256": "7eeb3a28fa5dd7044723e1c845789333719b673c6e3432e3977652192e510b81",
+  "probe": {
+    "tail_branch_site": "0xfffffff0076f8874",
+    "original_handler": "0xfffffff007719d94",
+    "marker_address": "0xfffffff007b614b4",
+    "code_address": "0xfffffff00740548c",
+    "code_bytes": 92,
+    "code_sha256": "7e9fa441ddc005a1f936f4119ecabfdaae2607bf4f8db281a01086407d5b6745",
+    "message": "main=%u e=%d D=%d W=%d S=%d",
+    "marker_written_by_probe": false,
+    "data_or_policy_written_by_probe": false,
+    "observed_globals": {
+      "D": "0xfffffff007a70f60",
+      "W": "0xfffffff007a70f88",
+      "S": "0xfffffff007b09f08"
+    },
+    "original_handler_arguments_unchanged": true,
+    "pass_through_frame_and_lr_restored": true,
+    "reset_probe": false,
+    "limits": "Terminates only after original sysctl handler leaves genuine initproc_spawned=1. D=Data error, W=policy error, S=policy stage; 0/0/4 proves kernel completed policy installation. Does not prove launchd accepted the override or later service startup. No output alone does not localize a stall."
+  },
+  "adt_trust_seed_config_unchanged": true,
+  "header_fd_dtb_tail_unchanged": true,
+  "terminal_diagnostic": true,
+  "reset_probe": false,
+  "hardware_result_pending": true
+}

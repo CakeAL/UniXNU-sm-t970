@@ -10,8 +10,8 @@
 以及真正的 `kern.initproc_spawned=1`：**launchd已到达main**。
 512MiB请求现已实机到达main，XNU管理约439MiB；CPU0与原DTS保留范围保持。
 BOOT6b83f4e6已恢复真实PMGR，并越过强制的可写APFS Data挂载检查，启动watchdogd（PID102），
-随后因SIGTRAP停止。现已刷入临时watchdogd启动策略版2387e904，实机结果待回报。
-Data实际写入/持久化与持续服务运行尚未验证。
+随后因SIGTRAP停止。临时策略版的隔离检查已实测main1/Data0/policy0/stage4，确认RAM策略文件写入完成。
+现已恢复无停止探针的2387e904；launchd策略接受、持续服务、Data持久化和桌面仍待验证。
 首次Data镜像的AMFI No PMGR已定位为新构建目录误用空实现，并新增拒绝检查。
 系统服务、Data实际读写、图形桌面和外设仍未验证，详见[RAM Data接入](docs/ram-data.md)。
 最新证据与镜像绑定见[交接](docs/handoff.md)、[用户态启动验证](evidence/storage/policy-memory/README.md)

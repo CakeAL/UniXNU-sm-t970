@@ -3,6 +3,19 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
+## 最新：main1/Data0/policy0/stage4已实测，正常2387e904已恢复
+
+正常2387e904超过4分钟保留紫条后，隔离28268af5只读检查版19:10照片显示
+`main=1 e=0 D=0 W=0 S=4`。RAM Data挂载和策略/迁移标记的实际写入、root元数据、
+fsync/close均已完成，并继续到真正launchd main。不是只凭紫条推断成功。
+尚不能证明原launchd随后加载override、watchdogd跳过、后续服务或桌面正常。
+
+脚本boot-state-probe.py只改固定内核副本的空白padding和原sysctl尾分支，
+保留原handler/参数/返回，27组Unicorn状态/错误测试和实际镜像独立读回检查通过。
+检查版有意终止；已仅刷BOOT恢复原正常2387e904，Heimdall exit0且正常请求重启。
+图像/镜像绑定与恢复回执见evidence/storage/watchdogd/boot-state-main及policy-normal-resume。
+下一步采样后续进程，区分无显示输出和服务等待，不继续以紫条时长定位。
+
 ## 当前镜像：临时watchdogd策略2387e904，待实机回报
 
 已在成功挂载RAM Data后、exec前接入t970-disable-watchdogd=1的显式策略。

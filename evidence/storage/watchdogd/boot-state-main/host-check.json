@@ -1,0 +1,14 @@
+{
+  "base_revision": "387cef760da554ccefd0a5e1ab37e5d2ebbc50b3",
+  "previous_boot_sha256": "2387e904a86fb48ca64aeabe4a91568721d97e18a34fc47f5f3e484e257b44cb",
+  "owner_observation": "After more than4minutes retained purple bar, no new visible output reported; not proof of execution stage or policy failure.",
+  "tests_passed": true,
+  "unittest_methods": 2,
+  "emulated_cases": 27,
+  "unknown_kernel_refusal": true,
+  "actual_pinned_kernel_patch_and_fat_roundtrip": true,
+  "source_and_normal_preserved": true,
+  "terminal_diagnostic": true,
+  "reset_probe": false,
+  "hardware_result_pending": true
+}
