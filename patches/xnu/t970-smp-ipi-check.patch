@@ -1,0 +1,68 @@
+--- a/bsd/kern/kern_exec.c
++++ b/bsd/kern/kern_exec.c
+@@ -8088,6 +8088,37 @@
+ 	}
+ }
+ 
++struct native_t970_ipi_snapshot {
++	uint64_t sent, tested, received;
++	uint32_t attempted, before, after, gic[8];
++};
++static void
++native_t970_ipi_check(struct native_t970_ipi_snapshot *out)
++{
++	uint32_t enabled = 0;
++	if (!PE_parse_boot_argn("t970-ipi-check", &enabled, sizeof(enabled)) || enabled != 1) return;
++	extern volatile uint64_t armcpu_ipi_sent, armcpu_ipi_selftest_sent, armcpu_ipi_interrupts;
++	extern void armcpu_ipi_selftest(uint64_t affinity);
++	extern void armcpu_gic_diag(uint64_t affinity, uint32_t *values);
++	if (processor_avail_count < 2 || armcpu_smp_step[1] != 7) {
++		out->attempted = 2;
++		return;
++	}
++	out->before = armcpu_core_sgi[1];
++	armcpu_ipi_selftest(0x100);
++	out->attempted = 1;
++	uint64_t deadline;
++	clock_interval_to_deadline(100, NSEC_PER_MSEC, &deadline);
++	if (assert_wait_deadline((event_t)out, THREAD_UNINT, deadline) == THREAD_WAITING) {
++		thread_block(THREAD_CONTINUE_NULL);
++	}
++	out->after = armcpu_core_sgi[1];
++	armcpu_gic_diag(0x100, out->gic);
++	out->sent = armcpu_ipi_sent;
++	out->tested = armcpu_ipi_selftest_sent;
++	out->received = armcpu_ipi_interrupts;
++}
++
+ static uint32_t native_t970_runtime_started;
+ static int
+ native_t970_runtime_collect(proc_t p, void *context)
+@@ -8119,6 +8150,8 @@
+ 	if (assert_wait_deadline((event_t)&native_t970_runtime_started, THREAD_UNINT, deadline) == THREAD_WAITING) {
+ 		(void)thread_block(THREAD_CONTINUE_NULL);
+ 	}
++	struct native_t970_ipi_snapshot ipi = {0};
++	native_t970_ipi_check(&ipi);
+ 	struct native_t970_runtime_snapshot snapshot = {0};
+ 	/* Skip transition waits; proc_iterate retains/releases each proc reference. */
+ 	proc_iterate(PROC_ALLPROCLIST | PROC_NOWAITTRANS, native_t970_runtime_collect, &snapshot, NULL, NULL);
+@@ -8135,7 +8168,7 @@
+ 	native_t970_reset_context(reset);
+ 	char cpu_state[512];
+ 	native_t970_smp_state(cpu_state, sizeof(cpu_state));
+-	panic("runtime target=%u main=%d n=%u wd=%d sb=%d bb=%d rb=%d D=%d W=%d S=%d blocks=%llu cpu=%u sec=%u\nC step/psci/fail/timer/sgi %s\nE reset/found/common/C %u %u %u %u %u %u %u %u\nV target=%llx ret=%llx vb=%llx pb=%llx t1=%llx t0=%llx tcr=%llx primary1=%llx\nR table=%llx want=%llx data1=%llx id1=%llx handler=%llx start=%llx\n%s",
++	panic("runtime target=%u main=%d n=%u wd=%d sb=%d bb=%d rb=%d D=%d W=%d S=%d blocks=%llu cpu=%u sec=%u\nC step/psci/fail/timer/sgi %s\nE reset/found/common/C %u %u %u %u %u %u %u %u\nV target=%llx ret=%llx vb=%llx pb=%llx t1=%llx t0=%llx tcr=%llx primary1=%llx\nI attempt=%u sent=%llu test=%llu recv=%llu cpu1=%u>%u G=%x/%x/%x/%x/%x/%x/%x/%x\nR table=%llx want=%llx data1=%llx id1=%llx handler=%llx start=%llx\n%s",
+ 	    seconds, native_t970_initproc_main(), snapshot.count, snapshot.watchdog, snapshot.springboard,
+ 	    snapshot.backboard, snapshot.runningboard, native_owner_data_status,
+ 	    native_t970_watchdog_policy_status, native_t970_watchdog_policy_stage,
+@@ -8145,6 +8178,9 @@
+ 	    (unsigned long long)translation[2], (unsigned long long)translation[3],
+ 	    (unsigned long long)translation[4], (unsigned long long)translation[5],
+ 	    (unsigned long long)translation[6], (unsigned long long)translation[7],
++	    ipi.attempted, (unsigned long long)ipi.sent, (unsigned long long)ipi.tested,
++	    (unsigned long long)ipi.received, ipi.before, ipi.after,
++	    ipi.gic[0], ipi.gic[1], ipi.gic[2], ipi.gic[3], ipi.gic[4], ipi.gic[5], ipi.gic[6], ipi.gic[7],
+ 	    (unsigned long long)reset[0], (unsigned long long)reset[1], (unsigned long long)reset[2],
+ 	    (unsigned long long)reset[3], (unsigned long long)reset[4], (unsigned long long)reset[5], snapshot.names);
+ }

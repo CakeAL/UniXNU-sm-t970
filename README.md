@@ -9,6 +9,8 @@
 已完整恢复并读回校验。现已依次确认dyld共享缓存映射返回成功、PID1在映射后继续执行，
 以及真正的 `kern.initproc_spawned=1`：**launchd已到达main**。
 512MiB请求现已实机到达main，XNU管理约439MiB；CPU0与原DTS保留范围保持。
+两核实验6fe3e519已确认cpu2/sec1、CPU1 step7/C入口4及两核计时器；
+唤醒前发布页表交接状态后，副核TTBR1与主核一致。IPI计数仍0，8核与持续多核运行尚未验证；默认DTS仍CPU0。
 BOOT6b83f4e6已恢复真实PMGR，并越过强制的可写APFS Data挂载检查，启动watchdogd（PID102），
 随后因SIGTRAP停止。临时策略版的隔离检查已实测main1/Data0/policy0/stage4，确认RAM策略文件写入完成。
 普通2387e904保留；服务采样eeeba83b已实测109个进程，含SpringBoard27、backboardd56、runningboardd26，
@@ -37,7 +39,7 @@ vsc/
 - [porting.toml](porting.toml)：13 个部分的适配范围、实现和验证证据。
 
 显式组件为 `ArmDTPlatform`、`ArmCpu`、`SoftwareAES`、`VirtioMmioBlock`、`RamBlock`、`XnuPrelink`、`DarwinBoot`；
-archive 还接入了设备内 UFS 副本、带固定公钥的 VerifiedRoot 与 PMGR 占位实现。
+archive 还接入了设备内 UFS 副本、带固定公钥的 VerifiedRoot 与真实 PMGR ABI 桥接。
 这些构建输入不等于功能验证通过；GPU、触控、音频、无线尚未适配。
 
 ## 检查与构建

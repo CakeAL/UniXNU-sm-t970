@@ -1,0 +1,77 @@
+
+out/data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/kernel/kernel.macho:	file format mach-o arm64
+
+Disassembly of section __TEXT_EXEC,__text:
+
+fffffff0076f7ac4 <_native_t970_ipi_check>:
+fffffff0076f7ac4: d100c3ff     	sub	sp, sp, #0x30
+fffffff0076f7ac8: a9014ff4     	stp	x20, x19, [sp, #0x10]
+fffffff0076f7acc: a9027bfd     	stp	x29, x30, [sp, #0x20]
+fffffff0076f7ad0: 910083fd     	add	x29, sp, #0x20
+fffffff0076f7ad4: aa0003f3     	mov	x19, x0
+fffffff0076f7ad8: b9000fff     	str	wzr, [sp, #0xc]
+fffffff0076f7adc: f0ffce80     	adrp	x0, 0xfffffff0070ca000 <_native_t970_cs_note.hex+0x1fc7>
+fffffff0076f7ae0: 913d3400     	add	x0, x0, #0xf4d
+fffffff0076f7ae4: 910033e1     	add	x1, sp, #0xc
+fffffff0076f7ae8: 52800082     	mov	w2, #0x4        ; =4
+fffffff0076f7aec: 9409a535     	bl	0xfffffff007960fc0 <_PE_parse_boot_argn>
+fffffff0076f7af0: b9400fe8     	ldr	w8, [sp, #0xc]
+fffffff0076f7af4: 7100001f     	cmp	w0, #0x0
+fffffff0076f7af8: 7a411900     	ccmp	w8, #0x1, #0x0, ne
+fffffff0076f7afc: 540006a1     	b.ne	0xfffffff0076f7bd0 <_native_t970_ipi_check+0x10c>
+fffffff0076f7b00: d0001d48     	adrp	x8, 0xfffffff007aa1000 <_pset0+0x3700>
+fffffff0076f7b04: 9122a108     	add	x8, x8, #0x8a8
+fffffff0076f7b08: b9400108     	ldr	w8, [x8]
+fffffff0076f7b0c: 7100091f     	cmp	w8, #0x2
+fffffff0076f7b10: 540005c3     	b.lo	0xfffffff0076f7bc8 <_native_t970_ipi_check+0x104>
+fffffff0076f7b14: b00021c8     	adrp	x8, 0xfffffff007b30000 <_gPEClockFrequencyInfo+0xa0>
+fffffff0076f7b18: 910b2108     	add	x8, x8, #0x2c8
+fffffff0076f7b1c: b9400508     	ldr	w8, [x8, #0x4]
+fffffff0076f7b20: 71001d1f     	cmp	w8, #0x7
+fffffff0076f7b24: 54000521     	b.ne	0xfffffff0076f7bc8 <_native_t970_ipi_check+0x104>
+fffffff0076f7b28: b00021d4     	adrp	x20, 0xfffffff007b30000 <_gPEClockFrequencyInfo+0xa0>
+fffffff0076f7b2c: 910a4294     	add	x20, x20, #0x290
+fffffff0076f7b30: b9400688     	ldr	w8, [x20, #0x4]
+fffffff0076f7b34: b9001e68     	str	w8, [x19, #0x1c]
+fffffff0076f7b38: 52802000     	mov	w0, #0x100      ; =256
+fffffff0076f7b3c: 940a4084     	bl	0xfffffff007987d4c <_armcpu_ipi_selftest>
+fffffff0076f7b40: 52800028     	mov	w8, #0x1        ; =1
+fffffff0076f7b44: b9001a68     	str	w8, [x19, #0x18]
+fffffff0076f7b48: f90003ff     	str	xzr, [sp]
+fffffff0076f7b4c: 910003e2     	mov	x2, sp
+fffffff0076f7b50: 52800c80     	mov	w0, #0x64       ; =100
+fffffff0076f7b54: 52884801     	mov	w1, #0x4240     ; =16960
+fffffff0076f7b58: 72a001e1     	movk	w1, #0xf, lsl #16
+fffffff0076f7b5c: 97ee1d73     	bl	0xfffffff00727f128 <_clock_interval_to_deadline>
+fffffff0076f7b60: f94003e2     	ldr	x2, [sp]
+fffffff0076f7b64: aa1303e0     	mov	x0, x19
+fffffff0076f7b68: 52800001     	mov	w1, #0x0        ; =0
+fffffff0076f7b6c: 97ef11bb     	bl	0xfffffff0072bc258 <_assert_wait_deadline>
+fffffff0076f7b70: 3100041f     	cmn	w0, #0x1
+fffffff0076f7b74: 54000061     	b.ne	0xfffffff0076f7b80 <_native_t970_ipi_check+0xbc>
+fffffff0076f7b78: d2800000     	mov	x0, #0x0        ; =0
+fffffff0076f7b7c: 97ef132e     	bl	0xfffffff0072bc834 <_thread_block>
+fffffff0076f7b80: b9400688     	ldr	w8, [x20, #0x4]
+fffffff0076f7b84: b9002268     	str	w8, [x19, #0x20]
+fffffff0076f7b88: 91009261     	add	x1, x19, #0x24
+fffffff0076f7b8c: 52802000     	mov	w0, #0x100      ; =256
+fffffff0076f7b90: 940a3fd5     	bl	0xfffffff007987ae4 <_armcpu_gic_diag>
+fffffff0076f7b94: b00021c8     	adrp	x8, 0xfffffff007b30000 <_gPEClockFrequencyInfo+0xa0>
+fffffff0076f7b98: 91090108     	add	x8, x8, #0x240
+fffffff0076f7b9c: f9400108     	ldr	x8, [x8]
+fffffff0076f7ba0: f9000268     	str	x8, [x19]
+fffffff0076f7ba4: b00021c8     	adrp	x8, 0xfffffff007b30000 <_gPEClockFrequencyInfo+0xa0>
+fffffff0076f7ba8: 91092108     	add	x8, x8, #0x248
+fffffff0076f7bac: f9400108     	ldr	x8, [x8]
+fffffff0076f7bb0: f9000668     	str	x8, [x19, #0x8]
+fffffff0076f7bb4: b00021c8     	adrp	x8, 0xfffffff007b30000 <_gPEClockFrequencyInfo+0xa0>
+fffffff0076f7bb8: 9108e108     	add	x8, x8, #0x238
+fffffff0076f7bbc: f9400108     	ldr	x8, [x8]
+fffffff0076f7bc0: f9000a68     	str	x8, [x19, #0x10]
+fffffff0076f7bc4: 14000003     	b	0xfffffff0076f7bd0 <_native_t970_ipi_check+0x10c>
+fffffff0076f7bc8: 52800048     	mov	w8, #0x2        ; =2
+fffffff0076f7bcc: b9001a68     	str	w8, [x19, #0x18]
+fffffff0076f7bd0: a9427bfd     	ldp	x29, x30, [sp, #0x20]
+fffffff0076f7bd4: a9414ff4     	ldp	x20, x19, [sp, #0x10]
+fffffff0076f7bd8: 9100c3ff     	add	sp, sp, #0x30
+fffffff0076f7bdc: d65f03c0     	ret

@@ -3,6 +3,18 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
+## 最新：两核和计时器已实测，标准SGI未收到（2026-11-03）
+
+BOOT6fe3e519的00:13:58照片确认cpu2/sec1、CPU1 phase7/C4、timer22925/22334，
+副核TTBR1=c4325000与主核一致。页表交接发布已越过此前副核启动阻塞。
+新BOOT7e60f7c9只刷BOOT，上传exit0正常重启；第一次UFS NOP stage0拒绝，
+机主重启相同镜像后恢复读取，两核/计时器再次确认。
+IPI采样attempt1/sent2/test1/recv0/cpu1=0>0，目标GIC帧found1。
+目前不能把在线2核等同于调度已完成；先定位SGI投递，再逐步4/8核。
+默认DTS仍CPU0；8核预备镜像未刷。主机36种IPI逻辑检查、链接后调用核对、
+原96组入口/2组跳转/10组C标记及独立打包均通过；实际SGI投递尚未通过。
+详见evidence/cpu/smp-bringup/ipi-check/device-result.json，含首次失败和重启后成功照片。
+
 ## 最新页表交接对照（2026-11-03）
 
 BOOT6fe3e519已刷入，BOOT-only、exit0正常结束并请求重启；目标等待10秒，2核。

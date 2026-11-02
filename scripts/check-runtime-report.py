@@ -32,6 +32,7 @@ typedef void (*thread_continue_t)(void *,wait_result_t);
 #define PROC_ALLPROCLIST 1
 #define PROC_NOWAITTRANS 4
 #define NSEC_PER_SEC 1000000000
+#define NSEC_PER_MSEC 1000000
 #define THREAD_UNINT 1
 #define THREAD_WAITING 1
 #define THREAD_CONTINUE_NULL NULL
@@ -51,6 +52,9 @@ uint32_t processor_avail_count=1;
 volatile uint32_t armcpu_smp_running,armcpu_smp_step[8],armcpu_smp_fail[8];
 volatile int32_t armcpu_smp_psci_rc[8];
 volatile uint32_t armcpu_core_timer[8],armcpu_core_sgi[8];
+volatile uint64_t armcpu_ipi_sent,armcpu_ipi_selftest_sent,armcpu_ipi_interrupts;
+void armcpu_ipi_selftest(uint64_t aff){assert(aff==0x100);++armcpu_ipi_selftest_sent;}
+void armcpu_gic_diag(uint64_t aff,uint32_t *out){assert(aff==0x100);memset(out,0,8*sizeof(*out));}
 void native_t970_trampoline_snapshot(uint64_t *out){for(unsigned i=0;i<8;++i)out[i]=0x100000000ULL+i;}
 void native_t970_secondary_snapshot(uint32_t *out){for(unsigned i=0;i<8;++i)out[i]=i%5;}
 int native_t970_initproc_main(void){return main_state;}
@@ -68,7 +72,7 @@ static void proc_iterate(unsigned flags,int (*callout)(proc_t,void*),void *arg,v
 static void clock_interval_to_deadline(unsigned n,unsigned scale,uint64_t *out){assert(scale==NSEC_PER_SEC);*out=(uint64_t)n*scale;}
 static int assert_wait_deadline(event_t e,int flags,uint64_t deadline){assert(e&&flags==THREAD_UNINT&&deadline>0);++waits;return wait_result;}
 static int thread_block(void *continuation){assert(!continuation);++blocks;return 3;}
-static int PE_parse_boot_argn(const char *name,void *out,int size){assert(!strcmp(name,"t970-runtime-report")&&size==sizeof(unsigned));*(unsigned*)out=seconds;return (int)enabled;}
+static int PE_parse_boot_argn(const char *name,void *out,int size){if(!strcmp(name,"t970-ipi-check"))return 0;assert(!strcmp(name,"t970-runtime-report")&&size==sizeof(unsigned));*(unsigned*)out=seconds;return (int)enabled;}
 static kern_return_t kernel_thread_start(thread_continue_t function,void *arg,thread_t *thread){++starts;start_function=function;start_arg=arg;*thread=(void*)1;return start_error;}
 static void thread_deallocate(thread_t t){assert(t==(void*)1);++deallocs;}
 static void test_panic(const char *format,...) __attribute__((noreturn,format(printf,1,2)));

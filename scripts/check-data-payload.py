@@ -38,6 +38,7 @@ def main():
                         help='Require per-core counters and the read-only reset-context accessor')
     parser.add_argument('--publish-reset-state', action='store_true',
                         help='Require the explicit reset translation-state publication argument')
+    parser.add_argument('--ipi-check', action='store_true', help='Require the explicit bounded CPU1 SGI delivery check')
     args = parser.parse_args()
     require(args.runtime_report_seconds == 0 or 5 <= args.runtime_report_seconds <= 300,
             'Runtime sampler interval must be 5..300 seconds')
@@ -89,6 +90,9 @@ def main():
     if args.publish_reset_state:
         expected_args += ['t970-smp-publish-state=1']
         require(b't970-smp-publish-state\0' in kernel.read_bytes(), 'Kernel lacks publication opt-in')
+    if args.ipi_check:
+        expected_args += ['t970-ipi-check=1']
+        require(b't970-ipi-check\0' in kernel.read_bytes(), 'Kernel lacks IPI check opt-in')
     require(sorted(entry['args'].split()) == sorted(expected_args), 'Unexpected effective boot arguments')
     require(config['boot']['default'] == 'xnu' and entry['initrd'] == 'Payloads/scratch-data.img',
             'Wrong default entry/Data initrd')
@@ -137,6 +141,7 @@ def main():
     result['terminal_diagnostic'] = bool(args.runtime_report_seconds)
     result['smp_observer'] = args.smp_observer
     result['publish_reset_state_requested'] = args.publish_reset_state
+    result['ipi_check_requested'] = args.ipi_check
     (out / 'validation.json').write_text(json.dumps(result, indent=2) + '\n')
     print(json.dumps(result, indent=2))
 

@@ -106,3 +106,31 @@ T733的ArmCpu55cc0617实际在CPU_ON之前额外清理sysreg_restore和cpu_ttep�
 实际C入口用模拟CPU数据检查8个有效编号和2个越界编号。
 此前“标记4未见”不能单独判断C入口；驱动phase、实际MMU/TTBR记录不受影响。
 该对照若成功，也仍需继续验证每核计时器、IPI与持续稳定性。
+
+## 两核上线与IPI检查
+
+BOOT6fe3e519的00:13:58照片确认cpu2/sec1、CPU1 step7/fail0、C入口4；
+CPU0/CPU1计时器计数22925/22334，CPU1 TTBR1=c4325000与主核一致。
+在保留其它启动机制的情况下，加入两项发布后越过了此前TTBR1=0的启动阻塞。
+这验证本板两核上线与计时器，不证明IPI、长期稳定或8核已完成。
+当时两核SGI计数均0，main0/n2为10秒早期采样。
+
+后续显式`t970-ipi-check=1`仅在诊断deadline后且CPU1 step7、在线数至少2时：
+调用现有ArmCpu的armcpu_ipi_selftest向affinity100发送一次标准SGI0，
+让出调度器等待100ms，再记录CPU1 SGI计数和现有armcpu_gic_diag的只读状态。
+不启用SPI替代、不遍历发送SGI0..15、不读取/消费IAR、不修改GIC分组或屏蔽配置。
+该额外100ms是调度目标等待，未标定实际时钟精度；总目标为原10秒加此短等待。
+
+I行含attempt、普通发送总数sent、显式自测发送总数test、收到IPI总数recv、CPU1前后计数，
+G的8项依次是IGROUPR0/ISENABLER0/ISPENDR0/IGRPMODR0/WAKER/GICD_CTLR/IPRIORITYR0/found。
+attempt0未启用，2表示副核尚未就绪而跳过，1表示已调用发送并完成短等待及GIC读取。
+只读GIC状态用于缩小范围；发送计数增加而接收不变尚不能直接证明EL2拦截。
+主机替身验证36种开关/就绪/投递结果组合，真实投递仍需本板截图。
+
+BOOT7e60f7c9第一次在UFS handoff NOP stage0拒绝，尚未提交该NOP命令；
+原图不足以区分ready()/映射漂移等具体准入条件。机主重启相同镜像后通过根卷读取，
+00:25:00照片再次确认cpu2/sec1、CPU1 step7、两核计时器与匹配TTBR1。
+I行attempt1/sent2/test1/recv0/cpu1=0>0，GIC目标帧found1：
+显式发送函数已执行，但未观察到SGI0处理计数。不能由此直接认定是EL2拦截或选定替代IRQ。
+IPI投递仍是扩核前的阻塞；即便单次投递成功，发送线程未固定核心，仍需后续双向核间验证。
+两次启动结果分别保存，未放宽UFS准入门槛。

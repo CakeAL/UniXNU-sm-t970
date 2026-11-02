@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "cases": 36,
+  "actual_source": true,
+  "helper_sha256": "8de4a3f997b854aeb83c5e4bcc41fbbde7c6cc0376401bab97c76be0743f67e9",
+  "scheduler_and_armcpu_apis_mocked": true,
+  "hardware_ipi_delivery_verified": false,
+  "result": "PASS: 36 actual IPI helper cases, opt-in/readiness guards, one send, 100ms scheduler yield, delivered/undelivered snapshots and output bounds"
+}

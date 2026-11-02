@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "kernel_sha256": "716062667f6f53cb30f88b7e8de1db8fe71931c4db7da61b825519f7a83a3b9f",
+  "audited_function": "_native_t970_ipi_check",
+  "compiled_standard_send_and_gic_read_calls_present": true,
+  "send_before_gic_read": true,
+  "scheduler_yield_compiled": true,
+  "hardware_delivery_verified": false
+}

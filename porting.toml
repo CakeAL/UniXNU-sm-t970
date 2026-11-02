@@ -6,7 +6,7 @@ schema_version = 1
 name = "sm-t970"
 soc = "SM8250"
 os_profile = "ipados-17.7.11-21H461"
-summary = "SM-T970 CPU0: launchd main and512MiB owned request device-confirmed (managed pages0x1b709). BOOT6b83f4e6 passes the enforced writable APFS Data mount gate and starts watchdogd PID102, which exits with SIGTRAP. Data writes/persistence, sustained services, desktop and peripherals remain unverified. First Data BOOT911a462a No PMGR traced to an implicit build stub, now refused by build and package checks."
+summary = "SM-T970: CPU0 previously reached launchd main and109 services;512MiB owned request and RAM Data policy verified. BOOT6fe3e519 now confirms two CPUs online, secondary phase7/C entry4, both per-core timers advancing, and matching TTBR1 after publishing reset translation inputs. SGI/IPI,8-core, sustained services, persistent Data and GUI remain unverified."
 
 [[area]]
 id = "configuration"
@@ -351,6 +351,8 @@ paths = [
   "patches/xnu/t970-smp-publish-reset-state.patch",
   "scripts/check-smp-publish-state.py",
   "scripts/check-smp-publish-linked.py",
+  "patches/xnu/t970-smp-ipi-check.patch",
+  "scripts/check-smp-ipi-check.py",
   "scripts/check-reset-context.py",
   "scripts/check-smp-entry-trace.py",
   "evidence/bring-up/runtime/after-mmu-brk-control/**",
@@ -384,6 +386,8 @@ procedure = [
   "Collect /proc/cpuinfo, online/present CPU lists, cpufreq policies, /proc/interrupts and the live DT using the inventory script.",
 ]
 findings = [
+  "BOOT7e60f7c9 after owner reboot reproduces two CPUs/phase7/timers and matching TTBR1. Explicit SGI0 test observed attempt1/sent2/test1/recv0/cpu1=0>0 and target redistributor found1. Standard SGI delivery remains unqualified; sender thread is not pinned, so a future single receive would not independently prove bidirectional IPI. Do not promote8-core yet.",
+  "BOOT6fe3e519 owner photo confirms cpu2/sec1, secondary phase7/C4, per-core timers22925/22334 and matching TTBR1=c4325000. This qualifies two-core startup/timers after reset publication; both SGI counts remain0. Added optional one-SGI0/100ms-yield plus existing read-only GIC snapshot before expanding core count. Actual IPI and8-core unverified.",
   "BOOT36c2f602 device records CPU1 pre-branch TTBR1=0 versus primary c4325000. T733 ArmCpu55cc0617 explicitly cleans cpu_ttep and sysreg_restore; previous comparison missed these ranges. Added an opt-in board qualification clean of these exact live objects in cpu_start before platform wake, preserving values/default behavior. Runtime fix remains to be verified.",
   "BOOTb44e4108 owner photo observes CPU1 milestone9 after MMU enable, with main0/n2 at target10. Added pre-branch register capture and first high-entry store through the already-used physical record alias to distinguish fetch from diagnostic-address failures. Actual transition and hardware page tables remain unverified.",
   "BOOT95accf53 owner photo confirms CPU1 entry3 (matched CPU data and reached common_start boundary); C marker4 not seen. Target10 snapshot main0/n2 is earlier than old120 samples. Added secondary-only common/TCR/table/SCTLR/trampoline markers without changing CPU setup values. See entry-trace/device-result.json and MMU trace records.",
@@ -741,6 +745,7 @@ procedure = [
   "Read block sysfs and by-name links; read each LUN's primary GPT header and entry array and validate their CRC32 values without writing any block device.",
 ]
 findings = [
+  "First boot of7e60f7c9 refused UFS handoff NOP at stage0, before NOP submission; CB0=100ff/1/e0, GFSR0 and historical FSR400. Owner rebooted the same image and root reads recovered. Exact stage0 predicate remains unknown; no storage gate or mappings were relaxed. Both photos are retained in evidence/cpu/smp-bringup/ipi-check/device-result.json.",
   "BOOTeeeba83b owner photo19:36:40 shows requested120-second runtime report: genuine main1,109 processes, watchdogd absent, SpringBoard27/backboardd56/runningboardd26, Data0/policy0/stage4,964876 verified blocks. Kernel deadline-wait/report executed; rate accuracy unmeasured. Interface-service process presence is not proof of rendering or functional services. Display backend remains disabled; next phase is display handoff/provider and independent staged SMP qualification.",
   "BOOTeeeba83b uses explicit t970-runtime-report=120 to start one diagnostic kernel thread after Data/policy install. Deadline wait yields CPU; bounded512 non-zombie callbacks, first18 names in512bytes and named service PIDs are displayed in intentional panic. Readonly genuine-main accessor and original process refs/exit policies retained. Actual helper sanitizer/API-substitute bounds/wait/range/once/thread-failure tests plus policy regression and independent symbol/FAT/ADT/boot/argument verification pass; implicit sampler configuration refused. BOOT-only upload exit0; physical timer/snapshot and later services pending.",
   "BOOT28268af5 owner photo19:10 confirms genuine main1/error0/Data0/policy0/stage4. Kernel installer actually completed root-owned RAM policy and migration marker writes/metadata/fsync/close before launchd main. Probe is readonly, preserves original sysctl semantics and caller frame;27 Unicorn state/result combinations plus unknown-input refusal pass, actual pinned binary/FAT/geometry checks pass. Normal BOOT2387e904 restored via BOOT-only upload exit0 after observation. Original launchd override acceptance, subsequent services and desktop remain unverified.",

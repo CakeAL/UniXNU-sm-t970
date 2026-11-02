@@ -14,7 +14,9 @@ linked-instruction-check仅验证模拟MPIDR/CPU数据下实际链接指令，�
 
 - trampoline-trace：BOOT36c2f602，高地址入口沿用物理记录指针，捕获实际跳转/返回/基址/TTBR/TCR；实机结果待回报。
 
-- reset-publish：BOOT6fe3e519，按T733经验显式清理cpu_ttep/sysreg_restore，实机结果待回报。
+- reset-publish：BOOT6fe3e519，实测cpu2/sec1、CPU1 step7/C4、两核计时器及匹配TTBR1。
 
 后续二进制检查确认前3版的C入口标记被C宏条件编译掉；不能以C4未见单独判断入口。
 reset-publish已修正并模拟验证实际C标记；汇编阶段记录和ArmCpu计数不受影响。
+
+- ipi-check：BOOT7e60f7c9，首次UFS NOP stage0拒绝，机主重启同镜像恢复；两核重现，显式SGI0发送后recv0/cpu1=0>0。IPI与8核仍待验证。

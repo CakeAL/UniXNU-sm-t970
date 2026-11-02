@@ -1,0 +1,8 @@
+{
+  "helper_sha256": "27c64b9c0bf220e7c21ac22ba919fd09ef3cf544c597c5eb419f8694f441c1ee",
+  "passed": true,
+  "scheduler_and_process_apis_mocked": true,
+  "hardware_timer_verified": false,
+  "hardware_process_snapshot_verified": false,
+  "result": "PASS: actual runtime report bounds, process names/PIDs, 512 callback cap, scheduler yield, opt-in/range/once guards and thread failure"
+}
