@@ -1,0 +1,11 @@
+{
+  "adt_full_tree_comparison": true,
+  "payload_independent_roundtrip": true,
+  "kernel_config_trustcache_preservation": true,
+  "boot_header_firmware_dtb_tail_preservation": true,
+  "main_probe_tests_passed": 2,
+  "porting_record_areas_checked": 13,
+  "diff_check_passed": true,
+  "hardware_allocation_verified": false,
+  "device_result_pending": true
+}

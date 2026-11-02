@@ -3,6 +3,25 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
+## 当前镜像：512MiB main检查，实际扩容结果待设备回报
+
+先上传无终止探针的正常BOOT867efc59，只在原正常release镜像中将chosen内存请求
+由256改为512MiB；机主报告貌似卡粉条。该画面本身不能定位，不能当作分配失败。
+为核实实际窗口与内存余量，随后上传BOOT97271e99（同一512MiB ADT，恢复已验证的main
+终止观察器），两次Heimdall均exit0且正常结束/请求重启。当前设备为97271e99，待拍摄
+`launchd main marker=...`、`pages`和`free`；没有BOOT读回，不冒称落盘比对完成。
+
+8GB为设备物理内存；256MiB是原XNU获得的诊断owned window。DarwinBoot仅能通过
+EFI ConventionalMemory正式申请更大连续区间；本轮没有改DTS或回收保留洞，board默认仍256MiB。
+源码、固定镜像及包装范围检查见evidence/storage/owned-window-512，主机准备脚本支持
+正常和--confirm-main两种模式。main检查有意停止，不能误报服务已继续执行。
+
+另已在主机新建32MiB APFS Data种子，复制原OS39份var文件，DBRDISK1编码1007696字节，
+完整逻辑内容摘要与原容器相同，正常卸载；没有写平板或修改OS镜像。
+该最小输入尚未集成RamBlock/OWNER_DATA_MOUNT，不满足完整系统运行容量声明。
+下一步先确认实际内存分配，再完成RamBlock种子与挂载接入；持久UFS写入仍禁用。
+证据见evidence/storage/data-seed-preparation。
+
 ## 当前里程碑：launchd已到达main（2026-11-02 14:51）
 
 机主照片显示 `launchd main marker=1 err=0`，BOOT870a11da（raw50cd2ef8）。

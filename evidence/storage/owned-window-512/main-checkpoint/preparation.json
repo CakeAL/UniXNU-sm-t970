@@ -1,0 +1,32 @@
+{
+  "source_boot_sha256": "73a5738beb948edc90b9d0357663a62a3e672e8a3ee75aaf7bd90aad699ecbba",
+  "boot_sha256": "97271e99a642a84712e3a19cd798366ce7bdd84b1943ff8955cc980aa735cd93",
+  "boot_bytes": 71303168,
+  "requested_owned_mib": 512,
+  "adt_sha256": "011c60cf3f73e45c99519dc1b6316cca11d261048c49cc5ed7b7b11ebf8765ec",
+  "kernel_sha256": "c53621bd35e7949b9d02e76989a13fb5267283424661db5e1ce07b63af52e370",
+  "payload_sha256": "0f9d1f38098d76fd676c1e0d3d4863080696adaa187f4c60f3080ff80b1b1f2f",
+  "ramdisk_offset": 3153920,
+  "no_terminal_probe": false,
+  "command_line_unchanged": true,
+  "firmware_dtb_header_tail_unchanged": true,
+  "adt_only_chosen_memory_size_changed": true,
+  "board_defaults_unchanged": true,
+  "hardware_allocation_verified": false,
+  "flashed": false,
+  "limitation": "EFI must allocate a real conventional-memory run. No Data volume is configured.",
+  "initproc_main": {
+    "tail_branch_site": "0xfffffff0076ee220",
+    "original_handler": "0xfffffff00770f740",
+    "marker_address": "0xfffffff007b554ac",
+    "code_address": "0xfffffff0073fd48c",
+    "code_bytes": 60,
+    "code_sha256": "4128f65cfdb5a5cb7836723fe5f558cee617c8aabf7da1209f30f0c14dd78777",
+    "message": "launchd main marker=%u err=%x",
+    "marker_written_by_probe": false,
+    "original_handler_arguments_unchanged": true,
+    "pass_through_frame_and_lr_restored": true,
+    "reset_probe": false,
+    "limits": "Terminates only after original sysctl handler leaves genuine initproc_spawned=1. That marks launchd main, not service startup or a desktop. No output alone does not localize a stall."
+  }
+}

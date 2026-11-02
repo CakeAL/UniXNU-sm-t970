@@ -1,0 +1,12 @@
+{
+  "boot_sha256": "867efc599a7686a86f4fa4c4394c26979b99a1789f452ac1da2d8da588e9728a",
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/owned-512-normal/boot-partition.img",
+  "exit_code": 0,
+  "boot_upload_successful": true,
+  "session_end_successful": true,
+  "reboot_requested": true,
+  "partition_readback_verified": false,
+  "hardware_allocation_verified": false,
+  "device_observation": "Pending owner screen; upload success is not runtime memory or service-start evidence",
+  "source_revision": "e56e349704e8a33d0ec13c2eff124a618a04579f"
+}

@@ -1,0 +1,13 @@
+{
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/step7/probes/owned-512-main/boot-partition.img"
+  ],
+  "exit_code": 0,
+  "boot_sha256": "97271e99a642a84712e3a19cd798366ce7bdd84b1943ff8955cc980aa735cd93",
+  "readback_verified": false,
+  "hardware_allocation_verified": false,
+  "observation": "Pending device screen"
+}

@@ -9,7 +9,8 @@
 已完整恢复并读回校验。现已依次确认dyld共享缓存映射返回成功、PID1在映射后继续执行，
 以及真正的 `kern.initproc_spawned=1`：**launchd已到达main**。
 当前BOOT是有意停止并显示标记的诊断版，系统服务、可写Data、图形桌面和外设仍未验证。
-CPU0与256MiB owned窗口保持；main诊断停点空闲约1MiB，后续需继续检查运行内存余量。
+CPU0保持；原256MiB owned窗口在main诊断停点空闲约1MiB。现已上传512MiB请求的main检查版，
+实际分配与页数待实机回报，板级默认仍256MiB。主机Data种子已生成，尚未接入内核。
 最新证据与镜像绑定见[交接](docs/handoff.md)、[用户态启动验证](evidence/storage/policy-memory/README.md)
 和[T733方案对照](docs/t733-kernel-comparison.md)；历史文档保留当时的验证范围。
 

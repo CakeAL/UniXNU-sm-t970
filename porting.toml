@@ -6,7 +6,7 @@ schema_version = 1
 name = "sm-t970"
 soc = "SM8250"
 os_profile = "ipados-17.7.11-21H461"
-summary = "SM-T970 CPU0 bring-up: restored OS/SystemOS and signed carriers fully readback-verified; shared cache mapping kr0, subsequent PID1 close0 and genuine kern.initproc_spawned1 observed on BOOT870a11da. Launchd main is device-confirmed; service startup, writableData, desktop, SMP and peripherals remain unverified. Current terminal diagnostic has ~1MiB free at its stop point under256MiB owned window."
+summary = "SM-T970 CPU0 bring-up: restored OS/SystemOS and signed carriers fully readback-verified; shared cache mapping kr0, subsequent PID1 close0 and genuine kern.initproc_spawned1 observed on BOOT870a11da. Launchd main is device-confirmed; service startup, writableData, desktop, SMP and peripherals remain unverified. Prior256MiB main snapshot had ~1MiB free. Current BOOT97271e99 requests512MiB and stops at genuine main for page counts; allocation confirmation pending. Host Data seed is prepared but not integrated."
 
 [[area]]
 id = "configuration"
@@ -632,6 +632,9 @@ id = "storage"
 status = "implemented"
 components = ["ShengUfs", "VirtioMmioBlock", "VerifiedRoot"]
 paths = [
+  "scripts/prepare-owned-window.py",
+  "evidence/storage/owned-window-512/**",
+  "evidence/storage/data-seed-preparation/**",
   "evidence/storage/root-restore-twrp-20261102/**",
   "evidence/storage/policy-memory/**",
   "patches/xnu/t970-policy-memory-status.patch",
@@ -709,6 +712,7 @@ procedure = [
   "Read block sysfs and by-name links; read each LUN's primary GPT header and entry array and validate their CRC32 values without writing any block device.",
 ]
 findings = [
+  "2026-11-02: normal release BOOT867efc59 requests512MiB via the chosen ADT property only; fixed normal kernel/FD/DTB/config/tail preserved, Heimdall upload exit0. Owner reports retained bars, which does not localize execution or verify allocation. Terminal main checkpoint BOOT97271e99 uploaded exit0 to measure actual pages; runtime result pending; Data APFS32MiB seed packed losslessly to1007696bytes on host, not integrated/flashed or persistence-qualified. Physical8GiB is not the EFI-owned256MiB diagnostic allocation.",
   "After corrected carriers were backed up/updated and fully readback-verified under explicit authorization, BOOT097c4f8c owner photo shows memorystatus no-victim (available3060pages), rather than prior cache EACCES. This is not proof of full mapping/launchd main. Source retains73293824bytes of carrier plus another73293824bytes of duplicated manifest tables. Borrow only exact authenticated driver-owned boot-lifetime allocations, protect them readonly, retain separate private readonly key pages and reauthenticate; fallback sources still copy. Teardown never frees borrowed carrier. Actual configure/free host ASan/UBSan+mprotect lifecycle/failure tests pass; Normal BOOT12766f5f stalls with persistent bars over3minutes. Isolated BOOTef97eb6a resets about10seconds after magenta per owner, confirming at least one shared-policy vr_open return but not success status. BOOTc544bae1 before-init-exec checkpoint immediately resets per owner, confirming the exec call boundary only; exec and launchd success remain unverified. Session stopped at owner request. EFI owned window remains256MiB.",
   "Root cause identified on host: deployed/readback raw root fd43ee70 contains original OS e5634d04/SystemOS b4908cde, but current owner envelopes signed stale sparse windows47c1e4b0/ee18c5c2. Prior userdata-write-audit already recorded the stale segment seek bug. SystemOS block43008 in stale segment/policy is SHNGROOT, whereas raw/original data match; host APFS mapping for .03 read offset34MiB covers this block. Signer read SHA at wrong entry offset80 instead of56 and never compared it. Fix both, validate full window digests before signing, and prepare envelopes from exact raw source. Five generator and five writer-order/error tests pass; real C verifier authenticates all2290185blocks. Corrected carrier write plan is prepared but not executed; do not infer new device success. Diagnostic BOOT097c4f8c remains host-prepared/unflashed.",
   "BOOT 6b04878c owner photo: stage171, .03 read offset0x2200000, expected original CDHash. AMFI and earlier signature setup passed; actual native4k vn_rdwr returns EACCES. Add read-mediation201 versus filesystem202 observations and first actual UFS integrity-rejected block index/LUN0-LBA/length/hash prefixes. No additional I/O or retry/grant; original rejection is preserved. Nine existing state tests and actual-helper ASan/UBSan bounds/retention checks pass. New build/runtime observations pending; storage corruption is not yet established.",
@@ -771,8 +775,10 @@ limits = [
   "Root image and corrected carrier writes were explicitly authorized, completed and readback-verified in their respective receipts. Readonly root and SystemOS preparation reached before-init-exec; writable Data, persistence and sustained XNU storage operation remain unverified.",
   "Current corrected runtime carriers authenticate the published OS/SystemOS windows; prior empty-policy publication reports are historical. Latest repeat has bootloader-only output, without a usable exec-return observation.",
 ]
-next_action = ["After committing this verified milestone, continue normal service/Data bring-up and measure memory use; preserve genuine main-marker evidence and256MiB owned-memory constraints. Current870a11da is terminal diagnostic, not a normal system image."]
+next_action = ["Verify actual larger EFI allocation at genuine main checkpoint, then continue normal services with separately prepared writable RamBlock Data; do not reclaim reserved holes or enable unqualified persistent UFS writes."]
 evidence = [
+  { kind = "host", reference = "evidence/storage/owned-window-512/preparation.json", revision = "e56e349704e8a33d0ec13c2eff124a618a04579f", command = "python3.14 scripts/prepare-owned-window.py --mib 512 --output out/step7/probes/owned-512-normal", result = "Normal BOOT867efc59: independently verified ADT-only memory request change and exact kernel/config/firmware/DTB/tail preservation. Runtime512MiB remains unverified." },
+  { kind = "device", reference = "evidence/storage/owned-window-512/upload.json", revision = "e56e349704e8a33d0ec13c2eff124a618a04579f", command = "heimdall flash --BOOT owned-512-normal/boot-partition.img", result = "Upload100%, session exit0 and reboot requested; owner reports retained bars. No readback/runtime allocation proof." },
   { kind = "device", reference = "evidence/storage/policy-memory/initproc-main/device-result.json", revision = "ba275cae5ba86c7076a40ae6057c755702262881", command = "BOOT870a11da original sysctl tail-call observer; owner photo14:51:31", result = "Genuine kern.initproc_spawned1 and original handler err0 confirm launchd main. Probe never writes marker. Services/Data/desktop unverified; terminal snapshot free260pages." },
   { kind = "device", reference = "evidence/storage/policy-memory/post-map-syscall/device-result.json", revision = "ba275cae5ba86c7076a40ae6057c755702262881", command = "BOOT24d8643b existing-PID1-trace predicate; owner photo14:43:57", result = "Prior completed PID1 cache syscall536 error0 followed by successful later close6; user execution continues after mapping." },
   { kind = "device", reference = "evidence/storage/policy-memory/shared-map-result/device-result.json", revision = "ba275cae5ba86c7076a40ae6057c755702262881", command = "BOOT06a968f7 mapping return panic display; owner photo14:25:27", result = "Actual vm_shared_region_map_file KERN_SUCCESS0 displayed before cleanup; no timer inference." },
@@ -1364,6 +1370,9 @@ id = "diagnostics"
 status = "implemented"
 components = []
 paths = [
+  "scripts/prepare-owned-window.py",
+  "evidence/storage/owned-window-512/**",
+  "evidence/storage/data-seed-preparation/**",
   "scripts/post-map-syscall-probe.py",
   "scripts/initproc-main-probe.py",
   "tests/test_post_map_syscall_probe.py",
@@ -1443,6 +1452,7 @@ procedure = [
   "Run python3 scripts/collect-adb-inventory.py --root --output evidence/<new-capture>; review per-command stderr, checksums, GPT CRC results and DT sanitization before updating this record.",
 ]
 findings = [
+  "2026-11-02: normal release BOOT867efc59 requests512MiB via the chosen ADT property only; fixed normal kernel/FD/DTB/config/tail preserved, Heimdall upload exit0. Owner reports retained bars, which does not localize execution or verify allocation. Terminal main checkpoint BOOT97271e99 uploaded exit0 to measure actual pages; runtime result pending; Data APFS32MiB seed packed losslessly to1007696bytes on host, not integrated/flashed or persistence-qualified. Physical8GiB is not the EFI-owned256MiB diagnostic allocation.",
   "The next cache diagnostic follows umi bounded kernel-state observation: trace PID1 syscall returns and only already copied namei buffers, with fixed arrays and a last-12 panic summary; it makes no extra user-pointer read. Actual-helper host checks pass; device results remain pending and must be tied to the next exact BOOT hash.",
   "BOOT cfbd84ba photo confirms stage4: ID/VALID/S2CR accepted, direct FAULT restore200ff succeeded without fallback, allRestored/mappingsUnchanged=1 and GFSR=0. Six context states captured; CB0..4 already configured with FSR400 of unknown age, CB73 SCTLR3ab3a706 is not a verified free bank. No context writes, DMA or UFS commands occurred.",
   "Combined field diagnostic BOOT cfbd84ba34fc03b50661b46c9e22fe59c43ba651bca6967da49f1df1ec373e75 prepared from source7ee2918/kernel53e9e68c. Thirteen host tests, input-stable kernel build, independent FAT/arguments/FD checks and DT/ADT check passed. BOOT-only upload exited0; actual VALID/S2CR/restoration/context observations remain pending.",
@@ -1550,6 +1560,8 @@ limits = [
 ]
 next_action = ["After committing this verified milestone, continue normal service/Data bring-up and measure memory use; preserve genuine main-marker evidence and256MiB owned-memory constraints. Current870a11da is terminal diagnostic, not a normal system image."]
 evidence = [
+  { kind = "host", reference = "evidence/storage/owned-window-512/preparation.json", revision = "e56e349704e8a33d0ec13c2eff124a618a04579f", command = "python3.14 scripts/prepare-owned-window.py --mib 512 --output out/step7/probes/owned-512-normal", result = "Normal BOOT867efc59: independently verified ADT-only memory request change and exact kernel/config/firmware/DTB/tail preservation. Runtime512MiB remains unverified." },
+  { kind = "device", reference = "evidence/storage/owned-window-512/upload.json", revision = "e56e349704e8a33d0ec13c2eff124a618a04579f", command = "heimdall flash --BOOT owned-512-normal/boot-partition.img", result = "Upload100%, session exit0 and reboot requested; owner reports retained bars. No readback/runtime allocation proof." },
   { kind = "host", reference = "evidence/storage/policy-memory/commit-validation.json", revision = "ba275cae5ba86c7076a40ae6057c755702262881", command = "24 targeted unittests; actual-source union/trace/signature and ASan memory lifecycle checks; check-platform; record/diff checks", result = "24 tests and4 actual-source checks pass. Platform checker still fails historical five-component selection versus existing VirtioMmioBlock; failure preserved.13-area record and whitespace checks pass." },
   { kind = "device", reference = "evidence/storage/policy-memory/initproc-main/device-result.json", revision = "ba275cae5ba86c7076a40ae6057c755702262881", command = "BOOT870a11da original sysctl tail-call observer; owner photo14:51:31", result = "Genuine kern.initproc_spawned1 and original handler err0 confirm launchd main. Probe never writes marker. Services/Data/desktop unverified; terminal snapshot free260pages." },
   { kind = "device", reference = "evidence/storage/policy-memory/post-map-syscall/device-result.json", revision = "ba275cae5ba86c7076a40ae6057c755702262881", command = "BOOT24d8643b existing-PID1-trace predicate; owner photo14:43:57", result = "Prior completed PID1 cache syscall536 error0 followed by successful later close6; user execution continues after mapping." },

@@ -1,0 +1,18 @@
+{
+  "source_boot_sha256": "73a5738beb948edc90b9d0357663a62a3e672e8a3ee75aaf7bd90aad699ecbba",
+  "boot_sha256": "867efc599a7686a86f4fa4c4394c26979b99a1789f452ac1da2d8da588e9728a",
+  "boot_bytes": 71303168,
+  "requested_owned_mib": 512,
+  "adt_sha256": "011c60cf3f73e45c99519dc1b6316cca11d261048c49cc5ed7b7b11ebf8765ec",
+  "kernel_sha256": "0b04a7823d5fa57ee0397133379f951bf9709dc5f6d32bd3039ff1a0c593451a",
+  "payload_sha256": "2e285fb498336a29b5970f2e329c243038b43da91f1c0692c5212f1b51b49971",
+  "ramdisk_offset": 3153920,
+  "no_terminal_probe": true,
+  "command_line_unchanged": true,
+  "firmware_dtb_header_tail_unchanged": true,
+  "adt_only_chosen_memory_size_changed": true,
+  "board_defaults_unchanged": true,
+  "hardware_allocation_verified": false,
+  "flashed": false,
+  "limitation": "EFI must allocate a real conventional-memory run. No Data volume is configured."
+}
