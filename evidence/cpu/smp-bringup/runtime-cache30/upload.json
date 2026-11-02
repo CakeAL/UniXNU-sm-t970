@@ -1,0 +1,18 @@
+{
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/data-bringup/cpu8-runtime-cache30/boot-partition.img"
+  ],
+  "exit_code": 0,
+  "boot_sha256": "79a949b61fb040a77ee067432be87f80be394fecbcc13fcf7fe0bafc09a19d85",
+  "cpus_requested": 8,
+  "target_wait_seconds": 30,
+  "additional_ipi_wait_milliseconds": 100,
+  "compact_pid1_cache_trace": true,
+  "armcpu_revision": "b5f9775777aafe850a4ec8778b03154dfcabbd2b",
+  "terminal_diagnostic": true,
+  "readback_verified": false,
+  "hardware_result_pending": true
+}

@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "binary_sha256": "89855beff6f72dbc7527b568a4a9aa4a57476381b52b2026f9211f7c147aa0cb",
+  "normal_and_diagnostic_sgi_write_emitted": true,
+  "sgi_ordering_barriers_emitted": true,
+  "gic_and_timer_isb_emitted": true,
+  "daif_mask_and_restore_emitted": true,
+  "counter_reads_emitted": true,
+  "hardware_ipi_delivery_verified": false
+}

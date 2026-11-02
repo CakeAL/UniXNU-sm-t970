@@ -41,6 +41,7 @@ typedef void (*thread_continue_t)(void *,wait_result_t);
 static struct process processes[1000];
 static unsigned supplied,count,enabled,seconds,starts,deallocs,waits,blocks,iteration_calls;
 static int start_error,wait_result=THREAD_WAITING;
+static unsigned trace_enabled;
 static void *start_arg;
 static thread_continue_t start_function;
 static jmp_buf stop;
@@ -57,6 +58,7 @@ void armcpu_ipi_selftest(uint64_t aff){assert(aff==0x100);++armcpu_ipi_selftest_
 void armcpu_gic_diag(uint64_t aff,uint32_t *out){assert(aff==0x100);memset(out,0,8*sizeof(*out));}
 void native_t970_trampoline_snapshot(uint64_t *out){for(unsigned i=0;i<8;++i)out[i]=0x100000000ULL+i;}
 void native_t970_secondary_snapshot(uint32_t *out){for(unsigned i=0;i<8;++i)out[i]=i%5;}
+const char *native_t970_cache_trace_text(void){return "init cache syscalls=7\nsc536 e0 r0 a0 c0 cache";}
 int native_t970_initproc_main(void){return main_state;}
 void native_t970_reset_context(uint64_t *out){
  const uint64_t values[6]={0x1000,0x1000,0x2000,0x100,0x3000,0x3000};memcpy(out,values,sizeof(values));
@@ -72,7 +74,7 @@ static void proc_iterate(unsigned flags,int (*callout)(proc_t,void*),void *arg,v
 static void clock_interval_to_deadline(unsigned n,unsigned scale,uint64_t *out){assert(scale==NSEC_PER_SEC);*out=(uint64_t)n*scale;}
 static int assert_wait_deadline(event_t e,int flags,uint64_t deadline){assert(e&&flags==THREAD_UNINT&&deadline>0);++waits;return wait_result;}
 static int thread_block(void *continuation){assert(!continuation);++blocks;return 3;}
-static int PE_parse_boot_argn(const char *name,void *out,int size){if(!strcmp(name,"t970-ipi-check"))return 0;assert(!strcmp(name,"t970-runtime-report")&&size==sizeof(unsigned));*(unsigned*)out=seconds;return (int)enabled;}
+static int PE_parse_boot_argn(const char *name,void *out,int size){if(!strcmp(name,"t970-runtime-cache-trace")){*(unsigned*)out=trace_enabled;return trace_enabled!=0;}if(!strcmp(name,"t970-ipi-check"))return 0;assert(!strcmp(name,"t970-runtime-report")&&size==sizeof(unsigned));*(unsigned*)out=seconds;return (int)enabled;}
 static kern_return_t kernel_thread_start(thread_continue_t function,void *arg,thread_t *thread){++starts;start_function=function;start_arg=arg;*thread=(void*)1;return start_error;}
 static void thread_deallocate(thread_t t){assert(t==(void*)1);++deallocs;}
 static void test_panic(const char *format,...) __attribute__((noreturn,format(printf,1,2)));
@@ -81,7 +83,7 @@ static void test_panic(const char *format,...){va_list ap;va_start(ap,format);vs
 '''
 main = r'''
 static void reset(void){
- enabled=seconds=starts=deallocs=waits=blocks=iteration_calls=0;start_error=0;wait_result=THREAD_WAITING;
+ enabled=seconds=starts=deallocs=waits=blocks=iteration_calls=trace_enabled=0;start_error=0;wait_result=THREAD_WAITING;
  native_t970_runtime_started=0;message[0]=0;main_state=1;
  supplied=1000;for(unsigned i=0;i<supplied;++i){processes[i].pid=(int)i;snprintf(processes[i].name,64,"proc%u",i);}
 }
@@ -111,6 +113,10 @@ int main(void){
   assert(strstr(message,"V target=100000000 ret=100000001 vb=100000002 pb=100000003 t1=100000004 t0=100000005 tcr=100000006 primary1=100000007"));
   assert(strstr(message,"R table=1000 want=1000 data1=2000 id1=100 handler=3000 start=3000"));
  }
+ reset();trace_enabled=1;main_state=0;supplied=2;
+ if(!setjmp(stop)){native_t970_runtime_report((void*)30,0);assert(0);}
+ assert(strstr(message,"runtime target=30 main=0 n=2")&&strstr(message,"init cache syscalls=7")&&strstr(message,"sc536 e0 r0 a0 c0 cache"));
+ assert(!strstr(message,"V target=")&&waits==1&&blocks==1&&iteration_calls==1);
  puts("PASS: actual runtime report bounds, process names/PIDs, 512 callback cap, scheduler yield, opt-in/range/once guards and thread failure");
  return 0;
 }

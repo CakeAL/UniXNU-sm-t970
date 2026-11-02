@@ -3,6 +3,18 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
+## 最新：八核20秒复现，PID1缓存追踪版已刷（2026-11-03）
+
+八核0dba26bc沿用已验证的内核，仅延后到20秒终止采样；实机仍cpu8/sec7/main0/n2，
+blocks371515，对比10秒189168提示继续读取。CPU5有timer2，CPU4/6/7此时未观察到timer。
+这两张是不同启动的快照，不当作同次运行的精确速率测量；更不能由main0单独断言卡死。
+
+当前BOOT79a949b6：新增显式t970-runtime-cache-trace=1，八核、目标30秒加100ms。
+画面紧凑显示runtime、C行和已有PID1缓存系统调用记录（最后完成的最多12条），
+不改变授权/返回值，不额外copyin。追踪是尽力快照，不直接代表当前正在阻塞的调用。
+源内核3d114c44、ArmCpu b5f9775，构建与格式化器/实际调用/SGI/发布/独立打包检查通过。
+见evidence/cpu/smp-bringup/runtime20及runtime-cache30；新实机结果待回报。
+
 ## 最新：八核启动与各核SGI已实测（2026-11-03）
 
 当前BOOTd95c45d9已收到00:49:07实机照片：cpu8/sec7，全部副核step7/PSCI0/fail0/C4，

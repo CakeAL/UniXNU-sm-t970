@@ -352,6 +352,7 @@ paths = [
   "scripts/check-smp-publish-state.py",
   "scripts/check-smp-publish-linked.py",
   "patches/xnu/t970-smp-ipi-check.patch",
+  "patches/xnu/t970-runtime-cache-trace.patch",
   "scripts/check-smp-ipi-check.py",
   "scripts/check-reset-context.py",
   "scripts/check-smp-entry-trace.py",
@@ -386,6 +387,7 @@ procedure = [
   "Collect /proc/cpuinfo, online/present CPU lists, cpufreq policies, /proc/interrupts and the live DT using the inventory script.",
 ]
 findings = [
+  "Same-kernel eight-core target20 image0dba26bc reproduces cpu8/sec7/secondary phase7/C4 and main0/n2. Verified blocks371515 versus189168 at target10 suggests continued reading across comparable boots. CPU5 timer2 observed; CPU4/6/7 timer0. Added optional compact runtime view of existing completed PID1 cache syscalls at target30 to localize startup without changing authorization or syscall behavior.",
   "BOOTd95c45d9 owner photo confirms8 available CPUs/sec7, every secondary phase7/PSCI0/fail0/C4, and positive SGI counts on all8 cores (54/62/59/26/6/24/2/1,total234). At target10, timers onCPU4/5/7 are0 and main0/n2. Eight-core startup and per-core SGI reception observed; all-core timer workload, sustained SMP, isolated bidirectional IPI and userspace remain unverified.",
   "BOOT1c778e4b owner photo confirms actual SGI reception on both CPUs:44/102,total146, CPU1 check99->102 after inline asm separator repair. Fixed-sender bidirectional isolation and sustained userspace remain unverified. Owner explicitly requested skipping4-core: same-kernel8-core BOOTd95c45d9 prepared, independently checked and uploaded; device result pending. Non-atomic sec aggregate is not sole core-online evidence.",
   "Actual old ArmCpu object/kernel lacked ICC_SGI1R_EL1 writes: semicolon-separated multi-instruction inline asm emitted only initial instruction under reviewed Apple arm64 assembler. Independent componentb5f9775 uses explicit newlines in17 strings. Old kernel negative control rejects; new object/kernel/payload checks confirm SGI writes/barriers, GIC/timer ISBs, DAIF and counter reads. BOOT1c778e4b uploaded with explicit local component override; default catalog/feed9066 unchanged. Hardware delivery pending; unused redistributor experiment not flashed.",

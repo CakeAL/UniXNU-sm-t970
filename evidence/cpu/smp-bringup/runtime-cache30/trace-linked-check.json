@@ -1,0 +1,7 @@
+{
+  "passed": true,
+  "kernel_sha256": "3d114c442502f3eb45c01da362d1490a28be194111ec462657546aac5abb121f",
+  "actual_runtime_cache_trace_call_present": true,
+  "explicit_option_present": true,
+  "hardware_pid1_trace_verified": false
+}

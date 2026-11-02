@@ -26,3 +26,6 @@ reset-publish已修正并模拟验证实际C标记；汇编阶段记录和ArmCpu
 - sgi-asm/device-result：两核SGI接收44/102、recv146确认。机主要求直接八核，sgi-asm/cpu8为同内核d95c45d9的准备和上传回执，实机结果待回报。
 
 - sgi-asm/cpu8/device-result：d95c45d9已实测cpu8/sec7、所有副核step7/C4、八核SGI总234。CPU4/5/7早期timer0，main0/n2；持续运行与用户态仍待验证。
+
+- runtime20：0dba26bc实测八核/main0/n2，blocks371515。
+- runtime-cache30：79a949b6已刷，30秒紧凑PID1缓存调用追踪，实际结果待回报。

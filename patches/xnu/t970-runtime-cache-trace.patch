@@ -1,0 +1,19 @@
+--- a/bsd/kern/kern_exec.c
++++ b/bsd/kern/kern_exec.c
+@@ -8168,6 +8168,16 @@
+ 	native_t970_reset_context(reset);
+ 	char cpu_state[512];
+ 	native_t970_smp_state(cpu_state, sizeof(cpu_state));
++	unsigned cache_trace = 0;
++	if (PE_parse_boot_argn("t970-runtime-cache-trace", &cache_trace, sizeof(cache_trace)) && cache_trace == 1) {
++		extern const char *native_t970_cache_trace_text(void);
++		panic("runtime target=%u main=%d n=%u wd=%d sb=%d bb=%d rb=%d D=%d W=%d S=%d blocks=%llu cpu=%u sec=%u\nC step/psci/fail/timer/sgi %s\n%s\n%s",
++		    seconds, native_t970_initproc_main(), snapshot.count, snapshot.watchdog, snapshot.springboard,
++		    snapshot.backboard, snapshot.runningboard, native_owner_data_status,
++		    native_t970_watchdog_policy_status, native_t970_watchdog_policy_stage,
++		    (unsigned long long)native_ufs_verified_blocks, processor_avail_count, armcpu_smp_running,
++		    cpu_state, native_t970_cache_trace_text(), snapshot.names);
++	}
+ 	panic("runtime target=%u main=%d n=%u wd=%d sb=%d bb=%d rb=%d D=%d W=%d S=%d blocks=%llu cpu=%u sec=%u\nC step/psci/fail/timer/sgi %s\nE reset/found/common/C %u %u %u %u %u %u %u %u\nV target=%llx ret=%llx vb=%llx pb=%llx t1=%llx t0=%llx tcr=%llx primary1=%llx\nI attempt=%u sent=%llu test=%llu recv=%llu cpu1=%u>%u G=%x/%x/%x/%x/%x/%x/%x/%x\nR table=%llx want=%llx data1=%llx id1=%llx handler=%llx start=%llx\n%s",
+ 	    seconds, native_t970_initproc_main(), snapshot.count, snapshot.watchdog, snapshot.springboard,
+ 	    snapshot.backboard, snapshot.runningboard, native_owner_data_status,

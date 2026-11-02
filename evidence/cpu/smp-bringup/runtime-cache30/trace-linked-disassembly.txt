@@ -1,0 +1,319 @@
+
+out/data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/kernel/kernel.macho:	file format mach-o arm64
+
+Disassembly of section __TEXT_EXEC,__text:
+
+fffffff0076f7ac4 <_native_t970_runtime_report>:
+fffffff0076f7ac4: a9ba6ffc     	stp	x28, x27, [sp, #-0x60]!
+fffffff0076f7ac8: a90167fa     	stp	x26, x25, [sp, #0x10]
+fffffff0076f7acc: a9025ff8     	stp	x24, x23, [sp, #0x20]
+fffffff0076f7ad0: a90357f6     	stp	x22, x21, [sp, #0x30]
+fffffff0076f7ad4: a9044ff4     	stp	x20, x19, [sp, #0x40]
+fffffff0076f7ad8: a9057bfd     	stp	x29, x30, [sp, #0x50]
+fffffff0076f7adc: 910143fd     	add	x29, sp, #0x50
+fffffff0076f7ae0: d11c43ff     	sub	sp, sp, #0x710
+fffffff0076f7ae4: 910803f4     	add	x20, sp, #0x200
+fffffff0076f7ae8: f9027e9f     	str	xzr, [x20, #0x4f8]
+fffffff0076f7aec: d101a3a2     	sub	x2, x29, #0x68
+fffffff0076f7af0: f900fbe0     	str	x0, [sp, #0x1f0]
+fffffff0076f7af4: 52994001     	mov	w1, #0xca00     ; =51712
+fffffff0076f7af8: 72a77341     	movk	w1, #0x3b9a, lsl #16
+fffffff0076f7afc: 97ee1d8b     	bl	0xfffffff00727f128 <_clock_interval_to_deadline>
+fffffff0076f7b00: f9427e82     	ldr	x2, [x20, #0x4f8]
+fffffff0076f7b04: d0002340     	adrp	x0, 0xfffffff007b61000 <_limit0+0x20>
+fffffff0076f7b08: 91128000     	add	x0, x0, #0x4a0
+fffffff0076f7b0c: 52800001     	mov	w1, #0x0        ; =0
+fffffff0076f7b10: 97ef11d2     	bl	0xfffffff0072bc258 <_assert_wait_deadline>
+fffffff0076f7b14: 3100041f     	cmn	w0, #0x1
+fffffff0076f7b18: 54000061     	b.ne	0xfffffff0076f7b24 <_native_t970_runtime_report+0x60>
+fffffff0076f7b1c: d2800000     	mov	x0, #0x0        ; =0
+fffffff0076f7b20: 97ef1345     	bl	0xfffffff0072bc834 <_thread_block>
+fffffff0076f7b24: f9027a9f     	str	xzr, [x20, #0x4f0]
+fffffff0076f7b28: 4f00e400     	movi.16b	v0, #0x0
+fffffff0076f7b2c: 3d813a80     	str	q0, [x20, #0x4e0]
+fffffff0076f7b30: 3d813680     	str	q0, [x20, #0x4d0]
+fffffff0076f7b34: 3d813280     	str	q0, [x20, #0x4c0]
+fffffff0076f7b38: 3d812e80     	str	q0, [x20, #0x4b0]
+fffffff0076f7b3c: b90203ff     	str	wzr, [sp, #0x200]
+fffffff0076f7b40: f0ffce80     	adrp	x0, 0xfffffff0070ca000 <_native_t970_cs_note.hex+0x1fc7>
+fffffff0076f7b44: 913fc400     	add	x0, x0, #0xff1
+fffffff0076f7b48: 910803e1     	add	x1, sp, #0x200
+fffffff0076f7b4c: 52800082     	mov	w2, #0x4        ; =4
+fffffff0076f7b50: 9409a5cc     	bl	0xfffffff007961280 <_PE_parse_boot_argn>
+fffffff0076f7b54: b00021da     	adrp	x26, 0xfffffff007b30000 <_gPEClockFrequencyInfo+0xa0>
+fffffff0076f7b58: 910a435a     	add	x26, x26, #0x290
+fffffff0076f7b5c: d0001d49     	adrp	x9, 0xfffffff007aa1000 <_pset0+0x3700>
+fffffff0076f7b60: 9122a129     	add	x9, x9, #0x8a8
+fffffff0076f7b64: 340006a0     	cbz	w0, 0xfffffff0076f7c38 <_native_t970_runtime_report+0x174>
+fffffff0076f7b68: b94203e8     	ldr	w8, [sp, #0x200]
+fffffff0076f7b6c: 7100051f     	cmp	w8, #0x1
+fffffff0076f7b70: 54000641     	b.ne	0xfffffff0076f7c38 <_native_t970_runtime_report+0x174>
+fffffff0076f7b74: b9400128     	ldr	w8, [x9]
+fffffff0076f7b78: 7100091f     	cmp	w8, #0x2
+fffffff0076f7b7c: 540005a3     	b.lo	0xfffffff0076f7c30 <_native_t970_runtime_report+0x16c>
+fffffff0076f7b80: b00021c8     	adrp	x8, 0xfffffff007b30000 <_gPEClockFrequencyInfo+0xa0>
+fffffff0076f7b84: 910b2108     	add	x8, x8, #0x2c8
+fffffff0076f7b88: b9400508     	ldr	w8, [x8, #0x4]
+fffffff0076f7b8c: 71001d1f     	cmp	w8, #0x7
+fffffff0076f7b90: 54000501     	b.ne	0xfffffff0076f7c30 <_native_t970_runtime_report+0x16c>
+fffffff0076f7b94: b9400748     	ldr	w8, [x26, #0x4]
+fffffff0076f7b98: b816c3a8     	stur	w8, [x29, #-0x94]
+fffffff0076f7b9c: 52802000     	mov	w0, #0x100      ; =256
+fffffff0076f7ba0: 940a413e     	bl	0xfffffff007988098 <_armcpu_ipi_selftest>
+fffffff0076f7ba4: 52800028     	mov	w8, #0x1        ; =1
+fffffff0076f7ba8: b81683a8     	stur	w8, [x29, #-0x98]
+fffffff0076f7bac: f9014a9f     	str	xzr, [x20, #0x290]
+fffffff0076f7bb0: 911243e2     	add	x2, sp, #0x490
+fffffff0076f7bb4: 52800c80     	mov	w0, #0x64       ; =100
+fffffff0076f7bb8: 52884801     	mov	w1, #0x4240     ; =16960
+fffffff0076f7bbc: 72a001e1     	movk	w1, #0xf, lsl #16
+fffffff0076f7bc0: 97ee1d5a     	bl	0xfffffff00727f128 <_clock_interval_to_deadline>
+fffffff0076f7bc4: f9414a82     	ldr	x2, [x20, #0x290]
+fffffff0076f7bc8: d102c3b3     	sub	x19, x29, #0xb0
+fffffff0076f7bcc: d102c3a0     	sub	x0, x29, #0xb0
+fffffff0076f7bd0: 52800001     	mov	w1, #0x0        ; =0
+fffffff0076f7bd4: 97ef11a1     	bl	0xfffffff0072bc258 <_assert_wait_deadline>
+fffffff0076f7bd8: 3100041f     	cmn	w0, #0x1
+fffffff0076f7bdc: 54000061     	b.ne	0xfffffff0076f7be8 <_native_t970_runtime_report+0x124>
+fffffff0076f7be0: d2800000     	mov	x0, #0x0        ; =0
+fffffff0076f7be4: 97ef1314     	bl	0xfffffff0072bc834 <_thread_block>
+fffffff0076f7be8: b9400748     	ldr	w8, [x26, #0x4]
+fffffff0076f7bec: b81703a8     	stur	w8, [x29, #-0x90]
+fffffff0076f7bf0: 91009261     	add	x1, x19, #0x24
+fffffff0076f7bf4: 52802000     	mov	w0, #0x100      ; =256
+fffffff0076f7bf8: 940a407d     	bl	0xfffffff007987dec <_armcpu_gic_diag>
+fffffff0076f7bfc: b00021c8     	adrp	x8, 0xfffffff007b30000 <_gPEClockFrequencyInfo+0xa0>
+fffffff0076f7c00: 91090108     	add	x8, x8, #0x240
+fffffff0076f7c04: f9400108     	ldr	x8, [x8]
+fffffff0076f7c08: f9025a88     	str	x8, [x20, #0x4b0]
+fffffff0076f7c0c: b00021c8     	adrp	x8, 0xfffffff007b30000 <_gPEClockFrequencyInfo+0xa0>
+fffffff0076f7c10: 91092108     	add	x8, x8, #0x248
+fffffff0076f7c14: f9400108     	ldr	x8, [x8]
+fffffff0076f7c18: f9025e88     	str	x8, [x20, #0x4b8]
+fffffff0076f7c1c: b00021c8     	adrp	x8, 0xfffffff007b30000 <_gPEClockFrequencyInfo+0xa0>
+fffffff0076f7c20: 9108e108     	add	x8, x8, #0x238
+fffffff0076f7c24: f9400108     	ldr	x8, [x8]
+fffffff0076f7c28: f9026288     	str	x8, [x20, #0x4c0]
+fffffff0076f7c2c: 14000003     	b	0xfffffff0076f7c38 <_native_t970_runtime_report+0x174>
+fffffff0076f7c30: 52800048     	mov	w8, #0x2        ; =2
+fffffff0076f7c34: b81683a8     	stur	w8, [x29, #-0x98]
+fffffff0076f7c38: 911243e0     	add	x0, sp, #0x490
+fffffff0076f7c3c: 52804401     	mov	w1, #0x220      ; =544
+fffffff0076f7c40: 940d4f80     	bl	0xfffffff007a4ba40 <_bzero>
+fffffff0076f7c44: 90000001     	adrp	x1, 0xfffffff0076f7000 <_native_cryptex_os_bind+0x10>
+fffffff0076f7c48: 913ea021     	add	x1, x1, #0xfa8
+fffffff0076f7c4c: 911243e2     	add	x2, sp, #0x490
+fffffff0076f7c50: 528000a0     	mov	w0, #0x5        ; =5
+fffffff0076f7c54: d2800003     	mov	x3, #0x0        ; =0
+fffffff0076f7c58: d2800004     	mov	x4, #0x0        ; =0
+fffffff0076f7c5c: 940043d5     	bl	0xfffffff007708bb0 <_proc_iterate>
+fffffff0076f7c60: 4f00e400     	movi.16b	v0, #0x0
+fffffff0076f7c64: ad138280     	stp	q0, q0, [x20, #0x270]
+fffffff0076f7c68: 9111c3e0     	add	x0, sp, #0x470
+fffffff0076f7c6c: 97f40cf0     	bl	0xfffffff0073fb02c <_native_t970_secondary_snapshot>
+fffffff0076f7c70: 4f00e400     	movi.16b	v0, #0x0
+fffffff0076f7c74: ad128280     	stp	q0, q0, [x20, #0x250]
+fffffff0076f7c78: ad118280     	stp	q0, q0, [x20, #0x230]
+fffffff0076f7c7c: 9110c3e0     	add	x0, sp, #0x430
+fffffff0076f7c80: 97f40d08     	bl	0xfffffff0073fb0a0 <_native_t970_trampoline_snapshot>
+fffffff0076f7c84: 4f00e400     	movi.16b	v0, #0x0
+fffffff0076f7c88: ad108280     	stp	q0, q0, [x20, #0x210]
+fffffff0076f7c8c: 3d808280     	str	q0, [x20, #0x200]
+fffffff0076f7c90: 911003e0     	add	x0, sp, #0x400
+fffffff0076f7c94: 97f40d2d     	bl	0xfffffff0073fb148 <_native_t970_reset_context>
+fffffff0076f7c98: d2800013     	mov	x19, #0x0       ; =0
+fffffff0076f7c9c: d2800017     	mov	x23, #0x0       ; =0
+fffffff0076f7ca0: 4f00e400     	movi.16b	v0, #0x0
+fffffff0076f7ca4: ad0f0280     	stp	q0, q0, [x20, #0x1e0]
+fffffff0076f7ca8: ad0e0280     	stp	q0, q0, [x20, #0x1c0]
+fffffff0076f7cac: ad0d0280     	stp	q0, q0, [x20, #0x1a0]
+fffffff0076f7cb0: ad0c0280     	stp	q0, q0, [x20, #0x180]
+fffffff0076f7cb4: ad0b0280     	stp	q0, q0, [x20, #0x160]
+fffffff0076f7cb8: ad0a0280     	stp	q0, q0, [x20, #0x140]
+fffffff0076f7cbc: ad090280     	stp	q0, q0, [x20, #0x120]
+fffffff0076f7cc0: ad080280     	stp	q0, q0, [x20, #0x100]
+fffffff0076f7cc4: ad070280     	stp	q0, q0, [x20, #0xe0]
+fffffff0076f7cc8: ad060280     	stp	q0, q0, [x20, #0xc0]
+fffffff0076f7ccc: ad050280     	stp	q0, q0, [x20, #0xa0]
+fffffff0076f7cd0: ad040280     	stp	q0, q0, [x20, #0x80]
+fffffff0076f7cd4: ad1303e0     	stp	q0, q0, [sp, #0x260]
+fffffff0076f7cd8: ad1203e0     	stp	q0, q0, [sp, #0x240]
+fffffff0076f7cdc: ad1103e0     	stp	q0, q0, [sp, #0x220]
+fffffff0076f7ce0: 5280401b     	mov	w27, #0x200     ; =512
+fffffff0076f7ce4: b00021dc     	adrp	x28, 0xfffffff007b30000 <_gPEClockFrequencyInfo+0xa0>
+fffffff0076f7ce8: 9110039c     	add	x28, x28, #0x400
+fffffff0076f7cec: b00021d6     	adrp	x22, 0xfffffff007b30000 <_gPEClockFrequencyInfo+0xa0>
+fffffff0076f7cf0: 910ca2d6     	add	x22, x22, #0x328
+fffffff0076f7cf4: ad1003e0     	stp	q0, q0, [sp, #0x200]
+fffffff0076f7cf8: 90ffceb4     	adrp	x20, 0xfffffff0070cb000 <_native_t970_cs_note.hex+0x2fc7>
+fffffff0076f7cfc: 91007e94     	add	x20, x20, #0x1f
+fffffff0076f7d00: 52803ff8     	mov	w24, #0x1ff     ; =511
+fffffff0076f7d04: b00021d9     	adrp	x25, 0xfffffff007b30000 <_gPEClockFrequencyInfo+0xa0>
+fffffff0076f7d08: 9109c339     	add	x25, x25, #0x270
+fffffff0076f7d0c: cb170375     	sub	x21, x27, x23
+fffffff0076f7d10: b00021c8     	adrp	x8, 0xfffffff007b30000 <_gPEClockFrequencyInfo+0xa0>
+fffffff0076f7d14: 910b2108     	add	x8, x8, #0x2c8
+fffffff0076f7d18: b8737908     	ldr	w8, [x8, x19, lsl #2]
+fffffff0076f7d1c: b8737b89     	ldr	w9, [x28, x19, lsl #2]
+fffffff0076f7d20: b8737aca     	ldr	w10, [x22, x19, lsl #2]
+fffffff0076f7d24: b8737b2b     	ldr	w11, [x25, x19, lsl #2]
+fffffff0076f7d28: b8737b4c     	ldr	w12, [x26, x19, lsl #2]
+fffffff0076f7d2c: a90233eb     	stp	x11, x12, [sp, #0x20]
+fffffff0076f7d30: a9012be9     	stp	x9, x10, [sp, #0x10]
+fffffff0076f7d34: 910803e9     	add	x9, sp, #0x200
+fffffff0076f7d38: 8b170120     	add	x0, x9, x23
+fffffff0076f7d3c: a90023f3     	stp	x19, x8, [sp]
+fffffff0076f7d40: aa1503e1     	mov	x1, x21
+fffffff0076f7d44: aa1403e2     	mov	x2, x20
+fffffff0076f7d48: 94010a6e     	bl	0xfffffff00773a700 <_snprintf>
+fffffff0076f7d4c: 7100041f     	cmp	w0, #0x1
+fffffff0076f7d50: 5400016b     	b.lt	0xfffffff0076f7d7c <_native_t970_runtime_report+0x2b8>
+fffffff0076f7d54: 2a0003e8     	mov	w8, w0
+fffffff0076f7d58: cb170309     	sub	x9, x24, x23
+fffffff0076f7d5c: eb0802bf     	cmp	x21, x8
+fffffff0076f7d60: 9a898108     	csel	x8, x8, x9, hi
+fffffff0076f7d64: f1001a7f     	cmp	x19, #0x6
+fffffff0076f7d68: 540000a8     	b.hi	0xfffffff0076f7d7c <_native_t970_runtime_report+0x2b8>
+fffffff0076f7d6c: 8b170117     	add	x23, x8, x23
+fffffff0076f7d70: 91000673     	add	x19, x19, #0x1
+fffffff0076f7d74: f107feff     	cmp	x23, #0x1ff
+fffffff0076f7d78: 54fffca3     	b.lo	0xfffffff0076f7d0c <_native_t970_runtime_report+0x248>
+fffffff0076f7d7c: b901ffff     	str	wzr, [sp, #0x1fc]
+fffffff0076f7d80: f0ffce80     	adrp	x0, 0xfffffff0070ca000 <_native_t970_cs_note.hex+0x1fc7>
+fffffff0076f7d84: 9136d400     	add	x0, x0, #0xdb5
+fffffff0076f7d88: 9107f3e1     	add	x1, sp, #0x1fc
+fffffff0076f7d8c: 52800082     	mov	w2, #0x4        ; =4
+fffffff0076f7d90: 9409a53c     	bl	0xfffffff007961280 <_PE_parse_boot_argn>
+fffffff0076f7d94: aa0003f5     	mov	x21, x0
+fffffff0076f7d98: b941fff6     	ldr	w22, [sp, #0x1fc]
+fffffff0076f7d9c: 940008aa     	bl	0xfffffff0076fa044 <_native_t970_initproc_main>
+fffffff0076f7da0: aa0003f3     	mov	x19, x0
+fffffff0076f7da4: b94493f7     	ldr	w23, [sp, #0x490]
+fffffff0076f7da8: b94497fb     	ldr	w27, [sp, #0x494]
+fffffff0076f7dac: b9449bfc     	ldr	w28, [sp, #0x498]
+fffffff0076f7db0: b9449fe8     	ldr	w8, [sp, #0x49c]
+fffffff0076f7db4: f900f7e8     	str	x8, [sp, #0x1e8]
+fffffff0076f7db8: b944a3e8     	ldr	w8, [sp, #0x4a0]
+fffffff0076f7dbc: f900f3e8     	str	x8, [sp, #0x1e0]
+fffffff0076f7dc0: b0001bc8     	adrp	x8, 0xfffffff007a70000 <_key_usrreqs+0x68>
+fffffff0076f7dc4: b94f6108     	ldr	w8, [x8, #0xf60]
+fffffff0076f7dc8: f900efe8     	str	x8, [sp, #0x1d8]
+fffffff0076f7dcc: b0001bc8     	adrp	x8, 0xfffffff007a70000 <_key_usrreqs+0x68>
+fffffff0076f7dd0: b94f8908     	ldr	w8, [x8, #0xf88]
+fffffff0076f7dd4: f900ebe8     	str	x8, [sp, #0x1d0]
+fffffff0076f7dd8: f0002088     	adrp	x8, 0xfffffff007b0a000 <_panic_on_proc_spawn_fail+0xe2>
+fffffff0076f7ddc: b00021c9     	adrp	x9, 0xfffffff007b30000 <_gPEClockFrequencyInfo+0xa0>
+fffffff0076f7de0: 91154129     	add	x9, x9, #0x550
+fffffff0076f7de4: b9437914     	ldr	w20, [x8, #0x378]
+fffffff0076f7de8: f9400138     	ldr	x24, [x9]
+fffffff0076f7dec: d0001d48     	adrp	x8, 0xfffffff007aa1000 <_pset0+0x3700>
+fffffff0076f7df0: 9122a108     	add	x8, x8, #0x8a8
+fffffff0076f7df4: b9400119     	ldr	w25, [x8]
+fffffff0076f7df8: b00021c8     	adrp	x8, 0xfffffff007b30000 <_gPEClockFrequencyInfo+0xa0>
+fffffff0076f7dfc: 910b0108     	add	x8, x8, #0x2c0
+fffffff0076f7e00: b940011a     	ldr	w26, [x8]
+fffffff0076f7e04: 34000355     	cbz	w21, 0xfffffff0076f7e6c <_native_t970_runtime_report+0x3a8>
+fffffff0076f7e08: 710006df     	cmp	w22, #0x1
+fffffff0076f7e0c: 54000301     	b.ne	0xfffffff0076f7e6c <_native_t970_runtime_report+0x3a8>
+fffffff0076f7e10: 94053c57     	bl	0xfffffff007846f6c <_native_t970_cache_trace_text>
+fffffff0076f7e14: 911243e8     	add	x8, sp, #0x490
+fffffff0076f7e18: 91008108     	add	x8, x8, #0x20
+fffffff0076f7e1c: 5283fe69     	mov	w9, #0x1ff3     ; =8179
+fffffff0076f7e20: d0ffce8a     	adrp	x10, 0xfffffff0070c9000 <_native_t970_cs_note.hex+0xfc7>
+fffffff0076f7e24: 9129cd4a     	add	x10, x10, #0xa73
+fffffff0076f7e28: a90827ea     	stp	x10, x9, [sp, #0x80]
+fffffff0076f7e2c: a90723e0     	stp	x0, x8, [sp, #0x70]
+fffffff0076f7e30: 910803e8     	add	x8, sp, #0x200
+fffffff0076f7e34: a90623fa     	stp	x26, x8, [sp, #0x60]
+fffffff0076f7e38: a90567f8     	stp	x24, x25, [sp, #0x50]
+fffffff0076f7e3c: a95d2be9     	ldp	x9, x10, [sp, #0x1d0]
+fffffff0076f7e40: a90453e9     	stp	x9, x20, [sp, #0x40]
+fffffff0076f7e44: a95e23e9     	ldp	x9, x8, [sp, #0x1e0]
+fffffff0076f7e48: a9032be9     	stp	x9, x10, [sp, #0x30]
+fffffff0076f7e4c: a90223fc     	stp	x28, x8, [sp, #0x20]
+fffffff0076f7e50: a9016ff7     	stp	x23, x27, [sp, #0x10]
+fffffff0076f7e54: aa1303e8     	mov	x8, x19
+fffffff0076f7e58: f940fbe9     	ldr	x9, [sp, #0x1f0]
+fffffff0076f7e5c: f0ffce80     	adrp	x0, 0xfffffff0070ca000 <_native_t970_cs_note.hex+0x1fc7>
+fffffff0076f7e60: 91373800     	add	x0, x0, #0xdce
+fffffff0076f7e64: a90023e9     	stp	x9, x8, [sp]
+fffffff0076f7e68: 940aee31     	bl	0xfffffff0079b372c <_panic>
+fffffff0076f7e6c: 910803e8     	add	x8, sp, #0x200
+fffffff0076f7e70: ad518500     	ldp	q0, q1, [x8, #0x230]
+fffffff0076f7e74: 3dc09502     	ldr	q2, [x8, #0x250]
+fffffff0076f7e78: f941310a     	ldr	x10, [x8, #0x260]
+fffffff0076f7e7c: f9413509     	ldr	x9, [x8, #0x268]
+fffffff0076f7e80: a91babe9     	stp	x9, x10, [sp, #0x1b8]
+fffffff0076f7e84: 3dc12d03     	ldr	q3, [x8, #0x4b0]
+fffffff0076f7e88: f942610d     	ldr	x13, [x8, #0x4c0]
+fffffff0076f7e8c: ad501504     	ldp	q4, q5, [x8, #0x200]
+fffffff0076f7e90: f9411101     	ldr	x1, [x8, #0x220]
+fffffff0076f7e94: f9411502     	ldr	x2, [x8, #0x228]
+fffffff0076f7e98: 911243e8     	add	x8, sp, #0x490
+fffffff0076f7e9c: 91008103     	add	x3, x8, #0x20
+fffffff0076f7ea0: b94473e8     	ldr	w8, [sp, #0x470]
+fffffff0076f7ea4: f900e7e8     	str	x8, [sp, #0x1c8]
+fffffff0076f7ea8: b94477e8     	ldr	w8, [sp, #0x474]
+fffffff0076f7eac: f900dbe8     	str	x8, [sp, #0x1b0]
+fffffff0076f7eb0: b9447be8     	ldr	w8, [sp, #0x478]
+fffffff0076f7eb4: f900d7e8     	str	x8, [sp, #0x1a8]
+fffffff0076f7eb8: b9447fee     	ldr	w14, [sp, #0x47c]
+fffffff0076f7ebc: b94483ef     	ldr	w15, [sp, #0x480]
+fffffff0076f7ec0: b94487f0     	ldr	w16, [sp, #0x484]
+fffffff0076f7ec4: b9448bf1     	ldr	w17, [sp, #0x488]
+fffffff0076f7ec8: b9448fe0     	ldr	w0, [sp, #0x48c]
+fffffff0076f7ecc: 296d17a4     	ldp	w4, w5, [x29, #-0x98]
+fffffff0076f7ed0: 296e1fa6     	ldp	w6, w7, [x29, #-0x90]
+fffffff0076f7ed4: 296f5bb5     	ldp	w21, w22, [x29, #-0x88]
+fffffff0076f7ed8: aa1b03eb     	mov	x11, x27
+fffffff0076f7edc: 29706fa8     	ldp	w8, w27, [x29, #-0x80]
+fffffff0076f7ee0: aa1c03e9     	mov	x9, x28
+fffffff0076f7ee4: aa1703ea     	mov	x10, x23
+fffffff0076f7ee8: 29715fbc     	ldp	w28, w23, [x29, #-0x78]
+fffffff0076f7eec: aa1303ec     	mov	x12, x19
+fffffff0076f7ef0: b85903b3     	ldur	w19, [x29, #-0x70]
+fffffff0076f7ef4: a9180be1     	stp	x1, x2, [sp, #0x180]
+fffffff0076f7ef8: a9154ff7     	stp	x23, x19, [sp, #0x150]
+fffffff0076f7efc: a91473fb     	stp	x27, x28, [sp, #0x140]
+fffffff0076f7f00: a91323f6     	stp	x22, x8, [sp, #0x130]
+fffffff0076f7f04: a91257e7     	stp	x7, x21, [sp, #0x120]
+fffffff0076f7f08: 52840068     	mov	w8, #0x2003     ; =8195
+fffffff0076f7f0c: f900d3e8     	str	x8, [sp, #0x1a0]
+fffffff0076f7f10: d0ffce88     	adrp	x8, 0xfffffff0070c9000 <_native_t970_cs_note.hex+0xfc7>
+fffffff0076f7f14: 9129cd08     	add	x8, x8, #0xa73
+fffffff0076f7f18: a91923e3     	stp	x3, x8, [sp, #0x190]
+fffffff0076f7f1c: ad0b17e4     	stp	q4, q5, [sp, #0x160]
+fffffff0076f7f20: a9111be5     	stp	x5, x6, [sp, #0x110]
+fffffff0076f7f24: f90087ed     	str	x13, [sp, #0x108]
+fffffff0076f7f28: 3c8f83e3     	stur	q3, [sp, #0xf8]
+fffffff0076f7f2c: f940dfe8     	ldr	x8, [sp, #0x1b8]
+fffffff0076f7f30: a90e93e8     	stp	x8, x4, [sp, #0xe8]
+fffffff0076f7f34: f940e3e8     	ldr	x8, [sp, #0x1c0]
+fffffff0076f7f38: f90073e8     	str	x8, [sp, #0xe0]
+fffffff0076f7f3c: ad060be1     	stp	q1, q2, [sp, #0xc0]
+fffffff0076f7f40: 3d802fe0     	str	q0, [sp, #0xb0]
+fffffff0076f7f44: a90a03f1     	stp	x17, x0, [sp, #0xa0]
+fffffff0076f7f48: a90943ef     	stp	x15, x16, [sp, #0x90]
+fffffff0076f7f4c: f940d7e8     	ldr	x8, [sp, #0x1a8]
+fffffff0076f7f50: a9083be8     	stp	x8, x14, [sp, #0x80]
+fffffff0076f7f54: f940dbe8     	ldr	x8, [sp, #0x1b0]
+fffffff0076f7f58: f9003fe8     	str	x8, [sp, #0x78]
+fffffff0076f7f5c: f940e7e8     	ldr	x8, [sp, #0x1c8]
+fffffff0076f7f60: f9003be8     	str	x8, [sp, #0x70]
+fffffff0076f7f64: 910803e8     	add	x8, sp, #0x200
+fffffff0076f7f68: a90623fa     	stp	x26, x8, [sp, #0x60]
+fffffff0076f7f6c: a90567f8     	stp	x24, x25, [sp, #0x50]
+fffffff0076f7f70: f940ebe8     	ldr	x8, [sp, #0x1d0]
+fffffff0076f7f74: a90453e8     	stp	x8, x20, [sp, #0x40]
+fffffff0076f7f78: f940efe8     	ldr	x8, [sp, #0x1d8]
+fffffff0076f7f7c: f9001fe8     	str	x8, [sp, #0x38]
+fffffff0076f7f80: f940f3e8     	ldr	x8, [sp, #0x1e0]
+fffffff0076f7f84: f9001be8     	str	x8, [sp, #0x30]
+fffffff0076f7f88: f940f7e8     	ldr	x8, [sp, #0x1e8]
+fffffff0076f7f8c: a90223e9     	stp	x9, x8, [sp, #0x20]
+fffffff0076f7f90: a9012fea     	stp	x10, x11, [sp, #0x10]
+fffffff0076f7f94: f940fbe8     	ldr	x8, [sp, #0x1f0]
+fffffff0076f7f98: f0ffce80     	adrp	x0, 0xfffffff0070ca000 <_native_t970_cs_note.hex+0x1fc7>
+fffffff0076f7f9c: 91396400     	add	x0, x0, #0xe59
+fffffff0076f7fa0: a90033e8     	stp	x8, x12, [sp]
+fffffff0076f7fa4: 940aede2     	bl	0xfffffff0079b372c <_panic>

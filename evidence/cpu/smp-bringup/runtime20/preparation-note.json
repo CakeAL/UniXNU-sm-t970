@@ -1,0 +1,10 @@
+{
+  "no_source_code_change": true,
+  "runtime_arg_changed_from": 10,
+  "runtime_arg_changed_to": 20,
+  "kernel_trust_data_seed_unchanged": true,
+  "adt_difference_from_previous_eight_core": [
+    "/chosen/random-seed"
+  ],
+  "hardware_result_observed": true
+}

@@ -1,0 +1,17 @@
+{
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/data-bringup/cpu8-runtime20/boot-partition.img"
+  ],
+  "exit_code": 0,
+  "boot_sha256": "0dba26bcbb5f331301e705c4c24b383c6744b3f7e00e034785b973fe8004399f",
+  "cpus_requested": 8,
+  "target_wait_seconds": 20,
+  "additional_ipi_wait_milliseconds": 100,
+  "same_kernel_as_eight_core_verified": true,
+  "terminal_diagnostic": true,
+  "readback_verified": false,
+  "hardware_result_pending": true
+}

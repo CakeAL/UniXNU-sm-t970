@@ -19,3 +19,4 @@ t970-smp-mmu-trace.patch
 t970-smp-trampoline-trace.patch
 t970-smp-publish-reset-state.patch
 t970-smp-ipi-check.patch
+t970-runtime-cache-trace.patch

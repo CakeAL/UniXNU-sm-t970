@@ -1,0 +1,26 @@
+{
+  "device_base_revision": "3aa4a4c8e04218b354ad9089e2a528ccc5a030d5",
+  "framework_revision": "2c834e313d25482c78d38d703eff1f8d190f2597",
+  "kernel_build_exit_code": 0,
+  "kernel_sha256": "3d114c442502f3eb45c01da362d1490a28be194111ec462657546aac5abb121f",
+  "payload_kernel_sha256": "89855beff6f72dbc7527b568a4a9aa4a57476381b52b2026f9211f7c147aa0cb",
+  "boot_sha256": "79a949b61fb040a77ee067432be87f80be394fecbcc13fcf7fe0bafc09a19d85",
+  "armcpu_revision": "b5f9775777aafe850a4ec8778b03154dfcabbd2b",
+  "target_wait_seconds": 30,
+  "additional_ipi_wait_ms": 100,
+  "compact_trace_requested": true,
+  "actual_trace_formatter_and_reporter_host_checks_passed": true,
+  "actual_linked_trace_call_verified": true,
+  "actual_sgi_and_publication_instructions_verified": true,
+  "original_syscall_authorization_and_return_behavior_unchanged": true,
+  "trace_is_best_effort_completed_calls": true,
+  "hardware_result_pending": true,
+  "commands": [
+    "UNIXNU_PMGR_REFERENCE_KERNEL=<original e4632618> PATH=<python3.14 LLVM lld> python3.14 ../UniXNU/unixnu build kernel -D . --out out/data-bringup --local-module driver:ArmCpu=.cache/armcpu-sgi-asm",
+    "python3.14 ../UniXNU/unixnu build payload -D . --out out/data-bringup --local-module driver:ArmCpu=.cache/armcpu-sgi-asm --data-ramdisk out/step7/data-seed-512/data-512.dbr --kernel-arg launchdsuffix=release --kernel-arg t970-disable-watchdogd=1 --kernel-arg t970-runtime-report=30 --kernel-arg t970-smp-publish-state=1 --kernel-arg t970-ipi-check=1 --kernel-arg t970-runtime-cache-trace=1",
+    "python3.14 ../UniXNU/unixnu bootimg -D . --out out/data-bringup --local-module driver:ArmCpu=.cache/armcpu-sgi-asm --uefi .cache/uefi-source/Mu-Silicium --fd out/step7/ufs-readonly-inputs/SILICIUM_UEFI.fd --dtb out/firmware-inputs/firmware.dtb --ramdisk <work>/payload/payload.img --output out/data-bringup/runtime-cache30.img",
+    "python3.14 scripts/check-data-payload.py --work <work> --boot out/data-bringup/runtime-cache30.img --seed out/step7/data-seed-512/data-512.dbr --watchdog-policy --runtime-report-seconds 30 --smp-observer --publish-reset-state --ipi-check --cache-trace --output out/data-bringup/runtime-cache-base-verified",
+    "python3.14 scripts/prepare-smp.py --cpus 8 --armcpu-source .cache/armcpu-sgi-asm --base out/data-bringup/runtime-cache-base-verified/boot-partition.img --base-validation out/data-bringup/runtime-cache-base-verified/validation.json --hardware-dtb <work>/device-tree/hardware.dtb --output out/data-bringup/cpu8-runtime-cache30"
+  ],
+  "work": "out/data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data"
+}

@@ -39,6 +39,7 @@ def main():
     parser.add_argument('--publish-reset-state', action='store_true',
                         help='Require the explicit reset translation-state publication argument')
     parser.add_argument('--ipi-check', action='store_true', help='Require the explicit bounded CPU1 SGI delivery check')
+    parser.add_argument('--cache-trace', action='store_true', help='Require compact runtime PID1 cache trace')
     args = parser.parse_args()
     require(args.runtime_report_seconds == 0 or 5 <= args.runtime_report_seconds <= 300,
             'Runtime sampler interval must be 5..300 seconds')
@@ -93,6 +94,9 @@ def main():
     if args.ipi_check:
         expected_args += ['t970-ipi-check=1']
         require(b't970-ipi-check\0' in kernel.read_bytes(), 'Kernel lacks IPI check opt-in')
+    if args.cache_trace:
+        expected_args += ['t970-runtime-cache-trace=1']
+        require('_native_t970_cache_trace_text' in names and b't970-runtime-cache-trace\0' in kernel.read_bytes(), 'Kernel lacks compact cache trace')
     require(sorted(entry['args'].split()) == sorted(expected_args), 'Unexpected effective boot arguments')
     require(config['boot']['default'] == 'xnu' and entry['initrd'] == 'Payloads/scratch-data.img',
             'Wrong default entry/Data initrd')
@@ -142,6 +146,7 @@ def main():
     result['smp_observer'] = args.smp_observer
     result['publish_reset_state_requested'] = args.publish_reset_state
     result['ipi_check_requested'] = args.ipi_check
+    result['runtime_cache_trace_requested'] = args.cache_trace
     (out / 'validation.json').write_text(json.dumps(result, indent=2) + '\n')
     print(json.dumps(result, indent=2))
 

@@ -1,0 +1,32 @@
+{
+  "boot_sha256": "0dba26bcbb5f331301e705c4c24b383c6744b3f7e00e034785b973fe8004399f",
+  "photo": "screen-005819.jpg",
+  "target_wait_seconds": 20,
+  "source_kernel_sha256": "a65817b8857a9d4f95f2cb9a0c960adf21e03252fc00e5d3a2403bccff923dd3",
+  "main": 0,
+  "processes": 2,
+  "cpus_available": 8,
+  "secondary_running": 7,
+  "all_secondary_step": 7,
+  "all_secondary_fail": 0,
+  "all_secondary_c_entry": 4,
+  "ufs_verified_blocks": 371515,
+  "previous_target10_blocks": 189168,
+  "ordinary_ipi_sent": 309,
+  "ipi_test_sent": 1,
+  "ipi_received": 309,
+  "core1_before": 117,
+  "core1_after": 118,
+  "timers_not_observed_on_cores": [
+    4,
+    6,
+    7
+  ],
+  "core5_timer": 2,
+  "ttbr1": "c4325000",
+  "primary_ttbr1": "c4325000",
+  "data_status": 0,
+  "watchdog_policy_status": 0,
+  "watchdog_policy_stage": 4,
+  "interpretation": "Eight CPUs/IPI still active at20seconds; verified-block count grows substantially across boots at10/20seconds while main0/n2 persists. Suggests ongoing I/O, not proof of a specific dyld stage. Sampling still intentionally terminates this boot. Add existing PID1 cache syscall trace to locate recent completed operations."
+}
