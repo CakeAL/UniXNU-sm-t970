@@ -13,7 +13,14 @@ parser.add_argument('--output', type=Path, required=True)
 args = parser.parse_args()
 source = args.source.read_text()
 start = source.index('static const char native_t970_watchdog_override[]')
-end = source.index('static int\nnative_owner_data_prepare(', start)
+function_start = source.index('static int\nnative_t970_watchdog_policy_prepare(', start)
+brace = source.index('{', function_start)
+depth = 1
+end = brace + 1
+while depth:
+    depth += (source[end] == '{') - (source[end] == '}')
+    end += 1
+end += 1
 actual = source[start:end]
 literal = re.search(r'native_t970_watchdog_override\[\] = (".*");', actual).group(1)
 policy = json.loads(literal)

@@ -32,7 +32,11 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--watchdog-policy', action='store_true',
                         help='Require the explicit RAM-only watchdog launch policy argument and symbols')
+    parser.add_argument('--runtime-report-seconds', type=int, default=0,
+                        help='Require the explicit terminal runtime sampler interval (30..300)')
     args = parser.parse_args()
+    require(args.runtime_report_seconds == 0 or 30 <= args.runtime_report_seconds <= 300,
+            'Runtime sampler interval must be 30..300 seconds')
     work, out = args.work.resolve(), args.output.resolve()
     require(not out.exists(), 'Use a new verification output directory')
     # Audit the actual archive and linked source kernel, not just the switch.
@@ -54,6 +58,9 @@ def main():
     if args.watchdog_policy:
         require({'_native_t970_watchdog_policy_stage', '_native_t970_watchdog_policy_status'} <= names,
                 'Kernel lacks the opt-in watchdog policy implementation')
+    if args.runtime_report_seconds:
+        require({'_native_t970_runtime_collect', '_native_t970_runtime_report',
+                 '_native_t970_initproc_main'} <= names, 'Kernel lacks the runtime sampler')
     report = json.loads((work / 'payload/payload.json').read_text())
     require(sha(kernel.read_bytes()) == report['kernel_sha256'], 'Source kernel changed after payload build')
     out.mkdir(parents=True)
@@ -69,6 +76,8 @@ def main():
     base_config = tomllib.loads((base.parent / 'unixnu.toml').read_text())
     base_args = next(e for e in base_config['entry'] if e['id'] == 'xnu')['args'].split()
     expected_args = base_args + (['t970-disable-watchdogd=1'] if args.watchdog_policy else [])
+    if args.runtime_report_seconds:
+        expected_args += [f't970-runtime-report={args.runtime_report_seconds}']
     require(sorted(entry['args'].split()) == sorted(expected_args), 'Unexpected effective boot arguments')
     require(config['boot']['default'] == 'xnu' and entry['initrd'] == 'Payloads/scratch-data.img',
             'Wrong default entry/Data initrd')
@@ -113,6 +122,8 @@ def main():
                   seed_sha256=sha(args.seed.read_bytes()), hardware_data_mount_verified=False)
     result['watchdog_policy_requested'] = args.watchdog_policy
     result['kernel_args'] = entry['args']
+    result['runtime_report_target_seconds'] = args.runtime_report_seconds
+    result['terminal_diagnostic'] = bool(args.runtime_report_seconds)
     (out / 'validation.json').write_text(json.dumps(result, indent=2) + '\n')
     print(json.dumps(result, indent=2))
 

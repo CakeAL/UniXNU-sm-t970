@@ -1,0 +1,98 @@
+--- a/bsd/kern/kern_exec.c
++++ b/bsd/kern/kern_exec.c
+@@ -8058,6 +8058,70 @@
+ 	return error;
+ }
+ 
++/* Opt-in, one-shot kernel-owned process snapshot. No user memory reads and
++ * no policy/result changes. The waiting thread yields the CPU; panic is intentional. */
++#include <kern/clock.h>
++struct native_t970_runtime_snapshot {
++	unsigned count;
++	int watchdog, springboard, backboard, runningboard;
++	size_t used;
++	char names[512];
++};
++static uint32_t native_t970_runtime_started;
++static int
++native_t970_runtime_collect(proc_t p, void *context)
++{
++	struct native_t970_runtime_snapshot *s = context;
++	char name[17] = {0};
++	int pid = proc_pid(p);
++	proc_name(pid, name, sizeof(name));
++	name[sizeof(name) - 1] = 0;
++	++s->count;
++	if (!strcmp(name, "watchdogd")) s->watchdog = pid;
++	if (!strcmp(name, "SpringBoard")) s->springboard = pid;
++	if (!strcmp(name, "backboardd")) s->backboard = pid;
++	if (!strcmp(name, "runningboardd")) s->runningboard = pid;
++	if (s->count <= 18 && s->used < sizeof(s->names) - 1) {
++		size_t remaining = sizeof(s->names) - s->used;
++		int n = snprintf(s->names + s->used, remaining, "%s:%d ", name, pid);
++		if (n > 0) s->used += (size_t)n < remaining ? (size_t)n : remaining - 1;
++	}
++	return s->count >= 512 ? PROC_RETURNED_DONE : PROC_RETURNED;
++}
++static void
++native_t970_runtime_report(void *parameter, wait_result_t result)
++{
++	(void)result;
++	unsigned seconds = (unsigned)(uintptr_t)parameter;
++	uint64_t deadline = 0;
++	clock_interval_to_deadline(seconds, NSEC_PER_SEC, &deadline);
++	if (assert_wait_deadline((event_t)&native_t970_runtime_started, THREAD_UNINT, deadline) == THREAD_WAITING) {
++		(void)thread_block(THREAD_CONTINUE_NULL);
++	}
++	struct native_t970_runtime_snapshot snapshot = {0};
++	/* Skip transition waits; proc_iterate retains/releases each proc reference. */
++	proc_iterate(PROC_ALLPROCLIST | PROC_NOWAITTRANS, native_t970_runtime_collect, &snapshot, NULL, NULL);
++	extern int native_t970_initproc_main(void);
++	extern volatile uint64_t native_ufs_verified_blocks;
++	panic("runtime target=%u main=%d n=%u wd=%d sb=%d bb=%d rb=%d D=%d W=%d S=%d blocks=%llu\n%s",
++	    seconds, native_t970_initproc_main(), snapshot.count, snapshot.watchdog, snapshot.springboard,
++	    snapshot.backboard, snapshot.runningboard, native_owner_data_status,
++	    native_t970_watchdog_policy_status, native_t970_watchdog_policy_stage,
++	    (unsigned long long)native_ufs_verified_blocks, snapshot.names);
++}
++static void
++native_t970_runtime_report_start(void)
++{
++	unsigned seconds = 0;
++	if (!PE_parse_boot_argn("t970-runtime-report", &seconds, sizeof(seconds)) || !seconds) return;
++	if (seconds < 30 || seconds > 300) panic("runtime report interval invalid: %u", seconds);
++	if (__atomic_exchange_n(&native_t970_runtime_started, 1, __ATOMIC_ACQ_REL)) return;
++	thread_t thread = THREAD_NULL;
++	kern_return_t error = kernel_thread_start(native_t970_runtime_report, (void *)(uintptr_t)seconds, &thread);
++	if (error != KERN_SUCCESS) panic("runtime report thread failed: %d", error);
++	thread_deallocate(thread);
++}
++
+ static int
+ native_owner_data_prepare(proc_t p, user_addr_t scratch)
+ {
+@@ -8302,6 +8366,7 @@
+ 		if (native_t970_watchdog_policy_status) panic("watchdog launch policy err=%d stage=%d",
+ 		    native_t970_watchdog_policy_status, native_t970_watchdog_policy_stage);
+ 	}
++	native_t970_runtime_report_start();
+ #endif
+ #if CONFIG_MEMORYSTATUS
+ 	(void) memorystatus_init_at_boot_snapshot();
+--- a/bsd/kern/kern_exit.c
++++ b/bsd/kern/kern_exit.c
+@@ -1333,6 +1333,14 @@
+ }
+ 
+ static int initproc_spawned = 0;
++/* Read-only diagnostic accessor; the original PID1-only setter is unchanged. */
++int native_t970_initproc_main(void);
++int
++native_t970_initproc_main(void)
++{
++	return initproc_spawned;
++}
++
+ 
+ static int
+ sysctl_initproc_spawned(struct sysctl_oid *oidp, __unused void *arg1, __unused int arg2, struct sysctl_req *req)

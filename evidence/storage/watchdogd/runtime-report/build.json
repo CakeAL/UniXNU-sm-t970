@@ -1,0 +1,18 @@
+{
+  "device_base_revision": "95050554b3de986d8b254217fec17ca420701c04",
+  "framework_revision": "90b15743cf44d566b00601db56e3604add3a8034",
+  "kernel_build_exit_code": 0,
+  "source_kernel_sha256": "ab84b0cac10a4c870bdae3c6635df785d7cdfc16af42ea6cfbdd24b4e05802f0",
+  "normal_policy_kernel_preserved": true,
+  "actual_runtime_helper_host_check_passed": true,
+  "policy_helper_regression_passed": true,
+  "runtime_argument_omission_refused": true,
+  "callback_limit": 512,
+  "displayed_process_name_limit": 18,
+  "target_wait_seconds": 120,
+  "wait_starts_at": "diagnostic kernel thread entry after Data/policy installer",
+  "physical_timer_verified": false,
+  "process_snapshot_verified": false,
+  "terminal_diagnostic": true,
+  "reset_probe": false
+}

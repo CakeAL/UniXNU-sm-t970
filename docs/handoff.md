@@ -3,6 +3,19 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
+## 当前镜像：服务采样eeeba83b，实机结果待回报
+
+在已实测main/Data/策略成功基础上新增显式t970-runtime-report=120的一次性内核线程。
+Data/策略安装后休眠让出CPU，目标120秒后有意panic显示原main状态、进程数量、
+watchdogd/SpringBoard/backboardd/runningboardd PID、Data/策略状态、累计校验块及前18个进程名。
+该时间从诊断线程开始等待算起，不是开机计时；实际时钟唤醒/进程采样均待本次实机结果。
+枚举不等待exec过渡，callback上限512、名字缓冲512字节，PID出现不代表UI可用。
+
+源内核ab84b0ca与真实PMGR重建成功，实际helper有界行为/调度API替身检查和策略回归通过。
+独立打包检查要求符号、明确bootarg120及全部固定输入；普通board参数不添加此终止诊断。
+BOOTeeeba83b仅刷BOOT，Heimdall exit0正常结束/请求重启。普通2387e904和检查28268af5均保留。
+详见evidence/storage/watchdogd/runtime-report，下一步读取runtime行和进程名以定位服务/显示阶段。
+
 ## 最新：main1/Data0/policy0/stage4已实测，正常2387e904已恢复
 
 正常2387e904超过4分钟保留紫条后，隔离28268af5只读检查版19:10照片显示

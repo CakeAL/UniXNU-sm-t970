@@ -1,0 +1,14 @@
+{
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/data-bringup/runtime-report-verified/boot-partition.img"
+  ],
+  "exit_code": 0,
+  "boot_sha256": "eeeba83b52373d7de0caf2704c05b017833ac85f8f8a48bede69c9256e966e80",
+  "terminal_runtime_sampler": true,
+  "target_wait_seconds": 120,
+  "readback_verified": false,
+  "hardware_timer_process_result_pending": true
+}
