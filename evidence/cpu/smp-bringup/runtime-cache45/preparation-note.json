@@ -1,0 +1,22 @@
+{
+  "source_kernel_sha256": "3d114c442502f3eb45c01da362d1490a28be194111ec462657546aac5abb121f",
+  "payload_kernel_sha256": "89855beff6f72dbc7527b568a4a9aa4a57476381b52b2026f9211f7c147aa0cb",
+  "previous_target_seconds": 30,
+  "target_wait_seconds": 45,
+  "source_and_payload_kernel_unchanged": true,
+  "numbered_host_cache_files": 52,
+  "observed_last_opened_number": 39,
+  "numbered_files_after39": 13,
+  "logical_bytes_after39": 989839360,
+  "fcntl97_name": "F_ADDFILESIGS_RETURN",
+  "fcntl97_reference": "xnu-10063.141.1 bsd/sys/fcntl.h:401",
+  "shared_mapping_and_main_not_yet_observed": true,
+  "hardware_result_pending": true,
+  "commands": [
+    "python3.14 ../UniXNU/unixnu build payload -D . --out out/data-bringup --local-module driver:ArmCpu=.cache/armcpu-sgi-asm --data-ramdisk out/step7/data-seed-512/data-512.dbr --kernel-arg launchdsuffix=release --kernel-arg t970-disable-watchdogd=1 --kernel-arg t970-runtime-report=45 --kernel-arg t970-smp-publish-state=1 --kernel-arg t970-ipi-check=1 --kernel-arg t970-runtime-cache-trace=1",
+    "python3.14 ../UniXNU/unixnu bootimg -D . --out out/data-bringup --local-module driver:ArmCpu=.cache/armcpu-sgi-asm --uefi .cache/uefi-source/Mu-Silicium --fd out/step7/ufs-readonly-inputs/SILICIUM_UEFI.fd --dtb out/firmware-inputs/firmware.dtb --ramdisk <work>/payload/payload.img --output out/data-bringup/runtime-cache45.img",
+    "python3.14 scripts/check-data-payload.py --work <work> --boot out/data-bringup/runtime-cache45.img --seed out/step7/data-seed-512/data-512.dbr --watchdog-policy --runtime-report-seconds 45 --smp-observer --publish-reset-state --ipi-check --cache-trace --output out/data-bringup/runtime-cache45-base-verified",
+    "python3.14 scripts/prepare-smp.py --cpus 8 --armcpu-source .cache/armcpu-sgi-asm --base out/data-bringup/runtime-cache45-base-verified/boot-partition.img --base-validation out/data-bringup/runtime-cache45-base-verified/validation.json --hardware-dtb <work>/device-tree/hardware.dtb --output out/data-bringup/cpu8-runtime-cache45"
+  ],
+  "work": "out/data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data"
+}

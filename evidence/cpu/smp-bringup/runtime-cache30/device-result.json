@@ -1,0 +1,30 @@
+{
+  "boot_sha256": "79a949b61fb040a77ee067432be87f80be394fecbcc13fcf7fe0bafc09a19d85",
+  "photo": "screen-010719.jpg",
+  "target_wait_seconds": 30,
+  "main": 0,
+  "processes": 2,
+  "cpus_available": 8,
+  "secondary_running": 7,
+  "all_secondary_step": 7,
+  "all_secondary_fail": 0,
+  "ufs_verified_blocks": 546747,
+  "init_cache_syscalls": 82,
+  "last_completed_cache_operation": {
+    "syscall": 463,
+    "name": "openat",
+    "error": 0,
+    "return_value_hex": "28",
+    "file": "dyld_shared_cache_arm64.39"
+  },
+  "recent_fcntl_command": 97,
+  "fcntl_command_name": "F_ADDFILESIGS_RETURN",
+  "recent_open_and_fcntl_errors": 0,
+  "timers_not_observed_on_cores": [
+    5,
+    6,
+    7
+  ],
+  "core4_timer": 2510,
+  "interpretation": "PID1 completed cache opens through numbered subcache39, with recent fcntl97 signature registration and openat returning0 error. Counter and filename progression support ongoing cache preparation; do not infer active blocking call or completed shared mapping. main0/n2 at terminal sample."
+}

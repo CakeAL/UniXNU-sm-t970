@@ -3,6 +3,17 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
+## 最新：PID1已打开缓存.39，45秒检查版已刷入（2026-11-03）
+
+79a949b6的01:07:19照片：cpu8/sec7/main0/n2，blocks546747、cache syscalls82，
+最近openat/fcntl均e0，最后打开dyld_shared_cache_arm64.39；c97是F_ADDFILESIGS_RETURN。
+原SystemOS目录含52个编号分片，.40–.52逻辑大小约990MB；当前证据支持缓存准备继续推进，
+尚未观测到此轮共享缓存映射返回与launchd main1。
+
+当前be219c43沿用完全相同3d114c44/89855bef内核，只延后终止采样到45秒；
+仍八核、标准SGI、相同RAM Data/信任输入及PID1紧凑追踪。
+准备/打包检查通过；BOOT-only上传exit0正常结束并请求重启，实际结果待回报，见runtime-cache30/device-result和runtime-cache45。
+
 ## 最新：八核20秒复现，PID1缓存追踪版已刷（2026-11-03）
 
 八核0dba26bc沿用已验证的内核，仅延后到20秒终止采样；实机仍cpu8/sec7/main0/n2，

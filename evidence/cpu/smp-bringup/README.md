@@ -29,3 +29,6 @@ reset-publish已修正并模拟验证实际C标记；汇编阶段记录和ArmCpu
 
 - runtime20：0dba26bc实测八核/main0/n2，blocks371515。
 - runtime-cache30：79a949b6已刷，30秒紧凑PID1缓存调用追踪，实际结果待回报。
+
+- runtime-cache30/device-result：PID1已打开.39，最近open/fcntl均e0；主机库存52编号分片。
+- runtime-cache45：be219c43同内核延后45秒，已刷入，结果待回报。

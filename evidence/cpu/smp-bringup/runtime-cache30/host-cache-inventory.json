@@ -1,0 +1,232 @@
+{
+  "source_image_sha256": "b4908cde41d23e6bc05e6af51a2c9eeb00cf0f863a6a18b1600c96a3fd70414f",
+  "source": "Existing host-mounted original SystemOS, read-only directory inventory",
+  "architecture": "arm64",
+  "total_matching_files": 54,
+  "numbered_subcaches": 52,
+  "main_cache_files": 1,
+  "symbols_files": 1,
+  "total_logical_bytes": 3987406848,
+  "symbols_logical_bytes": 685817856,
+  "numbered_after39": 13,
+  "logical_bytes_after39": 989839360,
+  "files": [
+    {
+      "name": "dyld_shared_cache_arm64",
+      "logical_bytes": 491520
+    },
+    {
+      "name": "dyld_shared_cache_arm64.01",
+      "logical_bytes": 114720768
+    },
+    {
+      "name": "dyld_shared_cache_arm64.02",
+      "logical_bytes": 49152
+    },
+    {
+      "name": "dyld_shared_cache_arm64.03",
+      "logical_bytes": 114229248
+    },
+    {
+      "name": "dyld_shared_cache_arm64.04",
+      "logical_bytes": 229376
+    },
+    {
+      "name": "dyld_shared_cache_arm64.05",
+      "logical_bytes": 115458048
+    },
+    {
+      "name": "dyld_shared_cache_arm64.06",
+      "logical_bytes": 327680
+    },
+    {
+      "name": "dyld_shared_cache_arm64.07",
+      "logical_bytes": 75857920
+    },
+    {
+      "name": "dyld_shared_cache_arm64.08",
+      "logical_bytes": 245760
+    },
+    {
+      "name": "dyld_shared_cache_arm64.09",
+      "logical_bytes": 112934912
+    },
+    {
+      "name": "dyld_shared_cache_arm64.10",
+      "logical_bytes": 245760
+    },
+    {
+      "name": "dyld_shared_cache_arm64.11",
+      "logical_bytes": 111951872
+    },
+    {
+      "name": "dyld_shared_cache_arm64.12",
+      "logical_bytes": 376832
+    },
+    {
+      "name": "dyld_shared_cache_arm64.13",
+      "logical_bytes": 113868800
+    },
+    {
+      "name": "dyld_shared_cache_arm64.14",
+      "logical_bytes": 376832
+    },
+    {
+      "name": "dyld_shared_cache_arm64.15",
+      "logical_bytes": 104628224
+    },
+    {
+      "name": "dyld_shared_cache_arm64.16",
+      "logical_bytes": 409600
+    },
+    {
+      "name": "dyld_shared_cache_arm64.17",
+      "logical_bytes": 115261440
+    },
+    {
+      "name": "dyld_shared_cache_arm64.18",
+      "logical_bytes": 393216
+    },
+    {
+      "name": "dyld_shared_cache_arm64.19",
+      "logical_bytes": 107970560
+    },
+    {
+      "name": "dyld_shared_cache_arm64.20",
+      "logical_bytes": 442368
+    },
+    {
+      "name": "dyld_shared_cache_arm64.21",
+      "logical_bytes": 113278976
+    },
+    {
+      "name": "dyld_shared_cache_arm64.22",
+      "logical_bytes": 294912
+    },
+    {
+      "name": "dyld_shared_cache_arm64.23",
+      "logical_bytes": 107675648
+    },
+    {
+      "name": "dyld_shared_cache_arm64.24",
+      "logical_bytes": 360448
+    },
+    {
+      "name": "dyld_shared_cache_arm64.25",
+      "logical_bytes": 112279552
+    },
+    {
+      "name": "dyld_shared_cache_arm64.26",
+      "logical_bytes": 442368
+    },
+    {
+      "name": "dyld_shared_cache_arm64.27",
+      "logical_bytes": 111132672
+    },
+    {
+      "name": "dyld_shared_cache_arm64.28",
+      "logical_bytes": 507904
+    },
+    {
+      "name": "dyld_shared_cache_arm64.29",
+      "logical_bytes": 113197056
+    },
+    {
+      "name": "dyld_shared_cache_arm64.30",
+      "logical_bytes": 327680
+    },
+    {
+      "name": "dyld_shared_cache_arm64.31",
+      "logical_bytes": 67960832
+    },
+    {
+      "name": "dyld_shared_cache_arm64.32",
+      "logical_bytes": 344064
+    },
+    {
+      "name": "dyld_shared_cache_arm64.33.dylddata",
+      "logical_bytes": 226721792
+    },
+    {
+      "name": "dyld_shared_cache_arm64.34.dyldlinkedit",
+      "logical_bytes": 27410432
+    },
+    {
+      "name": "dyld_shared_cache_arm64.35",
+      "logical_bytes": 115818496
+    },
+    {
+      "name": "dyld_shared_cache_arm64.36",
+      "logical_bytes": 524288
+    },
+    {
+      "name": "dyld_shared_cache_arm64.37",
+      "logical_bytes": 115818496
+    },
+    {
+      "name": "dyld_shared_cache_arm64.38",
+      "logical_bytes": 638976
+    },
+    {
+      "name": "dyld_shared_cache_arm64.39",
+      "logical_bytes": 106545152
+    },
+    {
+      "name": "dyld_shared_cache_arm64.40",
+      "logical_bytes": 606208
+    },
+    {
+      "name": "dyld_shared_cache_arm64.41",
+      "logical_bytes": 115965952
+    },
+    {
+      "name": "dyld_shared_cache_arm64.42",
+      "logical_bytes": 491520
+    },
+    {
+      "name": "dyld_shared_cache_arm64.43",
+      "logical_bytes": 115326976
+    },
+    {
+      "name": "dyld_shared_cache_arm64.44",
+      "logical_bytes": 606208
+    },
+    {
+      "name": "dyld_shared_cache_arm64.45",
+      "logical_bytes": 114573312
+    },
+    {
+      "name": "dyld_shared_cache_arm64.46",
+      "logical_bytes": 770048
+    },
+    {
+      "name": "dyld_shared_cache_arm64.47",
+      "logical_bytes": 115884032
+    },
+    {
+      "name": "dyld_shared_cache_arm64.48",
+      "logical_bytes": 786432
+    },
+    {
+      "name": "dyld_shared_cache_arm64.49",
+      "logical_bytes": 1458176
+    },
+    {
+      "name": "dyld_shared_cache_arm64.50",
+      "logical_bytes": 49152
+    },
+    {
+      "name": "dyld_shared_cache_arm64.51.dylddata",
+      "logical_bytes": 118456320
+    },
+    {
+      "name": "dyld_shared_cache_arm64.52.dyldlinkedit",
+      "logical_bytes": 404865024
+    },
+    {
+      "name": "dyld_shared_cache_arm64.symbols",
+      "logical_bytes": 685817856
+    }
+  ],
+  "limitation": "Directory inventory is not a measured runtime completion percentage or read-rate estimate; symbols file is listed separately and not assumed to be part of startup loading."
+}
