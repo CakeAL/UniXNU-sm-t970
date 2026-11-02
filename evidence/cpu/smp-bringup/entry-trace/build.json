@@ -1,0 +1,27 @@
+{
+  "device_base_revision": "6ac8dc5920a51b6816d5c92d9c7582f69785177b",
+  "framework_revision": "d57d6124305d0694583e3ff7fc68ce34a4b0f091",
+  "kernel_build_exit_code": 0,
+  "kernel_sha256": "9bd3f90873f7f4fa4bb2d02ad077021c40a16c58bd9a7d54ac3a6c51c8a2acd2",
+  "payload_kernel_sha256": "d7e9e307b178b24247a527634d69c93ec5acf87fceef6f8e2f54c94a186ff420",
+  "boot_sha256": "95accf537fb840f19068e9012f2ebf3e7d35b2370eb502bbb11fe77b301de3c7",
+  "target_wait_seconds": 10,
+  "linked_marker_cases": 30,
+  "entry_probe_mpidr_mocked": true,
+  "reset_exception_vectors_preserved": true,
+  "actual_entry_verified": false,
+  "hardware_result_pending": true,
+  "board_default_unchanged": true,
+  "eight_core_not_uploaded": true,
+  "platform_check": "Known historical framework pin mismatch, not passed",
+  "packaging_recovery": "First attempt rejected entry-relative padding overlap with LowExceptionVectorBase; capped to actual vector and moved zero-checked probe slots nearer entry. Second attempt safely rejected insufficient capacity; final compact slots fit. Payload extracted and reset branch, exception vectors and markers compared unchanged.",
+  "commands": [
+    "UNIXNU_PMGR_REFERENCE_KERNEL=<preserved original e4632618 kernel> PATH=<python3.14/LLVM/lld> python3.14 ../UniXNU/unixnu build kernel -D . --out out/data-bringup",
+    "python3.14 ../UniXNU/unixnu build payload -D . --out out/data-bringup --data-ramdisk out/step7/data-seed-512/data-512.dbr --kernel-arg launchdsuffix=release --kernel-arg t970-disable-watchdogd=1 --kernel-arg t970-runtime-report=10",
+    "python3.14 ../UniXNU/unixnu bootimg -D . --out out/data-bringup --uefi .cache/uefi-source/Mu-Silicium --fd out/step7/ufs-readonly-inputs/SILICIUM_UEFI.fd --dtb out/firmware-inputs/firmware.dtb --ramdisk <work>/payload/payload.img --output out/data-bringup/entry-trace-boot.img",
+    "python3.14 scripts/check-data-payload.py --work <work> --boot out/data-bringup/entry-trace-boot.img --seed out/step7/data-seed-512/data-512.dbr --watchdog-policy --runtime-report-seconds 10 --smp-observer --output out/data-bringup/entry-trace-base-verified",
+    "PATH=<LLVM> .cache/probe-test-venv/bin/python scripts/check-smp-entry-trace.py --kernel <work>/kernel/kernel.macho --packed out/data-bringup/entry-trace-base-verified/kernel.macho --output out/data-bringup/entry-trace-packed-instruction-check-final",
+    "python3.14 scripts/prepare-smp.py --cpus 2 --base out/data-bringup/entry-trace-base-verified/boot-partition.img --base-validation out/data-bringup/entry-trace-base-verified/validation.json --hardware-dtb <work>/device-tree/hardware.dtb --output out/data-bringup/smp2-entry-trace"
+  ],
+  "work": "out/data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data"
+}

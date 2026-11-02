@@ -1,0 +1,14 @@
+{
+  "device_base_revision": "6ac8dc5920a51b6816d5c92d9c7582f69785177b",
+  "source_kernel_sha256": "b0ea7afef4bd75aad9fe5b6c8abf6d9f495f0d9055caabfcd4fbd0bd3929c54b",
+  "kernel_build_exit_code": 0,
+  "actual_accessor_host_cases": 2,
+  "actual_accessor_sources_unchanged_in_tests": true,
+  "full_width_addresses_and_output_bounds_passed": true,
+  "reporter_regression_passed": true,
+  "independent_packaging_and_smp_roundtrip_passed": true,
+  "read_only": true,
+  "reset_context_result_pending": true,
+  "physical_entry_path_verified": false,
+  "eight_core_not_uploaded": true
+}

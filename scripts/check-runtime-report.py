@@ -47,7 +47,15 @@ static char message[2048];
 int native_owner_data_status=0,native_t970_watchdog_policy_status=0,native_t970_watchdog_policy_stage=4;
 volatile uint64_t native_ufs_verified_blocks=123456;
 static int main_state=1;
+uint32_t processor_avail_count=1;
+volatile uint32_t armcpu_smp_running,armcpu_smp_step[8],armcpu_smp_fail[8];
+volatile int32_t armcpu_smp_psci_rc[8];
+volatile uint32_t armcpu_core_timer[8],armcpu_core_sgi[8];
+void native_t970_secondary_snapshot(uint32_t *out){for(unsigned i=0;i<8;++i)out[i]=i%5;}
 int native_t970_initproc_main(void){return main_state;}
+void native_t970_reset_context(uint64_t *out){
+ const uint64_t values[6]={0x1000,0x1000,0x2000,0x100,0x3000,0x3000};memcpy(out,values,sizeof(values));
+}
 static int proc_pid(proc_t p){return p->pid;}
 static void proc_name(int pid,char *name,int size){
  assert(pid>=0&&(unsigned)pid<supplied);snprintf(name,(size_t)size,"%s",processes[pid].name);
@@ -73,10 +81,15 @@ static void reset(void){
  supplied=1000;for(unsigned i=0;i<supplied;++i){processes[i].pid=(int)i;snprintf(processes[i].name,64,"proc%u",i);}
 }
 int main(void){
+ char cpu[512];memset(cpu,'Z',sizeof(cpu));native_t970_smp_state(cpu,0);assert(cpu[0]=='Z');
+ native_t970_smp_state(cpu,1);assert(!cpu[0]&&cpu[1]=='Z');
+ native_t970_smp_state(cpu,2);assert(cpu[0]=='0'&&!cpu[1]&&cpu[2]=='Z');
+ for(unsigned i=0;i<8;++i){armcpu_smp_step[i]=armcpu_smp_fail[i]=armcpu_core_timer[i]=armcpu_core_sgi[i]=UINT32_MAX;armcpu_smp_psci_rc[i]=INT32_MIN;}
+ native_t970_smp_state(cpu,sizeof(cpu));assert(strlen(cpu)<sizeof(cpu)&&strstr(cpu,"7:4294967295/-2147483648/4294967295/4294967295/4294967295"));
  reset();native_t970_runtime_report_start();assert(!starts);
  enabled=1;native_t970_runtime_report_start();assert(!starts);
- for(unsigned n=29;n<=301;n+=272){reset();enabled=1;seconds=n;if(!setjmp(stop)){native_t970_runtime_report_start();assert(0);}assert(!starts&&strstr(message,"interval invalid"));}
- for(unsigned n=30;n<=300;n+=270){reset();enabled=1;seconds=n;native_t970_runtime_report_start();native_t970_runtime_report_start();assert(starts==1&&deallocs==1&&start_function==native_t970_runtime_report&&(uintptr_t)start_arg==n);}
+ for(unsigned n=4;n<=301;n+=297){reset();enabled=1;seconds=n;if(!setjmp(stop)){native_t970_runtime_report_start();assert(0);}assert(!starts&&strstr(message,"interval invalid"));}
+ unsigned valid[]={5,10,300};for(unsigned j=0;j<3;++j){unsigned n=valid[j];reset();enabled=1;seconds=n;native_t970_runtime_report_start();native_t970_runtime_report_start();assert(starts==1&&deallocs==1&&start_function==native_t970_runtime_report&&(uintptr_t)start_arg==n);}
  reset();enabled=1;seconds=120;start_error=17;if(!setjmp(stop)){native_t970_runtime_report_start();assert(0);}assert(starts==1&&!deallocs&&strstr(message,"failed: 17"));
  reset();strcpy(processes[31].name,"watchdogd");strcpy(processes[32].name,"SpringBoard");strcpy(processes[33].name,"backboardd");strcpy(processes[34].name,"runningboardd");
  struct {struct native_t970_runtime_snapshot sample;uint64_t guard;} s={.guard=0x123456789abcdef0ULL};
@@ -89,13 +102,15 @@ int main(void){
   if(!setjmp(stop)){native_t970_runtime_report((void*)120,0);assert(0);}
   assert(waits==1&&blocks==(unsigned)!awakened&&iteration_calls==1);
   assert(strstr(message,"main=1 n=35 wd=0 sb=32 bb=0 rb=0 D=0 W=0 S=4 blocks=123456"));
+  assert(strstr(message,"E reset/found/common/C 0 1 2 3 4 0 1 2"));
+  assert(strstr(message,"R table=1000 want=1000 data1=2000 id1=100 handler=3000 start=3000"));
  }
  puts("PASS: actual runtime report bounds, process names/PIDs, 512 callback cap, scheduler yield, opt-in/range/once guards and thread failure");
  return 0;
 }
 '''
 args.output.mkdir(parents=True, exist_ok=False)
-(args.output / 'test.c').write_text(prelude + actual + main)
+(args.output / 'test.c').write_text(prelude + actual.replace('#include <kern/processor.h>\n', '') + main)
 subprocess.run(['clang', '-std=c11', '-Wall', '-Wextra', '-Werror', '-O1', '-g',
                 '-fsanitize=address,undefined', str(args.output / 'test.c'), '-o', str(args.output / 'test')], check=True)
 result = subprocess.run([str(args.output / 'test')], capture_output=True, text=True, check=True)

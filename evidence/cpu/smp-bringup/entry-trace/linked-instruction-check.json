@@ -1,0 +1,32 @@
+{
+  "kernel_sha256": "9bd3f90873f7f4fa4bb2d02ad077021c40a16c58bd9a7d54ac3a6c51c8a2acd2",
+  "passed": true,
+  "linked_marker_cases": 30,
+  "trace_symbol": "0xfffffff007aeb280",
+  "trace_bytes": 1024,
+  "per_core_stride": 128,
+  "stages": [
+    {
+      "stage": 1,
+      "address": "0xfffffff007406400",
+      "sha256": "8b36d015935288fd2236ae226fcc453c3dbbf3f46f86c95062cdd3e2fe67462f"
+    },
+    {
+      "stage": 2,
+      "address": "0xfffffff007406478",
+      "sha256": "d5890c2905d364b133539a4ed8147cd9aa48ff22b234bc822c2f8c03e9af4b54"
+    },
+    {
+      "stage": 3,
+      "address": "0xfffffff007408058",
+      "sha256": "8b77874762e9e7f5829332cbb3a0b6651725e3f256c9404a041e4d988cbeb1ae"
+    }
+  ],
+  "mpidr_and_cpu_data_mocked": true,
+  "live_registers_preserved": true,
+  "actual_secondary_entry_verified": false,
+  "cache_coherence_verified": false,
+  "packed_sha256": "d7e9e307b178b24247a527634d69c93ec5acf87fceef6f8e2f54c94a186ff420",
+  "reset_branch_and_exception_vectors_preserved": true,
+  "packed_markers_unchanged": true
+}

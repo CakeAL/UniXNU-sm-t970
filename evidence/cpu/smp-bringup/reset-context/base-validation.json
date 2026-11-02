@@ -1,0 +1,25 @@
+{
+  "boot_sha256": "0f497ebb6730c9e66cbba02bd4daf748bee4d6e8d94a3fc246a13b9932cec208",
+  "boot_bytes": 71303168,
+  "raw_boot_sha256": "6ad98feefc7034e33357724c0824fd454fad656cfa3c189e4d499ee44138cc35",
+  "kernel_sha256": "b0ea7afef4bd75aad9fe5b6c8abf6d9f495f0d9055caabfcd4fbd0bd3929c54b",
+  "payload_kernel_sha256": "e127c98368d208ef3e0d979a349a496ad1246b06efaa4471b38f8dce1d4167ff",
+  "pmgr_archive_sha256": "4cdba54b8f6e144b40b8d9b9e0fc29244a07a340eb84099ca29b50d96be2e7fd",
+  "pmgr_members": [
+    "__.SYMDEF SORTED",
+    "ShengPlatformPower.late.o",
+    "original-bindings.o"
+  ],
+  "real_pmgr_and_ramblock_symbols": true,
+  "trustcache_unchanged": true,
+  "adt_only_expected_changes": true,
+  "exact_fd_dtb": true,
+  "zero_tail": true,
+  "seed_sha256": "4591566eccd77f0f9d13a1338ecaf3c73ce86cd04aeea732d91db6b2e100ca3a",
+  "hardware_data_mount_verified": false,
+  "watchdog_policy_requested": true,
+  "kernel_args": "t970-novc sheng-pmgr=2 t970-ufs-publish=1 -v cpus=1 launchdsuffix=release t970-disable-watchdogd=1 t970-runtime-report=120",
+  "runtime_report_target_seconds": 120,
+  "terminal_diagnostic": true,
+  "smp_observer": true
+}

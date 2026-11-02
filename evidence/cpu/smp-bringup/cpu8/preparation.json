@@ -1,0 +1,21 @@
+{
+  "cpus_requested": 8,
+  "boot_sha256": "3f37ce369b46da03def65772114f0d121747a039543ed4e3818615e34e0baec5",
+  "base_boot_sha256": "f0bdac8ba8860c60a5794ba3970ed4d3189fc6ff3e6d49f2d8042c775480af6a",
+  "kernel_sha256": "7e3c3989e61a2ce4d2a8d8ebc5a6a1760110e794e906dc35e568619ac85f9516",
+  "payload_kernel_sha256": "dc863ec2b80ee26fb3d8dba2468a00861a0f9f4380b5016f7aa41a61b7fac5d8",
+  "adt_sha256": "c31be8c26c513b1b256d386e203812da69d507a9f9a2f82a5c9a0883c2435717",
+  "args": "t970-novc sheng-pmgr=2 t970-ufs-publish=1 -v cpus=8 launchdsuffix=release t970-disable-watchdogd=1 t970-runtime-report=120 sheng-smp=1 armcpu-self-ipi=1 armcpu-spi-ipi=0",
+  "unrelated_adt_unchanged": true,
+  "psci_method": "smc",
+  "kernel_trust_seed_unchanged": true,
+  "header_fd_dtb_tail_unchanged": true,
+  "board_default_unchanged": true,
+  "captured_affinities_verified": true,
+  "ipi": "Standard SGI0; self test on, SPI fallback off",
+  "actual_sgi_expression_host_cases": 8,
+  "psci_and_cache_clean_source_verified": true,
+  "terminal_runtime_report": true,
+  "target_wait_seconds": 120,
+  "hardware_result_pending": true
+}

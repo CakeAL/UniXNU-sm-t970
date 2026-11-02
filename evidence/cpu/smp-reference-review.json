@@ -1,0 +1,52 @@
+{
+  "reviewed_at": "2026-11-02",
+  "umi": {
+    "repository_revision": "3eb72578597d2ca16471b172d45eddc096a34a04",
+    "soc": "SM8250",
+    "sources": [
+      "https://github.com/reAAAq/UniXNU-umi/blob/3eb72578597d2ca16471b172d45eddc096a34a04/bringup/tools/audit_umi_smp.py",
+      "https://github.com/reAAAq/UniXNU-umi/blob/3eb72578597d2ca16471b172d45eddc096a34a04/docs/validation.json",
+      "https://github.com/reAAAq/UniXNU-umi/blob/3eb72578597d2ca16471b172d45eddc096a34a04/README.md"
+    ],
+    "reported_online_cpus": 8,
+    "reported_smp_attempt": 50,
+    "reported_per_core_timer_at_120": [
+      181699,
+      196474,
+      101821,
+      24200,
+      23828,
+      14234,
+      11322,
+      12861
+    ],
+    "method": "PSCI SMC64 CPU_ON, Affinity1 IDs, standard SGI0 via ICC_SGI1R_EL1, self-IPI enabled, SPI fallback disabled; clean reset vector/data/boot_args before wake",
+    "limitation": "Other-device evidence; does not qualify T970 SMP. Public validation records Hello/Setup, not completed home screen; CPU presentation is not GPU acceleration."
+  },
+  "t733": {
+    "repository_revision": "3bb0d6f7840f088db6a0ec88ecb841e12042422f",
+    "soc": "SM7325",
+    "armcpu_revision": "55cc0617ea9203e85f1cbbf81ae2669f4fa41645",
+    "sources": [
+      "https://github.com/RigoLigoRLC/unixnu-sm-t733/blob/3bb0d6f7840f088db6a0ec88ecb841e12042422f/board.toml",
+      "https://github.com/RigoLigoRLC/unixnu-armcpu/blob/55cc0617ea9203e85f1cbbf81ae2669f4fa41645/ArmCpu.cpp"
+    ],
+    "method": "cpus=8/sheng-smp=1 and custom armcpu-redist-ipi=1; GICR_ISPENDR0 SGI pending writes",
+    "limitation": "Custom fork also changes counters and startup evidence; its switch is not implemented by current T970 catalog ArmCpu and is not adopted."
+  },
+  "t970": {
+    "armcpu_revision": "9066b53bbc82e92a98ec44a11dd50fd13eaf1a1b",
+    "source_affinities": [
+      0,
+      256,
+      512,
+      768,
+      1024,
+      1280,
+      1536,
+      1792
+    ],
+    "selected_method": "Use existing PSCI/cache-clean/standard-SGI implementation, then staged2->8 hardware qualification. Do not change default CPU0 DTS or adopt T733 registers.",
+    "cpu_rendering_distinction": "Core count may help software rendering. CPU framebuffer copy/display publication still needs separate backend/ABI/handoff integration."
+  }
+}

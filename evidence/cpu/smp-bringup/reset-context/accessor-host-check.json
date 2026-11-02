@@ -1,0 +1,8 @@
+{
+  "helper_sha256": "6175f9d6aa9c1a1c3c8631a7695ff6ba5148a1bdb51b1b6240ebf7987ebe88d4",
+  "passed": true,
+  "actual_source": true,
+  "address_translation_and_types_mocked": true,
+  "actual_reset_handoff_verified": false,
+  "result": "PASS: actual reset-context accessor preserves sources, full-width addresses, null CPU handling and six output bounds"
+}

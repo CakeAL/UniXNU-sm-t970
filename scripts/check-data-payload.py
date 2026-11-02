@@ -33,10 +33,12 @@ def main():
     parser.add_argument('--watchdog-policy', action='store_true',
                         help='Require the explicit RAM-only watchdog launch policy argument and symbols')
     parser.add_argument('--runtime-report-seconds', type=int, default=0,
-                        help='Require the explicit terminal runtime sampler interval (30..300)')
+                        help='Require the explicit terminal runtime sampler interval (5..300)')
+    parser.add_argument('--smp-observer', action='store_true',
+                        help='Require per-core counters and the read-only reset-context accessor')
     args = parser.parse_args()
-    require(args.runtime_report_seconds == 0 or 30 <= args.runtime_report_seconds <= 300,
-            'Runtime sampler interval must be 30..300 seconds')
+    require(args.runtime_report_seconds == 0 or 5 <= args.runtime_report_seconds <= 300,
+            'Runtime sampler interval must be 5..300 seconds')
     work, out = args.work.resolve(), args.output.resolve()
     require(not out.exists(), 'Use a new verification output directory')
     # Audit the actual archive and linked source kernel, not just the switch.
@@ -61,6 +63,10 @@ def main():
     if args.runtime_report_seconds:
         require({'_native_t970_runtime_collect', '_native_t970_runtime_report',
                  '_native_t970_initproc_main'} <= names, 'Kernel lacks the runtime sampler')
+    if args.smp_observer:
+        require(args.runtime_report_seconds and {'_native_t970_reset_context', '_processor_avail_count',
+                '_armcpu_smp_step', '_armcpu_smp_psci_rc', '_armcpu_smp_fail',
+                '_armcpu_core_timer', '_armcpu_core_sgi'} <= names, 'Kernel lacks SMP observation interfaces')
     report = json.loads((work / 'payload/payload.json').read_text())
     require(sha(kernel.read_bytes()) == report['kernel_sha256'], 'Source kernel changed after payload build')
     out.mkdir(parents=True)
@@ -124,6 +130,7 @@ def main():
     result['kernel_args'] = entry['args']
     result['runtime_report_target_seconds'] = args.runtime_report_seconds
     result['terminal_diagnostic'] = bool(args.runtime_report_seconds)
+    result['smp_observer'] = args.smp_observer
     (out / 'validation.json').write_text(json.dumps(result, indent=2) + '\n')
     print(json.dumps(result, indent=2))
 

@@ -1,0 +1,26 @@
+{
+  "boot_sha256": "3c72017fac6fc13799451cbb77248975b9b1c4c7e98358eb774b380d76f8ee8c",
+  "photo": "screen-200446.jpg",
+  "requested_cpus": 2,
+  "available_cpus": 1,
+  "secondary_running": 0,
+  "main": 1,
+  "processes": 84,
+  "watchdog_pid": 0,
+  "springboard_pid": 27,
+  "backboard_pid": 56,
+  "runningboard_pid": 26,
+  "data": 0,
+  "policy": 0,
+  "policy_stage": 4,
+  "ufs_verified_blocks": 1029698,
+  "cpu1": {
+    "step": 4,
+    "psci_return": 0,
+    "fail": 0,
+    "timer": 0,
+    "sgi": 0
+  },
+  "secondary_start_verified": false,
+  "interpretation": "PSCI accepted CPU_ON, but initCPU phase5 was not observed. Does not prove reset entry or correct execution. Keep8-core unflashed; inspect reset handoff context before adding entry observations."
+}

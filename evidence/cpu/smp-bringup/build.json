@@ -1,0 +1,16 @@
+{
+  "device_base_revision": "6ac8dc5920a51b6816d5c92d9c7582f69785177b",
+  "framework_revision": "90b15743cf44d566b00601db56e3604add3a8034",
+  "kernel_sha256": "7e3c3989e61a2ce4d2a8d8ebc5a6a1760110e794e906dc35e568619ac85f9516",
+  "kernel_build_exit_code": 0,
+  "runtime_report_cpu_formatter_tests_passed": true,
+  "actual_sgi_expression_host_cases": 8,
+  "captured_affinities_verified": true,
+  "board_cpu0_default_unchanged": true,
+  "owned_memory_mib": 512,
+  "kernel_max_cpus": 8,
+  "private_processor_count_interface": "Diagnostic uses explicit uint32_t extern consistent with XNU definition; BSD translation unit does not see MACH-private processor header declaration.",
+  "build_recovery": "First compile stopped on hidden processor count declaration. Corrected declaration; bootstrap compile rebuilt missing objects (bootstrap final link unresolved as expected without archives); subsequent full archive/link/prelink build passed. No failed build was flashed.",
+  "two_core_result_pending": true,
+  "eight_core_not_uploaded": true
+}

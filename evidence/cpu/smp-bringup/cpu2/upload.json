@@ -1,0 +1,15 @@
+{
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/data-bringup/smp2-runtime/boot-partition.img"
+  ],
+  "exit_code": 0,
+  "boot_sha256": "3c72017fac6fc13799451cbb77248975b9b1c4c7e98358eb774b380d76f8ee8c",
+  "cpus_requested": 2,
+  "terminal_diagnostic": true,
+  "readback_verified": false,
+  "hardware_result_pending": true,
+  "eight_core_image_prepared_not_uploaded": true
+}

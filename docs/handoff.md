@@ -3,6 +3,15 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
+## 最新副核诊断（2026-11-02）
+
+BOOT9d4dc888实机main1、106进程，但请求2核仍只有1核，CPU1 step4/PSCI0、timer0/SGI0。
+reset table、CPU1 affinity与reset handler均匹配。尚未确认副核进入复位代码。
+已刷BOOT95accf53：四段入口标记、目标等待10秒；Heimdall exit0正常结束并请求重启，实机结果待回报。
+它是一次终止采样，不是持续刷新。主仓库d57d612修复显示区边界，独立比较确认异常向量和标记保留。
+默认CPU0、普通镜像2387e904、原内核及旧诊断镜像均保留；8核版本尚未刷入。
+具体标记及可见性限制见[smp-bringup.md](smp-bringup.md)。
+
 ## 最新实机：109个进程，SpringBoard27/backboardd56/runningboardd26
 
 BOOTeeeba83b的19:36:40照片：runtime target120 main1 n109 wd0 sb27 bb56 rb26 D0 W0 S4，

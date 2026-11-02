@@ -1,0 +1,19 @@
+{
+  "boot_sha256": "9d4dc888f08dc0c9a3fbed478485ecf4839bc991f309acfa309613f9480a8201",
+  "source": "owner photo 2026-11-02 23:28:06",
+  "main": 1,
+  "processes": 106,
+  "cpus_online": 1,
+  "secondary_running": 0,
+  "cpu1_step": 4,
+  "cpu1_psci_rc": 0,
+  "cpu1_timer": 0,
+  "cpu1_sgi": 0,
+  "reset_table": "c38eb228",
+  "expected_table": "c38eb228",
+  "cpu1_data": "c44ca800",
+  "cpu1_phys_id": "100",
+  "reset_handler": "c320800c",
+  "expected_start": "c320800c",
+  "interpretation": "Reset handoff values match. CPU_ON accepted; secondary entry and C startup remain unconfirmed."
+}
