@@ -3,6 +3,19 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
+## 当前镜像：临时watchdogd策略2387e904，待实机回报
+
+已在成功挂载RAM Data后、exec前接入t970-disable-watchdogd=1的显式策略。
+只在RAM Data/持久化mode0/root凭据下新建root-owned的disabled.plist与迁移标记，
+已有配置拒绝覆盖，任何写入/元数据/fsync/close错误均停止并报实际错误及阶段。
+原launchd/watchdogd、原OS、critical-exit panic都不改；board默认参数不添加此项。
+
+源内核39d7cfe1、BOOT2387e904已完成构建，实际helper15个API失败点及守卫/清理检查通过，
+helper配置与已测试的原launchd配置一致。打包检查核对真实PMGR/全部FAT/ADT/种子/精确FD/DTB，
+并要求策略实现符号与实际bootarg；拒绝未声明策略的检查负例通过。
+BOOT-only上传exit0并正常结束/请求重启。当前策略安装和服务继续尚待设备回报；
+保留色条不能当作成功或失败证据。详见evidence/storage/watchdogd/launch-policy。
+
 ## 当前镜像：RAM Data已越过挂载检查，watchdogd SIGTRAP
 
 BOOT6b83f4e6经过超过2分钟保留色条后，18:42照片出现watchdogd[102]退出，namespace2/subcode5。

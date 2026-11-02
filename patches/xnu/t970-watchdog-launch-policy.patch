@@ -1,0 +1,104 @@
+--- a/bsd/kern/kern_exec.c
++++ b/bsd/kern/kern_exec.c
+@@ -7976,6 +7976,88 @@
+ 	vnode_put(vp);
+ }
+ 
++/* Temporary original-launchd override on volatile RAM Data only. No OS text
++ * changes, no critical-exit suppression and no replacement watchdog device. */
++static const char native_t970_watchdog_override[] = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n<plist version=\"1.0\">\n<dict>\n\t<key>com.apple.watchdogd</key>\n\t<true/>\n</dict>\n</plist>\n";
++volatile int native_t970_watchdog_policy_stage = 0;
++volatile int native_t970_watchdog_policy_status = -1;
++static int
++native_t970_watchdog_policy_file(const char *path, const char *data, int size)
++{
++	vfs_context_t ctx = vfs_context_current();
++	vnode_t vp = NULLVP;
++	int error = vnode_open(path, O_CREAT | O_EXCL | FWRITE | O_NOFOLLOW, 0644, 0, &vp, ctx);
++	if (error) return error;
++	if (vnode_vtype(vp) != VREG) error = EINVAL;
++	int resid = 0;
++	if (!error && size) {
++		error = vn_rdwr(UIO_WRITE, vp, (caddr_t)data, size, 0, UIO_SYSSPACE, IO_UNIT,
++		    vfs_context_ucred(ctx), &resid, vfs_context_proc(ctx));
++		if (!error && resid) error = EIO;
++	}
++	if (!error) {
++		struct vnode_attr va;
++		VATTR_INIT(&va);
++		VATTR_SET(&va, va_uid, 0);
++		VATTR_SET(&va, va_gid, 0);
++		VATTR_SET(&va, va_mode, 0644);
++		error = vnode_setattr(vp, &va, ctx);
++	}
++	if (!error) error = VNOP_FSYNC(vp, MNT_WAIT, ctx);
++	int close_error = vnode_close(vp, FWRITE, ctx);
++	return error ? error : close_error;
++}
++static int
++native_t970_watchdog_policy_prepare(proc_t p, user_addr_t scratch)
++{
++	static const char directory[] = "/private/var/db/com.apple.xpc.launchd";
++	static const char policy[] = "/private/var/db/com.apple.xpc.launchd/disabled.plist";
++	static const char marker[] = "/private/var/db/com.apple.xpc.launchd/disabled.migrated";
++	extern unsigned native_ufs_store_mode(void);
++	vfs_context_t ctx = vfs_context_current();
++	/* Refuse before touching files if the mounted RAM Data or credentials differ. */
++	if (!XNU_NATIVE_RAM_BLOCK || native_ufs_store_mode() != 0 ||
++	    native_owner_data_stage != 4 || native_owner_data_readonly != 0 ||
++	    kauth_cred_getuid(vfs_context_ucred(ctx)) != 0) return EPERM;
++	/* Never truncate an existing launch policy or migration marker. */
++	const char *paths[] = { policy, marker };
++	for (unsigned i = 0; i < 2; ++i) {
++		vnode_t vp = NULLVP;
++		int error = vnode_lookup(paths[i], VNODE_LOOKUP_NOFOLLOW, &vp, ctx);
++		if (!error) { vnode_put(vp); return EEXIST; }
++		if (error != ENOENT) return error;
++	}
++	native_t970_watchdog_policy_stage = 1;
++	struct mkdir_args request = { .path = scratch + 0xa00, .mode = 0755 };
++	int32_t result = 0;
++	int error = copyout(directory, request.path, sizeof(directory));
++	if (!error) error = mkdir(p, &request, &result);
++	if (error && error != EEXIST) return error;
++	vnode_t dir = NULLVP;
++	error = vnode_lookup(directory, VNODE_LOOKUP_NOFOLLOW, &dir, ctx);
++	if (error) return error;
++	if (vnode_vtype(dir) != VDIR) error = ENOTDIR;
++	if (!error) {
++		struct vnode_attr va;
++		VATTR_INIT(&va);
++		VATTR_SET(&va, va_uid, 0);
++		VATTR_SET(&va, va_gid, 0);
++		VATTR_SET(&va, va_mode, 0755);
++		error = vnode_setattr(dir, &va, ctx);
++	}
++	vnode_put(dir);
++	if (error) return error;
++	native_t970_watchdog_policy_stage = 2;
++	error = native_t970_watchdog_policy_file(policy, native_t970_watchdog_override,
++	    (int)sizeof(native_t970_watchdog_override) - 1);
++	if (error) return error;
++	native_t970_watchdog_policy_stage = 3;
++	/* Publish the migration marker only after the root-owned policy is closed. */
++	error = native_t970_watchdog_policy_file(marker, "", 0);
++	if (!error) native_t970_watchdog_policy_stage = 4;
++	return error;
++}
++
+ static int
+ native_owner_data_prepare(proc_t p, user_addr_t scratch)
+ {
+@@ -8214,6 +8296,12 @@
+ #if defined(XNU_OWNER_DATA_MOUNT) && XNU_OWNER_DATA_MOUNT
+ 	int data_error = native_owner_data_prepare(p, (user_addr_t)scratch_addr);
+ 	if (data_error) panic("offline scratch Data mount failed: %d", data_error);
++	unsigned int disable_watchdog = 0;
++	if (PE_parse_boot_argn("t970-disable-watchdogd", &disable_watchdog, sizeof(disable_watchdog)) && disable_watchdog == 1) {
++		native_t970_watchdog_policy_status = native_t970_watchdog_policy_prepare(p, (user_addr_t)scratch_addr);
++		if (native_t970_watchdog_policy_status) panic("watchdog launch policy err=%d stage=%d",
++		    native_t970_watchdog_policy_status, native_t970_watchdog_policy_stage);
++	}
+ #endif
+ #if CONFIG_MEMORYSTATUS
+ 	(void) memorystatus_init_at_boot_snapshot();

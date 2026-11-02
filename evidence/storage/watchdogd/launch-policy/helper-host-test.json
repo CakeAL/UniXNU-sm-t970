@@ -1,0 +1,10 @@
+{
+  "helper_sha256": "2b506db29f9d743c6d5b567989e3124e7381a5e9a75f1b1693973c251ad448b6",
+  "policy_sha256": "6f13254dd5b1339d31b34a7b7d77d19b420497b12085fa154136816e4c928cef",
+  "passed": true,
+  "actual_source": true,
+  "os_apis_mocked": true,
+  "actual_apfs": false,
+  "hardware_tested": false,
+  "result": "PASS: actual policy helper; 15 API failure points; persistence/UID/mount guards; existing files; partial write; vnode cleanup"
+}

@@ -10,3 +10,4 @@ t970-cache-syscalls.patch
 t970-cache-signature-stage.patch
 t970-cache-read-source.patch
 t970-policy-memory-status.patch
+t970-watchdog-launch-policy.patch

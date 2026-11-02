@@ -1,0 +1,15 @@
+{
+  "device_base_revision": "9ce8a34ea86ca42aa4d54b2bbd43767b5161f6cd",
+  "framework_revision": "90b15743cf44d566b00601db56e3604add3a8034",
+  "kernel_build_exit_code": 0,
+  "source_kernel_sha256": "39d7cfe12e77cb7d5b8f9a54488c9abb94222051d3d333219d9afb9f75c3b510",
+  "source_patch_sha256": "a8b3e3166b1ef6783cd640e3b9505290cd2d3e1d9720556dd1ab6559e7533e3a",
+  "actual_helper_host_check_passed": true,
+  "api_fault_points": 15,
+  "implicit_policy_argument_refused": true,
+  "original_launchd_watchdogd_unchanged": true,
+  "old_data_kernel_preserved": true,
+  "policy_applied_on_hardware_verified": false,
+  "service_startup_continuation_verified": false,
+  "command": "UNIXNU_PMGR_REFERENCE_KERNEL=<preserved e4632618> ./unixnu build kernel -D ../UniXNU-sm-t970 --out out/t970-data-bringup; build payload with launchdsuffix=release and t970-disable-watchdogd=1; bootimg exact515105d7 FD and captured DTB; check-data-payload.py --watchdog-policy"
+}

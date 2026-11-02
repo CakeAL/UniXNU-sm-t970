@@ -1,0 +1,13 @@
+{
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/data-bringup/watchdog-policy-verified/boot-partition.img"
+  ],
+  "exit_code": 0,
+  "boot_sha256": "2387e904a86fb48ca64aeabe4a91568721d97e18a34fc47f5f3e484e257b44cb",
+  "readback_verified": false,
+  "watchdog_policy_applied_on_device_verified": false,
+  "device_observation": "Pending owner screen; old bars do not localize execution"
+}

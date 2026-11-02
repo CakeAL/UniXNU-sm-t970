@@ -1,0 +1,18 @@
+{
+  "source_sha256": "cf9abdfff931390a6d72162d92ba1c32544cde989cfecfabe06e2ee7a809efce",
+  "archive_sha256": "f55903a18df2c879502b1afda4cffb87f395dff0bae6164e46c41701c8dd1a29",
+  "bindings": {
+    "__ZN9ApplePMGRC2EPK11OSMetaClass": "0xfffffff0049f003c",
+    "__ZN9ApplePMGRD2Ev": "0xfffffff0049f019c",
+    "__ZN9ApplePMGR10gMetaClassE": "0xfffffff006adf490",
+    "__ZN9ApplePMGR7readAonEv": "0xfffffff004a20fbc",
+    "__ZN9ApplePMGR8writeAonEy": "0xfffffff004a20fc4",
+    "_sheng_original_pmgr_nub_create": "0xfffffff004a22568",
+    "_sheng_original_pmgr_nub_read": "0xfffffff004a24adc",
+    "_sheng_original_pmgr_nub_write": "0xfffffff004a230ec"
+  },
+  "virtual_entries": 340,
+  "mode": "opt-in lifecycle/publication/refusal instrument; not a functional power backend",
+  "runtime_qualified": false,
+  "original_executable_modified": false
+}

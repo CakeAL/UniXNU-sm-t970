@@ -49,6 +49,13 @@ Data写入与持久化、持续服务和桌面仍未验证；当前定位转为w
 T733使用临时watchdogd启动禁用策略；本板已准备只禁用该job的原launchd配置并通过
 原launchd二进制loader/权限/job-gate的主机替身检查，尚未在RAM Data应用。
 
+随后已接入仅显式t970-disable-watchdogd=1启用的内核bootstrap helper，
+在确认RAM Data挂载成功后创建root-owned策略和迁移标记；拒绝持久化、非root和已有文件。
+写入、元数据、fsync及close全部成功才继续，失败报实际错误及阶段。
+BOOT2387e904已上传，安装结果和其他服务进展仍待设备回报。
+新实际helper15个API失败点及权限/文件存在/部分写入/引用释放检查通过；
+源内核和完整打包输入验证见watchdogd/launch-policy。原服务/OS与critical-exit不改。
+
 ## 命令
 
 以下从UniXNU主目录执行；需要Python3.14的python3位于PATH前部：
