@@ -1,5 +1,9 @@
 # 有界服务采样（BOOTeeeba83b，实机结果待回报）
 
+后续19:36:40实机照片已显示main1 n109 wd0 sb27 bb56 rb26 D0 W0 S4 blocks964876，
+原图与device-result.json保存。109小于callback上限；界面服务存在，未证明呈现或功能正常。
+deadline等待/报告已实际执行，但没有独立测量120秒精度。以下pending描述为上传时历史状态。
+
 主机已确认main1/Data0/policy0/stage4，但没有持续控制台或图形输出。
 新增设备补丁t970-runtime-report.patch，仅在显式t970-runtime-report=30..300时启动一次
 诊断内核线程。普通board参数不启用；本次配置120。没有CPU忙等或自动复位。

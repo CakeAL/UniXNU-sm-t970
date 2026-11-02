@@ -3,6 +3,19 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
+## 最新实机：109个进程，SpringBoard27/backboardd56/runningboardd26
+
+BOOTeeeba83b的19:36:40照片：runtime target120 main1 n109 wd0 sb27 bb56 rb26 D0 W0 S4，
+累计964876个verified blocks。诊断线程完成了deadline等待并报告进程列表，计时精度未测。
+临时策略下此时没有观察到watchdogd；有真实界面服务进程，但不证明它们正常呈现或桌面可用。
+XNU的软件显示后端目前仍关闭，不能继续把保留紫条当成早期启动故障。
+结果和原图绑定见evidence/storage/watchdogd/runtime-report/device-result.json。
+
+机主希望同时推进多核；T733使用定制ArmCpu55cc0617及redist-ipi方案，不能只复制其参数。
+同为SM8250的umi实测8核，其audit_umi_smp.py使用PSCI SMC64/清理reset代码和数据缓存、
+Affinity1 CPU编号与普通SGI0，开启self-ipi、关闭spi-ipi。T970已有对应共享入口/ArmCpu代码，
+下一步需独立验证本板的每核在线、计时器和IPI，不把对方成果当作本板实测。
+
 ## 当前镜像：服务采样eeeba83b，实机结果待回报
 
 在已实测main/Data/策略成功基础上新增显式t970-runtime-report=120的一次性内核线程。
