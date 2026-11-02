@@ -51,6 +51,7 @@ uint32_t processor_avail_count=1;
 volatile uint32_t armcpu_smp_running,armcpu_smp_step[8],armcpu_smp_fail[8];
 volatile int32_t armcpu_smp_psci_rc[8];
 volatile uint32_t armcpu_core_timer[8],armcpu_core_sgi[8];
+void native_t970_trampoline_snapshot(uint64_t *out){for(unsigned i=0;i<8;++i)out[i]=0x100000000ULL+i;}
 void native_t970_secondary_snapshot(uint32_t *out){for(unsigned i=0;i<8;++i)out[i]=i%5;}
 int native_t970_initproc_main(void){return main_state;}
 void native_t970_reset_context(uint64_t *out){
@@ -103,6 +104,7 @@ int main(void){
   assert(waits==1&&blocks==(unsigned)!awakened&&iteration_calls==1);
   assert(strstr(message,"main=1 n=35 wd=0 sb=32 bb=0 rb=0 D=0 W=0 S=4 blocks=123456"));
   assert(strstr(message,"E reset/found/common/C 0 1 2 3 4 0 1 2"));
+  assert(strstr(message,"V target=100000000 ret=100000001 vb=100000002 pb=100000003 t1=100000004 t0=100000005 tcr=100000006 primary1=100000007"));
   assert(strstr(message,"R table=1000 want=1000 data1=2000 id1=100 handler=3000 start=3000"));
  }
  puts("PASS: actual runtime report bounds, process names/PIDs, 512 callback cap, scheduler yield, opt-in/range/once guards and thread failure");

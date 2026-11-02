@@ -1,0 +1,32 @@
+{
+  "boot_sha256": "b44e4108c19afa7d91b6dbb4c3c5ba383d9f0b46f335b95e86f32b64dfa62fb3",
+  "photo": "screen-235250.jpg",
+  "target_wait_seconds": 10,
+  "main": 0,
+  "processes": 2,
+  "cpus_online": 1,
+  "secondary_running": 0,
+  "cpu1_step": 4,
+  "cpu1_psci_rc": 0,
+  "entry_records": [
+    0,
+    9,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "data_status": 0,
+  "watchdog_policy_status": 0,
+  "watchdog_policy_stage": 4,
+  "ufs_verified_blocks": 185258,
+  "reset_table": "c38eb698",
+  "expected_table": "c38eb698",
+  "cpu1_data": "c44ca860",
+  "cpu1_id": "100",
+  "handler": "c320800c",
+  "expected_start": "c320800c",
+  "interpretation": "CPU1 reached post-SCTLR/ISB/CPACR milestone9. High-VA milestone10 and C marker4 unseen. Does not distinguish high-VA fetch failure from marker-store visibility/fault."
+}

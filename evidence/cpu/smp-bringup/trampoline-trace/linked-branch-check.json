@@ -1,0 +1,14 @@
+{
+  "kernel_sha256": "792398cc78e0f61283e8da1b3195e76379cad7fbc6b2bc7983ea7dddad23877e",
+  "passed": true,
+  "cases": 2,
+  "full_width_high_va_branch_executed": true,
+  "register_values_mocked": true,
+  "physical_record_bounds_checked": true,
+  "captured_seven_full_width_values": true,
+  "live_registers_preserved": true,
+  "real_translation_tables_verified": false,
+  "cache_coherence_verified": false,
+  "packed_sha256": "e5e063c4ea04151d1a07aaadf2aa12f2f268732b3b0b4c0b2b98e2c204430d90",
+  "packed_branch_and_capture_unchanged": true
+}

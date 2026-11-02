@@ -5,6 +5,12 @@
 
 ## 最新副核诊断（2026-11-02）
 
+最新BOOT36c2f602已刷入（BOOT-only，exit0正常结束并请求重启）：目标10秒，
+跳转前捕获V行，11为BR前，12为高地址入口使用原物理记录指针，随后10和最终C标记4保留。
+此前b44e4108实机标记9，尚不能区分高地址跳转与新地址下记录访问问题。
+96组入口与2组实际链接跳转模拟、runtime回归、独立打包通过；实机高地址结果待回报。
+证据见evidence/cpu/smp-bringup/trampoline-trace。
+
 当前已刷BOOTb44e4108：副核MMU分段5/6/7/8/9/10，最终C入口仍为4。
 目标等待10秒；96组链接后指令模拟和payload异常向量比较通过，BOOT-only上传exit0正常重启。
 实机结果待回报，见evidence/cpu/smp-bringup/mmu-trace；默认CPU0与原镜像保留。

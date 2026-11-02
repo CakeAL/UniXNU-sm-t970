@@ -10,4 +10,6 @@
 linked-instruction-check仅验证模拟MPIDR/CPU数据下实际链接指令，不能验证缓存一致性和硬件启动。
 总体平台checker仍因历史框架版本断言失败，未记作通过；独立打包/CPU拓扑检查通过。
 
-- mmu-trace：BOOTb44e4108，新增6处副核MMU标记，10秒目标等待，实机结果待回报。
+- mmu-trace：BOOTb44e4108，实机CPU1标记9，尚未观察到高地址标记10。
+
+- trampoline-trace：BOOT36c2f602，高地址入口沿用物理记录指针，捕获实际跳转/返回/基址/TTBR/TCR；实机结果待回报。

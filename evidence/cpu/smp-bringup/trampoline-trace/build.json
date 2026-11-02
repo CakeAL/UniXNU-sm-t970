@@ -1,0 +1,30 @@
+{
+  "device_base_revision": "f03c3dc3a8fa9605f634edda71fcc5fcc0aec5a9",
+  "framework_revision": "d57d6124305d0694583e3ff7fc68ce34a4b0f091",
+  "kernel_build_exit_code": 0,
+  "kernel_sha256": "792398cc78e0f61283e8da1b3195e76379cad7fbc6b2bc7983ea7dddad23877e",
+  "payload_kernel_sha256": "e5e063c4ea04151d1a07aaadf2aa12f2f268732b3b0b4c0b2b98e2c204430d90",
+  "boot_sha256": "36c2f602a739a10bddb4d3e05300f8dbc10ca2119f4f31d46430cc5b9a22691e",
+  "linked_entry_marker_cases": 96,
+  "linked_branch_cases": 2,
+  "full_width_branch_simulated": true,
+  "system_registers_mocked": true,
+  "original_live_registers_preserved": true,
+  "all_seven_record_fields_checked": true,
+  "reset_exception_vectors_preserved": true,
+  "target_wait_seconds": 10,
+  "board_default_unchanged": true,
+  "actual_high_va_entry_verified": false,
+  "hardware_result_pending": true,
+  "eight_core_not_uploaded": true,
+  "commands": [
+    "UNIXNU_PMGR_REFERENCE_KERNEL=<preserved e4632618 kernel> PATH=<python3.14 LLVM lld> python3.14 ../UniXNU/unixnu build kernel -D . --out out/data-bringup",
+    "python3.14 ../UniXNU/unixnu build payload -D . --out out/data-bringup --data-ramdisk out/step7/data-seed-512/data-512.dbr --kernel-arg launchdsuffix=release --kernel-arg t970-disable-watchdogd=1 --kernel-arg t970-runtime-report=10",
+    "python3.14 ../UniXNU/unixnu bootimg -D . --out out/data-bringup --uefi .cache/uefi-source/Mu-Silicium --fd out/step7/ufs-readonly-inputs/SILICIUM_UEFI.fd --dtb out/firmware-inputs/firmware.dtb --ramdisk <work>/payload/payload.img --output out/data-bringup/trampoline-trace-boot.img",
+    "python3.14 scripts/check-data-payload.py --work <work> --boot out/data-bringup/trampoline-trace-boot.img --seed out/step7/data-seed-512/data-512.dbr --watchdog-policy --runtime-report-seconds 10 --smp-observer --output out/data-bringup/trampoline-trace-base-verified",
+    "PATH=<LLVM> .cache/probe-test-venv/bin/python scripts/check-smp-trampoline-trace.py --kernel <work>/kernel/kernel.macho --packed out/data-bringup/trampoline-trace-base-verified/kernel.macho --output out/data-bringup/trampoline-trace-packed-check",
+    "PATH=<LLVM> .cache/probe-test-venv/bin/python scripts/check-smp-entry-trace.py --mmu --kernel <work>/kernel/kernel.macho --packed out/data-bringup/trampoline-trace-base-verified/kernel.macho --output out/data-bringup/trampoline-trace-packed-entry-check",
+    "python3.14 scripts/prepare-smp.py --cpus 2 --base out/data-bringup/trampoline-trace-base-verified/boot-partition.img --base-validation out/data-bringup/trampoline-trace-base-verified/validation.json --hardware-dtb <work>/device-tree/hardware.dtb --output out/data-bringup/smp2-trampoline-trace"
+  ],
+  "work": "out/data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data"
+}

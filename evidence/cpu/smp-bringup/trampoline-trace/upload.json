@@ -1,0 +1,17 @@
+{
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/data-bringup/smp2-trampoline-trace/boot-partition.img"
+  ],
+  "exit_code": 0,
+  "boot_sha256": "36c2f602a739a10bddb4d3e05300f8dbc10ca2119f4f31d46430cc5b9a22691e",
+  "cpus_requested": 2,
+  "target_wait_seconds": 10,
+  "terminal_diagnostic": true,
+  "trampoline_register_capture": true,
+  "readback_verified": false,
+  "hardware_result_pending": true,
+  "eight_core_not_uploaded": true
+}

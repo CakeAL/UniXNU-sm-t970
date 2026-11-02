@@ -16,3 +16,4 @@ t970-smp-report.patch
 t970-smp-reset-context.patch
 t970-smp-entry-trace.patch
 t970-smp-mmu-trace.patch
+t970-smp-trampoline-trace.patch

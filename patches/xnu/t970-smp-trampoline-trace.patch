@@ -1,0 +1,89 @@
+--- a/osfmk/arm64/start.s
++++ b/osfmk/arm64/start.s
+@@ -963,6 +963,22 @@
+ 	add		x0, x0, x22
+ 	sub		x0, x0, x23
+ 
++#if XNU_NATIVE_ARCH_TIMER
++	/* x6 is the physical diagnostic record retained from milestone9. */
++	.globl EXT(native_t970_trampoline_before_branch)
++LEXT(native_t970_trampoline_before_branch)
++	stp	x0, lr, [x6, #8]
++	stp	x22, x23, [x6, #24]
++	mrs	x5, TTBR1_EL1
++	str	x5, [x6, #40]
++	mrs	x5, TTBR0_EL1
++	str	x5, [x6, #48]
++	mrs	x5, TCR_EL1
++	str	x5, [x6, #56]
++	mov	w5, #11
++	str	w5, [x6]
++	dsb	sy
++#endif
+ 	// Branch to the trampoline
+ 	br		x0
+ 
+@@ -973,6 +989,14 @@
+ 	.text
+ 	.align 2
+ arm_init_tramp:
++#if XNU_NATIVE_ARCH_TIMER
++	/* First high-VA instructions use the already-working physical alias. */
++	.globl EXT(native_t970_trampoline_high_alias)
++LEXT(native_t970_trampoline_high_alias)
++	mov	w5, #12
++	str	w5, [x6]
++	dsb	sy
++#endif
+ 
+ #if XNU_NATIVE_ARCH_TIMER
+ 	/* T970 secondary-only MMU transition diagnostic; preserve x0/x1 and LR. */
+--- a/osfmk/arm64/cpu.c
++++ b/osfmk/arm64/cpu.c
+@@ -1163,6 +1163,19 @@
+ 	for (unsigned i = 0; i < 8; ++i) out[i] = native_t970_secondary_entry[i][0];
+ }
+ 
++/* Observe the seven CPU1 values captured before the high-VA branch. */
++void native_t970_trampoline_snapshot(uint64_t *out);
++void
++native_t970_trampoline_snapshot(uint64_t *out)
++{
++	flush_dcache((vm_offset_t)native_t970_secondary_entry, sizeof(native_t970_secondary_entry), FALSE);
++	for (unsigned i = 0; i < 7; ++i) {
++		out[i] = (uint64_t)native_t970_secondary_entry[1][2 + 2 * i] |
++		    ((uint64_t)native_t970_secondary_entry[1][3 + 2 * i] << 32);
++	}
++	__asm__ volatile ("mrs %0, ttbr1_el1" : "=r" (out[7]));
++}
++
+ /* Read-only T970 secondary reset handoff observation. No CPU/power changes. */
+ #if !CONFIG_SPTM
+ void native_t970_reset_context(uint64_t *out);
+--- a/bsd/kern/kern_exec.c
++++ b/bsd/kern/kern_exec.c
+@@ -8128,16 +8128,23 @@
+ 	extern void native_t970_secondary_snapshot(uint32_t *out);
+ 	uint32_t entry[8] = {0};
+ 	native_t970_secondary_snapshot(entry);
++	extern void native_t970_trampoline_snapshot(uint64_t *out);
++	uint64_t translation[8] = {0};
++	native_t970_trampoline_snapshot(translation);
+ 	uint64_t reset[6] = {0};
+ 	native_t970_reset_context(reset);
+ 	char cpu_state[512];
+ 	native_t970_smp_state(cpu_state, sizeof(cpu_state));
+-	panic("runtime target=%u main=%d n=%u wd=%d sb=%d bb=%d rb=%d D=%d W=%d S=%d blocks=%llu cpu=%u sec=%u\nC step/psci/fail/timer/sgi %s\nE reset/found/common/C %u %u %u %u %u %u %u %u\nR table=%llx want=%llx data1=%llx id1=%llx handler=%llx start=%llx\n%s",
++	panic("runtime target=%u main=%d n=%u wd=%d sb=%d bb=%d rb=%d D=%d W=%d S=%d blocks=%llu cpu=%u sec=%u\nC step/psci/fail/timer/sgi %s\nE reset/found/common/C %u %u %u %u %u %u %u %u\nV target=%llx ret=%llx vb=%llx pb=%llx t1=%llx t0=%llx tcr=%llx primary1=%llx\nR table=%llx want=%llx data1=%llx id1=%llx handler=%llx start=%llx\n%s",
+ 	    seconds, native_t970_initproc_main(), snapshot.count, snapshot.watchdog, snapshot.springboard,
+ 	    snapshot.backboard, snapshot.runningboard, native_owner_data_status,
+ 	    native_t970_watchdog_policy_status, native_t970_watchdog_policy_stage,
+ 	    (unsigned long long)native_ufs_verified_blocks, processor_avail_count, armcpu_smp_running, cpu_state,
+ 	    entry[0], entry[1], entry[2], entry[3], entry[4], entry[5], entry[6], entry[7],
++	    (unsigned long long)translation[0], (unsigned long long)translation[1],
++	    (unsigned long long)translation[2], (unsigned long long)translation[3],
++	    (unsigned long long)translation[4], (unsigned long long)translation[5],
++	    (unsigned long long)translation[6], (unsigned long long)translation[7],
+ 	    (unsigned long long)reset[0], (unsigned long long)reset[1], (unsigned long long)reset[2],
+ 	    (unsigned long long)reset[3], (unsigned long long)reset[4], (unsigned long long)reset[5], snapshot.names);
+ }
