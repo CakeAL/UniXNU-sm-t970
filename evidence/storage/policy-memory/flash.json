@@ -1,0 +1,19 @@
+{
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/step7/probes/ufs-policy-memory/boot.img"
+  ],
+  "authorization": "Continue the user-authorized repair/BOOT diagnostic workflow after owner supplied corrected-policy memory-pressure photo",
+  "started_at": "2026-11-01T23:56:26.851276+08:00",
+  "finished_at": "2026-11-01T23:56:33.399781+08:00",
+  "boot_sha256": "12766f5f207f85d07f2b30a00c2ae30aa320cc702167da09727ff3889c9e0c0a",
+  "kernel_sha256": "e46326182b42f76791d00ad3671fbf77e00fda522ec2be5805e5aed0e1ba7a08",
+  "boot_bytes": 62713856,
+  "partition": "BOOT only",
+  "exit_code": 0,
+  "reboot_requested": true,
+  "policy_carriers": "Corrected OS8fefc15f/SystemOS869a186a remain deployed; no new carrier write in this step",
+  "hardware_startup_result": "pending owner observation"
+}

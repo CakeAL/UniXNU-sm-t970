@@ -1,0 +1,132 @@
+--- a/bsd/dev/arm/systemcalls.c
++++ b/bsd/dev/arm/systemcalls.c
+@@ -2,6 +2,7 @@
+  * Copyright (c) 2000-2022 Apple Inc. All rights reserved.
+  */
+ 
++#include <os/atomic_private.h>
+ #include <kern/bits.h>
+ #include <kern/task.h>
+ #include <kern/thread.h>
+@@ -40,6 +41,60 @@
+ extern int32_t dtrace_systrace_syscall(struct proc *, void *, int *);
+ extern void dtrace_systrace_syscall_return(unsigned short, int, int *);
+ #endif  /* CONFIG_DTRACE */
++
++
++/* T970_CACHE_TRACE_BEGIN: CPU0/initproc diagnostic, no extra user-memory reads. */
++#define T970_CACHE_TRACE_ROWS 24
++static char native_t970_cache_paths[64];
++static char native_t970_cache_rows[T970_CACHE_TRACE_ROWS][128];
++static unsigned native_t970_cache_count;
++void native_t970_cache_path_note(proc_t, const char *);
++const char *native_t970_cache_trace_text(void);
++void
++native_t970_cache_path_note(proc_t p, const char *path)
++{
++	if (!p || proc_getpid(p) != 1) return;
++	/* namei calls only after its own successful copy and length validation. */
++	size_t length = strlen(path);
++	strlcpy(native_t970_cache_paths, length > 63 ? path + length - 63 : path,
++	    sizeof(native_t970_cache_paths));
++}
++static void
++native_t970_cache_syscall_note(proc_t p, unsigned code, int error, uthread_t ut)
++{
++	if (!p || proc_getpid(p) != 1) return;
++	switch (code) {
++	case SYS_open: case SYS_open_nocancel: case SYS_openat: case SYS_openat_nocancel:
++	case SYS_fcntl: case SYS_fcntl_nocancel:
++	case SYS_shared_region_check_np: case SYS_shared_region_map_and_slide_2_np:
++		break;
++	default:
++		return;
++	}
++	int command = (code == SYS_fcntl || code == SYS_fcntl_nocancel) ? (int)ut->uu_arg[1] : 0;
++	int argument = (code == SYS_open || code == SYS_open_nocancel) ? 0 : (int)ut->uu_arg[0];
++	unsigned slot = os_atomic_inc_orig(&native_t970_cache_count, relaxed);
++	snprintf(native_t970_cache_rows[slot % T970_CACHE_TRACE_ROWS],
++	    sizeof(native_t970_cache_rows[0]), "sc%u e%d r%x a%d c%d %s",
++	    code, error, ut->uu_rval[0], argument, command,
++	    native_t970_cache_paths[0] ? native_t970_cache_paths : "(no path note)");
++}
++const char *
++native_t970_cache_trace_text(void)
++{
++	static char result[1664];
++	unsigned count = native_t970_cache_count;
++	unsigned first = count > 12 ? count - 12 : 0;
++	size_t used = (size_t)snprintf(result, sizeof(result), "init cache syscalls=%u", count);
++	for (unsigned i = first; i < count && used < sizeof(result) - 1; ++i) {
++		int n = snprintf(result + used, sizeof(result) - used, "\n%s",
++		    native_t970_cache_rows[i % T970_CACHE_TRACE_ROWS]);
++		if (n < 0 || (size_t)n >= sizeof(result) - used) break;
++		used += (size_t)n;
++	}
++	return result;
++}
++/* T970_CACHE_TRACE_END */
+ 
+ extern void
+ unix_syscall(struct arm_saved_state * regs, thread_t thread_act, struct proc * proc);
+@@ -149,6 +204,7 @@
+ 	}
+ #endif
+ 	pid = proc_pid(proc);
++	if (pid == 1) native_t970_cache_paths[0] = '\0';
+ 
+ #ifdef CONFIG_IOCOUNT_TRACE
+ 	uthread->uu_iocount = 0;
+@@ -184,6 +240,8 @@
+ #if CONFIG_MACF
+ skip_syscall:
+ #endif /* CONFIG_MACF */
++
++	native_t970_cache_syscall_note(proc, code, error, uthread);
+ 
+ 	unix_syscall_kprintf("code %d, error %d, results %x, %x (pid %d - %s, tid %lld)\n", code, error,
+ 	    uthread->uu_rval[0], uthread->uu_rval[1],
+@@ -260,6 +318,7 @@
+ #endif /* DEBUG || DEVELOPMENT */
+ 
+ 	AUDIT_SYSCALL_EXIT(code, proc, uthread, error);
++	native_t970_cache_syscall_note(proc, code, error, uthread);
+ 
+ 	/*
+ 	 * Get index into sysent table
+--- a/bsd/vfs/vfs_lookup.c
++++ b/bsd/vfs/vfs_lookup.c
+@@ -303,6 +303,10 @@
+ 	assert(bytes_copied <= MAXPATHLEN);
+ 	ndp->ni_pathlen = (u_int)bytes_copied;
+ 	bytes_copied = 0;
++	{
++		extern void native_t970_cache_path_note(proc_t, const char *);
++		native_t970_cache_path_note(p, cnp->cn_pnbuf);
++	}
+ 
+ 	/*
+ 	 * Since the name cache may contain positive entries of
+--- a/bsd/kern/kern_exit.c
++++ b/bsd/kern/kern_exit.c
+@@ -1872,16 +1872,18 @@
+ 		/* dyld reports "no dylib cache" both when it never found the cache file and
+ 		 * when the shared region refused to map it, so report the counters that tell
+ 		 * those two cases apart. */
++		extern const char *native_t970_cache_trace_text(void);
+ 		extern unsigned long native_owner_cache_carrier_accepts;
+ 		extern unsigned long native_owner_cache_carrier_rejects;
+ 		extern volatile int native_verified_block_root_uuid_match;
+ 		extern volatile int native_verified_block_root_media_matches;
+-		panic_with_options(0, NULL, DEBUGGER_OPTION_INITPROC_PANIC, "%s %s -- exit reason namespace %d subcode 0x%llx description: %." LAUNCHD_PANIC_REASON_STRING_MAXLEN "s carrier acc=%lu rej=%lu uuidmatch=%d media=%d",
++		panic_with_options(0, NULL, DEBUGGER_OPTION_INITPROC_PANIC, "%s %s -- exit reason namespace %d subcode 0x%llx description: %." LAUNCHD_PANIC_REASON_STRING_MAXLEN "s carrier acc=%lu rej=%lu uuidmatch=%d media=%d\n%s",
+ 		    ((proc_getcsflags(p) & CS_KILLED) ? "CS_KILLED" : ""),
+ 		    prefix_str, p->p_exit_reason->osr_namespace, p->p_exit_reason->osr_code,
+ 		    exit_reason_desc ? exit_reason_desc : "none",
+ 		    native_owner_cache_carrier_accepts, native_owner_cache_carrier_rejects,
+-		    native_verified_block_root_uuid_match, native_verified_block_root_media_matches);
++		    native_verified_block_root_uuid_match, native_verified_block_root_media_matches,
++		    native_t970_cache_trace_text());
+ 	}
+ }
+ 

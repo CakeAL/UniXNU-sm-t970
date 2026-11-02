@@ -1,0 +1,19 @@
+{
+  "device": "sm-t970",
+  "authorization": "Continuing user-authorized BOOT-only diagnosis after owner supplied syscall failure photo; device detected in Download mode before upload",
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/step7/probes/ufs-cache-signature/boot.img"
+  ],
+  "started_at": "2026-11-01T22:58:37.382894+08:00",
+  "finished_at": "2026-11-01T22:58:43.906771+08:00",
+  "boot_sha256": "6b04878c3a0df6e52664d4fbe5509798d5501a92e5b33d2785d50bdfc3b28750",
+  "kernel_sha256": "e1c866a2ac67a33693364dbbec6ecc845bf883705677f4e91f7d96a60ca479b8",
+  "boot_bytes": 62713856,
+  "partition": "BOOT only",
+  "exit_code": 0,
+  "reboot_policy": "Heimdall default reboot",
+  "hardware_startup_result": "pending owner observation"
+}

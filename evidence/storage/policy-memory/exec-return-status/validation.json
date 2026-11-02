@@ -1,0 +1,5 @@
+{
+  "command": "PATH=/opt/homebrew/opt/llvm/bin:$PATH .cache/probe-test-venv/bin/python -m unittest discover -s tests -p test_exec_return_status_probe.py -v",
+  "result": "3 tests passed: real assembled AArch64 execution for zero6s and nonzero16s (2,12,13,0xffffffff), original X0/X1/X2 passed unchanged to callee, one call, no probe memory writes; unknown source refused without output",
+  "scope": "Counter and return value simulated in host Unicorn; actual kernel copy separately hash/site/empty-cave checked and packed FAT code independently verified"
+}

@@ -1,0 +1,19 @@
+{
+  "device": "sm-t970",
+  "authorization": "Ongoing BOOT-only diagnosis following user 刷入 authorization; user supplied resulting photo and requested T733/SM8250 reference comparison. Device detected in Download mode before this upload.",
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/step7/probes/ufs-union-reference/boot.img"
+  ],
+  "started_at": "2026-11-01T22:35:34.044444+08:00",
+  "finished_at": "2026-11-01T22:35:40.608118+08:00",
+  "boot_sha256": "49f3b166316b3314d36c4bbbbe64a1434ab8302609c5649c8dfc8b006fd20ff7",
+  "kernel_sha256": "1d83105ebe04011b84915342aee4fea8173843bba531d4c3f7d3e0f47c66a93c",
+  "boot_bytes": 62713856,
+  "partition": "BOOT only",
+  "exit_code": 0,
+  "reboot_policy": "Heimdall default reboot",
+  "hardware_startup_result": "pending owner observation"
+}

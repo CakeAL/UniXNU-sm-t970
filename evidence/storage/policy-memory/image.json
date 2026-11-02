@@ -1,0 +1,25 @@
+{
+  "device_revision": "ba275cae5ba86c7076a40ae6057c755702262881",
+  "framework_revision": "194aae294c1107e791f4f74b2be371a391ac6bc4",
+  "command": "python3.14 scripts/build-smmu-report.py --mode publish --kernel-build out/step7/policy-memory-kernel.json --output out/step7/probes/ufs-policy-memory",
+  "kernel_sha256": "e46326182b42f76791d00ad3671fbf77e00fda522ec2be5805e5aed0e1ba7a08",
+  "payload_kernel_sha256": "0b04a7823d5fa57ee0397133379f951bf9709dc5f6d32bd3039ff1a0c593451a",
+  "firmware_sha256": "515105d758a9d61078dffce5012db0754a71cec351a1bb34b30ee791196b5690",
+  "firmware_dtb_sha256": "86c14aa305a6cf5db46665f4095d28aadcb1ea5ce9d213cd711641a07504ed1d",
+  "payload_sha256": "d47b1f0841f9192a9090bb03e991491998052d928d77c2dd3af052239a0aa310",
+  "boot_sha256": "12766f5f207f85d07f2b30a00c2ae30aa320cc702167da09727ff3889c9e0c0a",
+  "boot_bytes": 62713856,
+  "boot_partition_bytes": 71303168,
+  "kernel_args": [
+    "-v",
+    "cpus=1",
+    "t970-novc",
+    "sheng-pmgr=2",
+    "t970-ufs-publish=1"
+  ],
+  "independent_fat_check": true,
+  "independent_fd_check": true,
+  "mode": "publish",
+  "hardware_tested": false,
+  "flash_performed": false
+}

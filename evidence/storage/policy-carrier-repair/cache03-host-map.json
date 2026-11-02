@@ -1,0 +1,9 @@
+{
+  "file": "dyld_shared_cache_arm64.03",
+  "logical_file_offset": 35651584,
+  "device_byte_offset": 175710208,
+  "device_block_4096": 42898,
+  "contiguous_bytes": 1048576,
+  "flags": 0,
+  "scope": "Host read-only APFS F_LOG2PHYS_EXT mapping; not tablet mapping"
+}

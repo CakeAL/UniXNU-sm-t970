@@ -1,0 +1,17 @@
+{
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/step7/probes/policy-before-init-exec/boot.img"
+  ],
+  "authorization": "User resumed BOOT bring-up and reports returned to Download; repeat previously positive before-exec checkpoint explained as control",
+  "started_at": "2026-11-02T13:17:52.557591+08:00",
+  "finished_at": "2026-11-02T13:17:59.032707+08:00",
+  "boot_sha256": "c544bae1af7a960cc0d0d536209bfea51e55766bb441d1589e5c1cc2cbed7e36",
+  "partition": "BOOT only",
+  "exit_code": 0,
+  "reboot_requested": true,
+  "purpose": "Repeat exact previously positive immediate-before-exec checkpoint after ambiguous report for after-return image",
+  "hardware_startup_result": "pending owner observation"
+}

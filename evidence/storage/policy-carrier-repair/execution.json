@@ -1,0 +1,13 @@
+{
+  "authorization": "User 继续 following exact two-carrier-range approval request",
+  "recorded_after_carrier_completion_at": "2026-11-01T23:39:23.894409+08:00",
+  "carrier_bytes_written": 73287008,
+  "both_old_backups_verified": true,
+  "both_new_envelopes_fully_readback_verified": true,
+  "critical_root_blocks_unchanged": true,
+  "root_windows_rewritten": false,
+  "partition_table_changed": false,
+  "recovery_partition_written": false,
+  "xnu_boot_observation": "Owner photo now shows memorystatus no-victim panic, not the prior EACCES screen; full cache mapping remains unverified",
+  "observation_reference": "evidence/storage/policy-memory/device-097c4f8c.json"
+}

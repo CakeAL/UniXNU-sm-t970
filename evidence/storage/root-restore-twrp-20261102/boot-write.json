@@ -1,0 +1,19 @@
+{
+  "partition": "BOOT",
+  "image_sha256": "17bda459286b24f514933096009c989241536bea4916fc08009123725579c6fa",
+  "image_bytes": 62713856,
+  "started_at": "2026-11-02T13:36:48.448431+08:00",
+  "root_fully_verified": true,
+  "carriers_verified": true,
+  "write_attempted": true,
+  "verified": true,
+  "reboot_requested": true,
+  "write_exit_code": 0,
+  "readback_bytes": 62713856,
+  "readback_sha256": "17bda459286b24f514933096009c989241536bea4916fc08009123725579c6fa",
+  "read_exit_code": 0,
+  "finished_at": "2026-11-02T13:36:51.356217+08:00",
+  "reboot_exit_code": 0,
+  "reboot_at": "2026-11-02T13:37:16.311301+08:00",
+  "hardware_startup_result": "pending owner observation"
+}

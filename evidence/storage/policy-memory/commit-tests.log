@@ -1,0 +1,29 @@
+test_digest_crosses_raw_and_fill_boundaries (test_owner_manifest_inputs.OwnerManifestInputs.test_digest_crosses_raw_and_fill_boundaries) ... ok
+test_raw_window_matches_declared_digest (test_owner_manifest_inputs.OwnerManifestInputs.test_raw_window_matches_declared_digest) ... ok
+test_rejects_old_sparse_source_header_at_window_offset (test_owner_manifest_inputs.OwnerManifestInputs.test_rejects_old_sparse_source_header_at_window_offset) ... ok
+test_shngroot_digest_starts_at_entry_byte56 (test_owner_manifest_inputs.OwnerManifestInputs.test_shngroot_digest_starts_at_entry_byte56) ... ok
+test_short_raw_input_refused (test_owner_manifest_inputs.OwnerManifestInputs.test_short_raw_input_refused) ... ok
+test_both_backups_checked_before_first_write (test_policy_carrier_write.PolicyCarrierWrite.test_both_backups_checked_before_first_write) ... ok
+test_exact_readback_required_for_success (test_policy_carrier_write.PolicyCarrierWrite.test_exact_readback_required_for_success) ... ok
+test_first_backup_mismatch_prevents_all_remote_writes (test_policy_carrier_write.PolicyCarrierWrite.test_first_backup_mismatch_prevents_all_remote_writes) ... ok
+test_readback_mismatch_stops_before_second_envelope (test_policy_carrier_write.PolicyCarrierWrite.test_readback_mismatch_stops_before_second_envelope) ... ok
+test_write_or_flush_failure_stops_before_second_envelope (test_policy_carrier_write.PolicyCarrierWrite.test_write_or_flush_failure_stops_before_second_envelope) ... ok
+test_identity_geometry_and_mounts_fail_closed (test_recovery_storage.RecoveryReadinessTests.test_identity_geometry_and_mounts_fail_closed) ... ok
+test_twrp_requires_exact_model_and_product_pair (test_recovery_storage.RecoveryReadinessTests.test_twrp_requires_exact_model_and_product_pair) ... ok
+test_stream_write_readback_and_refusal (test_adb_root_write.WriteTests.test_stream_write_readback_and_refusal) ... ok
+test_nonzero_errors (test_exec_return_status_probe.ExecutionTests.test_nonzero_errors) ... ok
+test_zero_return (test_exec_return_status_probe.ExecutionTests.test_zero_return) ... ok
+test_unknown_source_is_preserved_and_refused (test_exec_return_status_probe.InputTests.test_unknown_source_is_preserved_and_refused) ... ok
+test_return_value_and_stack_abi (test_shared_map_result_probe.ExecutionTests.test_return_value_and_stack_abi) ... ok
+test_actual_pinned_copy_when_local_inputs_exist (test_shared_map_result_probe.InputTests.test_actual_pinned_copy_when_local_inputs_exist) ... ok
+test_unknown_source_is_refused_before_output (test_shared_map_result_probe.InputTests.test_unknown_source_is_refused_before_output) ... ok
+test_passthrough_without_matching_prior_success (test_post_map_syscall_probe.ExecutionTests.test_passthrough_without_matching_prior_success) ... ok
+test_successful_mapping_predicate_and_ring_wrap (test_post_map_syscall_probe.ExecutionTests.test_successful_mapping_predicate_and_ring_wrap) ... ok
+test_unknown_kernel_refused (test_post_map_syscall_probe.InputTests.test_unknown_kernel_refused) ... ok
+test_real_setter_result_and_unchanged_marker (test_initproc_main_probe.ExecutionTests.test_real_setter_result_and_unchanged_marker) ... ok
+test_unknown_kernel_refused_without_output (test_initproc_main_probe.InputTests.test_unknown_kernel_refused_without_output) ... ok
+
+----------------------------------------------------------------------
+Ran 24 tests in 3.084s
+
+OK

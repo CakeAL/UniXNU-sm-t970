@@ -1,0 +1,19 @@
+{
+  "device": "sm-t970",
+  "boot_sha256": "6b04878c3a0df6e52664d4fbe5509798d5501a92e5b33d2785d50bdfc3b28750",
+  "kernel_sha256": "e1c866a2ac67a33693364dbbec6ecc845bf883705677f4e91f7d96a60ca479b8",
+  "photo_sha256": "356db6684edc60649dc53b5c307d904aacb203233a145fe44b0f262370153ca2",
+  "association": "Owner photo after recorded BOOT-only upload; not readback",
+  "observed": {
+    "signature_error": 13,
+    "signature_stage": 171,
+    "read_file_offset_hex": "2200000",
+    "read_file_offset_bytes": 35651584,
+    "cdhash": "55b4a307efbf08234c98c81f09f1d17e5efc0d0a",
+    "selected_syscalls": 18,
+    "cache03_open_errno": 0,
+    "cache03_signature_add_errno": 13
+  },
+  "conclusion": "AMFI and earlier signature setup passed for this blob. EACCES originates in vn_rdwr during native4k preparation at .03 file offset34MiB. Read denial may originate in MAC read mediation or filesystem/block I/O; not yet distinguished.",
+  "next": "Observe MAC-read versus VNOP_READ errors and actual UFS owner-integrity failure state, without retries or grants."
+}

@@ -1,0 +1,20 @@
+{
+  "pass": true,
+  "compiler_flags": [
+    "XNU_OWNER_CACHE_MOUNT=1",
+    "XNU_OWNER_CACHE_STARTUP=1",
+    "XNU_OWNER_BOOT_MANIFEST=1",
+    "XNU_OWNER_DATA_MOUNT=0",
+    "XNU_OWNER_CRYPTEX_FILES=0",
+    "XNU_OWNER_UNION_SYSTEMOS=1"
+  ],
+  "preprocessed_sha256": "5fef001091c087d67f2e837163cf82a5a790924325f2d7505d15258f298ee68a",
+  "vfs_source_sha256": "16784fb61a44b8fd0c4f1a9c76052e21125f7ef268a78cddbc7d203b8c84ee32",
+  "kernel_sha256": "1d83105ebe04011b84915342aee4fea8173843bba531d4c3f7d3e0f47c66a93c",
+  "checks": [
+    "Active root mount with MNT_UNION; no DYLD_SHARED_CACHE_DIR override",
+    "Diagnostic requires the actual /System cache path, not an absent later cryptex alias",
+    "Five reference-accounting cases compiled from actual patched XNU functions pass"
+  ],
+  "scope": "Host build checks only; no runtime launchd/cache claim"
+}

@@ -1,0 +1,29 @@
+{
+  "device": "sm-t970",
+  "source": "User-provided startup photo and dsh handoff; image association comes from user report, not a readback",
+  "reported_boot_sha256": "a41b5c115bd131a804e6266ab66accf072790fdd3ea00264cd0e3eb2bdaf3818",
+  "reported_kernel_sha256": "d66b832bf19049138bba84ff020083e8bc77f115956f1ea0b0943f1dbe88a97c",
+  "photo_sha256": "17450813af2b7f075cb11d84b1b72be5aa63912822370c2696c606bbe0ec7815",
+  "observed": {
+    "mount": 0,
+    "stage": 6,
+    "auth": 1,
+    "mstatus": 0,
+    "sys": 0,
+    "cryptex": 2,
+    "preboot": 2,
+    "probe": 1,
+    "path": "/dev/disk1s1",
+    "media": 1,
+    "whole": 0,
+    "named": 1,
+    "authorized": 1
+  },
+  "host_findings": [
+    "Preserved d66b832b kernel matches the reported kernel digest.",
+    "Before regeneration, resolved .config and kern_exec.c compile record both enable OWNER_UNION_SYSTEMOS; changing the defconfig alone did not disable the union.",
+    "The path probe unconditionally panics before load_init_program_at_path; this photograph does not establish dyld execution or carrier acceptance."
+  ],
+  "baseline_directory": "out/step7/cryptex-resume-baseline",
+  "next": "Explicitly disable union, regenerate defconfig, allow successful cryptex probe to proceed, rebuild kernel/payload/BOOT, and check preprocessed compiler inputs."
+}

@@ -1,0 +1,21 @@
+{
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/step7/probes/policy-release-normal/boot-partition.img"
+  ],
+  "authorization": "Ongoing user-authorized bring-up after owner confirms release exec zero-return timing; normal image continuation explained",
+  "boot_sha256": "73a5738beb948edc90b9d0357663a62a3e672e8a3ee75aaf7bd90aad699ecbba",
+  "partition": "BOOT only",
+  "started_at": "2026-11-02T14:03:19.113933+08:00",
+  "expected_observation": "No deliberate reset; release launchd selection and normal panic screen. Observe actual startup or failure.",
+  "finished_at": "2026-11-02T14:03:25.821081+08:00",
+  "exit_code": 0,
+  "upload_reported_success": true,
+  "session_end_confirmed": true,
+  "reboot_requested": true,
+  "reboot_confirmed": true,
+  "readback_verified": false,
+  "hardware_result": "pending owner observation"
+}

@@ -1,0 +1,7 @@
+{
+  "observation_source": "Owner:16s后重启的",
+  "boot_partition_sha256": "201d98d2dba8d77891411bdde4dc31bb3e8cd9f974c941179f0d8faac3193474",
+  "result": "Original init exec call returned nonzero on first reached attempt",
+  "limits": "No exact errno recorded. DEVELOPMENT default first candidate is /usr/appleinternal/sbin/launchd.development, absent in originalOS; this terminal probe prevents fallback and does not prove /sbin/launchd failure.",
+  "next_action": "Keep same status probe but explicitly select launchdsuffix=release to test /sbin/launchd"
+}

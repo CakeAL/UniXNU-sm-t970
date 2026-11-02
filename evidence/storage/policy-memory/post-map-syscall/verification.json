@@ -1,0 +1,16 @@
+{
+  "pass": true,
+  "call_site": "0xfffffff00783b4b4",
+  "stub_va": "0xfffffff0073fd48c",
+  "message_va": "0xfffffff0073fd540",
+  "native_callback_and_original_lr_pass_through_verified": true,
+  "unmodified_outside_reviewed_stub_message_and_call": true,
+  "map_and_exec_calls_original": true,
+  "args": "-v cpus=1 t970-novc sheng-pmgr=2 t970-ufs-publish=1 launchdsuffix=release",
+  "raw_boot_sha256": "761421f8def1817d42c6947105fb279f12e40e690714657e92062e6f7b363e3e",
+  "boot_partition_sha256": "24d8643bf7ac6e13886f5f36235f32d6f720bde22acf402ddd6c3b5531106df6",
+  "boot_partition_bytes": 71303168,
+  "expected_message": "postmap sc=<later PID1 BSD syscall> err=<its result hex>",
+  "predicate": "Last completed tracked PID1 call prefix sc536 e0, current PID1 callback reached on a later BSD SVC",
+  "scope": "Existing kernel trace read only; no additional user-memory reads. If shown, a later PID1 BSD call has reached its result after successful cache map syscall. Does not prove launchd main; no display is not a localization."
+}

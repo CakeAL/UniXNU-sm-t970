@@ -1,0 +1,42 @@
+{
+  "segments": [],
+  "raw_image": "../UniXNU/out/sm-t970/ipados-17.7.11-21H461/sm-t970/userdata/userdata-root.img",
+  "input_window_digests_verified": true,
+  "image_bytes": 9382658048,
+  "generation": 1,
+  "windows": [
+    {
+      "name": "OS",
+      "offset": 1048576,
+      "size": 6077580800,
+      "block_count": 1483785,
+      "volume_uuid": "04769D26-2CA0-4825-B443-E2E5F88300F2",
+      "image_sha256": "e5634d04a8ac35f024845f583394e0a35deb26a04cb0c00286a8674e25a9a4f2",
+      "hash_table_sha256": "5f14cb46c74da9cfd64a456d589c845d81ffe3e7547fd035ca3a1961c9eefcb8",
+      "trusted_key_sha256": "4d5cb682a66bc56f07a17ec4015d0da2a100cf065df05d5a278bcf5646df49f4",
+      "envelope_bytes": 47481664,
+      "envelope_blocks": 11593,
+      "envelope_sha256": "8fefc15fecc382730c1aeae6154e0eabb195d16bc51099c6095ff1395be43dc2",
+      "signature_verified_by_openssl": true,
+      "host_verification": "vr_host_open plus 1483785 complete blocks authenticated",
+      "verified_blocks": 1483785
+    },
+    {
+      "name": "SystemOS",
+      "offset": 6079643648,
+      "size": 3303014400,
+      "block_count": 806400,
+      "volume_uuid": "8846FE78-2910-4297-AF97-D59BB6F8FC16",
+      "image_sha256": "b4908cde41d23e6bc05e6af51a2c9eeb00cf0f863a6a18b1600c96a3fd70414f",
+      "hash_table_sha256": "e3cbe58362060689f806cc81ecd5569debedcfa0b8df4da9875bbd79ba01afc8",
+      "trusted_key_sha256": "4d5cb682a66bc56f07a17ec4015d0da2a100cf065df05d5a278bcf5646df49f4",
+      "envelope_bytes": 25805344,
+      "envelope_blocks": 6301,
+      "envelope_sha256": "869a186ae40656ff9c3be64080120dc2e648f9307d3efa213d9ed5c2084960b8",
+      "signature_verified_by_openssl": true,
+      "host_verification": "vr_host_open plus 806400 complete blocks authenticated",
+      "verified_blocks": 806400
+    }
+  ],
+  "total_envelope_bytes": 73287008
+}

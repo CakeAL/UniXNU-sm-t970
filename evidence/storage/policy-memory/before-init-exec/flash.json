@@ -1,0 +1,18 @@
+{
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/step7/probes/policy-before-init-exec/boot.img"
+  ],
+  "authorization": "Ongoing user-authorized BOOT-only bring-up diagnosis; immediate before-exec probe explained before upload",
+  "started_at": "2026-11-02T00:21:40.479660+08:00",
+  "finished_at": "2026-11-02T00:21:46.999052+08:00",
+  "boot_sha256": "c544bae1af7a960cc0d0d536209bfea51e55766bb441d1589e5c1cc2cbed7e36",
+  "partition": "BOOT only",
+  "exit_code": 0,
+  "reboot_requested": true,
+  "expected_observation": "Immediate reset on reaching ___mac_execve call boundary, no intentional delay",
+  "hardware_startup_result": "pending owner observation",
+  "normal_image_preserved": "out/step7/probes/ufs-policy-memory/boot.img"
+}

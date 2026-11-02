@@ -1,0 +1,20 @@
+{
+  "device": "sm-t970",
+  "authorization": "User explicitly requested 刷入 for the reviewed dc42838f BOOT",
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/step7/probes/ufs-cryptex-resume/boot.img"
+  ],
+  "started_at": "2026-11-01T22:22:53.883924+08:00",
+  "finished_at": "2026-11-01T22:23:00.423100+08:00",
+  "boot_sha256": "dc42838f17c0e82a542839fdcb013a33ef6711c5a19e46b2d6545579d30a1700",
+  "boot_bytes": 62713856,
+  "kernel_sha256": "8262854bf783e882ebafcb8c230844039493f7e6ecf226185bba03be4196e693",
+  "exit_code": 0,
+  "partition": "BOOT only",
+  "reboot_policy": "Heimdall default reboot after upload",
+  "hardware_startup_result": "pending owner observation",
+  "log": "evidence/storage/ufs-cryptex-resume/flash.log"
+}

@@ -1,0 +1,17 @@
+{
+  "pass": true,
+  "source_call_va": "0xfffffff0076e90ac",
+  "probe_cave_va": "0xfffffff0073fd620",
+  "cave_words": [
+    "0x52800120",
+    "0x72b08000",
+    "0xaa1f03e1",
+    "0xaa1f03e2",
+    "0xaa1f03e3",
+    "0xd4000003",
+    "0xd503205f",
+    "0x17ffffff"
+  ],
+  "firmware_sha256": "515105d758a9d61078dffce5012db0754a71cec351a1bb34b30ee791196b5690",
+  "scope": "Immediate PSCI reset before ___mac_execve in load_init_program_at_path; does not execute exec or prove userspace startup."
+}

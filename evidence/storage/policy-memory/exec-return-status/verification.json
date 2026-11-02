@@ -1,0 +1,18 @@
+{
+  "pass": true,
+  "packed_kernel_checked": true,
+  "call_site": "0xfffffff0076e90ac",
+  "callee": "0xfffffff0076e830c",
+  "code_sha256": "a6caf37251a40c77b7eb295488dfb0150598a3e66ec10acb3287e82b6dff69ee",
+  "delays": {
+    "return_zero": 6,
+    "return_nonzero": 16
+  },
+  "args": "-v cpus=1 t970-novc sheng-pmgr=2 t970-ufs-publish=1",
+  "firmware_sha256": "515105d758a9d61078dffce5012db0754a71cec351a1bb34b30ee791196b5690",
+  "raw_boot_sha256": "7d43b59a1f4c6f1717ccd4d9bec66a4e2d200fb4090f21e573c0d460248bbd51",
+  "boot_partition_sha256": "201d98d2dba8d77891411bdde4dc31bb3e8cd9f974c941179f0d8faac3193474",
+  "boot_partition_bytes": 71303168,
+  "zero_tail": true,
+  "scope": "Same original exec arguments/callee, immediate W0 test and terminal reset. Independent packed FAT/FD checks; source kernel unchanged."
+}

@@ -1,0 +1,4 @@
+# Unified-diff context is literal input to the kernel patch tool.
+*.patch -whitespace
+# Retain raw command output, including its final blank separator.
+*.log whitespace=-blank-at-eof

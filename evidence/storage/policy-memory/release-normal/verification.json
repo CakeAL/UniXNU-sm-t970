@@ -1,0 +1,21 @@
+{
+  "source_normal_payload_sha256": "d47b1f0841f9192a9090bb03e991491998052d928d77c2dd3af052239a0aa310",
+  "source_normal_boot_sha256": "12766f5f207f85d07f2b30a00c2ae30aa320cc702167da09727ff3889c9e0c0a",
+  "source_kernel_sha256": "e46326182b42f76791d00ad3671fbf77e00fda522ec2be5805e5aed0e1ba7a08",
+  "packed_kernel_sha256": "0b04a7823d5fa57ee0397133379f951bf9709dc5f6d32bd3039ff1a0c593451a",
+  "args": "-v cpus=1 t970-novc sheng-pmgr=2 t970-ufs-publish=1 launchdsuffix=release",
+  "original_exec_call_intact": true,
+  "no_terminal_reset_probe": true,
+  "panic_screen": true,
+  "adt_unchanged": true,
+  "trust_cache_unchanged": true,
+  "scope": "Repack qualified normal12766f5f payload with release launchd selection only; no kernel recompile or board default changes",
+  "raw_boot_sha256": "2dfe07894edeb94ee66c71d05f4c422d74c30adafc547a61c5871af3c8873ff4",
+  "boot_partition_sha256": "73a5738beb948edc90b9d0357663a62a3e672e8a3ee75aaf7bd90aad699ecbba",
+  "boot_partition_bytes": 71303168,
+  "zero_tail": true,
+  "independent_fd_check": true,
+  "firmware_dtb_sha256": "86c14aa305a6cf5db46665f4095d28aadcb1ea5ce9d213cd711641a07504ed1d",
+  "packing_command": "PATH=/opt/homebrew/opt/python@3.14/libexec/bin:$PATH python3.14 ../UniXNU/unixnu bootimg -D . --uefi .cache/uefi-source/Mu-Silicium --fd out/step7/ufs-readonly-inputs/SILICIUM_UEFI.fd --dtb out/firmware-inputs/firmware.dtb --ramdisk out/step7/probes/policy-release-normal/payload.img --output out/step7/probes/policy-release-normal/boot.img",
+  "payload_transform": "Copy exact normal12766f5f FAT; replace exactly one existing args value by appending launchdsuffix=release via mcopy; independently compare kernel/ADT/trust-cache hashes and decode original exec BL. Pad completed BOOT with zeros to71303168bytes."
+}

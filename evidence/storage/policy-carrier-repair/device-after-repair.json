@@ -1,0 +1,17 @@
+{
+  "scope": "Two critical root-image blocks re-read after fixed carrier update; not a new full root-volume readback",
+  "rows": [
+    {
+      "window": "OS",
+      "partition_relative_lba": 763648,
+      "sha256": "803e18f71bec2094e805aa430e61ff80a3aab10cab7a47cbe4136ad43ba3b035",
+      "unchanged": true
+    },
+    {
+      "window": "SystemOS",
+      "partition_relative_lba": 1527296,
+      "sha256": "f6291e26c263031ec856e6bf47253e52369e1da0363ea7a7e4ac1ef988f7cd26",
+      "unchanged": true
+    }
+  ]
+}

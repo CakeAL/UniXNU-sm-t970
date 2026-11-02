@@ -1,0 +1,7 @@
+{
+  "command": "python3.14 -m unittest discover -s tests -p test_recovery_storage.py; python3.14 -m unittest discover -s tests -p test_adb_root_write.py; python3.14 -m unittest discover -s tests -p test_policy_carrier_write.py",
+  "result": "2 readiness tests (including exact TWRP pair acceptance/refusal), root writer1 test with6 failure/success subcases and5 carrier tests passed before device writes",
+  "check_script_sha256": "b2d9df1d948bc1dad9e30cec0880be99009680cb26254569870de540955258cd",
+  "scope": "TWRP identity support only; root, fixed geometry and unmounted checks retained",
+  "device_readback_scope": "Complete9.38GB root and both complete carrier payloads plus complete BOOT image prefix; readback receipts separate"
+}

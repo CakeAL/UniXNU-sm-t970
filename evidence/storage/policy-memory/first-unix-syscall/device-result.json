@@ -1,0 +1,7 @@
+{
+  "boot_sha256": "bb452d74a31e9998ef40bb4cc77f89023e7a9c39aa30f8a83fd83a7562d4c82f",
+  "observation_source": "Owner:6s后重启了",
+  "result": "Original get_bsdthread_info helper returned inside unix_syscall dispatcher; userspace SVC reached BSD path",
+  "limits": "No PID or syscall number captured; does not prove a syscall handler completed, shared cache mapped or launchd main executed.",
+  "next_action": "Check shared-region mapping call return"
+}

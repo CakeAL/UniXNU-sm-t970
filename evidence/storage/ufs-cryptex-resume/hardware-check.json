@@ -1,0 +1,47 @@
+{
+  "scope": "Step 5 host check of the two device-tree inputs and the firmware integration",
+  "device_revision": "ba275cae5ba86c7076a40ae6057c755702262881",
+  "firmware_dtb": {
+    "path": "/Users/cakeal/vsc/UniXNU-sm-t970/out/firmware-inputs/firmware.dtb",
+    "bytes": 837154,
+    "sha256": "86c14aa305a6cf5db46665f4095d28aadcb1ea5ce9d213cd711641a07504ed1d",
+    "nodes": 4533,
+    "memory": [
+      "0x80000000+0x3bb00000",
+      "0x180000000+0x100000000",
+      "0xc0000000+0xc0000000"
+    ],
+    "reserved_memory_entries": 0,
+    "chosen_properties": [
+      "bootargs",
+      "kaslr-seed",
+      "linux,initrd-end",
+      "linux,initrd-start"
+    ]
+  },
+  "board_dts": {
+    "bytes": 7057,
+    "sha256": "d9895e6fd3c99fc040f76f23816217c683273669c5fd2045c450c0293f53c157",
+    "nodes": 56,
+    "memory": [
+      "0x80000000+0x80000000"
+    ],
+    "adt_bytes": 11492
+  },
+  "firmware_integration": {
+    "dsc": true,
+    "fdf": true,
+    "base_configuration": "/Users/cakeal/vsc/UniXNU-sm-t970/.cache/uefi-source/Mu-Silicium/Silicon/Silicium/SiliciumPkg/SiliciumPkg.dsc.inc"
+  },
+  "built_firmware": {
+    "fd_bytes": 3145728,
+    "fd_sha256": "734842638d2884f20753de4117979bc388c175907c9689a33ff546d222bf68af",
+    "fv_files": 89
+  },
+  "result": "PASS",
+  "limits": [
+    "The ADT was generated with artificial identity 1 and is not a boot input.",
+    "The firmware DTB is the stock bootloader handoff tree; its /chosen identity values stay in ignored storage.",
+    "Nothing was compiled into a payload, written to the device or booted."
+  ]
+}

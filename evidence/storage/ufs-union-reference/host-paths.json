@@ -1,0 +1,44 @@
+{
+  "root_volume_uuid": "04769D26-2CA0-4825-B443-E2E5F88300F2",
+  "volume_writable": false,
+  "mount": "/Users/cakeal/vsc/UniXNU/.cache/firmware/target-volumes/os-mount",
+  "entries": {
+    "System": {
+      "mode": "drwxr-xr-x",
+      "symlink_target": null,
+      "children": [
+        "Applications",
+        "Cryptexes",
+        "Developer",
+        "DriverKit",
+        "Library"
+      ]
+    },
+    "System/Cryptexes": {
+      "mode": "drwxr-xr-x",
+      "symlink_target": null,
+      "children": [
+        "App",
+        "OS"
+      ]
+    },
+    "System/Cryptexes/OS": {
+      "mode": "lrwxr-xr-x",
+      "symlink_target": "../../private/preboot/Cryptexes/OS",
+      "children": null
+    },
+    "System/Cryptexes/App": {
+      "mode": "lrwxr-xr-x",
+      "symlink_target": "../../private/preboot/Cryptexes/App",
+      "children": null
+    },
+    "private/preboot": {
+      "mode": "drwxr-xr-x",
+      "symlink_target": null,
+      "children": []
+    }
+  },
+  "expected_target_in_root": "private/preboot/Cryptexes/OS",
+  "target_present": false,
+  "scope": "Read-only host image inspection; no device mountpoint probe"
+}

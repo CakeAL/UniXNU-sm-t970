@@ -1,0 +1,7 @@
+{
+  "boot_sha256": "73a5738beb948edc90b9d0357663a62a3e672e8a3ee75aaf7bd90aad699ecbba",
+  "observation_source": "Owner photo14:04:37 and text卡粉条了",
+  "result": "Persistent entry bars and firmware backdrop; no new panic text visible",
+  "limits": "Photo does not locate current execution; no-reset image after separately confirmed direct-init-exec zero return",
+  "next_action": "First BSD syscall dispatch checkpoint"
+}

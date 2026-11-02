@@ -1,0 +1,30 @@
+{
+  "command": "PATH=/opt/homebrew/opt/python@3.14/libexec/bin:$PATH python3.14 out/step7/verify-cryptex-build.py",
+  "checks": {
+    "kern_exec.c": {
+      "owner_flags": [
+        "XNU_OWNER_CACHE_MOUNT=1",
+        "XNU_OWNER_CACHE_STARTUP=1",
+        "XNU_OWNER_BOOT_MANIFEST=1",
+        "XNU_OWNER_DATA_MOUNT=0",
+        "XNU_OWNER_CRYPTEX_FILES=0",
+        "XNU_OWNER_UNION_SYSTEMOS=0"
+      ],
+      "preprocessed_sha256": "446603d424cd0d3c522119967e3149054404be175fc7bd2dd07cac434eae72a9",
+      "source_sha256": "982416d15f74fe4060152dbedc356d2acbc52d2501ff19132058c72bc48ee021",
+      "pass": true
+    },
+    "vm_unix.c": {
+      "owner_flags": [
+        "XNU_OWNER_CACHE_CARRIER=1",
+        "XNU_OWNER_CACHE_CARRIER_WRONG_UUID=0"
+      ],
+      "preprocessed_sha256": "54c65e100dac7e43c5355a22b58e424f19d99861355134b50d5aa517ca3636c8",
+      "source_sha256": "1904acb95be7093ff90dcdd4117b5900f5ff0a027f96ded7f7697cb2791934b4",
+      "pass": true
+    }
+  },
+  "kernel_sha256": "8262854bf783e882ebafcb8c230844039493f7e6ecf226185bba03be4196e693",
+  "pass": true,
+  "scope": "Real compiler records replayed with -E -P; checks active mount, environment, carrier and conditional panic branches. Host verification only."
+}

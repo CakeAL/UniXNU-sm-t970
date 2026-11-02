@@ -1,0 +1,17 @@
+{
+  "boot_sha256": "12766f5f207f85d07f2b30a00c2ae30aa320cc702167da09727ff3889c9e0c0a",
+  "source_kernel_sha256": "e46326182b42f76791d00ad3671fbf77e00fda522ec2be5805e5aed0e1ba7a08",
+  "photo_sha256": "323f558b986f437afdf48d827edb2c97dfab918c5a2a023a9fd7b42c985deb04",
+  "association": "Owner photo after recorded BOOT-only upload; subsequent owner reports duration and repeats boot",
+  "observations": [
+    "Green/blue/magenta bars with firmware menu background, no panic text in photo",
+    "Owner first reported under1minute, later rebooted and reported unchanged for3minutes"
+  ],
+  "confirmed": "Entry and pre-MMU marker executed; persistent color does not localize later stall",
+  "unverified": [
+    "Full cache mapping",
+    "launchd main",
+    "actual runtime pin/borrow/copy counters"
+  ],
+  "next": "Isolated after-return checkpoint for shared-branch vr_open, then later execution boundary"
+}

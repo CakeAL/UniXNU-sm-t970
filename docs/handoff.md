@@ -3,6 +3,288 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
+## 当前里程碑：launchd已到达main（2026-11-02 14:51）
+
+机主照片显示 `launchd main marker=1 err=0`，BOOT870a11da（raw50cd2ef8）。
+这是原sysctl_handle_int返回后，读取真实kern.initproc_spawned=1得到的证据；
+XNU只允许PID1首次设置它，并明确标为launchd到达main。探针不写/伪造该状态。
+当前有意停在诊断panic；不要当作正常系统崩溃，也不要说桌面已可用。
+
+此前06a968f7已实测dyld shared map kr=0；24d8643b实测postmap sc=6 err=0，
+证明完整缓存系统调用536成功后，用户态继续并完成close。分别保存原图与镜像绑定。
+新的入口空白诊断仅改普通已核验panic内核副本，原源e4632618和正常0b04a782均保留。
+本次main停点free=0x104页约1MiB，256MiB owned窗口仍很紧；服务阶段与内存运行状态
+需继续取证，不能擅自把DTS保留洞改为RAM。可写Data尚未配置，软件显示/输入及桌面待适配。
+
+本轮按机主要求以中文commit收束功能修复与实机证据，不继续刷入探针。
+提交检查：24项针对测试、4组实际源码/生命周期检查通过，结构化记录13区通过。
+check-platform仍因旧五组件selection快照与既有VirtioMmioBlock选择不一致而失败；
+保存commit-check-platform.log，不删断言或冒称通过，本轮未改DTS。
+现有DTBO为已恢复原机备份，TWRP保留。最新证据索引：policy-memory/README.md。
+下列定位步骤保留历史顺序；有当时pending字样的回执须连同后续device-result读取。
+
+## 最新：共享缓存映射函数已返回，待直接读取返回码
+
+机主确认dbe8ca9d约35秒后复位。这证明vm_shared_region_map_file已返回（此前setup返回0），
+但不包含kern_return_t，不能据此说缓存映射成功或launchd main执行。
+新的06a968f7只修改已验证正常panic内核0b04a782的空入口padding116字节与该调用点，
+保留原callee及参数，返回后将W0显式零扩展、写到Darwin变参栈槽，调用现有panic渲染器。
+预期屏幕 `diagnostic: dyld shared map kr=<实际值>`，有意终止，不再按时间复位。
+0为该次调用KERN_SUCCESS，非零按原XNU返回枚举调查；即使0也不证明后续用户态启动。
+源内核e4632618和正常副本均保持；实际指令、Darwin参数ABI、改动范围及打包检查通过。
+必须使用原未插桩源推导MMU/entry地址，正常副本的SCTLR序列已被早期标记替换。
+最新回执见policy-memory/shared-map-result；设备观测待回报。
+
+当前处于首用户进程启动调试：已确认root/SystemOS、正式init exec返回0、BSD入口、
+共享缓存映射函数返回。尚待映射成功码、dyld继续执行、launchd main与服务启动证据。
+到可交互桌面还需可写Data、软件显示及输入等独立工作；无法按未知bug数量估计时间。
+
+## 最新：用户态已到BSD系统调用入口（2026-11-02 14:07）
+
+无复位73a5738b机主照片停留旧彩条，没有新panic文本，不能据图定位MMU。
+随后bb452d74探针在_unix_syscall的_get_bsdthread_info调用返回后复位；
+机主确认约6秒重启，证实用户态SVC已到BSD入口，不记录PID/系统调用号，
+尚不证明具体handler完成、共享缓存映射或launchd main。
+原图及结果见policy-memory/release-normal，正检查点见first-unix-syscall。
+
+下一镜像dbe8ca9d使用同一e4632618源与release参数，恢复原exec/Unix入口，
+只在__shared_region_map_and_slide的vm_shared_region_map_file返回后6秒复位。
+源码setup必须先返回0才会调用此点；后续正信号仍不包含映射函数返回码。
+镜像、独立FAT调用/FD校验与上传回执见policy-memory/shared-map-return，观测待回报。
+6秒不是从开机计时；前置缓存读取、哈希等可能耗时，无复位不能单独当卡死。
+
+## 最新：正式launchd exec返回零，恢复无复位运行（2026-11-02）
+
+机主确认7ac0a4ba（launchdsuffix=release，直接/sbin/launchd）粉条后6秒复位，
+即原___mac_execve本次返回W0=0。不能证明launchd main或dyld缓存映射；
+源码还说明某些越过不可返回点的激活失败可能返回0，需观察继续运行的结果。
+
+准备并上传无终止探针BOOT73a5738b（raw2dfe0789），在原正常12766f5f payload副本中
+只追加launchdsuffix=release；正常内核0b04a782、ADT和trust-cache均逐字节/摘要保持，
+exec调用恢复原BL97fffc98，保留正常panic画面，无人为6/16秒复位。
+原始e4632618源内核及board默认不变，DTBO保持恢复的原机版本，根卷与载体保持已核验值。
+上传回执和最终状态见 `evidence/storage/policy-memory/release-normal/`；机主观测待回报。
+
+## 当前exec定位（2026-11-02）
+
+TWRP完整读回发现Heimdall上传全分区后BOOT仍有旧footer，实际对照未生效；
+随后通过TWRP直接写646f44ad并完整读回，证明17bda459前缀不变、尾部全零。
+机主手动System仍停三星页；只读vbmeta与原备份一致flags3，bootloader版本仍T970ZCU2CVK1，
+但DTBO不同。已保留当前DTBO be754ac7，恢复原机备份49bcf93a（Heimdall exit0）。
+其后机主确认出现粉条、约6秒复位：第一次init exec调用已返回，不等于成功。
+完整证据见bootloader-audit-20261102；DTBO恢复后尚未单独读回，不把具体差异宣称为唯一原因。
+
+新增受源内核e4632618哈希限制的exec-return-status探针，直接调用原callee后立即检查W0：
+零6秒／非零16秒。Unicorn执行实汇编覆盖0、2、12、13和全1返回值、原参数不变与无内存写入；
+未知源拒绝，3项测试通过。BOOT201d98d2已刷入，机主确认16秒复位，即首个候选exec返回非零。
+重要：DEVELOPMENT默认先尝试/usr/appleinternal/sbin/launchd.development，原始卷没有这个文件；
+探针截断了正常回退，因此不能认定正式/sbin/launchd失败或精确errno。
+同一探针已显式--kernel-arg launchdsuffix=release直达/sbin/launchd；
+BOOT分区镜像7ac0a4ba（raw前缀dfdb220a），完整FAT内核与上一版逐字节相同，
+独立校验配置只有该额外参数，board默认不变。上传回执见policy-memory/release-exec-status，观测待回报。
+
+## 当前BOOT尾部对照（2026-11-02 13:41）
+
+机主确认恢复后仍停三星/RPMB页，未按键；主机ADB无设备、Heimdall可检测Download。
+此前BOOT全分区读回尾64字节仍有旧AVBf，指向56438784偏移、2112字节metadata，
+该位置现为零而非AVB0。原Android备份同footer指向有效AVB0。尾部共14个非零字节。
+这是包装候选原因，不能称实机已证实；备份vbmeta flags3也不是当前vbmeta实测。
+制作完整71303168字节BOOT646f44ad：17bda459全部62713856字节不变，余8589312字节补零。
+仅刷BOOT，上传100%报告成功，但session-end确认失败exit1，未确认重启与读回。
+下一步机主手动正常重启（黑屏立即松开电源/音量下），记录是否进入UniXNU。
+若仍不进入，用现有TWRP读回完整BOOT，核对尾部，并只读比较当前vbmeta/DTBO与备份。
+不继续改XNU补丁，不重写已核验根卷/载体。证据：policy-memory/boot-tail-control。
+
+## 当前交付：完整恢复后已重启（2026-11-02 13:37）
+
+根镜像9382658048字节已写入并完整读回匹配fd43ee70；两份固定corrected策略载体
+均先备份、写入、sync/flush并完整读回匹配8fefc15f／869a186a。
+BOOT17bda459的62713856字节也已通过TWRP写入、刷新并全部读回一致。
+13:37:16+08已adb reboot，当前观测待机主回报。此BOOT是exec返回后6秒复位探针。
+TWRP保留在RECOVERY。未重分区、未创建可写Data，不得再次格式化USERDATA。
+实机当前根内容以 `evidence/storage/root-restore-twrp-20261102/` 的新完整回执为准。
+下列“正在恢复”和“只读待核对”文字保留为本轮历史步骤，现已完成。
+
+## USERDATA删除后恢复（2026-11-02）
+
+机主进入TWRP后要求刷入镜像，又明确说之前删除了UserData。
+只读核对：设备BOOT前62713856字节精确匹配c544bae1，RECOVERY全部86888448字节
+精确匹配TWRP b5c722e7，补足此前session-end失败的写入验证。
+但SHNGROOT头已变、OS/SystemOS两个关键块均为零；以前的完整根读回不能继续代表现状。
+已正常卸载/sdcard和/data，TWRP root/分区几何/无挂载检查通过；
+正在用原完整raw源fd43ee70恢复9382658048字节并完整读回。
+后续必须核对/恢复两个固定corrected载体，再写BOOT17bda459并核对读回。
+TWRP模型是SAMSUNG_gts7xlwifi；检查器只额外接受它与精确product=gts7xlwifi组合，
+不放宽root、sda36、243668070400字节、4096扇区与无挂载要求；回归检查通过。
+当前结果以 `evidence/storage/root-restore-twrp-20261102/` 为准，未完成前不重启。
+根内容删除与三星bootloader屏幕是不同证据，不将前者直接当成后者原因。
+
+## TWRP刷写（2026-11-02 13:23）
+
+机主提供 `out/minsos/twrp_gts7xlwifi.tar` 并明确要求直接刷写。
+已核对唯一regular成员recovery.img、header2、gts7xlwifi属性及86888448字节容量，
+只向RECOVERY上传TWRP `b5c722e7…`，保留旧备份 `out/device-backup/recovery.img`。
+Heimdall上传100%且报告RECOVERY upload successful，但session-end确认失败，exit1；
+不把它记作完整成功，不自动重刷。使用--no-reboot，下一步机主按键进入Recovery，
+ADB可用后先验证RECOVERY及BOOT实际字节。本轮未写BOOT或USERDATA。
+详细回执见 `evidence/storage/twrp-install-20261102/flash.json`。
+
+## 当前会话（2026-11-02 下午）
+
+机主已要求继续。T733固定提交审阅见 [内核方案对照](t733-kernel-comparison.md)。
+exec返回后6秒探针 BOOT `17bda459…` 上传成功，但机主报告没有进入预期启动，
+随后回到Download，没有本轮exec结果。已重新上传昨晚的精确对照 `c544bae1…`，
+13:19照片为三星标志和bootloader信息，主机仍检测Download接口；未看到本轮UniXNU。
+没有证据把这次现象归因于exec，亦不能把RPMB fuse Set一行当作校验失败。
+两版FD、固件DTB、BootShim和命令行一致，载体不变，本轮未写USERDATA。
+机主有现成TWRP并询问切换，已请其进入并保持只读；下一步通过root ADB读取
+BOOT实际字节、核对镜像前缀SHA256，排除上传/启动选择问题，再恢复exec定位。
+照片含DID，只留ignored输出；公开文字与回执在policy-memory对应子目录。
+
+## 最新实机状态（2026-11-02）
+
+只读载体复用版 BOOT `12766f5f…`（源内核 `e4632618…`）实机停留色条，
+机主重启复测超过3分钟无变化；色条会残留，不能定位为MMU卡死。
+隔离的共享分支 `vr_open` 返回后6秒复位探针 BOOT `ef97eb6a…` 已刷入，
+机主报告粉条后约10秒自动重启，确认该调用至少一次返回。
+它不记录返回码，不能证明验签成功、两个设备均已准备或launchd开始执行。
+
+下一张 BOOT `c544bae1…` 已于00:21:47刷入成功：在
+`_load_init_program_at_path` 的 `___mac_execve` 调用前立即复位。
+这版不执行该调用，没有额外6秒等待；机主确认立刻重启，已到达exec调用边界。
+尚未证明exec成功、完整缓存映射或launchd主程序执行。机主要求今天停止、明天继续；
+当前BOOT仍是会自动重启的诊断镜像。下一轮从exec内部进展定位开始，勿重复判定为早期MMU卡死。
+精确镜像、指令独立校验、上传回执和观测均在 `evidence/storage/policy-memory/`。
+正常镜像与源内核保留，board.toml没有复位探针；本次只写BOOT。
+
+## 最新：正确策略已部署，进入内存压力定位
+
+BOOT097c4f8c＋正确策略的机主画面变为
+`memorystatus_jetsam_thread: no victim! available pages:3060`；free=0x760。
+这不是此前initproc缓存读取EACCES画面，但不能据此单独证明完整缓存映射或launchd主程序。
+照片及精确镜像／策略绑定见 `evidence/storage/policy-memory/device-097c4f8c.json`。
+
+源码确认原载体73293824字节一直保留，块设备又各自复制对应哈希表，额外73293824字节。
+本轮让块设备借用精确匹配的、驱动已分配并验签的载体，把载体设为只读，
+仍为每个设备单独复制／保护公钥页并在保护后重新vr_open；其他来源保留复制路径。
+设备销毁不释放全局借用载体，只释放私有公钥页；自有复制仍按原路径释放。
+实际configure/free源码的ASan/UBSan＋mprotect主机检查覆盖借用、回退及保护／验签／分配失败。
+内存panic追加pin/borrow/copy及native4k读量／blob数，borrow是别名字节，不是额外分配。
+不扩大256MiB EFI owned窗口，不改DTS或物理内存归属。构建和实机结果另记。
+
+## 当前根因与修复准备：旧 sparse 被签进了新 owner 策略
+
+最新独立主机全表比较发现，旧策略与已部署 raw 根镜像不匹配。
+平板完整根镜像 fd43ee70… 已读回通过；策略却继续使用早先已知有 seek 错误的旧 sparse。
+SystemOS 首个错误策略块为43008，错误 sparse／策略在此对应 SHNGROOT 头；
+raw根镜像与原始SystemOS在此一致。主机APFS映射显示，机主 .03 偏移34MiB处的
+1MiB读取覆盖该块，与 stage171 的拒绝吻合。
+
+修复了签名器 SHA 字段偏移80→56及缺失的全窗口摘要比较，优先使用完整 raw 根镜像。
+旧 sparse 会拒绝；新策略通过 RSA 与真实C验证器全量 OS1483785／SystemOS806400块。
+5项生成和5项写入中止／备份／读回测试通过。新策略及固定载体修复计划在
+`evidence/storage/policy-carrier-repair/`。机主授权后已完成临时Recovery启动、
+两份旧包络备份、固定载体更新及精确长度整段读回。新鲜设备关键块与正确策略一致、
+与旧策略不符；更新后这些根数据块未变。全部命令成功，已返回XNU BOOT097c4f8c。
+
+读取来源诊断候选内核88f716b0／BOOT097c4f8c完成主机构建和打包，但未刷写；
+发现输入根因后暂停该候选测试。修复需临时Recovery BOOT取得root ADB，先备份并核对
+旧包络，再仅更新 USERDATA LBA5505024／5516624 两段签名载体，并整段读回。
+现有 OS/SystemOS 数据镜像无需重写。BOOT6b04878c的最后设备结果仍是读取拒绝。
+
+## 最新：6b04878c 定位到 native4k 的实际读取失败
+
+机主照片显示 `csig EACCES stage=171 off=2200000`，CDHash 正确匹配主机 `.03`。
+这意味着 AMFI 和前置签名设置已经通过，EACCES 来自文件偏移34MiB处的真实 vn_rdwr。
+证据见 `evidence/storage/ufs-cache-read-source/device-6b04878c.json`。
+
+下一版区分 vn_rdwr 内部 MAC 读取检查（201）和文件系统 VNOP_READ 错误（202），
+并显示真实 UFS owner-integrity 失败计数及首个拒绝块的 index／物理LBA／长度／
+预期和实际 SHA256 前8字节。hash位0=预期索引有效，位1=诊断SHA计算成功。
+不重读、不重试放行，原来块校验失败仍返回 NotPrivileged；只对同一已拒绝 bounce
+快照多算一次哈希。9项现有状态测试和实际诊断 helper 的 ASan/UBSan 检查通过。
+新的构建／打包／刷写及设备结果分别记录，不从读取EACCES直接断言存储损坏。
+
+## 最新：dd007d58 已定位到 .03 的签名添加 EACCES
+
+机主照片显示 `init cache syscalls=18`，可见的最近 12 条中：
+`.02` 的 openat 与 `F_ADDFILESIGS_RETURN(97)` 均成功；`.03` 的 openat 成功返回 fd4，
+随后 `fcntl(fd4,97)` 返回 EACCES(13)。最终仍是 dyld namespace 6/code 1。
+照片、关键行与原始镜像关联见 `evidence/storage/ufs-cache-signature/device-dd007d58.json`。
+未显示的早期 6 条不能推断，不能笼统宣称全程没有共享映射调用。
+
+只读检查原始主机文件：主缓存及 `.01`～`.04` 的全部 CodeDirectory 签名页匹配，
+各 CDHash 都在原始 System trust module；`.03` 为
+`55b4a307efbf08234c98c81f09f1d17e5efc0d0a`，6958 个 16KiB 签名页无不匹配。
+检查对象是主机原件，不等于设备运行时数据或签名策略已验证。
+
+下一版只加签名流水线边界观测：首个 PID1 EACCES 的阶段、文件偏移、内核已有的
+CodeDirectory 哈希；原有验证和错误行为不变。阶段 1=读取签名，2=blob_add 兜底，
+10=初始化，11=首次重组，12=MAC/AMFI，13=二次重组，14=多级哈希，15=辅助签名，
+16=entitlements，17=原始 16KiB 到 4KiB 准备，171=该准备中的实际文件读取。
+主机 helper 检查 PID／错误过滤、首失败锁存、偏移／哈希编码与空哈希通过；
+下一版构建、刷写和实机结果另记，尚未选择放宽验证或更改原始文件的方案。
+
+## 当前：dc42838f 挂载 ENOENT，按 T733／umi 恢复启动布局
+
+本节更新前一轮关于“空目录挂载点”的判断，保留旧镜像与证据。
+机主启动照片关联 BOOT `dc42838f…`／kernel `8262854b…`：
+`mount=2 stage=3 auth=0 mstatus=2 sys=2 cryptex=2 preboot=2`。
+SystemOS 媒体探测仍为已命名、已授权，挂载调用返回 ENOENT，尚未进入 dyld。
+
+只读检查原始 OS：`System/Cryptexes/OS` 与 `App` 是符号链接，分别指向
+`../../private/preboot/Cryptexes/OS`／`App`；`private/preboot` 为空。
+所以前一版直接挂到 OS 链接会遇到缺失的目标目录，不是“dyld 的唯一真实缓存路径”。
+
+按机主要求核对 T733（`3bb0d6f…`）和 SM8250 umi（`3eb7257…`）：
+两者初始启动均启用只读 SystemOS root union、cache startup、boot manifest 和
+4K 签名哈希缓存。共享 `zzyb-native-cryptex-os-view.patch` 在可写 Data 就绪后建立
+规范 cryptex 路径视图；本设备目前未准备该 Data，不能照搬后期目录。
+本轮恢复 root union，诊断按实际配置检查 `/System/Library/Caches/com.apple.dyld/`，
+不因尚未建立的 cryptex 别名而中止。
+
+同时移植 T733 的 `native-union-root-reference.patch`：本机 XNU 的
+`set_rootvnode` 让 kernproc cwd 借用 rootvnode 引用，而 `checkdirs_callback` 又释放一次。
+对实际 XNU 函数的主机计数测试复现旧代码引用错误，补丁后五种 cwd/rdir 场景通过。
+这是独立的正确性修复，当前设备照片没有证明发生过此类 panic。
+详细路径与固定源码链接见 `evidence/storage/ufs-union-reference/`。
+新内核 `1d83105e…`、BOOT `49f3b166…` 完成构建／编译分支／引用计数及打包检查；
+22:35 仅刷 BOOT，Heimdall exit 0 并请求重启。机主照片确认挂载／`/System` 缓存
+vnode 探测已过，真实 dyld 仍报 namespace 6/code 1 的 libSystem 缺失、no dyld cache，
+carrier acc/rej 均为 0。union 同卷可能不调用 carrier；尚不能定位打开、签名或映射失败。
+下一版加入有界 syscall 结果观测和内核已复制的 namei 路径记录，不读额外用户指针。
+只观察 PID1 的 open/openat、fcntl、shared-region 返回码，保留 24 条、退出时显示
+最近 12 条；路径是最近的内核复制记录，不是完整的线程因果跟踪。不会改变错误或策略。
+格式 `sc<调用号> e<errno> r<十六进制返回值> a<fd/计数> c<fcntl命令> <路径>`；
+92/406 为 fcntl，463/464 为 openat，536 为共享映射。下一版哈希／回执另存
+`evidence/storage/ufs-cache-syscalls/`。内核 `170cc979…`、BOOT `dd007d58…`
+已通过 helper／稳定输入构建／链接与 FAT/FD/容量检查；22:47 仅刷 BOOT，
+Heimdall exit 0 并请求重启，等待机主的真实 syscall 跟踪照片。
+
+## 接手 dsh：cryptex 路径与构建配置（2026-11-01）
+
+机主提供 BOOT `a41b5c11…`／kernel `d66b832b…` 的启动照片，显示
+`mount=0 stage=6 auth=1 mstatus=0 sys=0 cryptex=2 preboot=2`。
+镜像关联按机主报告记录；照片本身没有镜像哈希，未做设备读回。
+证据见 `evidence/storage/ufs-cryptex-resume/device-a41b5c11.json`。
+
+主机保存的内核哈希确为 `d66b832b…`，但当时 `.config` 及 `kern_exec.c`
+编译记录仍为 `OWNER_UNION_SYSTEMOS=1`：只修改 defconfig 没有更新已解析配置，
+所以新 `/System/Cryptexes/OS` 挂载分支没有生效。另外三路径探测会无条件 panic，
+成功挂载也不能启动 launchd；本照片不证明 dyld 已查找或映射缓存。
+
+本轮显式设 `CONFIG_XNU_OWNER_UNION_SYSTEMOS=n` 并重新运行 defconfig，保留上一轮
+内核、源码与编译参数于忽略目录 `out/step7/cryptex-resume-baseline/`。
+挂载点、`DYLD_SHARED_CACHE_DIR` 和 carrier 目录继续使用
+`/System/Cryptexes/OS/System/Library/Caches/com.apple.dyld` 对应布局。
+诊断仅在挂载失败或 cryptex 缓存探测失败时 panic；成功则继续启动 launchd。
+新 BOOT 为 `dc42838f…`（内核 `8262854b…`），实际 clang 参数重放预处理、
+FAT／FD／容量检查通过；DT/ADT 和适配记录检查通过。`check-platform.py` 因历史
+五组件断言未通过，详见新证据 README。镜像位于
+`out/step7/probes/ufs-cryptex-resume/boot.img`。机主授权后于 22:23 仅刷 BOOT，
+Heimdall 上传及重启命令成功（exit 0），回执见新证据 `flash.json`／`flash.log`；
+缓存映射和 launchd 进展待机主启动照片。
+
 ## 关键发现：UFS 已经通了
 
 survey 镜像（`c404ce26…`）的 7 个样本全部匹配、14 次读零错误，靠的不是新建 SMMU 上下文，而是

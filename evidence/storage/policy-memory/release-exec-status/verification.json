@@ -1,0 +1,14 @@
+{
+  "pass": true,
+  "same_kernel_bytes_as_prior_status_probe": true,
+  "packed_kernel_sha256": "6d18762aebe9ea4478a2ca8b3aac60889d01db2b15bb96c72eed5eab4f03b665",
+  "args": "-v cpus=1 t970-novc sheng-pmgr=2 t970-ufs-publish=1 launchdsuffix=release",
+  "release_path_source": "kern_exec.c launchdsuffix release branch selects /sbin/launchd directly",
+  "raw_boot_sha256": "dfdb220afcf2a85bbfd7e42973863ec835450885bffd8ec7a69443f97e76dfde",
+  "boot_partition_sha256": "7ac0a4baaec8f134b3450b85cc81039ad6cdd3c8282ced821d375959f038fc44",
+  "boot_partition_bytes": 71303168,
+  "firmware_sha256": "515105d758a9d61078dffce5012db0754a71cec351a1bb34b30ee791196b5690",
+  "return_zero_seconds": 6,
+  "return_nonzero_seconds": 16,
+  "scope": "Only effective kernel argument changed; same tested callee/W0 terminal status code, source kernel and board defaults unchanged"
+}

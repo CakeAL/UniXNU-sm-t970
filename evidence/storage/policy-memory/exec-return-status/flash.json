@@ -1,0 +1,21 @@
+{
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/step7/probes/policy-exec-return-status/boot-partition.img"
+  ],
+  "authorization": "Ongoing user-authorized bring-up after owner confirms previous6second after-exec return reset; status probe purpose explained",
+  "boot_sha256": "201d98d2dba8d77891411bdde4dc31bb3e8cd9f974c941179f0d8faac3193474",
+  "partition": "BOOT only",
+  "started_at": "2026-11-02T13:55:40.714891+08:00",
+  "expected_observation": "After original init exec returns, zero=>6seconds reset, nonzero=>16seconds reset; no successful launchd main claim",
+  "finished_at": "2026-11-02T13:55:47.350560+08:00",
+  "exit_code": 0,
+  "upload_reported_success": true,
+  "session_end_confirmed": true,
+  "reboot_requested": true,
+  "reboot_confirmed": true,
+  "readback_verified": false,
+  "hardware_result": "pending owner observation"
+}

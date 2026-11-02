@@ -1,0 +1,24 @@
+{
+  "partition": "DTBO only",
+  "source_sha256": "49bcf93a85cec4d24c0cfe6dbe334327b29182f06bd9b2080b7a9c7cba878731",
+  "image_bytes": 10485760,
+  "prior_current_sha256": "be754ac73168c407fbf8bea362b2e53905824d26522923cc4e45e6051ad9dd1a",
+  "prior_current_backup": "out/step7/bootloader-audit-20261102/dtbo.img",
+  "source": "Original same-device backup captured before bring-up; validated DT table and AVB0 footer target",
+  "authorization": "Ongoing authorized device bring-up/fix and user preference to proceed without repeated flashing confirmation; restoring backed-up same-device baseline, current bytes preserved",
+  "scope": "Restore originalDTBO only; no BOOT/recovery/vbmeta/userdata writes. DTBO mismatch is not established cause.",
+  "started_at": "2026-11-02T13:50:30.420975+08:00",
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--DTBO",
+    "out/device-backup/dtbo.img"
+  ],
+  "finished_at": "2026-11-02T13:50:35.443092+08:00",
+  "exit_code": 0,
+  "upload_reported_success": true,
+  "session_end_confirmed": true,
+  "reboot_requested": true,
+  "readback_verified": false,
+  "hardware_result": "pending owner observation"
+}

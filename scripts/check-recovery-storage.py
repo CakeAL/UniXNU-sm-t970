@@ -9,10 +9,13 @@ from pathlib import Path
 EXPECTED_BYTES = 243668070400
 
 
-def validate(model, identity, target, size, logical, mounts, device_mm):
+def validate(model, identity, target, size, logical, mounts, device_mm, product=''):
     reasons = []
-    if model.strip().upper() != 'SM-T970':
-        reasons.append('Device model must be exactly SM-T970')
+    stock_identity = model.strip().upper() == 'SM-T970'
+    twrp_identity = (model.strip() == 'SAMSUNG_gts7xlwifi' and
+                     product.strip() == 'gts7xlwifi')
+    if not (stock_identity or twrp_identity):
+        reasons.append('Require SM-T970 or exact gts7xlwifi TWRP model/product pair')
     if 'uid=0(' not in identity:
         reasons.append('A root shell is required')
     if target.strip() != '/dev/block/sda36':
@@ -54,7 +57,7 @@ def main():
     state = subprocess.run(['adb', '-s', args.serial, 'get-state'], capture_output=True, text=True, timeout=10)
     if state.returncode or state.stdout.strip() not in ('device', 'recovery'):
         raise SystemExit('Selected ADB device is not available with a shell')
-    values = dict(model=read('getprop ro.product.model'), identity=read('id'),
+    values = dict(model=read('getprop ro.product.model'), product=read('getprop ro.product.device'), identity=read('id'),
                   target=read('readlink -f /dev/block/by-name/userdata'),
                   size=read('blockdev --getsize64 /dev/block/by-name/userdata'),
                   logical=read('blockdev --getss /dev/block/by-name/userdata'),

@@ -1,0 +1,14 @@
+{
+  "observed_failure": "vn_rdwr in native4k preparation, .03 offset0x2200000, EACCES13",
+  "next_observations": {
+    "stage201": "MAC vnode read check denied",
+    "stage202": "VNOP_READ or swap-read error after read mediation passed",
+    "ufs_integrity": "actual count and first rejected VR block: index, physical LUN0 LBA, length, expected/got SHA256 first8bytes, validity bits"
+  },
+  "hash_bits": "bit0 expected index/hash table valid; bit1 diagnostic SHA256 computation succeeded",
+  "scope": "No additional disk read, retry, grant or modified result. One extra hash of the same already rejected immutable bounce snapshot. First failure preserved; prior deny remains. CPU0 diagnostic.",
+  "host_checks": [
+    "9 existing T970 SMMU/UFS-state tests pass",
+    "Actual diagnostic helper ASan/UBSan: first-error retention, bounds, prefix encoding; no second I/O"
+  ]
+}

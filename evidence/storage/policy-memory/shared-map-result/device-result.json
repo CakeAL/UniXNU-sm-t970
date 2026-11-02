@@ -1,0 +1,11 @@
+{
+  "boot_sha256": "06a968f709f8058bcb2d3b0964cef3d4b67fd698b448c2982045a75ac40a63b8",
+  "observation": "diagnostic: dyld shared map kr=0",
+  "result": "Actual mapping routine returned KERN_SUCCESS",
+  "free_pages": 1654,
+  "limits": "Terminal point precedes shared-region cleanup and syscall return; not launchd main. Free-page count is a phase snapshot, not a memory-exhaustion diagnosis.",
+  "observation_source": "Owner photo linked as device.jpg",
+  "source_kernel_sha256": "e46326182b42f76791d00ad3671fbf77e00fda522ec2be5805e5aed0e1ba7a08",
+  "root_image_sha256": "fd43ee7035ce185ce4215ac93fdc006fd784a54b3b7442e21457c226cbe03093",
+  "free_mib": 6.4609375
+}

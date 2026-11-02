@@ -1,0 +1,297 @@
+{
+  "repository": "RigoLigoRLC/unixnu-sm-t733",
+  "revision": "3bb0d6f7840f088db6a0ec88ecb841e12042422f",
+  "retrieval": "GitHub connector fetch of immutable commit paths",
+  "local_selected_patch_count": 32,
+  "scope": "All device-owned patches referenced by the five inspected series. Shared arch/SoC/component patch contents are not counted here. Directory presence alone is not activation; compile guards may still disable behavior.",
+  "patches": [
+    {
+      "path": "patches/t733-xnu/offline-component-load-probes.patch",
+      "sha256": "12fc9d0b83c9d4cd00e698611477266f44af83703236ede220ab1f8cf803a5a2",
+      "xnu_files": [
+        "bsd/kern/bsd_init.c",
+        "iokit/Kernel/IOUserClient.cpp"
+      ],
+      "url": "https://github.com/RigoLigoRLC/unixnu-sm-t733/blob/3bb0d6f7840f088db6a0ec88ecb841e12042422f/patches/t733-xnu/offline-component-load-probes.patch"
+    },
+    {
+      "path": "patches/t733-xnu/offline-owner-systemos-mount.patch",
+      "sha256": "6a51169974d703aa540fb5496c9694561666b3ca33b25615d4937581ce9053ef",
+      "xnu_files": [
+        "bsd/kern/kern_exec.c"
+      ],
+      "url": "https://github.com/RigoLigoRLC/unixnu-sm-t733/blob/3bb0d6f7840f088db6a0ec88ecb841e12042422f/patches/t733-xnu/offline-owner-systemos-mount.patch"
+    },
+    {
+      "path": "patches/t733-xnu/zzy-native-gpu-addon-mount.patch",
+      "sha256": "75ebd883c1028dbdc85e05f5a9282448d588c90a0e41ddf47f4d3ea2705fa2b8",
+      "xnu_files": [
+        "bsd/kern/kern_exec.c",
+        "bsd/miscfs/bindfs/bind_vfsops.c",
+        "bsd/miscfs/bindfs/bind_vnops.c",
+        "bsd/miscfs/bindfs/bindfs.h"
+      ],
+      "url": "https://github.com/RigoLigoRLC/unixnu-sm-t733/blob/3bb0d6f7840f088db6a0ec88ecb841e12042422f/patches/t733-xnu/zzy-native-gpu-addon-mount.patch"
+    },
+    {
+      "path": "patches/t733-xnu/zzy-staged-system-apps.patch",
+      "sha256": "85454bc6ec2d97747a93fd3c1ab7633e30c2e4a80910c4319edd025a4cf7f05b",
+      "xnu_files": [
+        "bsd/kern/kern_exec.c"
+      ],
+      "url": "https://github.com/RigoLigoRLC/unixnu-sm-t733/blob/3bb0d6f7840f088db6a0ec88ecb841e12042422f/patches/t733-xnu/zzy-staged-system-apps.patch"
+    },
+    {
+      "path": "patches/t733-xnu/zzz-boot-progress.patch",
+      "sha256": "2246e21946e27909eed29888ee45f53212a6c2e6b70ddcce390dbc1c146354dc",
+      "xnu_files": [
+        "osfmk/arm/arm_init.c",
+        "osfmk/kern/startup.c",
+        "osfmk/console/video_console.c",
+        "osfmk/console/serial_console.c",
+        "pexpert/arm/pe_kprintf.c",
+        "bsd/kern/bsd_init.c",
+        "bsd/kern/kern_exec.c",
+        "osfmk/arm64/sleh.c",
+        "osfmk/kern/boot_progress.h",
+        "osfmk/kern/Makefile",
+        "bsd/kern/kern_exit.c"
+      ],
+      "url": "https://github.com/RigoLigoRLC/unixnu-sm-t733/blob/3bb0d6f7840f088db6a0ec88ecb841e12042422f/patches/t733-xnu/zzz-boot-progress.patch"
+    },
+    {
+      "path": "patches/t733-xnu/kalloc-type-zone-budget-diagnostic.patch",
+      "sha256": "e1b159d41273c916adb8c2cac4c8febd4676ed188aa2f125730f3aa20f65769e",
+      "xnu_files": [
+        "osfmk/kern/kalloc.c"
+      ],
+      "url": "https://github.com/RigoLigoRLC/unixnu-sm-t733/blob/3bb0d6f7840f088db6a0ec88ecb841e12042422f/patches/t733-xnu/kalloc-type-zone-budget-diagnostic.patch"
+    },
+    {
+      "path": "patches/t733-xnu/native-build-label.patch",
+      "sha256": "cbc345d7c16c251504d16353487a25e09bb15fafff196cad437f8cacd996cd41",
+      "xnu_files": [
+        "osfmk/kern/startup.c"
+      ],
+      "url": "https://github.com/RigoLigoRLC/unixnu-sm-t733/blob/3bb0d6f7840f088db6a0ec88ecb841e12042422f/patches/t733-xnu/native-build-label.patch"
+    },
+    {
+      "path": "patches/t733-xnu/native-console-debug-output.patch",
+      "sha256": "7bdbd377602af00c96d6272201c2a7828f623e4af2f1d0c2faf8eea7b2038133",
+      "xnu_files": [
+        "osfmk/kern/printf.c"
+      ],
+      "url": "https://github.com/RigoLigoRLC/unixnu-sm-t733/blob/3bb0d6f7840f088db6a0ec88ecb841e12042422f/patches/t733-xnu/native-console-debug-output.patch"
+    },
+    {
+      "path": "patches/t733-xnu/native-debugger-entry-state.patch",
+      "sha256": "79c72ec0d7d37a220a3fa2303df6cb4ddc7cab2cbb029f5d7c471655b8905970",
+      "xnu_files": [
+        "osfmk/kern/debug.c"
+      ],
+      "url": "https://github.com/RigoLigoRLC/unixnu-sm-t733/blob/3bb0d6f7840f088db6a0ec88ecb841e12042422f/patches/t733-xnu/native-debugger-entry-state.patch"
+    },
+    {
+      "path": "patches/t733-xnu/native-platform-error-state.patch",
+      "sha256": "efaae6d4c0ba5a7a2b1a28b7f865595c663a623dc2b799406cd860bf9766cdcd",
+      "xnu_files": [
+        "osfmk/arm64/sleh.c"
+      ],
+      "url": "https://github.com/RigoLigoRLC/unixnu-sm-t733/blob/3bb0d6f7840f088db6a0ec88ecb841e12042422f/patches/t733-xnu/native-platform-error-state.patch"
+    },
+    {
+      "path": "patches/t733-xnu/native-platform-uuid-chip-id.patch",
+      "sha256": "442d99712f50d2053624bdb639fda40813aec5344c95e8c17c4a3b631cba99ec",
+      "xnu_files": [
+        "iokit/Kernel/IOPlatformExpert.cpp"
+      ],
+      "url": "https://github.com/RigoLigoRLC/unixnu-sm-t733/blob/3bb0d6f7840f088db6a0ec88ecb841e12042422f/patches/t733-xnu/native-platform-uuid-chip-id.patch"
+    },
+    {
+      "path": "patches/t733-xnu/native-t733-display-bind.patch",
+      "sha256": "fa59bc197660a1c052854ed615b14d4ede6254d8e4f8d362d40ff3ed54eccd37",
+      "xnu_files": [
+        "osfmk/kern/sched_prim.c"
+      ],
+      "url": "https://github.com/RigoLigoRLC/unixnu-sm-t733/blob/3bb0d6f7840f088db6a0ec88ecb841e12042422f/patches/t733-xnu/native-t733-display-bind.patch"
+    },
+    {
+      "path": "patches/t733-xnu/native-t733-framebuffer.patch",
+      "sha256": "220dec5c32e03117dea65d56b97a3410af0ca8d61490be5b5ad9c4e7eede602b",
+      "xnu_files": [
+        "osfmk/console/video_console.c"
+      ],
+      "url": "https://github.com/RigoLigoRLC/unixnu-sm-t733/blob/3bb0d6f7840f088db6a0ec88ecb841e12042422f/patches/t733-xnu/native-t733-framebuffer.patch"
+    },
+    {
+      "path": "patches/t733-xnu/native-text-repage.patch",
+      "sha256": "b019493da7de689e1ef2ea34ac1cb2ce63da6eddffff274c020bf5d5d58de22f",
+      "xnu_files": [
+        "osfmk/vm/vm_fault.c",
+        "bsd/kern/ubc_subr.c"
+      ],
+      "url": "https://github.com/RigoLigoRLC/unixnu-sm-t733/blob/3bb0d6f7840f088db6a0ec88ecb841e12042422f/patches/t733-xnu/native-text-repage.patch"
+    },
+    {
+      "path": "patches/t733-xnu/native-union-root-reference.patch",
+      "sha256": "b85f03c2dc4291b320b74df9ad04b237ce05e8cea8435a48d47bec30d4b0de09",
+      "xnu_files": [
+        "bsd/vfs/vfs_syscalls.c"
+      ],
+      "url": "https://github.com/RigoLigoRLC/unixnu-sm-t733/blob/3bb0d6f7840f088db6a0ec88ecb841e12042422f/patches/t733-xnu/native-union-root-reference.patch"
+    },
+    {
+      "path": "patches/t733-xnu/native-usb-debug.patch",
+      "sha256": "c3fa4fa5ab446a433a87ef5864550a11bca05b05034f857cbf496b3b9fe33dc4",
+      "xnu_files": [
+        "bsd/conf/files",
+        "bsd/kern/bsd_init.c",
+        "osfmk/console/serial_console.c",
+        "pexpert/arm/pe_kprintf.c",
+        "osfmk/kern/debug.c"
+      ],
+      "url": "https://github.com/RigoLigoRLC/unixnu-sm-t733/blob/3bb0d6f7840f088db6a0ec88ecb841e12042422f/patches/t733-xnu/native-usb-debug.patch"
+    },
+    {
+      "path": "patches/t733-xnu/native-usb-exec-events.patch",
+      "sha256": "460e8d75a641e78763d88a5c177c8432dd95e16e306959430f5978bc4c1bc74b",
+      "xnu_files": [
+        "bsd/kern/kern_exec.c",
+        "bsd/kern/kern_exit.c"
+      ],
+      "url": "https://github.com/RigoLigoRLC/unixnu-sm-t733/blob/3bb0d6f7840f088db6a0ec88ecb841e12042422f/patches/t733-xnu/native-usb-exec-events.patch"
+    },
+    {
+      "path": "patches/t733-xnu/native-usb-stack-region.patch",
+      "sha256": "2b183b5b86f7a9ad484e9c5a550394b4095a75c2c52c73d50ad7287d379ce1cb",
+      "xnu_files": [
+        "osfmk/vm/vm_shared_region.c"
+      ],
+      "url": "https://github.com/RigoLigoRLC/unixnu-sm-t733/blob/3bb0d6f7840f088db6a0ec88ecb841e12042422f/patches/t733-xnu/native-usb-stack-region.patch"
+    },
+    {
+      "path": "patches/t733-xnu/native-usb-tasks.patch",
+      "sha256": "95f09ad764c6f6a83d012a6a5038430133ed710f8e1ed71fa3e0325eedd868ef",
+      "xnu_files": [
+        "bsd/conf/files",
+        "osfmk/conf/files",
+        "bsd/kern/kern_proc.c"
+      ],
+      "url": "https://github.com/RigoLigoRLC/unixnu-sm-t733/blob/3bb0d6f7840f088db6a0ec88ecb841e12042422f/patches/t733-xnu/native-usb-tasks.patch"
+    },
+    {
+      "path": "patches/t733-xnu/zzzy-native-t733-brightness-preferences.patch",
+      "sha256": "7eef3e597d6736d0862ea413b727d94bb5417e0e9b1f3e28580907d02796f085",
+      "xnu_files": [
+        "bsd/kern/kern_exec.c"
+      ],
+      "url": "https://github.com/RigoLigoRLC/unixnu-sm-t733/blob/3bb0d6f7840f088db6a0ec88ecb841e12042422f/patches/t733-xnu/zzzy-native-t733-brightness-preferences.patch"
+    },
+    {
+      "path": "patches/t733-xnu/zzzz-native-usb-debug-addon.patch",
+      "sha256": "971f7b8f45e408d840ca7dc5186621df3e5195ebdb833149440d7783d5107275",
+      "xnu_files": [
+        "bsd/kern/kern_exec.c"
+      ],
+      "url": "https://github.com/RigoLigoRLC/unixnu-sm-t733/blob/3bb0d6f7840f088db6a0ec88ecb841e12042422f/patches/t733-xnu/zzzz-native-usb-debug-addon.patch"
+    },
+    {
+      "path": "patches/t733-xnu/diagnostics/native-process-diagnostics.patch",
+      "sha256": "631eedefb5cdcda8fa29ac4080a111de87d7dfc382eeada789506591df80e97a",
+      "xnu_files": [
+        "bsd/kern/kern_exit.c",
+        "osfmk/kern/exception.c"
+      ],
+      "url": "https://github.com/RigoLigoRLC/unixnu-sm-t733/blob/3bb0d6f7840f088db6a0ec88ecb841e12042422f/patches/t733-xnu/diagnostics/native-process-diagnostics.patch"
+    },
+    {
+      "path": "patches/t733-xnu/diagnostics/native-smp-entry-state.patch",
+      "sha256": "6a7915b2ef7ba5d8900e2dd2e1da581a6c5401c629734057172ba0bc49f5b8ba",
+      "xnu_files": [
+        "osfmk/arm64/start.s",
+        "osfmk/arm/arm_init.c"
+      ],
+      "url": "https://github.com/RigoLigoRLC/unixnu-sm-t733/blob/3bb0d6f7840f088db6a0ec88ecb841e12042422f/patches/t733-xnu/diagnostics/native-smp-entry-state.patch"
+    },
+    {
+      "path": "patches/t733-xnu/diagnostics/native-t733-page-diagnostics.patch",
+      "sha256": "86439b9cd3d1921d6a33f7ce24516b1753edaed9991ececfccd15f573a47bcf8",
+      "xnu_files": [
+        "osfmk/arm/pmap/pmap.c"
+      ],
+      "url": "https://github.com/RigoLigoRLC/unixnu-sm-t733/blob/3bb0d6f7840f088db6a0ec88ecb841e12042422f/patches/t733-xnu/diagnostics/native-t733-page-diagnostics.patch"
+    },
+    {
+      "path": "patches/t733-xnu/diagnostics/native-zone-expander-snapshot.patch",
+      "sha256": "6d3a4356ae547e9e5adb18d76f2de99f24ace8371be590975e3d73b8e49be5e2",
+      "xnu_files": [
+        "osfmk/kern/zalloc.c"
+      ],
+      "url": "https://github.com/RigoLigoRLC/unixnu-sm-t733/blob/3bb0d6f7840f088db6a0ec88ecb841e12042422f/patches/t733-xnu/diagnostics/native-zone-expander-snapshot.patch"
+    },
+    {
+      "path": "patches/t733-xnu/early-entry/zzzz-early-entry-marker.patch",
+      "sha256": "1e8a91c4a3602769657dcf82c62441c24c56c6a4a6226b0bf19eeb87d05c32f1",
+      "xnu_files": [
+        "osfmk/arm64/genassym.c",
+        "osfmk/arm64/start.s"
+      ],
+      "url": "https://github.com/RigoLigoRLC/unixnu-sm-t733/blob/3bb0d6f7840f088db6a0ec88ecb841e12042422f/patches/t733-xnu/early-entry/zzzz-early-entry-marker.patch"
+    },
+    {
+      "path": "patches/t733-xnu/early-entry/zzzzz-early-mmu-marker.patch",
+      "sha256": "d786ee1c9a4182d575e65b16fbd98910dca9e30b64391dd424f1086571c84909",
+      "xnu_files": [
+        "osfmk/arm64/start.s"
+      ],
+      "url": "https://github.com/RigoLigoRLC/unixnu-sm-t733/blob/3bb0d6f7840f088db6a0ec88ecb841e12042422f/patches/t733-xnu/early-entry/zzzzz-early-mmu-marker.patch"
+    },
+    {
+      "path": "patches/t733-xnu/early-entry/zzzzzz-early-c-marker.patch",
+      "sha256": "fdede336b2ff0ca28cef4ad80b64f0cf1684267bdf5dd26cefe93c7a00a99106",
+      "xnu_files": [
+        "osfmk/arm/arm_init.c",
+        "osfmk/kern/debug.c"
+      ],
+      "url": "https://github.com/RigoLigoRLC/unixnu-sm-t733/blob/3bb0d6f7840f088db6a0ec88ecb841e12042422f/patches/t733-xnu/early-entry/zzzzzz-early-c-marker.patch"
+    },
+    {
+      "path": "patches/t733-xnu/early-entry/zzzzzzz-vm-stage-marker.patch",
+      "sha256": "48d6aa11fedd223a6e2f63dbc3ec7fa20c0f41f3c9b2e8a4580d495e1e292253",
+      "xnu_files": [
+        "osfmk/arm64/arm_vm_init.c",
+        "osfmk/arm/arm_init.c",
+        "pexpert/arm/pe_init.c",
+        "osfmk/console/video_console.c",
+        "osfmk/arm64/sleh.c"
+      ],
+      "url": "https://github.com/RigoLigoRLC/unixnu-sm-t733/blob/3bb0d6f7840f088db6a0ec88ecb841e12042422f/patches/t733-xnu/early-entry/zzzzzzz-vm-stage-marker.patch"
+    },
+    {
+      "path": "patches/t733-xnu/early-entry/zzzzzzzz-undefined-stage-marker.patch",
+      "sha256": "ec5fbfaee6a688d2b1df21822dcb7aadb2cc4baa471fb5d44b3e09b528013e3f",
+      "xnu_files": [
+        "osfmk/arm64/sleh.c",
+        "osfmk/arm/arm_init.c"
+      ],
+      "url": "https://github.com/RigoLigoRLC/unixnu-sm-t733/blob/3bb0d6f7840f088db6a0ec88ecb841e12042422f/patches/t733-xnu/early-entry/zzzzzzzz-undefined-stage-marker.patch"
+    },
+    {
+      "path": "patches/t733-xnu/early-entry/zzzzzzzzz-early-framebuffer-map-space.patch",
+      "sha256": "8647d6b24138aca362606e79b65b4942f47297eb595fe884d4fbce526602b75c",
+      "xnu_files": [
+        "osfmk/arm64/arm_vm_init.c",
+        "osfmk/arm/pmap/pmap.c"
+      ],
+      "url": "https://github.com/RigoLigoRLC/unixnu-sm-t733/blob/3bb0d6f7840f088db6a0ec88ecb841e12042422f/patches/t733-xnu/early-entry/zzzzzzzzz-early-framebuffer-map-space.patch"
+    },
+    {
+      "path": "patches/t733-xnu/early-entry/zzzzzzzzzz-early-panic-format.patch",
+      "sha256": "1efd94ffaefcf04d02b1d2f675c8fb53a3a6d3771a239364e5ea5d00f1e913e7",
+      "xnu_files": [
+        "osfmk/kern/debug.c"
+      ],
+      "url": "https://github.com/RigoLigoRLC/unixnu-sm-t733/blob/3bb0d6f7840f088db6a0ec88ecb841e12042422f/patches/t733-xnu/early-entry/zzzzzzzzzz-early-panic-format.patch"
+    }
+  ]
+}

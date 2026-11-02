@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "/Users/cakeal/vsc/UniXNU-sm-t970/scripts/check-platform.py", line 303, in <module>
+    main()
+    ~~~~^^
+  File "/Users/cakeal/vsc/UniXNU-sm-t970/scripts/check-platform.py", line 78, in main
+    require(set(selected) == {'ArmDTPlatform', 'ArmCpu', 'SoftwareAES', 'XnuPrelink', 'DarwinBoot'},
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            'Unexpected bootstrap component selection')
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/cakeal/vsc/UniXNU-sm-t970/scripts/check-platform.py", line 19, in require
+    raise ValueError(message)
+ValueError: Unexpected bootstrap component selection

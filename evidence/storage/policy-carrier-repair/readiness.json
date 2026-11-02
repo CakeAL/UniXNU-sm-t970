@@ -1,0 +1,15 @@
+{
+  "scope": "Read-only environment check; not authorization to write",
+  "ready": true,
+  "reasons": [],
+  "observations": {
+    "model": "SM-T970",
+    "identity": "uid=0(root) gid=0(root) groups=0(root),1004(input),1007(log),1011(adb),1015(sdcard_rw),1028(sdcard_r),1078(ext_data_rw),1079(ext_obb_rw),3001(net_bt_admin),3002(net_bt),3003(inet),3006(net_bw_stats),3009(readproc),3011(uhid),3012(readtracefs) context=u:r:su:s0",
+    "target": "/dev/block/sda36",
+    "size": "243668070400",
+    "logical": "4096",
+    "mounts": "1 1 0:2 / / rw shared:1 - rootfs rootfs rw,seclabel,size=3383436k,nr_inodes=845859\n16 1 0:17 / /dev rw,nosuid,relatime shared:2 - tmpfs tmpfs rw,seclabel,mode=755\n17 16 0:18 / /dev/pts rw,relatime shared:3 - devpts devpts rw,seclabel,mode=600,ptmxmode=000\n18 1 0:5 / /proc rw,relatime shared:4 - proc proc rw,gid=3009,hidepid=2\n19 1 0:19 / /sys rw,relatime shared:5 - sysfs sysfs rw,seclabel\n20 19 0:14 / /sys/fs/selinux rw,relatime shared:6 - selinuxfs selinuxfs rw\n21 1 0:20 / /mnt rw,nosuid,nodev,noexec,relatime shared:7 - tmpfs tmpfs rw,seclabel,mode=755,gid=1000\n22 1 0:21 / /apex rw,nosuid,nodev,noexec,relatime - tmpfs tmpfs rw,seclabel,mode=755\n23 1 0:22 / /linkerconfig rw,nosuid,nodev,noexec,relatime - tmpfs tmpfs rw,seclabel,mode=755\n24 21 0:20 /user /mnt/installer rw,nosuid,nodev,noexec,relatime shared:8 master:7 - tmpfs tmpfs rw,seclabel,mode=755,gid=1000\n25 21 0:20 /user /mnt/androidwritable rw,nosuid,nodev,noexec,relatime shared:9 master:7 - tmpfs tmpfs rw,seclabel,mode=755,gid=1000\n26 19 0:23 / /sys/fs/cgroup rw,nosuid,nodev,noexec,relatime shared:10 - cgroup2 none rw,memory_recursiveprot\n27 1 0:24 / /tmp rw,relatime shared:11 - tmpfs tmpfs rw,seclabel\n28 1 0:25 / /storage rw,relatime shared:12 - tmpfs tmpfs rw,seclabel,mode=050,gid=1028\n29 16 0:26 / /dev/binderfs rw,relatime shared:13 - binder binder rw,max=1048576,stats=global\n30 19 0:27 / /sys/fs/pstore rw,relatime shared:14 - pstore pstore rw,seclabel\n31 1 0:15 / /config rw,relatime shared:15 - configfs none rw\n32 16 0:28 / /dev/usb-ffs/adb rw,relatime shared:16 - functionfs adb rw\n33 16 0:29 / /dev/usb-ffs/fastboot rw,relatime shared:17 - functionfs fastboot rw",
+    "device_mm": "259:20"
+  },
+  "device_written": false
+}

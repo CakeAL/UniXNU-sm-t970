@@ -1,0 +1,18 @@
+{
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/step7/probes/policy-after-init-exec/boot.img"
+  ],
+  "authorization": "Owner explicitly resumes ongoing BOOT-only bring-up diagnosis: \u7136\u540e\u7ee7\u7eed",
+  "started_at": "2026-11-02T13:14:14.853136+08:00",
+  "finished_at": "2026-11-02T13:14:21.364569+08:00",
+  "boot_sha256": "17bda459286b24f514933096009c989241536bea4916fc08009123725579c6fa",
+  "partition": "BOOT only",
+  "exit_code": 0,
+  "reboot_requested": true,
+  "expected_observation": "Reset6seconds after original ___mac_execve returns; no return-status capture",
+  "hardware_startup_result": "pending owner observation",
+  "normal_image_preserved": "out/step7/probes/ufs-policy-memory/boot.img"
+}

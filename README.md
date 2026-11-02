@@ -5,20 +5,13 @@
 
 ## 当前结果
 
-交接中的设备记录已到达 `bsd_init`／根卷挂载，当前回到第 6 步的 **UFS／SMMU 适配**。
-已有 USERDATA 根镜像写入回执，但 UFS DMA 与根卷挂载尚未通过；用户态、SMP 和外设仍未完成。
-本轮先做[只读 SMMU 核查](docs/smmu-readonly.md)，报告原始寄存器与候选 SID，
-实机已确认读到 87 组匹配配置、74 个 context bank，三个候选 SID 均未匹配。
-未提交 UFS 命令或挂载根卷；已按[同类设备对照](docs/ufs-reference-comparison.md)修正时钟诊断，
-[完整只读交接快照](docs/ufs-handoff.md)已确认 HCI ready、队列 doorbell 为零，
-唯一有效 stream 与显示对应。已实机确认[无效 SMR 的 ID 字段](docs/smr-id-test.md)可写且恢复成功；
-[合并核查 VALID、S2CR](docs/smmu-fields.md)已确认接受及恢复；
-[零命令预检](docs/ufs-preflight.md)已确认实际内存归属；
-[单次 NOP 测试](docs/ufs-nop.md)已完成一次命令／响应 DMA 往返；
-[LUN0只读数据核验](docs/ufs-read.md)已通过容量、重复GPT头和分区项CRC；
-[根镜像调查](docs/ufs-survey.md)确认非零SystemOS样本匹配、重复读取一致，
-旧部署不完整的问题已通过root ADB完整重写修复，9.38GB整段读回SHA256匹配；
-正在进行XNU重启交叉核验，持续稳定性及根卷挂载尚未验证。
+实机已完成UFS命令/DMA与根卷读取；删除USERDATA后的OS/SystemOS根镜像及授权载体
+已完整恢复并读回校验。现已依次确认dyld共享缓存映射返回成功、PID1在映射后继续执行，
+以及真正的 `kern.initproc_spawned=1`：**launchd已到达main**。
+当前BOOT是有意停止并显示标记的诊断版，系统服务、可写Data、图形桌面和外设仍未验证。
+CPU0与256MiB owned窗口保持；main诊断停点空闲约1MiB，后续需继续检查运行内存余量。
+最新证据与镜像绑定见[交接](docs/handoff.md)、[用户态启动验证](evidence/storage/policy-memory/README.md)
+和[T733方案对照](docs/t733-kernel-comparison.md)；历史文档保留当时的验证范围。
 
 两个仓库并列放置，普通构建命令在主仓库执行：
 
@@ -28,7 +21,7 @@ vsc/
 └── UniXNU-sm-t970/         # 本设备输入、DTS、固件 overlay、package 和记录
 ```
 
-- `board.toml`：格式 2，`name/kit=sm-t970`，SM8250 和 iPadOS profile，完整五组件选择。
+- `board.toml`：格式 2，`name/kit=sm-t970`，SM8250 和 iPadOS profile，显式组件选择。
 - `feeds.toml` / `unixnu.lock`：固定 SoC 和组件来源；固件及嵌套子模块固定在 `package/firmware/inputs.json`。
 - `configs/sm-t970_defconfig` / `patches/xnu/series`：设备配置、控制台初始化顺序修复及继承的配置／补丁。
 - `dts/`：诊断用低地址 DRAM 包络、30 个静态保留区、CPU0 及禁用的板级外设资源。
@@ -38,8 +31,8 @@ vsc/
   主机证据见[验证记录](evidence/firmware-log-exporter/README.md)，屏幕菜单与二维码尚未验证。
 - [porting.toml](porting.toml)：13 个部分的适配范围、实现和验证证据。
 
-显式组件为 `ArmDTPlatform`、`ArmCpu`、`SoftwareAES`、`XnuPrelink`、`DarwinBoot`；
-archive 还接入了设备内 UFS 实验副本、空策略 VerifiedRoot 与 PMGR 占位实现。
+显式组件为 `ArmDTPlatform`、`ArmCpu`、`SoftwareAES`、`VirtioMmioBlock`、`XnuPrelink`、`DarwinBoot`；
+archive 还接入了设备内 UFS 副本、带固定公钥的 VerifiedRoot 与 PMGR 占位实现。
 这些构建输入不等于功能验证通过；GPU、触控、音频、无线尚未适配。
 
 ## 检查与构建

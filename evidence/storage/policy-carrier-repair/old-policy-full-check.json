@@ -1,0 +1,25 @@
+{
+  "command": "python3.14 inline full block-hash-table comparison of owner-manifests/SystemOS/manifest.bin and original target-volumes/044-76034-038.dmg",
+  "image_bytes": 3303014400,
+  "blocks_checked": 806400,
+  "first_mismatching_indices": [
+    43008,
+    43009,
+    43010,
+    43011,
+    43012,
+    43013,
+    43014,
+    43015,
+    43016,
+    43017,
+    43018,
+    43019
+  ],
+  "image_sha256": "b4908cde41d23e6bc05e6af51a2c9eeb00cf0f863a6a18b1600c96a3fd70414f",
+  "manifest_image_sha256": "ee18c5c2147e0a58e63559ef15989bae3b8c97a7333d3213cca7faf54de2c977",
+  "manifest_sha256": "869da36d23bcf874315883bde6955cf1e7078d6d42a20ce4d511fc00189a87c1",
+  "seconds": 3.843282584042754,
+  "pass": false,
+  "scope": "Host original image and prepared envelope only; no tablet readback and no runtime hash-table verification"
+}

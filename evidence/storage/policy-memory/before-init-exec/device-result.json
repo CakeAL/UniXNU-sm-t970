@@ -1,0 +1,9 @@
+{
+  "boot_sha256": "c544bae1af7a960cc0d0d536209bfea51e55766bb441d1589e5c1cc2cbed7e36",
+  "source_kernel_sha256": "e46326182b42f76791d00ad3671fbf77e00fda522ec2be5805e5aed0e1ba7a08",
+  "observation_source": "Owner: 对的，立刻重启了，我们今天先这样，明天继续。",
+  "reached": "Immediate reset checkpoint before ___mac_execve in _load_init_program_at_path at0xfffffff0076e90ac",
+  "limits": "Confirms reaching the call boundary only; probe does not execute ___mac_execve and does not prove successful exec, cache mapping or launchd main",
+  "session_state": "Stopped at owner request; diagnostic BOOT remains installed",
+  "next_action": "Resume from confirmed before-exec boundary; review and select a bounded exec-stage checkpoint before building or uploading another image"
+}

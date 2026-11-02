@@ -1,0 +1,14 @@
+{
+  "observed": "BOOT097c4f8c with corrected policies panics in memorystatus_jetsam_thread: no victim, available3060pages",
+  "confirmed_source_cost": {
+    "carrier_pinned_bytes": 73293824,
+    "duplicate_manifest_copy_bytes": 73293824,
+    "private_key_pages_retained_bytes": 8192,
+    "intended_saved_bytes": 73293824
+  },
+  "change": "Block devices may borrow only exact authenticated driver-owned boot-lifetime carrier allocations. Each manifest is made readonly, each device keeps its own separately allocated/read-only key page, and vr_open reauthenticates after protection. Other policy sources keep existing copy path.",
+  "ownership": "Carrier lifetime remains global; free() skips borrowed manifests and frees only the private key. Owned fallback storage is still freed exactly once.",
+  "validation": "Actual configureVerification/free bodies compiled on host with ASan/UBSan and real mprotect: exact provenance, readonly manifest and private key passed to verifier stub, owned fallback, protection/auth/allocation failure and teardown. Cryptographic behavior itself remains original vr_open, previously full-block verified.",
+  "diagnostic_counters": "pin=unique carrier allocation bytes, borrow=authenticated borrowed-view bytes, copy=authenticated fallback table-copy bytes; borrow describes aliases, not additional RAM. csbytes is attempted native4k read bytes, not allocated bytes.",
+  "scope": "No DRAM/DTS/EFI allocation increase, no signature bypass, no userdata writes for this memory change; hardware result pending"
+}

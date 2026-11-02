@@ -1,0 +1,35 @@
+{
+  "source_boot_sha256": "17bda459286b24f514933096009c989241536bea4916fc08009123725579c6fa",
+  "source_boot_bytes": 62713856,
+  "boot_sha256": "646f44adc09c26ada027691e47ac1e06504e8cdfe0a6b3c486fec4c9bc7ef477",
+  "boot_bytes": 71303168,
+  "partition_bytes": 71303168,
+  "source_prefix_unchanged": true,
+  "tail_zero_bytes": 8589312,
+  "prior_tail_nonzero_bytes": 14,
+  "prior_footer": {
+    "magic": "AVBf",
+    "original_image_size": 56434704,
+    "vbmeta_offset": 56438784,
+    "vbmeta_size": 2112,
+    "pointed_magic_hex": "00000000"
+  },
+  "scope": "Same17bda459 prefix and checkpoint; deterministic zero tail across BOOT only. No vbmeta/recovery/userdata writes. Stale footer is a hypothesis, not established root cause.",
+  "reference": "https://android.googlesource.com/platform/external/avb/+/refs/heads/main/libavb/avb_footer.h",
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/step7/probes/policy-after-init-exec-full-partition/boot.img"
+  ],
+  "started_at": "2026-11-02T13:41:22.824268+08:00",
+  "authorization": "Ongoing authorized BOOT bring-up; owner confirms untouched Samsung/RPMB screen; explained full-partition same-prefix zero-tail control",
+  "finished_at": "2026-11-02T13:41:29.200495+08:00",
+  "exit_code": 1,
+  "reboot_requested": true,
+  "readback_verified": false,
+  "hardware_result": "Upload100% and success reported, but session-end confirmation failed; require manual normal reboot and owner observation. No automatic retry.",
+  "upload_reported_success": true,
+  "session_end_confirmed": false,
+  "reboot_confirmed": false
+}

@@ -1,0 +1,22 @@
+{
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/step7/probes/ufs-cache-read-source/boot.img"
+  ],
+  "authorization": "User-authorized fixed-carrier repair and return to XNU boot after complete verified carrier readback",
+  "started_at": "2026-11-01T23:39:41.229778+08:00",
+  "finished_at": "2026-11-01T23:39:47.827493+08:00",
+  "boot_sha256": "097c4f8c02ae97026a48d07afff2063eca774ddcf0a730b1c27f9ed025e83331",
+  "kernel_sha256": "88f716b0418fcefcb86beeef87323aed12219a543e270e324685fbbb1bd260ab",
+  "boot_bytes": 62713856,
+  "partition": "BOOT only",
+  "exit_code": 0,
+  "reboot_requested": true,
+  "corrected_policy_hashes": {
+    "OS": "8fefc15fecc382730c1aeae6154e0eabb195d16bc51099c6095ff1395be43dc2",
+    "SystemOS": "869a186ae40656ff9c3be64080120dc2e648f9307d3efa213d9ed5c2084960b8"
+  },
+  "hardware_startup_result": "pending owner observation"
+}

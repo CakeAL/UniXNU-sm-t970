@@ -1,0 +1,29 @@
+{
+  "scope": "Post-cache-map reference review; external source behavior is not T970 hardware verification",
+  "sources": [
+    {
+      "url": "https://github.com/RigoLigoRLC/unixnu-sm-t733/blob/3bb0d6f7840f088db6a0ec88ecb841e12042422f/patches/t733-xnu/native-text-repage.patch",
+      "finding": "Clears persistent vnode validation bitmap for modified text pages so reload validates original bytes and reapplies fixup; candidate for relevant page-reload faults, not proof of current cause."
+    },
+    {
+      "url": "https://github.com/RigoLigoRLC/unixnu-sm-t733/blob/3bb0d6f7840f088db6a0ec88ecb841e12042422f/board.toml",
+      "finding": "Original-byte matched21H461 libsystem_platform zero-fill DCZVA workaround and later framework fixes; hardware/fault relevance must be established per target."
+    },
+    {
+      "url": "https://github.com/reAAAq/UniXNU-umi/blob/3eb72578597d2ca16471b172d45eddc096a34a04/patches/umi-xnu/zzzzzzzzzz-umi-exec-trace.patch",
+      "finding": "Separate exec attempts/results, userspace SVC, exception and panic observations."
+    },
+    {
+      "url": "https://github.com/reAAAq/UniXNU-umi/blob/3eb72578597d2ca16471b172d45eddc096a34a04/patches/umi-xnu/zzzzzzzzzzzz-umi-critical-exit-trace.patch",
+      "finding": "Kernel-owned critical exit reason/register observations before later teardown; preserves crash policy."
+    },
+    {
+      "url": "https://github.com/reAAAq/UniXNU-umi/blob/3eb72578597d2ca16471b172d45eddc096a34a04/patches/umi-xnu/zzzzzzzzzzzzz-umi-runtime-observation.patch",
+      "finding": "Reads genuine initproc_spawned state. T970 now independently observes same original XNU marker through original-handler tail-call diagnostic."
+    },
+    {
+      "url": "https://github.com/reAAAq/UniXNU-umi/blob/3eb72578597d2ca16471b172d45eddc096a34a04/README.md",
+      "finding": "Maintainer reports tested SM8250 umi reaches Hello/Setup with CPU scanout, touch and persistentData; Setup completion/home screen unverified. Different memory/hardware scope."
+    }
+  ]
+}

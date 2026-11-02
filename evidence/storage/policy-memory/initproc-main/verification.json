@@ -1,0 +1,15 @@
+{
+  "pass": true,
+  "tail_site": "0xfffffff0076ee220",
+  "stub_va": "0xfffffff0073fd48c",
+  "original_handler_va": "0xfffffff00770f740",
+  "marker_va": "0xfffffff007b554ac",
+  "marker_written_by_probe": false,
+  "only_reviewed_stub_message_and_tail_branch_changed": true,
+  "args": "-v cpus=1 t970-novc sheng-pmgr=2 t970-ufs-publish=1 launchdsuffix=release",
+  "raw_boot_sha256": "50cd2ef8b7654fe1225651623c389caa2b8663dba440feeaff1f24b3bce6d3a9",
+  "boot_partition_sha256": "870a11da94430457898d3de040bed0d7230c179c803baff1931ac127a9bd25f9",
+  "boot_partition_bytes": 71303168,
+  "expected_message": "launchd main marker=1 err=<original sysctl result hex>",
+  "scope": "Original handler/security path preserved. Reads genuine state after original sysctl handler, terminal only at1. State0/other returns to original caller with X0/FP/LR/SP intact. No message alone does not localize failure."
+}

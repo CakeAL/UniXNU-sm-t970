@@ -1,0 +1,171 @@
+--- a/bsd/kern/kern_descrip.c
++++ b/bsd/kern/kern_descrip.c
+@@ -2536,6 +2536,32 @@
+  *		tests for cancellation prior to performing a potentially
+  *		blocking operation.
+  */
++
++/* T970_CS_STAGE_BEGIN: latch only the first actual initproc EACCES. */
++static char native_t970_cs_failure[192];
++void native_t970_cs_note(unsigned, int, off_t, const unsigned char *);
++const char *native_t970_cs_failure_text(void);
++void
++native_t970_cs_note(unsigned stage, int error, off_t offset, const unsigned char *cdhash)
++{
++	if (error != EACCES || proc_selfpid() != 1 || native_t970_cs_failure[0]) return;
++	char hash[41] = {0};
++	const char hex[] = "0123456789abcdef";
++	if (cdhash) for (unsigned i = 0; i < 20; ++i) {
++		hash[i * 2] = hex[cdhash[i] >> 4];
++		hash[i * 2 + 1] = hex[cdhash[i] & 15];
++	}
++	snprintf(native_t970_cs_failure, sizeof(native_t970_cs_failure),
++	    "csig EACCES stage=%u off=%llx cd=%s", stage, (unsigned long long)offset,
++	    cdhash ? hash : "unavailable");
++}
++const char *
++native_t970_cs_failure_text(void)
++{
++	return native_t970_cs_failure[0] ? native_t970_cs_failure : "csig: no EACCES captured";
++}
++/* T970_CS_STAGE_END */
++
+ int
+ sys_fcntl(proc_t p, struct fcntl_args *uap, int32_t *retval)
+ {
+@@ -4018,6 +4044,7 @@
+ 			}
+ 
+ 			if (error) {
++				native_t970_cs_note(1, error, fs.fs_file_start + fs.fs_blob_start, NULL);
+ 				ubc_cs_blob_deallocate(kernel_blob_addr,
+ 				    kernel_blob_size);
+ 				vnode_put(vp);
+@@ -4036,6 +4063,7 @@
+ 			    blob_add_flags,
+ 			    &blob);
+ 
++			native_t970_cs_note(2, error, fs.fs_file_start, NULL);
+ 			/* ubc_blob_add() has consumed "kernel_blob_addr" if it is zeroed */
+ 			if (error) {
+ 				if (kernel_blob_addr) {
+--- a/bsd/kern/ubc_subr.c
++++ b/bsd/kern/ubc_subr.c
+@@ -71,6 +71,7 @@
+ #include <vm/vm_kern.h>
+ #include <vm/vm_map.h>
+ #include <vm/vm_protos.h> /* last */
++extern void native_t970_cs_note(unsigned, int, off_t, const unsigned char *);
+ 
+ #include <libkern/crypto/sha1.h>
+ #include <libkern/crypto/sha2.h>
+@@ -4677,6 +4678,7 @@
+ 	boolean_t record_mtime = false;
+ 	kern_return_t kr = KERN_DENIED;
+ 	errno_t error = -1;
++	unsigned t970_cs_stage = 10;
+ 
+ #if HAS_APPLE_PAC
+ 	void *signed_entitlements = NULL;
+@@ -4700,6 +4702,7 @@
+ 	error = cs_blob_init_validated(addr, size, &tmp_blob, &cd);
+ 	if (error != 0) {
+ 		printf("unable to create a validated cs_blob object: %d\n", error);
++		native_t970_cs_note(t970_cs_stage, error, base_offset, tmp_blob.csb_cdhash);
+ 		return error;
+ 	}
+ 
+@@ -4708,6 +4711,7 @@
+ 	tmp_blob.csb_base_offset = base_offset;
+ 
+ 	/* Perform 1st stage reconstitution */
++	t970_cs_stage = 11;
+ 	error = reconstitute_code_signature(&tmp_blob);
+ 	if (error != 0) {
+ 		goto out;
+@@ -4768,6 +4772,7 @@
+ 	unsigned int cs_flags = tmp_blob.csb_flags;
+ 	unsigned int signer_type = tmp_blob.csb_signer_type;
+ 
++	t970_cs_stage = 12;
+ 	error = mac_vnode_check_signature(
+ 		vp,
+ 		&tmp_blob,
+@@ -4819,18 +4824,21 @@
+ #endif
+ 
+ 	/* Perform 2nd stage reconstitution */
++	t970_cs_stage = 13;
+ 	error = reconstitute_code_signature_2nd_stage(&tmp_blob);
+ 	if (error != 0) {
+ 		goto out;
+ 	}
+ 
+ 	/* Setup any multi-level hashing for the code signature */
++	t970_cs_stage = 14;
+ 	error = setup_multilevel_hashing(&tmp_blob);
+ 	if (error != 0) {
+ 		goto out;
+ 	}
+ 
+ 	/* Ensure security critical auxiliary blobs still exist */
++	t970_cs_stage = 15;
+ 	error = validate_auxiliary_signed_blobs(&tmp_blob);
+ 	if (error != 0) {
+ 		goto out;
+@@ -4844,6 +4852,7 @@
+ 	 * that is the last part of signature validation which can shift the code
+ 	 * signature around.
+ 	 */
++	t970_cs_stage = 16;
+ 	error = accelerate_entitlement_queries(&tmp_blob);
+ 	if (error != 0) {
+ 		goto out;
+@@ -4876,6 +4885,7 @@
+ 
+ #if defined(XNU_NATIVE_CS_HASH_CACHE) && XNU_NATIVE_CS_HASH_CACHE
+ 	/* Authenticate before publishing the signed object or taking its locks. */
++	t970_cs_stage = 17;
+ 	error = cs_native4k_prepare(vp, &tmp_blob);
+ 	if (error != 0) {
+ 		goto out;
+@@ -5077,6 +5087,7 @@
+ 	error = 0;      /* success ! */
+ 
+ out:
++	native_t970_cs_note(t970_cs_stage, error, base_offset, tmp_blob.csb_cdhash);
+ 	if (error) {
+ 		if (error != EAGAIN) {
+ 			printf("check_signature[pid: %d]: error = %d\n", proc_getpid(current_proc()), error);
+@@ -5833,6 +5844,7 @@
+ 		os_atomic_add(&cs_native4k_read_ticks, hash_start - read_start, relaxed);
+ 		os_atomic_add(&cs_native4k_bytes, (uint64_t)chunk_length, relaxed);
+ 		if (error || resid) {
++			native_t970_cs_note(171, error, position, blob->csb_cdhash);
+ 			error = error ? error : EIO;
+ 			goto out;
+ 		}
+--- a/bsd/kern/kern_exit.c
++++ b/bsd/kern/kern_exit.c
+@@ -1872,18 +1872,19 @@
+ 		/* dyld reports "no dylib cache" both when it never found the cache file and
+ 		 * when the shared region refused to map it, so report the counters that tell
+ 		 * those two cases apart. */
++		extern const char *native_t970_cs_failure_text(void);
+ 		extern const char *native_t970_cache_trace_text(void);
+ 		extern unsigned long native_owner_cache_carrier_accepts;
+ 		extern unsigned long native_owner_cache_carrier_rejects;
+ 		extern volatile int native_verified_block_root_uuid_match;
+ 		extern volatile int native_verified_block_root_media_matches;
+-		panic_with_options(0, NULL, DEBUGGER_OPTION_INITPROC_PANIC, "%s %s -- exit reason namespace %d subcode 0x%llx description: %." LAUNCHD_PANIC_REASON_STRING_MAXLEN "s carrier acc=%lu rej=%lu uuidmatch=%d media=%d\n%s",
++		panic_with_options(0, NULL, DEBUGGER_OPTION_INITPROC_PANIC, "%s %s -- exit reason namespace %d subcode 0x%llx description: %." LAUNCHD_PANIC_REASON_STRING_MAXLEN "s carrier acc=%lu rej=%lu uuidmatch=%d media=%d\n%s\n%s",
+ 		    ((proc_getcsflags(p) & CS_KILLED) ? "CS_KILLED" : ""),
+ 		    prefix_str, p->p_exit_reason->osr_namespace, p->p_exit_reason->osr_code,
+ 		    exit_reason_desc ? exit_reason_desc : "none",
+ 		    native_owner_cache_carrier_accepts, native_owner_cache_carrier_rejects,
+ 		    native_verified_block_root_uuid_match, native_verified_block_root_media_matches,
+-		    native_t970_cache_trace_text());
++		    native_t970_cs_failure_text(), native_t970_cache_trace_text());
+ 	}
+ }
+ 

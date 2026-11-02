@@ -6,8 +6,8 @@ BOOT image past the 71,303,168-byte partition. They are written to a fixed userd
 the root image instead, and the kernel links only the owner public key and authenticates each
 envelope with vr_open before any window may be published.
 
-Window geometry comes from the SHNGROOT manifest at the start of the flash image, decoded out of
-the sparse segments, and every window digest is checked against that same manifest.
+Use the exact raw deployment image when available. Legacy sparse inputs are accepted only if
+every complete window digest agrees with SHNGROOT before signing; stale segments are refused.
 """
 import argparse
 import hashlib
@@ -90,6 +90,52 @@ class Segments:
         return data
 
 
+class RawImage:
+    """Read the exact complete raw SHNGROOT image used by deployment/readback."""
+
+    def __init__(self, path):
+        self.handle = path.open('rb')
+        self.size = path.stat().st_size
+
+    def read_at(self, offset, count):
+        require(offset >= 0 and count >= 0, 'Negative raw-image range')
+        self.handle.seek(offset)
+        return self.handle.read(count)
+
+
+def parse_root_header(head):
+    require(len(head) == BLOCK and head[:8] == b'SHNGROOT', 'The image does not start with the SHNGROOT manifest')
+    require(hashlib.sha256(head[:4064]).digest() == head[4064:], 'SHNGROOT header digest mismatch')
+    version, windows = struct.unpack_from('<II', head, 8)
+    image_bytes, = struct.unpack_from('<Q', head, 16)
+    require(version == 1 and 0 < windows <= 4, 'Unsupported root manifest header')
+    entries = []
+    for index in range(windows):
+        base = 24 + 128 * index
+        name = head[base:base + 32].split(b'\0')[0].decode()
+        offset, size = struct.unpack_from('<QQ', head, base + 32)
+        digest = head[base + 56:base + 88]
+        entries.append({'name': name, 'offset': offset, 'size': size, 'digest': digest.hex()})
+    return image_bytes, entries
+
+
+def check_window_digest(source, entry):
+    """Refuse stale or corrupted sources before signing any envelope."""
+    digest = hashlib.sha256()
+    position, remaining = entry['offset'], entry['size']
+    while remaining:
+        data = source.read_at(position, min(4 * 1024 * 1024, remaining))
+        require(data and len(data) <= remaining,
+                f"{entry['name']}: incomplete input coverage at {position}")
+        digest.update(data)
+        position += len(data)
+        remaining -= len(data)
+    actual = digest.hexdigest()
+    require(actual == entry['digest'],
+            f"{entry['name']}: input digest mismatch: expected {entry['digest']}, got {actual}")
+    return actual
+
+
 class SparseStream:
     """Sequential, buffered reader over one window of the image."""
 
@@ -119,7 +165,7 @@ class SparseStream:
         return data
 
 
-def verify_host(verifier, output, segments, entries, windows, public_key):
+def verify_host(verifier, output, segments, entries, windows, public_key, all_blocks=False):
     """Authenticate each envelope with the real C code and compare sampled blocks with the image."""
     if not verifier.is_file():
         for window in windows:
@@ -148,21 +194,27 @@ def verify_host(verifier, output, segments, entries, windows, public_key):
         require(str(uuid.UUID(bytes=bytes(view.volume_uuid))).upper() == window['volume_uuid'],
                 f"{entry['name']}: host volume UUID differs")
         count = view.block_count
-        indices = sorted({0, 1, count // 4, count // 2, count - 2, count - 1})
+        indices = range(count) if all_blocks else sorted({0, 1, count // 4, count // 2, count - 2, count - 1})
         for index in indices:
             at = entry['offset'] + index * BLOCK
             data = segments.read_at(at, min(BLOCK, entry['size'] - index * BLOCK))
             require(data, f"{entry['name']}: sampled block {index} is outside the sparse coverage")
             require(not native.vr_host_block(ctypes.byref(view), index, data, len(data)),
                     f"{entry['name']}: sampled block {index} failed authentication")
-        window['host_verification'] = 'vr_host_open plus %d sampled blocks authenticated' % len(indices)
-        window['sampled_blocks'] = indices
+        window['host_verification'] = 'vr_host_open plus %d %s blocks authenticated' % (len(indices), 'complete' if all_blocks else 'sampled')
+        if all_blocks:
+            window['verified_blocks'] = count
+        else:
+            window['sampled_blocks'] = indices
     return windows
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--segments', type=Path, nargs='+', required=True)
+    inputs = parser.add_mutually_exclusive_group(required=True)
+    inputs.add_argument('--segments', type=Path, nargs='+')
+    inputs.add_argument('--image', type=Path, help='exact complete raw SHNGROOT deployment image')
+    parser.add_argument('--verify-all-blocks', action='store_true', help='authenticate every input block with the real C verifier')
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--generation', type=int, default=1)
     parser.add_argument('--private-key', type=Path, default=FW / 'build/verified-root-host/keys/owner.pem')
@@ -172,28 +224,31 @@ def main():
     output = options.output.resolve()
     require(not output.exists(), 'Choose a new output directory')
     require(options.private_key.is_file() and options.public_key.is_file(), 'Owner key pair is missing')
+    require(not options.verify_all_blocks or options.host_verifier.is_file(),
+            'Full block verification requires the real C verifier')
 
-    segments = Segments(options.segments)
+    segments = RawImage(options.image) if options.image else Segments(options.segments)
     head = segments.read_at(0, BLOCK)
-    require(head[:8] == b'SHNGROOT', 'The image does not start with the SHNGROOT manifest')
-    version, windows = struct.unpack_from('<II', head, 8)
-    image_bytes, = struct.unpack_from('<Q', head, 16)
-    require(version == 1 and 0 < windows <= 4, 'Unsupported root manifest header')
-    entries = []
-    for index in range(windows):
-        base = 24 + 128 * index
-        name = head[base:base + 32].split(b'\0')[0].decode()
-        offset, size = struct.unpack_from('<QQ', head, base + 32)
-        digest = head[base + 80:base + 112]
-        entries.append({'name': name, 'offset': offset, 'size': size, 'digest': digest.hex()})
+    image_bytes, entries = parse_root_header(head)
+    if options.image:
+        require(segments.size == image_bytes, 'Raw image length differs from SHNGROOT declaration')
     require(sum(e['size'] for e in entries) <= image_bytes, 'Windows exceed the image')
+    previous_end = BLOCK
+    for entry in sorted(entries, key=lambda e: e['offset']):
+        require(entry['offset'] >= previous_end and entry['size'] > 0 and
+                entry['offset'] % BLOCK == 0 and entry['offset'] <= image_bytes and
+                entry['size'] <= image_bytes - entry['offset'], 'Invalid or overlapping root window')
+        previous_end = entry['offset'] + entry['size']
+        check_window_digest(segments, entry)
 
     spec = importlib.util.spec_from_file_location('verified_manifest', FW / 'kits/VerifiedRoot/tools/manifest.py')
     manifest = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(manifest)
 
     output.mkdir(parents=True)
-    report = {'segments': [str(p) for p in options.segments], 'image_bytes': image_bytes,
+    report = {'segments': [str(p) for p in options.segments] if options.segments else [],
+              'raw_image': str(options.image) if options.image else None,
+              'input_window_digests_verified': True, 'image_bytes': image_bytes,
               'generation': options.generation, 'windows': []}
     for entry in entries:
         require(entry['name'] in POLICY_UUID, f"No policy UUID for window {entry['name']}")
@@ -201,6 +256,7 @@ def main():
         record = manifest.make(stream, entry['size'], options.private_key, options.public_key,
                                POLICY_UUID[entry['name']], options.generation, output / entry['name'])
         envelope = output / entry['name'] / 'manifest.bin'
+        require(record['image_sha256'] == entry['digest'], f"{entry['name']}: source changed during signing")
         bytes_in_envelope = envelope.stat().st_size
         require(bytes_in_envelope == 544 + 32 * record['block_count'], 'Unexpected envelope length')
         report['windows'].append({
@@ -214,7 +270,7 @@ def main():
             'signature_verified_by_openssl': record['signature_verified_by_openssl'],
         })
     report['windows'] = verify_host(options.host_verifier, output, segments, entries, report['windows'],
-                                    options.public_key)
+                                    options.public_key, options.verify_all_blocks)
     report['total_envelope_bytes'] = sum(w['envelope_bytes'] for w in report['windows'])
     (output / 'root-manifests.json').write_text(json.dumps(report, indent=2) + '\n')
     print(json.dumps(report, indent=2))

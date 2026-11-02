@@ -1,0 +1,8 @@
+{
+  "boot_sha256": "ef97eb6a61adfa29eea6f057f0b6b4e3b966acf67396812231fed36cc6c98348",
+  "source_kernel_sha256": "e46326182b42f76791d00ad3671fbf77e00fda522ec2be5805e5aed0e1ba7a08",
+  "observation_source": "Owner text: 粉条后10s自动重启了",
+  "reached": "Shared-policy vr_open call returned at reviewed callsite0xfffffff007981bf0; reset after configured6second delay is consistent with observed total time",
+  "limits": "Does not capture vr_open return status, both-device preparation, cache mapping or launchd main",
+  "recorded_at": "2026-11-02T00:16:56.945284+08:00"
+}

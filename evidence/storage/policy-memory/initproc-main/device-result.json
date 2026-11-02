@@ -1,0 +1,11 @@
+{
+  "boot_sha256": "870a11da94430457898d3de040bed0d7230c179c803baff1931ac127a9bd25f9",
+  "observation": "launchd main marker=1 err=0",
+  "result": "Genuine kern.initproc_spawned marker1 after successful original sysctl_handle_int. XNU restricts setting it to PID1 once and defines it as launchd reached main.",
+  "free_pages": 260,
+  "limits": "Deliberate terminal diagnostic; no probe marker write. Services, writableData, graphical UI and device peripherals are not verified. Snapshot free pages ~1MiB under256MiB owned envelope; no immediate memory-layout change authorized by this observation.",
+  "observation_source": "Owner photo linked as device.jpg",
+  "source_kernel_sha256": "e46326182b42f76791d00ad3671fbf77e00fda522ec2be5805e5aed0e1ba7a08",
+  "root_image_sha256": "fd43ee7035ce185ce4215ac93fdc006fd784a54b3b7442e21457c226cbe03093",
+  "free_mib": 1.015625
+}

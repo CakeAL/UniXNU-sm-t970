@@ -1,0 +1,19 @@
+{
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/step7/probes/policy-shared-vropen-return/boot.img"
+  ],
+  "authorization": "Continue authorized BOOT-only bring-up diagnosis after owner reported normal image stalled over3minutes; isolated after-return reset probe explained before upload",
+  "started_at": "2026-11-02T00:12:59.832855+08:00",
+  "finished_at": "2026-11-02T00:13:06.411971+08:00",
+  "boot_sha256": "ef97eb6a61adfa29eea6f057f0b6b4e3b966acf67396812231fed36cc6c98348",
+  "source_kernel_sha256": "e46326182b42f76791d00ad3671fbf77e00fda522ec2be5805e5aed0e1ba7a08",
+  "partition": "BOOT only",
+  "exit_code": 0,
+  "reboot_requested": true,
+  "expected_observation": "6-second reset after shared-policy vr_open call returns, not6seconds from power-on",
+  "hardware_startup_result": "pending owner observation",
+  "normal_image_preserved": "out/step7/probes/ufs-policy-memory/boot.img"
+}

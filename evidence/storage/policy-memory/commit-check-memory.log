@@ -1,0 +1,1 @@
+PASS: actual configure/free functions; borrowed RO/private-key lifecycle, fallback ownership, protection/auth/allocation failures

@@ -1,0 +1,20 @@
+{
+  "partition": "BOOT only",
+  "image_sha256": "646f44adc09c26ada027691e47ac1e06504e8cdfe0a6b3c486fec4c9bc7ef477",
+  "bytes": 71303168,
+  "started_at": "2026-11-02T13:45:16.034748+08:00",
+  "backup": "out/step7/bootloader-audit-20261102/boot.img",
+  "write_attempted": true,
+  "verified": true,
+  "scope": "Complete previously prepared same-prefix zero-tail image; original14-byte footer remained after Heimdall. No vbmeta/dtbo/root writes.",
+  "write_exit_code": 0,
+  "read_exit_code": 0,
+  "readback_bytes": 71303168,
+  "readback_sha256": "646f44adc09c26ada027691e47ac1e06504e8cdfe0a6b3c486fec4c9bc7ef477",
+  "zero_tail": true,
+  "finished_at": "2026-11-02T13:45:19.124707+08:00",
+  "reboot_requested": true,
+  "reboot_exit_code": 0,
+  "reboot_at": "2026-11-02T13:46:02.522456+08:00",
+  "hardware_result": "pending owner observation after readback-proven zero tail"
+}

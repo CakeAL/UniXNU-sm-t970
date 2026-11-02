@@ -1,0 +1,41 @@
+{
+  "node": "/dev/block/sda36",
+  "write": true,
+  "envelopes": [
+    {
+      "name": "OS",
+      "lba": 5505024,
+      "blocks": 11593,
+      "bytes": 47481664,
+      "sha256": "8fefc15fecc382730c1aeae6154e0eabb195d16bc51099c6095ff1395be43dc2",
+      "expected_old_sha256": "072390084050ec8ab3aa9f6e9d59e0a81ceb89774deffab701b55b37784724c7",
+      "backup": "out/step7/policy-restore-twrp-20261102/OS-before.bin",
+      "remote": "/tmp/unixnu-policy-OS.bin",
+      "write_attempted": true,
+      "backup_sha256": "072390084050ec8ab3aa9f6e9d59e0a81ceb89774deffab701b55b37784724c7",
+      "write_output": "conv=1\n11592+1 records in\n11592+1 records out\n47481664 bytes (45 M) copied, 0.133406 s, 339 M/s\n",
+      "write_exit_code": 0,
+      "readback_sha256": "8fefc15fecc382730c1aeae6154e0eabb195d16bc51099c6095ff1395be43dc2",
+      "verified": true
+    },
+    {
+      "name": "SystemOS",
+      "lba": 5516624,
+      "blocks": 6301,
+      "bytes": 25805344,
+      "sha256": "869a186ae40656ff9c3be64080120dc2e648f9307d3efa213d9ed5c2084960b8",
+      "expected_old_sha256": "bb3ccbcde478adb9497af16421ea2407535537ddd3658792345bd835e14dfa63",
+      "backup": "out/step7/policy-restore-twrp-20261102/SystemOS-before.bin",
+      "remote": "/tmp/unixnu-policy-SystemOS.bin",
+      "write_attempted": true,
+      "backup_sha256": "bb3ccbcde478adb9497af16421ea2407535537ddd3658792345bd835e14dfa63",
+      "write_output": "conv=1\n6300+1 records in\n6300+1 records out\n25805344 bytes (25 M) copied, 0.075709 s, 325 M/s\n",
+      "write_exit_code": 0,
+      "readback_sha256": "869a186ae40656ff9c3be64080120dc2e648f9307d3efa213d9ed5c2084960b8",
+      "verified": true
+    }
+  ],
+  "source_report": "out/step7/owner-manifests-corrected/root-manifests.json",
+  "all_verified": true,
+  "scope": "Two fixed owner-envelope ranges only; backup both old ranges before any write"
+}

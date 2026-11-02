@@ -1,0 +1,36 @@
+{
+  "device_revision": "ba275cae5ba86c7076a40ae6057c755702262881",
+  "framework_revision": "194aae294c1107e791f4f74b2be371a391ac6bc4",
+  "probe": {
+    "function": "_sysctl_initproc_spawned",
+    "target": "_sysctl_handle_int",
+    "occurrence": 1,
+    "position": "terminal-panic-after-return",
+    "reset_delay_seconds": null
+  },
+  "board_sha256": "0516305f2447927ca8ea9e36daa25552ae9b5f4baa0ab581b2aa45f55ddc8691",
+  "source_kernel_sha256": "e46326182b42f76791d00ad3671fbf77e00fda522ec2be5805e5aed0e1ba7a08",
+  "firmware_sha256": "515105d758a9d61078dffce5012db0754a71cec351a1bb34b30ee791196b5690",
+  "firmware_dtb_sha256": "86c14aa305a6cf5db46665f4095d28aadcb1ea5ce9d213cd711641a07504ed1d",
+  "boot_sha256": "50cd2ef8b7654fe1225651623c389caa2b8663dba440feeaff1f24b3bce6d3a9",
+  "boot_bytes": 62713856,
+  "boot_partition_bytes": 71303168,
+  "hardware_tested": false,
+  "note": "Probe modifies a payload copy only; no flash or reboot performed",
+  "initproc_main": {
+    "tail_branch_site": "0xfffffff0076ee220",
+    "original_handler": "0xfffffff00770f740",
+    "marker_address": "0xfffffff007b554ac",
+    "code_address": "0xfffffff0073fd48c",
+    "code_bytes": 60,
+    "code_sha256": "4128f65cfdb5a5cb7836723fe5f558cee617c8aabf7da1209f30f0c14dd78777",
+    "message": "launchd main marker=%u err=%x",
+    "marker_written_by_probe": false,
+    "original_handler_arguments_unchanged": true,
+    "pass_through_frame_and_lr_restored": true,
+    "reset_probe": false,
+    "limits": "Terminates only after original sysctl handler leaves genuine initproc_spawned=1. That marks launchd main, not service startup or a desktop. No output alone does not localize a stall."
+  },
+  "generator_sha256": "e106588aaf2c3102706239e2091ee77971d1ea4ea3f6f5bdce97dc9e63889ec5",
+  "build_command": "python3.14 scripts/build-entry-probe.py --unixnu ../UniXNU --target _sysctl_handle_int --function _sysctl_initproc_spawned --initproc-main --panic-kernel out/step7/probes/ufs-policy-memory/independent/kernel.macho --kernel-arg launchdsuffix=release --firmware-fd out/step7/ufs-readonly-inputs/SILICIUM_UEFI.fd --output out/step7/probes/policy-initproc-main"
+}

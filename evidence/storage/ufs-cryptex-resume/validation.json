@@ -1,0 +1,23 @@
+{
+  "checks": {
+    "kernel_build": "PASS: exit 0; tracked inputs unchanged during build",
+    "compiler_replay": "PASS: real compile records replayed with preprocessing; union=0 and all three active paths agree",
+    "hardware_description": "PASS: DT/ADT and firmware integration",
+    "fat_and_fd": "PASS: independently extracted payload and FD match",
+    "boot_geometry": "PASS: header v2, uncompressed FD/shim, separate firmware DTB, 62713856 < 71303168",
+    "platform_script": {
+      "exit_code": 1,
+      "result": "FAIL at historical five-component bootstrap assertion; current storage dependencies add components. No claim that this check passes."
+    }
+  },
+  "environment": "PATH=/opt/homebrew/opt/python@3.14/libexec/bin:$PATH (system python3 is 3.9.6 and cannot import tomllib)",
+  "hardware_tested": false,
+  "flash_performed": true,
+  "limits": [
+    "No runtime dyld cache mapping or launchd progress established for dc42838f.",
+    "Photo image association is owner-reported; no tablet image readback.",
+    "Storage persistence, display beyond the existing console, input and GPU were not tested."
+  ],
+  "flash_receipt": "evidence/storage/ufs-cryptex-resume/flash.json",
+  "hardware_result": "Heimdall BOOT upload and reboot command succeeded; startup observation pending"
+}

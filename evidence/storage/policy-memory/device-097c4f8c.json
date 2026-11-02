@@ -1,0 +1,15 @@
+{
+  "boot_sha256": "097c4f8c02ae97026a48d07afff2063eca774ddcf0a730b1c27f9ed025e83331",
+  "kernel_sha256": "88f716b0418fcefcb86beeef87323aed12219a543e270e324685fbbb1bd260ab",
+  "corrected_policies": {
+    "OS": "8fefc15fecc382730c1aeae6154e0eabb195d16bc51099c6095ff1395be43dc2",
+    "SystemOS": "869a186ae40656ff9c3be64080120dc2e648f9307d3efa213d9ed5c2084960b8"
+  },
+  "photo_sha256": "959b45267f289f4fdc156a2d48771e7f0909fc43f797449fc6dc2ce5418bf050",
+  "image_association": "Owner photo following recorded carrier update and XNU BOOT upload; not device boot readback",
+  "panic_text": "memorystatus_jetsam_thread: no victim! available pages:3060 @kern_memorystatus.c:4203",
+  "observed_free_hex": "760",
+  "conclusion": "Observed failure is now critical memory pressure, not the earlier initproc cache-read EACCES panic. This photo alone does not prove full cache mapping or launchd main.",
+  "host_finding": "Carrier envelopes remain allocated after each block device copies its matching manifest into another readonly allocation; two table copies cost73293824 bytes beyond the pinned carrier.",
+  "next": "Borrow only authenticated driver-owned pinned carrier allocations, protect manifests readonly, retain separate readonly per-device key copies and reverify. Never free borrowed global allocations from block-device teardown."
+}

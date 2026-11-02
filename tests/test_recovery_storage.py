@@ -9,6 +9,17 @@ SPEC.loader.exec_module(MODULE)
 
 
 class RecoveryReadinessTests(unittest.TestCase):
+    def test_twrp_requires_exact_model_and_product_pair(self):
+        good = dict(model='SAMSUNG_gts7xlwifi', product='gts7xlwifi',
+                    identity='uid=0(root) gid=0(root)', target='/dev/block/sda36',
+                    size='243668070400', logical='4096', device_mm='259:20',
+                    mounts='1 0 0:1 / / rw - rootfs rootfs rw')
+        self.assertEqual(MODULE.validate(**good), [])
+        for changes in ({'product': ''}, {'product': 'gts7wifi'},
+                        {'model': 'SAMSUNG_gts7wifi'}, {'model': 'SM-T733'}):
+            with self.subTest(changes=changes):
+                self.assertTrue(MODULE.validate(**dict(good, **changes)))
+
     def test_identity_geometry_and_mounts_fail_closed(self):
         good = dict(model='SM-T970', identity='uid=0(root) gid=0(root)', target='/dev/block/sda36',
                     size='243668070400', logical='4096', device_mm='259:20', mounts='1 0 0:1 / / rw - rootfs rootfs rw')

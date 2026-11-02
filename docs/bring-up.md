@@ -219,3 +219,22 @@ python3.14 scripts/build-entry-probe.py --target _PE_create_console --function _
 当前 DTS 是 ADT 的低地址包络。它包含固件保留洞，不是 2 GiB 可用内存池；DarwinBoot
 单独通过 EFI conventional memory 分配 256 MiB，并把该大小写入 boot_args。检查器会报告
 包络中的保留区，但并不把这些地址标记为空闲；每次实际分配仍需运行时日志验证。
+
+### init exec返回状态诊断（2026-11-02）
+
+`scripts/exec-return-status-probe.py`限制到源内核e4632618和经审核的调用地址；
+保留callee及参数，调用返回后立即读W0，0等待6秒复位、非0等待16秒复位。
+只修改独立payload副本，终止而不继续正常启动；无复位不能单独证明卡死。
+DEVELOPMENT默认先试不存在的launchd.development，故要测试正式launchd时显式加入
+`--kernel-arg launchdsuffix=release`；它只影响该次重打的payload，不修改board默认参数。
+每次仍须新ignored输出目录，使用--firmware-fd指定515105d7固件，并独立检查FAT实际参数。
+测试：`.cache/probe-test-venv/bin/python -m unittest discover -s tests -p test_exec_return_status_probe.py -v`。
+
+### 显示共享缓存映射返回值
+
+`--shared-map-result --panic-kernel <已验证normal kernel副本>`仅接受e4632618原源内核
+与0b04a782正常panic副本，调用点固定为__shared_region_map_and_slide里的
+vm_shared_region_map_file。独立输出使用已核对的入口后空白区，原入口标记/renderer不变，
+Darwin变参通过对齐的SP槽传给panic，显示 `diagnostic: dyld shared map kr=%d`并有意终止。
+这是读取实际返回码的诊断版，不是正常启动镜像；没有定时复位。
+主机测试覆盖真实汇编、原参数保留、返回值栈ABI和真实内核副本改动边界。

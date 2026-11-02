@@ -1,0 +1,19 @@
+--- a/bsd/kern/kern_memorystatus.c
++++ b/bsd/kern/kern_memorystatus.c
+@@ -4200,7 +4200,15 @@
+ 				/*
+ 				 * Still under pressure and unable to kill a process - panic
+ 				 */
+-				panic("memorystatus_jetsam_thread: no victim! available pages:%llu", (uint64_t)MEMORYSTATUS_LOG_AVAILABLE_PAGES);
++				extern volatile uint64_t native_ufs_policy_pinned_bytes;
++				extern volatile uint64_t native_ufs_policy_borrowed_bytes;
++				extern volatile uint64_t native_ufs_policy_copied_bytes;
++				extern uint64_t cs_native4k_bytes;
++				extern unsigned long cs_native4k_ready_blobs;
++				panic("memorystatus_jetsam_thread: no victim! available pages:%llu\npolicy pin=%llu borrow=%llu copy=%llu csbytes=%llu blobs=%lu",
++				    (uint64_t)MEMORYSTATUS_LOG_AVAILABLE_PAGES, native_ufs_policy_pinned_bytes,
++				    native_ufs_policy_borrowed_bytes, native_ufs_policy_copied_bytes,
++				    cs_native4k_bytes, cs_native4k_ready_blobs);
+ 			}
+ 		}
+ 

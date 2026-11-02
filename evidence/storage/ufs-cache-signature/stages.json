@@ -1,0 +1,14 @@
+{
+  "1": "signature read before blob_add",
+  "2": "blob_add fallback if no inner error recorded",
+  "10": "cs_blob_init_validated",
+  "11": "first signature reconstitution",
+  "12": "MAC/AMFI signature check",
+  "13": "second signature reconstitution",
+  "14": "multi-level hash setup",
+  "15": "auxiliary signed blobs",
+  "16": "entitlement query setup",
+  "17": "native4k preparation",
+  "171": "actual vn_rdwr inside native4k preparation",
+  "scope": "Only first PID1 EACCES; preserves original errors, policy and bytes; kernel-owned hash only"
+}

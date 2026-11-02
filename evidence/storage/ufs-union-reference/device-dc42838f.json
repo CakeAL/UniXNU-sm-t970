@@ -1,0 +1,23 @@
+{
+  "device": "sm-t970",
+  "boot_sha256": "dc42838f17c0e82a542839fdcb013a33ef6711c5a19e46b2d6545579d30a1700",
+  "kernel_sha256": "8262854bf783e882ebafcb8c230844039493f7e6ecf226185bba03be4196e693",
+  "image_association": "Owner startup photo supplied immediately after recorded BOOT-only upload; not a device image readback",
+  "photo_sha256": "e021f729c6a229d440e4fa80edef109b7402a3ac22f4bd5d87a0d824262bcb36",
+  "observed": {
+    "mount": 2,
+    "stage": 3,
+    "auth": 0,
+    "mstatus": 2,
+    "sys": 2,
+    "cryptex": 2,
+    "preboot": 2,
+    "probe": 1,
+    "path": "/dev/disk1s1",
+    "media": 1,
+    "whole": 0,
+    "named": 1,
+    "authorized": 1
+  },
+  "conclusion": "Mount returned ENOENT before mounted-vnode authorization; cache lookups all return ENOENT. Does not establish dyld execution."
+}

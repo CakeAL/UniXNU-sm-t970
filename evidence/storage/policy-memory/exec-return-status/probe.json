@@ -1,0 +1,38 @@
+{
+  "device_revision": "ba275cae5ba86c7076a40ae6057c755702262881",
+  "framework_revision": "194aae294c1107e791f4f74b2be371a391ac6bc4",
+  "probe": {
+    "function": "_load_init_program_at_path",
+    "target": "___mac_execve",
+    "occurrence": 1,
+    "position": "after-return",
+    "reset_delay_seconds": null
+  },
+  "board_sha256": "0516305f2447927ca8ea9e36daa25552ae9b5f4baa0ab581b2aa45f55ddc8691",
+  "source_kernel_sha256": "e46326182b42f76791d00ad3671fbf77e00fda522ec2be5805e5aed0e1ba7a08",
+  "firmware_sha256": "515105d758a9d61078dffce5012db0754a71cec351a1bb34b30ee791196b5690",
+  "firmware_dtb_sha256": "86c14aa305a6cf5db46665f4095d28aadcb1ea5ce9d213cd711641a07504ed1d",
+  "boot_sha256": "7d43b59a1f4c6f1717ccd4d9bec66a4e2d200fb4090f21e573c0d460248bbd51",
+  "boot_bytes": 62713856,
+  "boot_partition_bytes": 71303168,
+  "hardware_tested": false,
+  "note": "Probe modifies a payload copy only; no flash or reboot performed",
+  "exec_return_status": {
+    "checked_call_site": "0xfffffff0076e90ac",
+    "callee": "0xfffffff0076e830c",
+    "code_address": "0xfffffff0073fd620",
+    "code_bytes": 84,
+    "code_sha256": "a6caf37251a40c77b7eb295488dfb0150598a3e66ec10acb3287e82b6dff69ee",
+    "entry_probe_log": "patched kernel.macho: stage 1 blue bar, stage 2 magenta bar, stage 4 reset before call #1 to ___mac_execve in _load_init_program_at_path (at 0xfffffff0076e90ac)",
+    "delays_seconds": {
+      "return_zero": 6,
+      "return_nonzero": 16
+    },
+    "encoding": "Inspect W0 immediately after original ___mac_execve returns: zero6seconds, nonzero16seconds",
+    "counter_hz": 19200000,
+    "calls_original_callee": true,
+    "limits": "Terminal probe; zero return does not prove launchd main, full cache mapping or later userland. No reset alone does not localize failure."
+  },
+  "generator_sha256": "fe5469f2ffd3a597c60934284bc05b6981b15b232ba5432d3cc18e3290bb1186",
+  "build_command": "python3.14 scripts/build-entry-probe.py --unixnu ../UniXNU --target ___mac_execve --function _load_init_program_at_path --exec-return-status --firmware-fd out/step7/ufs-readonly-inputs/SILICIUM_UEFI.fd --output out/step7/probes/policy-exec-return-status"
+}

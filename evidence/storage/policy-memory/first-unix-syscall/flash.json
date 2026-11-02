@@ -1,0 +1,21 @@
+{
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/step7/probes/policy-first-unix-syscall/boot-partition.img"
+  ],
+  "authorization": "Ongoing user-authorized bring-up after normal no-reset image stalls at persistent bars; BSD dispatcher checkpoint explained",
+  "boot_sha256": "bb452d74a31e9998ef40bb4cc77f89023e7a9c39aa30f8a83fd83a7562d4c82f",
+  "partition": "BOOT only",
+  "started_at": "2026-11-02T14:07:21.964417+08:00",
+  "expected_observation": "Reset6seconds after original thread-info helper returns inside BSD syscall dispatch, not after exec; PID not recorded",
+  "finished_at": "2026-11-02T14:07:28.713205+08:00",
+  "exit_code": 0,
+  "upload_reported_success": true,
+  "session_end_confirmed": true,
+  "reboot_requested": true,
+  "reboot_confirmed": true,
+  "readback_verified": false,
+  "hardware_result": "pending owner observation"
+}

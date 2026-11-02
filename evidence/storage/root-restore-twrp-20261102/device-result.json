@@ -1,0 +1,9 @@
+{
+  "boot_sha256": "17bda459286b24f514933096009c989241536bea4916fc08009123725579c6fa",
+  "root_sha256": "fd43ee7035ce185ce4215ac93fdc006fd784a54b3b7442e21457c226cbe03093",
+  "observation_source": "Owner: \u5361\u4e4b\u524d\u7684\u9875\u9762",
+  "usb_after_report": "ADB absent; Heimdall detect reports Device detected",
+  "interpretation": "Confirmed no observed UniXNU/XNU on this attempt. Root/carriers and BOOT prefix verified, so investigate bootloader/packaging rather than exec. A stale AVB footer exists in prior fullBOOT readback; zero-tail same-prefix candidate prepared and uploaded, pending manual reboot.",
+  "scope": "Root/carriers/BOOT readback completed before reboot; no additional flash performed",
+  "owner_confirmation": "Samsung/RPMB screen, no keys pressed after reboot"
+}

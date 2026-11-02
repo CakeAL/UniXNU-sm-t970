@@ -1,0 +1,8 @@
+{
+  "observation_source": "Owner:6s后重启了",
+  "boot_partition_sha256": "7ac0a4baaec8f134b3450b85cc81039ad6cdd3c8282ced821d375959f038fc44",
+  "args": "-v cpus=1 t970-novc sheng-pmgr=2 t970-ufs-publish=1 launchdsuffix=release",
+  "result": "Direct /sbin/launchd call to original ___mac_execve returned W0=0 per6second timing encoding",
+  "limits": "Not proof launchd main/dyld cache mapping or later userland. XNU documents some post-point-of-no-return activation failures as zero returns; continue normal execution to observe real outcome.",
+  "next_action": "No-reset normal image with same release selection and panic screen"
+}

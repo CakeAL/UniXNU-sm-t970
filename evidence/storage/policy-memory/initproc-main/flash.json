@@ -1,0 +1,21 @@
+{
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/step7/probes/policy-initproc-main/boot-partition.img"
+  ],
+  "authorization": "Ongoing authorized bring-up after owner postmap close6/error0 photo; original main-marker observation explained",
+  "boot_sha256": "870a11da94430457898d3de040bed0d7230c179c803baff1931ac127a9bd25f9",
+  "partition": "BOOT only",
+  "started_at": "2026-11-02T14:49:57.040454+08:00",
+  "expected_observation": "Intentional launchd main marker=1 err=<original sysctl result> screen only after genuine state becomes1; no deliberate reset or marker write",
+  "finished_at": "2026-11-02T14:50:03.739756+08:00",
+  "exit_code": 0,
+  "upload_reported_success": true,
+  "session_end_confirmed": true,
+  "reboot_requested": true,
+  "reboot_confirmed": true,
+  "readback_verified": false,
+  "hardware_result": "pending owner observation"
+}

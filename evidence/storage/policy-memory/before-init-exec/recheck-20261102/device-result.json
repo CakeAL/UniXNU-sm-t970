@@ -1,0 +1,8 @@
+{
+  "boot_sha256": "c544bae1af7a960cc0d0d536209bfea51e55766bb441d1589e5c1cc2cbed7e36",
+  "observation_source": "Owner photo timestamp13:19:07 after control reflash; association follows upload/report, no partition readback yet",
+  "visible": "Samsung splash and bootloader state including RPMB fuse Set and RPMB PROVISIONED; no SECURE CHECK FAIL/BOOT failure text identified in photo",
+  "usb": "Heimdall detect reports Device detected after this photo",
+  "limits": "No observed UniXNU/XNU checkpoint on this attempt. Does not negate previous before-exec positive. Exact cause not established. Photograph retained only in ignored storage due device identifier.",
+  "next_action": "Owner offered existing TWRP; use root ADB to read back BOOT without mount/decrypt/format/write and compare actual image prefix hash."
+}

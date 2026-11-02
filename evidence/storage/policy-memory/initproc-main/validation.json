@@ -1,0 +1,5 @@
+{
+  "command": "PATH=/opt/homebrew/opt/llvm/bin:$PATH .cache/probe-test-venv/bin/python -m unittest discover -s tests -p test_initproc_main_probe.py -v",
+  "result": "2 tests pass; actual stub preserves original handler args, caller FP/LR/SP and return; state0/1/2 and errors0/1/14; only original handler mock updates marker and probe never does; unknown source refused",
+  "scope": "Host instruction emulator; packed kernel branches/allowed mutation spans checked independently, owner device results separate"
+}

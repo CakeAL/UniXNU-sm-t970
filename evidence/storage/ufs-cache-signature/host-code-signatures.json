@@ -1,0 +1,115 @@
+{
+  "bundle_sha256": "7416ca4f8377146626bb284e2133c76bee6cb4e3ee0af5d648b186235a7323a7",
+  "rows": [
+    {
+      "file": "dyld_shared_cache_arm64",
+      "bytes": 491520,
+      "signature_offset": 475136,
+      "signature_size": 16384,
+      "code_directories": [
+        {
+          "kind": 0,
+          "cdhash": "fcdb9268e40dc7599ae3f26c4116d5ab0329ead2",
+          "hashtype": 2,
+          "pageshift": 14,
+          "flags": "0x2",
+          "slots": 29,
+          "bad_pages_count": 0,
+          "bad_pages_first": [],
+          "trust_modules": [
+            null,
+            "02000000"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "dyld_shared_cache_arm64.01",
+      "bytes": 114720768,
+      "signature_offset": 114491392,
+      "signature_size": 229376,
+      "code_directories": [
+        {
+          "kind": 0,
+          "cdhash": "313918ed6d2bb23e805081c37c7dc21bd16a5bf3",
+          "hashtype": 2,
+          "pageshift": 14,
+          "flags": "0x2",
+          "slots": 6988,
+          "bad_pages_count": 0,
+          "bad_pages_first": [],
+          "trust_modules": [
+            null,
+            "02000000"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "dyld_shared_cache_arm64.02",
+      "bytes": 49152,
+      "signature_offset": 32768,
+      "signature_size": 16384,
+      "code_directories": [
+        {
+          "kind": 0,
+          "cdhash": "9d037a68ad6490e103e44e47086e279a2923b04e",
+          "hashtype": 2,
+          "pageshift": 14,
+          "flags": "0x2",
+          "slots": 2,
+          "bad_pages_count": 0,
+          "bad_pages_first": [],
+          "trust_modules": [
+            null,
+            "02000000"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "dyld_shared_cache_arm64.03",
+      "bytes": 114229248,
+      "signature_offset": 113999872,
+      "signature_size": 229376,
+      "code_directories": [
+        {
+          "kind": 0,
+          "cdhash": "55b4a307efbf08234c98c81f09f1d17e5efc0d0a",
+          "hashtype": 2,
+          "pageshift": 14,
+          "flags": "0x2",
+          "slots": 6958,
+          "bad_pages_count": 0,
+          "bad_pages_first": [],
+          "trust_modules": [
+            null,
+            "02000000"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "dyld_shared_cache_arm64.04",
+      "bytes": 229376,
+      "signature_offset": 212992,
+      "signature_size": 16384,
+      "code_directories": [
+        {
+          "kind": 0,
+          "cdhash": "bb384a1f26cdd1e0198073247aab82535e0211fc",
+          "hashtype": 2,
+          "pageshift": 14,
+          "flags": "0x2",
+          "slots": 13,
+          "bad_pages_count": 0,
+          "bad_pages_first": [],
+          "trust_modules": [
+            null,
+            "02000000"
+          ]
+        }
+      ]
+    }
+  ]
+}

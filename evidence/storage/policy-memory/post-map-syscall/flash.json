@@ -1,0 +1,21 @@
+{
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/step7/probes/policy-post-map-syscall/boot-partition.img"
+  ],
+  "authorization": "Ongoing authorized bring-up after map KERN_SUCCESS photo; existing trace predicate and later-PID1-call diagnostic explained",
+  "boot_sha256": "24d8643bf7ac6e13886f5f36235f32d6f720bde22acf402ddd6c3b5531106df6",
+  "partition": "BOOT only",
+  "started_at": "2026-11-02T14:42:05.356337+08:00",
+  "expected_observation": "Intentional postmap sc=<later PID1 call> err=<result hex> after existing trace records successful536; no deliberate reset",
+  "finished_at": "2026-11-02T14:42:12.084083+08:00",
+  "exit_code": 0,
+  "upload_reported_success": true,
+  "session_end_confirmed": true,
+  "reboot_requested": true,
+  "reboot_confirmed": true,
+  "readback_verified": false,
+  "hardware_result": "pending owner observation"
+}

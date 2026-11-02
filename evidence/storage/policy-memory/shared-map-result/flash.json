@@ -1,0 +1,21 @@
+{
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/step7/probes/policy-shared-map-result-v2/boot-partition.img"
+  ],
+  "authorization": "Ongoing authorized bring-up; actual map-return message with deliberate terminal panic explained after owner observed35second return reset",
+  "boot_sha256": "06a968f709f8058bcb2d3b0964cef3d4b67fd698b448c2982045a75ac40a63b8",
+  "partition": "BOOT only",
+  "started_at": "2026-11-02T14:23:56.680719+08:00",
+  "expected_observation": "Intentional screen: diagnostic: dyld shared map kr=<actual code>; no deliberate reset, wait through preceding cache work",
+  "finished_at": "2026-11-02T14:24:03.383576+08:00",
+  "exit_code": 0,
+  "upload_reported_success": true,
+  "session_end_confirmed": true,
+  "reboot_requested": true,
+  "reboot_confirmed": true,
+  "readback_verified": false,
+  "hardware_result": "pending owner observation"
+}

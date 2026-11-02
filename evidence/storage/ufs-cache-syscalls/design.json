@@ -1,0 +1,16 @@
+{
+  "purpose": "Localize actual dyld cache failure after BOOT 49f3b166 reached namespace 6 exit with carrier 0/0",
+  "scope": "PID1 only, last 12 of 24 bounded records for real open/openat, fcntl and shared-region syscall returns",
+  "path_source": "namei kernel cn_pnbuf only after original successful copy and length validation; no additional user-pointer copy",
+  "limits": [
+    "A path label is the most recently observed copied namei path for initproc, not a full per-thread causal trace. Intended for CPU0 early dyld startup.",
+    "No path note does not prove namei was never entered; compound lookup or failure before a new copied buffer can omit a note.",
+    "Does not alter syscall arguments, errors, mapping policy, signatures, dyld or storage.",
+    "Only on initproc fatal exit is the ring appended to the existing panic."
+  ],
+  "reference_method": "Compare pinned umi bounded exec/critical-exit tracing: observe kernel-owned state without additional user-memory reads. The board diagnostic uses numeric syscall returns and existing namei buffers instead of umi RAM-console/CRC transport.",
+  "reference_urls": [
+    "https://github.com/reAAAq/UniXNU-umi/blob/3eb72578597d2ca16471b172d45eddc096a34a04/scripts/umi-exec-trace.h",
+    "https://github.com/reAAAq/UniXNU-umi/blob/3eb72578597d2ca16471b172d45eddc096a34a04/patches/umi-xnu/zzzzzzzzzzzz-umi-critical-exit-trace.patch"
+  ]
+}

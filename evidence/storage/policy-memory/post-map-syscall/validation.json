@@ -1,0 +1,5 @@
+{
+  "command": "PATH=/opt/homebrew/opt/llvm/bin:$PATH .cache/probe-test-venv/bin/python -m unittest discover -s tests -p test_post_map_syscall_probe.py -v",
+  "result": "3 tests pass; predicate/PID filtering, count0 and24-row wrap includingUINT32_MAX, original callback args/LR passthrough, Darwin result slots, no trace writes, unknown source refusal",
+  "scope": "Host instruction emulator; packed kernel branches/allowed mutation spans checked independently, owner device results separate"
+}

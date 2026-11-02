@@ -1,0 +1,21 @@
+{
+  "device_revision": "ba275cae5ba86c7076a40ae6057c755702262881",
+  "framework_revision": "194aae294c1107e791f4f74b2be371a391ac6bc4",
+  "probe": {
+    "function": "_unix_syscall",
+    "target": "_get_bsdthread_info",
+    "occurrence": 1,
+    "position": "after-return",
+    "reset_delay_seconds": 6
+  },
+  "board_sha256": "0516305f2447927ca8ea9e36daa25552ae9b5f4baa0ab581b2aa45f55ddc8691",
+  "source_kernel_sha256": "e46326182b42f76791d00ad3671fbf77e00fda522ec2be5805e5aed0e1ba7a08",
+  "firmware_sha256": "515105d758a9d61078dffce5012db0754a71cec351a1bb34b30ee791196b5690",
+  "firmware_dtb_sha256": "86c14aa305a6cf5db46665f4095d28aadcb1ea5ce9d213cd711641a07504ed1d",
+  "boot_sha256": "5ee7c2c56e0de6dd42ac916b2ccfaf06fd128f9ed277c669beef1af84a507f1b",
+  "boot_bytes": 62713856,
+  "boot_partition_bytes": 71303168,
+  "hardware_tested": false,
+  "note": "Probe modifies a payload copy only; no flash or reboot performed",
+  "build_command": "python3.14 scripts/build-entry-probe.py --unixnu ../UniXNU --target _get_bsdthread_info --function _unix_syscall --occurrence 1 --delay 6 --kernel-arg launchdsuffix=release --firmware-fd out/step7/ufs-readonly-inputs/SILICIUM_UEFI.fd --output out/step7/probes/policy-first-unix-syscall"
+}

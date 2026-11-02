@@ -1,0 +1,31 @@
+{
+  "source_tar": "out/minsos/twrp_gts7xlwifi.tar",
+  "source_tar_sha256": "2b35f0fcb6e439717b7f83d29b2344ceebc9eabc6f40da228455be1135d51e16",
+  "image_sha256": "b5c722e70a2bf3aba8a1df2e08aff7096f306fc2272290af0597f48b9cc127b3",
+  "image_bytes": 86888448,
+  "partition": "RECOVERY",
+  "partition_bytes": 86888448,
+  "header_version": 2,
+  "device_property": "gts7xlwifi",
+  "prior_backup_sha256": "3b6df60e4aff4506b8a3f0e20111d1b5fb4053ee82170a5132999ac590ac28cb",
+  "authorization": "User explicitly requests flashing supplied TWRP and says no confirmation needed",
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--RECOVERY",
+    "out/minsos/twrp-flash-20261102/recovery.img",
+    "--no-reboot"
+  ],
+  "started_at": "2026-11-02T13:23:26.530212+08:00",
+  "finished_at": "2026-11-02T13:23:33.220205+08:00",
+  "exit_code": 1,
+  "reboot_requested": false,
+  "scope": "RECOVERY only; no BOOT/USERDATA write, no repartition; manual recovery entry required",
+  "upload_reported_success": true,
+  "session_end_confirmed": false,
+  "readback_verified": true,
+  "result": "Upload100% and upload success reported, session-end confirmation failed (exit1); subsequently owner entered TWRP and full86888448-byte recovery readback matches supplied image exactly.",
+  "readback_sha256": "b5c722e70a2bf3aba8a1df2e08aff7096f306fc2272290af0597f48b9cc127b3",
+  "readback_bytes": 86888448,
+  "readback_evidence": "evidence/storage/root-restore-twrp-20261102/before-readback.json"
+}

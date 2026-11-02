@@ -1,0 +1,8 @@
+{
+  "observation_source": "Owner: 现在进入到粉条了，然后6s后重启",
+  "boot_partition_sha256": "646f44adc09c26ada027691e47ac1e06504e8cdfe0a6b3c486fec4c9bc7ef477",
+  "source_boot_prefix_sha256": "17bda459286b24f514933096009c989241536bea4916fc08009123725579c6fa",
+  "dtbo_restore_source_sha256": "49bcf93a85cec4d24c0cfe6dbe334327b29182f06bd9b2080b7a9c7cba878731",
+  "result": "Entered XNU markers;6second after-return reset confirms original ___mac_execve returned at least once",
+  "limits": "No return-code or attempted-path capture. DTBO baseline restore is followed by recovered startup; DTBO binary readback still pending, exact original mismatch cause not isolated."
+}

@@ -1,0 +1,45 @@
+{
+  "sources": [
+    {
+      "repository": "RigoLigoRLC/unixnu-sm-t733",
+      "revision": "3bb0d6f7840f088db6a0ec88ecb841e12042422f",
+      "path": "configs/gts7fewifi_defconfig",
+      "url": "https://github.com/RigoLigoRLC/unixnu-sm-t733/blob/3bb0d6f7840f088db6a0ec88ecb841e12042422f/configs/gts7fewifi_defconfig",
+      "local_snapshot": ".cache/cryptex-references/t733-defconfig",
+      "snapshot_sha256": "61bd187bb548e459617fb8572eb64e0b6852e9b63cb758a6709c1f7ab4ad059d"
+    },
+    {
+      "repository": "RigoLigoRLC/unixnu-sm-t733",
+      "revision": "3bb0d6f7840f088db6a0ec88ecb841e12042422f",
+      "path": "patches/t733-xnu/native-union-root-reference.patch",
+      "url": "https://github.com/RigoLigoRLC/unixnu-sm-t733/blob/3bb0d6f7840f088db6a0ec88ecb841e12042422f/patches/t733-xnu/native-union-root-reference.patch",
+      "local_snapshot": ".cache/cryptex-references/t733-union-root-reference.patch",
+      "snapshot_sha256": "733bcb83fc4f1a0e9487be78c8ddd207e682ea74db78f20c00d2883ea12d8a98"
+    },
+    {
+      "repository": "RigoLigoRLC/unixnu-sm-t733",
+      "revision": "3bb0d6f7840f088db6a0ec88ecb841e12042422f",
+      "path": "patches/t733-xnu/offline-owner-systemos-mount.patch",
+      "url": "https://github.com/RigoLigoRLC/unixnu-sm-t733/blob/3bb0d6f7840f088db6a0ec88ecb841e12042422f/patches/t733-xnu/offline-owner-systemos-mount.patch",
+      "local_snapshot": ".cache/cryptex-references/t733-systemos-mount.patch",
+      "snapshot_sha256": "8728b71742e5fa0b25a2928ab18476d53c8eef680dabe4231c1818f3d0351d0c"
+    },
+    {
+      "repository": "reAAAq/UniXNU-umi",
+      "revision": "3eb72578597d2ca16471b172d45eddc096a34a04",
+      "path": "bringup/tools/build_umi_xnu.py",
+      "url": "https://github.com/reAAAq/UniXNU-umi/blob/3eb72578597d2ca16471b172d45eddc096a34a04/bringup/tools/build_umi_xnu.py",
+      "local_snapshot": ".cache/cryptex-references/umi-build-xnu.py",
+      "snapshot_sha256": "199ea0f48bbceff347fb4f4b0474a58593a1dcfd9a7ba84c138f62f05830244e"
+    }
+  ],
+  "findings": [
+    "Both inspected startup configurations enable OWNER_UNION_SYSTEMOS together with CACHE_MOUNT/STARTUP/BOOT_MANIFEST and NATIVE_CS_HASH_CACHE.",
+    "T733 separately fixes kernproc cwd/rootvnode shared-reference ownership during checkdirs. Our selected XNU has the same uncorrected ownership transfer.",
+    "Current shared zzyb-native-cryptex-os-view.patch builds a later Data-backed cryptex alias; the raw OS symlink is not a standalone mount directory."
+  ],
+  "limits": [
+    "External device success is maintainer-reported, not validated on T970.",
+    "The reference fix is a distinct correctness issue; this photo does not demonstrate a vnode-reference panic."
+  ]
+}

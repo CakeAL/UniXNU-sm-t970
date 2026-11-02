@@ -1,0 +1,17 @@
+{
+  "pass": true,
+  "call_site": "0xfffffff00778fa00",
+  "stub_va": "0xfffffff0073fd48c",
+  "callee_va": "0xfffffff0073ab774",
+  "panic_va": "0xfffffff0079a3f74",
+  "normal_kernel_unchanged_outside_stub_and_call": true,
+  "darwin_varargs_stack_slot_verified": true,
+  "args": "-v cpus=1 t970-novc sheng-pmgr=2 t970-ufs-publish=1 launchdsuffix=release",
+  "boot_partition_sha256": "06a968f709f8058bcb2d3b0964cef3d4b67fd698b448c2982045a75ac40a63b8",
+  "raw_boot_sha256": "6e2ff9c7eca7786f52f9661e3676917407af943f90d0987f115847aa753cbfa2",
+  "boot_partition_bytes": 71303168,
+  "expected_message": "diagnostic: dyld shared map kr=<actual return code>",
+  "intentional_terminal_panic": true,
+  "reset_probe": false,
+  "scope": "Original mapping call and arguments preserved; actual returnedW0 zero-extended, stored in Darwin vararg stack slot, then qualified panic renderer displays it. Source/normal kernels unchanged."
+}

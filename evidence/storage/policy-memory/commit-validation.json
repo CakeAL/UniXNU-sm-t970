@@ -1,0 +1,30 @@
+{
+  "targeted_unittests": "24 passed,0failed/0skipped; see commit-tests.json/log",
+  "actual_source_checks": {
+    "union": {
+      "pass": true,
+      "result": "PASS: five actual-XNU checkdirs reference-accounting cases"
+    },
+    "syscall": {
+      "pass": true,
+      "result": "PASS: PID filtering, null process, numeric errors, long path, ring wrap, output bound"
+    },
+    "signature": {
+      "pass": true,
+      "result": "PASS: PID/error filtering, first-failure retention, offset/hash encoding, null hash"
+    },
+    "memory": {
+      "pass": true,
+      "result": "PASS: actual configure/free functions; borrowed RO/private-key lifecycle, fallback ownership, protection/auth/allocation failures"
+    }
+  },
+  "platform_check": {
+    "pass": false,
+    "exit_code": 1,
+    "preexisting_limit": "check-platform.py still requires the historical five-component selection and originalselection review; current board includes the already selected VirtioMmioBlock. No DTS change in this commit. Failure retained rather than weakening review checks.",
+    "log": "commit-check-platform.log"
+  },
+  "record_check": "13 structured areas passed",
+  "diff_whitespace": "git diff --cached --check with explicit .gitattributes for literal patch context and raw log EOF separators; actual source/docs remain checked",
+  "scope": "Commit-time source/host/device evidence only; no declaration of normal service startup or a complete iPadOS desktop"
+}

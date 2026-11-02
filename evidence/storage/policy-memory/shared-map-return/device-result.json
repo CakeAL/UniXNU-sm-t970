@@ -1,0 +1,7 @@
+{
+  "boot_sha256": "dbe8ca9d7465c15732e658c1904dff16562bdc9715812985cb51bcb4237a56ca",
+  "observation_source": "Owner:大约35s后重启",
+  "result": "Original vm_shared_region_map_file returned; its caller reached mapping after setup returned0, then terminal6second wait caused reset",
+  "limits": "Actual mapping return code not captured. Total35seconds includes preceding work; cannot infer mapping success or launchd main.",
+  "next_action": "Qualified panic-renderer copy directly displays actual mapping return code"
+}

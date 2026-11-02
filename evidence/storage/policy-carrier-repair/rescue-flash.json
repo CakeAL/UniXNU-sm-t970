@@ -1,0 +1,16 @@
+{
+  "authorization": "User replied 继续 to the concrete temporary Recovery and fixed USERDATA policy-carrier repair plan",
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/step7/recovery-candidate/adb-rescue-boot.img"
+  ],
+  "started_at": "2026-11-01T23:37:24.286371+08:00",
+  "finished_at": "2026-11-01T23:37:30.337451+08:00",
+  "boot_sha256": "e67fe744d4ee9e2be7a0ab906d47a064b7409cc1a4db4c7eecaacaae9519a721",
+  "partition": "BOOT only",
+  "exit_code": 0,
+  "reboot_requested": true,
+  "carrier_written": false
+}

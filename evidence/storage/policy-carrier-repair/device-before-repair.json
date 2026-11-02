@@ -1,0 +1,30 @@
+{
+  "scope": "Fresh read-only tablet block evidence before policy update; SHA256 compared with exact raw source and both old/new policy tables",
+  "userdata_written": false,
+  "rows": [
+    {
+      "window": "OS",
+      "image_block_index": 763392,
+      "partition_relative_lba": 763648,
+      "device_read_bytes": 4096,
+      "device_sha256": "803e18f71bec2094e805aa430e61ff80a3aab10cab7a47cbe4136ad43ba3b035",
+      "raw_source_sha256": "803e18f71bec2094e805aa430e61ff80a3aab10cab7a47cbe4136ad43ba3b035",
+      "corrected_policy_sha256": "803e18f71bec2094e805aa430e61ff80a3aab10cab7a47cbe4136ad43ba3b035",
+      "old_wrong_policy_sha256": "bc908a6cf66491055077798550660f40128bfe6dce2fdc0db56e6af96511208d",
+      "device_matches_corrected_policy": true,
+      "old_policy_rejects_correct_device_data": true
+    },
+    {
+      "window": "SystemOS",
+      "image_block_index": 43008,
+      "partition_relative_lba": 1527296,
+      "device_read_bytes": 4096,
+      "device_sha256": "f6291e26c263031ec856e6bf47253e52369e1da0363ea7a7e4ac1ef988f7cd26",
+      "raw_source_sha256": "f6291e26c263031ec856e6bf47253e52369e1da0363ea7a7e4ac1ef988f7cd26",
+      "corrected_policy_sha256": "f6291e26c263031ec856e6bf47253e52369e1da0363ea7a7e4ac1ef988f7cd26",
+      "old_wrong_policy_sha256": "bc908a6cf66491055077798550660f40128bfe6dce2fdc0db56e6af96511208d",
+      "device_matches_corrected_policy": true,
+      "old_policy_rejects_correct_device_data": true
+    }
+  ]
+}

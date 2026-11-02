@@ -1,6 +1,6 @@
 --- a/bsd/kern/kern_exec.c
 +++ b/bsd/kern/kern_exec.c
-@@ -8181,7 +8181,27 @@
+@@ -8181,7 +8181,35 @@
  	user_addr_t init_envp = USER_ADDR_NULL;
  #if defined(XNU_OWNER_CACHE_MOUNT) && XNU_OWNER_CACHE_MOUNT
  	int cache_error = native_owner_cache_prepare(p, (user_addr_t)scratch_addr, &init_envp);
@@ -21,10 +21,18 @@
 +			looked[i] = vnode_lookup(paths[i], 0, &probe, vfs_context_current());
 +			if (probe) vnode_put(probe);
 +		}
-+		panic("offline owner cache: mount=%d stage=%d auth=%d mstatus=%d sys=%d cryptex=%d preboot=%d %s",
-+		    cache_error, native_owner_cache_stage, native_owner_cache_authorized,
-+		    native_owner_cache_mount_status, looked[0], looked[1], looked[2],
-+		    native_ufs_cache_probe_text());
++		/* Match the active mount layout; a missing later cryptex alias is not fatal. */
++#if defined(XNU_OWNER_UNION_SYSTEMOS) && XNU_OWNER_UNION_SYSTEMOS
++		const int expected = 0;
++#else
++		const int expected = 2;
++#endif
++		if (cache_error || looked[expected] != 0) {
++			panic("offline owner cache: mount=%d stage=%d auth=%d mstatus=%d sys=%d cryptex=%d preboot=%d %s",
++			    cache_error, native_owner_cache_stage, native_owner_cache_authorized,
++			    native_owner_cache_mount_status, looked[0], looked[1], looked[2],
++			    native_ufs_cache_probe_text());
++		}
 +	}
  #endif
  #if defined(XNU_OWNER_DATA_MOUNT) && XNU_OWNER_DATA_MOUNT

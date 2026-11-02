@@ -1,0 +1,14 @@
+{
+  "pass": true,
+  "call_site": "0xfffffff00783b214",
+  "callee": "_get_bsdthread_info",
+  "callee_va": "0xfffffff0073034d0",
+  "cave_va": "0xfffffff0073fd620",
+  "seconds_after_return": 6,
+  "original_init_exec_call_intact": true,
+  "args": "-v cpus=1 t970-novc sheng-pmgr=2 t970-ufs-publish=1 launchdsuffix=release",
+  "boot_partition_sha256": "bb452d74a31e9998ef40bb4cc77f89023e7a9c39aa30f8a83fd83a7562d4c82f",
+  "raw_boot_sha256": "5ee7c2c56e0de6dd42ac916b2ccfaf06fd128f9ed277c669beef1af84a507f1b",
+  "boot_partition_bytes": 71303168,
+  "scope": "First reached BSD unix_syscall dispatcher calls its original thread-info helper then terminal6second reset. Proves BSD dispatch reached, not PID identity, syscall handler completion, cache mapping or launchd main. Absence does not rule out prior Mach traps."
+}

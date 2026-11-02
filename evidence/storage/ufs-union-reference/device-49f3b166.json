@@ -1,0 +1,22 @@
+{
+  "device": "sm-t970",
+  "boot_sha256": "49f3b166316b3314d36c4bbbbe64a1434ab8302609c5649c8dfc8b006fd20ff7",
+  "kernel_sha256": "1d83105ebe04011b84915342aee4fea8173843bba531d4c3f7d3e0f47c66a93c",
+  "image_association": "Owner photo immediately after recorded BOOT upload; no device readback",
+  "photo_sha256": "93cda8e14d50e69ddd966d0fba22c360ae81e67e44bacc1c4e83d66f0eb5eff1",
+  "panic_text": [
+    "initproc failed to start -- exit reason namespace 6 subcode 0x1 description: Library not loaded: /usr/lib/libSystem.B.dylib",
+    "Referenced from: /sbin/launchd (UUID omitted from transcription)",
+    "Reason: tried: /usr/lib/libSystem.B.dylib (no such file, no dyld cache) carrier acc=0 rej=0 uuidmatch=1 media=1"
+  ],
+  "observed": {
+    "exit_namespace": 6,
+    "exit_subcode": 1,
+    "carrier_accepts": 0,
+    "carrier_rejects": 0,
+    "uuidmatch": 1,
+    "media": 1
+  },
+  "conclusion": "Passed mount preparation and active /System cache vnode lookup guard, then reached actual userspace dyld fatal exit. No carrier rejection observed. Full cache mapping/launchd main remains unverified.",
+  "next": "Bounded numeric syscall results and kernel-owned namei path observations to separate open/openat, fcntl and shared-region refusal."
+}

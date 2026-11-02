@@ -1,0 +1,6 @@
+{
+  "command": "PATH=/opt/homebrew/opt/llvm/bin:$PATH .cache/probe-test-venv/bin/python -m unittest discover -s tests -p test_shared_map_result_probe.py -v",
+  "result": "3 tests pass: actual AArch64 stub for0/1/2/3/5/0xffffffff with callee args preserved, zero-extended32bit return in16-byte-aligned Darwin stack vararg slot; actual pinned source/normal patch integration modifies only116-byte empty entry padding and mapping BL; unknown source refused. Source and normal originals unchanged.",
+  "scope": "Panic call intercepted by host emulator; actual prequalified renderer preserved byte-for-byte and packed target branches checked independently.",
+  "note": "Entry/MMU layout is derived from uninstrumented source, since qualified normal copy already replaces SCTLR sequence with entry markers."
+}

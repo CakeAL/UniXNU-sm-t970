@@ -1,0 +1,19 @@
+{
+  "patterns": [
+    "test_owner_manifest_inputs.py",
+    "test_policy_carrier_write.py",
+    "test_recovery_storage.py",
+    "test_adb_root_write.py",
+    "test_exec_return_status_probe.py",
+    "test_shared_map_result_probe.py",
+    "test_post_map_syscall_probe.py",
+    "test_initproc_main_probe.py"
+  ],
+  "tests_run": 24,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "pass": true,
+  "command": "PATH=/opt/homebrew/opt/llvm/bin:$PATH .cache/probe-test-venv/bin/python consolidated targeted unittest suite",
+  "scope": "Root/carrier generation and write failure gates, exact recovery identity, actual ARM64 diagnostic execution and pinned-copy patch boundaries"
+}

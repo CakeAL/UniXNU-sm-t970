@@ -1,0 +1,7 @@
+{
+  "boot_sha256": "17bda459286b24f514933096009c989241536bea4916fc08009123725579c6fa",
+  "observation_source": "Owner initially selected new text/error, then said 没进入boot and RPMB fuse Set, then reported returned to Download",
+  "result": "No usable XNU/after-exec checkpoint observation from this attempt",
+  "limits": "No conclusion about exec return, success or stall; no image readback yet",
+  "next_action": "Repeat known before-exec control, then verify actual BOOT through existing recovery if startup remains unavailable"
+}

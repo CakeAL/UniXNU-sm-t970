@@ -1,0 +1,11 @@
+{
+  "pass": true,
+  "source_call_va": "0xfffffff007981bf0",
+  "original_callee": "_vr_open",
+  "callee_va": "0xfffffff007998e90",
+  "probe_cave_va": "0xfffffff0073fd620",
+  "firmware_sha256": "515105d758a9d61078dffce5012db0754a71cec351a1bb34b30ee791196b5690",
+  "kernel_args": "-v cpus=1 t970-novc sheng-pmgr=2 t970-ufs-publish=1",
+  "reset_after_return_seconds": 6,
+  "scope": "One reviewed shared-policy vr_open call after both manifest/key protections. Reset proves return only, not success. No reset does not alone localize failure. Same pinned FD/DTB and board args as normal image."
+}

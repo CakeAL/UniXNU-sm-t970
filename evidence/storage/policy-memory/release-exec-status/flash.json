@@ -1,0 +1,21 @@
+{
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/step7/probes/policy-release-exec-status/boot-partition.img"
+  ],
+  "authorization": "Ongoing authorized bring-up; after nonzero first DEVELOPMENT candidate, explicit release-selected status probe explained",
+  "boot_sha256": "7ac0a4baaec8f134b3450b85cc81039ad6cdd3c8282ced821d375959f038fc44",
+  "partition": "BOOT only",
+  "started_at": "2026-11-02T13:59:23.420076+08:00",
+  "expected_observation": "Direct /sbin/launchd init exec: zero=>6second reset, nonzero=>16second reset; no reset alone not conclusive",
+  "finished_at": "2026-11-02T13:59:30.060192+08:00",
+  "exit_code": 0,
+  "upload_reported_success": true,
+  "session_end_confirmed": true,
+  "reboot_requested": true,
+  "reboot_confirmed": true,
+  "readback_verified": false,
+  "hardware_result": "pending owner observation"
+}

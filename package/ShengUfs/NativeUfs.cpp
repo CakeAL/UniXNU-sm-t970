@@ -1375,6 +1375,32 @@ constexpr uint64_t kOwnerPolicyPartitionLba = 2969600ULL;
 constexpr uint64_t kOwnerPolicyLbaOS = kOwnerPolicyPartitionLba + 5505024ULL;
 constexpr uint64_t kOwnerPolicyLbaSystemOS = kOwnerPolicyPartitionLba + 5516624ULL;
 constexpr uint64_t kOwnerPolicyHeaderBytes = 160, kOwnerPolicySignatureBytes = 384;
+// Boot-lifetime ownership stays with the carrier. Block devices borrow only exact registered
+// allocations; their readonly vr_view and private readonly key still authenticate every read.
+struct OwnerCarrierStorage {
+  const uint8_t *manifest = nullptr;
+  uint64_t length = 0;
+  vm_size_t allocation = 0;
+};
+static OwnerCarrierStorage gOwnerCarrierStorage[2];
+extern "C" {
+volatile uint64_t native_ufs_policy_pinned_bytes = 0;
+volatile uint64_t native_ufs_policy_borrowed_bytes = 0;
+volatile uint64_t native_ufs_policy_copied_bytes = 0;
+}
+static bool ownerCarrierAllocation (const uint8_t *manifest, uint64_t length, vm_size_t *allocation)
+{
+  if (!manifest || !length || !allocation) return false;
+  for (const auto &slot : gOwnerCarrierStorage) {
+    if (slot.manifest == manifest && slot.length == length && slot.allocation >= length &&
+        !(slot.allocation & PAGE_MASK) && !(reinterpret_cast<uintptr_t> (manifest) & PAGE_MASK)) {
+      *allocation = slot.allocation;
+      return true;
+    }
+  }
+  return false;
+}
+
 
 static bool readOwnerEnvelope (uint64_t lba, uint64_t expectedImageBytes, const char **why,
                                uint8_t **outBytes, uint64_t *outLength)
@@ -1457,6 +1483,8 @@ static bool installOwnerPolicyCarrier (const char **why)
       *why = "policy signature";
       return false;
     }
+    gOwnerCarrierStorage[index] = { bytes, length, round_page (static_cast<vm_size_t> (length)) };
+    native_ufs_policy_pinned_bytes += gOwnerCarrierStorage[index].allocation;
     table[index].manifest = bytes;
     table[index].manifestBytes = length;
     // A store through a const object is undefined behaviour and clang drops it, which is why the
@@ -2086,6 +2114,8 @@ class NativeUfsBlock : public IOBlockStorageDevice {
   struct vr_view verified = {};
   vm_offset_t verifiedStorage = 0;
   vm_size_t verifiedStorageBytes = 0;
+  bool verifiedStorageBorrowed = false;
+  vm_offset_t verifiedKeyStorage = 0;
   bool configureVerification ();
 #endif
 public:
@@ -2209,6 +2239,43 @@ volatile uint64_t native_ufs_verified_blocks = 0;
 volatile uint64_t native_ufs_verify_ticks = 0, native_ufs_read_ticks = 0;
 static inline uint64_t timerTicks (void) {uint64_t v; __asm__ volatile ("isb\n\tmrs %0, cntpct_el0" : "=r" (v)); return v;}
 volatile uint32_t native_ufs_integrity_failures = 0;
+// First rejected verified-block snapshot only; never retries or changes the refusal.
+static uint64_t gIntegrityIndex = UINT64_MAX, gIntegrityLba, gIntegrityLength;
+static uint64_t gIntegrityExpected, gIntegrityActual;
+static uint32_t gIntegrityHashOk, gIntegrityStatus;
+static void recordIntegrityFailure (const vr_view *view, uint64_t index, const void *data,
+                                    size_t length, uint64_t baseLba, int status)
+{
+  if (gIntegrityIndex != UINT64_MAX) return;
+  uint8_t digest[32] = {};
+  const bool valid = view && view->hashes && index < view->block_count;
+  const bool hashed = data && length <= 4096 && vr_xnu_crypto.sha256 &&
+                      vr_xnu_crypto.sha256 (data, length, digest);
+  for (unsigned i = 0; i < 8; ++i) {
+    gIntegrityExpected = (gIntegrityExpected << 8) | (valid ? view->hashes[index * 32 + i] : 0);
+    gIntegrityActual = (gIntegrityActual << 8) | (hashed ? digest[i] : 0);
+  }
+  gIntegrityHashOk = (valid ? 1U : 0U) | (hashed ? 2U : 0U);
+  gIntegrityStatus = static_cast<uint32_t> (status);
+  gIntegrityLba = baseLba + index;
+  gIntegrityLength = length;
+  gIntegrityIndex = index;
+}
+extern "C" const char *native_ufs_integrity_text (void)
+{
+  static char text[320];
+  if (gIntegrityIndex == UINT64_MAX) {
+    snprintf (text, sizeof (text), "ufs integrity=%u blocks=%llu no rejected block snapshot",
+              native_ufs_integrity_failures, native_ufs_verified_blocks);
+  } else {
+    snprintf (text, sizeof (text),
+              "ufs integrity=%u vr=%u idx=%llx lba=%llx n=%llx hash=%u exp=%016llx got=%016llx",
+              native_ufs_integrity_failures, gIntegrityStatus, gIntegrityIndex, gIntegrityLba,
+              gIntegrityLength, gIntegrityHashOk, gIntegrityExpected, gIntegrityActual);
+  }
+  return text;
+}
+
 
 bool NativeUfsBlock::configureVerification ()
 {
@@ -2251,6 +2318,29 @@ bool NativeUfsBlock::configureVerification ()
     gRootDiagnostic.stage = "no capacity-matching policy";
     return false;
   }
+  vm_size_t carrierAllocation = 0;
+  if (ownerCarrierAllocation (manifest, manifestBytes, &carrierAllocation)) {
+    gRootDiagnostic.stage = "shared policy key allocation";
+    verifiedStorage = reinterpret_cast<vm_offset_t> (manifest);
+    verifiedStorageBytes = carrierAllocation;
+    verifiedStorageBorrowed = true;
+    if (kmem_alloc (kernel_map, &verifiedKeyStorage, PAGE_SIZE,
+                    static_cast<kma_flags_t> (KMA_KOBJECT | KMA_DATA),
+                    VM_KERN_MEMORY_SECURITY) != KERN_SUCCESS) return false;
+    uint8_t *key = reinterpret_cast<uint8_t *> (verifiedKeyStorage);
+    memcpy (key, verified_root_key, VR_KEY_BYTES);
+    gRootDiagnostic.stage = "shared policy read-only protection";
+    if (vm_map_protect (kernel_map, verifiedStorage, verifiedStorage + verifiedStorageBytes,
+                        VM_PROT_READ, TRUE) != KERN_SUCCESS ||
+        vm_map_protect (kernel_map, verifiedKeyStorage, verifiedKeyStorage + PAGE_SIZE,
+                        VM_PROT_READ, TRUE) != KERN_SUCCESS) return false;
+    gRootDiagnostic.stage = "shared policy owner authentication";
+    const int status = vr_open (manifest, manifestBytes, key, 1, &vr_xnu_crypto, &verified);
+    gRootDiagnostic.verify = static_cast<uint32_t> (status);
+    const bool valid = status == VR_OK && verified.image_bytes == bytes;
+    if (valid) native_ufs_policy_borrowed_bytes += carrierAllocation;
+    return valid;
+  }
   gRootDiagnostic.stage = "policy storage";
   vm_size_t tableBytes = round_page (static_cast<vm_size_t> (manifestBytes));
   if (tableBytes < manifestBytes || tableBytes > UINT64_MAX - 4096) {
@@ -2275,7 +2365,9 @@ bool NativeUfsBlock::configureVerification ()
   int status = vr_open (reinterpret_cast<const uint8_t *> (verifiedStorage), manifestBytes, key, 1,
                         &vr_xnu_crypto, &verified);
   gRootDiagnostic.verify = static_cast<uint32_t> (status);
-  return status == VR_OK && verified.image_bytes == bytes;
+  const bool valid = status == VR_OK && verified.image_bytes == bytes;
+  if (valid) native_ufs_policy_copied_bytes += tableBytes;
+  return valid;
 }
 
 bool NativeUfsBlock::authenticatesVolume (const char *uuid, uint8_t *manifestDigest) const
@@ -2478,6 +2570,7 @@ IOReturn NativeUfsBlock::doAsyncReadWrite (IOMemoryDescriptor *buffer, UInt64 bl
     IOMemoryDescriptor *buffer;
 #if defined(NATIVE_VERIFIED_BLOCK) && NATIVE_VERIFIED_BLOCK
     const vr_view *view;
+    uint64_t baseLba;
 #endif
     void lock () { IOLockLock (mutex); }
     void unlock () { IOLockUnlock (mutex); }
@@ -2497,6 +2590,7 @@ IOReturn NativeUfsBlock::doAsyncReadWrite (IOMemoryDescriptor *buffer, UInt64 bl
       int status = vr_verify_block (view, index, data, length, &vr_xnu_crypto);
       __atomic_fetch_add (&native_ufs_verify_ticks, timerTicks () - t0, __ATOMIC_RELAXED);
       if (status != VR_OK) {
+        recordIntegrityFailure (view, index, data, length, baseLba, status);
         gRootDiagnostic.stage = "read block integrity";
         gRootDiagnostic.verify = static_cast<uint32_t> (status);
         __atomic_fetch_add (&native_ufs_integrity_failures, 1, __ATOMIC_RELAXED);
@@ -2516,7 +2610,7 @@ IOReturn NativeUfsBlock::doAsyncReadWrite (IOMemoryDescriptor *buffer, UInt64 bl
     }
   } operations = { windowLock, buffer
 #if defined(NATIVE_VERIFIED_BLOCK) && NATIVE_VERIFIED_BLOCK
-    , &verified
+    , &verified, absolute / 4096
 #endif
   };
   UfsWindowResult outcome = ufsReadWindow (operations, absolute, bytes, block, count, bounce);
@@ -2535,8 +2629,12 @@ void NativeUfsBlock::free ()
 {
 #if defined(NATIVE_VERIFIED_BLOCK) && NATIVE_VERIFIED_BLOCK
   if (verifiedStorage) {
-    kmem_free (kernel_map, verifiedStorage, verifiedStorageBytes);
+    if (!verifiedStorageBorrowed) kmem_free (kernel_map, verifiedStorage, verifiedStorageBytes);
     verifiedStorage = 0;
+  }
+  if (verifiedKeyStorage) {
+    kmem_free (kernel_map, verifiedKeyStorage, PAGE_SIZE);
+    verifiedKeyStorage = 0;
   }
 #endif
   if (bounce) {

@@ -1,0 +1,14 @@
+{
+  "trigger": "Owner reports previously deleting UserData, after asking to flash image and whether the8GB image also needs restoration",
+  "scope": "Restore exact previously deployed9382658048-byte root prefix of sda36, then restore/check two fixed corrected-policy ranges and BOOT. No repartition or formatting. No new Data design.",
+  "root_source_sha256": "fd43ee7035ce185ce4215ac93fdc006fd784a54b3b7442e21457c226cbe03093",
+  "root_script": "scripts/write-root-image-adb.py",
+  "readiness": "Exact gts7xlwifi TWRP model/product pair added without relaxing geometry/root/unmounted checks; regression tests passed",
+  "observed_before": "BOOTc544bae1 prefix matches and TWRP recovery matches in full. Root header differs; both formerly nonzero critical blocks now zero. Former full-root verification is historical after owner deletion.",
+  "limits": "Root deletion explains absent root content; it does not independently explain bootloader-only screen before UniXNU.",
+  "root_write_command": "python3.14 scripts/write-root-image-adb.py --serial <selected-device> --image ../UniXNU/out/sm-t970/ipados-17.7.11-21H461/sm-t970/userdata/userdata-root.img --output out/step7/root-restore-twrp-20261102 --write",
+  "status": "Root restore/full readback, both fixed carrier writes/full readbacks and BOOT prefix readback all passed; reboot requested13:37:16+08, startup observation pending",
+  "root_verified": true,
+  "carriers_verified": true,
+  "boot_verified": true
+}

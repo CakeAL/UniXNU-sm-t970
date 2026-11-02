@@ -1,0 +1,21 @@
+{
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/step7/probes/policy-shared-map-return/boot-partition.img"
+  ],
+  "authorization": "Ongoing authorized bring-up after owner confirms BSD entry reset; shared-cache map-return checkpoint explained",
+  "boot_sha256": "dbe8ca9d7465c15732e658c1904dff16562bdc9715812985cb51bcb4237a56ca",
+  "partition": "BOOT only",
+  "started_at": "2026-11-02T14:11:00.721147+08:00",
+  "expected_observation": "Reset6seconds after vm_shared_region_map_file returns; prior cache preparation can take time, no return-status capture",
+  "finished_at": "2026-11-02T14:11:07.447290+08:00",
+  "exit_code": 0,
+  "upload_reported_success": true,
+  "session_end_confirmed": true,
+  "reboot_requested": true,
+  "reboot_confirmed": true,
+  "readback_verified": false,
+  "hardware_result": "pending owner observation"
+}

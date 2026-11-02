@@ -1,0 +1,14 @@
+{
+  "pass": true,
+  "call_site": "0xfffffff00778fa00",
+  "callee": "_vm_shared_region_map_file",
+  "callee_va": "0xfffffff0073ab774",
+  "cave_va": "0xfffffff0073fd620",
+  "seconds_after_return": 6,
+  "init_exec_and_unix_entry_calls_intact": true,
+  "args": "-v cpus=1 t970-novc sheng-pmgr=2 t970-ufs-publish=1 launchdsuffix=release",
+  "boot_partition_sha256": "dbe8ca9d7465c15732e658c1904dff16562bdc9715812985cb51bcb4237a56ca",
+  "raw_boot_sha256": "057a861edd6d84dffa3fcc8e73fce89fe1dcfb8a64e6271694e6a843e4e0dd6b",
+  "boot_partition_bytes": 71303168,
+  "scope": "Reached mapping call only after shared_region_map_and_slide_setup succeeds (file/security checks). Terminal reset6seconds after map routine returns; no return-status capture. No reset alone does not locate a hang or exclude slow prior cache work."
+}

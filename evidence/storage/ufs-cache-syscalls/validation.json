@@ -1,0 +1,21 @@
+{
+  "result": "PASS for host preparation and BOOT upload; hardware startup observation pending",
+  "kernel_build_inputs_stable": true,
+  "helper_tests": "PASS: actual helper compiled with host stubs; PID/null filtering, errno/command, path truncation, ring wrap, last-12 output bound",
+  "linked_symbols": [
+    "_native_t970_cache_path_note",
+    "_native_t970_cache_trace_text",
+    "_native_t970_cache_syscall_note"
+  ],
+  "input_source_sha256": {
+    "bsd/dev/arm/systemcalls.c": "780894703928acb55f9ac969e6e7127b40d3ff28d7973dd622e8d0b583dd2a87",
+    "bsd/vfs/vfs_lookup.c": "3d5538c5afaa727005af7b0b1dec13bdf0001997aa740998584324262e250b7f",
+    "bsd/kern/kern_exit.c": "7f435e6219126eb33b526a1f9568e2601aca19ad0aa2144ae562664997132a13"
+  },
+  "independent_fat_and_fd": "PASS",
+  "boot_geometry": "PASS: v2 / uncompressed shim-FD / separate firmware DTB / 62713856 bytes < 71303168",
+  "platform_script": "Previously failed historical five-component assertion; unchanged and not claimed passed",
+  "hardware_startup_result": "pending",
+  "flash_performed": true,
+  "flash_exit_code": 0
+}

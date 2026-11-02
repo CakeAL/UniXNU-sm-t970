@@ -1,0 +1,46 @@
+{
+  "at": "2026-11-02T13:26:43.015670+08:00",
+  "scope": "Root TWRP read-only full BOOT/RECOVERY backup and three root-image samples before any new write",
+  "rows": [
+    {
+      "partition": "boot",
+      "read_bytes": 71303168,
+      "sha256": "27bbdd56fce0dadb11824709ead00b6cb32c3d4f3e3863b28e0941a9e4a79410",
+      "dd_exit_code": 0,
+      "expected_image_sha256": "c544bae1af7a960cc0d0d536209bfea51e55766bb441d1589e5c1cc2cbed7e36",
+      "prefix_sha256": "c544bae1af7a960cc0d0d536209bfea51e55766bb441d1589e5c1cc2cbed7e36",
+      "prefix_matches": true
+    },
+    {
+      "partition": "recovery",
+      "read_bytes": 86888448,
+      "sha256": "b5c722e70a2bf3aba8a1df2e08aff7096f306fc2272290af0597f48b9cc127b3",
+      "dd_exit_code": 0,
+      "expected_image_sha256": "b5c722e70a2bf3aba8a1df2e08aff7096f306fc2272290af0597f48b9cc127b3",
+      "full_matches": true
+    },
+    {
+      "root_sample": "SHNGROOT header",
+      "partition_relative_4096_block": 0,
+      "sha256": "dc96d1b4d4e60fd185cd624dcbcef065804f28c48a4190cc9e72821581b5730f",
+      "expected_sha256": "bc908a6cf66491055077798550660f40128bfe6dce2fdc0db56e6af96511208d",
+      "matches": false
+    },
+    {
+      "root_sample": "OS policy-critical sample",
+      "partition_relative_4096_block": 763648,
+      "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+      "expected_sha256": "803e18f71bec2094e805aa430e61ff80a3aab10cab7a47cbe4136ad43ba3b035",
+      "matches": false
+    },
+    {
+      "root_sample": "SystemOS policy-critical sample",
+      "partition_relative_4096_block": 1527296,
+      "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+      "expected_sha256": "f6291e26c263031ec856e6bf47253e52369e1da0363ea7a7e4ac1ef988f7cd26",
+      "matches": false
+    }
+  ],
+  "device_written": false,
+  "root_limit": "Three samples do not replace prior full9.38GB readback and do not prove all root bytes unchanged"
+}
