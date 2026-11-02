@@ -1,0 +1,140 @@
+--- a/osfmk/arm64/start.s
++++ b/osfmk/arm64/start.s
+@@ -690,6 +690,22 @@
+  */
+ common_start:
+ 
++#if XNU_NATIVE_ARCH_TIMER
++	/* T970 secondary-only MMU transition diagnostic; preserve x0/x1 and LR. */
++	cbz	x21, 9f
++	mrs	x4, MPIDR_EL1
++	ubfx	x4, x4, #8, #8
++	cmp	w4, #8
++	b.hs	9f
++	adrp	x6, EXT(native_t970_secondary_entry)@page
++	add	x6, x6, EXT(native_t970_secondary_entry)@pageoff
++	add	x6, x6, x4, lsl #7
++	mov	w5, #5
++	str	w5, [x6]
++	dsb	sy
++9:
++#endif
++
+ #if HAS_NEX_PG
+ 	mov x19, lr
+ 	bl		EXT(set_nex_pg)
+@@ -701,6 +717,22 @@
+ 	add		x0, x0, EXT(sysreg_restore)@pageoff
+ 	ldr		x1, [x0, SR_RESTORE_TCR_EL1]
+ 	MSR_TCR_EL1_X1
++
++#if XNU_NATIVE_ARCH_TIMER
++	/* T970 secondary-only MMU transition diagnostic; preserve x0/x1 and LR. */
++	cbz	x21, 9f
++	mrs	x4, MPIDR_EL1
++	ubfx	x4, x4, #8, #8
++	cmp	w4, #8
++	b.hs	9f
++	adrp	x6, EXT(native_t970_secondary_entry)@page
++	add	x6, x6, EXT(native_t970_secondary_entry)@pageoff
++	add	x6, x6, x4, lsl #7
++	mov	w5, #6
++	str	w5, [x6]
++	dsb	sy
++9:
++#endif
+ 
+ 	/* Set up translation table base registers.
+ 	 *	TTBR0 - V=P table @ top of kernel
+@@ -771,6 +803,22 @@
+ 	ic		iallu
+ #endif
+ 
++
++#if XNU_NATIVE_ARCH_TIMER
++	/* T970 secondary-only MMU transition diagnostic; preserve x0/x1 and LR. */
++	cbz	x21, 9f
++	mrs	x4, MPIDR_EL1
++	ubfx	x4, x4, #8, #8
++	cmp	w4, #8
++	b.hs	9f
++	adrp	x6, EXT(native_t970_secondary_entry)@page
++	add	x6, x6, EXT(native_t970_secondary_entry)@pageoff
++	add	x6, x6, x4, lsl #7
++	mov	w5, #7
++	str	w5, [x6]
++	dsb	sy
++9:
++#endif
+ 	/* If x21 is not 0, then this is either the start_cpu path or
+ 	 * the resume_idle_cpu path.  cpu_ttep should already be
+ 	 * populated, so just switch to the kernel_pmap now.
+@@ -804,6 +852,22 @@
+ 	PAC_INIT_KEY_STATE tmp=x0, tmp2=x1
+ #endif /* HAS_APPLE_PAC */
+ 
++
++#if XNU_NATIVE_ARCH_TIMER
++	/* T970 secondary-only MMU transition diagnostic; preserve x0/x1 and LR. */
++	cbz	x21, 9f
++	mrs	x4, MPIDR_EL1
++	ubfx	x4, x4, #8, #8
++	cmp	w4, #8
++	b.hs	9f
++	adrp	x6, EXT(native_t970_secondary_entry)@page
++	add	x6, x6, EXT(native_t970_secondary_entry)@pageoff
++	add	x6, x6, x4, lsl #7
++	mov	w5, #8
++	str	w5, [x6]
++	dsb	sy
++9:
++#endif
+ 	// Enable caches, MMU, ROP and JOP
+ 	MOV64   x0, SCTLR_EL1_DEFAULT
+ 	MSR_SCTLR_EL1_X0
+@@ -829,6 +893,22 @@
+ 
+ 	// Clear thread pointer
+ 	msr		TPIDR_EL1, xzr						// Set thread register
++
++#if XNU_NATIVE_ARCH_TIMER
++	/* T970 secondary-only MMU transition diagnostic; preserve x0/x1 and LR. */
++	cbz	x21, 9f
++	mrs	x4, MPIDR_EL1
++	ubfx	x4, x4, #8, #8
++	cmp	w4, #8
++	b.hs	9f
++	adrp	x6, EXT(native_t970_secondary_entry)@page
++	add	x6, x6, EXT(native_t970_secondary_entry)@pageoff
++	add	x6, x6, x4, lsl #7
++	mov	w5, #9
++	str	w5, [x6]
++	dsb	sy
++9:
++#endif
+ 
+ 
+ #if defined(APPLE_ARM64_ARCH_FAMILY)
+@@ -893,6 +973,22 @@
+ 	.text
+ 	.align 2
+ arm_init_tramp:
++
++#if XNU_NATIVE_ARCH_TIMER
++	/* T970 secondary-only MMU transition diagnostic; preserve x0/x1 and LR. */
++	cbz	x21, 9f
++	mrs	x4, MPIDR_EL1
++	ubfx	x4, x4, #8, #8
++	cmp	w4, #8
++	b.hs	9f
++	adrp	x6, EXT(native_t970_secondary_entry)@page
++	add	x6, x6, EXT(native_t970_secondary_entry)@pageoff
++	add	x6, x6, x4, lsl #7
++	mov	w5, #10
++	str	w5, [x6]
++	dsb	sy
++9:
++#endif
+ 	/* On a warm boot, the full kernel translation table is initialized in
+ 	 * addition to the bootstrap tables. The layout is as follows:
+ 	 *

@@ -1,0 +1,36 @@
+{
+  "device_base_revision": "159793fe209bc71d455cd2118ed6236a9ee4471b",
+  "framework_revision": "d57d6124305d0694583e3ff7fc68ce34a4b0f091",
+  "kernel_sha256": "2d09c0b468163e1249e7dc9b91a17260ed6376c5d2b05c798ba171427f6242c5",
+  "payload_kernel_sha256": "896c730cf7ca866a340e9f4c2ebb1926e82c89645458b6060670aa6febb454d0",
+  "boot_sha256": "b44e4108c19afa7d91b6dbb4c3c5ba383d9f0b46f335b95e86f32b64dfa62fb3",
+  "kernel_build_exit_code": 0,
+  "linked_marker_cases": 96,
+  "primary_cold_boot_skip_checked": true,
+  "original_sctlr_isb_cpacr_sequence_preserved": true,
+  "exception_vectors_and_packed_markers_preserved": true,
+  "cpu_initialization_register_values_unchanged": true,
+  "actual_secondary_mmu_transition_verified": false,
+  "hardware_result_pending": true,
+  "board_default_unchanged": true,
+  "eight_core_not_uploaded": true,
+  "stages": {
+    "5": "common_start entry",
+    "6": "TCR restored",
+    "7": "initial translation tables/MAIR/TLB setup completed",
+    "8": "before SCTLR MMU enable",
+    "9": "after SCTLR/ISB/CPACR and TPIDR clear",
+    "10": "high VA arm_init_tramp entry",
+    "4": "C arm_init_cpu entry"
+  },
+  "build_adjustment": "First source build retained, never uploaded. Moved post-MMU marker after original SCTLR/ISB/CPACR sequence to preserve primary entry probe qualification. Final full build passed.",
+  "commands": [
+    "UNIXNU_PMGR_REFERENCE_KERNEL=<original e4632618> PATH=<python3.14 LLVM lld> python3.14 ../UniXNU/unixnu build kernel -D . --out out/data-bringup",
+    "python3.14 ../UniXNU/unixnu build payload -D . --out out/data-bringup --data-ramdisk out/step7/data-seed-512/data-512.dbr --kernel-arg launchdsuffix=release --kernel-arg t970-disable-watchdogd=1 --kernel-arg t970-runtime-report=10",
+    "python3.14 ../UniXNU/unixnu bootimg -D . --out out/data-bringup --uefi .cache/uefi-source/Mu-Silicium --fd out/step7/ufs-readonly-inputs/SILICIUM_UEFI.fd --dtb out/firmware-inputs/firmware.dtb --ramdisk <work>/payload/payload.img --output out/data-bringup/mmu-trace-boot.img",
+    "python3.14 scripts/check-data-payload.py --work <work> --boot out/data-bringup/mmu-trace-boot.img --seed out/step7/data-seed-512/data-512.dbr --watchdog-policy --runtime-report-seconds 10 --smp-observer --output out/data-bringup/mmu-trace-base-verified",
+    "PATH=<LLVM> .cache/probe-test-venv/bin/python scripts/check-smp-entry-trace.py --mmu --kernel <work>/kernel/kernel.macho --packed out/data-bringup/mmu-trace-base-verified/kernel.macho --output out/data-bringup/mmu-trace-packed-instruction-check",
+    "python3.14 scripts/prepare-smp.py --cpus 2 --base out/data-bringup/mmu-trace-base-verified/boot-partition.img --base-validation out/data-bringup/mmu-trace-base-verified/validation.json --hardware-dtb <work>/device-tree/hardware.dtb --output out/data-bringup/smp2-mmu-trace"
+  ],
+  "work": "out/data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data"
+}

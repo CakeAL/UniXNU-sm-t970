@@ -45,3 +45,24 @@ handler=start=c320800c。它排除了这些交接数值不匹配，不能证明�
 公开记录8核在线且每核有计时器计数。T970当前ArmCpu已有这些机制，仍需实机资格验证。
 T733是SM7325，定制驱动的redistributor IPI开关不能直接移植到当前组件。
 固定来源与版本见 `evidence/cpu/smp-reference-review.json`。
+
+## MMU切换分段
+
+BOOT95accf53的23:44:40照片观察到CPU1入口3，确认已走到common_start之前。
+10秒时main0、2个进程；这只是较早采样，不能据此判定用户态回退。
+下一版复用同一每核记录，增加下列位置；数值4仍专指最终C入口，并非大小排序：
+
+| 数值 | 最后写入位置 |
+| --- | --- |
+| 5 | common_start入口 |
+| 6 | TCR恢复完成 |
+| 7 | 初始TTBR、MAIR及TLB设置完成，准备切换kernel_pmap |
+| 8 | 准备启用MMU |
+| 9 | 写入SCTLR、完成ISB及NEON/线程寄存器设置 |
+| 10 | 已跳入高地址arm_init_tramp |
+| 4 | 最终到达arm_init_cpu |
+
+新增标记首先检查x21，主核冷启动直接跳过，不访问副核数据；
+保留x0/x1、LR和交接寄存器，仅使用x4/x5/x6及条件码。
+不改变TCR/TTBR/MAIR/SCTLR数值或原有TLB/缓存操作。
+若停在某标记，只能说明下一标记尚未可见；不能据此直接宣判某个寄存器操作失败。

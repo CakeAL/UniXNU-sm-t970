@@ -1,0 +1,17 @@
+{
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/data-bringup/smp2-mmu-trace/boot-partition.img"
+  ],
+  "exit_code": 0,
+  "boot_sha256": "b44e4108c19afa7d91b6dbb4c3c5ba383d9f0b46f335b95e86f32b64dfa62fb3",
+  "cpus_requested": 2,
+  "target_wait_seconds": 10,
+  "terminal_diagnostic": true,
+  "secondary_mmu_trace": true,
+  "readback_verified": false,
+  "hardware_result_pending": true,
+  "eight_core_not_uploaded": true
+}

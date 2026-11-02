@@ -5,6 +5,13 @@
 
 ## 最新副核诊断（2026-11-02）
 
+当前已刷BOOTb44e4108：副核MMU分段5/6/7/8/9/10，最终C入口仍为4。
+目标等待10秒；96组链接后指令模拟和payload异常向量比较通过，BOOT-only上传exit0正常重启。
+实机结果待回报，见evidence/cpu/smp-bringup/mmu-trace；默认CPU0与原镜像保留。
+
+23:44:40照片确认BOOT95accf53的CPU1入口3：副核已到common_start前，C标记4未见。
+10秒时main0/n2为早期采样，不能与旧120秒进程数直接比较。下一版细分MMU切换路径。
+
 BOOT9d4dc888实机main1、106进程，但请求2核仍只有1核，CPU1 step4/PSCI0、timer0/SGI0。
 reset table、CPU1 affinity与reset handler均匹配。尚未确认副核进入复位代码。
 已刷BOOT95accf53：四段入口标记、目标等待10秒；Heimdall exit0正常结束并请求重启，实机结果待回报。

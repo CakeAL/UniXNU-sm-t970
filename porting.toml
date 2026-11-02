@@ -345,6 +345,7 @@ paths = [
   "patches/xnu/t970-smp-report.patch",
   "patches/xnu/t970-smp-reset-context.patch",
   "patches/xnu/t970-smp-entry-trace.patch",
+  "patches/xnu/t970-smp-mmu-trace.patch",
   "scripts/check-reset-context.py",
   "scripts/check-smp-entry-trace.py",
   "evidence/bring-up/runtime/after-mmu-brk-control/**",
@@ -378,6 +379,7 @@ procedure = [
   "Collect /proc/cpuinfo, online/present CPU lists, cpufreq policies, /proc/interrupts and the live DT using the inventory script.",
 ]
 findings = [
+  "BOOT95accf53 owner photo confirms CPU1 entry3 (matched CPU data and reached common_start boundary); C marker4 not seen. Target10 snapshot main0/n2 is earlier than old120 samples. Added secondary-only common/TCR/table/SCTLR/trampoline markers without changing CPU setup values. See entry-trace/device-result.json and MMU trace records.",
   "Two-core BOOT9d4dc888 observed main1 and106 processes but one CPU available; CPU1 phase4/PSCI0/timer0/SGI0. Reset table, CPU1 affinity and reset handler match. Entry execution remains unconfirmed. Added four diagnostic entry milestones and shortened future target wait to10 seconds; default CPU0 unchanged,8-core not uploaded. See evidence/cpu and docs/smp-bringup.md; source/build checks are not hardware SMP qualification.",
   "Uploaded deliberate after-MMU BRK control 150ed5ff9d73d81b17d3f6d32e609b9a9e42fdfe0397da7c5eea7d62f7ce7b4d, using patched Heimdall, exit 0. The device reset at about 50 seconds, matching the reviewed BRK path; original BOOT restoration is still pending. C startup and console behavior are not exercised.",
   "After-MMU BRK control image prepared and extracted from FAT: BRK word, unchanged PE_create_console call, guard bytes, vector branches and preserved IRQ/FIQ slots verified. Eight host tests passed; hardware BRK delivery and the ~50-second timed reset were observed.",
@@ -1245,6 +1247,7 @@ procedure = [
   "Read BuildManifest.plist from the local IPSW using Python zipfile and plistlib to identify its OS version, build and product types.",
 ]
 findings = [
+  "BOOT95accf53 owner photo confirms CPU1 entry3 (matched CPU data and reached common_start boundary); C marker4 not seen. Target10 snapshot main0/n2 is earlier than old120 samples. Added secondary-only common/TCR/table/SCTLR/trampoline markers without changing CPU setup values. See entry-trace/device-result.json and MMU trace records.",
   "Two-core BOOT9d4dc888 observed main1 and106 processes but one CPU available; CPU1 phase4/PSCI0/timer0/SGI0. Reset table, CPU1 affinity and reset handler match. Entry execution remains unconfirmed. Added four diagnostic entry milestones and shortened future target wait to10 seconds; default CPU0 unchanged,8-core not uploaded. See evidence/cpu and docs/smp-bringup.md; source/build checks are not hardware SMP qualification.",
   "BOOT97271e99 photo18:22 confirms launchd main1/err0 and managed pages0x1b709 (~439MiB):512MiB EFI-owned request works. BOOT911a462a new Data build failed AMFI No PMGR because isolated output silently used FirstPassStub. Remove implicit stub, require a reference, audit real PMGR340 slots and reject missing registration symbols/archive members in independent pack checks. Repaired6b83f4e6 uploaded exit0; photo18:42 shows watchdogd PID102 SIGTRAP. Enforced exact-device/writable/APFS mount success gate precedes exec, so Data mount success is inferred, not a Data write/persistence test. Original watchdogd host branch and launchd root-owned watchdog-only policy checks pass with explicit OS API substitutions; policy not applied.",
   "BOOT cfbd84ba photo confirms stage4: ID/VALID/S2CR accepted, direct FAULT restore200ff succeeded without fallback, allRestored/mappingsUnchanged=1 and GFSR=0. Six context states captured; CB0..4 already configured with FSR400 of unknown age, CB73 SCTLR3ab3a706 is not a verified free bank. No context writes, DMA or UFS commands occurred.",
@@ -1510,6 +1513,7 @@ procedure = [
   "Run python3 scripts/collect-adb-inventory.py --root --output evidence/<new-capture>; review per-command stderr, checksums, GPT CRC results and DT sanitization before updating this record.",
 ]
 findings = [
+  "BOOT95accf53 owner photo confirms CPU1 entry3 (matched CPU data and reached common_start boundary); C marker4 not seen. Target10 snapshot main0/n2 is earlier than old120 samples. Added secondary-only common/TCR/table/SCTLR/trampoline markers without changing CPU setup values. See entry-trace/device-result.json and MMU trace records.",
   "Two-core BOOT9d4dc888 observed main1 and106 processes but one CPU available; CPU1 phase4/PSCI0/timer0/SGI0. Reset table, CPU1 affinity and reset handler match. Entry execution remains unconfirmed. Added four diagnostic entry milestones and shortened future target wait to10 seconds; default CPU0 unchanged,8-core not uploaded. See evidence/cpu and docs/smp-bringup.md; source/build checks are not hardware SMP qualification.",
   "BOOTeeeba83b owner photo19:36:40 shows requested120-second runtime report: genuine main1,109 processes, watchdogd absent, SpringBoard27/backboardd56/runningboardd26, Data0/policy0/stage4,964876 verified blocks. Kernel deadline-wait/report executed; rate accuracy unmeasured. Interface-service process presence is not proof of rendering or functional services. Display backend remains disabled; next phase is display handoff/provider and independent staged SMP qualification.",
   "BOOTeeeba83b uses explicit t970-runtime-report=120 to start one diagnostic kernel thread after Data/policy install. Deadline wait yields CPU; bounded512 non-zombie callbacks, first18 names in512bytes and named service PIDs are displayed in intentional panic. Readonly genuine-main accessor and original process refs/exit policies retained. Actual helper sanitizer/API-substitute bounds/wait/range/once/thread-failure tests plus policy regression and independent symbol/FAT/ADT/boot/argument verification pass; implicit sampler configuration refused. BOOT-only upload exit0; physical timer/snapshot and later services pending.",
