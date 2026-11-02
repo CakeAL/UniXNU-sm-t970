@@ -1,0 +1,20 @@
+{
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/data-bringup/smp2-sgi-asm/boot-partition.img"
+  ],
+  "exit_code": 0,
+  "boot_sha256": "1c778e4ba7e9ef8b91385fcf814f40376d45771e13adcc531386d9ecd72d46cc",
+  "cpus_requested": 2,
+  "target_wait_seconds": 10,
+  "additional_ipi_wait_milliseconds": 100,
+  "armcpu_revision": "b5f9775777aafe850a4ec8778b03154dfcabbd2b",
+  "standard_sgi_instruction_audited": true,
+  "terminal_diagnostic": true,
+  "readback_verified": false,
+  "hardware_result_pending": true,
+  "redistributor_experiment_uploaded": false,
+  "eight_core_not_uploaded": true
+}

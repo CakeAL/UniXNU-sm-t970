@@ -20,3 +20,9 @@ linked-instruction-check仅验证模拟MPIDR/CPU数据下实际链接指令，�
 reset-publish已修正并模拟验证实际C标记；汇编阶段记录和ArmCpu计数不受影响。
 
 - ipi-check：BOOT7e60f7c9，首次UFS NOP stage0拒绝，机主重启同镜像恢复；两核重现，显式SGI0发送后recv0/cpu1=0>0。IPI与8核仍待验证。
+
+- sgi-asm：BOOT1c778e4b，独立ArmCpu b5f9775修复17处汇编分隔；旧二进制缺失SGI写入，新对象/内核/payload检查通过。实际投递待回报，redistributor实验未刷入。
+
+- sgi-asm/device-result：两核SGI接收44/102、recv146确认。机主要求直接八核，sgi-asm/cpu8为同内核d95c45d9的准备和上传回执，实机结果待回报。
+
+- sgi-asm/cpu8/device-result：d95c45d9已实测cpu8/sec7、所有副核step7/C4、八核SGI总234。CPU4/5/7早期timer0，main0/n2；持续运行与用户态仍待验证。

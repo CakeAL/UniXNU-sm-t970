@@ -42,6 +42,14 @@
       "directly_matches_current_t970_hypothesis": true,
       "review_correction": "Initial review focused on SGI/entry counters and missed these two extra clean ranges; full fork comparison now confirms direct precedent.",
       "same_hardware_symptom_proven": false
+    },
+    "standard_sgi_assembly": {
+      "source": "https://github.com/RigoLigoRLC/unixnu-armcpu/blob/55cc0617ea9203e85f1cbbf81ae2669f4fa41645/ArmCpu.cpp",
+      "normal_sender_uses_explicit_newlines": true,
+      "t970_original_component_used_semicolons": true,
+      "actual_t970_old_binary_missing_sgi_write": true,
+      "new_component_revision": "b5f9775777aafe850a4ec8778b03154dfcabbd2b",
+      "redistributor_feature_not_uploaded": true
     }
   },
   "t970": {

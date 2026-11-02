@@ -134,3 +134,42 @@ I行attempt1/sent2/test1/recv0/cpu1=0>0，GIC目标帧found1：
 显式发送函数已执行，但未观察到SGI0处理计数。不能由此直接认定是EL2拦截或选定替代IRQ。
 IPI投递仍是扩核前的阻塞；即便单次投递成功，发送线程未固定核心，仍需后续双向核间验证。
 两次启动结果分别保存，未放宽UFS准入门槛。
+
+## 实际汇编指令遗漏修复
+
+继续对照T733时先建立了redistributor SGI0实验分支1eff4aa，主机76例通过，未刷入。
+随后反汇编实际ArmCpu对象发现：旧标准发送路径的`dsb ishst; msr ...; isb`
+只产生首条DSB，根本没有ICC_SGI1R_EL1写入。T733正常发送路径使用显式换行。
+因此此前sent/test计数只能证明调用了C++发送函数，不能判断GIC或EL2是否丢弃了SGI。
+
+独立ArmCpu工作树`.cache/armcpu-sgi-asm`提交b5f9775777aafe850a4ec8778b03154dfcabbd2b，
+把17个多指令字符串的分号分隔改为显式换行，同时恢复计数器读取、DAIF更新与同步屏障。
+默认组件9066、目录和设备feed未修改；这次每条构建/打包命令显式选择
+`--local-module driver:ArmCpu=.cache/armcpu-sgi-asm`。
+源码SHA、对象/归档SHA和可移植组件提交补丁见sgi-asm/component.json与armcpu-change.patch。
+组件提交暂只在本机，尚未推送远端；旧源内核及未刷的redistributor实验均保留。
+
+新的实际指令检查在旧71606266内核上按预期拒绝，在新对象、内核和payload上通过：
+正常/诊断发送均有DSB→MSR ICC_SGI1R_EL1→ISB；并确认GIC/计时器同步、DAIF和计数器读取。
+prepare-smp现在要求明确的已审阅组件提交、干净工作树及实际构建树源码路径匹配。
+BOOT1c778e4b已刷入，两核、标准SGI0、10秒目标加100ms检查；实机投递仍待回报。
+
+00:46:05照片确认BOOT1c778e4b收到真实SGI：CPU0/CPU1计数44/102，合计146，
+I行sent146/test1/recv146，CPU1在检查期间99→102。它证明两核都有接收，
+但因为同时存在内核发送且线程未固定，不能把增量严格归因于唯一一次诊断发送或独立双向测试。
+10秒时仍main0/n2，用户态持续推进待后续检查。
+
+机主明确要求跳过四核、直接验证八核。BOOTd95c45d9沿用相同a65817b8源内核和9dc8a62c
+payload内核，只扩展ADT/PSCI CPU拓扑及cpus=8；非CPU ADT、固件、信任和Data种子逐项核对保持。
+已仅刷BOOT，exit0正常结束并请求重启，八核实机结果待回报。
+armcpu_smp_running为非原子的共享累加，sec不作为唯一验收依据；逐核stage/timer/sgi与
+XNU processor_avail_count联合观察。当前仍使用标准SGI，未刷redistributor方案。
+
+## 八核实机结果
+
+BOOTd95c45d9的00:49:07照片：cpu8/sec7，CPU1–7均step7/PSCI0/fail0，
+全部副核C入口4；CPU0–7 SGI计数54/62/59/26/6/24/2/1，合计234与recv234一致。
+这确认8核启动及每核实际SGI接收。
+计时器计数21084/23357/2086/5/0/0/2385/0；CPU4/5/7在此早期采样尚未观察到计时器中断，
+不能记为8核计时器负载测试已通过。main0/n2，用户态持续推进与GUI仍未验证。
+下一阶段需要逐核工作负载/计时器检查、持续多核运行和越过main前启动阶段。

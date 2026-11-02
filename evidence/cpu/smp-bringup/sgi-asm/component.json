@@ -1,0 +1,11 @@
+{
+  "base_revision": "9066b53bbc82e92a98ec44a11dd50fd13eaf1a1b",
+  "revision": "b5f9775777aafe850a4ec8778b03154dfcabbd2b",
+  "source_sha256": "d96298219ba0429b35a09dd74f0a4d45326e86003b1b7ed0ecdd9fec6e819ac6",
+  "object_sha256": "33834b9e1cd34f45e28ab75792ee3bcd88c14dcd4a26c68b945d154a0d8c34c3",
+  "archive_sha256": "c9f249b3f0cc855efe760a568f079ec1c79ae09ad7f0cc6055eb6313365ef672",
+  "local_override": "--local-module driver:ArmCpu=.cache/armcpu-sgi-asm",
+  "default_catalog_revision_unchanged": true,
+  "source_patch": "armcpu-change.patch",
+  "published_to_remote": false
+}

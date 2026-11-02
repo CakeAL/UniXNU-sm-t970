@@ -3,6 +3,43 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
+## 最新：八核启动与各核SGI已实测（2026-11-03）
+
+当前BOOTd95c45d9已收到00:49:07实机照片：cpu8/sec7，全部副核step7/PSCI0/fail0/C4，
+八核SGI54/62/59/26/6/24/2/1合计234，I行recv234；实际标准SGI投递已覆盖所有核心。
+计时器21084/23357/2086/5/0/0/2385/0，CPU4/5/7此时尚未观察到timer中断。
+10秒main0/n2，尚未证明用户态持续启动或桌面；后续需每核工作负载/计时器和启动推进验证。
+证据见evidence/cpu/smp-bringup/sgi-asm/cpu8/device-result.json。
+
+内核仍使用显式本地ArmCpu b5f9775（.cache/armcpu-sgi-asm），默认目录/feed9066保持；
+后续每条构建/打包命令必须保留local-module，prepare-smp必须传armcpu-source。
+八核这张图是CPU阶段成功，不把旧120秒CPU0的main1与当前八核main0混为一轮结果。
+
+## 最新：两核SGI已收到，按机主要求直接验证八核（2026-11-03）
+
+00:46:05照片确认BOOT1c778e4b两核SGI计数44/102，总recv146，CPU1在检查期间99→102。
+标准SGI指令分隔修复已在实机产生接收；独立固定发送核心的双向测试尚未完成。
+10秒main0/n2仍是早期快照，不能视为用户态持续启动已通过。
+
+当前已刷八核BOOTd95c45d9（exit0正常结束并请求重启），按机主明确要求跳过四核。
+沿用相同源内核a65817b8/payload内核9dc8a62c、ArmCpu b5f9775，只改拓扑和cpus=8。
+八核结果待回报，逐核查看C行及XNU cpu数；sec是非原子共享计数，不单独据此判断遗漏核心。
+当前实际源码必须用.cache/armcpu-sgi-asm的显式local-module；默认目录/feed仍旧版本。
+证据见evidence/cpu/smp-bringup/sgi-asm/device-result.json和cpu8上传回执。
+
+## 最新：修复实际SGI指令缺失（2026-11-03）
+
+BOOT1c778e4b已刷入，BOOT-only、exit0正常结束并请求重启；两核，10秒加100ms采样。
+ArmCpu实验提交b5f9775777aafe850a4ec8778b03154dfcabbd2b在.cache/armcpu-sgi-asm；
+构建/打包均须显式--local-module driver:ArmCpu=<该路径>，prepare-smp须--armcpu-source。
+默认组件/目录/feed仍9066；组件提交只在本机，补丁与源码/归档哈希已归档。
+
+旧对象/内核中分号分隔内联汇编只生成首条DSB，没有SGI写入，之前sent/test不代表硬件发送。
+本次统一修正17个字符串。新对象、内核、payload均实查通过SGI写入及同步/计数器/DAIF指令；
+旧内核负对照按预期拒绝。T733 redistributor方案的本地实验未刷入，优先验证正确标准指令。
+页表发布、C入口标记、96组汇编入口及独立打包检查保留通过；实际新SGI投递待回报。
+证据见evidence/cpu/smp-bringup/sgi-asm。下一张图看两核SGI、I行recv和launchd main。
+
 ## 最新：两核和计时器已实测，标准SGI未收到（2026-11-03）
 
 BOOT6fe3e519的00:13:58照片确认cpu2/sec1、CPU1 phase7/C4、timer22925/22334，

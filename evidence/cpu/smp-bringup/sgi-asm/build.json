@@ -1,0 +1,35 @@
+{
+  "device_base_revision": "2e3a05d6de92fdc3bb2006210c77e98612722bdb",
+  "kernel_build_exit_code": 0,
+  "kernel_sha256": "a65817b8857a9d4f95f2cb9a0c960adf21e03252fc00e5d3a2403bccff923dd3",
+  "payload_kernel_sha256": "9dc8a62ca276ffe4a2d4cc3d7d9c70c1b7caa1cced91c09ed18520ae68969dd4",
+  "boot_sha256": "1c778e4ba7e9ef8b91385fcf814f40376d45771e13adcc531386d9ecd72d46cc",
+  "component_revision": "b5f9775777aafe850a4ec8778b03154dfcabbd2b",
+  "multi_instruction_strings_fixed": 17,
+  "old_kernel_negative_control_passed": true,
+  "actual_object_kernel_payload_instruction_checks_passed": true,
+  "publication_c_marker_cases": 10,
+  "entry_marker_cases": 96,
+  "target_wait_seconds": 10,
+  "additional_ipi_wait_ms": 100,
+  "hardware_ipi_delivery_verified": false,
+  "hardware_result_pending": true,
+  "eight_core_not_uploaded": true,
+  "redistributor_experiment": {
+    "component_revision": "1eff4aa77036747e15eff7890d0593e8fc95355a",
+    "host_cases": 76,
+    "unused_kernel_sha256": "345aca5f73483de64eb7913f09e4534acce416e136d2d683ac33da2f8b8edb38",
+    "uploaded": false,
+    "reason": "Actual object inspection revealed normal SGI register write was absent; corrected inline asm before trying another transport."
+  },
+  "commands": [
+    "UNIXNU_PMGR_REFERENCE_KERNEL=<original e4632618 kernel> PATH=<python3.14 LLVM lld> python3.14 ../UniXNU/unixnu build kernel -D . --out out/data-bringup --local-module driver:ArmCpu=.cache/armcpu-sgi-asm",
+    "python3.14 ../UniXNU/unixnu build payload -D . --out out/data-bringup --local-module driver:ArmCpu=.cache/armcpu-sgi-asm --data-ramdisk out/step7/data-seed-512/data-512.dbr --kernel-arg launchdsuffix=release --kernel-arg t970-disable-watchdogd=1 --kernel-arg t970-runtime-report=10 --kernel-arg t970-smp-publish-state=1 --kernel-arg t970-ipi-check=1",
+    "python3.14 ../UniXNU/unixnu bootimg -D . --out out/data-bringup --local-module driver:ArmCpu=.cache/armcpu-sgi-asm --uefi .cache/uefi-source/Mu-Silicium --fd out/step7/ufs-readonly-inputs/SILICIUM_UEFI.fd --dtb out/firmware-inputs/firmware.dtb --ramdisk <work>/payload/payload.img --output out/data-bringup/sgi-asm-boot.img",
+    "python3.14 scripts/check-data-payload.py --work <work> --boot out/data-bringup/sgi-asm-boot.img --seed out/step7/data-seed-512/data-512.dbr --watchdog-policy --runtime-report-seconds 10 --smp-observer --publish-reset-state --ipi-check --output out/data-bringup/sgi-asm-base-verified",
+    "python3.14 scripts/prepare-smp.py --cpus 2 --armcpu-source .cache/armcpu-sgi-asm --base out/data-bringup/sgi-asm-base-verified/boot-partition.img --base-validation out/data-bringup/sgi-asm-base-verified/validation.json --hardware-dtb <work>/device-tree/hardware.dtb --output out/data-bringup/smp2-sgi-asm"
+  ],
+  "work": "out/data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data",
+  "framework_code_revision": "d57d612",
+  "framework_documentation_revision": "2c834e3"
+}

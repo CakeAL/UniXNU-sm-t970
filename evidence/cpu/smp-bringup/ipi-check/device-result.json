@@ -53,5 +53,10 @@
     "ufs_verified_blocks": 187561
   },
   "hardware_sgi_delivery_verified": false,
-  "interpretation": "Two-core startup and timers reproduced after reboot. Explicit standard SGI0 send invoked but no handler count increment. GIC/firmware transport requires further diagnosis; no8-core or scheduler completion claimed. First UFS refusal remains an unresolved intermittent handoff observation."
+  "interpretation": "Two-core startup and timers reproduced after reboot. Explicit standard SGI0 send invoked but no handler count increment. GIC/firmware transport requires further diagnosis; no8-core or scheduler completion claimed. First UFS refusal remains an unresolved intermittent handoff observation.",
+  "later_instruction_audit": {
+    "normal_and_diagnostic_sgi_write_emitted": false,
+    "reason": "Semicolon-separated inline asm emitted only initial DSB with reviewed Apple arm64 assembler. API send counts in this image do not prove a hardware SGI write; do not infer GIC or EL2 failure.",
+    "reference": "../sgi-asm/old-kernel-negative-control.json"
+  }
 }

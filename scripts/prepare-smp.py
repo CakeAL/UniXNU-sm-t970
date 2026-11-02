@@ -36,6 +36,7 @@ def main():
     parser.add_argument('--base-validation', type=Path, required=True)
     parser.add_argument('--hardware-dtb', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--armcpu-source', type=Path, default=FRAMEWORK / 'drivers/ArmCpu')
     args = parser.parse_args()
     require(not args.output.exists(), 'Preserve previous images; output must be new')
     base = args.base.read_bytes()
@@ -58,12 +59,15 @@ def main():
     require('#define MAX_CPUS                       8' in config, 'Kernel must support eight CPUs')
     require('#if HAS_CLUSTER || defined(BCM2837)' in (source_tree / 'osfmk/arm64/start.s').read_text(),
             'Reset entry must preserve Affinity1')
-    armcpu = FRAMEWORK / 'drivers/ArmCpu'
-    require(subprocess.check_output(['git', '-C', str(armcpu), 'rev-parse', 'HEAD'], text=True).strip()
-            == '9066b53bbc82e92a98ec44a11dd50fd13eaf1a1b', 'Unreviewed ArmCpu source')
+    armcpu = args.armcpu_source.resolve()
+    armcpu_revision = subprocess.check_output(['git', '-C', str(armcpu), 'rev-parse', 'HEAD'], text=True).strip()
+    reviewed = {'9066b53bbc82e92a98ec44a11dd50fd13eaf1a1b', 'b5f9775777aafe850a4ec8778b03154dfcabbd2b'}
+    require(armcpu_revision in reviewed, 'Unreviewed ArmCpu source')
     require(not subprocess.check_output(['git', '-C', str(armcpu), 'status', '--porcelain'], text=True),
             'ArmCpu source must be clean')
     armcpu_text = (armcpu / 'ArmCpu.cpp').read_text()
+    compiled_source = ctx.tree / 'drivers/ArmCpu/ArmCpu.cpp'
+    require(compiled_source.resolve() == (armcpu / 'ArmCpu.cpp').resolve(), 'Resolved build tree uses another ArmCpu source')
     require('psciCall (hvc, 0xc4000003ULL, affinity & 0xff00ffffffULL, entry, 0)' in armcpu_text,
             'Unexpected PSCI CPU_ON implementation')
     for region, length in [('LowResetVectorBase', '0x10000'), ('ResetHandlerData', '0x1000'), ('const_boot_args', '0x1000')]:
@@ -181,6 +185,7 @@ def main():
                   adt_sha256=sha(adt), args=' '.join(new_args), unrelated_adt_unchanged=True, psci_method='smc',
                   kernel_trust_seed_unchanged=True, header_fd_dtb_tail_unchanged=True, board_default_unchanged=True,
                   captured_affinities_verified=True, ipi='Standard SGI0; self test on, SPI fallback off',
+                  armcpu_revision=armcpu_revision, armcpu_source_sha256=sha(armcpu_text.encode()),
                   actual_sgi_expression_host_cases=8, psci_and_cache_clean_source_verified=True,
                   terminal_runtime_report=True, target_wait_seconds=validation['runtime_report_target_seconds'], hardware_result_pending=True)
     (out / 'preparation.json').write_text(json.dumps(report, indent=2) + '\n')

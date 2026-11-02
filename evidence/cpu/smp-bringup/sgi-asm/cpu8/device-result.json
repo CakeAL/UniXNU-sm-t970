@@ -1,0 +1,115 @@
+{
+  "boot_sha256": "d95c45d90dd83d3454dd74fe5780d265b0779d45314be692bd48fe63b110c674",
+  "photo": "screen-004907.jpg",
+  "target_wait_seconds": 10,
+  "cpus_requested": 8,
+  "cpus_available": 8,
+  "secondary_running": 7,
+  "main": 0,
+  "processes": 2,
+  "entry_records": [
+    0,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4
+  ],
+  "per_core": [
+    {
+      "cpu": 0,
+      "step": 0,
+      "psci": 0,
+      "fail": 0,
+      "timer": 21084,
+      "sgi": 54
+    },
+    {
+      "cpu": 1,
+      "step": 7,
+      "psci": 0,
+      "fail": 0,
+      "timer": 23357,
+      "sgi": 62
+    },
+    {
+      "cpu": 2,
+      "step": 7,
+      "psci": 0,
+      "fail": 0,
+      "timer": 2086,
+      "sgi": 59
+    },
+    {
+      "cpu": 3,
+      "step": 7,
+      "psci": 0,
+      "fail": 0,
+      "timer": 5,
+      "sgi": 26
+    },
+    {
+      "cpu": 4,
+      "step": 7,
+      "psci": 0,
+      "fail": 0,
+      "timer": 0,
+      "sgi": 6
+    },
+    {
+      "cpu": 5,
+      "step": 7,
+      "psci": 0,
+      "fail": 0,
+      "timer": 0,
+      "sgi": 24
+    },
+    {
+      "cpu": 6,
+      "step": 7,
+      "psci": 0,
+      "fail": 0,
+      "timer": 2385,
+      "sgi": 2
+    },
+    {
+      "cpu": 7,
+      "step": 7,
+      "psci": 0,
+      "fail": 0,
+      "timer": 0,
+      "sgi": 1
+    }
+  ],
+  "ipi_sent": 233,
+  "ipi_test_sent": 1,
+  "ipi_received": 234,
+  "cpu1_before": 60,
+  "cpu1_after": 62,
+  "ttbr1": "c4325000",
+  "primary_ttbr1": "c4325000",
+  "data_status": 0,
+  "watchdog_policy_status": 0,
+  "watchdog_policy_stage": 4,
+  "ufs_verified_blocks": 189168,
+  "eight_core_startup_observed": true,
+  "sgi_reception_on_all_cores_observed": true,
+  "timer_interrupts_observed_on_cores": [
+    0,
+    1,
+    2,
+    3,
+    6
+  ],
+  "timer_interrupts_not_observed_on_cores": [
+    4,
+    5,
+    7
+  ],
+  "all_core_timer_workload_qualification_completed": false,
+  "fixed_sender_bidirectional_isolation_completed": false,
+  "sustained_smp_and_userspace_verified": false,
+  "interpretation": "Eight available CPUs, all seven secondary driver phases7/PSCI0/fail0, C entry4 on all secondary CPUs and positive SGI counts on every core. This qualifies startup and actual SGI reception. At10seconds CPU4/5/7 timer counts remain0 and launchd main0/n2; sustained per-core timer activity and userspace progress require further observation."
+}

@@ -1,0 +1,34 @@
+
+out/data-bringup/sgi-asm-base-verified/kernel.macho:	file format mach-o arm64
+
+Disassembly of section __TEXT_EXEC,__text:
+
+fffffff007987dd8 <_armcpu_ipi_selftest>:
+fffffff007987dd8: b0000d48     	adrp	x8, 0xfffffff007b30000 <_gPEClockFrequencyInfo+0xa0>
+fffffff007987ddc: f9412509     	ldr	x9, [x8, #0x248]
+fffffff007987de0: 91000529     	add	x9, x9, #0x1
+fffffff007987de4: f9012509     	str	x9, [x8, #0x248]
+fffffff007987de8: b0000f28     	adrp	x8, 0xfffffff007b6c000 <_BufferIOBuffer+0x18c0>
+fffffff007987dec: 39628908     	ldrb	w8, [x8, #0x8a2]
+fffffff007987df0: 36000148     	tbz	w8, #0x0, 0xfffffff007987e18 <_armcpu_ipi_selftest+0x40>
+fffffff007987df4: b0000f28     	adrp	x8, 0xfffffff007b6c000 <_BufferIOBuffer+0x18c0>
+fffffff007987df8: f9443d08     	ldr	x8, [x8, #0x878]
+fffffff007987dfc: 53082809     	ubfx	w9, w0, #8, #3
+fffffff007987e00: d5033a9f     	dsb	ishst
+fffffff007987e04: 52a0002a     	mov	w10, #0x10000   ; =65536
+fffffff007987e08: 1ac92149     	lsl	w9, w10, w9
+fffffff007987e0c: b9027d09     	str	w9, [x8, #0x27c]
+fffffff007987e10: d5033f9f     	dsb	sy
+fffffff007987e14: d65f03c0     	ret
+fffffff007987e18: d348fc08     	lsr	x8, x0, #8
+fffffff007987e1c: d2c01fe9     	mov	x9, #0xff00000000 ; =1095216660480
+fffffff007987e20: f2e01fe9     	movk	x9, #0xff, lsl #48
+fffffff007987e24: 8a004129     	and	x9, x9, x0, lsl #16
+fffffff007987e28: b3701d09     	bfi	x9, x8, #16, #8
+fffffff007987e2c: 52800028     	mov	w8, #0x1        ; =1
+fffffff007987e30: 9ac02108     	lsl	x8, x8, x0
+fffffff007987e34: aa080128     	orr	x8, x9, x8
+fffffff007987e38: d5033a9f     	dsb	ishst
+fffffff007987e3c: d518cba8     	msr	ICC_SGI1R_EL1, x8
+fffffff007987e40: d5033fdf     	isb
+fffffff007987e44: d65f03c0     	ret

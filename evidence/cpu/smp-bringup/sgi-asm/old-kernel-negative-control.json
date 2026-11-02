@@ -1,0 +1,7 @@
+{
+  "passed": true,
+  "old_kernel_sha256": "716062667f6f53cb30f88b7e8de1db8fe71931c4db7da61b825519f7a83a3b9f",
+  "old_image_audit_refused": true,
+  "reason": "Normal sender lacks the DSB / MSR ICC_SGI1R_EL1 / ISB sequence; new actual-instruction check rejects it.",
+  "exit_code": 1
+}
