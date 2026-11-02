@@ -1,0 +1,8 @@
+{
+  "function_sha256": "3aca942dd63dfceb3f35122c033bf9ca55c48abaf8f65263eae518b253fb29a5",
+  "passed": true,
+  "cases": 9,
+  "apis_mocked": true,
+  "actual_apfs": false,
+  "hardware_observed": false
+}

@@ -1,0 +1,17 @@
+{
+  "device_base_revision": "9914e9b6671a9d6dc233f0a1f2f4b08a567835c2",
+  "framework_revision": "90b15743cf44d566b00601db56e3604add3a8034",
+  "previous_framework_revision": "194aae294c1107e791f4f74b2be371a391ac6bc4",
+  "framework_change": "Runtime object identity from binding record, plus current optional-callback stand-ins in host-only mount test; no kernel runtime policy change.",
+  "kernel_build_exit_code": 0,
+  "kernel_sha256": "0fb3577c46ff2c75df7998daf034e2d77d68a979b1302bd91e3aa72963bcded5",
+  "configuration": "sm-t970_data_defconfig",
+  "out_root": "UniXNU/out/t970-data-bringup (device out/data-bringup symlink)",
+  "commands": [
+    "./unixnu defconfig sm-t970_data_defconfig -D ../UniXNU-sm-t970 --out out/t970-data-bringup",
+    "./unixnu build kernel -D ../UniXNU-sm-t970 --out out/t970-data-bringup",
+    "./unixnu build payload -D ../UniXNU-sm-t970 --out out/t970-data-bringup --data-ramdisk ../UniXNU-sm-t970/out/step7/data-seed-512/data-512.dbr --kernel-arg launchdsuffix=release"
+  ],
+  "initial_build_attempt": "Device-owned output root exposed a legacy ancestor lookup for kits/VerifiedRoot; stopped before kernel build. Moved isolated output under framework and retried successfully. Original outputs preserved.",
+  "hardware_data_mount_verified": false
+}

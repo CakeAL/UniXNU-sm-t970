@@ -1,0 +1,16 @@
+{
+  "base_sha256": "0bef4684e536d448ecf389d145d01b6b23f45e5ed09bb835df429763dd504041",
+  "volume_uuid": "C25160D3-B586-4C11-9D3A-42CB2741227C",
+  "logical_mib": 512,
+  "packed": {
+    "bytes": 536870912,
+    "sha256": "3a6c07b2d50391697b60bf3c65e382dbfa62794220652db05183ec408d2c1278",
+    "encoded_bytes": 1040512,
+    "encoded_sha256": "4591566eccd77f0f9d13a1338ecaf3c73ce86cd04aeea732d91db6b2e100ca3a",
+    "packed": true
+  },
+  "guest_mutable": true,
+  "persistent_backend_enabled": false,
+  "host_only": true,
+  "hardware_mount_verified": false
+}

@@ -8,9 +8,11 @@
 实机已完成UFS命令/DMA与根卷读取；删除USERDATA后的OS/SystemOS根镜像及授权载体
 已完整恢复并读回校验。现已依次确认dyld共享缓存映射返回成功、PID1在映射后继续执行，
 以及真正的 `kern.initproc_spawned=1`：**launchd已到达main**。
-当前BOOT是有意停止并显示标记的诊断版，系统服务、可写Data、图形桌面和外设仍未验证。
-CPU0保持；原256MiB owned窗口在main诊断停点空闲约1MiB。现已上传512MiB请求的main检查版，
-实际分配与页数待实机回报，板级默认仍256MiB。主机Data种子已生成，尚未接入内核。
+512MiB请求现已实机到达main，XNU管理约439MiB；CPU0与原DTS保留范围保持。
+当前BOOT6b83f4e6已恢复真实PMGR，并越过强制的可写APFS Data挂载检查，启动watchdogd（PID102）；
+当前阻塞是watchdogd因SIGTRAP退出，Data实际写入/持久化与持续服务运行尚未验证。
+首次Data镜像的AMFI No PMGR已定位为新构建目录误用空实现，并新增拒绝检查。
+系统服务、Data实际读写、图形桌面和外设仍未验证，详见[RAM Data接入](docs/ram-data.md)。
 最新证据与镜像绑定见[交接](docs/handoff.md)、[用户态启动验证](evidence/storage/policy-memory/README.md)
 和[T733方案对照](docs/t733-kernel-comparison.md)；历史文档保留当时的验证范围。
 
@@ -32,14 +34,14 @@ vsc/
   主机证据见[验证记录](evidence/firmware-log-exporter/README.md)，屏幕菜单与二维码尚未验证。
 - [porting.toml](porting.toml)：13 个部分的适配范围、实现和验证证据。
 
-显式组件为 `ArmDTPlatform`、`ArmCpu`、`SoftwareAES`、`VirtioMmioBlock`、`XnuPrelink`、`DarwinBoot`；
+显式组件为 `ArmDTPlatform`、`ArmCpu`、`SoftwareAES`、`VirtioMmioBlock`、`RamBlock`、`XnuPrelink`、`DarwinBoot`；
 archive 还接入了设备内 UFS 副本、带固定公钥的 VerifiedRoot 与 PMGR 占位实现。
 这些构建输入不等于功能验证通过；GPU、触控、音频、无线尚未适配。
 
 ## 检查与构建
 
 需要 Python 3.11+（本机 `python3.14`）、git、dtc、LLVM/lld、Xcode 或对应 Linux 工具链。
-主仓库固定为 `194aae294c1107e791f4f74b2be371a391ac6bc4`，SoC 固定为
+本轮主仓库为 `90b15743cf44d566b00601db56e3604add3a8034`（此前固定 `194aae294c1107e791f4f74b2be371a391ac6bc4`），SoC 固定为
 `166235ec2480ff0992627b7aafa15c65ce6b4efa`。历史第 2 步快照仍保留其原始版本。
 
 ```sh

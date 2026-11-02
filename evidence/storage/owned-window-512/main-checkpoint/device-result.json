@@ -1,0 +1,20 @@
+{
+  "boot_sha256": "97271e99a642a84712e3a19cd798366ce7bdd84b1943ff8955cc980aa735cd93",
+  "photo": "screen-182243.jpg",
+  "owner_reported_at": "2026-11-02T18:22:43+08:00",
+  "launchd_main_marker": 1,
+  "original_handler_error": 0,
+  "managed_pages_hex": "0x1b709",
+  "managed_pages": 112393,
+  "managed_mib": 439.03515625,
+  "previous_256mib_managed_pages_hex": "0xbaf8",
+  "requested_owned_mib": 512,
+  "larger_memory_handoff_observed": true,
+  "free_mib_approx": "2–3",
+  "free_hex_exact": null,
+  "free_transcription_note": "Photo low digits visually ambiguous (02e9 vs OCR0269); do not invent exact free count. vm_page_free_count excludes other reclaimable pages.",
+  "terminal_diagnostic": true,
+  "data_configured": false,
+  "service_startup_verified": false,
+  "desktop_verified": false
+}

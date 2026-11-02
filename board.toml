@@ -9,10 +9,10 @@ description = "Samsung Galaxy Tab S7+ Wi-Fi (SM-T970, gts7xlwifi), single-core p
 kit = "sm-t970"
 
 [components]
-include = ["ArmDTPlatform", "ArmCpu", "SoftwareAES", "VirtioMmioBlock", "XnuPrelink", "DarwinBoot"]
+include = ["ArmDTPlatform", "ArmCpu", "SoftwareAES", "VirtioMmioBlock", "RamBlock", "XnuPrelink", "DarwinBoot"]
 
 [kernel]
-archives = ["build-corecrypto-14.py", "build-corecrypto-14.py --namespace", "component:ArmDTPlatform", "component:ArmCpu", "component:SoftwareAES", "build-verified-root-empty.py", "component:VirtioMmioBlock", "zz-build-virtio-block-local.py", "zz-build-shengufs-local.py", "build-storage-bindings.py --component NativeUfs --archive libShengUfs.a --directory build/sheng-ufs", "build-ufs-stubs.py", "build-software-aes-bindings.py", "build-platform-power.py", "build-mockfs-fixture.py", "build-libpthread-kernel.py"]
+archives = ["build-corecrypto-14.py", "build-corecrypto-14.py --namespace", "component:ArmDTPlatform", "component:ArmCpu", "component:SoftwareAES", "build-verified-root-empty.py", "component:VirtioMmioBlock", "zz-build-virtio-block-local.py", "build-storage-bindings.py --component NativeVirtioBlock --archive libVirtioMmioBlock.a --directory build/virtio-block-local --subset", "component:RamBlock", "build-storage-bindings.py --component NativeRamBlock --archive libRamBlock.a --directory build/ram-block --subset", "zz-build-shengufs-local.py", "build-storage-bindings.py --component NativeUfs --archive libShengUfs.a --directory build/sheng-ufs", "build-ufs-stubs.py", "build-software-aes-bindings.py", "build-platform-power.py", "build-mockfs-fixture.py", "build-libpthread-kernel.py"]
 defconfig = "sm-t970_defconfig"
 config_fragments = ["arch:configs/common.config", "soc:configs/sm8250.config", "os:configs/ipados.config"]
 patch_series = ["arch:patches/xnu/series", "soc:patches/xnu/series", "device:patches/xnu/os-series", "device:patches/xnu/series"]
@@ -47,9 +47,11 @@ panic_screen = true
 
 [payload.adt]
 root_match_volume_uuid = "04769D26-2CA0-4825-B443-E2E5F88300F2"
-# Match the loader's existing 256 MiB default explicitly. Allocation still uses
-# EfiConventionalMemory, never the complete DTS envelope or reserved holes.
-owned_memory_size = "0x10000000"
+# 512 MiB request reached real launchd main on BOOT97271e99 (managed pages0x1b709).
+# Allocation uses EfiConventionalMemory, never the DTS envelope or reserved holes.
+owned_memory_size = "0x20000000"
+# Keep the sparse seed packed during handoff; no persistent UFS backend is enabled.
+packed_data_ramdisk = true
 # Supply the board's identity seed through --unique-chip-id.
 # OS identity seed from the selected iPad7,1 profile, not the Qualcomm SoC ID.
 chip_id = "8011"

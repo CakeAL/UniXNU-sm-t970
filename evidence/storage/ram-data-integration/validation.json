@@ -1,0 +1,24 @@
+{
+  "kernel_sha256": "0fb3577c46ff2c75df7998daf034e2d77d68a979b1302bd91e3aa72963bcded5",
+  "payload_kernel_sha256": "fdeb73e67a9b6e24b853a907fca26c7b3a655c0a06f03070a2cdb45d25bf130a",
+  "raw_boot_sha256": "f03a5e92b0f97ecf8c80980caee894f8da0bcd28a4ba5e4888b099543e6c8e67",
+  "boot_sha256": "911a462a7d734050df6d45ce28c0b63bdfb4841ff8148d15d0703461c9d53b6a",
+  "boot_bytes": 71303168,
+  "source_kernel_preserved": true,
+  "trustcache_unchanged": true,
+  "adt_changes_only": [
+    "random-seed",
+    "chosen memory request512MiB",
+    "ephemeral-storage",
+    "PackedRAMDisk"
+  ],
+  "seed_packed_sha256": "4591566eccd77f0f9d13a1338ecaf3c73ce86cd04aeea732d91db6b2e100ca3a",
+  "fd_exact": true,
+  "firmware_dtb_exact": true,
+  "header_version": 2,
+  "zero_tail": true,
+  "no_terminal_probe": true,
+  "data_logical_mib": 512,
+  "data_uuid": "C25160D3-B586-4C11-9D3A-42CB2741227C",
+  "hardware_data_mount_verified": false
+}

@@ -6,7 +6,7 @@ schema_version = 1
 name = "sm-t970"
 soc = "SM8250"
 os_profile = "ipados-17.7.11-21H461"
-summary = "SM-T970 CPU0 bring-up: restored OS/SystemOS and signed carriers fully readback-verified; shared cache mapping kr0, subsequent PID1 close0 and genuine kern.initproc_spawned1 observed on BOOT870a11da. Launchd main is device-confirmed; service startup, writableData, desktop, SMP and peripherals remain unverified. Prior256MiB main snapshot had ~1MiB free. Current BOOT97271e99 requests512MiB and stops at genuine main for page counts; allocation confirmation pending. Host Data seed is prepared but not integrated."
+summary = "SM-T970 CPU0: launchd main and512MiB owned request device-confirmed (managed pages0x1b709). BOOT6b83f4e6 passes the enforced writable APFS Data mount gate and starts watchdogd PID102, which exits with SIGTRAP. Data writes/persistence, sustained services, desktop and peripherals remain unverified. First Data BOOT911a462a No PMGR traced to an implicit build stub, now refused by build and package checks."
 
 [[area]]
 id = "configuration"
@@ -630,8 +630,13 @@ evidence = [
 [[area]]
 id = "storage"
 status = "implemented"
-components = ["ShengUfs", "VirtioMmioBlock", "VerifiedRoot"]
+components = ["ShengUfs", "VirtioMmioBlock", "RamBlock", "VerifiedRoot"]
 paths = [
+  "configs/sm-t970_data_defconfig",
+  "scripts/check-data-payload.py",
+  "docs/ram-data.md",
+  "evidence/storage/ram-data-integration/**",
+  "evidence/storage/watchdogd/**",
   "scripts/prepare-owned-window.py",
   "evidence/storage/owned-window-512/**",
   "evidence/storage/data-seed-preparation/**",
@@ -712,6 +717,7 @@ procedure = [
   "Read block sysfs and by-name links; read each LUN's primary GPT header and entry array and validate their CRC32 values without writing any block device.",
 ]
 findings = [
+  "BOOT97271e99 photo18:22 confirms launchd main1/err0 and managed pages0x1b709 (~439MiB):512MiB EFI-owned request works. BOOT911a462a new Data build failed AMFI No PMGR because isolated output silently used FirstPassStub. Remove implicit stub, require a reference, audit real PMGR340 slots and reject missing registration symbols/archive members in independent pack checks. Repaired6b83f4e6 uploaded exit0; photo18:42 shows watchdogd PID102 SIGTRAP. Enforced exact-device/writable/APFS mount success gate precedes exec, so Data mount success is inferred, not a Data write/persistence test. Original watchdogd host branch and launchd root-owned watchdog-only policy checks pass with explicit OS API substitutions; policy not applied.",
   "2026-11-02: normal release BOOT867efc59 requests512MiB via the chosen ADT property only; fixed normal kernel/FD/DTB/config/tail preserved, Heimdall upload exit0. Owner reports retained bars, which does not localize execution or verify allocation. Terminal main checkpoint BOOT97271e99 uploaded exit0 to measure actual pages; runtime result pending; Data APFS32MiB seed packed losslessly to1007696bytes on host, not integrated/flashed or persistence-qualified. Physical8GiB is not the EFI-owned256MiB diagnostic allocation.",
   "After corrected carriers were backed up/updated and fully readback-verified under explicit authorization, BOOT097c4f8c owner photo shows memorystatus no-victim (available3060pages), rather than prior cache EACCES. This is not proof of full mapping/launchd main. Source retains73293824bytes of carrier plus another73293824bytes of duplicated manifest tables. Borrow only exact authenticated driver-owned boot-lifetime allocations, protect them readonly, retain separate private readonly key pages and reauthenticate; fallback sources still copy. Teardown never frees borrowed carrier. Actual configure/free host ASan/UBSan+mprotect lifecycle/failure tests pass; Normal BOOT12766f5f stalls with persistent bars over3minutes. Isolated BOOTef97eb6a resets about10seconds after magenta per owner, confirming at least one shared-policy vr_open return but not success status. BOOTc544bae1 before-init-exec checkpoint immediately resets per owner, confirming the exec call boundary only; exec and launchd success remain unverified. Session stopped at owner request. EFI owned window remains256MiB.",
   "Root cause identified on host: deployed/readback raw root fd43ee70 contains original OS e5634d04/SystemOS b4908cde, but current owner envelopes signed stale sparse windows47c1e4b0/ee18c5c2. Prior userdata-write-audit already recorded the stale segment seek bug. SystemOS block43008 in stale segment/policy is SHNGROOT, whereas raw/original data match; host APFS mapping for .03 read offset34MiB covers this block. Signer read SHA at wrong entry offset80 instead of56 and never compared it. Fix both, validate full window digests before signing, and prepare envelopes from exact raw source. Five generator and five writer-order/error tests pass; real C verifier authenticates all2290185blocks. Corrected carrier write plan is prepared but not executed; do not infer new device success. Diagnostic BOOT097c4f8c remains host-prepared/unflashed.",
@@ -775,8 +781,10 @@ limits = [
   "Root image and corrected carrier writes were explicitly authorized, completed and readback-verified in their respective receipts. Readonly root and SystemOS preparation reached before-init-exec; writable Data, persistence and sustained XNU storage operation remain unverified.",
   "Current corrected runtime carriers authenticate the published OS/SystemOS windows; prior empty-policy publication reports are historical. Latest repeat has bootloader-only output, without a usable exec-return observation.",
 ]
-next_action = ["Verify actual larger EFI allocation at genuine main checkpoint, then continue normal services with separately prepared writable RamBlock Data; do not reclaim reserved holes or enable unqualified persistent UFS writes."]
+next_action = ["Install root-owned watchdog-only original-launchd override into volatile RAM Data before exec and verify services continue. Preserve real SIGTRAP evidence; do not suppress critical-exit panics or claim watchdog hardware is implemented. Data write/persistence qualification remains separate."]
 evidence = [
+  { kind = "device", reference = "evidence/storage/watchdogd/device-result.json", revision = "9914e9b6671a9d6dc233f0a1f2f4b08a567835c2", command = "BOOT6b83f4e6; owner photo18:42:34 after waiting over2min", result = "watchdogd PID102 exits OS_REASON_SIGNAL2/SIGTRAP5. Execution passed mandatory exact-device writable APFS Data gate before launchd; no Data write/persistence or desktop proof." },
+  { kind = "host", reference = "evidence/storage/ram-data-integration/pmgr-repaired/validation.json", revision = "9914e9b6671a9d6dc233f0a1f2f4b08a567835c2", command = "python3.14 scripts/check-data-payload.py (inputs recorded in docs/ram-data.md)", result = "Actual PMGR archive members/340-slot audit, linked PMGR and RamBlock symbols, kernel/FAT/ADT/seed/trust/FD/DTB/header/geometry checks passed; missing reference and actual failed stub kernel refused." },
   { kind = "host", reference = "evidence/storage/owned-window-512/preparation.json", revision = "e56e349704e8a33d0ec13c2eff124a618a04579f", command = "python3.14 scripts/prepare-owned-window.py --mib 512 --output out/step7/probes/owned-512-normal", result = "Normal BOOT867efc59: independently verified ADT-only memory request change and exact kernel/config/firmware/DTB/tail preservation. Runtime512MiB remains unverified." },
   { kind = "device", reference = "evidence/storage/owned-window-512/upload.json", revision = "e56e349704e8a33d0ec13c2eff124a618a04579f", command = "heimdall flash --BOOT owned-512-normal/boot-partition.img", result = "Upload100%, session exit0 and reboot requested; owner reports retained bars. No readback/runtime allocation proof." },
   { kind = "device", reference = "evidence/storage/policy-memory/initproc-main/device-result.json", revision = "ba275cae5ba86c7076a40ae6057c755702262881", command = "BOOT870a11da original sysctl tail-call observer; owner photo14:51:31", result = "Genuine kern.initproc_spawned1 and original handler err0 confirm launchd main. Probe never writes marker. Services/Data/desktop unverified; terminal snapshot free260pages." },
@@ -1126,6 +1134,11 @@ components = [
   "XnuPrelink",
 ]
 paths = [
+  "configs/sm-t970_data_defconfig",
+  "scripts/check-data-payload.py",
+  "docs/ram-data.md",
+  "evidence/storage/ram-data-integration/**",
+  "evidence/storage/watchdogd/**",
   "evidence/storage/userdata-write-audit/**",
   "tests/test_userdata_sparse.py",
   "scripts/encode-userdata-sparse.py",
@@ -1204,6 +1217,7 @@ procedure = [
   "Read BuildManifest.plist from the local IPSW using Python zipfile and plistlib to identify its OS version, build and product types.",
 ]
 findings = [
+  "BOOT97271e99 photo18:22 confirms launchd main1/err0 and managed pages0x1b709 (~439MiB):512MiB EFI-owned request works. BOOT911a462a new Data build failed AMFI No PMGR because isolated output silently used FirstPassStub. Remove implicit stub, require a reference, audit real PMGR340 slots and reject missing registration symbols/archive members in independent pack checks. Repaired6b83f4e6 uploaded exit0; photo18:42 shows watchdogd PID102 SIGTRAP. Enforced exact-device/writable/APFS mount success gate precedes exec, so Data mount success is inferred, not a Data write/persistence test. Original watchdogd host branch and launchd root-owned watchdog-only policy checks pass with explicit OS API substitutions; policy not applied.",
   "BOOT cfbd84ba photo confirms stage4: ID/VALID/S2CR accepted, direct FAULT restore200ff succeeded without fallback, allRestored/mappingsUnchanged=1 and GFSR=0. Six context states captured; CB0..4 already configured with FSR400 of unknown age, CB73 SCTLR3ab3a706 is not a verified free bank. No context writes, DMA or UFS commands occurred.",
   "Combined field diagnostic BOOT cfbd84ba34fc03b50661b46c9e22fe59c43ba651bca6967da49f1df1ec373e75 prepared from source7ee2918/kernel53e9e68c. Thirteen host tests, input-stable kernel build, independent FAT/arguments/FD checks and DT/ADT check passed. BOOT-only upload exited0; actual VALID/S2CR/restoration/context observations remain pending.",
   "Prepared a combined single-slot field qualification after ee45890a: test VALID only under unchanged FAULT policy; test S2CR only with SMR invalid; restore with a bounded Qualcomm-aware fallback if necessary; compare all protected mappings; only then read six context states. No UFS commands, DMA route grants, queue/context/global/clock/SCM writes. Field results and restore flags still require exact-image device observation.",
@@ -1300,6 +1314,8 @@ limits = [
 ]
 next_action = ["Review an exclusive bypass-context and bounded command/DMA test plan using the qualified stream fields; preserve display CB4, reject unqualified CB73 and record actual data reads separately."]
 evidence = [
+  { kind = "device", reference = "evidence/storage/watchdogd/device-result.json", revision = "9914e9b6671a9d6dc233f0a1f2f4b08a567835c2", command = "BOOT6b83f4e6; owner photo18:42:34 after waiting over2min", result = "watchdogd PID102 exits OS_REASON_SIGNAL2/SIGTRAP5. Execution passed mandatory exact-device writable APFS Data gate before launchd; no Data write/persistence or desktop proof." },
+  { kind = "host", reference = "evidence/storage/ram-data-integration/pmgr-repaired/validation.json", revision = "9914e9b6671a9d6dc233f0a1f2f4b08a567835c2", command = "python3.14 scripts/check-data-payload.py (inputs recorded in docs/ram-data.md)", result = "Actual PMGR archive members/340-slot audit, linked PMGR and RamBlock symbols, kernel/FAT/ADT/seed/trust/FD/DTB/header/geometry checks passed; missing reference and actual failed stub kernel refused." },
   { kind = "device", reference = "evidence/storage/policy-memory/boot-tail-control/flash.json", revision = "ba275cae5ba86c7076a40ae6057c755702262881", command = "heimdall flash --BOOT out/step7/probes/policy-after-init-exec-full-partition/boot.img", result = "Same17bda459 prefix with zero tail to exactBOOT capacity646f44ad: upload100% and success reported; session-end failed exit1. No readback/reboot confirmation. Stale footer hypothesis not yet device-proven." },
   { kind = "host", reference = "evidence/storage/root-restore-twrp-20261102/validation.json", revision = "ba275cae5ba86c7076a40ae6057c755702262881", command = "python3.14 -m unittest discover -s tests -p test_recovery_storage.py (plus root/carrier writer tests)", result = "Exact gts7xlwifi TWRP model/product pair supported with strict root, geometry and unmounted requirements; acceptance/refusal and writer failure tests pass." },
   { kind = "device", reference = "evidence/storage/smmu-fields/device-result.json", revision = "7ee2918e7bafdc76d62225675c4bcaebd14e5753", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/smmu-fields/boot.img --no-reboot", result = "Owner photo confirms tested stream fields accepted and restored, display mapping preserved; context states are observations, not ownership or DMA qualification." },
@@ -1370,6 +1386,11 @@ id = "diagnostics"
 status = "implemented"
 components = []
 paths = [
+  "configs/sm-t970_data_defconfig",
+  "scripts/check-data-payload.py",
+  "docs/ram-data.md",
+  "evidence/storage/ram-data-integration/**",
+  "evidence/storage/watchdogd/**",
   "scripts/prepare-owned-window.py",
   "evidence/storage/owned-window-512/**",
   "evidence/storage/data-seed-preparation/**",
@@ -1452,6 +1473,7 @@ procedure = [
   "Run python3 scripts/collect-adb-inventory.py --root --output evidence/<new-capture>; review per-command stderr, checksums, GPT CRC results and DT sanitization before updating this record.",
 ]
 findings = [
+  "BOOT97271e99 photo18:22 confirms launchd main1/err0 and managed pages0x1b709 (~439MiB):512MiB EFI-owned request works. BOOT911a462a new Data build failed AMFI No PMGR because isolated output silently used FirstPassStub. Remove implicit stub, require a reference, audit real PMGR340 slots and reject missing registration symbols/archive members in independent pack checks. Repaired6b83f4e6 uploaded exit0; photo18:42 shows watchdogd PID102 SIGTRAP. Enforced exact-device/writable/APFS mount success gate precedes exec, so Data mount success is inferred, not a Data write/persistence test. Original watchdogd host branch and launchd root-owned watchdog-only policy checks pass with explicit OS API substitutions; policy not applied.",
   "2026-11-02: normal release BOOT867efc59 requests512MiB via the chosen ADT property only; fixed normal kernel/FD/DTB/config/tail preserved, Heimdall upload exit0. Owner reports retained bars, which does not localize execution or verify allocation. Terminal main checkpoint BOOT97271e99 uploaded exit0 to measure actual pages; runtime result pending; Data APFS32MiB seed packed losslessly to1007696bytes on host, not integrated/flashed or persistence-qualified. Physical8GiB is not the EFI-owned256MiB diagnostic allocation.",
   "The next cache diagnostic follows umi bounded kernel-state observation: trace PID1 syscall returns and only already copied namei buffers, with fixed arrays and a last-12 panic summary; it makes no extra user-pointer read. Actual-helper host checks pass; device results remain pending and must be tied to the next exact BOOT hash.",
   "BOOT cfbd84ba photo confirms stage4: ID/VALID/S2CR accepted, direct FAULT restore200ff succeeded without fallback, allRestored/mappingsUnchanged=1 and GFSR=0. Six context states captured; CB0..4 already configured with FSR400 of unknown age, CB73 SCTLR3ab3a706 is not a verified free bank. No context writes, DMA or UFS commands occurred.",
@@ -1560,6 +1582,8 @@ limits = [
 ]
 next_action = ["After committing this verified milestone, continue normal service/Data bring-up and measure memory use; preserve genuine main-marker evidence and256MiB owned-memory constraints. Current870a11da is terminal diagnostic, not a normal system image."]
 evidence = [
+  { kind = "device", reference = "evidence/storage/watchdogd/device-result.json", revision = "9914e9b6671a9d6dc233f0a1f2f4b08a567835c2", command = "BOOT6b83f4e6; owner photo18:42:34 after waiting over2min", result = "watchdogd PID102 exits OS_REASON_SIGNAL2/SIGTRAP5. Execution passed mandatory exact-device writable APFS Data gate before launchd; no Data write/persistence or desktop proof." },
+  { kind = "host", reference = "evidence/storage/ram-data-integration/pmgr-repaired/validation.json", revision = "9914e9b6671a9d6dc233f0a1f2f4b08a567835c2", command = "python3.14 scripts/check-data-payload.py (inputs recorded in docs/ram-data.md)", result = "Actual PMGR archive members/340-slot audit, linked PMGR and RamBlock symbols, kernel/FAT/ADT/seed/trust/FD/DTB/header/geometry checks passed; missing reference and actual failed stub kernel refused." },
   { kind = "host", reference = "evidence/storage/owned-window-512/preparation.json", revision = "e56e349704e8a33d0ec13c2eff124a618a04579f", command = "python3.14 scripts/prepare-owned-window.py --mib 512 --output out/step7/probes/owned-512-normal", result = "Normal BOOT867efc59: independently verified ADT-only memory request change and exact kernel/config/firmware/DTB/tail preservation. Runtime512MiB remains unverified." },
   { kind = "device", reference = "evidence/storage/owned-window-512/upload.json", revision = "e56e349704e8a33d0ec13c2eff124a618a04579f", command = "heimdall flash --BOOT owned-512-normal/boot-partition.img", result = "Upload100%, session exit0 and reboot requested; owner reports retained bars. No readback/runtime allocation proof." },
   { kind = "host", reference = "evidence/storage/policy-memory/commit-validation.json", revision = "ba275cae5ba86c7076a40ae6057c755702262881", command = "24 targeted unittests; actual-source union/trace/signature and ASan memory lifecycle checks; check-platform; record/diff checks", result = "24 tests and4 actual-source checks pass. Platform checker still fails historical five-component selection versus existing VirtioMmioBlock; failure preserved.13-area record and whitespace checks pass." },

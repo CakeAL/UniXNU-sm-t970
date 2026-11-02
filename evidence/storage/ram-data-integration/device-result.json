@@ -1,0 +1,10 @@
+{
+  "boot_sha256": "911a462a7d734050df6d45ce28c0b63bdfb4841ff8148d15d0703461c9d53b6a",
+  "photo": "screen-183444.jpg",
+  "panic": "AMFI: No PMGR",
+  "source": "ConfigurationSettings.cpp:235",
+  "data_mount_reached": false,
+  "root_cause": "Isolated new output had no reference kernel; build-platform-power.py silently archived a no-op sheng_pmgr_run first-pass stub. build log confirms. Not a Data/APFS mount failure.",
+  "repair": "Require an explicit existing reference; never silently generate a stub. Rebuild real PMGR with ABI contract audit before packaging.",
+  "repair_runtime_verified": false
+}

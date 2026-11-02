@@ -1,0 +1,7 @@
+{
+  "missing_reference_refused": true,
+  "existing_archive_preserved": true,
+  "actual_failed_stub_kernel_refused": true,
+  "repaired_actual_kernel_and_boot_verified": true,
+  "actual_apfs_hardware_test": false
+}

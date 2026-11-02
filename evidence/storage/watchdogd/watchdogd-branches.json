@@ -1,0 +1,55 @@
+{
+  "watchdogd_sha256": "ded4c688e1c2add74acf3e7f9eea5fe2c2c569180ce81492221877944d913a01",
+  "cases": [
+    {
+      "case": "physical_missing",
+      "service": 0,
+      "vmm": 0,
+      "open_error": 0,
+      "events": [
+        "failed to discover watchdog KEXT service",
+        "connect_to_kext() unexpectedly failed - unable to lookup watchdog KEXT service"
+      ],
+      "outcome": "brk",
+      "pc": "0x10000ab0c",
+      "message": "connect_to_kext() unexpectedly failed - unable to lookup watchdog KEXT service"
+    },
+    {
+      "case": "virtual_missing",
+      "service": 0,
+      "vmm": 1,
+      "open_error": 0,
+      "events": [
+        "failed to discover watchdog KEXT service",
+        "detected virtual machine environment and no watchdog KEXT found, exiting..."
+      ],
+      "outcome": "exit",
+      "status": 0
+    },
+    {
+      "case": "service_open_error",
+      "service": 99,
+      "vmm": 0,
+      "open_error": 3758097095,
+      "events": [
+        "IOServiceOpen failed with error : 0xe00002c7"
+      ],
+      "outcome": "brk",
+      "pc": "0x10000ab54",
+      "message": "IOServiceOpen failed with error : 0xe00002c7"
+    },
+    {
+      "case": "service_connected",
+      "service": 99,
+      "vmm": 0,
+      "open_error": 0,
+      "events": [
+        "connected to watchdog KEXT"
+      ],
+      "outcome": "connected"
+    }
+  ],
+  "external_APIs_stubbed": true,
+  "hardware_fault_PC_observed": false,
+  "physical_root_cause_proven": false
+}

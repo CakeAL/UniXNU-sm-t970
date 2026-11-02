@@ -1,0 +1,22 @@
+{
+  "boot_sha256": "6b83f4e6cb609bbdda1b9094a9eba4ccc2dbf29ab0c42db6341915125b95b714",
+  "photo": "screen-184234.jpg",
+  "process": "watchdogd",
+  "pid": 102,
+  "exit_namespace": 2,
+  "exit_subcode": 5,
+  "decoded_signal": "SIGTRAP",
+  "amfi_no_pmgr_reproduced": false,
+  "cache_cs_eacces_captured": false,
+  "ufs_integrity_rejections": 0,
+  "ufs_read_blocks": 1245978,
+  "pid1_trace_calls": 1017,
+  "data_mount_success_inferred": true,
+  "data_mount_basis": "Compiled OWNER_DATA_MOUNT path panics before exec on any native_owner_data_prepare failure; function verifies exact mounted device, APFS and writable flags. watchdogd PID102 proves execution continued past this enforced gate.",
+  "data_write_test_verified": false,
+  "data_persistence_verified": false,
+  "desktop_verified": false,
+  "watchdogd_fault_pc_observed": false,
+  "root_cause": "Unresolved exact user fault PC. Original binary physical missing-IOWatchdog and IOServiceOpen error paths both trap in host API-substituted execution; no driver service is implemented for this board.",
+  "candidate": "Temporary original-launchd disabled.plist policy for watchdogd only; must be installed root-owned into RAM Data before launchd. Prepared, not applied."
+}

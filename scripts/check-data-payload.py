@@ -1,0 +1,103 @@
+#!/usr/bin/env python3
+"""Independently unpack Data BOOT inputs and reject the PMGR bootstrap stub.
+
+Host checks only. This neither flashes a device nor proves an APFS mount.
+"""
+import argparse
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+import struct
+import subprocess
+
+DEVICE = Path(__file__).resolve().parents[1]
+
+
+def sha(blob):
+    return hashlib.sha256(blob).hexdigest()
+
+
+def require(ok, message):
+    if not ok:
+        raise ValueError(message)
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--work', type=Path, required=True)
+    parser.add_argument('--boot', type=Path, required=True)
+    parser.add_argument('--seed', type=Path, required=True)
+    parser.add_argument('--output', type=Path, required=True)
+    args = parser.parse_args()
+    work, out = args.work.resolve(), args.output.resolve()
+    require(not out.exists(), 'Use a new verification output directory')
+    # Audit the actual archive and linked source kernel, not just the switch.
+    pmgr = work / 'tree/build/sheng-platform-power'
+    archive = pmgr / 'libShengPlatformPower.a'
+    pmgr_report = json.loads((pmgr / 'build-report.json').read_text())
+    require(pmgr_report['virtual_entries'] == 340 and
+            pmgr_report['archive_sha256'] == sha(archive.read_bytes()), 'PMGR archive/report mismatch')
+    members = subprocess.check_output(['xcrun', 'ar', 't', str(archive)], text=True).splitlines()
+    objects = [name for name in members if name not in ('__.SYMDEF', '__.SYMDEF SORTED')]
+    require(len(objects) == 2 and set(objects) == {'ShengPlatformPower.late.o', 'original-bindings.o'},
+            'PMGR contains a stub/unexpected object')
+    kernel = work / 'kernel/kernel.macho'
+    symbols = subprocess.check_output(['/opt/homebrew/opt/llvm/bin/llvm-nm', '--defined-only', str(kernel)], text=True)
+    names = {line.split()[-1] for line in symbols.splitlines() if line.split()}
+    require({'_sheng_pmgr_run', '__GLOBAL__sub_I_ShengPlatformPower.cpp',
+             '__ZTV18ShengPlatformPower', '_native_ram_block_volume_seed'} <= names,
+            'Kernel lacks the real PMGR bridge or RamBlock')
+    report = json.loads((work / 'payload/payload.json').read_text())
+    require(sha(kernel.read_bytes()) == report['kernel_sha256'], 'Source kernel changed after payload build')
+    out.mkdir(parents=True)
+    for name in ('kernel.macho', 'kernel.macho.adt', 'kernel.macho.trustcache', 'scratch-data.img'):
+        subprocess.run(['mcopy', '-i', str(work / 'payload/payload.img'),
+                        '::/EFI/UniXNU/Payloads/' + name, str(out / name)], check=True)
+    require(sha((out / 'kernel.macho').read_bytes()) == report['payload_kernel_sha256'], 'Packed kernel mismatch')
+    base = DEVICE / 'out/step7/probes/policy-release-normal/independent'
+    require((out / 'kernel.macho.trustcache').read_bytes() == (base / 'kernel.macho.trustcache').read_bytes(),
+            'Original trust cache changed')
+    require((out / 'scratch-data.img').read_bytes() == args.seed.read_bytes(), 'Data seed mismatch')
+    spec = importlib.util.spec_from_file_location('platform_check', DEVICE / 'scripts/check-platform.py')
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    actual = module.decode_adt((out / 'kernel.macho.adt').read_bytes())
+    expected = module.decode_adt((base / 'kernel.macho.adt').read_bytes())
+    for tree in (actual, expected):
+        tree['/chosen'].pop('random-seed')
+    expected['/chosen']['darwinboot-memory-size'] = struct.pack('<Q', 0x20000000)
+    expected['/chosen']['ephemeral-storage'] = struct.pack('<I', 1)
+    expected['/chosen/memory-map']['PackedRAMDisk'] = bytes(16)
+    require(actual == expected, 'Unexpected hardware/identity/root/ADT change')
+    raw = args.boot.read_bytes()
+    require(raw[:8] == b'ANDROID!', 'Missing Android header')
+    ks, rs = struct.unpack_from('<I', raw, 8)[0], struct.unpack_from('<I', raw, 16)[0]
+    page, version = struct.unpack_from('<II', raw, 36)
+    require((page, version) == (4096, 2), 'Wrong Android format')
+    align = lambda n: ((n + page - 1) // page) * page
+    rd = page + align(ks)
+    require(raw[rd:rd + rs] == (work / 'payload/payload.img').read_bytes(), 'BOOT ramdisk mismatch')
+    fd = (DEVICE / 'out/step7/ufs-readonly-inputs/SILICIUM_UEFI.fd').read_bytes()
+    require(sha(fd) == '515105d758a9d61078dffce5012db0754a71cec351a1bb34b30ee791196b5690'
+            and ks == len(fd) + 112 and raw[page + 112:page + ks] == fd, 'Wrong firmware')
+    require(struct.unpack_from('<I', raw, 24)[0] == 0 and struct.unpack_from('<I', raw, 1632)[0] == 0,
+            'Unexpected second/recovery DTBO section')
+    dtb_size = struct.unpack_from('<I', raw, 1648)[0]
+    dtb = raw[align(rd + rs):align(rd + rs) + dtb_size]
+    require(dtb == (DEVICE / 'out/firmware-inputs/firmware.dtb').read_bytes(), 'Wrong firmware DTB')
+    require(report['panic_screen'] and len(raw) <= 71303168, 'Missing panic diagnostics or oversized BOOT')
+    full = raw + bytes(71303168 - len(raw))
+    (out / 'boot-partition.img').write_bytes(full)
+    result = dict(boot_sha256=sha(full), boot_bytes=len(full), raw_boot_sha256=sha(raw),
+                  kernel_sha256=report['kernel_sha256'], payload_kernel_sha256=report['payload_kernel_sha256'],
+                  pmgr_archive_sha256=pmgr_report['archive_sha256'], pmgr_members=members,
+                  real_pmgr_and_ramblock_symbols=True, trustcache_unchanged=True,
+                  adt_only_expected_changes=True, exact_fd_dtb=True, zero_tail=True,
+                  seed_sha256=sha(args.seed.read_bytes()), hardware_data_mount_verified=False)
+    (out / 'validation.json').write_text(json.dumps(result, indent=2) + '\n')
+    print(json.dumps(result, indent=2))
+
+
+if __name__ == '__main__':
+    main()

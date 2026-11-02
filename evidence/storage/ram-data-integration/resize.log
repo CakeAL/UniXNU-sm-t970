@@ -1,0 +1,28 @@
+Started APFS operation
+Aligning grow delta to 503,316,480 bytes and targeting a new container size of 536,870,912 bytes
+Determined the maximum size for the APFS Container to be 536,870,912 bytes
+Resizing APFS Container designated by APFS Container Reference disk9
+The specific APFS Physical Store being resized is disk8
+Verifying storage system
+Performing fsck_apfs -n -x /dev/disk8
+warning: nx_block_count is 8192, while device block count is 131072
+Checking the container superblock
+Checking the checkpoint with transaction ID 4
+Checking the space manager
+Checking the space manager free queue trees
+Checking the object map
+Checking volume /dev/rdisk9s1
+Checking the APFS volume superblock
+The volume OwnerData was formatted by newfs_apfs (3288.41.1) and last modified by apfs_kext (3288.41.1)
+Checking the object map
+Checking the snapshot metadata tree
+Checking the snapshot metadata
+Checking the fsroot tree
+Checking the extent ref tree
+Verifying volume object map space
+The volume /dev/rdisk9s1 with UUID C25160D3-B586-4C11-9D3A-42CB2741227C appears to be OK
+Verifying allocated space
+The container /dev/rdisk9 appears to be OK
+Storage system check exit code is 0
+Growing APFS data structures
+Finished APFS operation

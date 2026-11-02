@@ -3,6 +3,31 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
+## 当前镜像：RAM Data已越过挂载检查，watchdogd SIGTRAP
+
+BOOT6b83f4e6经过超过2分钟保留色条后，18:42照片出现watchdogd[102]退出，namespace2/subcode5。
+源码reason.h/signal.h对应SIGTRAP。系统已经拉起服务，不是凭色条推断的早期卡死。
+本版OWNER_DATA_MOUNT在exec前强制检查Data设备/可写/APFS，失败即panic；
+因此服务启动证明越过该挂载成功门槛，不等于单独写入测试或持久化验证。
+下一步只为RAM Data安装root-owned的原launchd禁用watchdogd策略；不吞掉critical-exit panic，
+不修改原OS/watchdogd或伪造IOWatchdog硬件。候选plist与原二进制host分支测试已准备，尚未应用。
+具体根因PC尚未捕获：缺IOWatchdog与service-open失败都可触发BRK，不能只凭SIGTRAP二选一。
+新证据见evidence/storage/watchdogd。
+
+## 已完成：真实PMGR与RAM Data版本6b83f4e6
+
+512MiB main检查已实测：18:22照片marker1 err0、pages0x1b709约439MiB，扩容生效。
+随后完成RamBlock、512MiB逻辑APFS种子和Data挂载配置的独立构建；首次911a462a报
+AMFI No PMGR，定位到新目录的PMGR脚本隐式FirstPassStub（此前漏检）。
+现已取消该回退，显式使用原e4632618参考重新审计/构建真实PMGR；新增打包检查拒绝空实现。
+修复BOOT6b83f4e6已仅刷BOOT，Heimdall exit0正常结束/请求重启。当前不是main终止探针；
+原始内核/旧BOOT/根卷/载体均保留。现已获得上段的服务退出证据。
+
+使用sm-t970_data_defconfig，输出在主框架out/t970-data-bringup，设备out/data-bringup符号链接。
+主框架新增构建/主机测试修复90b1574。默认板级owned请求现为已验证512MiB，DTS不变。
+完整说明与命令见docs/ram-data.md；结果绑定见evidence/storage/ram-data-integration。
+下列“待512MiB结果”等文字保留当时历史状态，以本段与device-result.json为准。
+
 ## 当前镜像：512MiB main检查，实际扩容结果待设备回报
 
 先上传无终止探针的正常BOOT867efc59，只在原正常release镜像中将chosen内存请求

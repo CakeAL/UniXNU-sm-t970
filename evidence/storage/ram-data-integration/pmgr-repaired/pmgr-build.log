@@ -1,0 +1,4 @@
+PASS: unchanged AMFI read/OR/write and original PMGR provider dispatch
+PASS: actual target AppleT8011PMGR slots read 0xffffffff and perform no write
+Static evidence only; native platform service integration remains unresolved
+PASS: ordinary ARM64/iOS17 build; exact native and original bindings; unimplemented power slots stop

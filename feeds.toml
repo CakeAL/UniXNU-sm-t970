@@ -43,3 +43,9 @@ name = "ShengUfs"
 kind = "driver"
 git = "https://github.com/FFT-infra/NativeUfs-alioth"
 commit = "ab5405905a1892da03a9a53e0fa3dcd255d04055"
+
+[[source]]
+name = "RamBlock"
+kind = "driver"
+git = "https://github.com/UniXNU/RamBlock.git"
+commit = "25c57e0e9b68bf452dd1986914525edc9d2320bc"

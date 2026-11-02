@@ -1,0 +1,35 @@
+{
+  "launchd_sha256": "8cec9a3c44a443b08e977ccc5d577850316ad428c575dc01f09b018dbd5b6a25",
+  "policy_sha256": "6f13254dd5b1339d31b34a7b7d77d19b420497b12085fa154136816e4c928cef",
+  "cases": [
+    {
+      "label": "com.apple.watchdogd",
+      "file_uid": 0,
+      "disabled": true,
+      "events": [
+        "existing migration marker",
+        "/private/var/db/com.apple.xpc.launchd/disabled.plist"
+      ]
+    },
+    {
+      "label": "com.apple.watchdogd",
+      "file_uid": 502,
+      "disabled": false,
+      "events": [
+        "existing migration marker",
+        "/private/var/db/com.apple.xpc.launchd/disabled.plist"
+      ]
+    },
+    {
+      "label": "com.apple.other",
+      "file_uid": 0,
+      "disabled": false,
+      "events": [
+        "existing migration marker",
+        "/private/var/db/com.apple.xpc.launchd/disabled.plist"
+      ]
+    }
+  ],
+  "filesystem_and_libxpc_APIs_substituted": true,
+  "hardware_policy_accepted": false
+}

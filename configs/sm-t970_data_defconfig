@@ -1,0 +1,44 @@
+# Kernel configuration: CONFIG_XNU_<NAME> becomes XNU_<NAME> for the kernel build script.
+# y and n are 1 and 0, a quoted string or a number is passed through, {tree} is the build tree.
+CONFIG_XNU_SOURCE_CORECRYPTO14=y
+CONFIG_XNU_SOURCE_PTHREAD=y
+CONFIG_XNU_ARM_DT_PLATFORM=y
+CONFIG_XNU_ARMCPU=y
+CONFIG_XNU_CRYPTO_BOOTSTRAP="prelinked"
+CONFIG_XNU_SHENG_PMGR=y
+CONFIG_XNU_NATIVE_UFS=y
+# CONFIG_XNU_NATIVE_ADRENO is not set
+# Board peripherals remain disabled until their target-specific interfaces exist.
+# CONFIG_XNU_NATIVE_MOBILE_DISPLAY is not set
+# CONFIG_XNU_NATIVE_LEGACY_DISPLAY is not set
+CONFIG_XNU_VERIFIED_ROOT_PROBE=y
+# The root volume is not Apple-sealed, so bsd_init must accept an owner-authenticated
+# read-only root: the audit records the decision and the trust switch lets it pass.
+# The owner-root trust switch requires the verified block storage personality.
+CONFIG_XNU_NATIVE_VIRTIO_BLOCK=y
+# The verified-block symbols only exist when the driver is compiled with NATIVE_VERIFIED_BLOCK,
+# which puts its archive beside the plain build.
+CONFIG_XNU_NATIVE_VIRTIO_BLOCK_ARCHIVE="{tree}/build/virtio-block-local/libVirtioMmioBlock.a"
+CONFIG_XNU_OWNER_ROOT_AUDIT=y
+CONFIG_XNU_OWNER_ROOT_TRUST=y
+# T733 and umi start dyld from the authenticated readonly SystemOS root union.
+# The stock /System/Cryptexes/OS is a symlink into the initially empty preboot;
+# its canonical alias requires a later writable Data-backed view.
+CONFIG_XNU_OWNER_CACHE_MOUNT=y
+CONFIG_XNU_OWNER_CACHE_STARTUP=y
+CONFIG_XNU_OWNER_BOOT_MANIFEST=y
+CONFIG_XNU_OWNER_CACHE_CARRIER=y
+# Keep the resolved configuration explicit; removing a line does not update .config.
+CONFIG_XNU_OWNER_UNION_SYSTEMOS=y
+# iPadOS signs code in 16 KiB pages; this 4 KiB kernel only accepts the shared cache
+# through the signature hash cache (fcntl(92) would otherwise return 85 EBADEXEC).
+CONFIG_XNU_NATIVE_CS_HASH_CACHE=y
+# Kryo implements PAN and SCTLR_EL1 leaves SPAN clear, so every exception entry sets
+# PSTATE.PAN; only the PAN build clears it around copyin/copyout.
+CONFIG_XNU_NATIVE_PAN=y
+CONFIG_XNU_VERIFIED_ROOT_ARCHIVE="{tree}/build/verified-root-empty/libVerifiedRootProbe.a"
+
+# Volatile APFS Data bring-up. Requires the hash-bound seed recorded in evidence.
+CONFIG_XNU_NATIVE_RAM_BLOCK=y
+CONFIG_XNU_OWNER_DATA_MOUNT=y
+CONFIG_XNU_OWNER_DATA_VOLUME_UUID="C25160D3-B586-4C11-9D3A-42CB2741227C"

@@ -1,0 +1,14 @@
+{
+  "kernel_sha256": "40672e83348c8cc5a7ce77aeea0cf837141b175f3ec11ccd6a8bb066bced3a97",
+  "payload_kernel_sha256": "8ae115da29c1951d653aa13664bce2da6984da565b92c1c50bcfa0afdeaebce1",
+  "adt_sha256": "27a310e996482a2c3db89f45b86d892744340d646f69d88d9d17443b37f20d6e",
+  "kernel_args": "t970-novc sheng-pmgr=2 t970-ufs-publish=1 -v cpus=1 launchdsuffix=release",
+  "trust_cache_sha256": "7416ca4f8377146626bb284e2133c76bee6cb4e3ee0af5d648b186235a7323a7",
+  "gpu_addon_sha256": null,
+  "data_ramdisk_sha256": "4591566eccd77f0f9d13a1338ecaf3c73ce86cd04aeea732d91db6b2e100ca3a",
+  "skip_setup": false,
+  "panic_screen": true,
+  "payload_sha256": "6dbdd5fb8d602ac12c39681c4edbd86e945d2b43e4d2e91beef695d1c7c60865",
+  "payload_bytes": 58720256,
+  "hardware_tested": false
+}

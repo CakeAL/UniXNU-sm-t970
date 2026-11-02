@@ -3,12 +3,14 @@
 
 It is build-sheng-platform-power.py of UniXNU-sheng with these changes. The source is the board kit's copy of
 ShengPlatformPower.cpp. The reference candidate is this board's previous prelinked kernel (out/<board>/kernel), built
-from the same original kernelcache. Without one, as on a new tree, it archives a no-op sheng_pmgr_run so the kernel
-links; the next kernel build then has the reference and links the bridge. The original kernelcache the contract audit
+from the same original kernelcache. Without one, a new tree must explicitly receive
+UNIXNU_PMGR_REFERENCE_KERNEL; it must never silently archive a no-op sheng_pmgr_run.
+The original kernelcache the contract audit
 reads is linked from the IPSW cache of the unixnu driver.
 """
 import hashlib
 import json
+import os
 from pathlib import Path
 import struct
 import subprocess
@@ -32,17 +34,10 @@ def require(value, message):
         raise SystemExit(message)
 
 
-reference = ROOT.parent / 'kernel/kernel.macho'
-if not reference.is_file():
-    stub = OUT / 'FirstPassStub.c'
-    stub.write_text('// No reference kernel yet: the bridge needs one, so the first kernel links without it.\n'
-                    'void sheng_pmgr_run(void);\nvoid sheng_pmgr_run(void)\n{\n}\n')
-    run(['xcrun', '--sdk', 'iphoneos', 'clang', '-arch', 'arm64', '-mkernel', '-miphoneos-version-min=17.0', '-Os',
-         '-c', stub, '-o', OUT / 'FirstPassStub.o'])
-    (OUT / 'libShengPlatformPower.a').unlink(missing_ok=True)
-    run(['xcrun', 'ar', 'rcs', OUT / 'libShengPlatformPower.a', OUT / 'FirstPassStub.o'])
-    print('PMGR bridge: no reference kernel yet; linked a no-op sheng_pmgr_run. Build the kernel again to link the bridge.')
-    raise SystemExit(0)
+reference = Path(os.environ.get('UNIXNU_PMGR_REFERENCE_KERNEL', ROOT.parent / 'kernel/kernel.macho')).resolve()
+require(reference.is_file(),
+        'PMGR bridge requires a prelinked reference kernel; set UNIXNU_PMGR_REFERENCE_KERNEL. '
+        'Refusing an implicit no-op PMGR archive.')
 
 # The contract audit reads the original kernelcache from .cache/firmware; take it from the IPSW cache of the driver.
 # The cache sits at out/ipsw/<build>/, but how many directories separate it from the tree depends on the layout

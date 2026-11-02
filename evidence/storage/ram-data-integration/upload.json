@@ -1,0 +1,13 @@
+{
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/data-bringup/boot-partition.img"
+  ],
+  "exit_code": 0,
+  "boot_sha256": "911a462a7d734050df6d45ce28c0b63bdfb4841ff8148d15d0703461c9d53b6a",
+  "readback_verified": false,
+  "hardware_data_mount_verified": false,
+  "device_observation": "Pending owner screen"
+}

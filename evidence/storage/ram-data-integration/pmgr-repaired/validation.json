@@ -1,0 +1,20 @@
+{
+  "boot_sha256": "6b83f4e6cb609bbdda1b9094a9eba4ccc2dbf29ab0c42db6341915125b95b714",
+  "boot_bytes": 71303168,
+  "raw_boot_sha256": "655f74e26fbc4e9977aa781e9a75694886d76a03ef8699beaf091f0ba83fea0d",
+  "kernel_sha256": "40672e83348c8cc5a7ce77aeea0cf837141b175f3ec11ccd6a8bb066bced3a97",
+  "payload_kernel_sha256": "8ae115da29c1951d653aa13664bce2da6984da565b92c1c50bcfa0afdeaebce1",
+  "pmgr_archive_sha256": "4db65f5b26a36fe4188883a869f31f8f71482a9fc5d29702e2ac87492c9fe103",
+  "pmgr_members": [
+    "__.SYMDEF SORTED",
+    "ShengPlatformPower.late.o",
+    "original-bindings.o"
+  ],
+  "real_pmgr_and_ramblock_symbols": true,
+  "trustcache_unchanged": true,
+  "adt_only_expected_changes": true,
+  "exact_fd_dtb": true,
+  "zero_tail": true,
+  "seed_sha256": "4591566eccd77f0f9d13a1338ecaf3c73ce86cd04aeea732d91db6b2e100ca3a",
+  "hardware_data_mount_verified": false
+}

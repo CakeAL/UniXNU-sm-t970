@@ -1,0 +1,13 @@
+{
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/data-bringup/pmgr-repaired-verified/boot-partition.img"
+  ],
+  "exit_code": 0,
+  "boot_sha256": "6b83f4e6cb609bbdda1b9094a9eba4ccc2dbf29ab0c42db6341915125b95b714",
+  "readback_verified": false,
+  "hardware_data_mount_verified": false,
+  "device_observation": "Pending owner screen"
+}

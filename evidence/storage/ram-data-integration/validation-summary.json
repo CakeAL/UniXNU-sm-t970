@@ -1,0 +1,18 @@
+{
+  "structured_record_areas": 13,
+  "structured_record_change_coverage_passed": true,
+  "actual_data_mount_function_host_cases": 9,
+  "real_storage_object_hash_and_alias_address_agreement": true,
+  "pmgr_340_slot_contract_audited": true,
+  "actual_missing_reference_and_old_stub_kernel_refused": true,
+  "independent_repaired_payload_boot_check": true,
+  "original_watchdogd_branch_cases": 4,
+  "original_launchd_policy_cases": 3,
+  "host_policy_applied_to_device": false,
+  "platform_check_passed": false,
+  "platform_check_limitation": "Historical framework194aae29/five-component/256MiB review snapshot; fails reviewed framework revision after90b1574. No assertion removed.",
+  "larger_efi_window_device_observed": true,
+  "data_mount_gate_device_inferred": true,
+  "data_write_persistence_verified": false,
+  "desktop_verified": false
+}
