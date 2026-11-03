@@ -1,0 +1,37 @@
+[
+  {
+    "name": "bounded_ptr.h",
+    "git_blob": "4c7de13f1a5bfe6d130413bde4c9c3de444a93ad",
+    "origin": "out/data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/build/xnu/ios-obj/EXPORT_HDRS/libkern/libkern/c++/bounded_ptr.h"
+  },
+  {
+    "name": "sha2.h",
+    "git_blob": "2e93f35d7cc6766f0996014362a7b6c57fa14f19",
+    "origin": "out/data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/build/xnu/ios-obj/EXPORT_HDRS/libkern/libkern/crypto/sha2.h"
+  },
+  {
+    "name": "API.h",
+    "git_blob": "d13cddf36560638696223559c210797fa0442f5d",
+    "origin": "https://raw.githubusercontent.com/apple-oss-distributions/xnu/xnu-8796.101.5/EXTERNAL_HEADERS/TrustCache/API.h"
+  },
+  {
+    "name": "RawTypes.h",
+    "git_blob": "16b684e219975b21f954813cad13bc243d2f6fe0",
+    "origin": "https://raw.githubusercontent.com/apple-oss-distributions/xnu/xnu-8796.101.5/EXTERNAL_HEADERS/TrustCache/RawTypes.h"
+  },
+  {
+    "name": "Return.h",
+    "git_blob": "440a53c4f85a025155a9ac408b4f31acf04089d8",
+    "origin": "https://raw.githubusercontent.com/apple-oss-distributions/xnu/xnu-8796.101.5/EXTERNAL_HEADERS/TrustCache/Return.h"
+  },
+  {
+    "name": "Types.h",
+    "git_blob": "f3412f3869c69d1d2e40a0f8883aa9e3f5b3c7ae",
+    "origin": "https://raw.githubusercontent.com/apple-oss-distributions/xnu/xnu-8796.101.5/EXTERNAL_HEADERS/TrustCache/Types.h"
+  },
+  {
+    "name": "TypesConfig.h",
+    "git_blob": "d93e8b09336ea508a968c563f2b2483e074e3cd4",
+    "origin": "https://raw.githubusercontent.com/apple-oss-distributions/xnu/xnu-8796.101.5/EXTERNAL_HEADERS/TrustCache/TypesConfig.h"
+  }
+]

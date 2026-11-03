@@ -41,7 +41,7 @@ typedef void (*thread_continue_t)(void *,wait_result_t);
 static struct process processes[1000];
 static unsigned supplied,count,enabled,seconds,starts,deallocs,waits,blocks,iteration_calls;
 static int start_error,wait_result=THREAD_WAITING;
-static unsigned trace_enabled;
+static unsigned trace_enabled,batch_mode;
 static void *start_arg;
 static thread_continue_t start_function;
 static jmp_buf stop;
@@ -78,7 +78,7 @@ static void proc_iterate(unsigned flags,int (*callout)(proc_t,void*),void *arg,v
 static void clock_interval_to_deadline(unsigned n,unsigned scale,uint64_t *out){assert(scale==NSEC_PER_SEC);*out=(uint64_t)n*scale;}
 static int assert_wait_deadline(event_t e,int flags,uint64_t deadline){assert(e&&flags==THREAD_UNINT&&deadline>0);++waits;return wait_result;}
 static int thread_block(void *continuation){assert(!continuation);++blocks;return 3;}
-static int PE_parse_boot_argn(const char *name,void *out,int size){if(!strcmp(name,"t970-ui-wait")){*(unsigned*)out=ui_wait_enabled;return ui_wait_enabled!=0;}if(!strcmp(name,"t970-runtime-cache-trace")){*(unsigned*)out=trace_enabled;return trace_enabled!=0;}if(!strcmp(name,"t970-ipi-check"))return 0;assert(!strcmp(name,"t970-runtime-report")&&size==sizeof(unsigned));*(unsigned*)out=seconds;return (int)enabled;}
+static int PE_parse_boot_argn(const char *name,void *out,int size){if(!strcmp(name,"t970-ui-stack")){*(unsigned*)out=batch_mode;return batch_mode!=0;}if(!strcmp(name,"t970-ui-wait")){*(unsigned*)out=ui_wait_enabled;return ui_wait_enabled!=0;}if(!strcmp(name,"t970-runtime-cache-trace")){*(unsigned*)out=trace_enabled;return trace_enabled!=0;}if(!strcmp(name,"t970-ipi-check"))return 0;assert(!strcmp(name,"t970-runtime-report")&&size==sizeof(unsigned));*(unsigned*)out=seconds;return (int)enabled;}
 static kern_return_t kernel_thread_start(thread_continue_t function,void *arg,thread_t *thread){++starts;start_function=function;start_arg=arg;*thread=(void*)1;return start_error;}
 static void thread_deallocate(thread_t t){assert(t==(void*)1);++deallocs;}
 static void test_panic(const char *format,...) __attribute__((noreturn,format(printf,1,2)));
@@ -125,6 +125,9 @@ int main(void){
  reset();trace_enabled=ui_wait_enabled=1;supplied=2;
  if(!setjmp(stop)){native_t970_runtime_report((void*)120,0);assert(0);}
  assert(strstr(message,"UI-wait-test registers")&&!strstr(message,"init cache syscalls="));
+ batch_mode=5;
+ if(!setjmp(stop)){native_t970_runtime_report((void*)90,0);assert(0);}
+ assert(strstr(message,"target=90")&&strstr(message,"UI-wait-test registers")&&!strstr(message,"C step/")&&!strstr(message,"ignored"));
  puts("PASS: actual runtime report bounds, process names/PIDs, 512 callback cap, scheduler yield, opt-in/range/once guards and thread failure");
  return 0;
 }

@@ -1,0 +1,16 @@
+{
+  "source_sha256": "418c79004f5182a5ad565e1f353b42fd15ad0cb44b0413c1e739d4e21d2daa6a",
+  "object_sha256": "52ed7bf92980c307b514c98b4efd6f2c5c9852b389ee305fdd3f01bf16a6e8d0",
+  "compile_recipe_sha256": "2fe39a2b1a5d3f4cc66f07ac3cbae843f78c38956942ef87a8e5de0b3a0b45e0",
+  "mach_private_recipe": true,
+  "reads_user_memory": "opt-in modes1-5 isolated worker",
+  "suspends_tasks": false,
+  "stack_frames_per_selected_thread": "mode1:8; mode2-5:16",
+  "stack_selection": "mode5 first8 of BB/SB/MobileGestaltHelper",
+  "report_wait_deadlines": 40,
+  "report_wait_interval_ms": 100,
+  "thread_limit_per_process": 8,
+  "runtime_verified": false,
+  "report_bytes": 8192,
+  "workqueue_detail": true
+}

@@ -1,0 +1,20 @@
+{
+  "boot_sha256": "6ef0db8c95530bb967d5eb1d116c2f16aab87b2af3cccebafd116fe5fd68eabe",
+  "target_wait_seconds": 90,
+  "stack_mode": 5,
+  "actual_sampler_asan_ubsan": true,
+  "actual_workqueue_helper_asan_ubsan": true,
+  "trylock_error_unlock_and_bounds": true,
+  "compact_runtime_host_check": true,
+  "current_mach_private_compile": true,
+  "actual_workqueue_kernel_recipe_compile": true,
+  "kernel_link_prelink": true,
+  "independent_pack_check": true,
+  "detailed_snapshot_symbol_required": true,
+  "final_fat_roundtrip": true,
+  "record_schema_check": true,
+  "patch_sha256": "c945f30bb4d0918c0f3395f87985e3db07571ccc0ccc7557fe00ac60cdc240b7",
+  "prepared_signature_matches": true,
+  "platform_check": "refused: framework differs from reviewed revision",
+  "device_result_pending": true
+}

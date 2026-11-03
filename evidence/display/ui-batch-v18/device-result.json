@@ -1,0 +1,39 @@
+{
+  "boot_sha256": "10dbedd8b39204d25780458e49d922370d75fdcf7a7fe66be8594398e7a8c84d",
+  "photo": "screen-target90.jpg",
+  "photo_sha256": "4d66820f49f0449e64b518d0a7b549293a13c55785c27bf7b9e83d767f69234e",
+  "association": "Owner photo after upload, mode5; no device hash readback",
+  "target_seconds": 90,
+  "main": 1,
+  "processes": 109,
+  "cpus": 8,
+  "cache_slide": "0x19000000",
+  "helper_pid": 95,
+  "helper_threads": 8,
+  "helper_wq_rc": 0,
+  "helper_wq_total": 7,
+  "helper_wq_running": 0,
+  "helper_wq_blocked": 6,
+  "helper_wq_limit_flags": 0,
+  "backboard_wq": [
+    0,
+    2,
+    0,
+    1,
+    0
+  ],
+  "springboard_wq": [
+    0,
+    2,
+    0,
+    0,
+    0
+  ],
+  "client_open": 2,
+  "swap": 0,
+  "screen_contains_batch_end": false,
+  "springboard_tail_visible": false,
+  "text_clipping_status_unknown": true,
+  "conclusion": "MG high-priority thread waits on semaphore; several MG workers share lock-wait chain. Snapshot does not establish pending user/kernel work or failed timer callback.",
+  "desktop_verified": false
+}

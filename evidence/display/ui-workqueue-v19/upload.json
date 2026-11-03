@@ -1,0 +1,15 @@
+{
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/data-bringup/ui-workqueue-memory768-v1/boot-partition.img"
+  ],
+  "boot_sha256": "6ef0db8c95530bb967d5eb1d116c2f16aab87b2af3cccebafd116fe5fd68eabe",
+  "exit_code": 0,
+  "reboot_requested": true,
+  "readback_verified": false,
+  "hardware_result_pending": true,
+  "authorization": "Owner ongoing batch device diagnosis",
+  "completed_utc": "2026-11-03T17:40:43.051302+00:00"
+}

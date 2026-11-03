@@ -1,0 +1,18 @@
+[
+  {
+    "attempt": 1,
+    "result": "compile failed: no member uu_thread; replaced by existing uthread_tid accessor"
+  },
+  {
+    "attempt": 2,
+    "result": "prepare public header download TLS EOF"
+  },
+  {
+    "attempt": 3,
+    "result": "same TLS EOF; recovered exact pinned blobs"
+  },
+  {
+    "attempt": 4,
+    "result": "archive symbol scan missing pthread_workqueue.o after prior compile failure; rebuilt with original recipe"
+  }
+]

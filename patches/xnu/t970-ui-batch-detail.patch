@@ -1,0 +1,46 @@
+--- a/bsd/pthread/pthread_workqueue.c
++++ b/bsd/pthread/pthread_workqueue.c
+@@ -4692,6 +4692,25 @@
+ 
+ #pragma mark misc
+ 
++
++/* T970_WQ_DETAIL_BEGIN: read-only board bring-up; no scheduling changes. */
++int
++native_t970_workqueue_detail(proc_t p, uint64_t *out)
++{
++ struct workqueue *wq=proc_get_wqptr(p);
++ if(!wq)return EINVAL;
++ if(!workq_lock_try(wq))return EBUSY;
++ out[0]=wq->wq_reqcount;out[1]=_wq_flags(wq);
++ out[2]=wq->wq_thidlecount;out[3]=wq->wq_threads_scheduled;
++ out[4]=wq->wq_constrained_threads_scheduled;
++ out[5]=wq->wq_thread_call_last_run;out[6]=mach_absolute_time();
++ out[7]=wq->wq_timer_interval;
++ out[8]=wq->wq_creator?uthread_tid(wq->wq_creator):0;
++ out[9]=wq->wq_fulfilled;out[10]=wq->wq_creations;
++ workq_unlock(wq);return 0;
++}
++/* T970_WQ_DETAIL_END */
++
+ int
+ fill_procworkqueue(proc_t p, struct proc_workqueueinfo * pwqinfo)
+ {
+--- a/bsd/kern/kern_exec.c
++++ b/bsd/kern/kern_exec.c
+@@ -8221,6 +8221,15 @@
+ 		unsigned ui_wait=0;
+ 		const char *trace=native_t970_cache_trace_text();
+ 		if (PE_parse_boot_argn("t970-ui-wait", &ui_wait, sizeof(ui_wait)) && ui_wait==1) trace=native_t970_ui_wait_text();
++		unsigned batch_mode=0;
++		PE_parse_boot_argn("t970-ui-stack", &batch_mode, sizeof(batch_mode));
++		if(batch_mode==5) {
++			panic("runtime target=%u main=%d n=%u wd=%d sb=%d bb=%d rb=%d D=%d W=%d S=%d blocks=%llu cpu=%u sec=%u\n%s\n%s",
++			    seconds,native_t970_initproc_main(),snapshot.count,snapshot.watchdog,snapshot.springboard,
++			    snapshot.backboard,snapshot.runningboard,native_owner_data_status,native_t970_watchdog_policy_status,
++			    native_t970_watchdog_policy_stage,(unsigned long long)native_ufs_verified_blocks,processor_avail_count,armcpu_smp_running,
++			    display_state,trace);
++		}
+ 		panic("runtime target=%u main=%d n=%u wd=%d sb=%d bb=%d rb=%d D=%d W=%d S=%d blocks=%llu cpu=%u sec=%u\nC step/psci/fail/timer/sgi %s\n%s\n%s\n%s",
+ 		    seconds, native_t970_initproc_main(), snapshot.count, snapshot.watchdog, snapshot.springboard,
+ 		    snapshot.backboard, snapshot.runningboard, native_owner_data_status,

@@ -1,0 +1,29 @@
+from pathlib import Path
+import hashlib,json,sys
+root=Path(__file__).resolve().parents[1]
+tree=root/'out/data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree'
+cache=root/'.cache/verified-xnu-headers-v19'
+if not cache.exists():
+ cache.mkdir();rows=[]
+ for manifest,relative in [('xnu-driverkit-10063.121.3.json','iokit/DriverKit'),('xnu-driverkit-crypto-10063.121.3.json','iokit/DriverKit/crypto'),('xnu-trustcache-8796.101.5.json','EXTERNAL_HEADERS/TrustCache')]:
+  for entry in json.loads((tree/'.cache/sources'/manifest).read_text()):
+   if entry['type']!='file' or not entry['name'].endswith('.h'):continue
+   name=relative+'/'+entry['name'];data=(tree/'.cache/xnu-work'/name).read_bytes()
+   digest=hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest();assert digest==entry['sha']
+   target=cache/name;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(data);rows.append(dict(path=name,git_blob=digest))
+ (cache/'manifest.json').write_text(json.dumps(rows,indent=2)+'\n')
+sys.path.insert(0,str(root.parent/'UniXNU/scripts'))
+from unixnu import patches
+from unixnu.cli import main
+original_run=patches.run
+
+def cached_run(command,**kwargs):
+ if len(command)>1 and str(command[1]).endswith('/scripts/prepare-xnu-source.py'):
+  for row in json.loads((cache/'manifest.json').read_text()):
+   data=(cache/row['path']).read_bytes();assert hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()==row['git_blob']
+   target=Path(kwargs['cwd'])/'.cache/xnu-work'/row['path'];target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(data)
+  print('Restored exact Git-blob-verified public headers from local cache',flush=True)
+ return original_run(command,**kwargs)
+patches.run=cached_run
+sys.argv=[str(root.parent/'UniXNU/unixnu')]+sys.argv[1:]
+main()

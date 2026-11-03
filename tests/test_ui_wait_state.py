@@ -85,6 +85,7 @@ static int thread_block(void *continuation){assert(!continuation);++waitCount;re
 #undef snprintf
 static unsigned wqCalls;static int wqError;
 int fill_procworkqueue(proc_t p,struct proc_workqueueinfo *info){(void)p;assert(!taskHeld&&!schedHeld&&irq);++wqCalls;if(wqError)return wqError;*info=(struct proc_workqueueinfo){7,1,6,4};return 0;}
+int native_t970_workqueue_detail(proc_t p,uint64_t *out){(void)p;assert(!taskHeld&&!schedHeld&&irq);out[0]=2;out[6]=100;out[5]=40;return 0;}
 int main(void){
  struct state states[10];struct thread threads[10];memset(states,0,sizeof(states));memset(threads,0,sizeof(threads));
  for(unsigned i=0;i<10;++i){states[i].is64=1;states[i].pc=UINT64_MAX;states[i].lr=UINT64_MAX;states[i].regs[16]=UINT64_MAX;states[i].regs[1]=UINT64_MAX;states[i].regs[3]=UINT64_MAX;threads[i].state=1;threads[i].machine.upcb=&states[i];threads[i].next=i==9?NULL:&threads[i+1];}
@@ -123,7 +124,7 @@ int main(void){
  assert(!strstr(text,"M1 st=")&&!strstr(text,"M9 st=")&&!map_storage.refs);userStacks=1;
  captureStarted=captureDone=0;userStacks=5;wqCalls=0;
  text=native_t970_ui_wait_text();assert(wqCalls==3&&strstr(text,"UI batch end processes=3 clipped=0")&&strstr(text,"wq=0:7/1/6/4"));
- assert(strstr(text,"M8 st=")&&strstr(text,"S8 st=")&&strstr(text,"b8 st=")&&strstr(text,"stack=same:")&&!map_storage.refs);
+ assert(strstr(text,"M8 id=")&&strstr(text,"S8 id=")&&strstr(text,"b8 id=")&&strstr(text,"same=")&&!map_storage.refs);
  captureStarted=captureDone=0;wqError=16;text=native_t970_ui_wait_text();assert(strstr(text,"wq=16:0/0/0/0"));wqError=0;userStacks=1;
  captureStarted=captureDone=0;workerError=17;text=native_t970_ui_wait_text();assert(strstr(text,"worker start error=17"));workerError=0;
  captureStarted=captureDone=0;stalled=1;text=native_t970_ui_wait_text();assert(waitCount==20&&strstr(text,"partial rows hidden"));

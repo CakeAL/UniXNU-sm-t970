@@ -23,7 +23,7 @@ void proc_iterate(unsigned,int (*)(proc_t,void *),void *,int (*)(proc_t,void *),
 #define PROC_NOWAITTRANS (1U<<2)
 /* T970_UI_WAIT_BEGIN: umi3eb7257 lock/copy pattern and bounded FP walk (MIT).
  * Stack mode reads user VM only in an isolated worker. The reporter waits at
- * most20 scheduler deadlines and never consumes a partially published buffer. */
+ * most20 scheduler deadlines (40 in batch mode) and never consumes a partially published buffer. */
 #define T970_UI_WAIT_THREADS 8
 #define T970_UI_STACK_FRAMES 16
 struct native_t970_ui_wait_row {
@@ -37,6 +37,7 @@ static struct native_t970_ui_wait_buffer capture;
 struct proc_workqueueinfo { uint32_t pwq_nthreads,pwq_runthreads,pwq_blockedthreads,pwq_state; };
 _Static_assert(sizeof(struct proc_workqueueinfo)==16,"proc workqueue ABI");
 int fill_procworkqueue(proc_t,struct proc_workqueueinfo *);
+int native_t970_workqueue_detail(proc_t,uint64_t *);
 static unsigned readUserStacks,captureStarted,captureDone,capturePhase,capturePid;
 const char *native_t970_ui_wait_text(void);
 static int ui_user_address(uint64_t address,unsigned size) {
@@ -70,7 +71,8 @@ static int native_t970_ui_wait_collect(proc_t p,void *context)
   if(strncmp(name,"MobileGestalt",13) && strncmp(name,"mobilegestalt",13))return PROC_RETURNED;
  } else if(strcmp(name,"SpringBoard") && strcmp(name,"backboardd"))return PROC_RETURNED;
  struct proc_workqueueinfo wq={0};int wqStatus=-1;
- if(readUserStacks==5)wqStatus=fill_procworkqueue(p,&wq);
+ uint64_t detail[11]={0};int detailStatus=-1;
+ if(readUserStacks==5){wqStatus=fill_procworkqueue(p,&wq);detailStatus=native_t970_workqueue_detail(p,detail);}
  ++out->selected;
  __atomic_store_n(&capturePid,(unsigned)pid,__ATOMIC_RELAXED);
  __atomic_store_n(&capturePhase,2,__ATOMIC_RELAXED);
@@ -115,24 +117,36 @@ static int native_t970_ui_wait_collect(proc_t p,void *context)
   n=snprintf(out->text+out->used,left," wq=%d:%u/%u/%u/%x",wqStatus,wq.pwq_nthreads,wq.pwq_runthreads,wq.pwq_blockedthreads,wq.pwq_state);
   if(n>0)out->used+=(unsigned)n<left?(unsigned)n:left-1;
  }
+ if(readUserStacks==5 && out->used<sizeof(out->text)-1) {
+  left=sizeof(out->text)-out->used;
+  n=snprintf(out->text+out->used,left,"\nW rc=%d req=%llu f=%llx idle=%llu sched=%llu con=%llu creator=%llx age=%llx int=%llx made=%llu done=%llu",detailStatus,
+   (unsigned long long)detail[0],(unsigned long long)detail[1],(unsigned long long)detail[2],(unsigned long long)detail[3],(unsigned long long)detail[4],
+   (unsigned long long)detail[8],(unsigned long long)(detail[6]>=detail[5]?detail[6]-detail[5]:0),(unsigned long long)detail[7],(unsigned long long)detail[10],(unsigned long long)detail[9]);
+  if(n>0)out->used+=(unsigned)n<left?(unsigned)n:left-1;
+ }
  for(unsigned i=0;i<count && out->used<sizeof(out->text)-1;++i) {
   struct native_t970_ui_wait_row *r=&rows[i];left=sizeof(out->text)-out->used;
-  n=snprintf(out->text+out->used,left,"\n%c%u st=%x pc=%llx lr=%llx x16=%llx",name[0],r->index,r->kstate,
-   (unsigned long long)r->pc,(unsigned long long)r->lr,(unsigned long long)r->trap);
-  if(n>0)out->used+=(unsigned)n<left?(unsigned)n:left-1;
-  if(readUserStacks==5 && out->used<sizeof(out->text)-1) {
-   left=sizeof(out->text)-out->used;
-   n=snprintf(out->text+out->used,left," id=%llx wait=%llx pri=%d/%d",(unsigned long long)r->tid,(unsigned long long)r->wait,r->priority,r->base);
+  if(readUserStacks==5) {
+   n=snprintf(out->text+out->used,left,"\n%c%u id=%llx st=%x w=%llx p=%d/%d pc=%llx lr=%llx",name[0],r->index,(unsigned long long)r->tid,r->kstate,(unsigned long long)r->wait,r->priority,r->base,(unsigned long long)r->pc,(unsigned long long)r->lr);
    if(n>0)out->used+=(unsigned)n<left?(unsigned)n:left-1;
    unsigned same=i;
    for(unsigned k=0;k<i;++k)if(r->pc==rows[k].pc && r->lr==rows[k].lr && r->trap==rows[k].trap && r->frames_used==rows[k].frames_used && r->frame_error==rows[k].frame_error && !memcmp(r->frames,rows[k].frames,r->frames_used*sizeof(uint64_t))){same=k;break;}
+   left=sizeof(out->text)-out->used;
    if(same<i) {
-    left=sizeof(out->text)-out->used;
-    n=snprintf(out->text+out->used,left," stack=same:%c%u",name[0],rows[same].index);
+    n=snprintf(out->text+out->used,left," same=%c%u",name[0],rows[same].index);
     if(n>0)out->used+=(unsigned)n<left?(unsigned)n:left-1;
     continue;
    }
+   n=snprintf(out->text+out->used,left," n=%u/e%u\nF",r->frames_used,r->frame_error);
+   if(n>0)out->used+=(unsigned)n<left?(unsigned)n:left-1;
+   for(unsigned j=0;j<r->frames_used && out->used<sizeof(out->text)-1;++j) {
+    left=sizeof(out->text)-out->used;n=snprintf(out->text+out->used,left," %llx",(unsigned long long)r->frames[j]);
+    if(n>0)out->used+=(unsigned)n<left?(unsigned)n:left-1;
+   }
+   continue;
   }
+  n=snprintf(out->text+out->used,left,"\n%c%u st=%x pc=%llx lr=%llx x16=%llx",name[0],r->index,r->kstate,(unsigned long long)r->pc,(unsigned long long)r->lr,(unsigned long long)r->trap);
+  if(n>0)out->used+=(unsigned)n<left?(unsigned)n:left-1;
   if(ui_stack_selected(name,r->index) && out->used<sizeof(out->text)-1) {
    left=sizeof(out->text)-out->used;
    n=snprintf(out->text+out->used,left,"\n%c%u FP=%llx n=%u e=%u",name[0],r->index,(unsigned long long)r->fp,r->frames_used,r->frame_error);

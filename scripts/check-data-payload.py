@@ -46,6 +46,7 @@ def main():
     parser.add_argument('--ui-spawn-calls', action='store_true', help='Require optional bounded spawn-return path observer')
     parser.add_argument('--key-state', action='store_true', help='Require pinned RAM-only KeyStore state service and board registration')
     parser.add_argument('--ui-wait', action='store_true', help='Require bounded saved-register UI diagnostics')
+    parser.add_argument('--workqueue-detail',action='store_true',help='Require linked read-only detailed workqueue snapshot')
     parser.add_argument('--ui-stack-mode',type=int,choices=(1,2,3,4,5),default=1)
     parser.add_argument('--ui-stack', action='store_true', help='Require opt-in isolated UI stack worker')
     args = parser.parse_args()
@@ -140,6 +141,9 @@ def main():
         require(args.ui_wait, 'UI stack requires UI wait diagnostic')
         expected_args += [f't970-ui-stack={args.ui_stack_mode}']
         require(b'UI stack worker busy' in kernel.read_bytes(), 'Missing isolated stack worker')
+    if args.workqueue_detail:
+        require(args.ui_stack and args.ui_stack_mode==5, 'Workqueue detail requires batch mode5')
+        require('_native_t970_workqueue_detail' in names and b'W rc=' in kernel.read_bytes(), 'Missing detailed workqueue snapshot')
     require(sorted(entry['args'].split()) == sorted(expected_args), 'Unexpected effective boot arguments')
     require(config['boot']['default'] == 'xnu' and entry['initrd'] == 'Payloads/scratch-data.img',
             'Wrong default entry/Data initrd')

@@ -27,3 +27,14 @@ VM读取超时不取消worker，完成前隐藏全部部分数据。单次总量
 不修改MobileGestalt/蓝牙/诊断数据返回值，不将未知provider或回调当作已实现。
 
 最终BOOT SHA256：`10dbedd8b39204d25780458e49d922370d75fdcf7a7fe66be8594398e7a8c84d`。mode5/90秒已独立核对；上传结果见upload.json。
+
+## 实机01:27:03
+
+main1/n109/cpu8，MG95线程8/visited8，wq rc0,total7/run0/blocked6/limitflags0；
+BB57 wq2/0/1，SB27 wq2/0/0，三者均rc0。显示open2/swap0。
+屏幕只显示到SB首线程，未见UI batch end，不能确认报告尾部/文本clipped值。
+MG第二线程pri63等待semaphore，多个其他线程pri31等待相同全局锁调用。
+原版SEMAPHORE_EVENT使用公共等待事件，因此MG/BB相同wait值不证明等待同一个信号量。
+工作队列run0/blocked6本身不证明有待派发任务或线程创建回调失败。
+下一版同屏增加reqcount/flags/idle/scheduled/creator/last-call-age和timer-interval，
+压缩F行并移除批量报告无关进程名单/逐核长行，让SB尾部与结束标记可见。
