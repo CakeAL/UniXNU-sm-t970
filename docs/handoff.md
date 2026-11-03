@@ -3,6 +3,14 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
+## 最新：BB同步XPC调用方深栈版（2026-11-04）
+
+BOOTdbb7921a照片00:58:17：BB第二线程8级FP链/e0，落在NSXPC同步回复等待；
+第8级仅到_sendSelector:withProxy:arg1:arg2:，尚未到调用方。第三线程start_wqthread，显示open2/swap0。
+slide0xe784000以已知原版mach_msg2 PC交叉确认，见v14的symbols-slide-verified.json。
+BOOT93bd51e8将模式2扩为16级，模式1仍8级；主机检查通过，实机深栈结果待回报。
+准备/上传回执见ui-stack-deep-v15。优先找第9级之后调用方，不能据XPC等待直接套用umi禁用列表。
+
 ## 最新：BB其余线程采样版（2026-11-04）
 
 BOOTdbb7921a，t970-ui-stack=2，八核/768MiB请求/120秒；选择BB队列第2-4线程，

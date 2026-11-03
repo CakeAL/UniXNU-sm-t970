@@ -1,0 +1,15 @@
+{
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/data-bringup/ui-stack-deep-memory768-v1/boot-partition.img"
+  ],
+  "boot_sha256": "93bd51e8388c88000848e4818b4df380aefe9c8b8510580f3b87499382f7d6f8",
+  "exit_code": 0,
+  "reboot_requested": true,
+  "readback_verified": false,
+  "hardware_result_pending": true,
+  "authorization": "Owner ongoing instruction to continue device diagnosis",
+  "completed_utc": "2026-11-03T17:00:33.483121+00:00"
+}

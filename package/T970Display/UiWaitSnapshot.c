@@ -25,7 +25,7 @@ void proc_iterate(unsigned,int (*)(proc_t,void *),void *,int (*)(proc_t,void *),
  * Stack mode reads user VM only in an isolated worker. The reporter waits at
  * most20 scheduler deadlines and never consumes a partially published buffer. */
 #define T970_UI_WAIT_THREADS 4
-#define T970_UI_STACK_FRAMES 8
+#define T970_UI_STACK_FRAMES 16
 struct native_t970_ui_wait_row {
  uint64_t pc,lr,fp,trap,arg1,arg3,frames[T970_UI_STACK_FRAMES];
  unsigned index,kstate,frames_used,frame_error;
@@ -43,7 +43,7 @@ static int ui_stack_selected(const char *name,unsigned index) {
 static void ui_stack_read(struct native_t970_ui_wait_row *row,vm_map_t map) {
  uint64_t fp=row->fp;
  if(!map){row->frame_error=4;return;}
- for(unsigned i=0;i<T970_UI_STACK_FRAMES && fp;++i) {
+ for(unsigned i=0;i<(readUserStacks==2?T970_UI_STACK_FRAMES:8) && fp;++i) {
   uint64_t pair[2]={0};
   if(!ui_user_address(fp,sizeof(pair)) || (fp&15)){row->frame_error=2;break;}
   if(vm_map_read_user(map,fp,pair,sizeof(pair))!=KERN_SUCCESS){row->frame_error=1;break;}

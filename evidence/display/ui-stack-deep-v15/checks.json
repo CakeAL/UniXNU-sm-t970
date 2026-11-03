@@ -1,0 +1,12 @@
+{
+  "boot_sha256": "93bd51e8388c88000848e4818b4df380aefe9c8b8510580f3b87499382f7d6f8",
+  "actual_helper_asan_ubsan": true,
+  "sixteen_frame_cap": true,
+  "current_mach_private_compile": true,
+  "kernel_link_prelink": true,
+  "independent_pack_check": true,
+  "final_fat_roundtrip": true,
+  "record_schema_check": true,
+  "platform_check": "refused: framework differs from reviewed revision",
+  "device_result_pending": true
+}

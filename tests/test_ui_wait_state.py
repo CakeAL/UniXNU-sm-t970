@@ -24,7 +24,7 @@ typedef int boolean_t;
 typedef struct state { uint64_t pc,lr,fp,regs[17]; int is64; } arm_saved_state_t;
 typedef struct thread { struct thread *next; int sched_lock; unsigned state; struct {arm_saved_state_t *upcb;} machine; } *thread_t;
 typedef struct test_map {unsigned refs,reads;int fail;} *vm_map_t;
-static struct test_map map_storage;static uint64_t fake_frames[8][2];
+static struct test_map map_storage;static uint64_t fake_frames[20][2];
 typedef struct task { thread_t threads; unsigned thread_count; int busy; unsigned task_shared_region_slide; vm_map_t map; } *task_t;
 typedef struct proc { int pid; char name[17]; task_t task; } *proc_t;
 static int irq=1,entry_irq=1,taskHeld,schedHeld,thread_lck_grp;
@@ -69,7 +69,7 @@ static void vm_map_reference(vm_map_t map){assert(taskHeld);++map->refs;}
 static void vm_map_deallocate(vm_map_t map){assert(!taskHeld&&!schedHeld&&map->refs);--map->refs;}
 static int vm_map_read_user(vm_map_t map,uint64_t address,void *out,unsigned size){
  assert(!taskHeld&&!schedHeld&&irq&&map->refs&&size==16);++map->reads;
- if(map->fail)return 1;assert(address>=0x10000&&address<0x10080&&!(address&15));memcpy(out,fake_frames[(address-0x10000)/16],16);return 0;
+ if(map->fail)return 1;assert(address>=0x10000&&address<0x10140&&!(address&15));memcpy(out,fake_frames[(address-0x10000)/16],16);return 0;
 }
 static int kernel_thread_start(void (*fn)(void*,int),void *arg,thread_t *thread){++workerStarts;if(workerError)return workerError;*thread=(thread_t)1;if(!stalled)fn(arg,0);return 0;}
 static void thread_deallocate(thread_t thread){assert(thread==(thread_t)1);++workerDrops;}
@@ -108,6 +108,9 @@ int main(void){
  captureStarted=captureDone=0;userStacks=2;states[1].fp=states[2].fp=0x10000;fake_frames[0][0]=0x10010;
  text=native_t970_ui_wait_text();assert(strstr(text,"stacks=2")&&strstr(text,"b2 FP=")&&strstr(text,"b3 FP="));
  assert(!strstr(text,"b1 FP=")&&!strstr(text,"S1 FP=")&&!map_storage.refs);userStacks=1;
+ captureStarted=captureDone=0;userStacks=2;
+ for(unsigned i=0;i<20;++i){fake_frames[i][0]=0x10000+16*(i+1);fake_frames[i][1]=0x180001000+4*i;}
+ text=native_t970_ui_wait_text();assert(strstr(text,"n=16 e=0")&&!map_storage.refs);userStacks=1;
  captureStarted=captureDone=0;workerError=17;text=native_t970_ui_wait_text();assert(strstr(text,"worker start error=17"));workerError=0;
  captureStarted=captureDone=0;stalled=1;text=native_t970_ui_wait_text();assert(waitCount==20&&strstr(text,"partial rows hidden"));
  return 0;

@@ -1,0 +1,19 @@
+{
+  "boot_sha256": "dbb7921a359415ac646c7b70e109c1e9d19b3b10f0d462e813fadfd53f1301ae",
+  "photo": "screen-target120.jpg",
+  "photo_sha256": "a779445260639de2797622bed8defb50d3624654cd36b82a9d64efc7bd06f349",
+  "association": "Owner photo after upload, stacks2; no device hash readback",
+  "main": 1,
+  "processes": 148,
+  "cpus": 8,
+  "client_open": 2,
+  "swap": 0,
+  "cache_slide": "0xe784000",
+  "slide_crosscheck": "PC mach_msg2_trap+8 minus known unslid PC = 0xe784000",
+  "b2_frames": 8,
+  "b2_error": 0,
+  "b3_frames": 1,
+  "b3_error": 0,
+  "conclusion": "BB second queued thread waits on synchronous NSXPC reply; caller and peer not yet resolved",
+  "desktop_verified": false
+}

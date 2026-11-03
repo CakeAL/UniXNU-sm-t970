@@ -31,3 +31,12 @@ block入口0x1900045d8，完成通知在0x190004980。原二进制只读审阅�
 最终BOOT SHA256：`dbb7921a359415ac646c7b70e109c1e9d19b3b10f0d462e813fadfd53f1301ae`。
 
 BOOT上传成功exit0并请求重启；无设备读回摘要，BB其他线程栈与桌面结果待机主照片。
+
+## 实机回报00:58:17
+
+main1/n148/cpu8，stacks2，BB第二线程n8/e0，第三线程n1/e0。
+正确slide0xe784000以mach_msg2_trap已知原版地址交叉核对；初次照片漏读高位e，
+错误0x784000结果已拒绝并仅保留在ignored审阅目录。symbols-slide-verified.json为正确分析。
+第二线程：mach_msg → dispatch_mach_send_and_wait_for_reply → xpc_connection_send_message_with_reply_sync
+→ NSXPCConnection同步发送 → _sendSelector:withProxy:arg1:arg2:。
+第三线程：start_wqthread。显示open2/swap0。下一步扩展第二线程FP链，确认XPC调用方与服务。

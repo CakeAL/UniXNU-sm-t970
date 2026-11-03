@@ -1,0 +1,94 @@
+{
+  "cache_slide": "0xe784000",
+  "cache_uuid": "590d839a82d230f1a17d0cc053420f73",
+  "local_symbols_uuid_matches": true,
+  "live_sample": true,
+  "frames": [
+    {
+      "address": "0x1d9f081b0",
+      "unslid_va": "0x1cb7841b0",
+      "image": "/usr/lib/system/libsystem_kernel.dylib",
+      "offset": 492,
+      "nearest_symbol": "_mach_msg_overwrite",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "fd7b51a9f44f50a9"
+    },
+    {
+      "address": "0x1d9f07fb8",
+      "unslid_va": "0x1cb783fb8",
+      "image": "/usr/lib/system/libsystem_kernel.dylib",
+      "offset": 20,
+      "nearest_symbol": "_mach_msg",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "fd7b41a9ff830091"
+    },
+    {
+      "address": "0x19dd0d538",
+      "unslid_va": "0x18f589538",
+      "image": "/usr/lib/system/libdispatch.dylib",
+      "nearest_local_symbol": "__dispatch_mach_send_and_wait_for_reply",
+      "offset": 524,
+      "nearest_symbol": "__dispatch_mach_send_and_wait_for_reply",
+      "symbol_table": "local",
+      "original_instruction_bytes": "f70300aa1f00136b"
+    },
+    {
+      "address": "0x19dd0d8d4",
+      "unslid_va": "0x18f5898d4",
+      "image": "/usr/lib/system/libdispatch.dylib",
+      "nearest_local_symbol": "_dispatch_mach_send_with_result_and_wait_for_reply$VARIANT$armv81",
+      "offset": 56,
+      "nearest_symbol": "_dispatch_mach_send_with_result_and_wait_for_reply$VARIANT$armv81",
+      "symbol_table": "local",
+      "original_instruction_bytes": "e83f403988010034"
+    },
+    {
+      "address": "0x1ebdf7df0",
+      "unslid_va": "0x1dd673df0",
+      "image": "/usr/lib/system/libxpc.dylib",
+      "offset": 256,
+      "nearest_symbol": "_xpc_connection_send_message_with_reply_sync",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "f60300aae00740f9"
+    },
+    {
+      "address": "0x195604d10",
+      "unslid_va": "0x186e80d10",
+      "image": "/System/Library/Frameworks/Foundation.framework/Foundation",
+      "nearest_local_symbol": "___NSXPCCONNECTION_IS_WAITING_FOR_A_SYNCHRONOUS_REPLY__",
+      "offset": 12,
+      "nearest_symbol": "___NSXPCCONNECTION_IS_WAITING_FOR_A_SYNCHRONOUS_REPLY__",
+      "symbol_table": "local",
+      "original_instruction_bytes": "fd7bc1a8c0035fd6"
+    },
+    {
+      "address": "0x195601528",
+      "unslid_va": "0x186e7d528",
+      "image": "/System/Library/Frameworks/Foundation.framework/Foundation",
+      "nearest_local_symbol": "-[NSXPCConnection _sendInvocation:orArguments:count:methodSignature:selector:withProxy:]",
+      "offset": 2024,
+      "nearest_symbol": "-[NSXPCConnection _sendInvocation:orArguments:count:methodSignature:selector:withProxy:]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "0a000014a8023037"
+    },
+    {
+      "address": "0x195670bc4",
+      "unslid_va": "0x186eecbc4",
+      "image": "/System/Library/Frameworks/Foundation.framework/Foundation",
+      "nearest_local_symbol": "-[NSXPCConnection _sendSelector:withProxy:arg1:arg2:]",
+      "offset": 124,
+      "nearest_symbol": "-[NSXPCConnection _sendSelector:withProxy:arg1:arg2:]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "e80f40f9098a34b0"
+    },
+    {
+      "address": "0x1ebda3ccc",
+      "unslid_va": "0x1dd61fccc",
+      "image": "/usr/lib/system/libsystem_pthread.dylib",
+      "nearest_symbol": "_start_wqthread",
+      "symbol_table": "exported",
+      "offset": 8,
+      "original_instruction_bytes": "200020d4ff7fbfa9"
+    }
+  ]
+}
