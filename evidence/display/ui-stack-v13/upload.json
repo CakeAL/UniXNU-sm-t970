@@ -1,0 +1,15 @@
+{
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/data-bringup/ui-stack-memory768-v1/boot-partition.img"
+  ],
+  "boot_sha256": "a708fadf1c93f6681cb654959ca48f45ee9280b4373547529ca1540dd07d9ee9",
+  "exit_code": 0,
+  "reboot_requested": true,
+  "readback_verified": false,
+  "hardware_result_pending": true,
+  "authorization": "Owner requested continue after prepared-image report",
+  "completed_utc": "2026-11-03T16:44:19.177264+00:00"
+}

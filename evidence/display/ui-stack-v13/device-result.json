@@ -1,0 +1,41 @@
+{
+  "boot_sha256": "a708fadf1c93f6681cb654959ca48f45ee9280b4373547529ca1540dd07d9ee9",
+  "photo": "screen-target120.jpg",
+  "photo_sha256": "a084100827cab9a9cbb4067232113a147afa9b5bec7643451e8dd0076ac4f18d",
+  "association": "Owner photo after BOOT upload, stacks=1 matches diagnostic; no device hash readback",
+  "main": 1,
+  "processes": 147,
+  "cpus": 8,
+  "secondaries": 7,
+  "client_open": 2,
+  "client_fail": 0,
+  "swap": 0,
+  "copies": 0,
+  "retire": 0,
+  "cache_slide": "0xf55c000",
+  "backboard_frames": [
+    "0x19eae3624",
+    "0x19f55fe94",
+    "0x19f558b0c",
+    "0x1d6e49cfc",
+    "0x100c7c7a4",
+    "0x100c7d4d4",
+    "0x100c7c77c",
+    "0x100c7cdf4"
+  ],
+  "springboard_frames": [
+    "0x1dace01b0",
+    "0x1dacdffb8",
+    "0x19ebb8cac",
+    "0x19ebb8b98",
+    "0x19ebb8884",
+    "0x19ebeebb8",
+    "0x19ebedef4",
+    "0x1b6625e58"
+  ],
+  "backboard_state": "0x41",
+  "springboard_state": "0x1",
+  "frame_errors": 0,
+  "frame_limit_reached": true,
+  "desktop_verified": false
+}

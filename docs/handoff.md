@@ -9,7 +9,7 @@
 每个目标队列首线程最多8级FP链，报告方最多20个100ms调度期限；超时隐藏未完成数据。
 实时线程的栈不保证一致，VM读取超时不取消worker。默认不开启用户栈读取。
 准备、校验与使用边界见[evidence/display/ui-stack-v13](../evidence/display/ui-stack-v13/README.md)。
-未刷写，新镜像实机结果待验证。
+BOOTa708fadf已上传；机主照片确认BB/SB各8级FP链e0。BB在IOHIDSessionOpen等待dispatch_async初始化完成，SB在BKSDisplayGetMainScreenInfo消息调用中等待；显示open2/swap0。见v13的device-result/symbols。下一轮采BB其余线程，尚不能归因于缺少触控。
 
 ## 最新：保存寄存器已取得，继续采调用栈
 
