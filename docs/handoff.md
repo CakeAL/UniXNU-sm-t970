@@ -3,6 +3,13 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
+## 最新：BB其余线程采样版（2026-11-04）
+
+BOOTdbb7921a，t970-ui-stack=2，八核/768MiB请求/120秒；选择BB队列第2-4线程，
+保留v13的首线程模式1。实际ASan/UBSan测试、Mach-private编译、内核链接/预链接、
+独立打包及FAT往返均通过；BOOT上传exit0并请求重启，实机结果待回报。准备/上传回执见ui-stack-other-v14。
+重点读取b2/b3 FP链；不能由HID函数名断言触控驱动缺席或复制他板禁用列表。
+
 ## 最新：隔离worker有限FP链检查版（2026-11-04）
 
 接续d80a3773的main1/n148、显示open2/swap0。已完成t970-ui-stack=1隔离worker诊断，

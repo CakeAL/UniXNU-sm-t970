@@ -105,6 +105,9 @@ int main(void){
  captureStarted=captureDone=0;map_storage.fail=1;text=native_t970_ui_wait_text();assert(strstr(text,"n=0 e=1"));map_storage.fail=0;
  captureStarted=captureDone=0;states[0].fp=0x10003;text=native_t970_ui_wait_text();assert(strstr(text,"n=0 e=2"));
  captureStarted=captureDone=0;states[0].fp=0x10000;fake_frames[0][0]=0x10000;text=native_t970_ui_wait_text();assert(strstr(text,"n=1 e=3"));
+ captureStarted=captureDone=0;userStacks=2;states[1].fp=states[2].fp=0x10000;fake_frames[0][0]=0x10010;
+ text=native_t970_ui_wait_text();assert(strstr(text,"stacks=2")&&strstr(text,"b2 FP=")&&strstr(text,"b3 FP="));
+ assert(!strstr(text,"b1 FP=")&&!strstr(text,"S1 FP=")&&!map_storage.refs);userStacks=1;
  captureStarted=captureDone=0;workerError=17;text=native_t970_ui_wait_text();assert(strstr(text,"worker start error=17"));workerError=0;
  captureStarted=captureDone=0;stalled=1;text=native_t970_ui_wait_text();assert(waitCount==20&&strstr(text,"partial rows hidden"));
  return 0;

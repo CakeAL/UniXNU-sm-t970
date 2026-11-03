@@ -1,0 +1,12 @@
+{
+  "boot_sha256": "dbb7921a359415ac646c7b70e109c1e9d19b3b10f0d462e813fadfd53f1301ae",
+  "actual_helper_asan_ubsan": true,
+  "current_mach_private_compile": true,
+  "kernel_link_prelink": true,
+  "independent_pack_check": true,
+  "final_fat_roundtrip": true,
+  "record_schema_check": true,
+  "platform_check": "refused: framework differs from reviewed revision",
+  "upload_exit_code": 0,
+  "device_result_pending": true
+}

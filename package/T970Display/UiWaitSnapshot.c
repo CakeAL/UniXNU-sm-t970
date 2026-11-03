@@ -37,6 +37,9 @@ const char *native_t970_ui_wait_text(void);
 static int ui_user_address(uint64_t address,unsigned size) {
  return address>=4096 && address<(UINT64_C(1)<<39) && size<=(UINT64_C(1)<<39)-address;
 }
+static int ui_stack_selected(const char *name,unsigned index) {
+ return readUserStacks==1 ? index==1 : readUserStacks==2 && name[0]=='b' && index>1;
+}
 static void ui_stack_read(struct native_t970_ui_wait_row *row,vm_map_t map) {
  uint64_t fp=row->fp;
  if(!map){row->frame_error=4;return;}
@@ -83,9 +86,9 @@ static int native_t970_ui_wait_collect(proc_t p,void *context)
   }
   task_unlock(task);
  }
- if(readUserStacks && count && rows[0].index==1) {
+ for(unsigned i=0;i<count;++i)if(ui_stack_selected(name,rows[i].index)) {
   __atomic_store_n(&capturePhase,3,__ATOMIC_RELAXED);
-  ui_stack_read(&rows[0],map);
+  ui_stack_read(&rows[i],map);
  }
  if(map)vm_map_deallocate(map);
  __atomic_store_n(&capturePhase,4,__ATOMIC_RELAXED);
@@ -98,9 +101,9 @@ static int native_t970_ui_wait_collect(proc_t p,void *context)
   n=snprintf(out->text+out->used,left,"\n%c%u st=%x pc=%llx lr=%llx x16=%llx",name[0],r->index,r->kstate,
    (unsigned long long)r->pc,(unsigned long long)r->lr,(unsigned long long)r->trap);
   if(n>0)out->used+=(unsigned)n<left?(unsigned)n:left-1;
-  if(readUserStacks && r->index==1 && out->used<sizeof(out->text)-1) {
+  if(ui_stack_selected(name,r->index) && out->used<sizeof(out->text)-1) {
    left=sizeof(out->text)-out->used;
-   n=snprintf(out->text+out->used,left,"\n%c FP=%llx n=%u e=%u",name[0],(unsigned long long)r->fp,r->frames_used,r->frame_error);
+   n=snprintf(out->text+out->used,left,"\n%c%u FP=%llx n=%u e=%u",name[0],r->index,(unsigned long long)r->fp,r->frames_used,r->frame_error);
    if(n>0)out->used+=(unsigned)n<left?(unsigned)n:left-1;
    for(unsigned j=0;j<r->frames_used && out->used<sizeof(out->text)-1;++j) {
     left=sizeof(out->text)-out->used;n=snprintf(out->text+out->used,left," %llx",(unsigned long long)r->frames[j]);
@@ -124,11 +127,11 @@ static void ui_stack_worker(void *parameter,wait_result_t result) {
 const char *native_t970_ui_wait_text(void)
 {
  unsigned enabled=0;
- unsigned stackMode=PE_parse_boot_argn("t970-ui-stack",&enabled,sizeof(enabled)) && enabled==1;
+ unsigned stackMode=PE_parse_boot_argn("t970-ui-stack",&enabled,sizeof(enabled)) && (enabled==1 || enabled==2);
  if(!stackMode){readUserStacks=0;ui_collect();return capture.text;}
  static char pending[128];
  if(!__atomic_exchange_n(&captureStarted,1,__ATOMIC_ACQ_REL)) {
-  readUserStacks=1;
+  readUserStacks=enabled;
   __atomic_store_n(&captureDone,0,__ATOMIC_RELAXED);
   thread_t worker=THREAD_NULL;
   kern_return_t error=kernel_thread_start(ui_stack_worker,NULL,&worker);
