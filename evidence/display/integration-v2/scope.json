@@ -1,0 +1,14 @@
+{
+  "display_backend_compiled": true,
+  "display_archive_linked": true,
+  "source_kernel_sha256": "0adf72f34da37d5ffb52e8d74c927db79f70ebd29dadafbfc29b1257cdd16c22",
+  "runtime_result_pending": true,
+  "cpu_present_enabled": false,
+  "terminal_report_seconds": 60,
+  "limitations": [
+    "Runtime report lacks dedicated display publication counters; main/services alone do not prove display publication.",
+    "CPU presentation, unsupported backend leaves and service-start failure paths require hardware qualification."
+  ],
+  "experimental_config": "existing ignored sm-t970_data/.config only; board defaults not changed",
+  "previous_kernel_and_config_preserved": "out/data-bringup/pre-display-v1"
+}

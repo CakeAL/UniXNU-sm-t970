@@ -3,6 +3,14 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
+## 最新：八核显示接入BOOT5e318d75准备并上传（2026-11-03）
+
+显示归档链接/预链接成功，源内核0adf72f3/payload1f9ea7ae，BOOT5e318d75。
+显式加载图形家族与Legacy GOP/PM，目标60秒；CPU呈现尚未启用。
+独立打包检查通过。设备结果待回报，普通main/services不等于显示已发布。
+见evidence/display/integration-v2上传回执；默认board/config保持，实验work/.config启用显示。
+后续构建仍须保留fixed ArmCpu local-module与已审计显示归档；旧内核/config在pre-display-v1。
+
 ## 最新：T970显示注册代码已编译，归档链接待接入（2026-11-03）
 
 package/T970Display新增显式启用的注册/映射/观测回调，严格检查本机GOP几何。

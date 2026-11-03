@@ -49,3 +49,19 @@ scripts/build-display-registration.py用当前XNU配方编译并检查真实符�
 IOMobileFramebufferLegacy原版类方法和内核符号仍需最终绑定/链接核对，尚未生成归档或BOOT。
 实际几何helper已通过2个有效断言和17个错误输入拒绝断言。失败清理代码尚未做API注入测试，
 服务注册/映射/帧完成尚无实机结果。证据见evidence/display/registration-v1。
+
+## 首次内核集成与检查镜像
+
+link-display-archive.py生成经对象摘要绑定的late归档，移除GOP静态构造表、显式导出构造入口，
+绑定原版Legacy方法与9个native_legacy别名。首次链接发现板级重复定义early_retires/failures，
+删除板级定义后，内核链接与预链接成功：源0adf72f3，payload1f9ea7ae。
+
+仅在忽略的sm-t970_data/.config启用LEGACY_DISPLAY，默认配置不动；之前内核/配置保存于
+out/data-bringup/pre-display-v1。完整BOOT5e318d75为8核、目标60秒、显式显示加载/GOP/PM检查。
+独立打包检查通过，原始信任/Data种子/FD/DTB保留。CPU-present/transfer未启用。
+此轮runtime报告尚无专用显示发布计数，所以普通main1不单独证明显示注册成功。
+下一步读取实际错误并加入显示状态采样，然后验证CPU帧传输和swap完成。
+准备/上传与实机结果见evidence/display/integration-v2。
+
+17:09:08实机：main1/n69/cpu8/sec7、SpringBoard27/runningboardd26、IOMFB_bics_daemon86；
+未观察到backboardd。无专用显示计数，尚不能确认发布或呈现，下一版增加状态采样。

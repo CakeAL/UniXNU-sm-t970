@@ -1,0 +1,17 @@
+{
+  "boot_sha256": "5e318d75251956403a05cc727425589288ef5efb6d069c35b2f5423851963541",
+  "photo": "screen-170908.jpg",
+  "main": 1,
+  "processes": 69,
+  "springboard": 27,
+  "backboardd": 0,
+  "runningboardd": 26,
+  "cpus": 8,
+  "secondary": 7,
+  "blocks": 808812,
+  "free_pages_hex": "87",
+  "managed_pages_hex": "1b5cd",
+  "iomfb_bics_daemon_pid": 86,
+  "display_publication_confirmed": false,
+  "interpretation": "Graphics-related daemon observed, not proof of service publication or rendered output. No dedicated display state counters in this image; add them next."
+}

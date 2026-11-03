@@ -12,7 +12,7 @@
 #include <pexpert/pexpert.h>
 #include "T970GopGeometry.h"
 
-extern "C" { volatile uint64_t native_legacy_early_retires=0, native_legacy_early_failures=0; }
+
 
 extern "C" kmod_info_t g_kernel_kmod_info;
 extern "C" void displayStaticInit(void) __asm__("__GLOBAL__sub_I_NativeLegacyDisplay.cpp");

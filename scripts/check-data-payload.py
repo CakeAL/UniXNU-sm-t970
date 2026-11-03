@@ -40,6 +40,7 @@ def main():
                         help='Require the explicit reset translation-state publication argument')
     parser.add_argument('--ipi-check', action='store_true', help='Require the explicit bounded CPU1 SGI delivery check')
     parser.add_argument('--cache-trace', action='store_true', help='Require compact runtime PID1 cache trace')
+    parser.add_argument('--display-probe', action='store_true', help='Require explicit T970 GOP service probe arguments and linked callbacks')
     args = parser.parse_args()
     require(args.runtime_report_seconds == 0 or 5 <= args.runtime_report_seconds <= 300,
             'Runtime sampler interval must be 5..300 seconds')
@@ -97,6 +98,9 @@ def main():
     if args.cache_trace:
         expected_args += ['t970-runtime-cache-trace=1']
         require('_native_t970_cache_trace_text' in names and b't970-runtime-cache-trace\0' in kernel.read_bytes(), 'Kernel lacks compact cache trace')
+    if args.display_probe:
+        expected_args += ['t970-display-start=1','offline-mobile-graphics-load=1','offline-legacy-register=1','offline-legacy-gop=1','offline-legacy-phase=4','offline-legacy-pm=1']
+        require(all(n in names for n in ['_native_legacy_display_probe','_native_legacy_display_late_probe','_native_legacy_gop_mapping_observed']), 'Missing display callbacks')
     require(sorted(entry['args'].split()) == sorted(expected_args), 'Unexpected effective boot arguments')
     require(config['boot']['default'] == 'xnu' and entry['initrd'] == 'Payloads/scratch-data.img',
             'Wrong default entry/Data initrd')
