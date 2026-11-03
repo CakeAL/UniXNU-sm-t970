@@ -914,6 +914,10 @@ id = "display"
 status = "planned"
 components = []
 paths = [
+  "package/T970Display/**",
+  "scripts/build-display-registration.py",
+  "tests/test_gop_geometry.py",
+  "evidence/display/registration-v1/**",
   "scripts/check-display-abi.py",
   "docs/display-bringup.md",
   "evidence/display/abi21h461/**",
@@ -938,6 +942,7 @@ procedure = [
   "Collect DRM modes, panel type and brightness limits; read only display-selection tokens from /proc/cmdline and match the selected S6TUUM3 node in the live DT.",
 ]
 findings = [
+  "T970 display registration/mapping/observation callbacks implemented behind explicit t970-display-start=1. Current XNU compile and actual GOP board callback-symbol checks pass; nine native_legacy original-family aliases plus original class/kernel bindings still require final linking. Geometry helper passes17 rejected and2 accepted assertions. No archive/BOOT or device publication/rendering result; failure cleanup not API-injection tested. See evidence/display/registration-v1.",
   "GopFramebuffer cf3b429 NativeLegacyDisplay compiled with current T970 XNU recipe and Wall/Wextra/Werror. Actual Mach-O relocation audit confirms358 virtual entries and24 expected owned methods/abstract leaves. Original/candidate ABI audit checks native-symbol rebound slots, nine abstract leaves, seven IOSurface getters and unchanged graphics text. Object only: registration callbacks, linked archive, runtime mapping/publication/presentation remain pending. See evidence/display/abi21h461.",
   "BOOT3da265b4 target60 owner photo confirms main1/n67/cpu8/sec7, SpringBoard27/runningboardd26, Data0/policy0/stage4 and all-core positive timer/SGI snapshots. Backboardd not observed; free0x183 excludes reclaimable memory, not sole OOM proof. Sustained runtime, controlled CPU workload and desktop remain unverified. See runtime-cache60/device-result.json.",
   "BOOTeeeba83b owner photo19:36:40 shows requested120-second runtime report: genuine main1,109 processes, watchdogd absent, SpringBoard27/backboardd56/runningboardd26, Data0/policy0/stage4,964876 verified blocks. Kernel deadline-wait/report executed; rate accuracy unmeasured. Interface-service process presence is not proof of rendering or functional services. Display backend remains disabled; next phase is display handoff/provider and independent staged SMP qualification.",

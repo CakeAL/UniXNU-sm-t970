@@ -36,3 +36,16 @@ cf3b429的NativeLegacyDisplay.cpp已使用当前T970 XNU的IOPlatformExpert编�
 生成头、命令、来源摘要、对象摘要见evidence/display/abi21h461。
 对象位于忽略输出out/data-bringup/display-object-cf3b429，尚未链接、未接注册回调、未刷入。
 此结果只确认编译及静态虚表形状；运行时ABI调用、GOP映射与呈现待验证。
+
+## T970注册回调
+
+package/T970Display/DisplayRegistration.cpp基于固定T733注册流程，删除其DPU/密钥服务调用，
+改为明确的t970-display-start=1启用；仅接受观测的0x9c000000、2800×1752、stride11200、
+32bpp、rotation0。映射需具有有效VA、完全匹配PA及长度。继承原GOP CPU复制和完成逻辑，
+板级回调负责登记观测与首帧交还控制台；未知后端接口仍会停止诊断。
+
+scripts/build-display-registration.py用当前XNU配方编译并检查真实符号；固定已审计的GOP对象摘要，
+板级native_legacy回调全部匹配，只留下9个需原版绑定的同前缀函数别名。
+IOMobileFramebufferLegacy原版类方法和内核符号仍需最终绑定/链接核对，尚未生成归档或BOOT。
+实际几何helper已通过2个有效断言和17个错误输入拒绝断言。失败清理代码尚未做API注入测试，
+服务注册/映射/帧完成尚无实机结果。证据见evidence/display/registration-v1。

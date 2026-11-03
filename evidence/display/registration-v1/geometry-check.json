@@ -1,0 +1,8 @@
+{
+  "command": "python3.14 -m unittest discover -s tests -p test_gop_geometry.py -v",
+  "exit_code": 0,
+  "actual_header_executed": true,
+  "negative_cases": 17,
+  "positive_cases": 2,
+  "hardware_verified": false
+}

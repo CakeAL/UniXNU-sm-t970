@@ -3,6 +3,13 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
+## 最新：T970显示注册代码已编译，归档链接待接入（2026-11-03）
+
+package/T970Display新增显式启用的注册/映射/观测回调，严格检查本机GOP几何。
+scripts/build-display-registration.py用当前XNU配方编译成功，板级回调符号匹配通过；
+9个原版native_legacy别名和原版类方法绑定仍待最终链接。几何helper拒绝测试通过。
+未启用默认显示后端，未生成/刷入新BOOT。证据见evidence/display/registration-v1。
+
 ## 最新：八核main1与服务启动已确认，进入显示接入（2026-11-03）
 
 BOOT3da265b4的12:25:28照片显示main1/n67/cpu8/sec7，SpringBoard27、runningboardd26，
