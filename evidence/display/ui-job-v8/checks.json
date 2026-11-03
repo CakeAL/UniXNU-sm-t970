@@ -1,0 +1,15 @@
+{
+  "cache_trace_helper_check": true,
+  "command": "python3.14 scripts/check-cache-syscall-trace.py --source <prepared bsd/dev/arm/systemcalls.c>",
+  "exit_code": 0,
+  "asan": true,
+  "checks": [
+    "PID1 filter",
+    "absolute and relative job basenames",
+    "failed and successful opens",
+    "ring wrap",
+    "format bounds",
+    "no extra copyin/copyinstr"
+  ],
+  "policy_gate_probe": "Original check-launchd-watchdog-policy.py executed with com.apple.other case replaced by com.apple.backboardd; policy unchanged; filesystem/libxpc APIs substituted; no device job-import conclusion"
+}

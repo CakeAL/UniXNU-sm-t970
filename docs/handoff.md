@@ -27,6 +27,14 @@ ui-activate-v7 BOOT535c53e9实测SB=1/27/0/1，BB=0/0/0/0，总激活89，main1/
 BB未观察到匹配激活仍不能排除更早失败、其他路径或更晚启动；下一步看launchd job加载/早期spawn。
 证据分别见evidence/display/client-v4、ui-exit-v5、ui-spawn-v6、ui-activate-v7。
 
+## 最新：启动项路径/open结果检查版1939b59d（2026-11-03）
+
+ui-job-v8增加job-lookups bb/sb计数与最近open错误，匹配PID1已由namei复制的路径。
+只读诊断、无额外用户读取，实际helper ASan测试通过，内核049897a9/独立打包通过。
+1939b59d上传结果见evidence/display/ui-job-v8/upload.json，实机结果待回报。
+前一版已验证SpringBoard激活1/27/0/1，backboardd匹配激活0，显示客户端0。
+job-lookups只证明路径查找，不能单独证明job字典解析/导入；e-1为未观测到open返回。
+
 ## 最新：客户端/帧计数版准备并上传（2026-11-03）
 
 client-v4沿用八核/60秒/CPU呈现参数，源内核b81e0783。

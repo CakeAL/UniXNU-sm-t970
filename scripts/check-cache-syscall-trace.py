@@ -65,13 +65,22 @@ int main(void)
     native_t970_cache_paths[0] = '\0';
     native_t970_cache_syscall_note(&init, SYS_shared_region_map_and_slide_2_np, 22, &ut);
     assert(strstr(native_t970_cache_trace_text(), "(no path note)"));
+    native_t970_cache_path_note(&other, "com.apple.backboardd.plist");
+    assert(native_t970_ui_job_hits[0] == 0);
+    native_t970_cache_path_note(&init, "/System/Library/LaunchDaemons/com.apple.backboardd.plist");
+    native_t970_cache_syscall_note(&init, SYS_openat, 13, &ut);
+    native_t970_cache_path_note(&init, "com.apple.SpringBoard.plist");
+    native_t970_cache_syscall_note(&init, SYS_open, 0, &ut);
+    assert(native_t970_ui_job_hits[0] == 1 && native_t970_ui_job_open_error[0] == 13);
+    assert(native_t970_ui_job_hits[1] == 1 && native_t970_ui_job_open_error[1] == 0);
+    assert(strstr(native_t970_cache_trace_text(), "job-lookups bb=1/e13 sb=1/e0"));
     puts("PASS: PID filtering, null process, numeric errors, long path, ring wrap, output bound");
 }
 '''
     with tempfile.TemporaryDirectory(prefix='t970-cache-trace-') as directory:
         path = Path(directory)
         (path / 'check.c').write_text(harness + helper + cases)
-        subprocess.run(['cc', '-std=c11', '-Wall', '-Wextra', '-Werror',
+        subprocess.run(['cc', '-std=c11', '-Wall', '-Wextra', '-Werror', '-fsanitize=address',
                         str(path / 'check.c'), '-o', str(path / 'check')], check=True)
         subprocess.run([str(path / 'check')], check=True)
 

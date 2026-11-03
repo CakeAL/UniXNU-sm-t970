@@ -387,6 +387,7 @@ procedure = [
   "Collect /proc/cpuinfo, online/present CPU lists, cpufreq policies, /proc/interrupts and the live DT using the inventory script.",
 ]
 findings = [
+  "UI-job-v8 kernel049897a9/BOOT1939b59d adds PID1 namei basename lookup counts and latest matching open error for BB/SB plists using existing kernel path copies only. Actual helper ASan tests cover filters/relative paths/errors/ring/bounds. Job lookup is not parsed/imported job proof; path/return association is best effort. Same eight-core60-second display diagnostics and policy. Hardware outcome pending; see evidence/display/ui-job-v8.",
   "BOOT3da265b4 target60 owner photo confirms main1/n67/cpu8/sec7, SpringBoard27/runningboardd26, Data0/policy0/stage4 and all-core positive timer/SGI snapshots. Backboardd not observed; free0x183 excludes reclaimable memory, not sole OOM proof. Sustained runtime, controlled CPU workload and desktop remain unverified. See runtime-cache60/device-result.json.",
   "Target45 BOOTbe219c43 owner photo confirms cpu8/sec7/main0/n2, blocks729210 and108 completed cache calls. Latest openat successfully opens final numbered subcache52.dyldlinkedit; recent open/fcntl errors0. Last signature-registration return and shared mapping not yet observed. Same-kernel target60 BOOT3da265b4 prepared, independently checked and uploaded BOOT-only with exit0; see runtime-cache45/device-result and runtime-cache60. No authorization changes or completed-main claim.",
   "Target30 BOOT79a949b6 shows cpu8/sec7/main0/n2, blocks546747 and82 completed cache syscalls, latest openat subcache39 with error0; recent fcntl97 signature registration also succeeds. Host SystemOS inventory has52 numbered subcaches;40..52 logical bytes989839360. Same-kernel target45 be219c43 prepared to observe mapping/main progress; no authorization or signature behavior changes.",
@@ -914,6 +915,8 @@ id = "display"
 status = "planned"
 components = []
 paths = [
+  "scripts/check-cache-syscall-trace.py",
+  "evidence/display/ui-job-v8/**",
   "patches/xnu/t970-ui-spawn-state.patch",
   "tests/test_ui_spawn_state.py",
   "evidence/display/ui-exit-v5/**",
@@ -956,6 +959,7 @@ procedure = [
   "Collect DRM modes, panel type and brightness limits; read only display-selection tokens from /proc/cmdline and match the selected S6TUUM3 node in the live DT.",
 ]
 findings = [
+  "UI-job-v8 kernel049897a9/BOOT1939b59d adds PID1 namei basename lookup counts and latest matching open error for BB/SB plists using existing kernel path copies only. Actual helper ASan tests cover filters/relative paths/errors/ring/bounds. Job lookup is not parsed/imported job proof; path/return association is best effort. Same eight-core60-second display diagnostics and policy. Hardware outcome pending; see evidence/display/ui-job-v8.",
   "Client-v4 confirms zero display clients/swaps. Native UI nonzero-exit trap v5 did not trigger. V6 saved-path sampling was too late (exec_activate_image already frees strings), so its zero target counts are invalid absence evidence. Corrected v7 BOOT535c53e9 observes SB1/27/0/activated1, BB0, total89 activations at60; positive SB control validates path capture. Does not rule out pre-activation failure, alternate path or later BB launch. Actual helper ASan checks and pre-free placement check pass. Next inspect launchd job import/early spawn.",
   "Client-v4 adds relaxed diagnostic counters for client enter/open/fail, swap accept/reject, transfer/status, copies, retirement and vsync notifications. Actual formatter/counter block passes ASan bounds/null/state checks. Kernelb81e0783 builds/prelinks; independent payload/BOOT/eight-core preparation passes. No rendering decisions changed; counters are best-effort snapshots. Hardware client/frame outcome pending; see client-v4.",
   "BOOT0854aff6 owner photo18:12:19 confirms display stage8/meta0/surface0/mapped1/published1, main1/n69/cpu8/sec7. Actual display class/init, IOSurface readiness, GOP mapping, original start and publication succeeded. Client opens, swaps, CPU copies and rendered desktop remain unverified; backboardd not observed in snapshot. See status-v3/device-result.json. Umi uses the same real IOBSD/IOSurface lifecycle boundary; do not copy its board geometry.",
@@ -1566,6 +1570,7 @@ procedure = [
   "Run python3 scripts/collect-adb-inventory.py --root --output evidence/<new-capture>; review per-command stderr, checksums, GPT CRC results and DT sanitization before updating this record.",
 ]
 findings = [
+  "UI-job-v8 kernel049897a9/BOOT1939b59d adds PID1 namei basename lookup counts and latest matching open error for BB/SB plists using existing kernel path copies only. Actual helper ASan tests cover filters/relative paths/errors/ring/bounds. Job lookup is not parsed/imported job proof; path/return association is best effort. Same eight-core60-second display diagnostics and policy. Hardware outcome pending; see evidence/display/ui-job-v8.",
   "BOOT3da265b4 target60 owner photo confirms main1/n67/cpu8/sec7, SpringBoard27/runningboardd26, Data0/policy0/stage4 and all-core positive timer/SGI snapshots. Backboardd not observed; free0x183 excludes reclaimable memory, not sole OOM proof. Sustained runtime, controlled CPU workload and desktop remain unverified. See runtime-cache60/device-result.json.",
   "BOOT95accf53 owner photo confirms CPU1 entry3 (matched CPU data and reached common_start boundary); C marker4 not seen. Target10 snapshot main0/n2 is earlier than old120 samples. Added secondary-only common/TCR/table/SCTLR/trampoline markers without changing CPU setup values. See entry-trace/device-result.json and MMU trace records.",
   "Two-core BOOT9d4dc888 observed main1 and106 processes but one CPU available; CPU1 phase4/PSCI0/timer0/SGI0. Reset table, CPU1 affinity and reset handler match. Entry execution remains unconfirmed. Added four diagnostic entry milestones and shortened future target wait to10 seconds; default CPU0 unchanged,8-core not uploaded. See evidence/cpu and docs/smp-bringup.md; source/build checks are not hardware SMP qualification.",

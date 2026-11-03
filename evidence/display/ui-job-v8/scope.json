@@ -1,0 +1,15 @@
+{
+  "job_lookups": "namei validated kernel path basename matches; count is not dictionary import",
+  "open_error": "best-effort latest matching open return, -1 if not observed",
+  "other_inputs_unchanged": true,
+  "hardware_result_pending": true,
+  "not_changed": [
+    "job policy",
+    "original launchd",
+    "original service plists",
+    "syscall results",
+    "mount authorization"
+  ],
+  "umi_reference": "reAAAq/UniXNU-umi@3eb72578597d2ca16471b172d45eddc096a34a04/package/boot-progress/BootWatchdogPolicy.c",
+  "umi_finding": "Upstream board isolates selected unavailable services to break synchronous XPC waits; no matching failure on T970 yet, policy not copied."
+}

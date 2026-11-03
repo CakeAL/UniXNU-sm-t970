@@ -8,7 +8,7 @@
  #include <kern/bits.h>
  #include <kern/task.h>
  #include <kern/thread.h>
-@@ -40,6 +41,60 @@
+@@ -40,6 +41,71 @@
  extern int32_t dtrace_systrace_syscall(struct proc *, void *, int *);
  extern void dtrace_systrace_syscall_return(unsigned short, int, int *);
  #endif  /* CONFIG_DTRACE */
@@ -19,6 +19,8 @@
 +static char native_t970_cache_paths[64];
 +static char native_t970_cache_rows[T970_CACHE_TRACE_ROWS][128];
 +static unsigned native_t970_cache_count;
++static unsigned native_t970_ui_job_hits[2];
++static int native_t970_ui_job_open_error[2] = {-1, -1};
 +void native_t970_cache_path_note(proc_t, const char *);
 +const char *native_t970_cache_trace_text(void);
 +void
@@ -26,6 +28,9 @@
 +{
 +	if (!p || proc_getpid(p) != 1) return;
 +	/* namei calls only after its own successful copy and length validation. */
++	const char *base = strrchr(path, '/'); base = base ? base + 1 : path;
++	if (!strcmp(base,"com.apple.backboardd.plist")) os_atomic_inc_orig(&native_t970_ui_job_hits[0], relaxed);
++	if (!strcmp(base,"com.apple.SpringBoard.plist")) os_atomic_inc_orig(&native_t970_ui_job_hits[1], relaxed);
 +	size_t length = strlen(path);
 +	strlcpy(native_t970_cache_paths, length > 63 ? path + length - 63 : path,
 +	    sizeof(native_t970_cache_paths));
@@ -42,6 +47,11 @@
 +	default:
 +		return;
 +	}
++	if (code == SYS_open || code == SYS_open_nocancel || code == SYS_openat || code == SYS_openat_nocancel) {
++		const char *base = strrchr(native_t970_cache_paths, '/'); base = base ? base + 1 : native_t970_cache_paths;
++		if (!strcmp(base,"com.apple.backboardd.plist")) native_t970_ui_job_open_error[0] = error;
++		if (!strcmp(base,"com.apple.SpringBoard.plist")) native_t970_ui_job_open_error[1] = error;
++	}
 +	int command = (code == SYS_fcntl || code == SYS_fcntl_nocancel) ? (int)ut->uu_arg[1] : 0;
 +	int argument = (code == SYS_open || code == SYS_open_nocancel) ? 0 : (int)ut->uu_arg[0];
 +	unsigned slot = os_atomic_inc_orig(&native_t970_cache_count, relaxed);
@@ -56,7 +66,8 @@
 +	static char result[1664];
 +	unsigned count = native_t970_cache_count;
 +	unsigned first = count > 12 ? count - 12 : 0;
-+	size_t used = (size_t)snprintf(result, sizeof(result), "init cache syscalls=%u", count);
++	size_t used = (size_t)snprintf(result, sizeof(result), "init cache syscalls=%u job-lookups bb=%u/e%d sb=%u/e%d", count,
++	    native_t970_ui_job_hits[0], native_t970_ui_job_open_error[0], native_t970_ui_job_hits[1], native_t970_ui_job_open_error[1]);
 +	for (unsigned i = first; i < count && used < sizeof(result) - 1; ++i) {
 +		int n = snprintf(result + used, sizeof(result) - used, "\n%s",
 +		    native_t970_cache_rows[i % T970_CACHE_TRACE_ROWS]);

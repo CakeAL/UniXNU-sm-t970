@@ -115,3 +115,15 @@ ui-activate-v7 BOOT535c53e9实测SB=1/27/0/1，BB=0/0/0/0，总激活89，main1/
 路径只从已有内核缓冲区读取，空指针/长度/终止符检查及ASan主机替身测试通过。
 BB未观察到匹配激活仍不能排除更早失败、其他路径或更晚启动；下一步看launchd job加载/早期spawn。
 证据分别见evidence/display/client-v4、ui-exit-v5、ui-spawn-v6、ui-activate-v7。
+
+## 启动项读取定位（ui-job-v8）
+
+源内核049897a9，BOOT1939b59d，八核/60秒。PID1 namei已有已验证路径按basename记录
+com.apple.backboardd.plist与com.apple.SpringBoard.plist查找次数；已有open返回记录最近error。
+不增加用户地址读取，不改结果。跨线程路径对应为尽力快照，查找次数不等于文件成功解析或job导入，
+e-1表示未捕获匹配open返回；相对路径和绝对路径均匹配。实际helper ASan主机测试通过。
+
+原版launchd策略读取/默认job gate针对backboardd的主机替身检查通过：watchdog-only
+禁用文件不禁用backboardd；尚无实机job gate被执行/接受的证据。
+借鉴umi的同步XPC依赖隔离经验，但T970未证实同一等待链，保持原策略不改。
+准备/上传和待回报实机结果见evidence/display/ui-job-v8。
