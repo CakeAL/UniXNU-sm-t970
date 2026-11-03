@@ -3,6 +3,15 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
+## 最新：修复纯SMP拓扑的EDGE并发额度（2026-11-04）
+
+BOOT705d4160照片02:38:12已确认cap0，MG done35→37，BB/SB排队不变。打包ADT八核均无cluster-type，
+XNU解析为SMP；最终qos_max_parallelism实际指向EDGE，原实现只计E/P，故缓存额度0。
+新增BCM2837兼容分支：仅在E/P CPU均0且SMP CPU非0时，使用真实SMP CPU或cluster数；
+不伪造E/P类型、不写死线程上限、不改已有E/P逻辑。当前端口仍是同构调度模型，不代表完成SM8250异构调度。
+BOOT5385b6ce保持mode6/90秒、八核、768MiB；源函数回归、真实kernel/最终反汇编、打包检查通过。
+记录见evidence/display/edge-smp-v21；Heimdall已上传exit0并重启，未做设备哈希读回。实机首先看cap是否非0、req/done和显示swap是否推进。
+
 ## 最新：工作队列两次进展/准入采样（2026-11-04）
 
 v19照片01:42:52确认MG/BB/SB分别req4/6/4、idle2/1/2、creator0，仍open2/swap0。

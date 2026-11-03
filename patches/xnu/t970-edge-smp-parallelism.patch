@@ -1,0 +1,23 @@
+--- a/osfmk/kern/sched_clutch.c
++++ b/osfmk/kern/sched_clutch.c
+@@ -5017,6 +5017,20 @@
+ 	uint32_t ecluster_count = ml_get_cluster_number_type(CLUSTER_TYPE_E);
+ 	uint32_t pcluster_count = ml_get_cluster_number_type(CLUSTER_TYPE_P);
+ 
++#if defined(BCM2837)
++	/* Generic ARM bring-up uses a homogeneous SMP topology. EDGE otherwise
++	 * reports zero width for every QoS because it counts only E/P types.
++	 * Use the registered SMP counts without inventing an E/P classification.
++	 */
++	if (ecpu_count == 0 && pcpu_count == 0) {
++		uint32_t smp_count = ml_get_cpu_number_type(CLUSTER_TYPE_SMP, false, false);
++		if (smp_count != 0) {
++			return (options & QOS_PARALLELISM_CLUSTER_SHARED_RESOURCE) ?
++			       ml_get_cluster_number_type(CLUSTER_TYPE_SMP) : smp_count;
++		}
++	}
++#endif
++
+ 	if (options & QOS_PARALLELISM_REALTIME) {
+ 		/* For realtime threads on AMP, we would want them
+ 		 * to limit the width to just the P-cores since we

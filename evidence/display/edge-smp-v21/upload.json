@@ -1,0 +1,15 @@
+{
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/data-bringup/edge-smp-memory768-v1/boot-partition.img"
+  ],
+  "boot_sha256": "5385b6ce178ac4125660337759c8d1825cd7fe3eecad4f96f67a2d12758c666a",
+  "exit_code": 0,
+  "reboot_requested": true,
+  "readback_verified": false,
+  "hardware_result_pending": true,
+  "authorization": "Owner ongoing device diagnosis; continued prior explicit flashing authorization",
+  "completed_utc": "2026-11-03T18:57:52.709050+00:00"
+}

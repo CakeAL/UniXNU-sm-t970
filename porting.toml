@@ -94,6 +94,7 @@ procedure = [
   "Run python3.14 ../UniXNU-sm-t970/scripts/check-platform.py --unixnu . to compare DT/ADT bindings with the captured hardware.",
 ]
 findings = [
+  "v21 BCM2837 EDGE width fallback uses registered SMP CPU/cluster counts only when E/P counts are both zero. Previous BOOT705d4160 has all eight ADT CPU cluster-type absent (SMP), cached constrained cap0 and callback progress. Actual prepared-function ASan/UBSan tests cover SMP1/8, E/P precedence and non-BCM guard; kernel/prelink/FAT checks pass. BOOT5385b6ce hardware result pending; this is not validated heterogeneous scheduling or desktop. See evidence/display/edge-smp-v21.",
   "BOOT cfbd84ba photo confirms stage4: ID/VALID/S2CR accepted, direct FAULT restore200ff succeeded without fallback, allRestored/mappingsUnchanged=1 and GFSR=0. Six context states captured; CB0..4 already configured with FSR400 of unknown age, CB73 SCTLR3ab3a706 is not a verified free bank. No context writes, DMA or UFS commands occurred.",
   "Combined field diagnostic BOOT cfbd84ba34fc03b50661b46c9e22fe59c43ba651bca6967da49f1df1ec373e75 prepared from source7ee2918/kernel53e9e68c. Thirteen host tests, input-stable kernel build, independent FAT/arguments/FD checks and DT/ADT check passed. BOOT-only upload exited0; actual VALID/S2CR/restoration/context observations remain pending.",
   "Prepared a combined single-slot field qualification after ee45890a: test VALID only under unchanged FAULT policy; test S2CR only with SMR invalid; restore with a bounded Qualcomm-aware fallback if necessary; compare all protected mappings; only then read six context states. No UFS commands, DMA route grants, queue/context/global/clock/SCM writes. Field results and restore flags still require exact-image device observation.",
@@ -339,6 +340,9 @@ components = [
   "ArmCpu",
 ]
 paths = [
+  "patches/xnu/t970-edge-smp-parallelism.patch",
+  "scripts/check-smp-parallelism.py",
+  "evidence/display/edge-smp-v21/**",
   "evidence/cpu/**",
   "docs/smp-bringup.md",
   "scripts/prepare-smp.py",
@@ -387,6 +391,7 @@ procedure = [
   "Collect /proc/cpuinfo, online/present CPU lists, cpufreq policies, /proc/interrupts and the live DT using the inventory script.",
 ]
 findings = [
+  "v21 BCM2837 EDGE width fallback uses registered SMP CPU/cluster counts only when E/P counts are both zero. Previous BOOT705d4160 has all eight ADT CPU cluster-type absent (SMP), cached constrained cap0 and callback progress. Actual prepared-function ASan/UBSan tests cover SMP1/8, E/P precedence and non-BCM guard; kernel/prelink/FAT checks pass. BOOT5385b6ce hardware result pending; this is not validated heterogeneous scheduling or desktop. See evidence/display/edge-smp-v21.",
   "UI-job-v8 kernel049897a9/BOOT1939b59d adds PID1 namei basename lookup counts and latest matching open error for BB/SB plists using existing kernel path copies only. Actual helper ASan tests cover filters/relative paths/errors/ring/bounds. Job lookup is not parsed/imported job proof; path/return association is best effort. Same eight-core60-second display diagnostics and policy. Hardware outcome pending; see evidence/display/ui-job-v8.",
   "BOOT3da265b4 target60 owner photo confirms main1/n67/cpu8/sec7, SpringBoard27/runningboardd26, Data0/policy0/stage4 and all-core positive timer/SGI snapshots. Backboardd not observed; free0x183 excludes reclaimable memory, not sole OOM proof. Sustained runtime, controlled CPU workload and desktop remain unverified. See runtime-cache60/device-result.json.",
   "Target45 BOOTbe219c43 owner photo confirms cpu8/sec7/main0/n2, blocks729210 and108 completed cache calls. Latest openat successfully opens final numbered subcache52.dyldlinkedit; recent open/fcntl errors0. Last signature-registration return and shared mapping not yet observed. Same-kernel target60 BOOT3da265b4 prepared, independently checked and uploaded BOOT-only with exit0; see runtime-cache45/device-result and runtime-cache60. No authorization changes or completed-main claim.",
@@ -976,6 +981,7 @@ procedure = [
   "Collect DRM modes, panel type and brightness limits; read only display-selection tokens from /proc/cmdline and match the selected S6TUUM3 node in the live DT.",
 ]
 findings = [
+  "v21 BCM2837 EDGE width fallback uses registered SMP CPU/cluster counts only when E/P counts are both zero. Previous BOOT705d4160 has all eight ADT CPU cluster-type absent (SMP), cached constrained cap0 and callback progress. Actual prepared-function ASan/UBSan tests cover SMP1/8, E/P precedence and non-BCM guard; kernel/prelink/FAT checks pass. BOOT5385b6ce hardware result pending; this is not validated heterogeneous scheduling or desktop. See evidence/display/edge-smp-v21.",
   "BOOT705d4160 mode6 owner photo02:38:12 captures all three processes/end marker unclipped. Constrained cap/active/busy=0/0/0; MG done35->37 while BB25/SB53 unchanged across 500ms deadlines. Runtime callback continues; investigate EDGE E/P counts versus current SMP topology before any scheduling change. See evidence/display/ui-queue-progress-v20/device-result.json.",
   "BOOT6ef0db8c photo01:42:52 shows MG/BB/SB req4/6/4 idle2/1/2 creator0 and open2/swap0; flags14=death+delayed scheduled,10=delayed. Single snapshots do not prove lost wakeups; SB tail remains offscreen. v20 mode6 takes two read-only queue/admission snapshots per process 500ms deadlines apart, converts absolute time with kernel API, and performs no user VM reads or scheduling mutations. Host helper/kernel/pack checks pass; device result pending, see evidence/display/ui-queue-progress-v20.",
   "BOOT10dbedd8 photo01:27:03 batch captures MG/BB/SB headers: MG wq7/0/6 and no limit flags, BB2/0/1, SB2/0/0; display open2/swap0. SB tail/end marker offscreen, clipping status unverified. Shared semaphore wait-event value does not prove same semaphore. v19 adds read-only workqueue req/flags/idle/creator/last-call timing snapshot and compact batch output; host helper/ABI checks pass, hardware pending.",
@@ -1346,6 +1352,7 @@ procedure = [
   "Read BuildManifest.plist from the local IPSW using Python zipfile and plistlib to identify its OS version, build and product types.",
 ]
 findings = [
+  "v21 BCM2837 EDGE width fallback uses registered SMP CPU/cluster counts only when E/P counts are both zero. Previous BOOT705d4160 has all eight ADT CPU cluster-type absent (SMP), cached constrained cap0 and callback progress. Actual prepared-function ASan/UBSan tests cover SMP1/8, E/P precedence and non-BCM guard; kernel/prelink/FAT checks pass. BOOT5385b6ce hardware result pending; this is not validated heterogeneous scheduling or desktop. See evidence/display/edge-smp-v21.",
   "BOOT705d4160 mode6 owner photo02:38:12 captures all three processes/end marker unclipped. Constrained cap/active/busy=0/0/0; MG done35->37 while BB25/SB53 unchanged across 500ms deadlines. Runtime callback continues; investigate EDGE E/P counts versus current SMP topology before any scheduling change. See evidence/display/ui-queue-progress-v20/device-result.json.",
   "BOOTdb0121c9, b9cc7afb, f6fd6636 and continuous ec912b09 were independently packed and BOOT-only uploaded, with receipts and owner observations kept together. Header v2, exact existing FD/firmware DTB, trust and RAM seed are preserved. New key-state and register diagnostics use opt-in runtime inputs; defaults and partition geometry remain unchanged.",
   "BOOT95accf53 owner photo confirms CPU1 entry3 (matched CPU data and reached common_start boundary); C marker4 not seen. Target10 snapshot main0/n2 is earlier than old120 samples. Added secondary-only common/TCR/table/SCTLR/trampoline markers without changing CPU setup values. See entry-trace/device-result.json and MMU trace records.",
@@ -1621,6 +1628,7 @@ procedure = [
   "Run python3 scripts/collect-adb-inventory.py --root --output evidence/<new-capture>; review per-command stderr, checksums, GPT CRC results and DT sanitization before updating this record.",
 ]
 findings = [
+  "v21 BCM2837 EDGE width fallback uses registered SMP CPU/cluster counts only when E/P counts are both zero. Previous BOOT705d4160 has all eight ADT CPU cluster-type absent (SMP), cached constrained cap0 and callback progress. Actual prepared-function ASan/UBSan tests cover SMP1/8, E/P precedence and non-BCM guard; kernel/prelink/FAT checks pass. BOOT5385b6ce hardware result pending; this is not validated heterogeneous scheduling or desktop. See evidence/display/edge-smp-v21.",
   "BOOT705d4160 mode6 owner photo02:38:12 captures all three processes/end marker unclipped. Constrained cap/active/busy=0/0/0; MG done35->37 while BB25/SB53 unchanged across 500ms deadlines. Runtime callback continues; investigate EDGE E/P counts versus current SMP topology before any scheduling change. See evidence/display/ui-queue-progress-v20/device-result.json.",
   "BOOTd80a3773 target120 owner photo confirms main1/n148/cpu8/sec7, BB57/SB27, display opens2 but no swap/frame, KeyStore opens49/calls194. Saved PC/LR of3 threads per target and slide10914000 captured with busy0. Original cache/symbol UUIDs match; BB queue-first PC maps semaphore_wait_trap+8 and LR libdispatch semaphore-wait variant+24; other rows map mach_msg2/workq. Current sampler has no scheduler-state or user stack, so an upstream dependency is not yet established. Next capture bounded caller frames in a separate worker.",
   "PID1/direct executable path observers miss the late BB launch route: target120 BB57/client2 are positive evidence despite direct-path counters0. Normal BOOTec912b09 removes terminal and UI error-exit diagnostic flags; owner sees only retained bars. Added a Mach-private saved-register sampler following umi3eb7257 lock/copy pattern, with task/thread try-locks, IRQ restoration and4-thread caps; no VM reads, task suspension or Mach peer lookup. Host ASan/UBSan and exact ABI compile pass; device capture pending.",

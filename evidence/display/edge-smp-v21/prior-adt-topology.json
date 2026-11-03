@@ -1,0 +1,42 @@
+[
+  {
+    "path": "/cpus/cpu0",
+    "affinity": "0x0",
+    "cluster_type": "absent -> SMP"
+  },
+  {
+    "path": "/cpus/cpu1",
+    "affinity": "0x100",
+    "cluster_type": "absent -> SMP"
+  },
+  {
+    "path": "/cpus/cpu2",
+    "affinity": "0x200",
+    "cluster_type": "absent -> SMP"
+  },
+  {
+    "path": "/cpus/cpu3",
+    "affinity": "0x300",
+    "cluster_type": "absent -> SMP"
+  },
+  {
+    "path": "/cpus/cpu4",
+    "affinity": "0x400",
+    "cluster_type": "absent -> SMP"
+  },
+  {
+    "path": "/cpus/cpu5",
+    "affinity": "0x500",
+    "cluster_type": "absent -> SMP"
+  },
+  {
+    "path": "/cpus/cpu6",
+    "affinity": "0x600",
+    "cluster_type": "absent -> SMP"
+  },
+  {
+    "path": "/cpus/cpu7",
+    "affinity": "0x700",
+    "cluster_type": "absent -> SMP"
+  }
+]

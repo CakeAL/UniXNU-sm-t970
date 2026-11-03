@@ -1,0 +1,11 @@
+{
+  "source_function_sha256": "41accea440ddf6f5855529bb4ee335aa939b912ad96439b905cf387a4cc4e05d",
+  "actual_prepared_function": true,
+  "topology_apis_mocked": true,
+  "smp_one_and_eight": true,
+  "unchanged_ep_policy": true,
+  "non_bcm_unchanged": true,
+  "qos_options_combinations_per_target": 56,
+  "asan_ubsan": true,
+  "device_result_pending": true
+}

@@ -1,0 +1,13 @@
+{
+  "boot_sha256": "5385b6ce178ac4125660337759c8d1825cd7fe3eecad4f96f67a2d12758c666a",
+  "kernel_sha256": "076005096bdf3db58e1699d0445c6050c5e5cfc2180edc194ec41a669b51f86f",
+  "patch_sha256": "60cf09610dc11641bafcfbe897f35fff9f3fd6dbbeab615a3392b25ccf80335a",
+  "prepared_signature_matches": true,
+  "actual_prepared_function_test": true,
+  "asan_ubsan": true,
+  "linked_disassembly_has_smp_fallback": true,
+  "independent_payload_check": true,
+  "final_fat_roundtrip": true,
+  "hardware_result_pending": true,
+  "platform_check": "refused framework vs reviewed revision; unchanged limitation"
+}
