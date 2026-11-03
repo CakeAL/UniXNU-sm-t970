@@ -59,6 +59,10 @@ void armcpu_gic_diag(uint64_t aff,uint32_t *out){assert(aff==0x100);memset(out,0
 void native_t970_trampoline_snapshot(uint64_t *out){for(unsigned i=0;i<8;++i)out[i]=0x100000000ULL+i;}
 void native_t970_secondary_snapshot(uint32_t *out){for(unsigned i=0;i<8;++i)out[i]=i%5;}
 const char *native_t970_cache_trace_text(void){return "init cache syscalls=7\nsc536 e0 r0 a0 c0 cache";}
+void native_t970_ui_spawn_state(char *out,unsigned length){snprintf(out,length,"\nui-spawn-test sb=1/27/0/1");}
+const char *native_t970_ui_calls_text(void){return "\nui-call-test sb=1/e0";}
+static unsigned ui_wait_enabled;
+const char *native_t970_ui_wait_text(void){return "UI-wait-test registers";}
 int native_t970_initproc_main(void){return main_state;}
 void native_t970_reset_context(uint64_t *out){
  const uint64_t values[6]={0x1000,0x1000,0x2000,0x100,0x3000,0x3000};memcpy(out,values,sizeof(values));
@@ -74,7 +78,7 @@ static void proc_iterate(unsigned flags,int (*callout)(proc_t,void*),void *arg,v
 static void clock_interval_to_deadline(unsigned n,unsigned scale,uint64_t *out){assert(scale==NSEC_PER_SEC);*out=(uint64_t)n*scale;}
 static int assert_wait_deadline(event_t e,int flags,uint64_t deadline){assert(e&&flags==THREAD_UNINT&&deadline>0);++waits;return wait_result;}
 static int thread_block(void *continuation){assert(!continuation);++blocks;return 3;}
-static int PE_parse_boot_argn(const char *name,void *out,int size){if(!strcmp(name,"t970-runtime-cache-trace")){*(unsigned*)out=trace_enabled;return trace_enabled!=0;}if(!strcmp(name,"t970-ipi-check"))return 0;assert(!strcmp(name,"t970-runtime-report")&&size==sizeof(unsigned));*(unsigned*)out=seconds;return (int)enabled;}
+static int PE_parse_boot_argn(const char *name,void *out,int size){if(!strcmp(name,"t970-ui-wait")){*(unsigned*)out=ui_wait_enabled;return ui_wait_enabled!=0;}if(!strcmp(name,"t970-runtime-cache-trace")){*(unsigned*)out=trace_enabled;return trace_enabled!=0;}if(!strcmp(name,"t970-ipi-check"))return 0;assert(!strcmp(name,"t970-runtime-report")&&size==sizeof(unsigned));*(unsigned*)out=seconds;return (int)enabled;}
 static kern_return_t kernel_thread_start(thread_continue_t function,void *arg,thread_t *thread){++starts;start_function=function;start_arg=arg;*thread=(void*)1;return start_error;}
 static void thread_deallocate(thread_t t){assert(t==(void*)1);++deallocs;}
 static void test_panic(const char *format,...) __attribute__((noreturn,format(printf,1,2)));
@@ -116,15 +120,21 @@ int main(void){
  reset();trace_enabled=1;main_state=0;supplied=2;
  if(!setjmp(stop)){native_t970_runtime_report((void*)30,0);assert(0);}
  assert(strstr(message,"runtime target=30 main=0 n=2")&&strstr(message,"init cache syscalls=7")&&strstr(message,"sc536 e0 r0 a0 c0 cache"));
+ assert(strstr(message,"display-test stage8")&&strstr(message,"ui-spawn-test sb=1/27/0/1")&&strstr(message,"ui-call-test sb=1/e0"));
  assert(!strstr(message,"V target=")&&waits==1&&blocks==1&&iteration_calls==1);
+ reset();trace_enabled=ui_wait_enabled=1;supplied=2;
+ if(!setjmp(stop)){native_t970_runtime_report((void*)120,0);assert(0);}
+ assert(strstr(message,"UI-wait-test registers")&&!strstr(message,"init cache syscalls="));
  puts("PASS: actual runtime report bounds, process names/PIDs, 512 callback cap, scheduler yield, opt-in/range/once guards and thread failure");
  return 0;
 }
 '''
 args.output.mkdir(parents=True, exist_ok=False)
 (args.output / 'test.c').write_text(prelude + actual.replace('#include <kern/processor.h>\n', '') + main)
+# Separate translation unit preserves the real optional weak-import call site.
+(args.output / 'display.c').write_text('#include <stdio.h>\nvoid native_t970_display_state(char *out,unsigned length){snprintf(out,length,"display-test stage8");}\n')
 subprocess.run(['clang', '-std=c11', '-Wall', '-Wextra', '-Werror', '-O1', '-g',
-                '-fsanitize=address,undefined', str(args.output / 'test.c'), '-o', str(args.output / 'test')], check=True)
+                '-fsanitize=address,undefined', str(args.output / 'test.c'), str(args.output / 'display.c'), '-o', str(args.output / 'test')], check=True)
 result = subprocess.run([str(args.output / 'test')], capture_output=True, text=True, check=True)
 report = dict(helper_sha256=hashlib.sha256(actual.encode()).hexdigest(), passed=True,
               scheduler_and_process_apis_mocked=True, hardware_timer_verified=False,

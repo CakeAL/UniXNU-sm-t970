@@ -1,0 +1,20 @@
+{
+  "component": "AppleKeyStoreState",
+  "revision": "42ff83e08b2265fe741d4adaf084bebe003452ba",
+  "repository": "https://github.com/UniXNU/AppleKeyStoreState.git",
+  "source_sha256": "273b030afee897e48c30bc917c4df8a9c4d94a189d073ef80c0e0a15caef82ee",
+  "canonical_builder_sha256": "0b7d210547a9a8eddcad2026b3578aa1e2eca00c9dcd53d0ca3956faa1f870e7",
+  "board_source_sha256": "64cc02e971f7fc0c945ba7c057e667fcc2eec393d377b05c20654f3deb1cc31e",
+  "component_object_sha256": "6f6d65b4724d05ed61815e715993ee2be5076fd1b402850cf929c36272cbe2bf",
+  "board_object_sha256": "6f92c44f0078830dfcd98e95e5e82fcd8c7a2440bca536b008d8ac4e6c342061",
+  "compile_recipe_sha256": "9fc5352fc5fb5e911bc6a9a877b11b1b78d5fd64cd724a60a6aba9b58b95e180",
+  "callbacks_resolved": true,
+  "late_initializer": true,
+  "canonical_build_command": [
+    "python3.14",
+    "/Users/cakeal/vsc/UniXNU/out/t970-data-bringup/key-state-registration-v1/tree/scripts/build-arm-driver.py",
+    "AppleKeyStoreState"
+  ],
+  "kernel_linked": false,
+  "runtime_verified": false
+}

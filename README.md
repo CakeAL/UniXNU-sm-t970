@@ -20,6 +20,8 @@ BOOT6b83f4e6已恢复真实PMGR，并越过强制的可写APFS Data挂载检查�
 系统服务、Data实际读写、图形桌面和外设仍未验证，详见[RAM Data接入](docs/ram-data.md)。
 最新证据与镜像绑定见[交接](docs/handoff.md)、[用户态启动验证](evidence/storage/policy-memory/README.md)
 和[T733方案对照](docs/t733-kernel-comparison.md)；历史文档保留当时的验证范围。
+显示定位现已实测backboardd57与2次成功客户端打开，尚无swap或帧；目录KeyStore状态服务已注册并响应一次调用。
+独立768MiB请求已实测管理约689.5MiB，默认仍512MiB；持续版尚只有色条，见[UI对照与最新结果](docs/ui-reference-comparison.md)。
 
 两个仓库并列放置，普通构建命令在主仓库执行：
 

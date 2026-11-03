@@ -1,0 +1,13 @@
+{
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/data-bringup/key-state-memory768/boot-partition.img"
+  ],
+  "boot_sha256": "f6fd663660d9f6e70b0c0028197afd229ac2d2aaed71c135952393493c736a40",
+  "exit_code": 0,
+  "reboot_requested": true,
+  "readback_verified": false,
+  "hardware_allocation_pending": true
+}

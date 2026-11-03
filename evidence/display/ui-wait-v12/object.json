@@ -1,0 +1,10 @@
+{
+  "source_sha256": "afdec0ea31454f234084771a4541ba62e20b69c506f03dcb53bca7f9596d8b0f",
+  "object_sha256": "4c2416c00eda7c417d733471a399785721ec95ca6537f1c51acc0b903ba9f3f5",
+  "compile_recipe_sha256": "2fe39a2b1a5d3f4cc66f07ac3cbae843f78c38956942ef87a8e5de0b3a0b45e0",
+  "mach_private_recipe": true,
+  "reads_user_memory": false,
+  "suspends_tasks": false,
+  "thread_limit_per_process": 4,
+  "runtime_verified": false
+}

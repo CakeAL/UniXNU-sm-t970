@@ -3,6 +3,40 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
+## 最新：保存寄存器已取得，继续采调用栈
+
+BOOTd80a3773 target120已实测main1/n148、BB57/SB27、显示open2/swap0，KeyStore open49/call194。
+寄存器采样busy0：BB首线程对应semaphore_wait_trap与libdispatch信号量等待代码，其他样本为Mach消息/工作队列。
+缓存slide10914000与原symbols UUID匹配；这不是完整调用栈，也不单独证明调度等待状态。
+下一步使用隔离worker读取有限FP链，报告线程不读取用户VM。精确照片、转录和符号结果见ui-wait-v12。
+
+## 当前：KeyStore、768MiB与等待位置采样
+
+BOOTdb0121c9 target120照片已确认BB57与显示client2/open2/fail0、swap0；
+PID1直接路径探针的BB0不能再作缺席证据。BOOTb9cc7afb target60已验证目录KeyStore
+stage4/ready1/open1/call1、selector0成功。BOOTf6fd6636只改owned请求为768MiB，
+pages0x2b187（约689.5MiB）确认生效，但60秒仍无显示客户端/帧。
+持续BOOTec912b09移除定时终止与UI退出陷阱，机主报告只有色条、未见新图形。
+
+当前准备BB/SB寄存器采样：按umi3eb7257分离Mach-private编译单元，task/thread try-lock
+期间复制各前4线程PC/LR/x16/x1/x3及共享缓存slide，解锁后格式化，不读用户VM、不挂起任务。
+等待实际位置后再选下一项修复。原镜像、内核和上传/观测在ui-call-v9、key-state-v10、
+memory768-v11中共同保留，默认512MiB不变。
+
+## 最新：v9实机与跨项目对照（2026-11-03）
+
+用户照片含v9的ui-call-return：target60/main1/n69/cpu8/sec7，SB27返回1/e0，BB0/e-1，
+path-copy-errors0；两者job-lookups均0/e-1。display stage8/mapped1/published1，客户端与帧计数全0。
+按最后准备/上传顺序关联BOOT45531047；屏幕无镜像ID、无设备hash读回，关联边界见ui-call-v9。
+主机原版plist和签名launchd缓存均含backboardd自动启动项，不能据此推断实机已导入。
+
+重新读取T733/umi/sheng固定源码后，确认本板尚缺它们均有的KeyStore状态服务接入，
+且管理内存仅约439MiB，而参考出界面配置使用数GiB。均为下一步审阅项，尚未证明根因。
+参考文件/版本和实验顺序见[UI对照](ui-reference-comparison.md)。
+同内核120秒版BOOTdb0121c9已独立打包并核对，仅改终止时间；未上传、未启动。
+本轮ASan/UBSan helper检查通过；平台总检查因框架版本与旧审阅快照不同而拒绝，未绕过。
+证据见`evidence/display/ui-call-v9/README.md`。
+
 
 ## 持续CPU呈现尝试（2026-11-03）
 

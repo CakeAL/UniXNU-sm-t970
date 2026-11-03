@@ -1,0 +1,50 @@
+{
+  "boot_sha256": "db0121c95cc83e05d3faba56bbbb32b4af020a5115f780632b99e7afd671d1c8",
+  "photo": "screen-runtime120.jpg",
+  "photo_sha256": "1dc1540d9789e62b4ad5844e45f8bb57db93095a43b112f957dfd816a43f82a1",
+  "association": "User supplied photo immediately after exact BOOT upload and reboot; no image hash on screen or device readback",
+  "target_seconds": 120,
+  "main": 1,
+  "processes": 79,
+  "cpus": 8,
+  "secondaries": 7,
+  "springboard_pid": 27,
+  "backboard_pid": 57,
+  "runningboard_pid": 26,
+  "display_stage": 8,
+  "mapped": 1,
+  "published": 1,
+  "client_enter": 2,
+  "client_open": 2,
+  "client_fail": 0,
+  "client_type": 0,
+  "client_status": 0,
+  "swap_accepted": 0,
+  "swap_rejected": 0,
+  "transfer": 0,
+  "copies": 0,
+  "retire": 0,
+  "vsync": 0,
+  "activation_total": 112,
+  "springboard_spawn_return": [
+    1,
+    0
+  ],
+  "backboard_spawn_return": [
+    0,
+    -1
+  ],
+  "path_copy_errors": 0,
+  "job_lookups_bb": [
+    0,
+    -1
+  ],
+  "job_lookups_sb": [
+    0,
+    -1
+  ],
+  "cache_syscalls": 1019,
+  "managed_pages_hex": "0x1b5ca",
+  "free_pages_hex": "0xc1",
+  "interpretation": "Late backboardd process and two successful display opens confirmed by target120. No swap or frame. PID1/direct-path-only spawn observer misses this launch route; its zero is not evidence of absent backboardd. Different exe/parent/proxy route requires separate tracing; no specific proxy route established by this screen."
+}

@@ -1,0 +1,57 @@
+--- a/bsd/dev/arm/systemcalls.c
++++ b/bsd/dev/arm/systemcalls.c
+@@ -106,6 +106,38 @@
+ 	return result;
+ }
+ /* T970_CACHE_TRACE_END */
++/* T970_UI_CALLS_BEGIN: explicit bounded diagnostic read before syscall return. */
++_Static_assert(__builtin_offsetof(struct posix_spawn_args, path) == sizeof(uint64_t), "ARM64 spawn path argument offset");
++static unsigned native_t970_ui_calls[2], native_t970_ui_copy_errors;
++static int native_t970_ui_call_errors[2] = {-1,-1};
++const char *native_t970_ui_calls_text(void);
++static void
++native_t970_ui_call_note(proc_t p, unsigned code, int error, uthread_t ut)
++{
++ if (!p || proc_getpid(p)!=1 || code!=SYS_posix_spawn) return;
++ unsigned enabled=0;
++ if (!PE_parse_boot_argn("t970-ui-spawn-calls",&enabled,sizeof(enabled)) || enabled!=1) return;
++ char path[192]={0}; size_t copied=0;
++ int e=copyinstr((user_addr_t)ut->uu_arg[1],path,sizeof(path),&copied);
++ if(e) { os_atomic_inc_orig(&native_t970_ui_copy_errors,relaxed); return; }
++ if(!copied || copied>sizeof(path) || path[copied-1]) return;
++ int slot=-1;
++ if(!strcmp(path,"/usr/libexec/backboardd")) slot=0;
++ if(!strcmp(path,"/System/Library/CoreServices/SpringBoard.app/SpringBoard")) slot=1;
++ if(slot<0) return;
++ native_t970_ui_call_errors[slot]=error;
++ os_atomic_inc_orig(&native_t970_ui_calls[slot],relaxed);
++}
++const char *
++native_t970_ui_calls_text(void)
++{
++ static char text[128];
++ snprintf(text,sizeof(text),"\nui-call-return bb=%u/e%d sb=%u/e%d path-copy-errors=%u",
++  native_t970_ui_calls[0],native_t970_ui_call_errors[0],native_t970_ui_calls[1],native_t970_ui_call_errors[1],native_t970_ui_copy_errors);
++ return text;
++}
++/* T970_UI_CALLS_END */
++
+ 
+ extern void
+ unix_syscall(struct arm_saved_state * regs, thread_t thread_act, struct proc * proc);
+@@ -253,6 +284,7 @@
+ #endif /* CONFIG_MACF */
+ 
+ 	native_t970_cache_syscall_note(proc, code, error, uthread);
++	native_t970_ui_call_note(proc, code, error, uthread);
+ 
+ 	unix_syscall_kprintf("code %d, error %d, results %x, %x (pid %d - %s, tid %lld)\n", code, error,
+ 	    uthread->uu_rval[0], uthread->uu_rval[1],
+@@ -330,6 +362,7 @@
+ 
+ 	AUDIT_SYSCALL_EXIT(code, proc, uthread, error);
+ 	native_t970_cache_syscall_note(proc, code, error, uthread);
++	native_t970_ui_call_note(proc, code, error, uthread);
+ 
+ 	/*
+ 	 * Get index into sysent table

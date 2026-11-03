@@ -43,6 +43,9 @@ def main():
     parser.add_argument('--display-probe', action='store_true', help='Require explicit T970 GOP service probe arguments and linked callbacks')
     parser.add_argument('--cpu-present', action='store_true', help='Require continuous CPU presentation arguments')
     parser.add_argument('--ui-exit-probe', action='store_true', help='Require native XNU UI error-exit trap')
+    parser.add_argument('--ui-spawn-calls', action='store_true', help='Require optional bounded spawn-return path observer')
+    parser.add_argument('--key-state', action='store_true', help='Require pinned RAM-only KeyStore state service and board registration')
+    parser.add_argument('--ui-wait', action='store_true', help='Require bounded saved-register UI diagnostics')
     args = parser.parse_args()
     require(args.runtime_report_seconds == 0 or 5 <= args.runtime_report_seconds <= 300,
             'Runtime sampler interval must be 5..300 seconds')
@@ -110,6 +113,27 @@ def main():
         require(args.display_probe and args.runtime_report_seconds, 'UI exit trap requires bounded display diagnostics')
         expected_args += ['panic_on_error_exit=backboardd,SpringBoard']
         require(b'panic_on_error_exit\0' in kernel.read_bytes(), 'Kernel lacks native error-exit tunable')
+    if args.ui_spawn_calls:
+        require(args.runtime_report_seconds and args.display_probe, 'UI call observer requires bounded display diagnostic')
+        expected_args += ['t970-ui-spawn-calls=1']
+        require('_native_t970_ui_calls_text' in names and b't970-ui-spawn-calls\0' in kernel.read_bytes(), 'Missing UI call observer')
+    if args.key_state:
+        require(args.display_probe and args.runtime_report_seconds, 'Key state requires bounded display diagnostics')
+        expected_args += ['offline-key-events=1', 'sheng-aks=1']
+        require({'_t970_keystore_start', '_native_t970_keystore_state', '_native_keyevents_allocate',
+                 '_native_aks_state_enabled', '_native_aks_encode_state'} <= names, 'Missing key-state implementation')
+        archive = work / 'tree/build/native-legacy-display/libNativeLegacyDisplay.late.a'
+        key_report = json.loads(archive.with_name('build-report.json').read_text())
+        require(sha(archive.read_bytes()) == key_report['archive_sha256'], 'Display/key-state archive hash mismatch')
+        state = key_report.get('key_state') or {}
+        require(state.get('component') == 'AppleKeyStoreState' and
+                state.get('revision') == '42ff83e08b2265fe741d4adaf084bebe003452ba' and
+                state.get('callbacks_resolved'), 'Unqualified key-state component')
+    if args.ui_wait:
+        require(args.display_probe and args.cache_trace and args.runtime_report_seconds,
+                'UI saved registers require bounded display/cache diagnostics')
+        expected_args += ['t970-ui-wait=1']
+        require('_native_t970_ui_wait_text' in names and b'UI saved-regs:' in kernel.read_bytes(), 'Missing UI saved-register sampler')
     require(sorted(entry['args'].split()) == sorted(expected_args), 'Unexpected effective boot arguments')
     require(config['boot']['default'] == 'xnu' and entry['initrd'] == 'Payloads/scratch-data.img',
             'Wrong default entry/Data initrd')
@@ -161,6 +185,8 @@ def main():
     result['ipi_check_requested'] = args.ipi_check
     result['continuous_cpu_present'] = args.cpu_present and args.runtime_report_seconds == 0
     result['runtime_cache_trace_requested'] = args.cache_trace
+    result['key_state_requested'] = args.key_state
+    result['ui_wait_requested'] = args.ui_wait
     (out / 'validation.json').write_text(json.dumps(result, indent=2) + '\n')
     print(json.dumps(result, indent=2))
 

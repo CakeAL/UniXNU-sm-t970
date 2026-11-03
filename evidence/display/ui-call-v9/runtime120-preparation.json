@@ -1,0 +1,19 @@
+{
+  "base_boot_sha256": "455310477633ec07c43bd030f024711945ef2d74d7e34925e3ab05f4963ac932",
+  "boot_sha256": "db0121c95cc83e05d3faba56bbbb32b4af020a5115f780632b99e7afd671d1c8",
+  "boot_bytes": 71303168,
+  "changed_argument": "t970-runtime-report=60 -> 120",
+  "target_wait_seconds": 120,
+  "cpus_requested": 8,
+  "unchanged_payload_inputs": {
+    "Payloads/kernel.macho": "3bababf8933d12879ed920cc42ef1515ee4ec59cf23b15c74844780f14fb8da4",
+    "Payloads/kernel.macho.adt": "09a170d0d99d046b6b6b432e1a8104b359432f6e1f11df17b8c6559f2c294258",
+    "Payloads/kernel.macho.trustcache": "7416ca4f8377146626bb284e2133c76bee6cb4e3ee0af5d648b186235a7323a7",
+    "Payloads/scratch-data.img": "4591566eccd77f0f9d13a1338ecaf3c73ce86cd04aeea732d91db6b2e100ca3a"
+  },
+  "final_boot_fat_roundtrip": true,
+  "header_fd_dtb_tail_unchanged": true,
+  "board_default_unchanged": true,
+  "uploaded": false,
+  "hardware_result_pending": true
+}

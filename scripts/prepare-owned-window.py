@@ -31,7 +31,7 @@ def require(ok, message):
         raise ValueError(message)
 
 
-def replace_request(blob, size):
+def replace_request(blob, size, expected_size=0x10000000):
     """Walk the serialized ADT, permitting exactly one reviewed 64-bit value."""
     changed = bytearray(blob)
     found = []
@@ -51,8 +51,8 @@ def replace_request(blob, size):
         path = '' if root else parent + '/' + name
         if 'darwinboot-memory-size' in props:
             pos, old = props['darwinboot-memory-size']
-            require(path == '/chosen' and old == struct.pack('<Q', 0x10000000),
-                    'Not the qualified 256 MiB chosen property')
+            require(path == '/chosen' and old == struct.pack('<Q', expected_size),
+                    'Not the expected chosen owned-memory property')
             changed[pos:pos + 8] = struct.pack('<Q', size)
             found.append(pos)
         for _ in range(children):

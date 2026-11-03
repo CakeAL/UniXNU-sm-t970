@@ -1,0 +1,20 @@
+--- a/bsd/kern/kern_exec.c
++++ b/bsd/kern/kern_exec.c
+@@ -8217,12 +8217,16 @@
+ 		native_t970_ui_spawn_state(display_state + display_used, sizeof(display_state) - display_used);
+ 		extern const char *native_t970_ui_calls_text(void);
+ 		strlcat(display_state, native_t970_ui_calls_text(), sizeof(display_state));
++		extern const char *native_t970_ui_wait_text(void);
++		unsigned ui_wait=0;
++		const char *trace=native_t970_cache_trace_text();
++		if (PE_parse_boot_argn("t970-ui-wait", &ui_wait, sizeof(ui_wait)) && ui_wait==1) trace=native_t970_ui_wait_text();
+ 		panic("runtime target=%u main=%d n=%u wd=%d sb=%d bb=%d rb=%d D=%d W=%d S=%d blocks=%llu cpu=%u sec=%u\nC step/psci/fail/timer/sgi %s\n%s\n%s\n%s",
+ 		    seconds, native_t970_initproc_main(), snapshot.count, snapshot.watchdog, snapshot.springboard,
+ 		    snapshot.backboard, snapshot.runningboard, native_owner_data_status,
+ 		    native_t970_watchdog_policy_status, native_t970_watchdog_policy_stage,
+ 		    (unsigned long long)native_ufs_verified_blocks, processor_avail_count, armcpu_smp_running,
+-		    cpu_state, display_state, native_t970_cache_trace_text(), snapshot.names);
++		    cpu_state, display_state, trace, snapshot.names);
+ 	}
+ 	panic("runtime target=%u main=%d n=%u wd=%d sb=%d bb=%d rb=%d D=%d W=%d S=%d blocks=%llu cpu=%u sec=%u\nC step/psci/fail/timer/sgi %s\nE reset/found/common/C %u %u %u %u %u %u %u %u\nV target=%llx ret=%llx vb=%llx pb=%llx t1=%llx t0=%llx tcr=%llx primary1=%llx\nI attempt=%u sent=%llu test=%llu recv=%llu cpu1=%u>%u G=%x/%x/%x/%x/%x/%x/%x/%x\nR table=%llx want=%llx data1=%llx id1=%llx handler=%llx start=%llx\n%s",
+ 	    seconds, native_t970_initproc_main(), snapshot.count, snapshot.watchdog, snapshot.springboard,

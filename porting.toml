@@ -523,6 +523,9 @@ id = "memory"
 status = "implemented"
 components = []
 paths = [
+  "evidence/display/memory768-v11/**",
+  "evidence/display/key-state-v10/prepare-memory768.py",
+
   "evidence/storage/policy-memory/**",
   "patches/xnu/t970-policy-memory-status.patch",
   "evidence/storage/userdata-write-audit/**",
@@ -583,6 +586,7 @@ procedure = [
   "Capture root-readable /proc/iomem and the live DT, then compare physical memory and reserved-memory reg values.",
 ]
 findings = [
+  "Isolated BOOTf6fd6636 changes only darwinboot-memory-size512->768MiB; final FAT round-trip, unchanged kernel/arguments/trust/seed/DTS/reservations pass. Device target60 main1/cpu8 and pages0x2b187 confirm about689.5MiB managed RAM. Free0x13b alone is not OOM evidence. Default remains512MiB and no high-memory map is enabled.",
   "BOOT3da265b4 target60 owner photo confirms main1/n67/cpu8/sec7, SpringBoard27/runningboardd26, Data0/policy0/stage4 and all-core positive timer/SGI snapshots. Backboardd not observed; free0x183 excludes reclaimable memory, not sole OOM proof. Sustained runtime, controlled CPU workload and desktop remain unverified. See runtime-cache60/device-result.json.",
   "After corrected carriers were backed up/updated and fully readback-verified under explicit authorization, BOOT097c4f8c owner photo shows memorystatus no-victim (available3060pages), rather than prior cache EACCES. This is not proof of full mapping/launchd main. Source retains73293824bytes of carrier plus another73293824bytes of duplicated manifest tables. Borrow only exact authenticated driver-owned boot-lifetime allocations, protect them readonly, retain separate private readonly key pages and reauthenticate; fallback sources still copy. Teardown never frees borrowed carrier. Actual configure/free host ASan/UBSan+mprotect lifecycle/failure tests pass; Normal BOOT12766f5f stalls with persistent bars over3minutes. Isolated BOOTef97eb6a resets about10seconds after magenta per owner, confirming at least one shared-policy vr_open return but not success status. BOOTc544bae1 before-init-exec checkpoint immediately resets per owner, confirming the exec call boundary only; exec and launchd success remain unverified. Session stopped at owner request. EFI owned window remains256MiB.",
   "BOOT cfbd84ba photo confirms stage4: ID/VALID/S2CR accepted, direct FAULT restore200ff succeeded without fallback, allRestored/mappingsUnchanged=1 and GFSR=0. Six context states captured; CB0..4 already configured with FSR400 of unknown age, CB73 SCTLR3ab3a706 is not a verified free bank. No context writes, DMA or UFS commands occurred.",
@@ -915,6 +919,18 @@ id = "display"
 status = "planned"
 components = []
 paths = [
+  "scripts/symbolicate-ui-registers.py",
+  "scripts/build-keystore-registration.py",
+  "tests/test_keystore_registration.py",
+  "evidence/display/key-state-v10/**",
+  "evidence/display/memory768-v11/**",
+  "evidence/display/ui-wait-v12/**",
+
+  "docs/ui-reference-comparison.md",
+  "evidence/display/ui-call-v9/**",
+  "patches/xnu/t970-ui-spawn-calls.patch",
+  "tests/test_ui_spawn_calls.py",
+  "scripts/check-runtime-report.py",
   "scripts/check-cache-syscall-trace.py",
   "evidence/display/ui-job-v8/**",
   "patches/xnu/t970-ui-spawn-state.patch",
@@ -959,6 +975,9 @@ procedure = [
   "Collect DRM modes, panel type and brightness limits; read only display-selection tokens from /proc/cmdline and match the selected S6TUUM3 node in the live DT.",
 ]
 findings = [
+  "BOOTd80a3773 target120 owner photo confirms main1/n148/cpu8/sec7, BB57/SB27, display opens2 but no swap/frame, KeyStore opens49/calls194. Saved PC/LR of3 threads per target and slide10914000 captured with busy0. Original cache/symbol UUIDs match; BB queue-first PC maps semaphore_wait_trap+8 and LR libdispatch semaphore-wait variant+24; other rows map mach_msg2/workq. Current sampler has no scheduler-state or user stack, so an upstream dependency is not yet established. Next capture bounded caller frames in a separate worker.",
+  "UI runtime follow-up: BOOTdb0121c9 target120 confirms BB57 and display client2/open2/fail0, all swap/frame counters0. Catalog AppleKeyStoreState42ff83e is now linked behind explicit RAM-only gates: BOOTb9cc7afb target60 confirms stage4/ready1/open1/call1/selector0 success, no frame. BOOTf6fd6636 confirms768MiB request manages pages0x2b187, no earlier display by60. Continuous BOOTec912b09 owner observation remains color bars only. See ui-call-v9, key-state-v10 and memory768-v11.",
+  "V9 owner photo target60 confirms main1/n69/cpu8/sec7, SB27 spawn return1/e0, BB0/e-1, path-copy-errors0, both job-lookups0/e-1, display stage8/mapped1/published1 and all client/frame counters0. Associated with latest prepared/uploaded BOOT45531047 by sequence and unique v9 field, without screen image ID or device hash readback. Host original plist/cache contains automatic backboardd job; runtime import not proven. Fixed T733/umi/sheng code review identifies missing KeyStore state registration and much smaller managed RAM as concrete audit targets, not established causes. Same-kernel target120 BOOTdb0121c9 packed/round-trip verified, not uploaded. ASan/UBSan helper tests pass after updating report API stand-ins; platform checker refuses stale reviewed framework revision.",
   "UI-job-v8 kernel049897a9/BOOT1939b59d adds PID1 namei basename lookup counts and latest matching open error for BB/SB plists using existing kernel path copies only. Actual helper ASan tests cover filters/relative paths/errors/ring/bounds. Job lookup is not parsed/imported job proof; path/return association is best effort. Same eight-core60-second display diagnostics and policy. Hardware outcome pending; see evidence/display/ui-job-v8.",
   "Client-v4 confirms zero display clients/swaps. Native UI nonzero-exit trap v5 did not trigger. V6 saved-path sampling was too late (exec_activate_image already frees strings), so its zero target counts are invalid absence evidence. Corrected v7 BOOT535c53e9 observes SB1/27/0/activated1, BB0, total89 activations at60; positive SB control validates path capture. Does not rule out pre-activation failure, alternate path or later BB launch. Actual helper ASan checks and pre-free placement check pass. Next inspect launchd job import/early spawn.",
   "Client-v4 adds relaxed diagnostic counters for client enter/open/fail, swap accept/reject, transfer/status, copies, retirement and vsync notifications. Actual formatter/counter block passes ASan bounds/null/state checks. Kernelb81e0783 builds/prelinks; independent payload/BOOT/eight-core preparation passes. No rendering decisions changed; counters are best-effort snapshots. Hardware client/frame outcome pending; see client-v4.",
@@ -997,10 +1016,16 @@ limits = [
   "Framebuffer physical address, stride, pixel format and UEFI GOP handoff are not verified by the mode list.",
 ]
 next_action = [
-  "Build a T970-specific GopFramebuffer archive and registration/mapping callbacks from the audited358-slot ABI; verify service publication then CPU presentation and swap completion. Backend remains disabled; no new display image prepared or uploaded.",
-  "Establish whether PE_create_console returns in the repaired kernel and classify early faults. Retained UEFI pixels do not verify XNU text rendering.",
+  "Capture BB/SB saved PC/LR and shared-region slide at target120 with the isolated register diagnostic; symbolize against the unchanged21H461 cache before selecting service isolation or graphics changes. KeyStore ready and768MiB are qualified, while frames remain unobserved.",
 ]
+
 evidence = [
+  { kind = "device", reference = "evidence/display/ui-call-v9/runtime120-device-result.json", revision = "1a41d7e019273dda4d3357f08c08b66a39b9f5e8", command = "Owner photo after exact BOOT upload", result = "Target120 confirms BB57 and two successful display opens; no swaps/frames." },
+  { kind = "device", reference = "evidence/display/key-state-v10/device-result.json", revision = "1a41d7e019273dda4d3357f08c08b66a39b9f5e8", command = "Owner photo after exact BOOT upload", result = "RAM-only KeyStore stage4/ready1/open1/call1 observed at60; no frame." },
+  { kind = "device", reference = "evidence/display/memory768-v11/device-result.json", revision = "1a41d7e019273dda4d3357f08c08b66a39b9f5e8", command = "Owner photo after exact BOOT upload", result = "768MiB request is effective: pages0x2b187 and main1/cpu8 at60; no earlier clients/frames." },
+
+  { kind = "device", reference = "evidence/display/ui-call-v9/device-result.json", revision = "1a41d7e019273dda4d3357f08c08b66a39b9f5e8", command = "Owner photo transcription of v9 target60 runtime report", result = "Owner v9 photo: SB spawn return succeeds; no matching BB return or display clients/frames by target60. Image association based on preparation/upload sequence; no device hash readback." },
+  { kind = "host", reference = "evidence/display/ui-call-v9/runtime120-preparation.json", revision = "1a41d7e019273dda4d3357f08c08b66a39b9f5e8", command = "python3.14 evidence/display/ui-call-v9/prepare-runtime120.py", result = "Final BOOT FAT round-trip verified; only report deadline changed from60 to120, kernel/ADT/trust/seed unchanged. BOOTdb0121c9 not uploaded." },
   { kind = "device", reference = "evidence/storage/watchdogd/runtime-report/device-result.json", revision = "2fcc9f9a4237a50af2d85bfd8f6ec27459291a0e", command = "BOOTeeeba83b, target120-second one-shot runtime report; owner photo19:36:40", result = "109 processes including SpringBoard27/backboardd56/runningboardd26, watchdogd not observed, genuine main1 and D0/W0/S4. Timer wait and sampler executed; no calibrated timing/rendering/desktop proof." },
   { kind = "device", reference = "evidence/storage/handoff-readonly/device-result.json", revision = "58bdac8ab42ee268ec0aee2b1102a3bc58020bcb", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/ufs-handoff-readonly/boot.img --no-reboot", result = "Owner confirmation and photo transcription: complete 87-slot handoff table, HCI and clock state readable; sole valid mapping identified as display. No UFS transfer success claimed." },
   { kind = "device", reference = "evidence/bring-up/runtime/after-mmu-brk-control/flash.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/probes/after-mmu-brk-control/boot.img --no-reboot", result = "Uploaded deliberate after-MMU BRK control 150ed5ff9d73d81b17d3f6d32e609b9a9e42fdfe0397da7c5eea7d62f7ce7b4d, using patched Heimdall, exit 0. The device reset at about 50 seconds, matching the reviewed BRK path; original BOOT restoration is still pending. C startup and console behavior are not exercised.", revision = "fc4828781445ebab36819d6cdad8a2eddde82435" },
@@ -1219,6 +1244,10 @@ components = [
   "XnuPrelink",
 ]
 paths = [
+  "evidence/display/key-state-v10/**",
+  "evidence/display/memory768-v11/**",
+  "evidence/display/ui-wait-v12/**",
+
   "evidence/cpu/**",
   "docs/smp-bringup.md",
   "configs/sm-t970_data_defconfig",
@@ -1304,6 +1333,7 @@ procedure = [
   "Read BuildManifest.plist from the local IPSW using Python zipfile and plistlib to identify its OS version, build and product types.",
 ]
 findings = [
+  "BOOTdb0121c9, b9cc7afb, f6fd6636 and continuous ec912b09 were independently packed and BOOT-only uploaded, with receipts and owner observations kept together. Header v2, exact existing FD/firmware DTB, trust and RAM seed are preserved. New key-state and register diagnostics use opt-in runtime inputs; defaults and partition geometry remain unchanged.",
   "BOOT95accf53 owner photo confirms CPU1 entry3 (matched CPU data and reached common_start boundary); C marker4 not seen. Target10 snapshot main0/n2 is earlier than old120 samples. Added secondary-only common/TCR/table/SCTLR/trampoline markers without changing CPU setup values. See entry-trace/device-result.json and MMU trace records.",
   "Two-core BOOT9d4dc888 observed main1 and106 processes but one CPU available; CPU1 phase4/PSCI0/timer0/SGI0. Reset table, CPU1 affinity and reset handler match. Entry execution remains unconfirmed. Added four diagnostic entry milestones and shortened future target wait to10 seconds; default CPU0 unchanged,8-core not uploaded. See evidence/cpu and docs/smp-bringup.md; source/build checks are not hardware SMP qualification.",
   "BOOT97271e99 photo18:22 confirms launchd main1/err0 and managed pages0x1b709 (~439MiB):512MiB EFI-owned request works. BOOT911a462a new Data build failed AMFI No PMGR because isolated output silently used FirstPassStub. Remove implicit stub, require a reference, audit real PMGR340 slots and reject missing registration symbols/archive members in independent pack checks. Repaired6b83f4e6 uploaded exit0; photo18:42 shows watchdogd PID102 SIGTRAP. Enforced exact-device/writable/APFS mount success gate precedes exec, so Data mount success is inferred, not a Data write/persistence test. Original watchdogd host branch and launchd root-owned watchdog-only policy checks pass with explicit OS API substitutions; policy not applied.",
@@ -1475,6 +1505,13 @@ id = "diagnostics"
 status = "implemented"
 components = []
 paths = [
+  "scripts/symbolicate-ui-registers.py",
+  "package/T970Display/UiWaitSnapshot.c",
+  "scripts/build-ui-wait-snapshot.py",
+  "tests/test_ui_wait_state.py",
+  "patches/xnu/t970-ui-wait-state.patch",
+  "evidence/display/ui-wait-v12/**",
+
   "evidence/cpu/**",
   "docs/smp-bringup.md",
   "patches/xnu/t970-runtime-report.patch",
@@ -1570,6 +1607,8 @@ procedure = [
   "Run python3 scripts/collect-adb-inventory.py --root --output evidence/<new-capture>; review per-command stderr, checksums, GPT CRC results and DT sanitization before updating this record.",
 ]
 findings = [
+  "BOOTd80a3773 target120 owner photo confirms main1/n148/cpu8/sec7, BB57/SB27, display opens2 but no swap/frame, KeyStore opens49/calls194. Saved PC/LR of3 threads per target and slide10914000 captured with busy0. Original cache/symbol UUIDs match; BB queue-first PC maps semaphore_wait_trap+8 and LR libdispatch semaphore-wait variant+24; other rows map mach_msg2/workq. Current sampler has no scheduler-state or user stack, so an upstream dependency is not yet established. Next capture bounded caller frames in a separate worker.",
+  "PID1/direct executable path observers miss the late BB launch route: target120 BB57/client2 are positive evidence despite direct-path counters0. Normal BOOTec912b09 removes terminal and UI error-exit diagnostic flags; owner sees only retained bars. Added a Mach-private saved-register sampler following umi3eb7257 lock/copy pattern, with task/thread try-locks, IRQ restoration and4-thread caps; no VM reads, task suspension or Mach peer lookup. Host ASan/UBSan and exact ABI compile pass; device capture pending.",
   "UI-job-v8 kernel049897a9/BOOT1939b59d adds PID1 namei basename lookup counts and latest matching open error for BB/SB plists using existing kernel path copies only. Actual helper ASan tests cover filters/relative paths/errors/ring/bounds. Job lookup is not parsed/imported job proof; path/return association is best effort. Same eight-core60-second display diagnostics and policy. Hardware outcome pending; see evidence/display/ui-job-v8.",
   "BOOT3da265b4 target60 owner photo confirms main1/n67/cpu8/sec7, SpringBoard27/runningboardd26, Data0/policy0/stage4 and all-core positive timer/SGI snapshots. Backboardd not observed; free0x183 excludes reclaimable memory, not sole OOM proof. Sustained runtime, controlled CPU workload and desktop remain unverified. See runtime-cache60/device-result.json.",
   "BOOT95accf53 owner photo confirms CPU1 entry3 (matched CPU data and reached common_start boundary); C marker4 not seen. Target10 snapshot main0/n2 is earlier than old120 samples. Added secondary-only common/TCR/table/SCTLR/trampoline markers without changing CPU setup values. See entry-trace/device-result.json and MMU trace records.",

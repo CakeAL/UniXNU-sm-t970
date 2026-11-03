@@ -1,0 +1,74 @@
+{
+  "boot_sha256": "d80a3773dd0614e6106a9c15b7df355781eb82dd54d193bd0a81bbdc56e2b365",
+  "photo": "screen-target120.jpg",
+  "photo_sha256": "d988be80c13d25ac4fd140d9ed639e0cb73878e06c9801df8569a1be4f32c802",
+  "association": "Owner photo after exact BOOT upload; no device hash readback",
+  "target_seconds": 120,
+  "main": 1,
+  "processes": 148,
+  "cpus": 8,
+  "secondaries": 7,
+  "springboard_pid": 27,
+  "backboard_pid": 57,
+  "display_stage": 8,
+  "mapped": 1,
+  "published": 1,
+  "client_enter": 2,
+  "client_open": 2,
+  "client_fail": 0,
+  "swap": 0,
+  "transfer": 0,
+  "copies": 0,
+  "retire": 0,
+  "vsync": 0,
+  "key_state_stage": 4,
+  "key_state_ready": 1,
+  "key_state_opens": 49,
+  "key_state_calls": 194,
+  "key_state_selector": 7,
+  "key_state_result": 0,
+  "managed_pages_hex": "0x2b187",
+  "free_pages_hex": "0x50a",
+  "shared_region_slide": "0x10914000",
+  "backboard_threads": [
+    {
+      "index": 1,
+      "pc": "0x1dc094ad4",
+      "lr": "0x19fe9afe8",
+      "x16": "0xffffffffffffffdc"
+    },
+    {
+      "index": 2,
+      "pc": "0x1dc094b58",
+      "lr": "0x1dc098224",
+      "x16": "0xffffffffffffffd1"
+    },
+    {
+      "index": 3,
+      "pc": "0x1dc0948e8",
+      "lr": "0x1edf36580",
+      "x16": "0x170"
+    }
+  ],
+  "springboard_threads": [
+    {
+      "index": 1,
+      "pc": "0x1dc094b58",
+      "lr": "0x1dc098224",
+      "x16": "0xffffffffffffffd1"
+    },
+    {
+      "index": 2,
+      "pc": "0x1dc0948e8",
+      "lr": "0x1edf36580",
+      "x16": "0x170"
+    },
+    {
+      "index": 3,
+      "pc": "0x1dc0948e8",
+      "lr": "0x1edf36580",
+      "x16": "0x170"
+    }
+  ],
+  "interpretation": "Positive BB/SB saved-state capture and busy0, each task reports3 threads. Original cache mapping identifies semaphore wait/libdispatch for BB first sampled thread, Mach message and workq for others. Saved registers alone do not prove scheduler waiting state or name the upstream dependency. Need bounded caller frames."
+}

@@ -1,0 +1,47 @@
+{
+  "method": "GitHub connector fetch_file at fixed tree revisions; read-only",
+  "sources": [
+    {
+      "repository": "reAAAq/UniXNU-umi",
+      "revision": "3eb72578597d2ca16471b172d45eddc096a34a04",
+      "path": "bringup/tools/umi_memory_profile.py",
+      "blob": "d9b27fcbf13d6e84211fccdee14154a9c914985d",
+      "url": "https://github.com/reAAAq/UniXNU-umi/blob/3eb72578597d2ca16471b172d45eddc096a34a04/bringup/tools/umi_memory_profile.py"
+    },
+    {
+      "repository": "reAAAq/UniXNU-umi",
+      "revision": "3eb72578597d2ca16471b172d45eddc096a34a04",
+      "path": "package/legacy-display/KeyStoreProbe.cpp",
+      "blob": "49901d1a637b810fc158cb9776cec222a942ecf3",
+      "url": "https://github.com/reAAAq/UniXNU-umi/blob/3eb72578597d2ca16471b172d45eddc096a34a04/package/legacy-display/KeyStoreProbe.cpp"
+    },
+    {
+      "repository": "reAAAq/UniXNU-umi",
+      "revision": "3eb72578597d2ca16471b172d45eddc096a34a04",
+      "path": "bringup/tools/build_umi_data_display.py",
+      "blob": "4bf510827213b36308a54eafda05601c09782a53",
+      "url": "https://github.com/reAAAq/UniXNU-umi/blob/3eb72578597d2ca16471b172d45eddc096a34a04/bringup/tools/build_umi_data_display.py"
+    },
+    {
+      "repository": "RigoLigoRLC/unixnu-sm-t733",
+      "revision": "3bb0d6f7840f088db6a0ec88ecb841e12042422f",
+      "path": "package/BootWatchdogPolicy.c",
+      "blob": "f4f06b22cd71e040765d98478b8cb3a52f57263a",
+      "url": "https://github.com/RigoLigoRLC/unixnu-sm-t733/blob/3bb0d6f7840f088db6a0ec88ecb841e12042422f/package/BootWatchdogPolicy.c"
+    },
+    {
+      "repository": "RigoLigoRLC/unixnu-sm-t733",
+      "revision": "3bb0d6f7840f088db6a0ec88ecb841e12042422f",
+      "path": "package/T733Display/KeyStoreRegistration.cpp",
+      "blob": "077e0658e4bd583b531d2db233a1b93d1dccfe6e",
+      "url": "https://github.com/RigoLigoRLC/unixnu-sm-t733/blob/3bb0d6f7840f088db6a0ec88ecb841e12042422f/package/T733Display/KeyStoreRegistration.cpp"
+    },
+    {
+      "repository": "RigoLigoRLC/unixnu-sm-t733",
+      "revision": "3bb0d6f7840f088db6a0ec88ecb841e12042422f",
+      "path": "board.toml",
+      "blob": "5e186504ce74c06150416ef5fec2b4077ff50d05",
+      "url": "https://github.com/RigoLigoRLC/unixnu-sm-t733/blob/3bb0d6f7840f088db6a0ec88ecb841e12042422f/board.toml"
+    }
+  ]
+}

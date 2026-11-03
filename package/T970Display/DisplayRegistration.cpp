@@ -18,6 +18,8 @@ extern "C" kmod_info_t g_kernel_kmod_info;
 extern "C" void displayStaticInit(void) __asm__("__GLOBAL__sub_I_NativeLegacyDisplay.cpp");
 extern "C" IOService *native_legacy_display_allocate(void);
 extern "C" kern_return_t OSKextLoadKextWithIdentifier(const char *);
+extern "C" void t970_keystore_start(void);
+extern "C" void native_t970_keystore_state(char *, unsigned);
 
 static IOService *pendingDisplay;
 static IOService *activeDisplay;
@@ -38,6 +40,8 @@ extern "C" void native_t970_display_state(char *out, unsigned length) {
              sample(clientsEntered),sample(clientsOpened),sample(clientsFailed),sample(lastClientType),
              sample(lastClientStatus),sample(swapsAccepted),sample(swapsRejected),sample(lastSwapReason),
              sample(transfers),sample(lastTransferStatus),sample(copies),sample(retired),sample(vsyncSent));
+    size_t used = strlen(out);
+    native_t970_keystore_state(out + used, length - used);
 }
 static bool consoleReleased;
 static uint32_t completedFrames;
@@ -63,6 +67,7 @@ extern "C" void native_legacy_display_probe(void) {
         return;
     }
     initialized = true;
+    t970_keystore_start();
     displayStage=1;
 
     PE_Video video = {};

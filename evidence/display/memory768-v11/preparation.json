@@ -1,0 +1,24 @@
+{
+  "base_boot_sha256": "b9cc7afbeb2cf06a76fa7f430b4c6201c9b2c66447800c7492af414b8a253a13",
+  "boot_sha256": "f6fd663660d9f6e70b0c0028197afd229ac2d2aaed71c135952393493c736a40",
+  "boot_bytes": 71303168,
+  "changed_property": "/chosen/darwinboot-memory-size",
+  "old_owned_bytes": 536870912,
+  "new_owned_bytes": 805306368,
+  "unchanged_payload_inputs": {
+    "unixnu.toml": "374b4f102fb0327475e59f37ef9cd3cc2493f24ddf6f2805b13a4b351560f985",
+    "Payloads/kernel.macho": "1a13f92fca9b6cfe05c5e39ad04fa05f482ead5c0b72684cb0cec629a9e497dc",
+    "Payloads/kernel.macho.trustcache": "7416ca4f8377146626bb284e2133c76bee6cb4e3ee0af5d648b186235a7323a7",
+    "Payloads/scratch-data.img": "4591566eccd77f0f9d13a1338ecaf3c73ce86cd04aeea732d91db6b2e100ca3a"
+  },
+  "adt_sha256": "d6374580ec019074aca7c2c92bead58174d633e9031c00eb5ed62c3de4e02e8e",
+  "only_one_adt_property_changed": true,
+  "final_boot_fat_roundtrip": true,
+  "header_fd_dtb_tail_unchanged": true,
+  "board_dts_reservations_unchanged": true,
+  "runtime_allocator": "Existing DarwinBoot AllocateWindow: EfiConventionalMemory and AllocatePages only",
+  "allocation_verified": false,
+  "uploaded": false,
+  "hardware_result_pending": true,
+  "target_wait_seconds": 60
+}

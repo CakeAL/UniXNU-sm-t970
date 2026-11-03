@@ -1,0 +1,57 @@
+{
+  "boot_sha256": "455310477633ec07c43bd030f024711945ef2d74d7e34925e3ab05f4963ac932",
+  "image_association": "Latest prepared v9 plus existing upload receipt; unique v9 field visible. No image ID on screen or device hash readback.",
+  "photo": "screen-user.png",
+  "photo_sha256": "f48a1d56bb20996e4f535a63346e01142855d630646d4a1b262d7b4563e36c57",
+  "target_seconds": 60,
+  "main": 1,
+  "processes": 69,
+  "cpus": 8,
+  "secondaries": 7,
+  "springboard_pid": 27,
+  "backboard_pid": 0,
+  "display_stage": 8,
+  "mapped": 1,
+  "published": 1,
+  "client_enter": 0,
+  "client_open": 0,
+  "swap": 0,
+  "transfer": 0,
+  "copies": 0,
+  "retire": 0,
+  "vsync": 0,
+  "activation_total": 89,
+  "springboard_activation": [
+    1,
+    27,
+    0,
+    1
+  ],
+  "backboard_activation": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "springboard_spawn_return": [
+    1,
+    0
+  ],
+  "backboard_spawn_return": [
+    0,
+    -1
+  ],
+  "path_copy_errors": 0,
+  "job_lookups_bb": [
+    0,
+    -1
+  ],
+  "job_lookups_sb": [
+    0,
+    -1
+  ],
+  "cache_syscalls": 743,
+  "managed_pages_hex": "0x1b5c9",
+  "free_pages_hex": "0xb9",
+  "interpretation": "SpringBoard positive spawn-return control succeeds. No matching backboardd spawn return observed by target60; no framebuffer client or frame observed. Zero job lookups do not establish absence from signed launchd cache. Free page count alone does not establish OOM."
+}

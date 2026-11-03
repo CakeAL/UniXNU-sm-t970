@@ -7,6 +7,8 @@ def main():
  p=argparse.ArgumentParser(description=__doc__)
  for n in ('framework','gop-object','registration-object','output'):p.add_argument('--'+n,type=Path,required=True)
  p.add_argument('--registration-report',type=Path,default=DEVICE/'evidence/display/registration-v1/report.json')
+ p.add_argument('--keystore-directory',type=Path,help='Explicit pinned RAM-only AppleKeyStoreState integration')
+ p.add_argument('--ui-wait-directory',type=Path,help='Explicit bounded saved-register diagnostic object')
  a=p.parse_args();out=a.output.resolve()
  if out.exists():raise ValueError('Preserve earlier outputs')
  audit=json.loads((DEVICE/'evidence/display/abi21h461/audit.json').read_text())
@@ -41,14 +43,34 @@ def main():
  subprocess.run(['xcrun','clang','-target','arm64-apple-ios17.0','-c',str(assembly),'-o',str(out/'original-bindings.o')],check=True)
  subprocess.run(['llvm-objcopy','--remove-section=__DATA,__mod_init_func','--globalize-symbol=__GLOBAL__sub_I_NativeLegacyDisplay.cpp',str(a.gop_object),str(out/'NativeLegacyDisplay.late.o')],check=True)
  archive=out/'libNativeLegacyDisplay.late.a'
- subprocess.run(['xcrun','ar','rcs',str(archive),str(out/'NativeLegacyDisplay.late.o'),str(a.registration_object),str(out/'original-bindings.o')],check=True)
+ objects=[out/'NativeLegacyDisplay.late.o',a.registration_object,out/'original-bindings.o']
+ key_report=None
+ if a.keystore_directory:
+  kd=a.keystore_directory;key_report=json.loads((kd/'report.json').read_text())
+  if key_report['component']!='AppleKeyStoreState' or key_report['revision']!='42ff83e08b2265fe741d4adaf084bebe003452ba':raise ValueError('Unreviewed key-state component')
+  for name,field in [('NativeKeyStoreEvents.late.o','component_object_sha256'),('KeyStoreRegistration.o','board_object_sha256')]:
+   if sha(kd/name)!=key_report[field]:raise ValueError('Key-state object changed')
+   objects.append(kd/name)
+ wait_report=None
+ if a.ui_wait_directory:
+  wd=a.ui_wait_directory;wait_report=json.loads((wd/'report.json').read_text())
+  if sha(wd/'UiWaitSnapshot.o')!=wait_report['object_sha256']:raise ValueError('UI register sampler object changed')
+  objects.append(wd/'UiWaitSnapshot.o')
+ subprocess.run(['xcrun','ar','rcs',str(archive)]+[str(o) for o in objects],check=True)
  # Every private class import and native_legacy callback must be supplied by archive members.
  undef=set();defined=set()
- for obj in (out/'NativeLegacyDisplay.late.o',a.registration_object,out/'original-bindings.o'):
+ for obj in objects:
   undef.update(subprocess.check_output(['xcrun','nm','-u',str(obj)],text=True).split())
   defined.update(line.split()[-1] for line in subprocess.check_output(['xcrun','nm','-gU',str(obj)],text=True).splitlines() if line.split())
- missing={n for n in undef-defined if n.startswith('_native_legacy_') or '25IOMobileFramebufferLegacy' in n or '__GLOBAL__sub_I_NativeLegacyDisplay' in n}
+ missing={n for n in undef-defined if n.startswith(('_native_legacy_','_native_aks_','_native_keyevents_','_native_t970_keystore_','_t970_keystore_')) or '25IOMobileFramebufferLegacy' in n or '__GLOBAL__sub_I_NativeLegacyDisplay' in n or '__GLOBAL__sub_I_NativeKeyStoreEvents' in n}
  if missing:raise ValueError(str(sorted(missing)))
- (out/'build-report.json').write_text(json.dumps(dict(archive_sha256=sha(archive),bindings={k:hex(v) for k,v in bind.items()},gop_object_sha256=sha(a.gop_object),registration_object_sha256=sha(a.registration_object),private_imports_resolved=True,kernel_linked=False,runtime_verified=False),indent=2)+'\n')
+ sources={str(DEVICE/'package/T970Display/DisplayRegistration.cpp'):reg['source_sha256'],str(DEVICE/'package/T970Display/T970GopGeometry.h'):reg['geometry_header_sha256']}
+ if key_report:
+  sources[str(DEVICE/'package/T970Display/KeyStoreRegistration.cpp')]=key_report['board_source_sha256']
+  sources[str(a.framework.resolve()/'drivers/AppleKeyStoreState/NativeKeyStoreEvents.cpp')]=key_report['source_sha256']
+ if wait_report:sources[str(DEVICE/'package/T970Display/UiWaitSnapshot.c')]=wait_report['source_sha256']
+ for name,digest in sources.items():
+  if sha(Path(name))!=digest:raise ValueError('Source changed since compilation: '+name)
+ (out/'build-report.json').write_text(json.dumps(dict(archive_sha256=sha(archive),bindings={k:hex(v) for k,v in bind.items()},gop_object_sha256=sha(a.gop_object),registration_object_sha256=sha(a.registration_object),key_state=key_report,source_sha256=sources,private_imports_resolved=True,kernel_linked=False,runtime_verified=False),indent=2)+'\n')
  print('PASS: late archive built; private class imports and board callbacks resolved')
 if __name__=='__main__':main()

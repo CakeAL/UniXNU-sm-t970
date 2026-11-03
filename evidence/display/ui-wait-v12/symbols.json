@@ -1,0 +1,63 @@
+{
+  "cache_slide": "0x10914000",
+  "cache_uuid": "590d839a82d230f1a17d0cc053420f73",
+  "local_symbols_uuid_matches": true,
+  "live_sample": true,
+  "frames": [
+    {
+      "address": "0x1dc094ad4",
+      "unslid_va": "0x1cb780ad4",
+      "image": "/usr/lib/system/libsystem_kernel.dylib",
+      "nearest_symbol": "_semaphore_wait_trap",
+      "symbol_table": "exported",
+      "offset": 8,
+      "original_instruction_bytes": "c0035fd690048092"
+    },
+    {
+      "address": "0x19fe9afe8",
+      "unslid_va": "0x18f586fe8",
+      "image": "/usr/lib/system/libdispatch.dylib",
+      "nearest_local_symbol": "__dispatch_sema4_wait$VARIANT$armv81",
+      "offset": 24,
+      "nearest_symbol": "__dispatch_sema4_wait$VARIANT$armv81",
+      "symbol_table": "local",
+      "original_instruction_bytes": "1f340071cd000054"
+    },
+    {
+      "address": "0x1dc094b58",
+      "unslid_va": "0x1cb780b58",
+      "image": "/usr/lib/system/libsystem_kernel.dylib",
+      "nearest_symbol": "_mach_msg2_trap",
+      "symbol_table": "exported",
+      "offset": 8,
+      "original_instruction_bytes": "c0035fd6f0058092"
+    },
+    {
+      "address": "0x1dc098224",
+      "unslid_va": "0x1cb784224",
+      "image": "/usr/lib/system/libsystem_kernel.dylib",
+      "offset": 76,
+      "nearest_symbol": "_mach_msg2_internal",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "00050034fa013037"
+    },
+    {
+      "address": "0x1dc0948e8",
+      "unslid_va": "0x1cb7808e8",
+      "image": "/usr/lib/system/libsystem_kernel.dylib",
+      "nearest_symbol": "___workq_kernreturn",
+      "symbol_table": "exported",
+      "offset": 8,
+      "original_instruction_bytes": "e3000054fd7bbfa9"
+    },
+    {
+      "address": "0x1edf36580",
+      "unslid_va": "0x1dd622580",
+      "image": "/usr/lib/system/libsystem_pthread.dylib",
+      "offset": 360,
+      "nearest_symbol": "__pthread_wqthread",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "68ae80b9f457bfa9"
+    }
+  ]
+}

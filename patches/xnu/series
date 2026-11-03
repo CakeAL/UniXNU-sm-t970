@@ -21,3 +21,5 @@ t970-smp-publish-reset-state.patch
 t970-smp-ipi-check.patch
 t970-runtime-cache-trace.patch
 t970-ui-spawn-state.patch
+t970-ui-spawn-calls.patch
+t970-ui-wait-state.patch

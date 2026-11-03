@@ -1,0 +1,80 @@
+"""Actual register sampler: bounded traversal, try-lock failures and IRQ restoration."""
+from pathlib import Path
+import subprocess
+import tempfile
+import unittest
+
+
+class WaitState(unittest.TestCase):
+    def test_lock_copy_and_bounds(self):
+        added = (Path(__file__).resolve().parents[1] / 'package/T970Display/UiWaitSnapshot.c').read_text()
+        block = added[added.index('/* T970_UI_WAIT_BEGIN'):added.index('/* T970_UI_WAIT_END */')]
+        stub = r'''
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdarg.h>
+#include <assert.h>
+typedef int boolean_t;
+#define FALSE 0
+#define PROC_RETURNED 0
+#define PROC_RETURNED_DONE 1
+#define PROC_ALLPROCLIST 1
+#define PROC_NOWAITTRANS 4
+typedef struct state { uint64_t pc,lr,regs[17]; int is64; } arm_saved_state_t;
+typedef struct thread { struct thread *next; int sched_lock; struct {arm_saved_state_t *upcb;} machine; } *thread_t;
+typedef struct task { thread_t threads; unsigned thread_count; int busy; unsigned task_shared_region_slide; } *task_t;
+typedef struct proc { int pid; char name[17]; task_t task; } *proc_t;
+static int irq=1,entry_irq=1,taskHeld,schedHeld,thread_lck_grp;
+static unsigned copies,visits;
+static struct proc processes[3];
+static int proc_pid(proc_t p){return p->pid;}
+static void proc_name(int pid,char *out,unsigned size){assert(pid>=0&&pid<3);snprintf(out,size,"%s",processes[pid].name);}
+static task_t proc_task(proc_t p){return p->task;}
+static int ml_get_interrupts_enabled(void){return irq;}
+static int ml_set_interrupts_enabled(int value){int old=irq;irq=value;return old;}
+static int task_lock_try(task_t task){assert(!taskHeld&&!schedHeld);if(task->busy)return 0;taskHeld=1;return 1;}
+static void task_unlock(task_t task){(void)task;assert(taskHeld&&!schedHeld&&irq==entry_irq);taskHeld=0;}
+static int simple_lock_try(int *lock,int *group){assert(taskHeld&&!schedHeld&&!irq&&group==&thread_lck_grp);if(*lock)return 0;schedHeld=1;return 1;}
+static void thread_unlock(thread_t thread){(void)thread;assert(taskHeld&&schedHeld&&!irq);schedHeld=0;}
+static int is_saved_state64(arm_saved_state_t *s){assert(taskHeld&&schedHeld&&!irq);return s->is64;}
+static uint64_t get_saved_state_pc(arm_saved_state_t *s){++copies;assert(taskHeld&&schedHeld&&!irq);return s->pc;}
+static uint64_t get_saved_state_lr(arm_saved_state_t *s){return s->lr;}
+static uint64_t get_saved_state_reg(arm_saved_state_t *s,unsigned n){return s->regs[n];}
+#define queue_iterate(head,thread,type,field) for(thread=*(head);thread;thread=thread->next)
+static void proc_iterate(unsigned flags,int (*callback)(proc_t,void *),void *context,void *filter,void *arg){
+ assert(flags==(PROC_ALLPROCLIST|PROC_NOWAITTRANS)&&!filter&&!arg);
+ for(unsigned i=0;i<3;++i){++visits;if(callback(&processes[i],context)==PROC_RETURNED_DONE)break;}
+}
+static int unlocked_snprintf(char *out,size_t size,const char *format,...){
+ assert(!taskHeld&&!schedHeld&&irq==entry_irq);
+ va_list ap;va_start(ap,format);int n=vsnprintf(out,size,format,ap);va_end(ap);return n;
+}
+#define snprintf unlocked_snprintf
+'''
+        main = r'''
+#undef snprintf
+int main(void){
+ struct state states[10];struct thread threads[10];memset(states,0,sizeof(states));memset(threads,0,sizeof(threads));
+ for(unsigned i=0;i<10;++i){states[i].is64=1;states[i].pc=UINT64_MAX;states[i].lr=UINT64_MAX;states[i].regs[16]=UINT64_MAX;states[i].regs[1]=UINT64_MAX;states[i].regs[3]=UINT64_MAX;threads[i].machine.upcb=&states[i];threads[i].next=i==9?NULL:&threads[i+1];}
+ struct task task={threads,10,0,0x12340000};
+ processes[0]=(struct proc){0,"SpringBoard",&task};processes[1]=(struct proc){1,"backboardd",&task};processes[2]=(struct proc){2,"ignored",&task};
+ const char *text=native_t970_ui_wait_text();assert(visits==2&&copies==8&&strlen(text)<1408);assert(strstr(text,"threads=10 visited=4 busy=0"));assert(strstr(text,"slide=12340000"));assert(strstr(text,"S4 pc=ffffffffffffffff"));assert(strstr(text,"b4 pc=ffffffffffffffff"));assert(!strstr(text,"S5"));
+ copies=0;threads[0].sched_lock=1;text=native_t970_ui_wait_text();assert(copies==6&&strstr(text,"busy=1"));assert(irq==1&&!taskHeld&&!schedHeld);
+ task.busy=1;text=native_t970_ui_wait_text();assert(strstr(text,"status=3 threads=0 visited=0 busy=0"));task.busy=0;
+ processes[0].task=processes[1].task=NULL;text=native_t970_ui_wait_text();assert(strstr(text,"status=2"));
+ irq=entry_irq=0;text=native_t970_ui_wait_text();assert(strstr(text,"status=1")&&!irq);irq=entry_irq=1;
+ processes[0].task=&task;threads[0].sched_lock=0;threads[0].machine.upcb=NULL;states[1].is64=0;
+ copies=0;text=native_t970_ui_wait_text();assert(copies==2&&strstr(text,"S3 pc=")&&!strstr(text,"S1 pc="));
+ struct {struct native_t970_ui_wait_buffer out;uint64_t guard;} checked={0};checked.guard=0x123456789abcdef0ULL;
+ checked.out.used=sizeof(checked.out.text)-2;
+ native_t970_ui_wait_collect(&processes[0],&checked.out);assert(checked.guard==0x123456789abcdef0ULL&&checked.out.used==sizeof(checked.out.text)-1&&!checked.out.text[sizeof(checked.out.text)-1]);
+ return 0;
+}
+'''
+        with tempfile.TemporaryDirectory() as directory:
+            source, exe = Path(directory) / 'test.c', Path(directory) / 'test'
+            source.write_text(stub + block + main)
+            subprocess.run(['xcrun','clang','-std=c11','-Wall','-Wextra','-Werror',
+                            '-fsanitize=address,undefined',str(source),'-o',str(exe)],check=True)
+            subprocess.run([str(exe)],check=True)

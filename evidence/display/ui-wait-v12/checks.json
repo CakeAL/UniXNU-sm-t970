@@ -1,0 +1,24 @@
+{
+  "boot_sha256": "d80a3773dd0614e6106a9c15b7df355781eb82dd54d193bd0a81bbdc56e2b365",
+  "source": "package/T970Display/UiWaitSnapshot.c",
+  "source_sha256": "afdec0ea31454f234084771a4541ba62e20b69c506f03dcb53bca7f9596d8b0f",
+  "checks": {
+    "actual_helper_asan_ubsan": true,
+    "filtering_and_four_thread_cap": true,
+    "task_and_sched_trylock_failure": true,
+    "irq_restore_before_formatting": true,
+    "null_and_non64_state": true,
+    "shared_region_slide": true,
+    "output_canary": true,
+    "current_mach_private_compile": true,
+    "kernel_link_prelink": true,
+    "final_fat_roundtrip": true
+  },
+  "limitations": [
+    "Not a frozen or complete stack snapshot",
+    "No user VM reads or Mach-port peer lookup",
+    "Process traversal may wait; timer is not a hard deadline",
+    "Task/thread APIs are host stand-ins in helper tests",
+    "Device register capture still pending"
+  ]
+}
