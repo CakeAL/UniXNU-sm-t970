@@ -11,7 +11,7 @@
 512MiB请求现已实机到达main，XNU管理约439MiB；CPU0与原DTS保留范围保持。
 两核实验6fe3e519已确认cpu2/sec1、CPU1 step7/C入口4及两核计时器；
 唤醒前发布页表交接状态后，副核TTBR1与主核一致。ArmCpu内联汇编分隔修复后，两核SGI接收44/102已确认。同内核八核版d95c45d9已实测cpu8/sec7、全部副核step7及八核SGI接收。
-10秒时CPU4/5/7计时器仍0且main0/n2；持续运行、逐核计时器负载和用户态推进待验证，默认DTS仍CPU0。
+八核BOOT3da265b4在60秒已实测main1、67个进程、SpringBoard27/runningboardd26，全部核心timer/SGI均正；backboardd此次未观察到。持续稳定性、受控逐核负载和桌面待验证，默认DTS仍CPU0。
 BOOT6b83f4e6已恢复真实PMGR，并越过强制的可写APFS Data挂载检查，启动watchdogd（PID102），
 随后因SIGTRAP停止。临时策略版的隔离检查已实测main1/Data0/policy0/stage4，确认RAM策略文件写入完成。
 普通2387e904保留；服务采样eeeba83b已实测109个进程，含SpringBoard27、backboardd56、runningboardd26，

@@ -6,7 +6,7 @@ schema_version = 1
 name = "sm-t970"
 soc = "SM8250"
 os_profile = "ipados-17.7.11-21H461"
-summary = "SM-T970: CPU0 previously reached launchd main and109 services;512MiB owned request and RAM Data policy verified. BOOT6fe3e519 now confirms two CPUs online, secondary phase7/C entry4, both per-core timers advancing, and matching TTBR1 after publishing reset translation inputs. SGI/IPI,8-core, sustained services, persistent Data and GUI remain unverified."
+summary = "SM-T970: eight-core BOOT3da265b4 reaches launchd main1 and67 processes, SpringBoard27/runningboardd26; all cores show timer/SGI.512MiB owned window and RAM Data policy verified. Sustained SMP, controlled workload, persistent Data and GUI remain unverified; display ABI host audit passed, backend still disabled."
 
 [[area]]
 id = "configuration"
@@ -387,6 +387,7 @@ procedure = [
   "Collect /proc/cpuinfo, online/present CPU lists, cpufreq policies, /proc/interrupts and the live DT using the inventory script.",
 ]
 findings = [
+  "BOOT3da265b4 target60 owner photo confirms main1/n67/cpu8/sec7, SpringBoard27/runningboardd26, Data0/policy0/stage4 and all-core positive timer/SGI snapshots. Backboardd not observed; free0x183 excludes reclaimable memory, not sole OOM proof. Sustained runtime, controlled CPU workload and desktop remain unverified. See runtime-cache60/device-result.json.",
   "Target45 BOOTbe219c43 owner photo confirms cpu8/sec7/main0/n2, blocks729210 and108 completed cache calls. Latest openat successfully opens final numbered subcache52.dyldlinkedit; recent open/fcntl errors0. Last signature-registration return and shared mapping not yet observed. Same-kernel target60 BOOT3da265b4 prepared, independently checked and uploaded BOOT-only with exit0; see runtime-cache45/device-result and runtime-cache60. No authorization changes or completed-main claim.",
   "Target30 BOOT79a949b6 shows cpu8/sec7/main0/n2, blocks546747 and82 completed cache syscalls, latest openat subcache39 with error0; recent fcntl97 signature registration also succeeds. Host SystemOS inventory has52 numbered subcaches;40..52 logical bytes989839360. Same-kernel target45 be219c43 prepared to observe mapping/main progress; no authorization or signature behavior changes.",
   "Same-kernel eight-core target20 image0dba26bc reproduces cpu8/sec7/secondary phase7/C4 and main0/n2. Verified blocks371515 versus189168 at target10 suggests continued reading across comparable boots. CPU5 timer2 observed; CPU4/6/7 timer0. Added optional compact runtime view of existing completed PID1 cache syscalls at target30 to localize startup without changing authorization or syscall behavior.",
@@ -581,6 +582,7 @@ procedure = [
   "Capture root-readable /proc/iomem and the live DT, then compare physical memory and reserved-memory reg values.",
 ]
 findings = [
+  "BOOT3da265b4 target60 owner photo confirms main1/n67/cpu8/sec7, SpringBoard27/runningboardd26, Data0/policy0/stage4 and all-core positive timer/SGI snapshots. Backboardd not observed; free0x183 excludes reclaimable memory, not sole OOM proof. Sustained runtime, controlled CPU workload and desktop remain unverified. See runtime-cache60/device-result.json.",
   "After corrected carriers were backed up/updated and fully readback-verified under explicit authorization, BOOT097c4f8c owner photo shows memorystatus no-victim (available3060pages), rather than prior cache EACCES. This is not proof of full mapping/launchd main. Source retains73293824bytes of carrier plus another73293824bytes of duplicated manifest tables. Borrow only exact authenticated driver-owned boot-lifetime allocations, protect them readonly, retain separate private readonly key pages and reauthenticate; fallback sources still copy. Teardown never frees borrowed carrier. Actual configure/free host ASan/UBSan+mprotect lifecycle/failure tests pass; Normal BOOT12766f5f stalls with persistent bars over3minutes. Isolated BOOTef97eb6a resets about10seconds after magenta per owner, confirming at least one shared-policy vr_open return but not success status. BOOTc544bae1 before-init-exec checkpoint immediately resets per owner, confirming the exec call boundary only; exec and launchd success remain unverified. Session stopped at owner request. EFI owned window remains256MiB.",
   "BOOT cfbd84ba photo confirms stage4: ID/VALID/S2CR accepted, direct FAULT restore200ff succeeded without fallback, allRestored/mappingsUnchanged=1 and GFSR=0. Six context states captured; CB0..4 already configured with FSR400 of unknown age, CB73 SCTLR3ab3a706 is not a verified free bank. No context writes, DMA or UFS commands occurred.",
   "Combined field diagnostic BOOT cfbd84ba34fc03b50661b46c9e22fe59c43ba651bca6967da49f1df1ec373e75 prepared from source7ee2918/kernel53e9e68c. Thirteen host tests, input-stable kernel build, independent FAT/arguments/FD checks and DT/ADT check passed. BOOT-only upload exited0; actual VALID/S2CR/restoration/context observations remain pending.",
@@ -912,6 +914,10 @@ id = "display"
 status = "planned"
 components = []
 paths = [
+  "scripts/check-display-abi.py",
+  "docs/display-bringup.md",
+  "evidence/display/abi21h461/**",
+  "evidence/cpu/smp-bringup/runtime-cache60/**",
   "evidence/storage/watchdogd/runtime-report/**",
   "evidence/bring-up/runtime/after-mmu-brk-control/**",
   "evidence/bring-up/runtime/console-create-guarded/**",
@@ -932,6 +938,8 @@ procedure = [
   "Collect DRM modes, panel type and brightness limits; read only display-selection tokens from /proc/cmdline and match the selected S6TUUM3 node in the live DT.",
 ]
 findings = [
+  "GopFramebuffer cf3b429 NativeLegacyDisplay compiled with current T970 XNU recipe and Wall/Wextra/Werror. Actual Mach-O relocation audit confirms358 virtual entries and24 expected owned methods/abstract leaves. Original/candidate ABI audit checks native-symbol rebound slots, nine abstract leaves, seven IOSurface getters and unchanged graphics text. Object only: registration callbacks, linked archive, runtime mapping/publication/presentation remain pending. See evidence/display/abi21h461.",
+  "BOOT3da265b4 target60 owner photo confirms main1/n67/cpu8/sec7, SpringBoard27/runningboardd26, Data0/policy0/stage4 and all-core positive timer/SGI snapshots. Backboardd not observed; free0x183 excludes reclaimable memory, not sole OOM proof. Sustained runtime, controlled CPU workload and desktop remain unverified. See runtime-cache60/device-result.json.",
   "BOOTeeeba83b owner photo19:36:40 shows requested120-second runtime report: genuine main1,109 processes, watchdogd absent, SpringBoard27/backboardd56/runningboardd26, Data0/policy0/stage4,964876 verified blocks. Kernel deadline-wait/report executed; rate accuracy unmeasured. Interface-service process presence is not proof of rendering or functional services. Display backend remains disabled; next phase is display handoff/provider and independent staged SMP qualification.",
   "BOOT 933a5d77 device screen is confirmed through END slots=87. Corrected SM8250 GCC gate passes; HCE=1 HCS=10f IS=400, both queue run-stop bits set and both doorbells zero, UTRLBA=9b296000. The sole valid SMR 84020820/S2CR 4 exactly matches the captured display SID 0820 mask 0402; preserve slot 04 and CB4. Candidate residues in invalid slots 02/03 are not active routes. No DMA, SCSI or root read was attempted.",
   "Uploaded deliberate after-MMU BRK control 150ed5ff9d73d81b17d3f6d32e609b9a9e42fdfe0397da7c5eea7d62f7ce7b4d, using patched Heimdall, exit 0. The device reset at about 50 seconds, matching the reviewed BRK path; original BOOT restoration is still pending. C startup and console behavior are not exercised.",
@@ -960,6 +968,7 @@ limits = [
   "Framebuffer physical address, stride, pixel format and UEFI GOP handoff are not verified by the mode list.",
 ]
 next_action = [
+  "Build a T970-specific GopFramebuffer archive and registration/mapping callbacks from the audited358-slot ABI; verify service publication then CPU presentation and swap completion. Backend remains disabled; no new display image prepared or uploaded.",
   "Establish whether PE_create_console returns in the repaired kernel and classify early faults. Retained UEFI pixels do not verify XNU text rendering.",
 ]
 evidence = [
@@ -1532,6 +1541,7 @@ procedure = [
   "Run python3 scripts/collect-adb-inventory.py --root --output evidence/<new-capture>; review per-command stderr, checksums, GPT CRC results and DT sanitization before updating this record.",
 ]
 findings = [
+  "BOOT3da265b4 target60 owner photo confirms main1/n67/cpu8/sec7, SpringBoard27/runningboardd26, Data0/policy0/stage4 and all-core positive timer/SGI snapshots. Backboardd not observed; free0x183 excludes reclaimable memory, not sole OOM proof. Sustained runtime, controlled CPU workload and desktop remain unverified. See runtime-cache60/device-result.json.",
   "BOOT95accf53 owner photo confirms CPU1 entry3 (matched CPU data and reached common_start boundary); C marker4 not seen. Target10 snapshot main0/n2 is earlier than old120 samples. Added secondary-only common/TCR/table/SCTLR/trampoline markers without changing CPU setup values. See entry-trace/device-result.json and MMU trace records.",
   "Two-core BOOT9d4dc888 observed main1 and106 processes but one CPU available; CPU1 phase4/PSCI0/timer0/SGI0. Reset table, CPU1 affinity and reset handler match. Entry execution remains unconfirmed. Added four diagnostic entry milestones and shortened future target wait to10 seconds; default CPU0 unchanged,8-core not uploaded. See evidence/cpu and docs/smp-bringup.md; source/build checks are not hardware SMP qualification.",
   "BOOTeeeba83b owner photo19:36:40 shows requested120-second runtime report: genuine main1,109 processes, watchdogd absent, SpringBoard27/backboardd56/runningboardd26, Data0/policy0/stage4,964876 verified blocks. Kernel deadline-wait/report executed; rate accuracy unmeasured. Interface-service process presence is not proof of rendering or functional services. Display backend remains disabled; next phase is display handoff/provider and independent staged SMP qualification.",

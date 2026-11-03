@@ -3,6 +3,20 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
+## 最新：八核main1与服务启动已确认，进入显示接入（2026-11-03）
+
+BOOT3da265b4的12:25:28照片显示main1/n67/cpu8/sec7，SpringBoard27、runningboardd26，
+backboardd此次未观察到；全部核心timer/SGI为正，Data0/策略0/stage4。
+free0x183仅为free队列，不包含可回收页，尚不能判定OOM。
+照片绑定见runtime-cache60/device-result.json。本次终止采样已停止运行。
+
+本机原始kernelcache与当前3d114c44候选的Legacy ABI检查通过：358槽位（包含按名称
+重绑定的原生基类方法）、9个抽象叶、7个IOSurface getter，原版图形代码段完整。
+见scripts/check-display-abi.py和evidence/display/abi21h461/audit.json。
+GopFramebuffer cf3b429实际对象编译通过，实际358槽/24个自有方法形状检查通过；
+证据见abi21h461/object-check.json。显示后端仍关闭，尚未链接显示归档或刷入新的显示镜像。
+下一步构建T970专用注册/GOP映射与完成回调，验证发布后再检查实际呈现。
+
 ## 最新：45秒已打开缓存.52，60秒同内核检查已刷入（2026-11-03）
 
 be219c43的12:21:40照片：cpu8/sec7/main0/n2、blocks729210、cache syscalls108，
