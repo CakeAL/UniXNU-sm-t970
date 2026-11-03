@@ -1,0 +1,14 @@
+{
+  "reason": "Owner requests one uninterrupted full boot attempt",
+  "same_kernel_as_display_v2": true,
+  "terminal_runtime_report": false,
+  "cpu_present": true,
+  "software_vsync_hz": 60,
+  "hardware_rendering_verified": false,
+  "display_state_draft_not_compiled": ".cache/display-state-draft.patch",
+  "limits": [
+    "Original backend retains unimplemented abstract-leaf guards; compositor may stop there.",
+    "Software rendering compatibility and physical refresh timing remain unverified.",
+    "RAM Data remains volatile and owned RAM request remains512MiB."
+  ]
+}

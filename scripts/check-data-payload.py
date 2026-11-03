@@ -41,6 +41,7 @@ def main():
     parser.add_argument('--ipi-check', action='store_true', help='Require the explicit bounded CPU1 SGI delivery check')
     parser.add_argument('--cache-trace', action='store_true', help='Require compact runtime PID1 cache trace')
     parser.add_argument('--display-probe', action='store_true', help='Require explicit T970 GOP service probe arguments and linked callbacks')
+    parser.add_argument('--cpu-present', action='store_true', help='Require continuous CPU presentation arguments')
     args = parser.parse_args()
     require(args.runtime_report_seconds == 0 or 5 <= args.runtime_report_seconds <= 300,
             'Runtime sampler interval must be 5..300 seconds')
@@ -69,7 +70,7 @@ def main():
         require({'_native_t970_runtime_collect', '_native_t970_runtime_report',
                  '_native_t970_initproc_main'} <= names, 'Kernel lacks the runtime sampler')
     if args.smp_observer:
-        require(args.runtime_report_seconds and {'_native_t970_reset_context', '_processor_avail_count',
+        require((args.runtime_report_seconds or args.cpu_present) and {'_native_t970_reset_context', '_processor_avail_count',
                 '_armcpu_smp_step', '_armcpu_smp_psci_rc', '_armcpu_smp_fail',
                 '_armcpu_core_timer', '_armcpu_core_sgi'} <= names, 'Kernel lacks SMP observation interfaces')
     report = json.loads((work / 'payload/payload.json').read_text())
@@ -101,6 +102,9 @@ def main():
     if args.display_probe:
         expected_args += ['t970-display-start=1','offline-mobile-graphics-load=1','offline-legacy-register=1','offline-legacy-gop=1','offline-legacy-phase=4','offline-legacy-pm=1']
         require(all(n in names for n in ['_native_legacy_display_probe','_native_legacy_display_late_probe','_native_legacy_gop_mapping_observed']), 'Missing display callbacks')
+    if args.cpu_present:
+        require(args.display_probe and args.runtime_report_seconds == 0, 'CPU presentation requires continuous explicit display probe')
+        expected_args += ['offline-legacy-transfer=1','offline-legacy-validate=1','offline-legacy-cpu-present=1','offline-legacy-retire=1','sheng-vsync=60']
     require(sorted(entry['args'].split()) == sorted(expected_args), 'Unexpected effective boot arguments')
     require(config['boot']['default'] == 'xnu' and entry['initrd'] == 'Payloads/scratch-data.img',
             'Wrong default entry/Data initrd')
@@ -150,6 +154,7 @@ def main():
     result['smp_observer'] = args.smp_observer
     result['publish_reset_state_requested'] = args.publish_reset_state
     result['ipi_check_requested'] = args.ipi_check
+    result['continuous_cpu_present'] = args.cpu_present
     result['runtime_cache_trace_requested'] = args.cache_trace
     (out / 'validation.json').write_text(json.dumps(result, indent=2) + '\n')
     print(json.dumps(result, indent=2))

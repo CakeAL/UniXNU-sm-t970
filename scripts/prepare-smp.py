@@ -42,7 +42,9 @@ def main():
     base = args.base.read_bytes()
     validation = json.loads(args.base_validation.read_text())
     require(sha(base) == validation['boot_sha256'] and validation['exact_fd_dtb'] and
-            validation['watchdog_policy_requested'] and 5 <= validation['runtime_report_target_seconds'] <= 300,
+            validation['watchdog_policy_requested'] and
+            (5 <= validation['runtime_report_target_seconds'] <= 300 or
+             (validation.get('continuous_cpu_present') is True and validation['runtime_report_target_seconds'] == 0 and not validation['terminal_diagnostic'])),
             'Require a verified CPU0 policy/runtime-sampler base')
     sys.path.insert(0, str(FRAMEWORK / 'scripts'))
     from unixnu import devicetree as dt
@@ -187,7 +189,7 @@ def main():
                   captured_affinities_verified=True, ipi='Standard SGI0; self test on, SPI fallback off',
                   armcpu_revision=armcpu_revision, armcpu_source_sha256=sha(armcpu_text.encode()),
                   actual_sgi_expression_host_cases=8, psci_and_cache_clean_source_verified=True,
-                  terminal_runtime_report=True, target_wait_seconds=validation['runtime_report_target_seconds'], hardware_result_pending=True)
+                  terminal_runtime_report=validation['terminal_diagnostic'], target_wait_seconds=validation['runtime_report_target_seconds'], hardware_result_pending=True)
     (out / 'preparation.json').write_text(json.dumps(report, indent=2) + '\n')
     print(json.dumps(report, indent=2))
 

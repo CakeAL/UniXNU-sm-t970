@@ -3,6 +3,15 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
+
+## 持续CPU呈现尝试（2026-11-03）
+
+按机主要求，BOOTc39efc0f沿用0adf72f3/1f9ea7ae内核，八核，移除runtime终止参数，
+启用transfer/validate/cpu-present/retire与sheng-vsync=60。该60Hz是软件通知请求，非面板实测。
+原始信任、种子与固件保持，独立打包检查通过；具体上传结果见continuous-v1/upload.json。
+运行到自然错误或持续呈现，未证明桌面成功。原有未实现抽象接口仍可能触发保护性panic。
+显示状态报告草稿保存.cache/display-state-draft.patch，未编译进本镜像。
+
 ## 最新：八核显示接入BOOT5e318d75准备并上传（2026-11-03）
 
 显示归档链接/预链接成功，源内核0adf72f3/payload1f9ea7ae，BOOT5e318d75。

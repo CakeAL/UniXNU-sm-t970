@@ -914,6 +914,8 @@ id = "display"
 status = "planned"
 components = []
 paths = [
+  "scripts/prepare-smp.py",
+  "evidence/display/continuous-v1/**",
   "scripts/link-display-archive.py",
   "scripts/check-data-payload.py",
   "evidence/display/integration-v2/**",
@@ -945,6 +947,7 @@ procedure = [
   "Collect DRM modes, panel type and brightness limits; read only display-selection tokens from /proc/cmdline and match the selected S6TUUM3 node in the live DT.",
 ]
 findings = [
+  "Owner requested full continuous boot: same-kernel BOOTc39efc0f prepared with8 CPUs, runtime sampler absent, CPU transfer/validation/retirement and software vsync60 enabled. Independent packing checks pass; rendering and physical refresh unverified. Abstract backend guards remain. See evidence/display/continuous-v1 upload and pending hardware observation.",
   "BOOT5e318d75 target60 owner photo17:09:08 confirms main1/n69/cpu8/sec7, SpringBoard27/runningboardd26 and IOMFB_bics_daemon86; backboardd not observed. No dedicated display counters yet, so publication/mapping/presentation not qualified. BOOT-only upload exit0; next add direct stage/status sampling.",
   "Display late archive linked after removing duplicated board-owned early frame counters. Kernel0adf72f3 prelink and independent BOOT5e318d75 packing checks pass; isolated work .config enables Legacy only, defaults unchanged. Eight-core target60 explicit GOP/PM integration probe; CPU presentation off. Runtime report lacks dedicated publication counters, so main1 alone will not verify display. Hardware observation pending; see evidence/display/integration-v2.",
   "T970 display registration/mapping/observation callbacks implemented behind explicit t970-display-start=1. Current XNU compile and actual GOP board callback-symbol checks pass; nine native_legacy original-family aliases plus original class/kernel bindings still require final linking. Geometry helper passes17 rejected and2 accepted assertions. No archive/BOOT or device publication/rendering result; failure cleanup not API-injection tested. See evidence/display/registration-v1.",

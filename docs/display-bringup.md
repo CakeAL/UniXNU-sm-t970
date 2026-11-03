@@ -65,3 +65,11 @@ out/data-bringup/pre-display-v1。完整BOOT5e318d75为8核、目标60秒、显�
 
 17:09:08实机：main1/n69/cpu8/sec7、SpringBoard27/runningboardd26、IOMFB_bics_daemon86；
 未观察到backboardd。无专用显示计数，尚不能确认发布或呈现，下一版增加状态采样。
+
+## 持续CPU呈现尝试（2026-11-03）
+
+按机主要求，BOOTc39efc0f沿用0adf72f3/1f9ea7ae内核，八核，移除runtime终止参数，
+启用transfer/validate/cpu-present/retire与sheng-vsync=60。该60Hz是软件通知请求，非面板实测。
+原始信任、种子与固件保持，独立打包检查通过；具体上传结果见continuous-v1/upload.json。
+运行到自然错误或持续呈现，未证明桌面成功。原有未实现抽象接口仍可能触发保护性panic。
+显示状态报告草稿保存.cache/display-state-draft.patch，未编译进本镜像。
