@@ -148,5 +148,6 @@
       "symbol_table": "local",
       "original_instruction_bytes": "e00317aafd7b43a9"
     }
-  ]
+  ],
+  "transcription_correction": "Address0x1b5d940e0 rejected after image/instruction cross-check; use0x1b5d94be0 in symbols-corrected-first-frame.json. Other rows unchanged."
 }

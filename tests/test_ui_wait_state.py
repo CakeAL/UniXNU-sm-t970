@@ -114,6 +114,10 @@ int main(void){
  captureStarted=captureDone=0;userStacks=3;processes[2].task=&task;strcpy(processes[2].name,"MobileGestaltHel");
  text=native_t970_ui_wait_text();assert(strstr(text,"stacks=3")&&strstr(text,"MobileGestal p2")&&strstr(text,"M1 FP=")&&strstr(text,"M2 FP="));
  assert(!strstr(text,"M3 FP=")&&!strstr(text,"backboardd p")&&!map_storage.refs);userStacks=1;
+ captureStarted=captureDone=0;userStacks=4;
+ for(unsigned i=4;i<8;++i)states[i].fp=0x10000;
+ text=native_t970_ui_wait_text();assert(strstr(text,"stacks=4")&&strstr(text,"visited=8")&&strstr(text,"M5 FP=")&&strstr(text,"M8 FP="));
+ assert(!strstr(text,"M1 st=")&&!strstr(text,"M9 st=")&&!map_storage.refs);userStacks=1;
  captureStarted=captureDone=0;workerError=17;text=native_t970_ui_wait_text();assert(strstr(text,"worker start error=17"));workerError=0;
  captureStarted=captureDone=0;stalled=1;text=native_t970_ui_wait_text();assert(waitCount==20&&strstr(text,"partial rows hidden"));
  return 0;

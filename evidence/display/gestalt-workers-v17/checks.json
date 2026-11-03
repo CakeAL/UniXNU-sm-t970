@@ -1,0 +1,16 @@
+{
+  "boot_sha256": "6da8d322641f359a4147f729b3f1a087f2244908654b18289ed1e7b593ffa748",
+  "target_wait_seconds": 90,
+  "stack_mode": 4,
+  "actual_helper_asan_ubsan": true,
+  "helper_queued_threads_5_to_8": true,
+  "visited_cap": 8,
+  "stored_row_cap": 4,
+  "current_mach_private_compile": true,
+  "kernel_link_prelink": true,
+  "independent_pack_check": true,
+  "final_fat_roundtrip": true,
+  "record_schema_check": true,
+  "platform_check": "refused: framework differs from reviewed revision",
+  "device_result_pending": true
+}

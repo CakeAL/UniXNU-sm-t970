@@ -1,0 +1,23 @@
+{
+  "original_kernelcache_sha256": "f18b4df865405f2a287b84977d7aca745e056d656d9fc9df1662970ce2969de7",
+  "cache_uuid": "590d839a82d230f1a17d0cc053420f73",
+  "original_user_code_modified": false,
+  "wait_helper": "0x1a0230b54",
+  "wait_return_pc": "0x1a0230be0",
+  "queue_block": "0x1a0230c00",
+  "runloop_mode": "MobileGestaltRunLoopMode",
+  "syscfg_function": "0x1a0231cac",
+  "fallback_service": "AppleDiagnosticDataAccessReadOnly",
+  "fallback_property": "AppleDiagnosticDataSysCfg",
+  "cached_key": "syscfg-v2-data",
+  "timeout_parameter": 5,
+  "provider_classes": [
+    "AppleARMNORFlashDevice",
+    "AppleNANDConfigAccess"
+  ],
+  "limitations": [
+    "Static control-flow review, not runtime callback execution proof",
+    "Missing provider does not establish infinite wait; normal timeout path exists",
+    "No diagnostic-data provider or synthetic capability answers added"
+  ]
+}

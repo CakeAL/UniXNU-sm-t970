@@ -1,0 +1,17 @@
+{
+  "cache_slide": "0x15b64000",
+  "cache_uuid": "590d839a82d230f1a17d0cc053420f73",
+  "local_symbols_uuid_matches": true,
+  "live_sample": true,
+  "frames": [
+    {
+      "address": "0x1b5d94be0",
+      "unslid_va": "0x1a0230be0",
+      "image": "/usr/lib/libMobileGestalt.dylib",
+      "nearest_symbol": "__MGCopyAnswerWithMode",
+      "symbol_table": "exported",
+      "offset": 106600,
+      "original_instruction_bytes": "e00317aa13d50094"
+    }
+  ]
+}

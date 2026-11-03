@@ -3,6 +3,13 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
+## 最新：MobileGestalt后半工作线程版（2026-11-04）
+
+原版MG回退路径匹配AppleDiagnosticDataAccessReadOnly，读AppleDiagnosticDataSysCfg；
+原kext依赖Apple NOR/NAND配置。其RunLoop路径仍有超时，尚不能将缺少接口当作永久阻塞根因。
+v16只访问了8线程中的前4个；mode4改采第5-8个，各最多16级FP链，报告仍90秒。
+准备/上传见gestalt-workers-v17；实机结果待回报。主机模式选择/引用释放测试及真实ABI编译通过。
+
 ## 最新：90秒MobileGestalt服务端诊断（2026-11-04）
 
 v15照片01:03:24将BB同步XPC上层定位到RemoteHID AACP → BTSessionAttachWithQueue →

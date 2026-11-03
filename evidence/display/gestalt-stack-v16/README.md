@@ -26,3 +26,5 @@ M2在处理NSXPC导出对象调用时，经_MGServerCopyAnswerWithError进入Mob
 最终在dispatch_semaphore_wait_slow等待。大偏移邻近导出符号仅作映像定位，不认定精确内部函数名。
 证明helper已启动且执行服务调用，排除本轮单纯helper未启动的解释；仍不能确定所等待的provider。
 下一步审阅原版内部等待函数和完成回调，找实际设备服务或依赖，暂不伪造MobileGestalt返回。
+
+后续指令交叉核对更正首个MG返回地址：1b5d94be0，而非初次1b5d940e0；见symbols-corrected-first-frame.json。该点在semaphore_wait返回处，原先关于MG内部等待的范围结论不变。
