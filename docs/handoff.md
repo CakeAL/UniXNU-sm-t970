@@ -3,6 +3,14 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
+## 最新：队列已推进，采修正后的主线程栈（2026-11-04）
+
+v21照片03:00:42已见三组req0，BB done161、SB75→78、MG134，显示open6/fail0，swap仍0。
+Q无请求时cap0是未采额度的零占位，不能解读为修复失败。仍没有桌面或首帧证据。
+BOOTe44011cb使用完全相同修正内核，只把stack6切回既有mode1：BB/SB各前4线程寄存器，
+首线程最多8级FP链，90秒；当前等待位置需重新确认，不能沿用修复前的IOHID信号量结论。
+准备/校验见evidence/display/ui-post-admission-v22。
+
 ## 最新：修复纯SMP拓扑的EDGE并发额度（2026-11-04）
 
 BOOT705d4160照片02:38:12已确认cap0，MG done35→37，BB/SB排队不变。打包ADT八核均无cluster-type，

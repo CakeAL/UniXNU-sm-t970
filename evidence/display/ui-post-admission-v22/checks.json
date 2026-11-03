@@ -1,0 +1,11 @@
+{
+  "boot_sha256": "e44011cb29156ae60679de64d2fb9ca8f9e3dc36eb81845124c0801cfba53f01",
+  "same_kernel_as_v21": true,
+  "kernel_sha256": "076005096bdf3db58e1699d0445c6050c5e5cfc2180edc194ec41a669b51f86f",
+  "only_argument_change": "t970-ui-stack=6 -> 1",
+  "independent_payload_check": true,
+  "final_fat_roundtrip": true,
+  "target_wait_seconds": 90,
+  "stack_limit": 8,
+  "hardware_result_pending": true
+}

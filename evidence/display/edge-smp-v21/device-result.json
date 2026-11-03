@@ -1,0 +1,93 @@
+{
+  "boot_sha256": "5385b6ce178ac4125660337759c8d1825cd7fe3eecad4f96f67a2d12758c666a",
+  "association": "post-upload owner photo; no device partition hash readback",
+  "photo_name": "\u622a\u5c4f2026-11-04 03.00.42.jpg",
+  "photo_sha256": "a804b7a473c7bc4b3c1990ab3723fac05e6f85e5674865a43245b61f2114a1a8",
+  "runtime": {
+    "target": 90,
+    "main": 1,
+    "processes": 112,
+    "cpu": 8,
+    "secondary": 7
+  },
+  "display": {
+    "open": 6,
+    "swap": 0,
+    "surface": 0
+  },
+  "queues": {
+    "MobileGestalt": {
+      "req": [
+        0,
+        0
+      ],
+      "idle": [
+        6,
+        6
+      ],
+      "scheduled": [
+        1,
+        1
+      ],
+      "made": [
+        8,
+        8
+      ],
+      "done": [
+        134,
+        134
+      ]
+    },
+    "backboardd": {
+      "req": [
+        0,
+        0
+      ],
+      "idle": [
+        5,
+        5
+      ],
+      "scheduled": [
+        0,
+        0
+      ],
+      "made": [
+        5,
+        5
+      ],
+      "done": [
+        161,
+        161
+      ]
+    },
+    "SpringBoard": {
+      "req": [
+        0,
+        0
+      ],
+      "idle": [
+        5,
+        5
+      ],
+      "scheduled": [
+        0,
+        0
+      ],
+      "made": [
+        9,
+        9
+      ],
+      "done": [
+        75,
+        78
+      ]
+    }
+  },
+  "processes": 3,
+  "clipped": 0,
+  "findings": [
+    "Pending work drained versus v20; fulfilled totals increased and six display opens observed",
+    "Q cap=0 when no constrained head is an absent-field placeholder, not a new observed zero cached limit",
+    "No first frame: all swap/transfer/copy/retire remain zero; current user wait unknown"
+  ]
+}

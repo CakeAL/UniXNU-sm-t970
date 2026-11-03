@@ -8,6 +8,7 @@
   "linked_disassembly_has_smp_fallback": true,
   "independent_payload_check": true,
   "final_fat_roundtrip": true,
-  "hardware_result_pending": true,
-  "platform_check": "refused framework vs reviewed revision; unchanged limitation"
+  "hardware_result_pending": false,
+  "platform_check": "refused framework vs reviewed revision; unchanged limitation",
+  "device_result": "device-result.json"
 }

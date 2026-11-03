@@ -1,0 +1,15 @@
+{
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/data-bringup/ui-post-admission-memory768-v1/boot-partition.img"
+  ],
+  "boot_sha256": "e44011cb29156ae60679de64d2fb9ca8f9e3dc36eb81845124c0801cfba53f01",
+  "exit_code": 0,
+  "reboot_requested": true,
+  "readback_verified": false,
+  "hardware_result_pending": true,
+  "authorization": "Owner ongoing device diagnosis; continued prior explicit flashing authorization",
+  "completed_utc": "2026-11-03T19:06:23.841928+00:00"
+}
