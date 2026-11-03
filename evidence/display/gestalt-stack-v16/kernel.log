@@ -1,0 +1,43 @@
+== submodules /Users/cakeal/vsc/UniXNU
+== tree /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree
+== kernel: XNU
+== kernel: archive-01-build-corecrypto-14
++ python3 /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/scripts/build-corecrypto-14.py
+== kernel: archive-02-build-corecrypto-14
++ python3 /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/scripts/build-corecrypto-14.py --namespace
+== kernel: component-ArmDTPlatform
++ python3 /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/scripts/build-arm-driver.py ArmDTPlatform
+== kernel: component-ArmCpu
++ python3 /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/scripts/build-arm-driver.py ArmCpu
+== kernel: component-SoftwareAES
++ python3 /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/scripts/build-arm-driver.py SoftwareAES
+== kernel: archive-06-build-verified-root-empty
++ python3 /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/scripts/build-verified-root-empty.py
+== kernel: component-VirtioMmioBlock
++ python3 /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/scripts/build-arm-driver.py VirtioMmioBlock
+== kernel: archive-08-zz-build-virtio-block-local
++ python3 /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/scripts/zz-build-virtio-block-local.py
+== kernel: archive-09-build-storage-bindings
++ python3 /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/scripts/build-storage-bindings.py --component NativeVirtioBlock --archive libVirtioMmioBlock.a --directory build/virtio-block-local --subset
+== kernel: component-RamBlock
++ python3 /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/scripts/build-arm-driver.py RamBlock
+== kernel: archive-11-build-storage-bindings
++ python3 /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/scripts/build-storage-bindings.py --component NativeRamBlock --archive libRamBlock.a --directory build/ram-block --subset
+== kernel: archive-12-zz-build-shengufs-local
++ python3 /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/scripts/zz-build-shengufs-local.py
+== kernel: archive-13-build-storage-bindings
++ python3 /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/scripts/build-storage-bindings.py --component NativeUfs --archive libShengUfs.a --directory build/sheng-ufs
+== kernel: archive-14-build-ufs-stubs
++ python3 /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/scripts/build-ufs-stubs.py
+== kernel: archive-15-build-software-aes-bindings
++ python3 /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/scripts/build-software-aes-bindings.py
+== kernel: archive-16-build-platform-power
++ python3 /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/scripts/build-platform-power.py
+== kernel: archive-17-build-mockfs-fixture
++ python3 /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/scripts/build-mockfs-fixture.py
+== kernel: archive-18-build-libpthread-kernel
++ python3 /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/scripts/build-libpthread-kernel.py
++ bash /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/scripts/build-xnu-4k-baseline.sh
+== kernel: prelink
++ python3 /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/kits/XnuPrelink/emit_prelink.py --kernel /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/mach.development.bcm2837.unstripped.noctf --prelinked /Users/cakeal/vsc/UniXNU/out/ipsw/21H461/kernelcache.decompressed --slide=-0x1000000 --output /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/kernel/kernel.macho --root com.apple.AppleFSCompression.AppleFSCompressionTypeZlib --root com.apple.driver.AppleARMPlatform --root com.apple.driver.AppleARMWatchdogTimer --root com.apple.driver.AppleAudioClockLibs --root com.apple.driver.AppleEffaceableStorage --root com.apple.driver.AppleIISController --root com.apple.driver.AppleM2ScalerCSCDriver --root com.apple.driver.AppleMobileFileIntegrity --root com.apple.driver.ApplePMGR --root com.apple.driver.IODARTFamily --root com.apple.filesystems.apfs --root com.apple.iokit.CoreAnalyticsFamily --root com.apple.iokit.IOAVFamily --root com.apple.iokit.IOAudio2Family --root com.apple.iokit.IOCECFamily --root com.apple.iokit.IOCryptoAcceleratorFamily --root com.apple.iokit.IOGPUFamily --root com.apple.iokit.IOHDCPFamily --root com.apple.iokit.IOMobileGraphicsFamily --root com.apple.iokit.IOReportFamily --root com.apple.iokit.IOSlowAdaptiveClockingFamily --root com.apple.iokit.IOStorageFamily --root com.apple.iokit.IOSurface --root com.apple.kec.Libm --root com.apple.kec.corecrypto --root com.apple.kext.AppleMatch --root com.apple.kext.CoreTrust --root com.apple.security.AppleImage4 --root com.apple.security.sandbox --root com.apple.iokit.IOHIDFamily --root com.apple.iokit.IOHIDEventDriver --early-security-init com.apple.driver.AppleMobileFileIntegrity=0xfffffff005ab4ae0
+== kernel: /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/kernel/kernel.macho sha256 9b424df85b17388b35715622f067adcf768166dd3f10d2a5ad3ac9709b5e677c

@@ -1,0 +1,20 @@
+{
+  "boot_sha256": "93bd51e8388c88000848e4818b4df380aefe9c8b8510580f3b87499382f7d6f8",
+  "photo": "screen-target120.jpg",
+  "photo_sha256": "9441eb7c6e77499b0f076102076662436a3ac4e5137b4531329d220de0c43a7c",
+  "association": "Owner photo after upload, BB16 frames; no device hash readback",
+  "main": 1,
+  "processes": 147,
+  "cpus": 8,
+  "client_open": 2,
+  "swap": 0,
+  "cache_slide": "0xf258000",
+  "b2_frames": 16,
+  "b2_error": 0,
+  "b3_frames": 1,
+  "b4_frames": 1,
+  "conclusion": "RemoteHID AACP activate -> BTSessionAttachWithQueue -> MGGetBoolAnswer -> MobileGestaltExtensions synchronous NSXPC send",
+  "bluetooth_key": "bluetooth",
+  "is_simulator_query_not_yet_reached": true,
+  "desktop_verified": false
+}

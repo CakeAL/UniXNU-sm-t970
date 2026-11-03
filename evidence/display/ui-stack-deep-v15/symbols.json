@@ -1,0 +1,89 @@
+{
+  "cache_slide": "0xf258000",
+  "cache_uuid": "590d839a82d230f1a17d0cc053420f73",
+  "local_symbols_uuid_matches": true,
+  "live_sample": true,
+  "frames": [
+    {
+      "address": "0x196144bc4",
+      "unslid_va": "0x186eecbc4",
+      "image": "/System/Library/Frameworks/Foundation.framework/Foundation",
+      "nearest_local_symbol": "-[NSXPCConnection _sendSelector:withProxy:arg1:arg2:]",
+      "offset": 124,
+      "nearest_symbol": "-[NSXPCConnection _sendSelector:withProxy:arg1:arg2:]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "e80f40f9098a34b0"
+    },
+    {
+      "address": "0x19614498c",
+      "unslid_va": "0x186eec98c",
+      "image": "/System/Library/Frameworks/Foundation.framework/Foundation",
+      "nearest_local_symbol": "__NSXPCDistantObjectSimpleMessageSend2",
+      "offset": 64,
+      "nearest_symbol": "__NSXPCDistantObjectSimpleMessageSend2",
+      "symbol_table": "local",
+      "original_instruction_bytes": "14008052c002ae95"
+    },
+    {
+      "address": "0x1b6cb2b58",
+      "unslid_va": "0x1a7a5ab58",
+      "image": "/usr/lib/libMobileGestaltExtensions.dylib",
+      "nearest_symbol": "__MGSSetLazyFuncs",
+      "symbol_table": "exported",
+      "offset": 1896,
+      "original_instruction_bytes": "e00315aa211f0094"
+    },
+    {
+      "address": "0x1af46592c",
+      "unslid_va": "0x1a020d92c",
+      "image": "/usr/lib/libMobileGestalt.dylib",
+      "nearest_symbol": "_MGIsDeviceOfType",
+      "symbol_table": "exported",
+      "offset": 876,
+      "original_instruction_bytes": "f70300aa600100b4"
+    },
+    {
+      "address": "0x1af4660c4",
+      "unslid_va": "0x1a020e0c4",
+      "image": "/usr/lib/libMobileGestalt.dylib",
+      "nearest_symbol": "_MGGetBoolAnswer",
+      "symbol_table": "exported",
+      "offset": 32,
+      "original_instruction_bytes": "f30300aae80f40b9"
+    },
+    {
+      "address": "0x1c6cca198",
+      "unslid_va": "0x1b7a72198",
+      "image": "/System/Library/PrivateFrameworks/MobileBluetooth.framework/MobileBluetooth",
+      "offset": 80,
+      "nearest_symbol": "_BTSessionAttachWithQueue",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "a0000034c0c21890"
+    },
+    {
+      "address": "0x213d6e38c",
+      "unslid_va": "0x204b1638c",
+      "image": "/System/Library/PrivateFrameworks/RemoteHID.framework/RemoteHID",
+      "nearest_local_symbol": "-[HIDRemoteDeviceAACPServer btSessionCreate]",
+      "offset": 64,
+      "nearest_symbol": "-[HIDRemoteDeviceAACPServer btSessionCreate]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "f30300aafeae9c94"
+    },
+    {
+      "address": "0x213d6e20c",
+      "unslid_va": "0x204b1620c",
+      "image": "/System/Library/PrivateFrameworks/RemoteHID.framework/RemoteHID",
+      "nearest_local_symbol": "-[HIDRemoteDeviceAACPServer activate]",
+      "offset": 24,
+      "nearest_symbol": "-[HIDRemoteDeviceAACPServer activate]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "48b51290088546f9"
+    },
+    {
+      "address": "0x1014f56b4",
+      "unslid_va": "0xf229d6b4",
+      "image": null
+    }
+  ]
+}

@@ -17,3 +17,14 @@ FP链达到上限不表示完整；live线程状态/栈非冻结快照。VM读�
 单报告固定1792字节，异常长输出会截断；运行中队列编号不保证跨采样稳定。
 
 最终BOOT SHA256：`93bd51e8388c88000848e4818b4df380aefe9c8b8510580f3b87499382f7d6f8`。主机检查通过，上传结果见upload.json。
+
+## 实机01:03:24
+
+BB第二线程n16/e0，新增上层为RemoteHID的HIDRemoteDeviceAACPServer activate/btSessionCreate，
+BTSessionAttachWithQueue、MGGetBoolAnswer、libMobileGestaltExtensions同步NSXPC发送。
+原版BTSessionAttachWithQueue在返回PC前传入CFString bluetooth；另一分支后续才查询IsSimulator。
+原版LaunchDaemon com.apple.mobilegestalt.xpc.plist指定/usr/libexec/MobileGestaltHelper并发布同名Mach服务。
+服务端是否卡住/等待其他依赖仍待采样，不能将该进程禁用或伪造查询成功当作已证实修复。
+slide0xf258000与mach_msg2 PC差值一致，symbols UUID匹配；缓存工具的MG邻近导出符号偏移较大，
+仅用来标识映像，不将_MGSSetLazyFuncs+1896当作精确内部函数身份。
+下一版按用户要求缩至90秒，采MobileGestaltHelper前两个线程16级FP链；60秒历史未见BB，暂不直接缩到60秒。

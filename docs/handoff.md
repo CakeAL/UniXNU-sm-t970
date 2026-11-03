@@ -3,6 +3,15 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
+## 最新：90秒MobileGestalt服务端诊断（2026-11-04）
+
+v15照片01:03:24将BB同步XPC上层定位到RemoteHID AACP → BTSessionAttachWithQueue →
+MGGetBoolAnswer，原版参数为bluetooth。MobileGestaltExtensions发出同步NSXPC调用，
+com.apple.mobilegestalt.xpc的原版Program为/usr/libexec/MobileGestaltHelper；服务端状态仍未知。
+BOOT91025540按用户要求将报告目标由120缩至90秒，模式3采该helper前2线程各16级FP链，
+其余寄存器仍最多4线程。主机helper/ABI/链接/打包检查通过，上传回执见gestalt-stack-v16。
+优先看MobileGestalt进程行和M1/M2 FP。90秒未出现匹配行不能证明稍后仍缺席；显示仍无swap证据。
+
 ## 最新：BB同步XPC调用方深栈版（2026-11-04）
 
 BOOTdbb7921a照片00:58:17：BB第二线程8级FP链/e0，落在NSXPC同步回复等待；
