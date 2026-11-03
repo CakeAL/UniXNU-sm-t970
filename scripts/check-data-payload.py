@@ -46,7 +46,7 @@ def main():
     parser.add_argument('--ui-spawn-calls', action='store_true', help='Require optional bounded spawn-return path observer')
     parser.add_argument('--key-state', action='store_true', help='Require pinned RAM-only KeyStore state service and board registration')
     parser.add_argument('--ui-wait', action='store_true', help='Require bounded saved-register UI diagnostics')
-    parser.add_argument('--ui-stack-mode',type=int,choices=(1,2,3,4),default=1)
+    parser.add_argument('--ui-stack-mode',type=int,choices=(1,2,3,4,5),default=1)
     parser.add_argument('--ui-stack', action='store_true', help='Require opt-in isolated UI stack worker')
     args = parser.parse_args()
     require(args.runtime_report_seconds == 0 or 5 <= args.runtime_report_seconds <= 300,

@@ -3,6 +3,14 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
+## 最新：三进程合并采样（2026-11-04）
+
+按用户要求减少逐页刷写，BOOT10dbedd8采用mode5/target90，合并BB/SB/MobileGestaltHelper
+各前8线程、16级FP链、tid/等待事件/优先级、workqueue数量/限制标志；同进程重复栈引用去重。
+末尾UI batch end processes=N clipped=0用于确认采到进程数与文本完整性，实际目标标题应逐个核对。
+主机helper/ABI/链接/打包检查通过；实机结果待回报，见ui-batch-v18准备/上传记录。
+v17照片已确认MG线程5-7等同一处全局锁调用，尚不知owner/callback是否执行。
+
 ## 最新：MobileGestalt后半工作线程版（2026-11-04）
 
 原版MG回退路径匹配AppleDiagnosticDataAccessReadOnly，读AppleDiagnosticDataSysCfg；

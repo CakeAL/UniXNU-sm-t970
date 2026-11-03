@@ -1,0 +1,22 @@
+{
+  "boot_sha256": "6da8d322641f359a4147f729b3f1a087f2244908654b18289ed1e7b593ffa748",
+  "photo": "screen-target90.jpg",
+  "photo_sha256": "2c17d6e511194911001eec7e8b39777ab9b2276a8f753376d62fa2e656c88c5a",
+  "association": "Owner photo after upload, stacks4; no device hash readback",
+  "target_seconds": 90,
+  "main": 1,
+  "processes": 109,
+  "cpus": 8,
+  "helper_pid": 94,
+  "helper_threads": 8,
+  "visited": 8,
+  "busy": 0,
+  "cache_slide": "0x1cea4000",
+  "threads_5_6_7_frames": 16,
+  "thread8_frames": 1,
+  "frame_errors": 0,
+  "client_open": 2,
+  "swap": 0,
+  "conclusion": "MG threads5-7 share same FP chain; first MG return0x1a0232370 follows lock call using global0x1ede8a370. Owner/callback execution not established.",
+  "desktop_verified": false
+}

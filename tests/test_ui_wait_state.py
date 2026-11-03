@@ -22,7 +22,7 @@ typedef int boolean_t;
 #define PROC_ALLPROCLIST 1
 #define PROC_NOWAITTRANS 4
 typedef struct state { uint64_t pc,lr,fp,regs[17]; int is64; } arm_saved_state_t;
-typedef struct thread { struct thread *next; int sched_lock; unsigned state; struct {arm_saved_state_t *upcb;} machine; } *thread_t;
+typedef struct thread { struct thread *next; int sched_lock; unsigned state; uint64_t wait_event; int sched_pri,base_pri; struct {arm_saved_state_t *upcb;} machine; } *thread_t;
 typedef struct test_map {unsigned refs,reads;int fail;} *vm_map_t;
 static struct test_map map_storage;static uint64_t fake_frames[20][2];
 typedef struct task { thread_t threads; unsigned thread_count; int busy; unsigned task_shared_region_slide; vm_map_t map; } *task_t;
@@ -32,6 +32,7 @@ static unsigned copies,visits;
 static struct proc processes[3];
 static int proc_pid(proc_t p){return p->pid;}
 static void proc_name(int pid,char *out,unsigned size){assert(pid>=0&&pid<3);snprintf(out,size,"%s",processes[pid].name);}
+static uint64_t thread_tid(thread_t th){return (uint64_t)(uintptr_t)th;}
 static task_t proc_task(proc_t p){return p->task;}
 static int ml_get_interrupts_enabled(void){return irq;}
 static int ml_set_interrupts_enabled(int value){int old=irq;irq=value;return old;}
@@ -82,6 +83,8 @@ static int thread_block(void *continuation){assert(!continuation);++waitCount;re
 '''
         main = r'''
 #undef snprintf
+static unsigned wqCalls;static int wqError;
+int fill_procworkqueue(proc_t p,struct proc_workqueueinfo *info){(void)p;assert(!taskHeld&&!schedHeld&&irq);++wqCalls;if(wqError)return wqError;*info=(struct proc_workqueueinfo){7,1,6,4};return 0;}
 int main(void){
  struct state states[10];struct thread threads[10];memset(states,0,sizeof(states));memset(threads,0,sizeof(threads));
  for(unsigned i=0;i<10;++i){states[i].is64=1;states[i].pc=UINT64_MAX;states[i].lr=UINT64_MAX;states[i].regs[16]=UINT64_MAX;states[i].regs[1]=UINT64_MAX;states[i].regs[3]=UINT64_MAX;threads[i].state=1;threads[i].machine.upcb=&states[i];threads[i].next=i==9?NULL:&threads[i+1];}
@@ -118,6 +121,10 @@ int main(void){
  for(unsigned i=4;i<8;++i)states[i].fp=0x10000;
  text=native_t970_ui_wait_text();assert(strstr(text,"stacks=4")&&strstr(text,"visited=8")&&strstr(text,"M5 FP=")&&strstr(text,"M8 FP="));
  assert(!strstr(text,"M1 st=")&&!strstr(text,"M9 st=")&&!map_storage.refs);userStacks=1;
+ captureStarted=captureDone=0;userStacks=5;wqCalls=0;
+ text=native_t970_ui_wait_text();assert(wqCalls==3&&strstr(text,"UI batch end processes=3 clipped=0")&&strstr(text,"wq=0:7/1/6/4"));
+ assert(strstr(text,"M8 st=")&&strstr(text,"S8 st=")&&strstr(text,"b8 st=")&&strstr(text,"stack=same:")&&!map_storage.refs);
+ captureStarted=captureDone=0;wqError=16;text=native_t970_ui_wait_text();assert(strstr(text,"wq=16:0/0/0/0"));wqError=0;userStacks=1;
  captureStarted=captureDone=0;workerError=17;text=native_t970_ui_wait_text();assert(strstr(text,"worker start error=17"));workerError=0;
  captureStarted=captureDone=0;stalled=1;text=native_t970_ui_wait_text();assert(waitCount==20&&strstr(text,"partial rows hidden"));
  return 0;

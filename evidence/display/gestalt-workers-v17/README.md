@@ -26,3 +26,10 @@ ASan/UBSan实际helper覆盖mode4页选择、访问上限8、存储上限4和map
 下一轮看M5-M8的FP链，定位实际查询/RunLoop工作线程后再选最小修复。
 
 最终BOOT SHA256：`6da8d322641f359a4147f729b3f1a087f2244908654b18289ed1e7b593ffa748`。报告mode4/90秒独立核对通过，上传结果见upload.json。
+
+## 实机01:17:48
+
+target90/main1/n109，helper94线程8/visited8/busy0；M5/M6/M7均16级e0且FP链相同，
+M8 start_wqthread。显示open2/swap0。新链首个MG返回1a0232370紧随以全局1ede8a370为参数的锁调用。
+实际owner和异步callback是否调度尚未确认；不能把这组锁等待直接当作配置数据缺失的证明。
+按用户要求下轮一次采三进程前8线程、workqueue及等待事件，合并重复栈，减少逐页刷写。

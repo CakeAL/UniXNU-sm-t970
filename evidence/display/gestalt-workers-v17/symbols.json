@@ -1,0 +1,165 @@
+{
+  "cache_slide": "0x1cea4000",
+  "cache_uuid": "590d839a82d230f1a17d0cc053420f73",
+  "local_symbols_uuid_matches": true,
+  "live_sample": true,
+  "frames": [
+    {
+      "address": "0x1bd0d6370",
+      "unslid_va": "0x1a0232370",
+      "image": "/usr/lib/libMobileGestalt.dylib",
+      "nearest_symbol": "__MGCopyAnswerWithMode",
+      "symbol_table": "exported",
+      "offset": 112632,
+      "original_instruction_bytes": "d5e22690b4a241f9"
+    },
+    {
+      "address": "0x1bd0b189c",
+      "unslid_va": "0x1a020d89c",
+      "image": "/usr/lib/libMobileGestalt.dylib",
+      "nearest_symbol": "_MGIsDeviceOfType",
+      "symbol_table": "exported",
+      "offset": 732,
+      "original_instruction_bytes": "f70300aae0f6ffb4"
+    },
+    {
+      "address": "0x1bd0af044",
+      "unslid_va": "0x1a020b044",
+      "image": "/usr/lib/libMobileGestalt.dylib",
+      "nearest_symbol": "_MGCopyAnswerWithError",
+      "symbol_table": "exported",
+      "offset": 24,
+      "original_instruction_bytes": "f40300aa730000b4"
+    },
+    {
+      "address": "0x1bd0d7f14",
+      "unslid_va": "0x1a0233f14",
+      "image": "/usr/lib/libMobileGestalt.dylib",
+      "nearest_symbol": "__MGCopyAnswerWithMode",
+      "symbol_table": "exported",
+      "offset": 119708,
+      "original_instruction_bytes": "f30300aa200400b5"
+    },
+    {
+      "address": "0x1bd0ca760",
+      "unslid_va": "0x1a0226760",
+      "image": "/usr/lib/libMobileGestalt.dylib",
+      "nearest_symbol": "__MGCopyAnswerWithMode",
+      "symbol_table": "exported",
+      "offset": 64488,
+      "original_instruction_bytes": "a00200b4f30300aa"
+    },
+    {
+      "address": "0x1bd0b1a30",
+      "unslid_va": "0x1a020da30",
+      "image": "/usr/lib/libMobileGestalt.dylib",
+      "nearest_symbol": "_MGIsDeviceOfType",
+      "symbol_table": "exported",
+      "offset": 1136,
+      "original_instruction_bytes": "68a125d008d147f9"
+    },
+    {
+      "address": "0x1bd0b0208",
+      "unslid_va": "0x1a020c208",
+      "image": "/usr/lib/libMobileGestalt.dylib",
+      "nearest_symbol": "__MGServerCopyAnswerWithError",
+      "symbol_table": "exported",
+      "offset": 188,
+      "original_instruction_bytes": "f50300aa96fbff97"
+    },
+    {
+      "address": "0x100a84578",
+      "unslid_va": "0xe3be0578",
+      "image": null
+    },
+    {
+      "address": "0x1a3d7447c",
+      "unslid_va": "0x186ed047c",
+      "image": "/System/Library/Frameworks/Foundation.framework/Foundation",
+      "nearest_local_symbol": "___NSXPCCONNECTION_IS_CALLING_OUT_TO_EXPORTED_OBJECT_S2__",
+      "offset": 12,
+      "nearest_symbol": "___NSXPCCONNECTION_IS_CALLING_OUT_TO_EXPORTED_OBJECT_S2__",
+      "symbol_table": "local",
+      "original_instruction_bytes": "fd7bc1a8c0035fd6"
+    },
+    {
+      "address": "0x1a3d73434",
+      "unslid_va": "0x186ecf434",
+      "image": "/System/Library/Frameworks/Foundation.framework/Foundation",
+      "nearest_local_symbol": "-[NSXPCConnection _decodeAndInvokeMessageWithEvent:reply:flags:]",
+      "offset": 1576,
+      "nearest_symbol": "-[NSXPCConnection _decodeAndInvokeMessageWithEvent:reply:flags:]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "0b000014a18353f8"
+    },
+    {
+      "address": "0x1a3d727e4",
+      "unslid_va": "0x186ece7e4",
+      "image": "/System/Library/Frameworks/Foundation.framework/Foundation",
+      "nearest_local_symbol": "_message_handler_message",
+      "offset": 84,
+      "nearest_symbol": "_message_handler_message",
+      "symbol_table": "local",
+      "original_instruction_bytes": "e00317aafd7b43a9"
+    },
+    {
+      "address": "0x1a3d726c0",
+      "unslid_va": "0x186ece6c0",
+      "image": "/System/Library/Frameworks/Foundation.framework/Foundation",
+      "nearest_local_symbol": "_message_handler",
+      "offset": 148,
+      "nearest_symbol": "_message_handler",
+      "symbol_table": "local",
+      "original_instruction_bytes": "b50100b4e80f40f9"
+    },
+    {
+      "address": "0x1fa518ee8",
+      "unslid_va": "0x1dd674ee8",
+      "image": "/usr/lib/system/libxpc.dylib",
+      "nearest_local_symbol": "__xpc_connection_call_event_handler",
+      "offset": 68,
+      "nearest_symbol": "__xpc_connection_call_event_handler",
+      "symbol_table": "local",
+      "original_instruction_bytes": "fd7b41a9f44fc2a8"
+    },
+    {
+      "address": "0x1fa51a978",
+      "unslid_va": "0x1dd676978",
+      "image": "/usr/lib/system/libxpc.dylib",
+      "nearest_local_symbol": "__xpc_connection_mach_event",
+      "offset": 1348,
+      "nearest_symbol": "__xpc_connection_mach_event",
+      "symbol_table": "local",
+      "original_instruction_bytes": "e00314aa18c3ff97"
+    },
+    {
+      "address": "0x1ac45ad74",
+      "unslid_va": "0x18f5b6d74",
+      "image": "/usr/lib/system/libdispatch.dylib",
+      "nearest_local_symbol": "__dispatch_client_callout4",
+      "offset": 16,
+      "nearest_symbol": "__dispatch_client_callout4",
+      "symbol_table": "local",
+      "original_instruction_bytes": "fd7b41a9f44fc2a8"
+    },
+    {
+      "address": "0x1ac42e894",
+      "unslid_va": "0x18f58a894",
+      "image": "/usr/lib/system/libdispatch.dylib",
+      "nearest_local_symbol": "__dispatch_mach_msg_invoke$VARIANT$armv81",
+      "offset": 372,
+      "nearest_symbol": "__dispatch_mach_msg_invoke$VARIANT$armv81",
+      "symbol_table": "local",
+      "original_instruction_bytes": "780100b50c000014"
+    },
+    {
+      "address": "0x1bd0d6370",
+      "unslid_va": "0x1a0232370",
+      "image": "/usr/lib/libMobileGestalt.dylib",
+      "nearest_symbol": "__MGCopyAnswerWithMode",
+      "symbol_table": "exported",
+      "offset": 112632,
+      "original_instruction_bytes": "d5e22690b4a241f9"
+    }
+  ]
+}
