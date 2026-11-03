@@ -1,0 +1,7 @@
+{
+  "previous_boot_sha256": "be219c430b57eb08d64b6bb59a851633f9dc20999ed563539986533955dbe0d1",
+  "source_and_payload_kernel_unchanged": true,
+  "target_wait_seconds": 60,
+  "reason": "Target45 completed openat of final numbered subcache52 without observed last signature registration/shared mapping/main. Extend same-kernel terminal sample by15 seconds to distinguish continued preparation from a later stop.",
+  "hardware_result_pending": true
+}

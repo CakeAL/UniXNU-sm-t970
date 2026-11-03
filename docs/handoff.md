@@ -3,6 +3,14 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
+## 最新：45秒已打开缓存.52，60秒同内核检查已刷入（2026-11-03）
+
+be219c43的12:21:40照片：cpu8/sec7/main0/n2、blocks729210、cache syscalls108，
+最后openat成功打开.52.dyldlinkedit，最近调用均e0。最后签名登记和共享映射尚未观察到。
+下一版BOOT3da265b4沿用相同3d114c44/89855bef内核，目标60秒；独立打包检查通过，BOOT-only上传exit0并请求重启，未读回，实机结果待回报。
+准备、上传回执与后续实机结果见evidence/cpu/smp-bringup/runtime-cache60。
+仍是终止诊断，并非实时刷新；下一步验证映射/main，再转持续启动和显示。
+
 ## 最新：PID1已打开缓存.39，45秒检查版已刷入（2026-11-03）
 
 79a949b6的01:07:19照片：cpu8/sec7/main0/n2，blocks546747、cache syscalls82，

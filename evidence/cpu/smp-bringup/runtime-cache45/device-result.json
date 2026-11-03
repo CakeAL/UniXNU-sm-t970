@@ -1,0 +1,45 @@
+{
+  "boot_sha256": "be219c430b57eb08d64b6bb59a851633f9dc20999ed563539986533955dbe0d1",
+  "photo": "screen-122140.jpg",
+  "photo_sha256": "cfef37ad076905617e7bf39df2d646e0fa5e601d453710681520f6afa1cc338d",
+  "target_wait_seconds": 45,
+  "main": 0,
+  "processes": 2,
+  "cpus_available": 8,
+  "secondary_running": 7,
+  "all_secondary_step": 7,
+  "all_secondary_fail": 0,
+  "ufs_verified_blocks": 729210,
+  "init_cache_syscalls": 108,
+  "last_completed_cache_operation": {
+    "syscall": 463,
+    "name": "openat",
+    "error": 0,
+    "return_value_hex": "35",
+    "file": "dyld_shared_cache_arm64.52.dyldlinkedit"
+  },
+  "recent_fcntl_command": 97,
+  "fcntl_command_name": "F_ADDFILESIGS_RETURN",
+  "recent_open_and_fcntl_errors": 0,
+  "per_core_timer": [
+    74489,
+    74357,
+    2594,
+    37,
+    0,
+    32194,
+    0,
+    0
+  ],
+  "per_core_sgi": [
+    429,
+    424,
+    93,
+    18,
+    10,
+    14,
+    7,
+    1
+  ],
+  "interpretation": "All 52 numbered cache files have now been opened; recent completed openat/fcntl calls return error0. Last .52 signature registration and shared-region mapping have not yet been observed. This is progress beyond the separate 30-second boot, not proof of a stall or completed mapping. Eight CPUs remain available; timer snapshot is not a controlled per-core workload test."
+}
