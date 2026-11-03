@@ -1,6 +1,6 @@
 --- a/bsd/pthread/pthread_workqueue.c
 +++ b/bsd/pthread/pthread_workqueue.c
-@@ -4692,6 +4692,25 @@
+@@ -4692,6 +4692,45 @@
  
  #pragma mark misc
  
@@ -19,6 +19,26 @@
 + out[7]=wq->wq_timer_interval;
 + out[8]=wq->wq_creator?uthread_tid(wq->wq_creator):0;
 + out[9]=wq->wq_fulfilled;out[10]=wq->wq_creations;
++ /* Queue heads and admission inputs only; never call the mutating selector. */
++ workq_threadreq_t req=priority_queue_max(&wq->wq_constrained_queue,struct workq_threadreq_s,tr_entry);
++ if(req) {
++  out[11]=req->tr_qos;out[12]=req->tr_flags;out[13]=req->tr_count;
++  if(req->tr_qos>=WORKQ_THREAD_QOS_MIN && req->tr_qos<=WORKQ_THREAD_QOS_MAX) {
++   uint32_t busy=0;
++   out[14]=wq_max_parallelism[_wq_bucket(req->tr_qos)];
++   out[15]=_wq_thactive_aggregate_downto_qos(wq,_wq_thactive(wq),req->tr_qos,&busy,NULL);
++   out[16]=busy;
++  }
++ }
++ out[17]=wq_max_constrained_threads;
++ req=priority_queue_max(&wq->wq_overcommit_queue,struct workq_threadreq_s,tr_entry);
++ if(req){out[18]=req->tr_qos;out[19]=req->tr_flags;out[20]=req->tr_count;}
++ req=priority_queue_max(&wq->wq_special_queue,struct workq_threadreq_s,tr_entry);
++ if(req){out[21]=req->tr_qos;out[22]=req->tr_flags;out[23]=req->tr_count;}
++ out[24]=wq->wq_event_manager_threadreq!=NULL;
++ out[25]=wq->wq_cooperative_queue_best_req_qos;
++ for(unsigned i=0;i<WORKQ_NUM_QOS_BUCKETS;i++)out[26]+=wq->wq_cooperative_queue_scheduled_count[i];
++ out[27]=wq->wq_cooperative_queue_has_limited_max_size;
 + workq_unlock(wq);return 0;
 +}
 +/* T970_WQ_DETAIL_END */
@@ -34,7 +54,7 @@
  		if (PE_parse_boot_argn("t970-ui-wait", &ui_wait, sizeof(ui_wait)) && ui_wait==1) trace=native_t970_ui_wait_text();
 +		unsigned batch_mode=0;
 +		PE_parse_boot_argn("t970-ui-stack", &batch_mode, sizeof(batch_mode));
-+		if(batch_mode==5) {
++		if(batch_mode==5 || batch_mode==6) {
 +			panic("runtime target=%u main=%d n=%u wd=%d sb=%d bb=%d rb=%d D=%d W=%d S=%d blocks=%llu cpu=%u sec=%u\n%s\n%s",
 +			    seconds,native_t970_initproc_main(),snapshot.count,snapshot.watchdog,snapshot.springboard,
 +			    snapshot.backboard,snapshot.runningboard,native_owner_data_status,native_t970_watchdog_policy_status,

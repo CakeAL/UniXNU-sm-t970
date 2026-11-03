@@ -1,0 +1,136 @@
+{
+  "boot_sha256": "705d4160c4c61d94fade1026719274586be19a2985f3a4ee3aa4eb110eccd70c",
+  "association": "owner post-upload photo; no device hash readback",
+  "photo_name": "\u622a\u5c4f2026-11-04 02.38.12.jpg",
+  "photo_sha256": "734d19dea118503c10b77e3b9372a092f48463a870eec465a6a229b276a7cdd9",
+  "runtime": {
+    "main": 1,
+    "processes": 108,
+    "cpu": 8,
+    "secondary": 7,
+    "target": 90
+  },
+  "display": {
+    "open": 2,
+    "swap": 0
+  },
+  "processes": 3,
+  "clipped": 0,
+  "queues": {
+    "MobileGestalt": {
+      "req": [
+        4,
+        4
+      ],
+      "idle": [
+        2,
+        1
+      ],
+      "scheduled": [
+        5,
+        6
+      ],
+      "constrained": [
+        5,
+        6
+      ],
+      "done": [
+        35,
+        37
+      ],
+      "age_ms": [
+        7,
+        1
+      ],
+      "interval_ms": 50,
+      "head_qos_flags_count": [
+        5,
+        2,
+        1
+      ],
+      "cap_active_busy": [
+        0,
+        0,
+        0
+      ]
+    },
+    "backboardd": {
+      "req": [
+        6,
+        6
+      ],
+      "idle": [
+        1,
+        1
+      ],
+      "scheduled": [
+        1,
+        1
+      ],
+      "constrained": [
+        1,
+        1
+      ],
+      "done": [
+        25,
+        25
+      ],
+      "age_ms": [
+        1,
+        46
+      ],
+      "interval_ms": 50,
+      "head_qos_flags_count": [
+        6,
+        0,
+        1
+      ],
+      "cap_active_busy": [
+        0,
+        0,
+        0
+      ]
+    },
+    "SpringBoard": {
+      "req": [
+        4,
+        4
+      ],
+      "idle": [
+        2,
+        2
+      ],
+      "scheduled": [
+        0,
+        0
+      ],
+      "constrained": [
+        0,
+        0
+      ],
+      "done": [
+        53,
+        53
+      ],
+      "age_ms": [
+        47,
+        42
+      ],
+      "interval_ms": 50,
+      "head_qos_flags_count": [
+        6,
+        0,
+        1
+      ],
+      "cap_active_busy": [
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "finding": "Constrained cached parallelism zero despite active/busy zero. Thread-call progress and MG fulfilled delta contradict globally stopped callback.",
+  "limits": [
+    "This is not proof that repairing parallelism will produce desktop."
+  ]
+}

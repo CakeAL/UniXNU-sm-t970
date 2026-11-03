@@ -16,5 +16,6 @@
   "patch_sha256": "c945f30bb4d0918c0f3395f87985e3db07571ccc0ccc7557fe00ac60cdc240b7",
   "prepared_signature_matches": true,
   "platform_check": "refused: framework differs from reviewed revision",
-  "device_result_pending": true
+  "device_result_pending": false,
+  "device_result": "device-result.json"
 }

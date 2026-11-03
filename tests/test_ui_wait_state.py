@@ -75,8 +75,9 @@ static int vm_map_read_user(vm_map_t map,uint64_t address,void *out,unsigned siz
 static int kernel_thread_start(void (*fn)(void*,int),void *arg,thread_t *thread){++workerStarts;if(workerError)return workerError;*thread=(thread_t)1;if(!stalled)fn(arg,0);return 0;}
 static void thread_deallocate(thread_t thread){assert(thread==(thread_t)1);++workerDrops;}
 static void thread_terminate_self(void){++workerStops;}
-static void clock_interval_to_deadline(unsigned n,unsigned scale,uint64_t *deadline){assert(n==100&&scale==NSEC_PER_MSEC);*deadline=(uint64_t)n*scale;}
+static void clock_interval_to_deadline(unsigned n,unsigned scale,uint64_t *deadline){assert((n==100||n==500)&&scale==NSEC_PER_MSEC);*deadline=(uint64_t)n*scale;}
 static int assert_wait_deadline(event_t event,int flags,uint64_t deadline){assert(event&&flags==THREAD_UNINT&&deadline);return THREAD_WAITING;}
+static void absolutetime_to_nanoseconds(uint64_t ticks,uint64_t *ns){assert(!taskHeld&&!schedHeld);*ns=ticks*1000000;}
 static int thread_block(void *continuation){assert(!continuation);++waitCount;return 0;}
 
 #define snprintf unlocked_snprintf
@@ -126,6 +127,10 @@ int main(void){
  text=native_t970_ui_wait_text();assert(wqCalls==3&&strstr(text,"UI batch end processes=3 clipped=0")&&strstr(text,"wq=0:7/1/6/4"));
  assert(strstr(text,"M8 id=")&&strstr(text,"S8 id=")&&strstr(text,"b8 id=")&&strstr(text,"same=")&&!map_storage.refs);
  captureStarted=captureDone=0;wqError=16;text=native_t970_ui_wait_text();assert(strstr(text,"wq=16:0/0/0/0"));wqError=0;userStacks=1;
+ captureStarted=captureDone=0;userStacks=6;unsigned readsBefore=map_storage.reads,copiesBefore=copies,waitsBefore=waitCount;
+ text=native_t970_ui_wait_text();assert(strstr(text,"queue progress")&&strstr(text,"W0 rc=0")&&strstr(text,"W1 rc=0")&&strstr(text,"Q1 C(q/f/n)")&&strstr(text,"age_ms=60")&&strstr(text,"UI batch end processes=3 clipped=0"));
+ assert(map_storage.reads==readsBefore&&copies==copiesBefore&&waitCount==waitsBefore+3&&!map_storage.refs);
+ waitCount=0;userStacks=1;
  captureStarted=captureDone=0;workerError=17;text=native_t970_ui_wait_text();assert(strstr(text,"worker start error=17"));workerError=0;
  captureStarted=captureDone=0;stalled=1;text=native_t970_ui_wait_text();assert(waitCount==20&&strstr(text,"partial rows hidden"));
  return 0;

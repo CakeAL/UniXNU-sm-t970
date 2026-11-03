@@ -128,6 +128,9 @@ int main(void){
  batch_mode=5;
  if(!setjmp(stop)){native_t970_runtime_report((void*)90,0);assert(0);}
  assert(strstr(message,"target=90")&&strstr(message,"UI-wait-test registers")&&!strstr(message,"C step/")&&!strstr(message,"ignored"));
+ batch_mode=6;
+ if(!setjmp(stop)){native_t970_runtime_report((void*)90,0);assert(0);}
+ assert(strstr(message,"target=90")&&strstr(message,"UI-wait-test registers")&&!strstr(message,"C step/")&&!strstr(message,"ignored"));
  puts("PASS: actual runtime report bounds, process names/PIDs, 512 callback cap, scheduler yield, opt-in/range/once guards and thread failure");
  return 0;
 }

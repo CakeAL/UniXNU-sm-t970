@@ -1,0 +1,19 @@
+{
+  "boot_sha256": "705d4160c4c61d94fade1026719274586be19a2985f3a4ee3aa4eb110eccd70c",
+  "kernel_sha256": "4165e7071811ff932ec0a918d5f18a8f4d025a3136d7cb5df81d4913d4f65e05",
+  "patch_sha256": "cc934a56f328c01c620a3975e0ace553ca246d4f74f042cdb02a637d35718004",
+  "stack_mode": 6,
+  "target_wait_seconds": 90,
+  "samples_per_process": 2,
+  "sample_deadline_ms": 500,
+  "user_memory_reads": false,
+  "actual_sampler_asan_ubsan": true,
+  "actual_workqueue_helper_asan_ubsan": true,
+  "kernel_build_prelink": true,
+  "independent_payload_check": true,
+  "fat_roundtrip": true,
+  "hardware_result_pending": false,
+  "platform_check": "not accepted: framework differs from reviewed revision",
+  "prepared_signature_matches": true,
+  "device_result": "device-result.json"
+}

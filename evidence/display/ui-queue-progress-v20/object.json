@@ -1,0 +1,14 @@
+{
+  "source_sha256": "65b40c16de2656634ac75e660625a8ee993be492a2e4a14491d66cee4081b8fa",
+  "object_sha256": "d4420bc49126cefb3111c7195be3e4581b7215af906701db85bb99d254bf32ae",
+  "compile_recipe_sha256": "2fe39a2b1a5d3f4cc66f07ac3cbae843f78c38956942ef87a8e5de0b3a0b45e0",
+  "mach_private_recipe": true,
+  "reads_user_memory": "opt-in t970-ui-stack=1/2/3/4/5, isolated worker",
+  "suspends_tasks": false,
+  "stack_frames_per_selected_thread": "mode1:8; mode2/3/4/5:16",
+  "stack_selection": "mode1: first UI threads; mode2: other BB threads; mode3: Gestalt helper first2; mode4: helper threads5-8; mode5: all UI/helper first8; mode6: queue-only two samples 500ms apart, no user reads",
+  "report_wait_deadlines": 40,
+  "report_wait_interval_ms": 100,
+  "thread_limit_per_process": 8,
+  "runtime_verified": false
+}

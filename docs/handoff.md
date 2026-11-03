@@ -3,6 +3,15 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
+## 最新：工作队列两次进展/准入采样（2026-11-04）
+
+v19照片01:42:52确认MG/BB/SB分别req4/6/4、idle2/1/2、creator0，仍open2/swap0。
+f14为death+delayed scheduled，f10仅delayed；SB尾部仍未显示。单次待处理+空闲不证明丢唤醒。
+BOOT705d4160使用mode6/90秒，每进程两次只读快照，间隔500ms调度期限，不重复读用户栈。
+W0/1显示进展及真正内核换算毫秒；Q0/1显示三队列头、constrained并发cap/active/busy和全局上限、manager/cooperative输入。
+三进程在同屏报告；不调用会重排队的admission/selector，不改调度行为。host helper/真实kernel/打包检查通过。
+见evidence/display/ui-queue-progress-v20，照片02:38:12已完整显示三组与end marker：cap全部0，MG done35→37，BB/SB不变。已定位EDGE只计E/P与当前SMP拓扑不匹配，下一步修复计数兼容。
+
 ## 最新：工作队列待处理请求与紧凑报告（2026-11-04）
 
 BOOT6ef0db8c，mode5/90秒，仍合并三进程。W行增加req/内部flags/idle/scheduled/constrained/
@@ -10,7 +19,7 @@ creator tid/last-call age与interval（原始absolute ticks）/made/done，全�
 不redrive、不改调度逻辑。紧凑head+F行及批量分支去掉逐核/无关进程名单，以保留SB尾部和end marker。
 新增板级patch已入series；真实内核编译、helper ASan/UBSan、链接/预链接、打包检查通过。
 初次误用uthread字段已改为uthread_tid；公开头文件TLS中断用Git-blob核验缓存恢复，失败与恢复均有记录。
-准备/上传见ui-workqueue-v19，实机W行资格验证待回报。大age或run0单独不证明调度器故障。
+准备/上传见ui-workqueue-v19，实机W行已见device-result.json。大age或run0单独不证明调度器故障。
 
 ## 最新：三进程合并采样（2026-11-04）
 

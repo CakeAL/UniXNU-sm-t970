@@ -1,0 +1,62 @@
+{
+  "boot_sha256": "6ef0db8c95530bb967d5eb1d116c2f16aab87b2af3cccebafd116fe5fd68eabe",
+  "association": "owner photo after upload; no device hash readback",
+  "photo_name": "\u622a\u5c4f2026-11-04 01.42.52.jpg",
+  "photo_sha256": "c35407dfe60692292fde8039332cd34a0b20b6f1bc990c6a66ef78d28bc261c1",
+  "runtime": {
+    "target": 90,
+    "main": 1,
+    "processes": 107,
+    "cpu": 8,
+    "secondary": 7
+  },
+  "display": {
+    "open": 2,
+    "swap": 0,
+    "surface": 0
+  },
+  "slide": "0x1f250000",
+  "queues": {
+    "MobileGestalt": {
+      "req": 4,
+      "flags": "0x14",
+      "idle": 2,
+      "scheduled": 5,
+      "constrained": 5,
+      "creator": 0,
+      "age_ticks": "0x8632e",
+      "interval_ticks": "0xea600",
+      "made": 7,
+      "done": 36
+    },
+    "backboardd": {
+      "req": 6,
+      "flags": "0x10",
+      "idle": 1,
+      "scheduled": 1,
+      "constrained": 1,
+      "creator": 0,
+      "age_ticks": "0xeec957",
+      "interval_ticks": "0xea600",
+      "made": 5,
+      "done": 25
+    },
+    "SpringBoard": {
+      "req": 4,
+      "flags": "0x14",
+      "idle": 2,
+      "scheduled": 0,
+      "constrained": 0,
+      "creator": 0,
+      "age_ticks": "0x8cca5",
+      "interval_ticks": "0xea600",
+      "made": 5,
+      "done": 49
+    }
+  },
+  "limits": [
+    "single live snapshot; pending requests plus idle threads do not prove scheduler failure",
+    "SB tail/end marker offscreen; full physical report not verified",
+    "0x14 is death call scheduled plus delayed call scheduled; no unit conversion of ticks inferred"
+  ]
+}

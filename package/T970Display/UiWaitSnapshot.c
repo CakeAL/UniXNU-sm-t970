@@ -60,18 +60,49 @@ static void ui_stack_read(struct native_t970_ui_wait_row *row,vm_map_t map) {
   fp=pair[0];
  }
 }
+/* Mode6 takes two snapshots per process, sleeping with no task/workqueue locks. */
+static void ui_queue_line(struct native_t970_ui_wait_buffer *out,proc_t p,unsigned sample) {
+ uint64_t d[28]={0};int rc=native_t970_workqueue_detail(p,d);
+ uint64_t age=0,interval=0;
+ absolutetime_to_nanoseconds(d[6]>=d[5]?d[6]-d[5]:0,&age);
+ absolutetime_to_nanoseconds(d[7],&interval);
+ unsigned left=sizeof(out->text)-out->used;
+ int n=snprintf(out->text+out->used,left,
+  "\nW%u rc=%d req=%llu f=%llx idle=%llu sched=%llu con=%llu creator=%llx age_ms=%llu int_ms=%llu made=%llu done=%llu"
+  "\nQ%u C(q/f/n)=%llu/%llx/%llu cap/active/busy=%llu/%llu/%llu limit=%llu O=%llu/%llx/%llu S=%llu/%llx/%llu mgr=%llu coop(q/run/lim)=%llu/%llu/%llu",
+  sample,rc,(unsigned long long)d[0],(unsigned long long)d[1],(unsigned long long)d[2],(unsigned long long)d[3],(unsigned long long)d[4],(unsigned long long)d[8],
+  (unsigned long long)(age/NSEC_PER_MSEC),(unsigned long long)(interval/NSEC_PER_MSEC),(unsigned long long)d[10],(unsigned long long)d[9],sample,
+  (unsigned long long)d[11],(unsigned long long)d[12],(unsigned long long)d[13],(unsigned long long)d[14],(unsigned long long)d[15],(unsigned long long)d[16],(unsigned long long)d[17],
+  (unsigned long long)d[18],(unsigned long long)d[19],(unsigned long long)d[20],(unsigned long long)d[21],(unsigned long long)d[22],(unsigned long long)d[23],
+  (unsigned long long)d[24],(unsigned long long)d[25],(unsigned long long)d[26],(unsigned long long)d[27]);
+ if(n>0)out->used+=(unsigned)n<left?(unsigned)n:left-1;
+}
 static int native_t970_ui_wait_collect(proc_t p,void *context)
 {
  struct native_t970_ui_wait_buffer *out=context;
  char name[17]={0};int pid=proc_pid(p);proc_name(pid,name,sizeof(name));name[sizeof(name)-1]=0;
  unsigned gestalt=!strncmp(name,"MobileGestalt",13) || !strncmp(name,"mobilegestalt",13);
- if(readUserStacks==5) {
+ if(readUserStacks>=5) {
   if(!gestalt && strcmp(name,"SpringBoard") && strcmp(name,"backboardd"))return PROC_RETURNED;
  } else if(readUserStacks==3 || readUserStacks==4) {
   if(strncmp(name,"MobileGestalt",13) && strncmp(name,"mobilegestalt",13))return PROC_RETURNED;
  } else if(strcmp(name,"SpringBoard") && strcmp(name,"backboardd"))return PROC_RETURNED;
+ if(readUserStacks==6) {
+  ++out->selected;
+  __atomic_store_n(&capturePid,(unsigned)pid,__ATOMIC_RELAXED);
+  __atomic_store_n(&capturePhase,5,__ATOMIC_RELAXED);
+  unsigned left=sizeof(out->text)-out->used;
+  int n=snprintf(out->text+out->used,left,"\n%.12s p%d queue progress (500ms deadline)",name,pid);
+  if(n>0)out->used+=(unsigned)n<left?(unsigned)n:left-1;
+  ui_queue_line(out,p,0);
+  uint64_t deadline=0;clock_interval_to_deadline(500,NSEC_PER_MSEC,&deadline);
+  if(assert_wait_deadline((event_t)&capturePhase,THREAD_UNINT,deadline)==THREAD_WAITING)
+   (void)thread_block(THREAD_CONTINUE_NULL);
+  ui_queue_line(out,p,1);
+  return out->selected>=3?PROC_RETURNED_DONE:PROC_RETURNED;
+ }
  struct proc_workqueueinfo wq={0};int wqStatus=-1;
- uint64_t detail[11]={0};int detailStatus=-1;
+ uint64_t detail[28]={0};int detailStatus=-1;
  if(readUserStacks==5){wqStatus=fill_procworkqueue(p,&wq);detailStatus=native_t970_workqueue_detail(p,detail);}
  ++out->selected;
  __atomic_store_n(&capturePid,(unsigned)pid,__ATOMIC_RELAXED);
@@ -164,7 +195,7 @@ static void ui_collect(void) {
  capture.used=(unsigned)snprintf(capture.text,sizeof(capture.text),"UI saved-regs: queue order; live/best-effort; stacks=%u",readUserStacks);
  __atomic_store_n(&capturePhase,1,__ATOMIC_RELAXED);
  proc_iterate(PROC_ALLPROCLIST|PROC_NOWAITTRANS,native_t970_ui_wait_collect,&capture,NULL,NULL);
- if(readUserStacks==5) {
+ if(readUserStacks>=5) {
   unsigned clipped=capture.used>=sizeof(capture.text)-96;
   if(clipped)capture.used=sizeof(capture.text)-96;
   snprintf(capture.text+capture.used,sizeof(capture.text)-capture.used,"\nUI batch end processes=%u clipped=%u",capture.selected,clipped);
@@ -178,7 +209,7 @@ static void ui_stack_worker(void *parameter,wait_result_t result) {
 const char *native_t970_ui_wait_text(void)
 {
  unsigned enabled=0;
- unsigned stackMode=PE_parse_boot_argn("t970-ui-stack",&enabled,sizeof(enabled)) && (enabled>=1 && enabled<=5);
+ unsigned stackMode=PE_parse_boot_argn("t970-ui-stack",&enabled,sizeof(enabled)) && (enabled>=1 && enabled<=6);
  if(!stackMode){readUserStacks=0;ui_collect();return capture.text;}
  static char pending[128];
  if(!__atomic_exchange_n(&captureStarted,1,__ATOMIC_ACQ_REL)) {
@@ -189,7 +220,7 @@ const char *native_t970_ui_wait_text(void)
   if(error!=KERN_SUCCESS){snprintf(pending,sizeof(pending),"UI stack worker start error=%d",error);return pending;}
   thread_deallocate(worker);
  }
- for(unsigned i=0;i<(readUserStacks==5?40U:20U) && !__atomic_load_n(&captureDone,__ATOMIC_ACQUIRE);++i) {
+ for(unsigned i=0;i<(readUserStacks>=5?40U:20U) && !__atomic_load_n(&captureDone,__ATOMIC_ACQUIRE);++i) {
   uint64_t deadline=0;clock_interval_to_deadline(100,NSEC_PER_MSEC,&deadline);
   if(assert_wait_deadline((event_t)&captureStarted,THREAD_UNINT,deadline)==THREAD_WAITING)
    (void)thread_block(THREAD_CONTINUE_NULL);
