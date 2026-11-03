@@ -1,0 +1,21 @@
+{
+  "boot_sha256": "0854aff68a07c1f946b2d77d9e8c26da5698c399d9b30ab61a511cfca5bc8beb",
+  "photo": "screen-181219.jpg",
+  "main": 1,
+  "processes": 69,
+  "springboard_pid": 27,
+  "backboardd_pid": 0,
+  "runningboardd_pid": 26,
+  "cpus": 8,
+  "secondary": 7,
+  "display_stage": 8,
+  "display_meta_status": 0,
+  "display_surface_load_status": 0,
+  "display_mapped": 1,
+  "display_published": 1,
+  "ufs_blocks": 807959,
+  "free_pages_hex": "90",
+  "display_start_confirmed": true,
+  "rendering_confirmed": false,
+  "interpretation": "Display class/init, IOSurface dependency, GOP mapping and original service start/publication succeeded. Client opening, swaps and actual frames not observed by these counters. Backboardd absent in this sample does not identify exit cause."
+}

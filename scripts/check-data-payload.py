@@ -103,7 +103,7 @@ def main():
         expected_args += ['t970-display-start=1','offline-mobile-graphics-load=1','offline-legacy-register=1','offline-legacy-gop=1','offline-legacy-phase=4','offline-legacy-pm=1']
         require(all(n in names for n in ['_native_legacy_display_probe','_native_legacy_display_late_probe','_native_legacy_gop_mapping_observed']), 'Missing display callbacks')
     if args.cpu_present:
-        require(args.display_probe and args.runtime_report_seconds == 0, 'CPU presentation requires continuous explicit display probe')
+        require(args.display_probe, 'CPU presentation requires explicit display probe')
         expected_args += ['offline-legacy-transfer=1','offline-legacy-validate=1','offline-legacy-cpu-present=1','offline-legacy-retire=1','sheng-vsync=60']
     require(sorted(entry['args'].split()) == sorted(expected_args), 'Unexpected effective boot arguments')
     require(config['boot']['default'] == 'xnu' and entry['initrd'] == 'Payloads/scratch-data.img',
@@ -154,7 +154,7 @@ def main():
     result['smp_observer'] = args.smp_observer
     result['publish_reset_state_requested'] = args.publish_reset_state
     result['ipi_check_requested'] = args.ipi_check
-    result['continuous_cpu_present'] = args.cpu_present
+    result['continuous_cpu_present'] = args.cpu_present and args.runtime_report_seconds == 0
     result['runtime_cache_trace_requested'] = args.cache_trace
     (out / 'validation.json').write_text(json.dumps(result, indent=2) + '\n')
     print(json.dumps(result, indent=2))

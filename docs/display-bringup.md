@@ -73,3 +73,15 @@ out/data-bringup/pre-display-v1。完整BOOT5e318d75为8核、目标60秒、显�
 原始信任、种子与固件保持，独立打包检查通过；具体上传结果见continuous-v1/upload.json。
 运行到自然错误或持续呈现，未证明桌面成功。原有未实现抽象接口仍可能触发保护性panic。
 显示状态报告草稿保存.cache/display-state-draft.patch，未编译进本镜像。
+
+## 显示发布已实测（status-v3）
+
+BOOT0854aff6的18:12:19照片确认stage8/meta0/surface0/mapped1/published1，
+main1/n69/cpu8/sec7。这证明原版显示实例启动、IOSurface依赖、GOP映射和服务发布已通过。
+状态行是尽力诊断快照，不把它当作CPU帧提交/复制/完成或桌面呈现证据。
+backboardd此次未观察到，下一步采样客户端打开、swap验证、transfer/retirement。
+
+对照[umi显示代码](https://github.com/reAAAq/UniXNU-umi/blob/3eb72578597d2ca16471b172d45eddc096a34a04/package/legacy-display/LegacyDisplayProbe.cpp)：
+按真实IOBSD/IOSurface边界延后启动、分开记录init/probe/start，与当前T970注册顺序一致。
+[umi说明](https://github.com/reAAAq/UniXNU-umi/blob/3eb72578597d2ca16471b172d45eddc096a34a04/README.md)
+报告CPU复制到继承scanout可显示Hello；其板级内存、面板、触控参数不能直接移植。

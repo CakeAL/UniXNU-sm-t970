@@ -12,6 +12,13 @@
 运行到自然错误或持续呈现，未证明桌面成功。原有未实现抽象接口仍可能触发保护性panic。
 显示状态报告草稿保存.cache/display-state-draft.patch，未编译进本镜像。
 
+## 最新：显示启动/映射/发布已确认（2026-11-03）
+
+0854aff6的18:12:19照片：display stage8/meta0/surface0/mapped1/published1，
+main1/n69/cpu8/sec7；SpringBoard27/runningboardd26，backboardd此次未观察到。
+显示注册链通过，尚无客户端/帧完成证据，下一步采样client/swap/transfer/retire。
+证据见evidence/display/status-v3；当前是60秒主动终止的定位版。
+
 ## 最新：八核显示接入BOOT5e318d75准备并上传（2026-11-03）
 
 显示归档链接/预链接成功，源内核0adf72f3/payload1f9ea7ae，BOOT5e318d75。

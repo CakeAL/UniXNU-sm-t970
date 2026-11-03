@@ -1,0 +1,41 @@
+{
+  "source_sha256": "554782fcc84045c5fc822c75092438cdd114ec14392453c35e247227654f2878",
+  "geometry_header_sha256": "857bba99be57e8ffc3ee9ce14250fea4f2bc08a951e053986cebc433d2d4b117",
+  "compile_recipe_sha256": "9fc5352fc5fb5e911bc6a9a877b11b1b78d5fd64cd724a60a6aba9b58b95e180",
+  "object_sha256": "dad0516027aa7b8c996f7f0b1cc94df7e65bc6d67bc1ab8c7afdf74da5d32b9e",
+  "gop_object_sha256": "54e56f545f2fccecd9a6161bc1d841b978543acbc56dfae97642d0a25761859a",
+  "board_callbacks_resolved": [
+    "_native_legacy_backend_guard",
+    "_native_legacy_client_enter",
+    "_native_legacy_client_observed",
+    "_native_legacy_copy_timing_observed",
+    "_native_legacy_frame_colors_observed",
+    "_native_legacy_frame_observed",
+    "_native_legacy_gop_mapping_observed",
+    "_native_legacy_gpu_fallback_observed",
+    "_native_legacy_gpu_offer",
+    "_native_legacy_pm_observed",
+    "_native_legacy_prepare_scanout",
+    "_native_legacy_registration_observed",
+    "_native_legacy_retirement_observed",
+    "_native_legacy_surface_rejected",
+    "_native_legacy_swap_stage",
+    "_native_legacy_swap_validation_observed",
+    "_native_legacy_transfer_observed",
+    "_native_legacy_vsync_observed"
+  ],
+  "pending_original_aliases": [
+    "_native_legacy_set_refresh_properties",
+    "_native_legacy_surface_allocation",
+    "_native_legacy_surface_descriptor",
+    "_native_legacy_surface_format",
+    "_native_legacy_surface_height",
+    "_native_legacy_surface_planes",
+    "_native_legacy_surface_stride",
+    "_native_legacy_surface_width",
+    "_native_legacy_vsync_notify"
+  ],
+  "compiled": true,
+  "linked": false,
+  "runtime_display_verified": false
+}

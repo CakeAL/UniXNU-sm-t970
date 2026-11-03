@@ -6,11 +6,12 @@ DEVICE=Path(__file__).resolve().parents[1]
 def main():
  p=argparse.ArgumentParser(description=__doc__)
  for n in ('framework','gop-object','registration-object','output'):p.add_argument('--'+n,type=Path,required=True)
+ p.add_argument('--registration-report',type=Path,default=DEVICE/'evidence/display/registration-v1/report.json')
  a=p.parse_args();out=a.output.resolve()
  if out.exists():raise ValueError('Preserve earlier outputs')
  audit=json.loads((DEVICE/'evidence/display/abi21h461/audit.json').read_text())
  gop=json.loads((DEVICE/'evidence/display/abi21h461/object-check.json').read_text())
- reg=json.loads((DEVICE/'evidence/display/registration-v1/report.json').read_text())
+ reg=json.loads(a.registration_report.read_text())
  sha=lambda f:hashlib.sha256(f.read_bytes()).hexdigest()
  if sha(a.gop_object)!=gop['object_sha256'] or sha(a.registration_object)!=reg['object_sha256']:raise ValueError('Unreviewed object')
  sys.path.insert(0,str(a.framework.resolve()/'kits/XnuPrelink'))

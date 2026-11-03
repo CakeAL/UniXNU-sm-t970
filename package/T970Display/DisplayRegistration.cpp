@@ -23,6 +23,13 @@ static IOService *pendingDisplay;
 static IOService *activeDisplay;
 static IOPlatformDevice *activeProvider;
 static bool initialized;
+static volatile unsigned displayStage, displayMapped, displayPublished;
+static volatile int displayMeta=-1, displaySurface=-1;
+extern "C" void native_t970_display_state(char *out, unsigned length) {
+    if (!out || !length) return;
+    snprintf(out,length,"display stage=%u meta=%d surface=%d mapped=%u published=%u",
+             displayStage,displayMeta,displaySurface,displayMapped,displayPublished);
+}
 static bool consoleReleased;
 static uint32_t completedFrames;
 static uint32_t rejectedFrames;
@@ -47,18 +54,21 @@ extern "C" void native_legacy_display_probe(void) {
         return;
     }
     initialized = true;
+    displayStage=1;
 
     PE_Video video = {};
     if (!videoAvailable(video)) {
         IOLog("T970 display: firmware framebuffer geometry unavailable\n");
         return;
     }
+    displayStage=2;
     void *handle = OSMetaClass::preModLoad(g_kernel_kmod_info.name);
     if (!handle) {
         return;
     }
     displayStaticInit();
     OSReturn status = OSMetaClass::postModLoad(handle);
+    displayMeta=status; displayStage=3;
     if (status) {
         IOLog("T970 display: class registration failed %x\n", status);
         return;
@@ -71,6 +81,7 @@ extern "C" void native_legacy_display_probe(void) {
         return;
     }
     pendingDisplay = display;
+    displayStage=4;
     IOLog("T970 display: initialized original Legacy, waiting for IOBSD\n");
 }
 
@@ -80,11 +91,14 @@ extern "C" void native_legacy_display_late_probe(void) {
         return;
     }
     pendingDisplay = nullptr;
+    displayStage=5;
 
     kern_return_t load = OSKextLoadKextWithIdentifier("com.apple.iokit.IOSurface");
     OSDictionary *matching = IOService::nameMatching("IOCoreSurfaceRoot");
     IOService *surface = matching ? IOService::waitForMatchingService(matching, 5000000000ULL) : nullptr;
     bool surfaceReady = load == KERN_SUCCESS && surface;
+    displaySurface=load;
+    if(surfaceReady) displayStage=6;
     OSSafeReleaseNULL(surface);
     OSSafeReleaseNULL(matching);
     PE_Video video = {};
@@ -118,6 +132,7 @@ extern "C" void native_legacy_display_late_probe(void) {
             provider->setName("gop-display", gIODTPlane);
             treeAttached = provider->attachToParent(treeParent, gIODTPlane);
         }
+        displayStage=7;
         SInt32 score = 0;
         if (treeAttached && display->probe(provider, &score) == display) {
             displayAttached = display->attach(provider);
@@ -131,6 +146,7 @@ extern "C" void native_legacy_display_late_probe(void) {
     OSSafeReleaseNULL(ranges);
     OSSafeReleaseNULL(memory);
     if (displayStarted) {
+        displayStage=8;
         activeDisplay = display;
         activeProvider = provider;
         OSSafeReleaseNULL(treeParent);
@@ -175,6 +191,7 @@ extern "C" bool native_legacy_gop_mapping_observed(IOService *, IOMemoryMap *map
     IOLog("T970 display: scanout cache option=%llx physical=%llx bytes=%llu\n",
           (uint64_t)(mapping->getMapOptions() & kIOMapCacheMask),
           (uint64_t)mapping->getPhysicalAddress(), (uint64_t)mapping->getLength());
+    if(result) displayMapped=1;
     return result;
 }
 
@@ -193,6 +210,7 @@ extern "C" __attribute__((noreturn)) void native_legacy_backend_guard(unsigned s
 }
 
 extern "C" void native_legacy_registration_observed(IOService *display) {
+    displayPublished=1;
     IOLog("T970 display: registered %s\n", display->getMetaClass()->getClassName());
 }
 
