@@ -1,0 +1,9 @@
+{
+  "command": "python3.14 -m unittest discover -s tests -p test_ui_spawn_state.py -v",
+  "exit_code": 0,
+  "actual_helper_executed": true,
+  "asan": true,
+  "proc_apis_substituted": true,
+  "observation_before_execargs_free_source_check": true,
+  "limits": "Image activation status, not final spawn return or userspace main. Multi-field snapshot is best effort."
+}

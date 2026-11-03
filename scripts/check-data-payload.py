@@ -42,6 +42,7 @@ def main():
     parser.add_argument('--cache-trace', action='store_true', help='Require compact runtime PID1 cache trace')
     parser.add_argument('--display-probe', action='store_true', help='Require explicit T970 GOP service probe arguments and linked callbacks')
     parser.add_argument('--cpu-present', action='store_true', help='Require continuous CPU presentation arguments')
+    parser.add_argument('--ui-exit-probe', action='store_true', help='Require native XNU UI error-exit trap')
     args = parser.parse_args()
     require(args.runtime_report_seconds == 0 or 5 <= args.runtime_report_seconds <= 300,
             'Runtime sampler interval must be 5..300 seconds')
@@ -105,6 +106,10 @@ def main():
     if args.cpu_present:
         require(args.display_probe, 'CPU presentation requires explicit display probe')
         expected_args += ['offline-legacy-transfer=1','offline-legacy-validate=1','offline-legacy-cpu-present=1','offline-legacy-retire=1','sheng-vsync=60']
+    if args.ui_exit_probe:
+        require(args.display_probe and args.runtime_report_seconds, 'UI exit trap requires bounded display diagnostics')
+        expected_args += ['panic_on_error_exit=backboardd,SpringBoard']
+        require(b'panic_on_error_exit\0' in kernel.read_bytes(), 'Kernel lacks native error-exit tunable')
     require(sorted(entry['args'].split()) == sorted(expected_args), 'Unexpected effective boot arguments')
     require(config['boot']['default'] == 'xnu' and entry['initrd'] == 'Payloads/scratch-data.img',
             'Wrong default entry/Data initrd')

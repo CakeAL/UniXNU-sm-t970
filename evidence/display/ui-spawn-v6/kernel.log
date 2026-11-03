@@ -1,0 +1,129 @@
+== submodules /Users/cakeal/vsc/UniXNU
+== tree /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree
+== kernel: XNU
+== kernel: prepare XNU d8b80295118e
++ git clone --quiet --shared --no-checkout /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/feeds/xnu-b7545ced /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/.cache/xnu-work
+== kernel: patch apple-only-cpu-tunables.patch
+== kernel: patch architectural-timer-entry.patch
+== kernel: patch armvirt-platform-personality.patch
+== kernel: patch cxx-flag-dependencies.patch
+== kernel: patch disabled-deferred-reclaim.patch
+== kernel: patch external-archive-dependencies.patch
+== kernel: patch kernel-sdk-root.patch
+== kernel: patch local-availability.patch
+== kernel: patch mockfs-intermediate-lookup.patch
+== kernel: patch mockfs-memory-device-width.patch
+== kernel: patch mockfs-statfs.patch
+== kernel: patch mockfs-test-file.patch
+== kernel: patch mockfs-typed-allocation.patch
+== kernel: patch native-4k-bootstrap-capacity.patch
+== kernel: patch native-4k-signature-hash-cache.patch
+== kernel: patch native-4k-user-abi.patch
+== kernel: patch native-aes-personality.patch
+== kernel: patch native-arm-pan.patch
+== kernel: patch native-dt-panic-region.patch
+== kernel: patch native-lookup-trace.patch
+== kernel: patch native-priv-work-interval.patch
+== kernel: patch native-quiet-managed-page-report.patch
+== kernel: patch native-text-fixup.patch
+== kernel: patch native-trust-cache-runtime.patch
+== kernel: patch native-union-getattrlistbulk.patch
+== kernel: patch native-union-lower-directory.patch
+== kernel: patch native-work-interval-soft-fail.patch
+== kernel: patch native-work-interval-trace.patch
+== kernel: patch native-work-interval-instance.patch
+== kernel: patch non-apple-cache-monitor.patch
+== kernel: patch non-apple-iommu-bootstrap.patch
+== kernel: patch non-apple-pmap-field.patch
+== kernel: patch null-root-media.patch
+== kernel: patch offline-component-load-probes.patch
+== kernel: patch offline-legacy-start.patch
+== kernel: patch offline-native-gpu-broker.patch
+== kernel: patch offline-owner-boot-manifest.patch
+== kernel: patch offline-owner-cache-carrier.patch
+== kernel: patch offline-owner-root-binding-audit.patch
+== kernel: patch offline-owner-root-crypto-probe.patch
+== kernel: patch offline-owner-systemos-mount.patch
+== kernel: patch offline-owner-z-air-init.patch
+== kernel: patch offline-pgz-alignment-probe.patch
+== kernel: patch pgz-aligned-validation.patch
+== kernel: patch public-entitlements-header.patch
+== kernel: patch published-freezer-condition.patch
+== kernel: patch source-corecrypto14-bootstrap.patch
+== kernel: patch source-machine-layer.patch
+== kernel: patch source-pthread-bootstrap.patch
+== kernel: patch zzw-native-adreno-sandbox-grant.patch
+== kernel: patch zzwb-native-sandbox-grant-set-properties.patch
+== kernel: patch zzx-pmap-sync-64bit-pa.patch
+== kernel: patch zzy-native-gpu-addon-mount.patch
+== kernel: patch zzy-staged-system-apps.patch
+== kernel: patch zzyb-native-cryptex-os-view.patch
+== kernel: patch zzyc-owner-skip-launch-constraints.patch
+== kernel: patch native-smp-secondary.patch
+== kernel: patch native-smp-type-clusters.patch
+== kernel: patch xnu-10063.141.1-security-init.patch
+== kernel: patch xnu-10063.141.1-sparse-index.patch
+== kernel: patch sheng-platform-power.patch
+== kernel: patch t970-console-bootstrap.patch
+== kernel: patch t970-skip-vcattach.patch
+== kernel: patch t970-smmu-dump.patch
+== kernel: patch t970-owner-mount-status.patch
+== kernel: patch t970-carrier-counters.patch
+== kernel: patch t970-union-root-reference.patch
+== kernel: patch t970-cache-syscalls.patch
+== kernel: patch t970-cache-signature-stage.patch
+== kernel: patch t970-cache-read-source.patch
+== kernel: patch t970-policy-memory-status.patch
+== kernel: patch t970-watchdog-launch-policy.patch
+== kernel: patch t970-runtime-report.patch
+== kernel: patch t970-smp-report.patch
+== kernel: patch t970-smp-reset-context.patch
+== kernel: patch t970-smp-entry-trace.patch
+== kernel: patch t970-smp-mmu-trace.patch
+== kernel: patch t970-smp-trampoline-trace.patch
+== kernel: patch t970-smp-publish-reset-state.patch
+== kernel: patch t970-smp-ipi-check.patch
+== kernel: patch t970-runtime-cache-trace.patch
+== kernel: patch t970-ui-spawn-state.patch
++ python3 /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/scripts/prepare-xnu-source.py
+Restored 26 omitted public headers from Apple; blob hashes verified
+== kernel: archive-01-build-corecrypto-14
++ python3 /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/scripts/build-corecrypto-14.py
+== kernel: archive-02-build-corecrypto-14
++ python3 /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/scripts/build-corecrypto-14.py --namespace
+== kernel: component-ArmDTPlatform
++ python3 /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/scripts/build-arm-driver.py ArmDTPlatform
+== kernel: component-ArmCpu
++ python3 /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/scripts/build-arm-driver.py ArmCpu
+== kernel: component-SoftwareAES
++ python3 /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/scripts/build-arm-driver.py SoftwareAES
+== kernel: archive-06-build-verified-root-empty
++ python3 /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/scripts/build-verified-root-empty.py
+== kernel: component-VirtioMmioBlock
++ python3 /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/scripts/build-arm-driver.py VirtioMmioBlock
+== kernel: archive-08-zz-build-virtio-block-local
++ python3 /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/scripts/zz-build-virtio-block-local.py
+== kernel: archive-09-build-storage-bindings
++ python3 /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/scripts/build-storage-bindings.py --component NativeVirtioBlock --archive libVirtioMmioBlock.a --directory build/virtio-block-local --subset
+== kernel: component-RamBlock
++ python3 /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/scripts/build-arm-driver.py RamBlock
+== kernel: archive-11-build-storage-bindings
++ python3 /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/scripts/build-storage-bindings.py --component NativeRamBlock --archive libRamBlock.a --directory build/ram-block --subset
+== kernel: archive-12-zz-build-shengufs-local
++ python3 /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/scripts/zz-build-shengufs-local.py
+== kernel: archive-13-build-storage-bindings
++ python3 /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/scripts/build-storage-bindings.py --component NativeUfs --archive libShengUfs.a --directory build/sheng-ufs
+== kernel: archive-14-build-ufs-stubs
++ python3 /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/scripts/build-ufs-stubs.py
+== kernel: archive-15-build-software-aes-bindings
++ python3 /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/scripts/build-software-aes-bindings.py
+== kernel: archive-16-build-platform-power
++ python3 /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/scripts/build-platform-power.py
+== kernel: archive-17-build-mockfs-fixture
++ python3 /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/scripts/build-mockfs-fixture.py
+== kernel: archive-18-build-libpthread-kernel
++ python3 /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/scripts/build-libpthread-kernel.py
++ bash /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/scripts/build-xnu-4k-baseline.sh
+== kernel: prelink
++ python3 /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/kits/XnuPrelink/emit_prelink.py --kernel /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree/build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/mach.development.bcm2837.unstripped.noctf --prelinked /Users/cakeal/vsc/UniXNU/out/ipsw/21H461/kernelcache.decompressed --slide=-0x1000000 --output /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/kernel/kernel.macho --root com.apple.AppleFSCompression.AppleFSCompressionTypeZlib --root com.apple.driver.AppleARMPlatform --root com.apple.driver.AppleARMWatchdogTimer --root com.apple.driver.AppleAudioClockLibs --root com.apple.driver.AppleEffaceableStorage --root com.apple.driver.AppleIISController --root com.apple.driver.AppleM2ScalerCSCDriver --root com.apple.driver.AppleMobileFileIntegrity --root com.apple.driver.ApplePMGR --root com.apple.driver.IODARTFamily --root com.apple.filesystems.apfs --root com.apple.iokit.CoreAnalyticsFamily --root com.apple.iokit.IOAVFamily --root com.apple.iokit.IOAudio2Family --root com.apple.iokit.IOCECFamily --root com.apple.iokit.IOCryptoAcceleratorFamily --root com.apple.iokit.IOGPUFamily --root com.apple.iokit.IOHDCPFamily --root com.apple.iokit.IOMobileGraphicsFamily --root com.apple.iokit.IOReportFamily --root com.apple.iokit.IOSlowAdaptiveClockingFamily --root com.apple.iokit.IOStorageFamily --root com.apple.iokit.IOSurface --root com.apple.kec.Libm --root com.apple.kec.corecrypto --root com.apple.kext.AppleMatch --root com.apple.kext.CoreTrust --root com.apple.security.AppleImage4 --root com.apple.security.sandbox --root com.apple.iokit.IOHIDFamily --root com.apple.iokit.IOHIDEventDriver --early-security-init com.apple.driver.AppleMobileFileIntegrity=0xfffffff005ab4ae0
+== kernel: /Users/cakeal/vsc/UniXNU/out/t970-data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/kernel/kernel.macho sha256 d4896832b6dc001ba8d2a7c4476352b790acabb6c3e50f92283965adc781891b

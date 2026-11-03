@@ -1,0 +1,18 @@
+{
+  "boot_sha256": "535c53e9ec0f3030f4ea2018f5096f56ef850ffcad1cb132ef47bcc6ad679e55",
+  "photo": "screen-204513.jpg",
+  "main": 1,
+  "processes": 69,
+  "cpus": 8,
+  "display_stage": 8,
+  "mapped": 1,
+  "published": 1,
+  "client_enter": 0,
+  "activation_total": 89,
+  "springboard_seen": 1,
+  "springboard_pid": 27,
+  "springboard_error": 0,
+  "springboard_activated": 1,
+  "backboard_seen": 0,
+  "interpretation": "SpringBoard positive control validates saved-path observation before free. No matching backboardd image activation observed by target60. Does not rule out spawn failure before image activation/path setup, a different executable path, or a later launch. Next inspect launchd job import and early spawn attempts."
+}

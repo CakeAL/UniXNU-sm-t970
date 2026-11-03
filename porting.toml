@@ -914,6 +914,11 @@ id = "display"
 status = "planned"
 components = []
 paths = [
+  "patches/xnu/t970-ui-spawn-state.patch",
+  "tests/test_ui_spawn_state.py",
+  "evidence/display/ui-exit-v5/**",
+  "evidence/display/ui-spawn-v6/**",
+  "evidence/display/ui-activate-v7/**",
   "tests/test_display_state.py",
   "evidence/display/client-v4/**",
   "patches/xnu/t970-runtime-cache-trace.patch",
@@ -951,6 +956,7 @@ procedure = [
   "Collect DRM modes, panel type and brightness limits; read only display-selection tokens from /proc/cmdline and match the selected S6TUUM3 node in the live DT.",
 ]
 findings = [
+  "Client-v4 confirms zero display clients/swaps. Native UI nonzero-exit trap v5 did not trigger. V6 saved-path sampling was too late (exec_activate_image already frees strings), so its zero target counts are invalid absence evidence. Corrected v7 BOOT535c53e9 observes SB1/27/0/activated1, BB0, total89 activations at60; positive SB control validates path capture. Does not rule out pre-activation failure, alternate path or later BB launch. Actual helper ASan checks and pre-free placement check pass. Next inspect launchd job import/early spawn.",
   "Client-v4 adds relaxed diagnostic counters for client enter/open/fail, swap accept/reject, transfer/status, copies, retirement and vsync notifications. Actual formatter/counter block passes ASan bounds/null/state checks. Kernelb81e0783 builds/prelinks; independent payload/BOOT/eight-core preparation passes. No rendering decisions changed; counters are best-effort snapshots. Hardware client/frame outcome pending; see client-v4.",
   "BOOT0854aff6 owner photo18:12:19 confirms display stage8/meta0/surface0/mapped1/published1, main1/n69/cpu8/sec7. Actual display class/init, IOSurface readiness, GOP mapping, original start and publication succeeded. Client opens, swaps, CPU copies and rendered desktop remain unverified; backboardd not observed in snapshot. See status-v3/device-result.json. Umi uses the same real IOBSD/IOSurface lifecycle boundary; do not copy its board geometry.",
   "Owner requested full continuous boot: same-kernel BOOTc39efc0f prepared with8 CPUs, runtime sampler absent, CPU transfer/validation/retirement and software vsync60 enabled. Independent packing checks pass; rendering and physical refresh unverified. Abstract backend guards remain. See evidence/display/continuous-v1 upload and pending hardware observation.",

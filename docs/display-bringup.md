@@ -101,3 +101,17 @@ transfer次数/最后status、copies、retire和vsync通知次数。计数使用
 - open>0但swap=0：继续查用户态合成、backboardd和提交链路。
 - bad>0或transfer失败：按reason/status定位表面格式/尺寸/映射或复制。
 - retire>0仍无正确画面：再检查实际像素、scanout布局与所有权。
+
+## UI启动链定位（2026-11-03）
+
+client-v4实机确认显示stage8/mapped1/published1，但client/swap/copy/retire全部0。
+原XNU panic_on_error_exit=backboardd,SpringBoard检查版ui-exit-v5未触发非零退出诊断，
+仅说明本轮没有命中该检查，不排除零状态退出或exec前失败。
+
+ui-spawn-v6曾放在posix_spawn清理处；实机SB27存在但目标路径计数0，不能作缺席证据。
+已定位exec_activate_image先释放ip_strings。修正至其bad_notrans中释放前观察，
+ui-activate-v7 BOOT535c53e9实测SB=1/27/0/1，BB=0/0/0/0，总激活89，main1/n69。
+这是图像激活完成处的error/状态，不等于最终spawn系统调用结果或用户main。
+路径只从已有内核缓冲区读取，空指针/长度/终止符检查及ASan主机替身测试通过。
+BB未观察到匹配激活仍不能排除更早失败、其他路径或更晚启动；下一步看launchd job加载/早期spawn。
+证据分别见evidence/display/client-v4、ui-exit-v5、ui-spawn-v6、ui-activate-v7。

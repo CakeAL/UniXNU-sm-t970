@@ -1,0 +1,7 @@
+{
+  "boot_sha256": "535c53e9ec0f3030f4ea2018f5096f56ef850ffcad1cb132ef47bcc6ad679e55",
+  "exit_code": 0,
+  "boot_only": true,
+  "readback_verified": false,
+  "reboot_requested": true
+}

@@ -1,0 +1,17 @@
+{
+  "boot_sha256": "3597fc5e2bcb76ebfa9a47e2ea16bd657adb0864a1d9cf4072edfbcf424bf667",
+  "photo": "screen-200308.jpg",
+  "main": 1,
+  "processes": 69,
+  "springboard_pid": 27,
+  "backboardd_pid": 0,
+  "display_stage": 8,
+  "mapped": 1,
+  "published": 1,
+  "clients_entered": 0,
+  "spawn_total": 88,
+  "backboard_matches": 0,
+  "springboard_matches": 0,
+  "trace_valid_for_target_absence": false,
+  "interpretation": "SpringBoard exists but no path match. Collector ran after exec_activate_image freed saved strings; targeted counters incomplete and cannot establish absence of launches. Fixed observation point required. Original framebuffer/client observations remain valid."
+}

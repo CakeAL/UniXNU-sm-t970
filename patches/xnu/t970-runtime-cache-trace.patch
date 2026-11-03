@@ -1,6 +1,6 @@
 --- a/bsd/kern/kern_exec.c
 +++ b/bsd/kern/kern_exec.c
-@@ -8168,6 +8168,19 @@
+@@ -8168,6 +8168,22 @@
  	native_t970_reset_context(reset);
  	char cpu_state[512];
  	native_t970_smp_state(cpu_state, sizeof(cpu_state));
@@ -8,8 +8,11 @@
 +	if (PE_parse_boot_argn("t970-runtime-cache-trace", &cache_trace, sizeof(cache_trace)) && cache_trace == 1) {
 +		extern const char *native_t970_cache_trace_text(void);
 +		extern void native_t970_display_state(char *, unsigned) __attribute__((weak_import));
-+		char display_state[384] = "display backend absent";
++		char display_state[640] = "display backend absent";
 +		if (native_t970_display_state) native_t970_display_state(display_state, sizeof(display_state));
++		extern void native_t970_ui_spawn_state(char *, unsigned);
++		size_t display_used = strlen(display_state);
++		native_t970_ui_spawn_state(display_state + display_used, sizeof(display_state) - display_used);
 +		panic("runtime target=%u main=%d n=%u wd=%d sb=%d bb=%d rb=%d D=%d W=%d S=%d blocks=%llu cpu=%u sec=%u\nC step/psci/fail/timer/sgi %s\n%s\n%s\n%s",
 +		    seconds, native_t970_initproc_main(), snapshot.count, snapshot.watchdog, snapshot.springboard,
 +		    snapshot.backboard, snapshot.runningboard, native_owner_data_status,

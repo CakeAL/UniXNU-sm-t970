@@ -1,0 +1,61 @@
+--- a/bsd/kern/kern_exec.c
++++ b/bsd/kern/kern_exec.c
+@@ -386,6 +386,7 @@
+ 
+ struct image_params;    /* Forward */
+ static int exec_activate_image(struct image_params *imgp);
++static void native_t970_ui_spawn_note(proc_t, proc_t, struct image_params *, int, boolean_t);
+ static int exec_copyout_strings(struct image_params *imgp, user_addr_t *stackp);
+ static int load_return_to_errno(load_return_t lrtn);
+ static int execargs_alloc(struct image_params *imgp);
+@@ -2381,6 +2382,8 @@
+ 	proc_transend(p, 0);
+ 
+ bad_notrans:
++	/* Read saved path before exec_activate_image releases it. */
++	native_t970_ui_spawn_note(current_proc(), p, imgp, error, error == 0);
+ 	if (imgp->ip_strings) {
+ 		execargs_free(imgp);
+ 	}
+@@ -3541,6 +3544,41 @@
+  *		Handle posix_spawnattr_t
+  *		Handle posix_spawn_file_actions_t
+  */
++/* T970_UI_SPAWN_BEGIN: bounded kernel-owned executable path only. */
++static unsigned native_t970_ui_spawns, native_t970_ui_seen[2];
++static int native_t970_ui_pid[2], native_t970_ui_error[2], native_t970_ui_exec[2];
++void native_t970_ui_spawn_state(char *, unsigned);
++void
++native_t970_ui_spawn_state(char *out, unsigned length)
++{
++ if (!out || !length) return;
++ snprintf(out,length,"\nui-spawn total=%u bb seen/pid/err/activated=%u/%d/%d/%d sb=%u/%d/%d/%d",
++  __atomic_load_n(&native_t970_ui_spawns,__ATOMIC_RELAXED),
++  __atomic_load_n(&native_t970_ui_seen[0],__ATOMIC_RELAXED),native_t970_ui_pid[0],native_t970_ui_error[0],native_t970_ui_exec[0],
++  __atomic_load_n(&native_t970_ui_seen[1],__ATOMIC_RELAXED),native_t970_ui_pid[1],native_t970_ui_error[1],native_t970_ui_exec[1]);
++}
++static void
++native_t970_ui_spawn_note(proc_t parent, proc_t child, struct image_params *imgp, int error, boolean_t executed)
++{
++ if (!parent || proc_getpid(parent)!=1) return;
++ __atomic_fetch_add(&native_t970_ui_spawns,1,__ATOMIC_RELAXED);
++ if (!imgp || !imgp->ip_strings || !imgp->ip_strendp) return;
++ const char *path=imgp->ip_strings+strlen(EXECUTABLE_KEY);
++ if (imgp->ip_strendp<=path) return;
++ size_t length=(size_t)(imgp->ip_strendp-path);
++ if(length>MAXPATHLEN) length=MAXPATHLEN;
++ const char *end=memchr(path,0,length);
++ if(!end) return;
++ int slot=-1;
++ if(!strcmp(path,"/usr/libexec/backboardd")) slot=0;
++ if(!strcmp(path,"/System/Library/CoreServices/SpringBoard.app/SpringBoard")) slot=1;
++ if(slot<0) return;
++ native_t970_ui_pid[slot]=child ? proc_getpid(child) : -1;
++ native_t970_ui_error[slot]=error; native_t970_ui_exec[slot]=executed;
++ __atomic_fetch_add(&native_t970_ui_seen[slot],1,__ATOMIC_RELAXED);
++}
++/* T970_UI_SPAWN_END */
++
+ int
+ posix_spawn(proc_t ap, struct posix_spawn_args *uap, int32_t *retval)
+ {

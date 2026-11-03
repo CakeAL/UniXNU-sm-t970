@@ -1,0 +1,15 @@
+{
+  "boot_sha256": "6118e00eab0554986b781e398ad07c9a8a8443bc48ed411d1e49f2b46ac719ab",
+  "photo": "screen-191612.jpg",
+  "native_error_exit_trap_observed": false,
+  "main": 1,
+  "processes": 69,
+  "cpus": 8,
+  "display_stage": 8,
+  "mapped": 1,
+  "published": 1,
+  "client_enter": 0,
+  "swap_accepted": 0,
+  "backboardd": 0,
+  "interpretation": "No matching nonzero exit trap before terminal60 sample. Does not establish no spawn failure or no zero-status exit. Next inspect copied executable path and spawn completion."
+}
