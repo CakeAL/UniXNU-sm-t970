@@ -1,0 +1,15 @@
+{
+  "command": "python3.14 -m unittest discover -s tests -p test_display_state.py -v",
+  "exit_code": 0,
+  "actual_formatter_executed": true,
+  "asan": true,
+  "bounded_lengths": [
+    0,
+    1,
+    16,
+    384
+  ],
+  "null_buffer_checked": true,
+  "counter_snapshot_checked": true,
+  "notes": "Individual counters use relaxed atomics; snapshot is best effort, not a synchronized event ledger. No change to rendering decisions."
+}

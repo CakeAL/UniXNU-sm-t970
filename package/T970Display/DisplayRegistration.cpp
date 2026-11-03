@@ -25,10 +25,19 @@ static IOPlatformDevice *activeProvider;
 static bool initialized;
 static volatile unsigned displayStage, displayMapped, displayPublished;
 static volatile int displayMeta=-1, displaySurface=-1;
+// Relaxed counters are diagnostic only; they never decide driver behavior.
+static uint32_t clientsEntered, clientsOpened, clientsFailed, lastClientType, lastClientStatus;
+static uint32_t swapsAccepted, swapsRejected, lastSwapReason, transfers, lastTransferStatus;
+static uint32_t copies, retired, vsyncSent;
+static inline void note(uint32_t &value) { __atomic_fetch_add(&value,1,__ATOMIC_RELAXED); }
+static inline uint32_t sample(uint32_t &value) { return __atomic_load_n(&value,__ATOMIC_RELAXED); }
 extern "C" void native_t970_display_state(char *out, unsigned length) {
     if (!out || !length) return;
-    snprintf(out,length,"display stage=%u meta=%d surface=%d mapped=%u published=%u",
-             displayStage,displayMeta,displaySurface,displayMapped,displayPublished);
+    snprintf(out,length,"display stage=%u meta=%d surface=%d mapped=%u published=%u\nclient enter/open/fail=%u/%u/%u type=%x status=%x swap ok/bad=%u/%u why=%u xfer=%u status=%x copies=%u retire=%u vsync=%u",
+             displayStage,displayMeta,displaySurface,displayMapped,displayPublished,
+             sample(clientsEntered),sample(clientsOpened),sample(clientsFailed),sample(lastClientType),
+             sample(lastClientStatus),sample(swapsAccepted),sample(swapsRejected),sample(lastSwapReason),
+             sample(transfers),sample(lastTransferStatus),sample(copies),sample(retired),sample(vsyncSent));
 }
 static bool consoleReleased;
 static uint32_t completedFrames;
@@ -219,14 +228,19 @@ extern "C" void native_legacy_pm_observed(unsigned stage, IOReturn status, unsig
 }
 
 extern "C" void native_legacy_client_enter(task_t, uint32_t type) {
+    note(clientsEntered); __atomic_store_n(&lastClientType,type,__ATOMIC_RELAXED);
     IOLog("T970 display: opening user client type=%u\n", type);
 }
 
 extern "C" void native_legacy_client_observed(IOReturn status, IOUserClient *) {
+    note(status == kIOReturnSuccess ? clientsOpened : clientsFailed);
+    __atomic_store_n(&lastClientStatus,(uint32_t)status,__ATOMIC_RELAXED);
     IOLog("T970 display: user client status=%x\n", status);
 }
 
 extern "C" void native_legacy_swap_validation_observed(bool accepted, unsigned reason, const void *, const void *) {
+    note(accepted ? swapsAccepted : swapsRejected);
+    __atomic_store_n(&lastSwapReason,reason,__ATOMIC_RELAXED);
     if (!accepted && rejectedFrames++ < 16) {
         IOLog("T970 display: rejected swap reason=%u\n", reason);
     }
@@ -241,12 +255,14 @@ extern "C" void native_legacy_surface_rejected(uint64_t width, uint64_t height, 
 }
 
 extern "C" void native_legacy_transfer_observed(IOReturn status, const void *, uint64_t bytes) {
+    note(transfers); __atomic_store_n(&lastTransferStatus,(uint32_t)status,__ATOMIC_RELAXED);
     if (status || completedFrames < 4) {
         IOLog("T970 display: CPU transfer status=%x bytes=%llu\n", status, bytes);
     }
 }
 
 extern "C" void native_legacy_retirement_observed(IOService *) {
+    note(retired);
     ++completedFrames;
     if (completedFrames <= 4) {
         IOLog("T970 display: completed frame=%u\n", completedFrames);
@@ -254,12 +270,14 @@ extern "C" void native_legacy_retirement_observed(IOService *) {
 }
 
 extern "C" void native_legacy_copy_timing_observed(uint64_t ticks, uint64_t bytes) {
+    note(copies);
     if (completedFrames < 4) {
         IOLog("T970 display: CPU copy ticks=%llu bytes=%llu\n", ticks, bytes);
     }
 }
 
 extern "C" void native_legacy_vsync_observed(unsigned event, unsigned hz) {
+    if (event == 1) note(vsyncSent);
     if (event == 4 || event == 5) {
         IOLog("T970 display: refresh event=%u hz=%u\n", event, hz);
     }

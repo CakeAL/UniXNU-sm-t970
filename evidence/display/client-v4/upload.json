@@ -1,0 +1,13 @@
+{
+  "boot_sha256": "a4ec49362a7b0a254b7bfc447932e29567cf3cd69f66ffb3739665a3f58783b5",
+  "exit_code": 0,
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/data-bringup/display-client-cpu8/boot-partition.img"
+  ],
+  "readback_verified": false,
+  "reboot_requested": true,
+  "hardware_result_pending": true
+}

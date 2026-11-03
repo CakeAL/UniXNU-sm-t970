@@ -12,6 +12,14 @@
 运行到自然错误或持续呈现，未证明桌面成功。原有未实现抽象接口仍可能触发保护性panic。
 显示状态报告草稿保存.cache/display-state-draft.patch，未编译进本镜像。
 
+## 最新：客户端/帧计数版准备并上传（2026-11-03）
+
+client-v4沿用八核/60秒/CPU呈现参数，源内核b81e0783。
+新增client enter/open/fail/type/status、swap ok/bad/reason、transfer/status、copies/retire/vsync。
+计数和格式化ASan检查、实际编译/预链接、独立打包检查通过。
+具体BOOT摘要/上传与待回报实机结果见evidence/display/client-v4；不预先判定有帧或桌面。
+上一版0854aff6已确认stage8/mapped1/published1，下一张图先判断是否有client或swap。
+
 ## 最新：显示启动/映射/发布已确认（2026-11-03）
 
 0854aff6的18:12:19照片：display stage8/meta0/surface0/mapped1/published1，

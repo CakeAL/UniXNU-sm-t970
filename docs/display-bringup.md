@@ -85,3 +85,19 @@ backboardd此次未观察到，下一步采样客户端打开、swap验证、tra
 按真实IOBSD/IOSurface边界延后启动、分开记录init/probe/start，与当前T970注册顺序一致。
 [umi说明](https://github.com/reAAAq/UniXNU-umi/blob/3eb72578597d2ca16471b172d45eddc096a34a04/README.md)
 报告CPU复制到继承scanout可显示Hello；其板级内存、面板、触控参数不能直接移植。
+
+## 客户端/帧链路采样（client-v4）
+
+新增只读报告：client enter/open/fail、最后type/status、swap ok/bad及reason、
+transfer次数/最后status、copies、retire和vsync通知次数。计数使用relaxed原子操作，
+多字段为尽力快照，不是同步事务；不改变原返回、授权、提交或完成逻辑。
+实际计数/格式化代码通过ASan主机测试：0/1/16/384长度、空指针、计数和关键字段。
+
+同八核/60秒/CPU呈现配置，新源b81e0783已构建/预链接与独立打包校验通过，
+证据见evidence/display/client-v4，具体BOOT摘要及上传见其preparation/upload。
+
+- enter=0：尚未观察到显示客户端打开，不能直接归因于帧复制或面板。
+- enter>0且fail>0：按status定位原版客户端创建失败。
+- open>0但swap=0：继续查用户态合成、backboardd和提交链路。
+- bad>0或transfer失败：按reason/status定位表面格式/尺寸/映射或复制。
+- retire>0仍无正确画面：再检查实际像素、scanout布局与所有权。
