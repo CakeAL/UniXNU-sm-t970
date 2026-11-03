@@ -1,0 +1,31 @@
+{
+  "boot_sha256": "21c9b7ddcfef3158af03d6312212738ca8d8285b89d33fb57feb9bce824f89e4",
+  "boot_bytes": 71303168,
+  "raw_boot_sha256": "a875be922a643bfc4926c738f4cae251f8ebd521e34f7c9043f8ab85a692a51f",
+  "kernel_sha256": "c971aacbc8bcd68d14717334df84ba60c28ad926978d7da7c8844b095a3cfd37",
+  "payload_kernel_sha256": "c858439e6579cb9256fb88e0dc5680530ac3ab3721c1ae8ec82af0b76a44a4ca",
+  "pmgr_archive_sha256": "5c3c6b2348819a09ba6d4abcb291135eb559ce936912a9dc3ae3ae06d22d3c79",
+  "pmgr_members": [
+    "__.SYMDEF SORTED",
+    "ShengPlatformPower.late.o",
+    "original-bindings.o"
+  ],
+  "real_pmgr_and_ramblock_symbols": true,
+  "trustcache_unchanged": true,
+  "adt_only_expected_changes": true,
+  "exact_fd_dtb": true,
+  "zero_tail": true,
+  "seed_sha256": "4591566eccd77f0f9d13a1338ecaf3c73ce86cd04aeea732d91db6b2e100ca3a",
+  "hardware_data_mount_verified": false,
+  "watchdog_policy_requested": true,
+  "kernel_args": "t970-novc sheng-pmgr=2 t970-ufs-publish=1 -v cpus=1 launchdsuffix=release t970-disable-watchdogd=1 t970-smp-publish-state=1 t970-display-start=1 offline-mobile-graphics-load=1 offline-legacy-register=1 offline-legacy-gop=1 offline-legacy-phase=4 offline-legacy-pm=1 offline-legacy-transfer=1 offline-legacy-validate=1 offline-legacy-cpu-present=1 offline-legacy-retire=1 sheng-vsync=60 t970-runtime-report=120 t970-runtime-cache-trace=1 panic_on_error_exit=backboardd,SpringBoard t970-ui-spawn-calls=1 offline-key-events=1 sheng-aks=1 t970-ui-wait=1 t970-ui-stack=1",
+  "runtime_report_target_seconds": 120,
+  "terminal_diagnostic": true,
+  "smp_observer": true,
+  "publish_reset_state_requested": true,
+  "ipi_check_requested": false,
+  "continuous_cpu_present": false,
+  "runtime_cache_trace_requested": true,
+  "key_state_requested": true,
+  "ui_wait_requested": true
+}

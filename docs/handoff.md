@@ -3,6 +3,14 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
+## 最新：隔离worker有限FP链检查版（2026-11-04）
+
+接续d80a3773的main1/n148、显示open2/swap0。已完成t970-ui-stack=1隔离worker诊断，
+每个目标队列首线程最多8级FP链，报告方最多20个100ms调度期限；超时隐藏未完成数据。
+实时线程的栈不保证一致，VM读取超时不取消worker。默认不开启用户栈读取。
+准备、校验与使用边界见[evidence/display/ui-stack-v13](../evidence/display/ui-stack-v13/README.md)。
+未刷写，新镜像实机结果待验证。
+
 ## 最新：保存寄存器已取得，继续采调用栈
 
 BOOTd80a3773 target120已实测main1/n148、BB57/SB27、显示open2/swap0，KeyStore open49/call194。

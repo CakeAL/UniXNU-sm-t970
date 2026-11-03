@@ -1,0 +1,13 @@
+{
+  "source_sha256": "216a280af161075bffd5c692c7de04c112e5bd76d28a5f9853d7111cd106aa62",
+  "object_sha256": "953601c64f8dfca1adc6a1d9b38c8bc2265f00cbcfff14d6ba92405fdedf79f7",
+  "compile_recipe_sha256": "2fe39a2b1a5d3f4cc66f07ac3cbae843f78c38956942ef87a8e5de0b3a0b45e0",
+  "mach_private_recipe": true,
+  "reads_user_memory": "opt-in t970-ui-stack=1, isolated worker",
+  "suspends_tasks": false,
+  "thread_limit_per_process": 4,
+  "runtime_verified": false,
+  "stack_frames_per_first_thread": 8,
+  "report_wait_deadlines": 20,
+  "report_wait_interval_ms": 100
+}

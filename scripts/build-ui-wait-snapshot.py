@@ -40,5 +40,6 @@ assert recipe.read_bytes() == raw
 sha = lambda path:hashlib.sha256(path.read_bytes()).hexdigest()
 (out / 'report.json').write_text(json.dumps(dict(source_sha256=sha(source),object_sha256=sha(obj),
     compile_recipe_sha256=hashlib.sha256(raw).hexdigest(),mach_private_recipe=True,
-    reads_user_memory=False,suspends_tasks=False,thread_limit_per_process=4,runtime_verified=False),indent=2)+'\n')
+    reads_user_memory="opt-in t970-ui-stack=1, isolated worker",suspends_tasks=False,
+    stack_frames_per_first_thread=8,report_wait_deadlines=20,report_wait_interval_ms=100,thread_limit_per_process=4,runtime_verified=False),indent=2)+'\n')
 print('PASS: bounded saved-register sampler compiled against current Mach-private ABI')

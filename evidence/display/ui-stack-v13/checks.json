@@ -1,0 +1,13 @@
+{
+  "boot_sha256": "a708fadf1c93f6681cb654959ca48f45ee9280b4373547529ca1540dd07d9ee9",
+  "image": "/Users/cakeal/vsc/UniXNU/out/t970-data-bringup/ui-stack-memory768-v1/boot-partition.img",
+  "framework_revision": "2c834e313d25482c78d38d703eff1f8d190f2597",
+  "device_base_revision": "93ad77eb4e1734bd5c605f9427b2bdcacb53bb39",
+  "actual_helper_asan_ubsan": true,
+  "current_mach_private_compile": true,
+  "kernel_link_prelink": true,
+  "final_fat_roundtrip": true,
+  "platform_check": "refused: framework differs from reviewed revision",
+  "uploaded": false,
+  "device_result_pending": true
+}
