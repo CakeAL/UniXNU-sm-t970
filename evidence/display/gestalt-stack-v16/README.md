@@ -17,3 +17,12 @@ ASan/UBSan实际helper覆盖前缀选择、前2线程栈读取和map引用释放
 硬件预期：stacks3、MobileGestalt进程行和M1/M2 FP地址；后续根据实际服务端栈决定最小修复。
 
 最终BOOT SHA256：`91025540c43ffcecbacaf9f565912dbc9be0e07ad606e739e9de1b441e30277e`。目标90秒与mode3已独立核对，上传结果见upload.json。
+
+## 实机01:09:00
+
+target90/main1/n107/cpu8，BB57，MobileGestaltHelper95已有8线程，visited4/busy0。
+M1 n9/e0，M2 n16/e0；显示open2/swap0。90秒已足以采到本轮目标。
+M2在处理NSXPC导出对象调用时，经_MGServerCopyAnswerWithError进入MobileGestalt内部计算，
+最终在dispatch_semaphore_wait_slow等待。大偏移邻近导出符号仅作映像定位，不认定精确内部函数名。
+证明helper已启动且执行服务调用，排除本轮单纯helper未启动的解释；仍不能确定所等待的provider。
+下一步审阅原版内部等待函数和完成回调，找实际设备服务或依赖，暂不伪造MobileGestalt返回。

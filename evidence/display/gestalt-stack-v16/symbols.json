@@ -1,0 +1,152 @@
+{
+  "cache_slide": "0x15b64000",
+  "cache_uuid": "590d839a82d230f1a17d0cc053420f73",
+  "local_symbols_uuid_matches": true,
+  "live_sample": true,
+  "frames": [
+    {
+      "address": "0x1a50eb624",
+      "unslid_va": "0x18f587624",
+      "image": "/usr/lib/system/libdispatch.dylib",
+      "nearest_local_symbol": "__dispatch_semaphore_wait_slow",
+      "offset": 128,
+      "nearest_symbol": "__dispatch_semaphore_wait_slow",
+      "symbol_table": "local",
+      "original_instruction_bytes": "000080d2fd7b42a9"
+    },
+    {
+      "address": "0x1b5d940e0",
+      "unslid_va": "0x1a02300e0",
+      "image": "/usr/lib/libMobileGestalt.dylib",
+      "nearest_symbol": "__MGCopyAnswerWithMode",
+      "symbol_table": "exported",
+      "offset": 103784,
+      "original_instruction_bytes": "e00314aae10313aa"
+    },
+    {
+      "address": "0x1b5d94e0c",
+      "unslid_va": "0x1a0230e0c",
+      "image": "/usr/lib/libMobileGestalt.dylib",
+      "nearest_symbol": "__MGCopyAnswerWithMode",
+      "symbol_table": "exported",
+      "offset": 107156,
+      "original_instruction_bytes": "a00301d101018052"
+    },
+    {
+      "address": "0x1b5d95884",
+      "unslid_va": "0x1a0231884",
+      "image": "/usr/lib/libMobileGestalt.dylib",
+      "nearest_symbol": "__MGCopyAnswerWithMode",
+      "symbol_table": "exported",
+      "offset": 109836,
+      "original_instruction_bytes": "930000b4740000b5"
+    },
+    {
+      "address": "0x1b5d970f8",
+      "unslid_va": "0x1a02330f8",
+      "image": "/usr/lib/libMobileGestalt.dylib",
+      "nearest_symbol": "__MGCopyAnswerWithMode",
+      "symbol_table": "exported",
+      "offset": 116096,
+      "original_instruction_bytes": "600500b4f30300aa"
+    },
+    {
+      "address": "0x1b5d964fc",
+      "unslid_va": "0x1a02324fc",
+      "image": "/usr/lib/libMobileGestalt.dylib",
+      "nearest_symbol": "__MGCopyAnswerWithMode",
+      "symbol_table": "exported",
+      "offset": 113028,
+      "original_instruction_bytes": "e004003646000014"
+    },
+    {
+      "address": "0x1b5d7189c",
+      "unslid_va": "0x1a020d89c",
+      "image": "/usr/lib/libMobileGestalt.dylib",
+      "nearest_symbol": "_MGIsDeviceOfType",
+      "symbol_table": "exported",
+      "offset": 732,
+      "original_instruction_bytes": "f70300aae0f6ffb4"
+    },
+    {
+      "address": "0x1b5d6f044",
+      "unslid_va": "0x1a020b044",
+      "image": "/usr/lib/libMobileGestalt.dylib",
+      "nearest_symbol": "_MGCopyAnswerWithError",
+      "symbol_table": "exported",
+      "offset": 24,
+      "original_instruction_bytes": "f40300aa730000b4"
+    },
+    {
+      "address": "0x1b5d97f14",
+      "unslid_va": "0x1a0233f14",
+      "image": "/usr/lib/libMobileGestalt.dylib",
+      "nearest_symbol": "__MGCopyAnswerWithMode",
+      "symbol_table": "exported",
+      "offset": 119708,
+      "original_instruction_bytes": "f30300aa200400b5"
+    },
+    {
+      "address": "0x1b5d8a760",
+      "unslid_va": "0x1a0226760",
+      "image": "/usr/lib/libMobileGestalt.dylib",
+      "nearest_symbol": "__MGCopyAnswerWithMode",
+      "symbol_table": "exported",
+      "offset": 64488,
+      "original_instruction_bytes": "a00200b4f30300aa"
+    },
+    {
+      "address": "0x1b5d71a30",
+      "unslid_va": "0x1a020da30",
+      "image": "/usr/lib/libMobileGestalt.dylib",
+      "nearest_symbol": "_MGIsDeviceOfType",
+      "symbol_table": "exported",
+      "offset": 1136,
+      "original_instruction_bytes": "68a125d008d147f9"
+    },
+    {
+      "address": "0x1b5d70208",
+      "unslid_va": "0x1a020c208",
+      "image": "/usr/lib/libMobileGestalt.dylib",
+      "nearest_symbol": "__MGServerCopyAnswerWithError",
+      "symbol_table": "exported",
+      "offset": 188,
+      "original_instruction_bytes": "f50300aa96fbff97"
+    },
+    {
+      "address": "0x101327578",
+      "unslid_va": "0xeb7c3578",
+      "image": null
+    },
+    {
+      "address": "0x19ca3447c",
+      "unslid_va": "0x186ed047c",
+      "image": "/System/Library/Frameworks/Foundation.framework/Foundation",
+      "nearest_local_symbol": "___NSXPCCONNECTION_IS_CALLING_OUT_TO_EXPORTED_OBJECT_S2__",
+      "offset": 12,
+      "nearest_symbol": "___NSXPCCONNECTION_IS_CALLING_OUT_TO_EXPORTED_OBJECT_S2__",
+      "symbol_table": "local",
+      "original_instruction_bytes": "fd7bc1a8c0035fd6"
+    },
+    {
+      "address": "0x19ca33434",
+      "unslid_va": "0x186ecf434",
+      "image": "/System/Library/Frameworks/Foundation.framework/Foundation",
+      "nearest_local_symbol": "-[NSXPCConnection _decodeAndInvokeMessageWithEvent:reply:flags:]",
+      "offset": 1576,
+      "nearest_symbol": "-[NSXPCConnection _decodeAndInvokeMessageWithEvent:reply:flags:]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "0b000014a18353f8"
+    },
+    {
+      "address": "0x19ca327e4",
+      "unslid_va": "0x186ece7e4",
+      "image": "/System/Library/Frameworks/Foundation.framework/Foundation",
+      "nearest_local_symbol": "_message_handler_message",
+      "offset": 84,
+      "nearest_symbol": "_message_handler_message",
+      "symbol_table": "local",
+      "original_instruction_bytes": "e00317aafd7b43a9"
+    }
+  ]
+}

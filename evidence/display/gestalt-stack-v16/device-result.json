@@ -1,0 +1,23 @@
+{
+  "boot_sha256": "91025540c43ffcecbacaf9f565912dbc9be0e07ad606e739e9de1b441e30277e",
+  "photo": "screen-target90.jpg",
+  "photo_sha256": "d0ca21cf47fc3d6a85837125472bee3baed111f5abe461b1426abd7679c9fa28",
+  "association": "Owner photo after upload, target90/stacks3; no device hash readback",
+  "target_seconds": 90,
+  "main": 1,
+  "processes": 107,
+  "cpus": 8,
+  "backboard_pid": 57,
+  "helper_pid": 95,
+  "helper_threads": 8,
+  "visited": 4,
+  "busy": 0,
+  "cache_slide": "0x15b64000",
+  "first_thread_frames": 9,
+  "second_thread_frames": 16,
+  "frame_errors": 0,
+  "client_open": 2,
+  "swap": 0,
+  "conclusion": "Helper is present and handling NSXPC request; second thread waits on semaphore in MobileGestalt internal answer computation. Precise internal function/awaited provider unresolved; large nearest-export offsets are not exact function identification.",
+  "desktop_verified": false
+}
