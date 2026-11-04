@@ -1,0 +1,16 @@
+{
+  "original_kernelcache_sha256": "f18b4df865405f2a287b84977d7aca745e056d656d9fc9df1662970ce2969de7",
+  "packed_kernel_sha256": "583cb6b51fc3a001f5728062950031fb4270b99b1027f742a71fbaff507e5cca",
+  "original_sender": "0xfffffff006796720",
+  "packed_sender": "0xfffffff005796720",
+  "matched_sender_bytes": 404,
+  "sender_sha256": "59f1a7b1dfc47530395b0827e306ffdf5fb2fc27587084f9a4d133dd9b09565f",
+  "queue_head_load": {
+    "original_address": "0xfffffff006796830",
+    "instruction": "ldr x8, [x8, #0x15d8]",
+    "bytes": "08ed4af9",
+    "offset": 5592
+  },
+  "gop_revision": "cf3b42979a9c44219e7bb149543e6fc3388b58ed",
+  "result": "The packed original sender reads the same queue head offset as GopFramebuffer vsyncWanted. This verifies the offset, not runtime registration or delivery."
+}

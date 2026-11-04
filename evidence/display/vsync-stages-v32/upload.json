@@ -1,0 +1,13 @@
+{
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/data-bringup/vsync-stages-v32/boot-partition.img"
+  ],
+  "boot_sha256": "6b692880cc0c9afb2e8aaaaf65dd8ac4bdc4f38c57c5c316a495620f3d3a2485",
+  "exit_code": 0,
+  "reboot_requested": true,
+  "readback_verified": false,
+  "hardware_result_pending": true
+}

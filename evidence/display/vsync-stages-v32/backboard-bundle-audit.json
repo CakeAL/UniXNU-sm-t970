@@ -1,0 +1,17 @@
+{
+  "binary": "21H461 original /usr/libexec/backboardd",
+  "uuid": "A07C4B68-D96D-32CE-98D8-018075585471",
+  "sha256": "6e362a46a2b46eb2741ecc6fcb50ffecb2fbc299641159045475361e62b34634",
+  "method": "Enumerated ARM64 call instructions immediately preceding executable return-address candidates with the same low 12 bits. Inspected the call to the Objective-C load stub and its preceding path construction in the original executable.",
+  "candidate": {
+    "original_return_address": "0x10006eb44",
+    "call": "0x10006eb40 bl 0x1000a0020",
+    "selector": "load",
+    "bundle_path_literal": "System/Library/AccessibilityBundles/BackBoard.axbundle",
+    "bundle_path_cstring_offset": "0xcb78b",
+    "path_creation": "BSSystemRootDirectory, stringByAppendingPathComponent:, bundleWithPath:",
+    "v31_inferred_slide": "0x3e7000",
+    "v32_inferred_slide": "0x13ca000"
+  },
+  "limit": "The sampled PCs inside the UUID-matched shared cache are resolved. The executable return-address attribution remains a candidate because the independent backboardd executable slide was not captured on either boot."
+}

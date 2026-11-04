@@ -937,6 +937,7 @@ id = "display"
 status = "planned"
 components = []
 paths = [
+  "evidence/display/vsync-stages-v32/**",
   "evidence/display/wifi-address-125-v30/**",
   "evidence/display/mobilegestalt-wifi-audit/**",
   "scripts/audit-mobilegestalt-wifi.py",
@@ -1002,6 +1003,7 @@ procedure = [
   "Collect DRM modes, panel type and brightness limits; read only display-selection tokens from /proc/cmdline and match the selected S6TUUM3 node in the live DT.",
 ]
 findings = [
+  "V32 adds board-side counters for the existing GopFramebuffer software vsync events. BOOT6b692880 rebuilt and passed prelink and final FAT verification against v31, retaining the same arguments and non-kernel inputs. Owner photo shows timer start1/arm0/notify0, open7 and three successful frame retirements. At 60 Hz refresh0 matches the component gate.",
   "BOOTc96f86d7 is a 125-second comparison to BOOTbb4d8474 adding only a synthetic Wi-Fi address. Owner photo shows the same open7/swap2/copy2/retire2 as baseline; SB sample is in the Control Center default module-list property-list path versus a LaunchServices lookup in baseline. Independent live snapshots do not establish relative progress or causality. No confirmed UI improvement; stop repeating address comparisons. See evidence/display/wifi-address-125-v30.",
   "Original 21H461 MobileGestalt static control-flow audit confirms a conditional chosen Wi-Fi property path, sdio/wlan/marconi-wifi fallbacks and an IONetworkController-related fallback. An earlier branch can bypass it. This is not proof of runtime invocation, property acceptance, timeout, or the T970 seeding cause. See evidence/display/mobilegestalt-wifi-audit.",
   "BOOTfec656ec adds only a synthetic local Wi-Fi address property to observed BOOTaeb13ffc. At target90 owner photo still shows open5/swap0, lsd journal-recovery and XPC database-seeding waits, and SB BackBoard screen-info wait matching the baseline caller chains. Single independent samples occur before first frame, and runtime property consumption is unmeasured; no immediate improvement or definitive cause established. See evidence/display/wifi-address-control-v29.",
@@ -1066,10 +1068,13 @@ limits = [
   "Framebuffer physical address, stride, pixel format and UEFI GOP handoff are not verified by the mode list.",
 ]
 next_action = [
-  "V31 confirmed spare RAM Data capacity at target125. Distinguish software vsync timer creation, arm and notification on the existing display path, then follow the first missing stage.",
+  "V31 confirmed spare RAM Data capacity at target125. V32 confirms timer creation with no observed arm and identifies a repeated bundle-load stack. Compare a 150-second report on the same v32 kernel before selecting the next registration or userspace probe.",
 ]
 
 evidence = [
+  { kind = "device", reference = "evidence/display/vsync-stages-v32/device-result.json", revision = "61d51aef2416634abf5964e807d1d6897fbbdfe0", command = "Owner photo after BOOT6b692880 upload, target125 terminal report", result = "Timer start1/arm0/notify0, three completed frame retirements and 323383296 bytes available on RAM Data. No vsync client registration result captured." },
+  { kind = "device", reference = "evidence/display/vsync-stages-v32/upload.json", revision = "61d51aef2416634abf5964e807d1d6897fbbdfe0", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/vsync-stages-v32/boot-partition.img", result = "Owner authorized direct BOOT flashing. Heimdall reported successful upload and requested reboot. Device readback and screen result pending." },
+  { kind = "host", reference = "evidence/display/vsync-stages-v32/preparation.json", revision = "61d51aef2416634abf5964e807d1d6897fbbdfe0", command = "python3.14 evidence/display/vsync-stages-v32/prepare.py", result = "BOOT6b692880 contains the new software vsync stage report. Final FAT independently confirms the packed kernel and unchanged v31 args, ADT, trust cache and seed. Hardware pending." },
   { kind = "device", reference = "evidence/storage/data-space-v31/device-result.json", revision = "657a9404016124564be3af25531daad80c286448", command = "Owner photo after BOOTe0a2d858 upload, target125 terminal report", result = "Writable RAM Data APFS capacity returned all requested fields, 320040960 bytes available. Open7/swap2/copy2/retire2/vsync0; home screen unverified." },
   { kind = "host", reference = "evidence/display/wifi-address-125-v30/preparation.json", revision = "fd8c980bfe6b578928ea9e61e71f74218ada4cf9", command = "python3.14 evidence/display/wifi-address-125-v30/prepare.py", result = "Diagnostic BOOTc96f86d7 adds one synthetic locally administered Wi-Fi address property to 125-second BOOTbb4d8474; FAT roundtrip and independently decoded ADT comparison pass. Host checks do not establish device execution." },
   { kind = "device", reference = "evidence/display/wifi-address-125-v30/upload.json", revision = "fd8c980bfe6b578928ea9e61e71f74218ada4cf9", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/wifi-address-125-v30/boot-partition.img", result = "Owner authorized BOOT upload and reboot; Heimdall reported success and requested reboot. No device readback." },

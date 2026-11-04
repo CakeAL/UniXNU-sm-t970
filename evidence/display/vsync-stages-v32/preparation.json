@@ -1,0 +1,22 @@
+{
+  "base_boot_sha256": "e0a2d8586cbf2123c0943d6d7f52ea0b649e8eee50fffdb32d1448fe5fced8fb",
+  "boot_sha256": "6b692880cc0c9afb2e8aaaaf65dd8ac4bdc4f38c57c5c316a495620f3d3a2485",
+  "boot_bytes": 71303168,
+  "kernel_sha256": "81d525d1df9860ebee2da9ae17bae00e1d033b96209e5245be309091f8ff2851",
+  "payload_kernel_sha256": "583cb6b51fc3a001f5728062950031fb4270b99b1027f742a71fbaff507e5cca",
+  "unchanged_payload_sha256": {
+    "unixnu.toml": "253c2d1e145ce1053967d8da36f1cbafd75e98f5d51e5613666da3f30000e9f9",
+    "Payloads/kernel.macho.adt": "778cc0f6f2d9fdb6cd9896aac1e51ce6496858a80e083339afd1775ec7a0c0cd",
+    "Payloads/kernel.macho.trustcache": "7416ca4f8377146626bb284e2133c76bee6cb4e3ee0af5d648b186235a7323a7",
+    "Payloads/scratch-data.img": "4591566eccd77f0f9d13a1338ecaf3c73ce86cd04aeea732d91db6b2e100ca3a"
+  },
+  "original_panic_screen_reproduced": true,
+  "final_boot_fat_roundtrip": true,
+  "header_fd_dtb_tail_unchanged": true,
+  "target_seconds": 125,
+  "cpus_requested": 8,
+  "owned_bytes": 805306368,
+  "terminal_runtime_report": true,
+  "uploaded": false,
+  "hardware_result_pending": true
+}

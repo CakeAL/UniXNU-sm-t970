@@ -30,16 +30,20 @@ static volatile int displayMeta=-1, displaySurface=-1;
 // Relaxed counters are diagnostic only; they never decide driver behavior.
 static uint32_t clientsEntered, clientsOpened, clientsFailed, lastClientType, lastClientStatus;
 static uint32_t swapsAccepted, swapsRejected, lastSwapReason, transfers, lastTransferStatus;
-static uint32_t copies, retired, vsyncSent;
+static uint32_t copies, retired;
+// GopFramebuffer cf3b429 reports arm, notify, idle, late, start, refresh.
+static uint32_t vsyncEvents[6];
 static inline void note(uint32_t &value) { __atomic_fetch_add(&value,1,__ATOMIC_RELAXED); }
 static inline uint32_t sample(uint32_t &value) { return __atomic_load_n(&value,__ATOMIC_RELAXED); }
 extern "C" void native_t970_display_state(char *out, unsigned length) {
     if (!out || !length) return;
-    snprintf(out,length,"display stage=%u meta=%d surface=%d mapped=%u published=%u\nclient enter/open/fail=%u/%u/%u type=%x status=%x swap ok/bad=%u/%u why=%u xfer=%u status=%x copies=%u retire=%u vsync=%u",
+    snprintf(out,length,"display stage=%u meta=%d surface=%d mapped=%u published=%u vsync start/arm/idle/late/refresh=%u/%u/%u/%u/%u\nclient enter/open/fail=%u/%u/%u type=%x status=%x swap ok/bad=%u/%u why=%u xfer=%u status=%x copies=%u retire=%u vsync=%u",
              displayStage,displayMeta,displaySurface,displayMapped,displayPublished,
+             sample(vsyncEvents[4]),sample(vsyncEvents[0]),sample(vsyncEvents[2]),
+             sample(vsyncEvents[3]),sample(vsyncEvents[5]),
              sample(clientsEntered),sample(clientsOpened),sample(clientsFailed),sample(lastClientType),
              sample(lastClientStatus),sample(swapsAccepted),sample(swapsRejected),sample(lastSwapReason),
-             sample(transfers),sample(lastTransferStatus),sample(copies),sample(retired),sample(vsyncSent));
+             sample(transfers),sample(lastTransferStatus),sample(copies),sample(retired),sample(vsyncEvents[1]));
     size_t used = strlen(out);
     native_t970_keystore_state(out + used, length - used);
 }
@@ -286,7 +290,7 @@ extern "C" void native_legacy_copy_timing_observed(uint64_t ticks, uint64_t byte
 }
 
 extern "C" void native_legacy_vsync_observed(unsigned event, unsigned hz) {
-    if (event == 1) note(vsyncSent);
+    if (event < sizeof(vsyncEvents) / sizeof(vsyncEvents[0])) note(vsyncEvents[event]);
     if (event == 4 || event == 5) {
         IOLog("T970 display: refresh event=%u hz=%u\n", event, hz);
     }

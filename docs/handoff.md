@@ -5,6 +5,8 @@
 
 ## 最新：首帧后的持续运行对照（2026-11-04）
 
+已上传 BOOT `6b692880…` 保留 v31 的125秒终止报告，增加软件 vsync 的 start/arm/idle/late/refresh 计数。内核预链接及最终 FAT 回读通过。机主照片确认 timer 创建1、arm0、notify0，帧退役3，Data 可用约308.4 MiB。BB 再次采到 bundle 加载，主程序候选调用点为 BackBoard.axbundle。见 [vsync 阶段诊断](../evidence/display/vsync-stages-v32/README.md)。
+
 BOOT `e0a2d858…` 的机主照片在 125 秒确认可写 RAM Data APFS 查询成功，512 MiB 中约 305.2 MiB 可用。同屏 open7、swap/copy/retire 各2，vsync0。UUID 匹配符号显示 SB 正采到默认显示上下文构建，BB 正采到 bundle 加载。继续区分软件 vsync timer 创建、arm 和通知阶段。见 [Data 空间诊断](../evidence/storage/data-space-v31/README.md)。
 
 首帧阶段的单因素对照 BOOT `c96f86d7…`：基于已有 Apple logo 及2次成功帧的 `bb4d8474…`，只增加随机本地管理 Wi-Fi 测试地址，保留原125秒报告与其余输入。机主照片 open7、swap/copy/retire 各2，和基线计数相同；SB 此次在控制中心默认模块列表的 property list 路径，基线处于同组件 LaunchServices 查询路径，不能从瞬时栈判断进度或因果。90秒对照也未见明显阶段改善；不继续重复地址对照。见 [125秒对照](../evidence/display/wifi-address-125-v30/README.md)。

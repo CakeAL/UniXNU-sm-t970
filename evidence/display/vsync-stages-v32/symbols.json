@@ -1,0 +1,226 @@
+{
+  "cache_slide": "0x51e8000",
+  "cache_uuid": "590d839a82d230f1a17d0cc053420f73",
+  "local_symbols_uuid_matches": true,
+  "live_sample": true,
+  "frames": [
+    {
+      "address": "0x1852e9774",
+      "unslid_va": "0x180101774",
+      "image": "/usr/lib/libobjc.A.dylib",
+      "nearest_local_symbol": "_map_images_nolock",
+      "offset": 4084,
+      "nearest_symbol": "_map_images_nolock",
+      "symbol_table": "local",
+      "original_instruction_bytes": "800740f963020094"
+    },
+    {
+      "address": "0x1852e974c",
+      "unslid_va": "0x18010174c",
+      "image": "/usr/lib/libobjc.A.dylib",
+      "nearest_local_symbol": "_map_images_nolock",
+      "offset": 4044,
+      "nearest_symbol": "_map_images_nolock",
+      "symbol_table": "local",
+      "original_instruction_bytes": "b80355f8d81000b4"
+    },
+    {
+      "address": "0x1852f41bc",
+      "unslid_va": "0x18010c1bc",
+      "image": "/usr/lib/libobjc.A.dylib",
+      "nearest_local_symbol": "_map_images",
+      "offset": 116,
+      "nearest_symbol": "_map_images",
+      "symbol_table": "local",
+      "original_instruction_bytes": "e81a40b9c97e5f88"
+    },
+    {
+      "address": "0x1ae61c214",
+      "unslid_va": "0x1a9434214",
+      "image": "/usr/lib/dyld",
+      "nearest_local_symbol": "__ZN5dyld412RuntimeState10notifyLoadERKNSt3__14spanIPKNS_6LoaderELm18446744073709551615EEE",
+      "offset": 944,
+      "nearest_symbol": "__ZN5dyld412RuntimeState10notifyLoadERKNSt3__14spanIPKNS_6LoaderELm18446744073709551615EEE",
+      "symbol_table": "local",
+      "original_instruction_bytes": "880640f908f54239"
+    },
+    {
+      "address": "0x1ae6307c0",
+      "unslid_va": "0x1a94487c0",
+      "image": "/usr/lib/dyld",
+      "nearest_local_symbol": "__ZN5dyld44APIs11dlopen_fromEPKciPv",
+      "offset": 964,
+      "nearest_symbol": "__ZN5dyld44APIs11dlopen_fromEPKciPv",
+      "symbol_table": "local",
+      "original_instruction_bytes": "a08350f8e10315aa"
+    },
+    {
+      "address": "0x18d146ecc",
+      "unslid_va": "0x187f5eecc",
+      "image": "/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation",
+      "nearest_local_symbol": "__CFBundleDlfcnLoadBundle",
+      "offset": 188,
+      "nearest_symbol": "__CFBundleDlfcnLoadBundle",
+      "symbol_table": "local",
+      "original_instruction_bytes": "f80300aab7feff97"
+    },
+    {
+      "address": "0x18d145f5c",
+      "unslid_va": "0x187f5df5c",
+      "image": "/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation",
+      "offset": 316,
+      "nearest_symbol": "__CFBundleLoadExecutableAndReturnError",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "23000014c84736b0"
+    },
+    {
+      "address": "0x18c143fa8",
+      "unslid_va": "0x186f5bfa8",
+      "image": "/System/Library/Frameworks/Foundation.framework/Foundation",
+      "nearest_local_symbol": "-[NSBundle loadAndReturnError:]",
+      "offset": 308,
+      "nearest_symbol": "-[NSBundle loadAndReturnError:]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "600e0034a0048052"
+    },
+    {
+      "address": "0x101438b44",
+      "unslid_va": "0xfc250b44",
+      "image": null
+    },
+    {
+      "address": "0x19479ecc0",
+      "unslid_va": "0x18f5b6cc0",
+      "image": "/usr/lib/system/libdispatch.dylib",
+      "nearest_local_symbol": "__dispatch_client_callout",
+      "offset": 16,
+      "nearest_symbol": "__dispatch_client_callout",
+      "symbol_table": "local",
+      "original_instruction_bytes": "fd7b41a9f44fc2a8"
+    },
+    {
+      "address": "0x194770054",
+      "unslid_va": "0x18f588054",
+      "image": "/usr/lib/system/libdispatch.dylib",
+      "nearest_local_symbol": "_dispatch_once$VARIANT$armv81",
+      "offset": 0,
+      "nearest_symbol": "_dispatch_once$VARIANT$armv81",
+      "symbol_table": "local",
+      "original_instruction_bytes": "220840f901000014"
+    },
+    {
+      "address": "0x1852ddf94",
+      "unslid_va": "0x1800f5f94",
+      "image": "/usr/lib/libobjc.A.dylib",
+      "nearest_local_symbol": "_CALLING_SOME_+initialize_METHOD",
+      "offset": 20,
+      "nearest_symbol": "_CALLING_SOME_+initialize_METHOD",
+      "symbol_table": "local",
+      "original_instruction_bytes": "fd7bc1a8c0035fd6"
+    },
+    {
+      "address": "0x1852dba98",
+      "unslid_va": "0x1800f3a98",
+      "image": "/usr/lib/libobjc.A.dylib",
+      "nearest_local_symbol": "_initializeNonMetaClass",
+      "offset": 600,
+      "nearest_symbol": "_initializeNonMetaClass",
+      "symbol_table": "local",
+      "original_instruction_bytes": "a82644b908010034"
+    },
+    {
+      "address": "0x1852db7b4",
+      "unslid_va": "0x1800f37b4",
+      "image": "/usr/lib/libobjc.A.dylib",
+      "nearest_local_symbol": "__ZL24initializeAndMaybeRelockP10objc_classP11objc_objectR12locker_mixinIN9lockdebug10lock_mixinI16objc_lock_base_tEEEb",
+      "offset": 288,
+      "nearest_symbol": "__ZL24initializeAndMaybeRelockP10objc_classP11objc_objectR12locker_mixinIN9lockdebug10lock_mixinI16objc_lock_base_tEEEb",
+      "symbol_table": "local",
+      "original_instruction_bytes": "f401003468d03bd5"
+    },
+    {
+      "address": "0x1852d9f50",
+      "unslid_va": "0x1800f1f50",
+      "image": "/usr/lib/libobjc.A.dylib",
+      "offset": 212,
+      "nearest_symbol": "_objc_retainAutoreleaseReturnValue",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "680240f908817d92"
+    },
+    {
+      "address": "0x1ad24af80",
+      "unslid_va": "0x1a8062f80",
+      "image": "/System/Library/PrivateFrameworks/SpringBoardUIServices.framework/SpringBoardUIServices",
+      "offset": 152,
+      "nearest_symbol": "__SBUIEffectiveBiometricClassFromString",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "f40300aaec774f95"
+    },
+    {
+      "address": "0x1ad24b100",
+      "unslid_va": "0x1a8063100",
+      "image": "/System/Library/PrivateFrameworks/SpringBoardUIServices.framework/SpringBoardUIServices",
+      "nearest_local_symbol": "-[_SBUIBiometricKitInterface init]",
+      "offset": 212,
+      "nearest_symbol": "-[_SBUIBiometricKitInterface init]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "00d9029453774f95"
+    },
+    {
+      "address": "0x1ad296f3c",
+      "unslid_va": "0x1a80aef3c",
+      "image": "/System/Library/PrivateFrameworks/SpringBoardUIServices.framework/SpringBoardUIServices",
+      "nearest_local_symbol": "-[SBUIBiometricResource init]",
+      "offset": 28,
+      "nearest_symbol": "-[SBUIBiometricResource init]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "f40300aae00313aa"
+    },
+    {
+      "address": "0x1ad296f0c",
+      "unslid_va": "0x1a80aef0c",
+      "image": "/System/Library/PrivateFrameworks/SpringBoardUIServices.framework/SpringBoardUIServices",
+      "nearest_local_symbol": "___39+[SBUIBiometricResource sharedInstance]_block_invoke",
+      "offset": 20,
+      "nearest_symbol": "___39+[SBUIBiometricResource sharedInstance]_block_invoke",
+      "symbol_table": "local",
+      "original_instruction_bytes": "28032390015940f9"
+    },
+    {
+      "address": "0x1d0968b58",
+      "unslid_va": "0x1cb780b58",
+      "image": "/usr/lib/system/libsystem_kernel.dylib",
+      "nearest_symbol": "_mach_msg2_trap",
+      "symbol_table": "exported",
+      "offset": 8,
+      "original_instruction_bytes": "c0035fd6f0058092"
+    },
+    {
+      "address": "0x1d096c224",
+      "unslid_va": "0x1cb784224",
+      "image": "/usr/lib/system/libsystem_kernel.dylib",
+      "offset": 76,
+      "nearest_symbol": "_mach_msg2_internal",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "00050034fa013037"
+    },
+    {
+      "address": "0x1d09688e8",
+      "unslid_va": "0x1cb7808e8",
+      "image": "/usr/lib/system/libsystem_kernel.dylib",
+      "nearest_symbol": "___workq_kernreturn",
+      "symbol_table": "exported",
+      "offset": 8,
+      "original_instruction_bytes": "e3000054fd7bbfa9"
+    },
+    {
+      "address": "0x1e280a580",
+      "unslid_va": "0x1dd622580",
+      "image": "/usr/lib/system/libsystem_pthread.dylib",
+      "offset": 360,
+      "nearest_symbol": "__pthread_wqthread",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "68ae80b9f457bfa9"
+    }
+  ]
+}
