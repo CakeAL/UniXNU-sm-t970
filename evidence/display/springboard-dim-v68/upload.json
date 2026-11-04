@@ -1,0 +1,12 @@
+{
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/springboard-dim-v68/anti-dim/boot-partition.img",
+  "finished_at": "2026-11-04T15:21:04+00:00",
+  "boot_sha256": "269153961cb22368642fe2a9bed76675ce46ee35f8914d060b9bff16c463d030",
+  "partition": "BOOT",
+  "exit_code": 0,
+  "transfer_log_sha256": "3634cb6a721690ebec51de2aae82b631e02d349f10201c5a1708783765e0f6ac",
+  "transfer_confirmed": true,
+  "reboot_requested": true,
+  "partition_readback": false,
+  "userdata_partition_uploaded": false
+}

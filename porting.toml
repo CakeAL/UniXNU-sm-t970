@@ -681,6 +681,7 @@ id = "storage"
 status = "implemented"
 components = ["ShengUfs", "VirtioMmioBlock", "RamBlock", "VerifiedRoot"]
 paths = [
+  "evidence/display/springboard-dim-v68/**",
   "evidence/display/owned-window-2g-v62/**",
   "patches/xnu/t970-data-space-report.patch",
   "tests/test_data_space_report.py",
@@ -778,6 +779,7 @@ procedure = [
   "Read block sysfs and by-name links; read each LUN's primary GPT header and entry array and validate their CRC32 values without writing any block device.",
 ]
 findings = [
+  "The matched v68 display comparison runs disposable RAM Data from copies of the existing 512 MiB seed. Both retain the Data UUID and disable the persistent backend to avoid reinitializing the existing UFS store. A direct v67 comparison therefore mixes Data history and policy.",
   "The v62 owner report shows Data mounted with 15402 free 4 KiB blocks (about 60.2 MiB) and 1115551 verified UFS blocks. There is no ENOSPC measurement. Data contents change across boots.",
   "The verified 512 MiB APFS seed reports 534294528 free bytes when attached read-only on the host, before any device writes. This is not runtime free space. BOOTe0a2d858 adds an opt-in bounded worker that checks the actual RAM Data device and requests APFS block counts, while preserving display counters in the 125-second terminal report. Host helper, BSD compile, kernel/prelink and packing checks pass; owner photo after successful BOOT upload shows rc0/phase1/support1d0 and 78135 available blocks of 4096 bytes (320040960 bytes). At the target125 snapshot the mounted RAM Data APFS has free capacity. See evidence/storage/data-space-v31.",
   "BOOT705d4160 mode6 owner photo02:38:12 captures all three processes/end marker unclipped. Constrained cap/active/busy=0/0/0; MG done35->37 while BB25/SB53 unchanged across 500ms deadlines. Runtime callback continues; investigate EDGE E/P counts versus current SMP topology before any scheduling change. See evidence/display/ui-queue-progress-v20/device-result.json.",
@@ -852,6 +854,7 @@ limits = [
 ]
 next_action = ["Track persistent Data separately from the v31 RAM Data result. Reopen the capacity hypothesis if a write operation reports ENOSPC or a later sample shows exhaustion."]
 evidence = [
+  { kind = "host", reference = "evidence/display/springboard-dim-v68/preparation.json", revision = "2e16664c9230a3788e028fb5f90f777e24671be2", command = "python3.14 evidence/display/springboard-dim-v68/prepare.py --output out/data-bringup/springboard-dim-v68", result = "The final FAT verification confirms matching kernel, ADT, trust cache and configuration. The same-size Data seeds retain the volume UUID and differ only by the three intended SpringBoard keys and APFS edit metadata." },
   { kind = "device", reference = "evidence/storage/data-space-v31/device-result.json", revision = "657a9404016124564be3af25531daad80c286448", command = "Owner photo after BOOTe0a2d858 upload, target125 terminal report", result = "Writable RAM Data APFS capacity returned all requested fields, 320040960 bytes available. Open7/swap2/copy2/retire2/vsync0; home screen unverified." },
   { kind = "host", reference = "evidence/storage/data-space-survey/initial-seed.json", revision = "657a9404016124564be3af25531daad80c286448", command = "python3.14 scripts/check-data-seed-space.py --seed <raw-seed> --expected-sha256 <reviewed-hash> --output <report>", result = "Verified initial 512 MiB seed, attached it read-only, measured 534294528 bytes free, and detached. No runtime Data capacity is implied." },
   { kind = "host", reference = "evidence/storage/data-space-v31/preparation.json", revision = "657a9404016124564be3af25531daad80c286448", command = "python3.14 evidence/storage/data-space-v31/build-image.py", result = "BOOTe0a2d858 contains the opt-in Data space worker and 125-second terminal report; helper tests, BSD compile, prelink and final FAT checks passed. See the separate owner photo result." },
@@ -945,6 +948,7 @@ id = "display"
 status = "planned"
 components = []
 paths = [
+  "evidence/display/springboard-dim-v68/**",
   "evidence/display/pm-watchdog-v67/**",
   "patches/xnu/t970-pm-watchdog-detail.patch",
   "evidence/display/sleep-disabled-v66/**",
@@ -1026,6 +1030,7 @@ procedure = [
   "Collect DRM modes, panel type and brightness limits; read only display-selection tokens from /proc/cmdline and match the selected S6TUUM3 node in the live DT.",
 ]
 findings = [
+  "v68 compares matched RAM-Data BOOT images with and without the three SpringBoard idle/dim preferences used by Sirius. The 21H461 cache has direct references from SBIdleTimerDefaults and SBPowerDefaults. The BOOTs share kernel, ADT, trust cache, arguments and firmware. The treatment was uploaded; runtime preference use and display outcome await device observation.",
   "v67 adds an opt-in root-domain watchdog panic detail with PM machine state, wait reason, current and requested power states, pending count and first pending service class. It also retains a 240-second frame report if no watchdog fires. Kernel prelink and final BOOT FAT checks pass. The device reaches target240 with a completed blank GOP fill 28 ms after the last normal CPU copy. No PM watchdog panic occurred before the report.",
   "v65 with noidle=1 still shows Hello and then turns black after about ten seconds. The owner photo shows no panic text. v66 uses the sleep-disabled ADT default also used on T733 and dada; it retains noidle and adds only that property to the tested payload.",
   "v64 owner photo confirms Sleep/Wake hang detected at IOPMrootDomain.cpp:12812. The linked stack reaches IOService::watchdog_timer_expired; this timer belongs to the PM root domain. The original triggering request and blocked child are unknown. v65 changes only noidle=1 on the continuous v63 image and preserves the power watchdog.",
@@ -1098,11 +1103,13 @@ limits = [
   "Framebuffer physical address, stride, pixel format and UEFI GOP handoff are not verified by the mode list.",
 ]
 next_action = [
-  "Trace the compositor blank submission and compare SpringBoard display policy with the sirius port. v67 reaches target240 after explicit GOP black fill. Keep watch for a separate PM timeout.",
+  "Compare Hello duration and final blank-fill timestamp between v68 SpringBoard preference treatment and RAM-Data control. Keep power timeout and input verification separate.",
   "V31 confirmed spare RAM Data capacity at target125. V35 reports hold0 and reproduces the v34 BB QuartzCore mutex and SB LaunchServices context waits. V36 shows SwapEnd and dispatch group wait in BackBoard, but screen clips before SpringBoard. V37 fits both processes on screen. Capture the resolved SpringBoard unfair-lock owner, then map that ID to the peer stacks. Compare source extent with a straight-on photo only if both show the same frame.",
 ]
 
 evidence = [
+  { kind = "device", reference = "evidence/display/springboard-dim-v68/upload.json", revision = "2e16664c9230a3788e028fb5f90f777e24671be2", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/springboard-dim-v68/anti-dim/boot-partition.img", result = "BOOT upload completed and reboot requested. Treatment behavior is pending." },
+  { kind = "host", reference = "evidence/display/springboard-dim-v68/preparation.json", revision = "2e16664c9230a3788e028fb5f90f777e24671be2", command = "python3.14 evidence/display/springboard-dim-v68/prepare.py --output out/data-bringup/springboard-dim-v68", result = "The final FAT verification confirms matching kernel, ADT, trust cache and configuration. The same-size Data seeds retain the volume UUID and differ only by the three intended SpringBoard keys and APFS edit metadata." },
   { kind = "host", reference = "evidence/display/pm-watchdog-v67/preparation.json", revision = "a1af20bddd4d35ff2c18758946c74b8d32c59e5f", command = "python3.14 evidence/display/hello-black-v64/build-kernel.py --cached-headers --output out/data-bringup/pm-watchdog-v67-build && python3.14 evidence/display/hello-black-v64/prepare.py --pm-watchdog", result = "Kernel prelink includes both report markers. Final FAT retains the v66 2 GiB ADT, trust cache and Data seed." },
   { kind = "device", reference = "evidence/display/pm-watchdog-v67/upload.json", revision = "a1af20bddd4d35ff2c18758946c74b8d32c59e5f", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/pm-watchdog-v67/boot-partition.img", result = "BOOT upload and reboot request succeeded. Owner photo captures target240 with last CPU copy at 158554 ms and explicit blank GOP fill at 158582 ms. No PM panic preceded this report." },
   { kind = "device", reference = "evidence/display/no-idle-v65/device-result.json", revision = "2fb4fc1eb578ae3640396e5308aeb277ac7f7da2", command = "Owner observation after BOOTed1868cf upload", result = "Hello appeared and the panel went black about ten seconds later, with no visible panic text." },

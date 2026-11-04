@@ -1,0 +1,58 @@
+{
+  "cache_slide": "0x0",
+  "cache_uuid": "590d839a82d230f1a17d0cc053420f73",
+  "local_symbols_uuid_matches": true,
+  "live_sample": true,
+  "frames": [
+    {
+      "address": "0x190075280",
+      "unslid_va": "0x190075280",
+      "image": "/System/Library/PrivateFrameworks/SpringBoardFoundation.framework/SpringBoardFoundation",
+      "nearest_local_symbol": "-[SBPowerDefaults _bindAndRegisterDefaults]",
+      "offset": 52,
+      "nearest_symbol": "-[SBPowerDefaults _bindAndRegisterDefaults]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "23652b9063c02e91"
+    },
+    {
+      "address": "0x1900a6d60",
+      "unslid_va": "0x1900a6d60",
+      "image": "/System/Library/PrivateFrameworks/SpringBoardFoundation.framework/SpringBoardFoundation",
+      "nearest_local_symbol": "-[SBIdleTimerDefaults _bindAndRegisterDefaults]",
+      "offset": 116,
+      "nearest_symbol": "-[SBIdleTimerDefaults _bindAndRegisterDefaults]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "c3632bd063403391"
+    },
+    {
+      "address": "0x1900a6da0",
+      "unslid_va": "0x1900a6da0",
+      "image": "/System/Library/PrivateFrameworks/SpringBoardFoundation.framework/SpringBoardFoundation",
+      "nearest_local_symbol": "-[SBIdleTimerDefaults _bindAndRegisterDefaults]",
+      "offset": 180,
+      "nearest_symbol": "-[SBIdleTimerDefaults _bindAndRegisterDefaults]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "c3632bd063403491"
+    },
+    {
+      "address": "0x1900a6ee8",
+      "unslid_va": "0x1900a6ee8",
+      "image": "/System/Library/PrivateFrameworks/SpringBoardFoundation.framework/SpringBoardFoundation",
+      "nearest_local_symbol": "-[SBIdleTimerDefaults disableAutoDim]",
+      "offset": 40,
+      "nearest_symbol": "-[SBIdleTimerDefaults disableAutoDim]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "c2632bd042403391"
+    },
+    {
+      "address": "0x1900a6f24",
+      "unslid_va": "0x1900a6f24",
+      "image": "/System/Library/PrivateFrameworks/SpringBoardFoundation.framework/SpringBoardFoundation",
+      "nearest_local_symbol": "-[SBIdleTimerDefaults disableAutoDimExists]",
+      "offset": 24,
+      "nearest_symbol": "-[SBIdleTimerDefaults disableAutoDimExists]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "c2632bd042403391"
+    }
+  ]
+}
