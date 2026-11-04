@@ -1,0 +1,13 @@
+{
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/data-bringup/display-hold-v34/boot-partition.img"
+  ],
+  "boot_sha256": "c9c49879eb2ad60d20c7e16bd843e72190918c660e2932fd89b09f86fa9bd05f",
+  "exit_code": 0,
+  "reboot_requested": true,
+  "readback_verified": false,
+  "hardware_result_pending": true
+}

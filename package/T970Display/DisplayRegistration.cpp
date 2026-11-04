@@ -2,12 +2,14 @@
 // 3bb0d6f7840f088db6a0ec88ecb841e12042422f, package/T733Display/DisplayRegistration.cpp.
 // SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <IOKit/IOPlatformExpert.h>
+#include <IOKit/IOCommandGate.h>
 #include <IOKit/IODeviceMemory.h>
 #include <IOKit/IODeviceTreeSupport.h>
 #include <IOKit/IOLib.h>
 #include <IOKit/IOUserClient.h>
 #include <libkern/c++/OSData.h>
 #include <mach/kmod.h>
+#include <kern/clock.h>
 #include <machine/machine_routines.h>
 #include <pexpert/pexpert.h>
 #include "T970GopGeometry.h"
@@ -48,6 +50,9 @@ extern "C" void native_t970_display_state(char *out, unsigned length) {
     native_t970_keystore_state(out + used, length - used);
 }
 static bool consoleReleased;
+static IOCommandGate *reportGate;
+static bool reportOwnsScanout;
+static uint64_t publishedAt, firstCopyAt;
 static uint32_t completedFrames;
 static uint32_t rejectedFrames;
 
@@ -164,6 +169,16 @@ extern "C" void native_legacy_display_late_probe(void) {
     OSSafeReleaseNULL(ranges);
     OSSafeReleaseNULL(memory);
     if (displayStarted) {
+        unsigned hold = 0;
+        if (PE_parse_boot_argn("t970-display-hold", &hold, sizeof(hold)) && hold == 1) {
+            IOWorkLoop *loop = display->getWorkLoop();
+            IOCommandGate *gate = loop ? IOCommandGate::commandGate(display) : nullptr;
+            if (gate && loop->addEventSource(gate) == kIOReturnSuccess) {
+                __atomic_store_n(&reportGate, gate, __ATOMIC_RELEASE);
+            } else {
+                OSSafeReleaseNULL(gate);
+            }
+        }
         displayStage=8;
         activeDisplay = display;
         activeProvider = provider;
@@ -214,6 +229,7 @@ extern "C" bool native_legacy_gop_mapping_observed(IOService *, IOMemoryMap *map
 }
 
 extern "C" bool native_legacy_prepare_scanout(void) {
+    if (__atomic_load_n(&reportOwnsScanout, __ATOMIC_ACQUIRE)) return false;
     if (!consoleReleased) {
         unsigned int noVideoConsole = 0;
         // Match arm_init: presence of t970-novc skips text console setup.
@@ -226,12 +242,32 @@ extern "C" bool native_legacy_prepare_scanout(void) {
     return true;
 }
 
+extern "C" int native_t970_display_hold(void) {
+    IOCommandGate *gate = __atomic_load_n(&reportGate, __ATOMIC_ACQUIRE);
+    if (!gate) return -1;
+    IOReturn result = gate->attemptAction([](OSObject *, void *, void *, void *, void *) -> IOReturn {
+        __atomic_store_n(&reportOwnsScanout, true, __ATOMIC_RELEASE);
+        return kIOReturnSuccess;
+    });
+    if (result == kIOReturnCannotLock) return 1;
+    return result == kIOReturnSuccess ? 0 : -2;
+}
+
+extern "C" void native_t970_display_timing(char *out, unsigned length, int hold) {
+    uint64_t publishNs = 0, copyNs = 0;
+    absolutetime_to_nanoseconds(__atomic_load_n(&publishedAt, __ATOMIC_RELAXED), &publishNs);
+    absolutetime_to_nanoseconds(__atomic_load_n(&firstCopyAt, __ATOMIC_RELAXED), &copyNs);
+    snprintf(out, length, "\nFB hold=%d publish/first-copy ms=%llu/%llu",
+             hold, (unsigned long long)(publishNs / 1000000), (unsigned long long)(copyNs / 1000000));
+}
+
 extern "C" __attribute__((noreturn)) void native_legacy_backend_guard(unsigned slot, void *object, void *caller) {
     panic("T970 display: unsupported original backend slot=%u object=%p caller=%p frames=%u",
           slot, object, caller, completedFrames);
 }
 
 extern "C" void native_legacy_registration_observed(IOService *display) {
+    __atomic_store_n(&publishedAt, mach_absolute_time(), __ATOMIC_RELAXED);
     displayPublished=1;
     IOLog("T970 display: registered %s\n", display->getMetaClass()->getClassName());
 }
@@ -283,6 +319,11 @@ extern "C" void native_legacy_retirement_observed(IOService *) {
 }
 
 extern "C" void native_legacy_copy_timing_observed(uint64_t ticks, uint64_t bytes) {
+    if (!__atomic_load_n(&firstCopyAt, __ATOMIC_RELAXED)) {
+        uint64_t unset = 0;
+        __atomic_compare_exchange_n(&firstCopyAt, &unset, mach_absolute_time(),
+                                    false, __ATOMIC_RELAXED, __ATOMIC_RELAXED);
+    }
     note(copies);
     if (completedFrames < 4) {
         IOLog("T970 display: CPU copy ticks=%llu bytes=%llu\n", ticks, bytes);

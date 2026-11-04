@@ -1,0 +1,68 @@
+{
+  "device_base": "7ac6db0ada1c516bd2f6c9f7c4bec2263a47cbc3",
+  "framework": "2c834e313d25482c78d38d703eff1f8d190f2597",
+  "board_object": {
+    "source_sha256": "41ec3b8a03531f1456b5146f29dbbadd273c74084978ba451d19d4e2d04f480e",
+    "geometry_header_sha256": "857bba99be57e8ffc3ee9ce14250fea4f2bc08a951e053986cebc433d2d4b117",
+    "compile_recipe_sha256": "9fc5352fc5fb5e911bc6a9a877b11b1b78d5fd64cd724a60a6aba9b58b95e180",
+    "object_sha256": "225e325cad64d168b828a2050a10f9cf09c1d7a204ce6e9179ceeb039e89e33a",
+    "gop_object_sha256": "54e56f545f2fccecd9a6161bc1d841b978543acbc56dfae97642d0a25761859a",
+    "board_callbacks_resolved": [
+      "_native_legacy_backend_guard",
+      "_native_legacy_client_enter",
+      "_native_legacy_client_observed",
+      "_native_legacy_copy_timing_observed",
+      "_native_legacy_frame_colors_observed",
+      "_native_legacy_frame_observed",
+      "_native_legacy_gop_mapping_observed",
+      "_native_legacy_gpu_fallback_observed",
+      "_native_legacy_gpu_offer",
+      "_native_legacy_pm_observed",
+      "_native_legacy_prepare_scanout",
+      "_native_legacy_registration_observed",
+      "_native_legacy_retirement_observed",
+      "_native_legacy_surface_rejected",
+      "_native_legacy_swap_stage",
+      "_native_legacy_swap_validation_observed",
+      "_native_legacy_transfer_observed",
+      "_native_legacy_vsync_observed"
+    ],
+    "pending_original_aliases": [
+      "_native_legacy_set_refresh_properties",
+      "_native_legacy_surface_allocation",
+      "_native_legacy_surface_descriptor",
+      "_native_legacy_surface_format",
+      "_native_legacy_surface_height",
+      "_native_legacy_surface_planes",
+      "_native_legacy_surface_stride",
+      "_native_legacy_surface_width",
+      "_native_legacy_vsync_notify"
+    ],
+    "compiled": true,
+    "linked": false,
+    "runtime_display_verified": false
+  },
+  "archive_sha256": "8e78bdbbbe094e1bce28454f7e784474e9b3de51b1f317df695f277aaa9e3619",
+  "only_board_archive_member_replaced": true,
+  "kernel_prelink_passed": true,
+  "kernel_sha256": "c55fb34451a53c4f651cfc4ffa6439eedd2ff5bb14ae1e5e694d3e2c26e2840d",
+  "linked_symbols": {
+    "_native_t970_runtime_report": "0xfffffff0076f7f2c",
+    "_native_t970_display_hold": "0xfffffff0079a05e8",
+    "_native_t970_display_timing": "0xfffffff0079a0650"
+  },
+  "host_tests": [
+    "test_display_state.py",
+    "test_data_space_report.py"
+  ],
+  "platform_check": "Stopped before DT/ADT due to mismatched reviewed framework revision.",
+  "packed_report_direct_calls": {
+    "_native_t970_display_hold": [
+      "0xfffffff0076f8650",
+      "0xfffffff0076f86a0"
+    ],
+    "_native_t970_display_timing": [
+      "0xfffffff0076f86d8"
+    ]
+  }
+}

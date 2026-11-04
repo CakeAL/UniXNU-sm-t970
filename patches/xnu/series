@@ -26,3 +26,4 @@ t970-ui-wait-state.patch
 t970-ui-batch-detail.patch
 t970-edge-smp-parallelism.patch
 t970-data-space-report.patch
+t970-display-report-hold.patch

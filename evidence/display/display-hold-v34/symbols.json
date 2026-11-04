@@ -1,0 +1,204 @@
+{
+  "cache_slide": "0x48d8000",
+  "cache_uuid": "590d839a82d230f1a17d0cc053420f73",
+  "local_symbols_uuid_matches": true,
+  "live_sample": true,
+  "frames": [
+    {
+      "address": "0x1d005eb8c",
+      "unslid_va": "0x1cb786b8c",
+      "image": "/usr/lib/system/libsystem_kernel.dylib",
+      "offset": 8,
+      "nearest_symbol": "___psynch_mutexwait",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "e3000054fd7bbfa9"
+    },
+    {
+      "address": "0x1e1ef9e04",
+      "unslid_va": "0x1dd621e04",
+      "image": "/usr/lib/system/libsystem_pthread.dylib",
+      "nearest_local_symbol": "__pthread_mutex_firstfit_lock_wait",
+      "offset": 80,
+      "nearest_symbol": "__pthread_mutex_firstfit_lock_wait",
+      "symbol_table": "local",
+      "original_instruction_bytes": "c30240f91f040031"
+    },
+    {
+      "address": "0x1e1f02b4c",
+      "unslid_va": "0x1dd62ab4c",
+      "image": "/usr/lib/system/libsystem_pthread.dylib",
+      "nearest_local_symbol": "__pthread_mutex_firstfit_lock_slow$VARIANT$armv81",
+      "offset": 244,
+      "nearest_symbol": "__pthread_mutex_firstfit_lock_slow$VARIANT$armv81",
+      "symbol_table": "local",
+      "original_instruction_bytes": "680e40b909051e12"
+    },
+    {
+      "address": "0x18df72f3c",
+      "unslid_va": "0x18969af3c",
+      "image": "/System/Library/Frameworks/QuartzCore.framework/QuartzCore",
+      "nearest_local_symbol": "-[CAWindowServerDisplay setInvertsColors:]",
+      "offset": 80,
+      "nearest_symbol": "-[CAWindowServerDisplay setInvertsColors:]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "a03240f9080040f9"
+    },
+    {
+      "address": "0x220a18474",
+      "unslid_va": "0x21c140474",
+      "image": "/System/Library/AccessibilityBundles/BackBoard.axbundle/BackBoard",
+      "nearest_local_symbol": "-[AXBDisplayFilterManager _updateCoreSupport]",
+      "offset": 292,
+      "nearest_symbol": "-[AXBDisplayFilterManager _updateCoreSupport]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "e00319aae20317aa"
+    },
+    {
+      "address": "0x220a17e2c",
+      "unslid_va": "0x21c13fe2c",
+      "image": "/System/Library/AccessibilityBundles/BackBoard.axbundle/BackBoard",
+      "nearest_local_symbol": "___44+[AXBDisplayFilterManager initializeMonitor]_block_invoke_3",
+      "offset": 36,
+      "nearest_symbol": "___44+[AXBDisplayFilterManager initializeMonitor]_block_invoke_3",
+      "symbol_table": "local",
+      "original_instruction_bytes": "e00740f9fd7b41a9"
+    },
+    {
+      "address": "0x1982626f0",
+      "unslid_va": "0x19398a6f0",
+      "image": "/System/Library/PrivateFrameworks/AXCoreUtilities.framework/AXCoreUtilities",
+      "nearest_local_symbol": "___63-[AXBaseSettings _handlePreferenceChangedWithNotificationName:]_block_invoke_2",
+      "offset": 44,
+      "nearest_symbol": "___63-[AXBaseSettings _handlePreferenceChangedWithNotificationName:]_block_invoke_2",
+      "symbol_table": "local",
+      "original_instruction_bytes": "e00740f9fd7b41a9"
+    },
+    {
+      "address": "0x18c76be70",
+      "unslid_va": "0x187e93e70",
+      "image": "/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation",
+      "nearest_local_symbol": "___NSARRAY_IS_CALLING_OUT_TO_A_BLOCK__",
+      "offset": 16,
+      "nearest_symbol": "___NSARRAY_IS_CALLING_OUT_TO_A_BLOCK__",
+      "symbol_table": "local",
+      "original_instruction_bytes": "fd7bc1a8c0035fd6"
+    },
+    {
+      "address": "0x18c7d16ac",
+      "unslid_va": "0x187ef96ac",
+      "image": "/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation",
+      "nearest_local_symbol": "-[__NSSingleObjectArrayI enumerateObjectsWithOptions:usingBlock:]",
+      "offset": 88,
+      "nearest_symbol": "-[__NSSingleObjectArrayI enumerateObjectsWithOptions:usingBlock:]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "e00315aa986afe97"
+    },
+    {
+      "address": "0x19825fb9c",
+      "unslid_va": "0x193987b9c",
+      "image": "/System/Library/PrivateFrameworks/AXCoreUtilities.framework/AXCoreUtilities",
+      "offset": 56,
+      "nearest_symbol": "_AXPerformBlockOnMainThread",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "05000014808a2ef0"
+    },
+    {
+      "address": "0x1d0058970",
+      "unslid_va": "0x1cb780970",
+      "image": "/usr/lib/system/libsystem_kernel.dylib",
+      "nearest_symbol": "___ulock_wait2",
+      "symbol_table": "exported",
+      "offset": 8,
+      "original_instruction_bytes": "e3000054fd7bbfa9"
+    },
+    {
+      "address": "0x1e1e440e0",
+      "unslid_va": "0x1dd56c0e0",
+      "image": "/usr/lib/system/libsystem_platform.dylib",
+      "nearest_local_symbol": "__os_unfair_lock_lock_slow",
+      "offset": 184,
+      "nearest_symbol": "__os_unfair_lock_lock_slow",
+      "symbol_table": "local",
+      "original_instruction_bytes": "4001f836e803004b"
+    },
+    {
+      "address": "0x18c565228",
+      "unslid_va": "0x187c8d228",
+      "image": "/System/Library/Frameworks/CoreServices.framework/CoreServices",
+      "nearest_local_symbol": "__ZL20_LSContextInitCommonP9LSContextP17_LSDServiceDomainmPU15__autoreleasingP7NSError",
+      "offset": 760,
+      "nearest_symbol": "__ZL20_LSContextInitCommonP9LSContextP17_LSDServiceDomainmPU15__autoreleasingP7NSError",
+      "symbol_table": "local",
+      "original_instruction_bytes": "a05f36f000e02191"
+    },
+    {
+      "address": "0x18c564eb8",
+      "unslid_va": "0x187c8ceb8",
+      "image": "/System/Library/Frameworks/CoreServices.framework/CoreServices",
+      "nearest_local_symbol": "__ZN14LaunchServices8Database7Context4_getEP17_LSDServiceDomainm",
+      "offset": 108,
+      "nearest_symbol": "__ZN14LaunchServices8Database7Context4_getEP17_LSDServiceDomainm",
+      "symbol_table": "local",
+      "original_instruction_bytes": "fa0300aaf90740f9"
+    },
+    {
+      "address": "0x18c564ac8",
+      "unslid_va": "0x187c8cac8",
+      "image": "/System/Library/Frameworks/CoreServices.framework/CoreServices",
+      "nearest_local_symbol": "-[LSApplicationRecord _initWithNode:bundleIdentifier:placeholderBehavior:systemPlaceholder:itemID:forceInBundleContainer:context:error:]",
+      "offset": 276,
+      "nearest_symbol": "-[LSApplicationRecord _initWithNode:bundleIdentifier:placeholderBehavior:systemPlaceholder:itemID:forceInBundleContainer:context:error:]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "fa0300aabc0f40f9"
+    },
+    {
+      "address": "0x18c587d10",
+      "unslid_va": "0x187cafd10",
+      "image": "/System/Library/Frameworks/CoreServices.framework/CoreServices",
+      "nearest_local_symbol": "-[LSApplicationRecord initWithBundleIdentifier:fetchingPlaceholder:error:]",
+      "offset": 48,
+      "nearest_symbol": "-[LSApplicationRecord initWithBundleIdentifier:fetchingPlaceholder:error:]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "fd7b41a9ff830091"
+    },
+    {
+      "address": "0x205661ce0",
+      "unslid_va": "0x200d89ce0",
+      "image": "/System/Library/PrivateFrameworks/ControlCenterServices.framework/ControlCenterServices",
+      "nearest_local_symbol": "___81-[CCSModuleRepository _queue_filterModuleMetadataByAssociatedBundleAvailability:]_block_invoke",
+      "offset": 84,
+      "nearest_symbol": "___81-[CCSModuleRepository _queue_filterModuleMetadataByAssociatedBundleAvailability:]_block_invoke",
+      "symbol_table": "local",
+      "original_instruction_bytes": "f50300aae80740f9"
+    },
+    {
+      "address": "0x193fe00e8",
+      "unslid_va": "0x18f7080e8",
+      "image": "/System/Library/PrivateFrameworks/BaseBoard.framework/BaseBoard",
+      "offset": 216,
+      "nearest_symbol": "_BSCollectionFilter",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "80000034e00315aa"
+    },
+    {
+      "address": "0x2056616b8",
+      "unslid_va": "0x200d896b8",
+      "image": "/System/Library/PrivateFrameworks/ControlCenterServices.framework/ControlCenterServices",
+      "nearest_local_symbol": "-[CCSModuleRepository _queue_filterModuleMetadataByAssociatedBundleAvailability:]",
+      "offset": 48,
+      "nearest_symbol": "-[CCSModuleRepository _queue_filterModuleMetadataByAssociatedBundleAvailability:]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "d2d69195f30300aa"
+    },
+    {
+      "address": "0x2056615b0",
+      "unslid_va": "0x200d895b0",
+      "image": "/System/Library/PrivateFrameworks/ControlCenterServices.framework/ControlCenterServices",
+      "nearest_local_symbol": "-[CCSModuleRepository _queue_updateAvailableModuleMetadataForAllModuleMetadata:]",
+      "offset": 52,
+      "nearest_symbol": "-[CCSModuleRepository _queue_updateAvailableModuleMetadataForAllModuleMetadata:]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "14d79195f50300aa"
+    }
+  ]
+}

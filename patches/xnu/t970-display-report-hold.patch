@@ -1,0 +1,26 @@
+--- a/bsd/kern/kern_exec.c
++++ b/bsd/kern/kern_exec.c
+@@ -8288,6 +8288,23 @@
+ 		unsigned ui_wait=0;
+ 		const char *trace=native_t970_cache_trace_text();
+ 		if (PE_parse_boot_argn("t970-ui-wait", &ui_wait, sizeof(ui_wait)) && ui_wait==1) trace=native_t970_ui_wait_text();
++		unsigned hold_display = 0;
++		extern int native_t970_display_hold(void) __attribute__((weak_import));
++		extern void native_t970_display_timing(char *, unsigned, int) __attribute__((weak_import));
++		if (PE_parse_boot_argn("t970-display-hold", &hold_display, sizeof(hold_display)) && hold_display == 1 &&
++		    native_t970_display_hold && native_t970_display_timing) {
++			int hold = native_t970_display_hold();
++			for (unsigned attempt = 0; hold == 1 && attempt < 20; ++attempt) {
++				uint64_t retry = 0;
++				clock_interval_to_deadline(100, NSEC_PER_MSEC, &retry);
++				if (assert_wait_deadline((event_t)&native_t970_runtime_started, THREAD_UNINT, retry) == THREAD_WAITING) {
++					(void)thread_block(THREAD_CONTINUE_NULL);
++				}
++				hold = native_t970_display_hold();
++			}
++			size_t used = strlen(display_state);
++			native_t970_display_timing(display_state + used, sizeof(display_state) - used, hold);
++		}
+ 		unsigned batch_mode=0;
+ 		PE_parse_boot_argn("t970-ui-stack", &batch_mode, sizeof(batch_mode));
+ 		if(batch_mode==5 || batch_mode==6) {
