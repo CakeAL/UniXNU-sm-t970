@@ -1,0 +1,28 @@
+{
+  "boot_sha256": "e44011cb29156ae60679de64d2fb9ca8f9e3dc36eb81845124c0801cfba53f01",
+  "photo_name": "\u622a\u5c4f2026-11-04 03.08.38.jpg",
+  "photo_sha256": "731cb676e6b7a6b2a3435bb77bb96883c8762da19af0b678cdf134de9ea7f87e",
+  "association": "owner photo after flash; no hash readback",
+  "runtime": {
+    "main": 1,
+    "processes": 109,
+    "cpu": 8,
+    "secondary": 7,
+    "target": 90
+  },
+  "display": {
+    "open": 6,
+    "swap": 0,
+    "surface": 0
+  },
+  "keystore": {
+    "ready": 1,
+    "last_selector": 10,
+    "last_rc": "0xe00002c7"
+  },
+  "slide": "0xf974000",
+  "bb": "QuartzCore CAMetalContextCreate block: IOAcceleratorES poll; 100ms sleep, 300 iterations maximum",
+  "sb": "BKSDisplayGetMainScreenInfo synchronous Mach reply",
+  "symbols": "symbols.json",
+  "call_targets": "ca-wait-targets.json"
+}

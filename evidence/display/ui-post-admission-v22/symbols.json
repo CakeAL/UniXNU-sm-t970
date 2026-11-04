@@ -1,0 +1,190 @@
+{
+  "cache_slide": "0xf974000",
+  "cache_uuid": "590d839a82d230f1a17d0cc053420f73",
+  "local_symbols_uuid_matches": true,
+  "live_sample": true,
+  "frames": [
+    {
+      "address": "0x1db0fa394",
+      "unslid_va": "0x1cb786394",
+      "image": "/usr/lib/system/libsystem_kernel.dylib",
+      "offset": 8,
+      "nearest_symbol": "___semwait_signal",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "e3000054fd7bbfa9"
+    },
+    {
+      "address": "0x19efb0694",
+      "unslid_va": "0x18f63c694",
+      "image": "/usr/lib/system/libsystem_c.dylib",
+      "offset": 44,
+      "nearest_symbol": "_getutxid",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "e10313aafd7b41a9"
+    },
+    {
+      "address": "0x19ef60ab0",
+      "unslid_va": "0x18f5ecab0",
+      "image": "/usr/lib/system/libsystem_c.dylib",
+      "offset": 64,
+      "nearest_symbol": "_usleep",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "fd7b41a9ff830091"
+    },
+    {
+      "address": "0x198f09bd8",
+      "unslid_va": "0x189595bd8",
+      "image": "/System/Library/Frameworks/QuartzCore.framework/QuartzCore",
+      "nearest_local_symbol": "___CAMetalContextCreate_block_invoke",
+      "offset": 220,
+      "nearest_symbol": "___CAMetalContextCreate_block_invoke",
+      "symbol_table": "local",
+      "original_instruction_bytes": "e7ffff17b6ac1395"
+    },
+    {
+      "address": "0x19ef2acc0",
+      "unslid_va": "0x18f5b6cc0",
+      "image": "/usr/lib/system/libdispatch.dylib",
+      "nearest_local_symbol": "__dispatch_client_callout",
+      "offset": 16,
+      "nearest_symbol": "__dispatch_client_callout",
+      "symbol_table": "local",
+      "original_instruction_bytes": "fd7b41a9f44fc2a8"
+    },
+    {
+      "address": "0x19eefc0e4",
+      "unslid_va": "0x18f5880e4",
+      "image": "/usr/lib/system/libdispatch.dylib",
+      "nearest_local_symbol": "__dispatch_once_callout",
+      "offset": 28,
+      "nearest_symbol": "__dispatch_once_callout",
+      "symbol_table": "local",
+      "original_instruction_bytes": "68d03bd5081940b9"
+    },
+    {
+      "address": "0x198ed7570",
+      "unslid_va": "0x189563570",
+      "image": "/System/Library/Frameworks/QuartzCore.framework/QuartzCore",
+      "nearest_local_symbol": "_CAMetalContextCreate",
+      "offset": 88,
+      "nearest_symbol": "_CAMetalContextCreate",
+      "symbol_table": "local",
+      "original_instruction_bytes": "f3ffff17f40300aa"
+    },
+    {
+      "address": "0x198e39f84",
+      "unslid_va": "0x1894c5f84",
+      "image": "/System/Library/Frameworks/QuartzCore.framework/QuartzCore",
+      "nearest_local_symbol": "__ZN2CA12WindowServer11AccelServer8rendererEv",
+      "offset": 40,
+      "nearest_symbol": "__ZN2CA12WindowServer11AccelServer8rendererEv",
+      "symbol_table": "local",
+      "original_instruction_bytes": "809200f9a00900b4"
+    },
+    {
+      "address": "0x198f39cc8",
+      "unslid_va": "0x1895c5cc8",
+      "image": "/System/Library/Frameworks/QuartzCore.framework/QuartzCore",
+      "nearest_local_symbol": "__ZN2CA12WindowServer11AccelServerC1EPNS0_12IOMFBDisplayEPK10__CFString",
+      "offset": 1888,
+      "nearest_symbol": "__ZN2CA12WindowServer11AccelServerC1EPNS0_12IOMFBDisplayEPK10__CFString",
+      "symbol_table": "local",
+      "original_instruction_bytes": "a8035af8290331d0"
+    },
+    {
+      "address": "0x198f1222c",
+      "unslid_va": "0x18959e22c",
+      "image": "/System/Library/Frameworks/QuartzCore.framework/QuartzCore",
+      "nearest_local_symbol": "__ZN2CA12WindowServer12AppleDisplay10new_serverEv",
+      "offset": 84,
+      "nearest_symbol": "__ZN2CA12WindowServer12AppleDisplay10new_serverEv",
+      "symbol_table": "local",
+      "original_instruction_bytes": "fd7b41a9f44fc2a8"
+    },
+    {
+      "address": "0x1db0f4b58",
+      "unslid_va": "0x1cb780b58",
+      "image": "/usr/lib/system/libsystem_kernel.dylib",
+      "nearest_symbol": "_mach_msg2_trap",
+      "symbol_table": "exported",
+      "offset": 8,
+      "original_instruction_bytes": "c0035fd6f0058092"
+    },
+    {
+      "address": "0x1db0f81b0",
+      "unslid_va": "0x1cb7841b0",
+      "image": "/usr/lib/system/libsystem_kernel.dylib",
+      "offset": 492,
+      "nearest_symbol": "_mach_msg_overwrite",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "fd7b51a9f44f50a9"
+    },
+    {
+      "address": "0x1db0f7fb8",
+      "unslid_va": "0x1cb783fb8",
+      "image": "/usr/lib/system/libsystem_kernel.dylib",
+      "offset": 20,
+      "nearest_symbol": "_mach_msg",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "fd7b41a9ff830091"
+    },
+    {
+      "address": "0x19efd0cac",
+      "unslid_va": "0x18f65ccac",
+      "image": "/System/Library/PrivateFrameworks/BackBoardServices.framework/BackBoardServices",
+      "offset": 164,
+      "nearest_symbol": "__BKSDisplayGetMainScreenInfo",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "f30300aac8ff9f52"
+    },
+    {
+      "address": "0x19efd0b98",
+      "unslid_va": "0x18f65cb98",
+      "image": "/System/Library/PrivateFrameworks/BackBoardServices.framework/BackBoardServices",
+      "nearest_local_symbol": "__BKSDisplayServicesGetMainScreenInfo",
+      "offset": 120,
+      "nearest_symbol": "__BKSDisplayServicesGetMainScreenInfo",
+      "symbol_table": "local",
+      "original_instruction_bytes": "780000b4e01f40bd"
+    },
+    {
+      "address": "0x19efd0884",
+      "unslid_va": "0x18f65c884",
+      "image": "/System/Library/PrivateFrameworks/BackBoardServices.framework/BackBoardServices",
+      "offset": 80,
+      "nearest_symbol": "_BKSDisplayServicesStart",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "f30300aa1fd00431"
+    },
+    {
+      "address": "0x19f006bb8",
+      "unslid_va": "0x18f692bb8",
+      "image": "/System/Library/PrivateFrameworks/BackBoardServices.framework/BackBoardServices",
+      "nearest_local_symbol": "-[BKSSystemShellService _activateServerConnectionWithIdleSleepInterval:]",
+      "offset": 488,
+      "nearest_symbol": "-[BKSSystemShellService _activateServerConnectionWithIdleSleepInterval:]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "e00319aa1aca4795"
+    },
+    {
+      "address": "0x19f005ef4",
+      "unslid_va": "0x18f691ef4",
+      "image": "/System/Library/PrivateFrameworks/BackBoardServices.framework/BackBoardServices",
+      "nearest_local_symbol": "-[BKSSystemShellService initWithConfigurator:]",
+      "offset": 284,
+      "nearest_symbol": "-[BKSSystemShellService initWithConfigurator:]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "76cd4795e81740f9"
+    },
+    {
+      "address": "0x1b6a3de58",
+      "unslid_va": "0x1a70c9e58",
+      "image": "/System/Library/PrivateFrameworks/FrontBoard.framework/FrontBoard",
+      "nearest_local_symbol": "-[FBSystemShell _initWithOptions:]",
+      "offset": 768,
+      "nearest_symbol": "-[FBSystemShell _initWithOptions:]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "a81640f9a01600f9"
+    }
+  ]
+}

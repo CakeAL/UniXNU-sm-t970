@@ -7,5 +7,6 @@
   "final_fat_roundtrip": true,
   "target_wait_seconds": 90,
   "stack_limit": 8,
-  "hardware_result_pending": true
+  "hardware_result_pending": false,
+  "device_result": "device-result.json"
 }

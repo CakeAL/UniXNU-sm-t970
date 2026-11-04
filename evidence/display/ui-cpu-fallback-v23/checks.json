@@ -1,0 +1,11 @@
+{
+  "boot_sha256": "08b90255b96ff8a81c6d598cb55fa5e1dccfd8a00ef79f035d470ae8cba68833",
+  "same_source_kernel": true,
+  "same_payload_kernel": true,
+  "same_trust_cache_and_data": true,
+  "adt_diff_only": "/chosen/random-seed",
+  "only_argument_change": "runtime target90 -> 125",
+  "independent_payload_check": true,
+  "final_fat_roundtrip": true,
+  "hardware_result_pending": true
+}

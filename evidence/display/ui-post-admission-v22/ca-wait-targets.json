@@ -1,0 +1,80 @@
+{
+  "cache_slide": "0x0",
+  "cache_uuid": "590d839a82d230f1a17d0cc053420f73",
+  "local_symbols_uuid_matches": true,
+  "live_sample": true,
+  "frames": [
+    {
+      "address": "0x18ffb6b60",
+      "unslid_va": "0x18ffb6b60",
+      "image": "/System/Library/Frameworks/IOKit.framework/Versions/A/IOKit",
+      "offset": 0,
+      "nearest_symbol": "_IOMainPort",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "f3440014ffc300d1"
+    },
+    {
+      "address": "0x18ffb83d4",
+      "unslid_va": "0x18ffb83d4",
+      "image": "/System/Library/Frameworks/IOKit.framework/Versions/A/IOKit",
+      "offset": 0,
+      "nearest_symbol": "_IOServiceMatching",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "e10300aaa06a2bd0"
+    },
+    {
+      "address": "0x18ffc74c8",
+      "unslid_va": "0x18ffc74c8",
+      "image": "/System/Library/Frameworks/IOKit.framework/Versions/A/IOKit",
+      "offset": 0,
+      "nearest_symbol": "_IOServiceGetMatchingServices",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "ff8301d1fa6701a9"
+    },
+    {
+      "address": "0x18ffb8c58",
+      "unslid_va": "0x18ffb8c58",
+      "image": "/System/Library/Frameworks/IOKit.framework/Versions/A/IOKit",
+      "offset": 0,
+      "nearest_symbol": "_IOIteratorNext",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "ff8300d1fd7b01a9"
+    },
+    {
+      "address": "0x18ffb9010",
+      "unslid_va": "0x18ffb9010",
+      "image": "/System/Library/Frameworks/IOKit.framework/Versions/A/IOKit",
+      "offset": 0,
+      "nearest_symbol": "_IOObjectRelease",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "e10300aaa8b32db0"
+    },
+    {
+      "address": "0x18f5eca70",
+      "unslid_va": "0x18f5eca70",
+      "image": "/usr/lib/system/libsystem_c.dylib",
+      "offset": 0,
+      "nearest_symbol": "_usleep",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "ff8300d1fd7b01a9"
+    },
+    {
+      "address": "0x1800e900c",
+      "unslid_va": "0x1800e900c",
+      "image": "/usr/lib/libobjc.A.dylib",
+      "offset": 0,
+      "nearest_symbol": "_objc_autoreleasePoolPush",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "4d0a0014c0035fd6"
+    },
+    {
+      "address": "0x187ac8668",
+      "unslid_va": "0x187ac8668",
+      "image": "/System/Library/Frameworks/Metal.framework/Metal",
+      "offset": 0,
+      "nearest_symbol": "_MTLCreateSystemDefaultDevice",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "ff0302d1f44f06a9"
+    }
+  ]
+}

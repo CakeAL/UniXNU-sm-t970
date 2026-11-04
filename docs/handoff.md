@@ -3,6 +3,12 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
+## 最新：T733 CPU 出帧对照与 QuartzCore 等待（2026-11-04）
+
+BOOT e44011cb 照片 03:08:38 绑定的符号确认 BB 在 CAMetalContextCreate 轮询 IOAcceleratorES，SB 等待主屏幕信息。原版轮询每次 100ms，最多约 30 秒。T733 48f 实机有 CPU 出帧记录，显示端通过 NativeLegacyDisplay 复制 IOSurface。当前 T970 open6、swap0，继续核对首帧前的软件渲染选择。
+
+BOOT 08b90255 使用同一内核和 mode1，将报告由 90 改为 125 秒。最终 FAT 对照通过，ADT 差异仅重建随机种子。实机验证待回报，见 evidence/display/ui-cpu-fallback-v23。
+
 ## 最新：队列已推进，采修正后的主线程栈（2026-11-04）
 
 v21照片03:00:42已见三组req0，BB done161、SB75→78、MG134，显示open6/fail0，swap仍0。

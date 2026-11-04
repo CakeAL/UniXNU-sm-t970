@@ -1,0 +1,14 @@
+{
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/data-bringup/ui-cpu-fallback-memory768-v1/boot-partition.img"
+  ],
+  "boot_sha256": "08b90255b96ff8a81c6d598cb55fa5e1dccfd8a00ef79f035d470ae8cba68833",
+  "exit_code": 0,
+  "reboot_requested": true,
+  "readback_verified": false,
+  "hardware_result_pending": true,
+  "completed_utc": "2026-11-04T05:09:01.060152+00:00"
+}
