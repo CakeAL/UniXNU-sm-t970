@@ -5,6 +5,10 @@
 
 ## 最新：首帧后的持续运行对照（2026-11-04）
 
+首帧阶段的单因素对照 BOOT `c96f86d7…`：基于已有 Apple logo 及2次成功帧的 `bb4d8474…`，只增加随机本地管理 Wi-Fi 测试地址，保留原125秒报告与其余输入。机主照片 open7、swap/copy/retire 各2，和基线计数相同；SB 此次在控制中心默认模块列表的 property list 路径，基线处于同组件 LaunchServices 查询路径，不能从瞬时栈判断进度或因果。90秒对照也未见明显阶段改善；不继续重复地址对照。见 [125秒对照](../evidence/display/wifi-address-125-v30/README.md)。
+
+本机 21H461 原始 MobileGestalt 静态核查已确认条件路径包含 `/chosen` Wi-Fi 属性、无线节点及网络控制器回退，结构与 Poco F1 参考相近；不证明实际执行或本机因它等待，见 [核查](../evidence/display/mobilegestalt-wifi-audit/README.md)。
+
 基于已实测 90 秒 mode7 BOOT `aeb13ffc…` 制备 `fec656ec…`：只在隔离 ADT 新增六字节、随机本地管理的 Wi-Fi 测试地址，其他属性、内核、参数、Data 等经最终 FAT 独立回读一致。机主照片90秒显示 open5/swap0，lsd安装恢复及等待数据库 seeding、SB等 BackBoard 主屏幕信息与基线调用链一致；尚无明显阶段改善。属性未测运行时读取，单次快照不排除稍后作用。地址不是板卡真实身份，也不启用 Wi-Fi。见 [单因素对照](../evidence/display/wifi-address-control-v29/README.md)。
 
 约 90 秒诊断 BOOT `f69965a7…` 的机主照片显示 lsd7线程、完整采到第5–7：第5经 XPC 等待数据库 seeding，第6/7处于工作队列入口。没有捕获 seeding 执行线程或 Wi-Fi 查询；跨启动顺序可能变化。见 [lsd 后半采样](../evidence/display/lsd-later-mode8-v28/README.md)。

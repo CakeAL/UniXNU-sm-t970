@@ -16,6 +16,10 @@
 
 据此准备单因素对照 `fec656ec…`：基于有 SB/lsd 栈的90秒 BOOT `aeb13ffc…`，只在隔离的 `/chosen` 增加随机本地管理 Wi-Fi 地址，不写入默认配置，不加入蓝牙地址；FAT独立回读确认其他 ADT 属性、参数、内核和Data种子不变。机主照片90秒 open5/swap0，lsd 首线程安装日志恢复、另一线程等待 seeding，SB 等 BackBoard 主屏幕信息，均与基线采样调用链相同。没有观察到明显阶段改善，但快照较早且独立启动，未直接验证运行时读取该属性，不足以完全排除稍后效果。见 `evidence/display/wifi-address-control-v29/`。
 
+进一步静态核对本机 21H461 `libMobileGestalt`：一条条件路径将 `IODeviceTree:/chosen` 与 `mac-address-wifi0` 传入内部函数，成功分支直接返回，失败后依次尝试 `sdio`、`wlan`、`marconi-wifi` 并可进入引用 `IONetworkController` 的回退函数。关键指令、CFString及路径已用固定 UUID 缓存验证，见 `evidence/display/mobilegestalt-wifi-audit/`。该路径有前置条件；静态检查不能证明当前启动执行、属性被接收或出现参考项目中的等待。
+
+进一步将单属性对照移至已有首帧的125秒：`c96f86d7` 与无地址的 `bb4d8474` 均为 open7、swap/copy/retire2。前者 SB 采样在控制中心默认模块列表 property list 读取，后者在控制中心 LaunchServices 查询；仅凭两个独立启动瞬时栈不能比较进度或归因。该对照无可确认的界面改善，停做重复地址对照，转查 seeding、Data 可用空间或显示依赖。见 `evidence/display/wifi-address-125-v30/`。
+
 本轮重新通过GitHub连接读取固定提交的实际代码，范围不止README。
 具体提交、文件与blob见`evidence/display/ui-call-v9/reference-sources.json`。
 

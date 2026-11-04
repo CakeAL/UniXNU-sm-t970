@@ -1,0 +1,109 @@
+{
+  "cache_slide": "0xf280000",
+  "cache_uuid": "590d839a82d230f1a17d0cc053420f73",
+  "local_symbols_uuid_matches": true,
+  "live_sample": true,
+  "frames": [
+    {
+      "address": "0x1961cced8",
+      "unslid_va": "0x186f4ced8",
+      "image": "/System/Library/Frameworks/Foundation.framework/Foundation",
+      "nearest_local_symbol": "+[NSPropertyListSerialization propertyListWithData:options:format:error:]",
+      "offset": 0,
+      "nearest_symbol": "+[NSPropertyListSerialization propertyListWithData:options:format:error:]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "f44fbea9fd7b01a9"
+    },
+    {
+      "address": "0x196179078",
+      "unslid_va": "0x186ef9078",
+      "image": "/System/Library/Frameworks/Foundation.framework/Foundation",
+      "nearest_local_symbol": "+[NSArray(NSArray) newWithContentsOf:immutable:]",
+      "offset": 140,
+      "nearest_symbol": "+[NSArray(NSArray) newWithContentsOf:immutable:]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "30d1ad95f40300aa"
+    },
+    {
+      "address": "0x1966aa710",
+      "unslid_va": "0x18742a710",
+      "image": "/System/Library/Frameworks/Foundation.framework/Foundation",
+      "nearest_local_symbol": "+[NSArray(NSArray) arrayWithContentsOfURL:]",
+      "offset": 28,
+      "nearest_symbol": "+[NSArray(NSArray) arrayWithContentsOfURL:]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "fd7b41a9f44fc2a8"
+    },
+    {
+      "address": "0x2100119ec",
+      "unslid_va": "0x200d919ec",
+      "image": "/System/Library/PrivateFrameworks/ControlCenterServices.framework/ControlCenterServices",
+      "nearest_local_symbol": "+[CCSModuleRepository _defaultModuleIdentifierAllowedList]",
+      "offset": 96,
+      "nearest_symbol": "+[CCSModuleRepository _defaultModuleIdentifierAllowedList]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "05b69195f30300aa"
+    },
+    {
+      "address": "0x21001125c",
+      "unslid_va": "0x200d9125c",
+      "image": "/System/Library/PrivateFrameworks/ControlCenterServices.framework/ControlCenterServices",
+      "nearest_local_symbol": "+[CCSModuleRepository repositoryWithDefaults]",
+      "offset": 52,
+      "nearest_symbol": "+[CCSModuleRepository repositoryWithDefaults]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "e9b79195f30300aa"
+    },
+    {
+      "address": "0x21000b0a8",
+      "unslid_va": "0x200d8b0a8",
+      "image": "/System/Library/PrivateFrameworks/ControlCenterServices.framework/ControlCenterServices",
+      "nearest_local_symbol": "-[CCSRemoteServiceProvider _init]",
+      "offset": 64,
+      "nearest_symbol": "-[CCSRemoteServiceProvider _init]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "56d09195680640f9"
+    },
+    {
+      "address": "0x21000b054",
+      "unslid_va": "0x200d8b054",
+      "image": "/System/Library/PrivateFrameworks/ControlCenterServices.framework/ControlCenterServices",
+      "nearest_local_symbol": "___42+[CCSRemoteServiceProvider sharedInstance]_block_invoke",
+      "offset": 24,
+      "nearest_symbol": "___42+[CCSRemoteServiceProvider sharedInstance]_block_invoke",
+      "symbol_table": "local",
+      "original_instruction_bytes": "e88918b001fd47f9"
+    },
+    {
+      "address": "0x19e836cc0",
+      "unslid_va": "0x18f5b6cc0",
+      "image": "/usr/lib/system/libdispatch.dylib",
+      "nearest_local_symbol": "__dispatch_client_callout",
+      "offset": 16,
+      "nearest_symbol": "__dispatch_client_callout",
+      "symbol_table": "local",
+      "original_instruction_bytes": "fd7b41a9f44fc2a8"
+    },
+    {
+      "address": "0x19e8080e4",
+      "unslid_va": "0x18f5880e4",
+      "image": "/usr/lib/system/libdispatch.dylib",
+      "nearest_local_symbol": "__dispatch_once_callout",
+      "offset": 28,
+      "nearest_symbol": "__dispatch_once_callout",
+      "symbol_table": "local",
+      "original_instruction_bytes": "68d03bd5081940b9"
+    },
+    {
+      "address": "0x21000b038",
+      "unslid_va": "0x200d8b038",
+      "image": "/System/Library/PrivateFrameworks/ControlCenterServices.framework/ControlCenterServices",
+      "nearest_local_symbol": "+[CCSRemoteServiceProvider sharedInstance]",
+      "offset": 60,
+      "nearest_symbol": "+[CCSRemoteServiceProvider sharedInstance]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "f7ffff17fd7bbfa9"
+    }
+  ],
+  "note": "SpringBoard only; backboardd transcription omitted pending independent verification."
+}

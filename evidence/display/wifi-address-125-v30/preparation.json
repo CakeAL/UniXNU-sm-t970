@@ -1,0 +1,25 @@
+{
+  "base_boot_sha256": "bb4d847476d455c0a49d28ffea03492e8e0f2b5fd0f2480ed2eb34dc5604912e",
+  "boot_sha256": "c96f86d777d472b5e5905b9128bbd24945398129fc8698179fd6522cf0ec5af4",
+  "boot_bytes": 71303168,
+  "base_adt_sha256": "3e38c4ff0a1847e8e4770011e85c93588d214aaf3564517da4a8d56c8e0a83db",
+  "adt_sha256": "8c54137eb41fcb05652ff38bd13bf2c50b864dfbc9620710724b642a230c8646",
+  "adt_only_added": "/chosen/mac-address-wifi0",
+  "address_bytes": 6,
+  "address_policy": "random locally administered unicast; diagnostic only, not board identity",
+  "unchanged_inputs": {
+    "unixnu.toml": "be788aa74b44de8bcd9c6ea757e66a9cc2f54d41bf5fda8fff9e99292f2e5115",
+    "Payloads/kernel.macho": "59252aba52a2fb8d08b998f21c0c9a85b71901dab95fd6e919824ac2b73500b1",
+    "Payloads/kernel.macho.trustcache": "7416ca4f8377146626bb284e2133c76bee6cb4e3ee0af5d648b186235a7323a7",
+    "Payloads/scratch-data.img": "4591566eccd77f0f9d13a1338ecaf3c73ce86cd04aeea732d91db6b2e100ca3a"
+  },
+  "config_unchanged": true,
+  "final_boot_fat_roundtrip": true,
+  "header_fd_dtb_tail_unchanged": true,
+  "target_seconds": 125,
+  "terminal_runtime_report": true,
+  "board_defaults_unchanged": true,
+  "wifi_functionality_verified": false,
+  "uploaded": false,
+  "hardware_result_pending": true
+}

@@ -1,0 +1,44 @@
+{
+  "boot_sha256": "c96f86d777d472b5e5905b9128bbd24945398129fc8698179fd6522cf0ec5af4",
+  "baseline_boot_sha256": "bb4d847476d455c0a49d28ffea03492e8e0f2b5fd0f2480ed2eb34dc5604912e",
+  "photo": "screen-target125.jpg",
+  "photo_sha256": "bad4903c0d9149f8f4c696925a29d931e19cd84c0d3327b740688e1b4bd9874b",
+  "association": "owner photo following successful BOOT upload; no device hash readback",
+  "runtime": {
+    "target": 125,
+    "main": 1,
+    "processes": 110,
+    "cpu": 8,
+    "secondary": 7,
+    "sb_pid": 27,
+    "bb_pid": 57,
+    "verified_blocks": 1318550
+  },
+  "display": {
+    "client_open": 7,
+    "failed": 0,
+    "swap_ok": 2,
+    "swap_bad": 0,
+    "copies": 2,
+    "retired": 2,
+    "vsync": 0
+  },
+  "sample": {
+    "mode": 1,
+    "springboard_threads": 9,
+    "springboard_visited": 4,
+    "springboard_busy": 0,
+    "cache_slide": "0xf280000"
+  },
+  "observations": [
+    "same 125-second open7, swap2, copies2 and retired2 as baseline",
+    "SpringBoard sampled in Foundation property list reading under ControlCenterServices default module allowlist; baseline sampled in LaunchServices lookup under ControlCenterServices",
+    "stack positions differ but neither establishes which boot progressed further or a causal effect"
+  ],
+  "limitations": [
+    "independent live snapshots are not coherent progress traces",
+    "runtime reading and acceptance of synthetic address not observed",
+    "no home screen verified"
+  ],
+  "symbols": "symbols.json"
+}

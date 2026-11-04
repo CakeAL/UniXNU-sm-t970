@@ -1,0 +1,17 @@
+{
+  "cache_uuid": "590d839a82d230f1a17d0cc053420f73",
+  "image": "/usr/lib/libMobileGestalt.dylib",
+  "resolver_start_unslid": "0x1a0228284",
+  "chosen_path": "IODeviceTree:/chosen",
+  "chosen_property_cfstring": "mac-address-wifi0",
+  "chosen_internal_call": "0x1a02078a4",
+  "success_branch_returns": true,
+  "fallback_node_names": [
+    "sdio",
+    "wlan",
+    "marconi-wifi"
+  ],
+  "fallback_function_unslid": "0x1a02307a8",
+  "fallback_string": "IONetworkController",
+  "note": "An earlier branch can bypass this path. This is a static control-flow audit, not proof of runtime invocation, property type acceptance, timeout semantics, or cause of the device wait."
+}
