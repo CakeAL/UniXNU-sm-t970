@@ -14,6 +14,8 @@
 
 独立启动 `f69965a7` 采 lsd5–7：第5也在经 XPC 等待 seeding，第6/7在工作队列入口；该样本没有捕获 seeding 执行线程，也没有证明 Wi-Fi 查询。参考项目的属性在 ADT 中是两项各6字节的本地管理地址；任何此类值在本板只能是显式的隔离诊断输入，不能作为真实设备身份或 Wi-Fi 功能证据。见 `evidence/display/lsd-later-mode8-v28/` 及 [参考属性实现](https://github.com/ry-diffusion/Bergamota/blob/37a7a7a917fc09945ed2f7d1ae68b84d4525b4cb/tools/mkadt.py)。
 
+据此准备单因素对照 `fec656ec…`：基于有 SB/lsd 栈的90秒 BOOT `aeb13ffc…`，只在隔离的 `/chosen` 增加随机本地管理 Wi-Fi 地址，不写入默认配置，不加入蓝牙地址；FAT独立回读确认其他 ADT 属性、参数、内核和Data种子不变。机主照片90秒 open5/swap0，lsd 首线程安装日志恢复、另一线程等待 seeding，SB 等 BackBoard 主屏幕信息，均与基线采样调用链相同。没有观察到明显阶段改善，但快照较早且独立启动，未直接验证运行时读取该属性，不足以完全排除稍后效果。见 `evidence/display/wifi-address-control-v29/`。
+
 本轮重新通过GitHub连接读取固定提交的实际代码，范围不止README。
 具体提交、文件与blob见`evidence/display/ui-call-v9/reference-sources.json`。
 

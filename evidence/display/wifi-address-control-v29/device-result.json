@@ -1,0 +1,49 @@
+{
+  "boot_sha256": "fec656ec985544578036d2e7cc15c7a7a843191d6fa32920303f3b9b01e2c7eb",
+  "baseline_boot_sha256": "aeb13ffcb50b8f2d22819e2daf7de6a7b22b07a6815cb95aaac95652322ca5c8",
+  "photo": "screen-target90.jpg",
+  "photo_sha256": "1fb58e4cef05c8682df6efad00dfc2528500dd1648a6bbb9998e8787eb13bc42",
+  "association": "owner photo following successful BOOT upload; no device hash readback",
+  "runtime": {
+    "target": 90,
+    "main": 1,
+    "processes": 110,
+    "cpu": 8,
+    "secondary": 7,
+    "sb_pid": 27,
+    "bb_pid": 57,
+    "lsd_pid": 98,
+    "verified_blocks": 1029336
+  },
+  "display": {
+    "client_open": 5,
+    "swap_ok": 0,
+    "copies": 0,
+    "retired": 0
+  },
+  "sample": {
+    "mode": 7,
+    "lsd_threads": 7,
+    "lsd_visited": 4,
+    "lsd_busy": 0,
+    "springboard_threads": 5,
+    "springboard_visited": 4,
+    "springboard_busy": 0,
+    "processes": 2,
+    "clipped": 0,
+    "cache_slide": "0x132cc000"
+  },
+  "observations": [
+    "lsd main thread waits on a dispatch queue in install journal recovery, the same caller chain as baseline",
+    "lsd thread 4 handles an XPC request and waits for database seeding through dispatch group wait, same caller chain as baseline thread 3",
+    "SpringBoard first thread waits for BackBoard main screen info, same caller chain as baseline",
+    "display open and swap counts match baseline at target90"
+  ],
+  "limitations": [
+    "single samples from independent boots do not establish identical runtime or causality",
+    "test is before first frame in both runs",
+    "device runtime consumption of synthetic property is not directly measured",
+    "no direct Wi-Fi lookup or seeding worker observed"
+  ],
+  "symbols": "symbols.json"
+}

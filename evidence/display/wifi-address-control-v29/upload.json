@@ -1,0 +1,14 @@
+{
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/data-bringup/wifi-address-control-v29/boot-partition.img"
+  ],
+  "boot_sha256": "fec656ec985544578036d2e7cc15c7a7a843191d6fa32920303f3b9b01e2c7eb",
+  "exit_code": 0,
+  "reboot_requested": true,
+  "readback_verified": false,
+  "hardware_result_pending": false,
+  "device_result": "device-result.json"
+}

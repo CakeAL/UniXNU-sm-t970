@@ -927,6 +927,7 @@ id = "display"
 status = "planned"
 components = []
 paths = [
+  "evidence/display/wifi-address-control-v29/**",
   "evidence/display/lsd-later-mode8-v28/**",
   "evidence/display/springboard-mode7-v27/**",
   "scripts/check-mobilegestalt-reference.py",
@@ -988,6 +989,7 @@ procedure = [
   "Collect DRM modes, panel type and brightness limits; read only display-selection tokens from /proc/cmdline and match the selected S6TUUM3 node in the live DT.",
 ]
 findings = [
+  "BOOTfec656ec adds only a synthetic local Wi-Fi address property to observed BOOTaeb13ffc. At target90 owner photo still shows open5/swap0, lsd journal-recovery and XPC database-seeding waits, and SB BackBoard screen-info wait matching the baseline caller chains. Single independent samples occur before first frame, and runtime property consumption is unmeasured; no immediate improvement or definitive cause established. See evidence/display/wifi-address-control-v29.",
   "Mode8 BOOTf69965a7 target90 photo captures lsd threads5-7: thread5 handles an XPC request waiting for database seeding, threads6/7 are in workqueue entry; report end marker unclipped. The seeding worker and Wi-Fi lookup were not observed, and thread order can change across boots. See evidence/display/lsd-later-mode8-v28.",
   "Poco F1 iOS16 port reports the same Control Center/LaunchServices/unfair-lock caller chain and traced its stall through lsd seeding and a Wi-Fi address wait. Original 21H461 MobileGestalt contains relevant address and IONetworkController strings; actual T970 v24 ADT lacks both address properties. BOOTaeb13ffc target90 photo shows lsd7 threads, first4 sampled: install journal recovery/dispatch queue, inactive installs/dispatch group, and an XPC call waiting for database seeding. SB still waits for BackBoard screen info, swap0. lsd5-7, seeding owner and cause are unobserved; strings do not prove Wi-Fi lookup. See docs/ui-reference-comparison.md and evidence/display/springboard-mode7-v27.",
   "BOOTe82eec17 target300 owner photo shows main1, CPU8, open7, swap7/0, copy7 and retire7; upload was successful but not read back. SB waits on an unfair lock under the same LaunchServices/Control Center caller chain sampled in the independent target125 boot. BB first thread is in CFRunLoop Mach receive. These two snapshots neither prove continuous refresh nor establish a permanent deadlock. Owner requests shorter future waits. See evidence/display/display-late-v26.",
@@ -1049,10 +1051,13 @@ limits = [
   "Framebuffer physical address, stride, pixel format and UEFI GOP handoff are not verified by the mode list.",
 ]
 next_action = [
-  "Assess the reference Wi-Fi-address hypothesis with an isolated controlled comparison and investigate Data free space before attributing the unchanged Apple logo to a specific cause. Do not treat a synthetic address as hardware identity or Wi-Fi support.",
+  "Investigate lsd seeding worker and Data free space; if comparing the test address at a later stage, account for per-boot timing and explicitly verify runtime property consumption. Do not treat a synthetic address as hardware identity or Wi-Fi support.",
 ]
 
 evidence = [
+  { kind = "host", reference = "evidence/display/wifi-address-control-v29/preparation.json", revision = "ddcbdb7a78073a47188e0f6b75db4517bbeeaa20", command = "python3.14 evidence/display/wifi-address-control-v29/prepare.py", result = "Diagnostic BOOTfec656ec adds one synthetic locally administered Wi-Fi address property to BOOTaeb13ffc; final FAT and independent ADT roundtrip checks show other inputs unchanged. Host checks do not establish device execution." },
+  { kind = "device", reference = "evidence/display/wifi-address-control-v29/upload.json", revision = "ddcbdb7a78073a47188e0f6b75db4517bbeeaa20", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/wifi-address-control-v29/boot-partition.img", result = "Owner authorized BOOT upload and reboot; Heimdall reported success and requested reboot. No device readback." },
+  { kind = "device", reference = "evidence/display/wifi-address-control-v29/device-result.json", revision = "ddcbdb7a78073a47188e0f6b75db4517bbeeaa20", command = "Owner photo after BOOTfec656ec upload and reboot", result = "Target90 lsd journal-recovery and database-seeding wait chains and SB screen-info wait match the no-address baseline, with open5/swap0. No immediate phase improvement observed; runtime property consumption and later effect unverified." },
   { kind = "host", reference = "evidence/display/lsd-later-mode8-v28/preparation.json", revision = "ae278f227831fe64e360fcd9826d2a806aaa1749", command = "python3.14 evidence/display/lsd-later-mode8-v28/build-image.py", result = "Mode8 target90 BOOTf69965a7 built and FAT roundtrip passed; sampler host tests and private ABI compile passed. No device result. Platform check stopped before DT/ADT due to mismatched reviewed framework revision." },
   { kind = "device", reference = "evidence/display/lsd-later-mode8-v28/upload.json", revision = "ae278f227831fe64e360fcd9826d2a806aaa1749", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/lsd-later-mode8-memory768-v1/boot-partition.img", result = "Owner authorized BOOT upload and reboot; Heimdall reported success and requested reboot. No device readback." },
   { kind = "device", reference = "evidence/display/lsd-later-mode8-v28/device-result.json", revision = "ae278f227831fe64e360fcd9826d2a806aaa1749", command = "Owner photo after BOOTf69965a7 upload and reboot", result = "Target90 captures lsd5 waiting for database seeding via XPC and lsd6/7 at workqueue entry; no seeding worker or Wi-Fi lookup established." },
