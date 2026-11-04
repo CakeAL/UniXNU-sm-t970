@@ -1,0 +1,14 @@
+{
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--resume",
+    "--BOOT",
+    "out/data-bringup/display-continuous-v25/boot-partition.img"
+  ],
+  "boot_sha256": "b6e55159daa9d0df032bb90b9b32fccb6615189804b425ae4a6e06ec577d1304",
+  "exit_code": 1,
+  "reboot_requested": false,
+  "readback_verified": false,
+  "hardware_result_pending": true
+}

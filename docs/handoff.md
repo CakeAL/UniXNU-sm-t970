@@ -3,6 +3,10 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
+## 最新：首帧后的持续运行对照（2026-11-04）
+
+由实机观察到 Apple logo 的 BOOT `bb4d8474…` 制备 `b6e55159…`：仅移除 125 秒主动 panic 报告参数，其余启动参数和内核、ADT、trust cache、Data 种子、固件、DTB 均与原镜像一致。仍保留 UI 进程异常退出 panic。主机 FAT 回读与镜像边界检查通过；机主授权后首次两次会话在上传前失败，重新进入 Download Mode 后第三次仅 BOOT 上传成功、Heimdall exit 0 并请求重启，未设备读回。机主反馈重启后超过三分钟 Apple logo 未变化、无其他画面或自动重启；后台进展与桌面仍未知。`check-platform.py` 因 UniXNU HEAD 不等于历史审阅版本而在 DT/ADT 检查前停止。详见 [对照记录](../evidence/display/display-continuous-v25/README.md)。
+
 ## 最新：Apple logo 与首帧完成（2026-11-04）
 
 BOOTbb4d8474 owner observed Apple logo; photo14:40:13 shows swap2/0, transfer2, copies2, retire2. BOOT08b90255 previously panicked on uninitialized vc_progress_lock via first swap console handoff. Guard now matches t970-novc bootstrap. SpringBoard sample reaches LaunchServices database context from Control Center module discovery; sustained desktop pending.

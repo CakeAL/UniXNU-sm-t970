@@ -1,0 +1,22 @@
+Heimdall v1.4.2
+
+Copyright (c) 2010-2017 Benjamin Dobell, Glass Echidna
+http://www.glassechidna.com.au/
+
+This software is provided free of charge. Copying and redistribution is
+encouraged.
+
+If you appreciate this software and you would like to support future
+development please consider donating:
+http://www.glassechidna.com.au/donate/
+
+Initialising connection...
+Detecting device...
+Claiming interface...
+Setting up interface...
+
+Initialising protocol...
+ERROR: Failed to send handshake!ERROR: Protocol initialisation failed!
+
+Releasing device interface...
+

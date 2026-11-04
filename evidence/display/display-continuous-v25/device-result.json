@@ -1,0 +1,10 @@
+{
+  "boot_sha256": "b6e55159daa9d0df032bb90b9b32fccb6615189804b425ae4a6e06ec577d1304",
+  "association": "owner observation following successful BOOT upload and requested reboot; no device readback",
+  "owner_observation": "Apple logo persisted unchanged for over three minutes after restart",
+  "other_screen_or_reboot_observed": false,
+  "duration": "more than three minutes, owner estimate",
+  "desktop_verified": false,
+  "background_progress_verified": false,
+  "presentation_progress_verified": false
+}

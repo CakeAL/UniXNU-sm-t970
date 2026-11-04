@@ -927,6 +927,7 @@ id = "display"
 status = "planned"
 components = []
 paths = [
+  "evidence/display/display-continuous-v25/**",
   "scripts/symbolicate-ui-registers.py",
   "scripts/build-keystore-registration.py",
   "tests/test_keystore_registration.py",
@@ -983,6 +984,7 @@ procedure = [
   "Collect DRM modes, panel type and brightness limits; read only display-selection tokens from /proc/cmdline and match the selected S6TUUM3 node in the live DT.",
 ]
 findings = [
+  "Host prepared BOOTb6e55159 from observed BOOTbb4d8474, removing only the terminal 125-second runtime report argument. FAT roundtrip passes. After two failed pre-upload attempts the authorized BOOT upload succeeded without readback. Owner observed unchanged Apple logo for over three minutes following reboot, without other screen or reboot; background progress, frame updates and desktop remain unverified. check-platform stops before DT/ADT because the sibling framework HEAD differs from the reviewed pin. See evidence/display/display-continuous-v25.",
   "BOOTbb4d8474 owner observed Apple logo; photo14:40:13 shows swap2/0, transfer2, copies2, retire2. BOOT08b90255 previously panicked on uninitialized vc_progress_lock via first swap console handoff. Guard now matches t970-novc bootstrap. SpringBoard sample reaches LaunchServices database context from Control Center module discovery; sustained desktop pending. See evidence/display/display-novc-v24.",
   "BOOTe44011cb photo03:08:38 links BB wait to QuartzCore CAMetalContextCreate polling IOAcceleratorES, at most 300 sleeps of 100ms; SB waits for main screen info, open6/swap0. T733 48f documents CPU frames through NativeLegacyDisplay. BOOT08b90255 keeps kernel and changes report target to 125s; FAT comparison passes, ADT differs only in random-seed. See evidence/display/ui-cpu-fallback-v23.",
   "BOOT5385b6ce owner photo03:00:42 shows three pending queues drained, MG done134, BB161, SB75->78, display open6/fail0/swap0. No constrained head means Q cap zero is absent data, not a measured cached limit. v22 reuses exact v21 kernel with existing stack mode1 to locate current BB/SB main waits; host image checks pass, hardware stack result pending.",
@@ -1040,10 +1042,13 @@ limits = [
   "Framebuffer physical address, stride, pixel format and UEFI GOP handoff are not verified by the mode list.",
 ]
 next_action = [
-  "Capture BB/SB saved PC/LR and shared-region slide at target120 with the isolated register diagnostic; symbolize against the unchanged21H461 cache before selecting service isolation or graphics changes. KeyStore ready and768MiB are qualified, while frames remain unobserved.",
+  "Compare later runtime display counters and UI stacks with the 125-second sample before attributing the unchanged Apple logo to a stalled process or display. Desktop and sustained presentation remain unverified.",
 ]
 
 evidence = [
+  { kind = "host", reference = "evidence/display/display-continuous-v25/preparation.json", revision = "fb107f0059d2b82e4e01266319268c50455cc5c8", command = "python3.14 evidence/display/display-continuous-v25/prepare.py", result = "BOOTb6e55159 preserves the observed v24 payload inputs and boot boundaries; only the terminal report argument is removed. FAT roundtrip passes; host checks do not establish device execution." },
+  { kind = "device", reference = "evidence/display/display-continuous-v25/upload.json", revision = "fb107f0059d2b82e4e01266319268c50455cc5c8", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/display-continuous-v25/boot-partition.img", result = "Owner authorized BOOT only. After two attempts failed before upload, fresh Download Mode session uploaded BOOTb6e55159 successfully and requested reboot; no device readback." },
+  { kind = "device", reference = "evidence/display/display-continuous-v25/device-result.json", revision = "fb107f0059d2b82e4e01266319268c50455cc5c8", command = "Owner observation after BOOTb6e55159 upload and reboot", result = "Owner reports unchanged Apple logo for more than three minutes after reboot, no other screen or automatic reboot. Background progress and desktop are not established." },
   { kind = "device", reference = "evidence/display/ui-call-v9/runtime120-device-result.json", revision = "1a41d7e019273dda4d3357f08c08b66a39b9f5e8", command = "Owner photo after exact BOOT upload", result = "Target120 confirms BB57 and two successful display opens; no swaps/frames." },
   { kind = "device", reference = "evidence/display/key-state-v10/device-result.json", revision = "1a41d7e019273dda4d3357f08c08b66a39b9f5e8", command = "Owner photo after exact BOOT upload", result = "RAM-only KeyStore stage4/ready1/open1/call1 observed at60; no frame." },
   { kind = "device", reference = "evidence/display/memory768-v11/device-result.json", revision = "1a41d7e019273dda4d3357f08c08b66a39b9f5e8", command = "Owner photo after exact BOOT upload", result = "768MiB request is effective: pages0x2b187 and main1/cpu8 at60; no earlier clients/frames." },
@@ -1268,6 +1273,7 @@ components = [
   "XnuPrelink",
 ]
 paths = [
+  "evidence/display/display-continuous-v25/**",
   "evidence/display/key-state-v10/**",
   "evidence/display/memory768-v11/**",
   "evidence/display/ui-wait-v12/**",

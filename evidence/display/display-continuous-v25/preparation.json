@@ -1,0 +1,23 @@
+{
+  "base_boot_sha256": "bb4d847476d455c0a49d28ffea03492e8e0f2b5fd0f2480ed2eb34dc5604912e",
+  "boot_sha256": "b6e55159daa9d0df032bb90b9b32fccb6615189804b425ae4a6e06ec577d1304",
+  "boot_bytes": 71303168,
+  "removed_arguments": [
+    "t970-runtime-report=125"
+  ],
+  "args": "t970-novc sheng-pmgr=2 t970-ufs-publish=1 -v cpus=8 launchdsuffix=release t970-disable-watchdogd=1 t970-smp-publish-state=1 t970-display-start=1 offline-mobile-graphics-load=1 offline-legacy-register=1 offline-legacy-gop=1 offline-legacy-phase=4 offline-legacy-pm=1 offline-legacy-transfer=1 offline-legacy-validate=1 offline-legacy-cpu-present=1 offline-legacy-retire=1 sheng-vsync=60 t970-runtime-cache-trace=1 panic_on_error_exit=backboardd,SpringBoard t970-ui-spawn-calls=1 offline-key-events=1 sheng-aks=1 t970-ui-wait=1 t970-ui-stack=1 sheng-smp=1 armcpu-self-ipi=1 armcpu-spi-ipi=0",
+  "owned_bytes": 805306368,
+  "cpus_requested": 8,
+  "unchanged_payload_inputs": {
+    "Payloads/kernel.macho": "59252aba52a2fb8d08b998f21c0c9a85b71901dab95fd6e919824ac2b73500b1",
+    "Payloads/kernel.macho.adt": "3e38c4ff0a1847e8e4770011e85c93588d214aaf3564517da4a8d56c8e0a83db",
+    "Payloads/kernel.macho.trustcache": "7416ca4f8377146626bb284e2133c76bee6cb4e3ee0af5d648b186235a7323a7",
+    "Payloads/scratch-data.img": "4591566eccd77f0f9d13a1338ecaf3c73ce86cd04aeea732d91db6b2e100ca3a"
+  },
+  "final_boot_fat_roundtrip": true,
+  "header_fd_dtb_tail_unchanged": true,
+  "terminal_runtime_report": false,
+  "process_exit_panic_retained": true,
+  "uploaded": false,
+  "hardware_result_pending": true
+}

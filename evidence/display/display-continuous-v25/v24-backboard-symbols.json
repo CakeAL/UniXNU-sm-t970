@@ -1,0 +1,82 @@
+{
+  "cache_slide": "0x1ff08000",
+  "cache_uuid": "590d839a82d230f1a17d0cc053420f73",
+  "local_symbols_uuid_matches": true,
+  "live_sample": true,
+  "frames": [
+    {
+      "address": "0x19fffce44",
+      "unslid_va": "0x1800f4e44",
+      "image": "/usr/lib/libobjc.A.dylib",
+      "nearest_local_symbol": "__ZN10objc_class13demangledNameEb",
+      "offset": 60,
+      "nearest_symbol": "__ZN10objc_class13demangledNameEb",
+      "symbol_table": "local",
+      "original_instruction_bytes": "0a0140b9ca03f837"
+    },
+    {
+      "address": "0x1a00146d0",
+      "unslid_va": "0x18010c6d0",
+      "image": "/usr/lib/libobjc.A.dylib",
+      "nearest_local_symbol": "__Z29copyClassNamesForImage_nolockP11header_infoPj",
+      "offset": 120,
+      "nearest_symbol": "__Z29copyClassNamesForImage_nolockP11header_infoPj",
+      "symbol_table": "local",
+      "original_instruction_bytes": "080f17cb000100f9"
+    },
+    {
+      "address": "0x1a00145d8",
+      "unslid_va": "0x18010c5d8",
+      "image": "/usr/lib/libobjc.A.dylib",
+      "offset": 192,
+      "nearest_symbol": "_objc_copyClassNamesForImageHeader",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "f40300aae81a40b9"
+    },
+    {
+      "address": "0x1a6e63fe4",
+      "unslid_va": "0x186f5bfe4",
+      "image": "/System/Library/Frameworks/Foundation.framework/Foundation",
+      "nearest_local_symbol": "-[NSBundle loadAndReturnError:]",
+      "offset": 368,
+      "nearest_symbol": "-[NSBundle loadAndReturnError:]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "fb0300aae00b00b4"
+    },
+    {
+      "address": "0x100812b44",
+      "unslid_va": "0xe090ab44",
+      "image": null
+    },
+    {
+      "address": "0x1af4becc0",
+      "unslid_va": "0x18f5b6cc0",
+      "image": "/usr/lib/system/libdispatch.dylib",
+      "nearest_local_symbol": "__dispatch_client_callout",
+      "offset": 16,
+      "nearest_symbol": "__dispatch_client_callout",
+      "symbol_table": "local",
+      "original_instruction_bytes": "fd7b41a9f44fc2a8"
+    },
+    {
+      "address": "0x1af4900e4",
+      "unslid_va": "0x18f5880e4",
+      "image": "/usr/lib/system/libdispatch.dylib",
+      "nearest_local_symbol": "__dispatch_once_callout",
+      "offset": 28,
+      "nearest_symbol": "__dispatch_once_callout",
+      "symbol_table": "local",
+      "original_instruction_bytes": "68d03bd5081940b9"
+    },
+    {
+      "address": "0x1007c677c",
+      "unslid_va": "0xe08be77c",
+      "image": null
+    },
+    {
+      "address": "0x1007c7050",
+      "unslid_va": "0xe08bf050",
+      "image": null
+    }
+  ]
+}
