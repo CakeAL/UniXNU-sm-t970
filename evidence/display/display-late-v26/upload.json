@@ -1,0 +1,14 @@
+{
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/data-bringup/display-late-v26/boot-partition.img"
+  ],
+  "boot_sha256": "e82eec17eef5292eccdd746ba53b733d8996dfa8cb511e875136acd57baa49bc",
+  "exit_code": 0,
+  "reboot_requested": true,
+  "readback_verified": false,
+  "hardware_result_pending": false,
+  "device_result": "device-result.json"
+}

@@ -1,0 +1,38 @@
+{
+  "boot_sha256": "e82eec17eef5292eccdd746ba53b733d8996dfa8cb511e875136acd57baa49bc",
+  "photo": "screen-target300.jpg",
+  "photo_sha256": "408224b98364f5c88044787630782c933c09a52e12e32191ec580a4e228fcef8",
+  "association": "owner photo after successful BOOT upload; no device hash readback",
+  "runtime": {
+    "target": 300,
+    "main": 1,
+    "processes": 122,
+    "watchdogd": 0,
+    "SpringBoard": 27,
+    "backboardd": 57,
+    "runningboardd": 26,
+    "data": 0,
+    "watchdog_policy": 0,
+    "policy_stage": 4,
+    "verified_blocks": 2719538,
+    "cpu": 8,
+    "secondary": 7
+  },
+  "display": {
+    "stage": 8,
+    "mapped": 1,
+    "published": 1,
+    "client_enter": 7,
+    "client_open": 7,
+    "client_fail": 0,
+    "swap_ok": 7,
+    "swap_bad": 0,
+    "transfers": 7,
+    "copies": 7,
+    "retired": 7,
+    "vsync": 0
+  },
+  "shared_cache_slide": "0x81f4000",
+  "interpretation": "Independent boot has more copies than the 125-second boot; this is not a same-boot progression or proof of continuous refresh. SpringBoard sampled waiting for unfair lock under the same LaunchServices and Control Center call chain seen at target125; one sample cannot identify lock owner or establish permanent deadlock. Backboardd first sampled thread in CFRunLoop Mach message receive. No desktop verified.",
+  "symbols": "symbols.json"
+}

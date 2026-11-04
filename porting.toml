@@ -927,6 +927,7 @@ id = "display"
 status = "planned"
 components = []
 paths = [
+  "evidence/display/display-late-v26/**",
   "evidence/display/display-continuous-v25/**",
   "scripts/symbolicate-ui-registers.py",
   "scripts/build-keystore-registration.py",
@@ -984,6 +985,7 @@ procedure = [
   "Collect DRM modes, panel type and brightness limits; read only display-selection tokens from /proc/cmdline and match the selected S6TUUM3 node in the live DT.",
 ]
 findings = [
+  "BOOTe82eec17 target300 owner photo shows main1, CPU8, open7, swap7/0, copy7 and retire7; upload was successful but not read back. SB waits on an unfair lock under the same LaunchServices/Control Center caller chain sampled in the independent target125 boot. BB first thread is in CFRunLoop Mach receive. These two snapshots neither prove continuous refresh nor establish a permanent deadlock. Owner requests shorter future waits. See evidence/display/display-late-v26.",
   "Host prepared BOOTb6e55159 from observed BOOTbb4d8474, removing only the terminal 125-second runtime report argument. FAT roundtrip passes. After two failed pre-upload attempts the authorized BOOT upload succeeded without readback. Owner observed unchanged Apple logo for over three minutes following reboot, without other screen or reboot; background progress, frame updates and desktop remain unverified. check-platform stops before DT/ADT because the sibling framework HEAD differs from the reviewed pin. See evidence/display/display-continuous-v25.",
   "BOOTbb4d8474 owner observed Apple logo; photo14:40:13 shows swap2/0, transfer2, copies2, retire2. BOOT08b90255 previously panicked on uninitialized vc_progress_lock via first swap console handoff. Guard now matches t970-novc bootstrap. SpringBoard sample reaches LaunchServices database context from Control Center module discovery; sustained desktop pending. See evidence/display/display-novc-v24.",
   "BOOTe44011cb photo03:08:38 links BB wait to QuartzCore CAMetalContextCreate polling IOAcceleratorES, at most 300 sleeps of 100ms; SB waits for main screen info, open6/swap0. T733 48f documents CPU frames through NativeLegacyDisplay. BOOT08b90255 keeps kernel and changes report target to 125s; FAT comparison passes, ADT differs only in random-seed. See evidence/display/ui-cpu-fallback-v23.",
@@ -1042,10 +1044,13 @@ limits = [
   "Framebuffer physical address, stride, pixel format and UEFI GOP handoff are not verified by the mode list.",
 ]
 next_action = [
-  "Compare later runtime display counters and UI stacks with the 125-second sample before attributing the unchanged Apple logo to a stalled process or display. Desktop and sustained presentation remain unverified.",
+  "Use shorter targeted or batched diagnostics to inspect SpringBoard's other threads and the LaunchServices dependency. Identify lock ownership before attributing the unchanged Apple logo to a permanent deadlock. Desktop and sustained presentation remain unverified.",
 ]
 
 evidence = [
+  { kind = "host", reference = "evidence/display/display-late-v26/preparation.json", revision = "99031fd202b825242724fbee88e5e4333b0e4a31", command = "python3.14 evidence/display/display-late-v26/prepare.py", result = "Terminal BOOTe82eec17 changes only report interval125 to300 seconds from BOOTbb4d8474; final FAT roundtrip and payload inputs pass. Host checks do not establish device execution." },
+  { kind = "device", reference = "evidence/display/display-late-v26/upload.json", revision = "99031fd202b825242724fbee88e5e4333b0e4a31", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/display-late-v26/boot-partition.img", result = "Owner authorized BOOT-only upload; Heimdall reported success and requested reboot. Device readback not performed." },
+  { kind = "device", reference = "evidence/display/display-late-v26/device-result.json", revision = "99031fd202b825242724fbee88e5e4333b0e4a31", command = "Owner photo after BOOTe82eec17 upload and reboot", result = "Target300 shows 7 successful swaps, copies and retirements; SB waits under LaunchServices/Control Center stack also seen at target125. No desktop, lock owner, continuous refresh or permanent deadlock established." },
   { kind = "host", reference = "evidence/display/display-continuous-v25/preparation.json", revision = "fb107f0059d2b82e4e01266319268c50455cc5c8", command = "python3.14 evidence/display/display-continuous-v25/prepare.py", result = "BOOTb6e55159 preserves the observed v24 payload inputs and boot boundaries; only the terminal report argument is removed. FAT roundtrip passes; host checks do not establish device execution." },
   { kind = "device", reference = "evidence/display/display-continuous-v25/upload.json", revision = "fb107f0059d2b82e4e01266319268c50455cc5c8", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/display-continuous-v25/boot-partition.img", result = "Owner authorized BOOT only. After two attempts failed before upload, fresh Download Mode session uploaded BOOTb6e55159 successfully and requested reboot; no device readback." },
   { kind = "device", reference = "evidence/display/display-continuous-v25/device-result.json", revision = "fb107f0059d2b82e4e01266319268c50455cc5c8", command = "Owner observation after BOOTb6e55159 upload and reboot", result = "Owner reports unchanged Apple logo for more than three minutes after reboot, no other screen or automatic reboot. Background progress and desktop are not established." },

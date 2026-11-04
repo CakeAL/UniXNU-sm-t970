@@ -5,6 +5,8 @@
 
 ## 最新：首帧后的持续运行对照（2026-11-04）
 
+诊断 BOOT `e82eec17…` 基于 `bb4d8474…`，只把终止报告目标从 125 秒延至 300 秒。机主授权后仅 BOOT 上传成功、未设备读回；照片显示 main1、CPU8、open7、swap/copy/retire 各7。SB 首线程等 unfair lock，上层 LaunchServices/Control Center 栈与 125 秒照片相同；BB 首线程在 CFRunLoop Mach 接收。两次为独立启动，不能证明持续刷新或永久死锁。机主要求后续缩短等待，详见 [300 秒对照](../evidence/display/display-late-v26/README.md)。
+
 由实机观察到 Apple logo 的 BOOT `bb4d8474…` 制备 `b6e55159…`：仅移除 125 秒主动 panic 报告参数，其余启动参数和内核、ADT、trust cache、Data 种子、固件、DTB 均与原镜像一致。仍保留 UI 进程异常退出 panic。主机 FAT 回读与镜像边界检查通过；机主授权后首次两次会话在上传前失败，重新进入 Download Mode 后第三次仅 BOOT 上传成功、Heimdall exit 0 并请求重启，未设备读回。机主反馈重启后超过三分钟 Apple logo 未变化、无其他画面或自动重启；后台进展与桌面仍未知。`check-platform.py` 因 UniXNU HEAD 不等于历史审阅版本而在 DT/ADT 检查前停止。详见 [对照记录](../evidence/display/display-continuous-v25/README.md)。
 
 ## 最新：Apple logo 与首帧完成（2026-11-04）
