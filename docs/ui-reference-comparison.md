@@ -1,5 +1,17 @@
 # UI启动对照（2026-11-03）
 
+## 2026-11-04：Apple logo、LaunchServices 与数据卷
+
+- [Bergamota / Poco F1 的固定版本记录](https://github.com/ry-diffusion/Bergamota/blob/37a7a7a917fc09945ed2f7d1ae68b84d4525b4cb/NOTES.md)：iOS 16 曾在 Apple logo 停留约 15 分钟；SpringBoard 主线程的 Control Center → LaunchServices → unfair lock 栈与 T970 的 target300 照片高度相似。该项目继续采样 SpringBoard 和 lsd，并结合统一日志发现 lsd 建库时反复等待 MobileGestalt 的 Wi-Fi 地址查询；该设备加入独立构造的 ADT 地址后报告到达锁屏。这是 iOS 16 / Poco F1 的实机结论，不是 T970 的实机根因。
+- T970 target125 与 target300 的 SpringBoard 上层栈相同，target300 的 PC/LR 位于 unfair-lock 等待；此时没有 lsd 栈和锁拥有者信息。两次是独立启动，不能单独证明永久死锁。
+- 对当前 21H461 原始缓存及 `bb4d8474` 的实际打包 ADT 做只读检查：libMobileGestalt 映像中存在 `mac-address-wifi0`、`mac-address-bluetooth0`、`marconi-wifi` 和 `IONetworkController` 字符串；该 ADT 两种地址属性均缺席。缓存映像归属、UUID、ADT 哈希和限制见 `evidence/display/springboard-mode7-v27/reference-check.json`。字符串存在不证明对应代码在本次运行中被调用，也不确认属性格式或返回语义；不把另一设备的地址当作本板硬件值。
+- [EVB10 固定记录](https://github.com/Ken-u/UniXNU-evb10/blob/e03f9880ae8fc420fa337366a444c8888b0e3fdc/porting.toml)报告 iPadOS 17 的 256 MiB Data 卷因 ENOSPC 使 SpringBoard 停滞，512 MiB 到达锁屏、最终配置 2 GiB。T970 使用 512 MiB **逻辑** RAM Data 种子，每次重启丢失修改；当前没有运行时 ENOSPC 或空闲空间测量，不能把此参考当作本板证据。它与 768 MiB EFI 内存请求是不同资源。
+- [Sirius 设备记录](https://unixnu.com/devices/sirius-dddqmmx)报告 Setup 启动约 295 秒；较早采样可能只看到中间阶段。T970 新的 90 秒批量栈若尚未达到 LaunchServices，结果不能排除稍后出现该等待。
+
+下一步针对 SpringBoard 与 lsd 各采最多四线程、每线程最多八层栈，目标90秒；若报告出现目标进程则检查 reseed、XPC 及锁拥有者线索，再判断是否值得设计只改 ADT 地址的受控对照。该方案不对真实 Wi-Fi 或蓝牙功能作声明，且照片空间或实时采样可能截断。持续 Data 的 UFS 写入仍未授权或实现。
+
+实机 `aeb13ffc` 的 90 秒样本显示 lsd7线程、采前4，其中一条通过 XPC 进入等待数据库 seeding 的函数，另两条在安装记录恢复及 dispatch group 等待；SpringBoard 仍在等待 BackBoard 主屏幕信息、尚无 swap。采样没有覆盖 lsd5–7，不能认定数据库由 Wi-Fi 地址阻塞。照片和符号见 `evidence/display/springboard-mode7-v27/`。
+
 本轮重新通过GitHub连接读取固定提交的实际代码，范围不止README。
 具体提交、文件与blob见`evidence/display/ui-call-v9/reference-sources.json`。
 

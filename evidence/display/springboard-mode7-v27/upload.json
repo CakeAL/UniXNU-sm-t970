@@ -1,0 +1,14 @@
+{
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/data-bringup/springboard-lsd-mode7-memory768-v1/boot-partition.img"
+  ],
+  "boot_sha256": "aeb13ffcb50b8f2d22819e2daf7de6a7b22b07a6815cb95aaac95652322ca5c8",
+  "exit_code": 0,
+  "reboot_requested": true,
+  "readback_verified": false,
+  "hardware_result_pending": false,
+  "device_result": "device-result.json"
+}

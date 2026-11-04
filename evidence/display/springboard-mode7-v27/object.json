@@ -1,0 +1,14 @@
+{
+  "source_sha256": "b650b7616643a2ca31cea9a1157bdc0554f2335c3bd986b32624c8ca3764f2fc",
+  "object_sha256": "a8a8b9d210481b16653b831c2e1766f1695a97b937093d8ee4882c1ce8e99a0f",
+  "compile_recipe_sha256": "2fe39a2b1a5d3f4cc66f07ac3cbae843f78c38956942ef87a8e5de0b3a0b45e0",
+  "mach_private_recipe": true,
+  "reads_user_memory": "opt-in t970-ui-stack=1/2/3/4/5/7, isolated worker",
+  "suspends_tasks": false,
+  "stack_frames_per_selected_thread": "mode1/7:8; mode2/3/4/5:16",
+  "stack_selection": "mode1: first UI threads; mode2: other BB threads; mode3: Gestalt helper first2; mode4: helper threads5-8; mode5: all UI/helper first8; mode6: queue-only two samples 500ms apart, no user reads; mode7: SpringBoard and lsd first4 each",
+  "report_wait_deadlines": 40,
+  "report_wait_interval_ms": 100,
+  "thread_limit_per_process": 8,
+  "runtime_verified": false
+}

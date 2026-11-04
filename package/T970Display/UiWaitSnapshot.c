@@ -44,12 +44,12 @@ static int ui_user_address(uint64_t address,unsigned size) {
  return address>=4096 && address<(UINT64_C(1)<<39) && size<=(UINT64_C(1)<<39)-address;
 }
 static int ui_stack_selected(const char *name,unsigned index) {
- return readUserStacks==5 ? 1 : readUserStacks==1 ? index==1 : readUserStacks==4 ? 1 : readUserStacks==3 ? index<=2 : readUserStacks==2 && name[0]=='b' && index>1;
+ return readUserStacks==5 || readUserStacks==7 ? 1 : readUserStacks==1 ? index==1 : readUserStacks==4 ? 1 : readUserStacks==3 ? index<=2 : readUserStacks==2 && name[0]=='b' && index>1;
 }
 static void ui_stack_read(struct native_t970_ui_wait_row *row,vm_map_t map) {
  uint64_t fp=row->fp;
  if(!map){row->frame_error=4;return;}
- for(unsigned i=0;i<(readUserStacks==1?8:T970_UI_STACK_FRAMES) && fp;++i) {
+ for(unsigned i=0;i<((readUserStacks==1 || readUserStacks==7)?8:T970_UI_STACK_FRAMES) && fp;++i) {
   uint64_t pair[2]={0};
   if(!ui_user_address(fp,sizeof(pair)) || (fp&15)){row->frame_error=2;break;}
   if(vm_map_read_user(map,fp,pair,sizeof(pair))!=KERN_SUCCESS){row->frame_error=1;break;}
@@ -82,7 +82,9 @@ static int native_t970_ui_wait_collect(proc_t p,void *context)
  struct native_t970_ui_wait_buffer *out=context;
  char name[17]={0};int pid=proc_pid(p);proc_name(pid,name,sizeof(name));name[sizeof(name)-1]=0;
  unsigned gestalt=!strncmp(name,"MobileGestalt",13) || !strncmp(name,"mobilegestalt",13);
- if(readUserStacks>=5) {
+ if(readUserStacks==7) {
+  if(strcmp(name,"SpringBoard") && strcmp(name,"lsd"))return PROC_RETURNED;
+ } else if(readUserStacks==5 || readUserStacks==6) {
   if(!gestalt && strcmp(name,"SpringBoard") && strcmp(name,"backboardd"))return PROC_RETURNED;
  } else if(readUserStacks==3 || readUserStacks==4) {
   if(strncmp(name,"MobileGestalt",13) && strncmp(name,"mobilegestalt",13))return PROC_RETURNED;
@@ -209,7 +211,7 @@ static void ui_stack_worker(void *parameter,wait_result_t result) {
 const char *native_t970_ui_wait_text(void)
 {
  unsigned enabled=0;
- unsigned stackMode=PE_parse_boot_argn("t970-ui-stack",&enabled,sizeof(enabled)) && (enabled>=1 && enabled<=6);
+ unsigned stackMode=PE_parse_boot_argn("t970-ui-stack",&enabled,sizeof(enabled)) && (enabled>=1 && enabled<=7);
  if(!stackMode){readUserStacks=0;ui_collect();return capture.text;}
  static char pending[128];
  if(!__atomic_exchange_n(&captureStarted,1,__ATOMIC_ACQ_REL)) {

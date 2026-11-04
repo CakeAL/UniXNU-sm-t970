@@ -1,0 +1,49 @@
+{
+  "boot_sha256": "aeb13ffcb50b8f2d22819e2daf7de6a7b22b07a6815cb95aaac95652322ca5c8",
+  "photo": "screen-target90.jpg",
+  "photo_sha256": "79d91cb3f66e0bfacb0576a54fdce029306910bbf04484de4c03a996810e2149",
+  "association": "owner photo following successful upload, no device hash readback",
+  "runtime": {
+    "target": 90,
+    "main": 1,
+    "processes": 111,
+    "cpu": 8,
+    "secondary": 7,
+    "sb_pid": 27,
+    "bb_pid": 57,
+    "lsd_pid": 97,
+    "verified_blocks": 1029299
+  },
+  "display": {
+    "open": 5,
+    "failed": 0,
+    "swap_ok": 0,
+    "copies": 0,
+    "retired": 0
+  },
+  "sample": {
+    "mode": 7,
+    "lsd_threads": 7,
+    "lsd_visited": 4,
+    "lsd_busy": 0,
+    "springboard_threads": 4,
+    "springboard_visited": 4,
+    "springboard_busy": 0,
+    "processes": 2,
+    "clipped": 0,
+    "cache_slide": "0x66cc000"
+  },
+  "observations": [
+    "lsd first thread waits on a dispatch queue while performing install journal recovery",
+    "lsd second thread waits on dispatch group while restoring inactive installs",
+    "lsd third thread waits for database seeding from an exported XPC call",
+    "SpringBoard first thread waits for backboard display information, not the later LaunchServices chain"
+  ],
+  "limitations": [
+    "live threads are not an atomic snapshot",
+    "lsd threads 5-7 were not sampled",
+    "no direct evidence identifies why database seeding waits",
+    "90 seconds is before first frame in this run"
+  ],
+  "symbols": "symbols.json"
+}

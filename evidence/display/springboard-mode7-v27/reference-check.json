@@ -1,0 +1,41 @@
+{
+  "cache_uuid": "590d839a82d230f1a17d0cc053420f73",
+  "subcache": "dyld_shared_cache_arm64.11",
+  "adt_sha256": "3e38c4ff0a1847e8e4770011e85c93588d214aaf3564517da4a8d56c8e0a83db",
+  "image": "/usr/lib/libMobileGestalt.dylib",
+  "strings": {
+    "mac-address-wifi0": [
+      {
+        "unslid_va": "0x1a0277a97",
+        "subcache_offset": "0x593a97"
+      }
+    ],
+    "mac-address-bluetooth0": [
+      {
+        "unslid_va": "0x1a0274e83",
+        "subcache_offset": "0x590e83"
+      }
+    ],
+    "IONetworkController": [
+      {
+        "unslid_va": "0x1a0278ece",
+        "subcache_offset": "0x594ece"
+      }
+    ],
+    "marconi-wifi": [
+      {
+        "unslid_va": "0x1a0275724",
+        "subcache_offset": "0x591724"
+      },
+      {
+        "unslid_va": "0x1a0277aae",
+        "subcache_offset": "0x593aae"
+      }
+    ]
+  },
+  "adt_property_presence": {
+    "mac-address-wifi0": [],
+    "mac-address-bluetooth0": []
+  },
+  "limitation": "String presence is not an executed call, cross-reference, or proof of the device wait cause."
+}
