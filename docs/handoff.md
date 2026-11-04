@@ -5,6 +5,8 @@
 
 ## 最新：首帧后的持续运行对照（2026-11-04）
 
+BOOT `a30af66e…` 已上传并请求重启。沿用 v35 内核和150秒报告，只切换到 mode5 扩大采样。机主照片在 BB 后截断，SB 未显示。BB 渲染线程在 SwapEnd，hold1 的实际写入线程仍待核对。见 [线程对照](../evidence/display/ui-peer-stacks-v36/README.md)。
+
 BOOT `0c99c6d4…` 已刷入并请求重启。v35 先关闭新写屏准入，再等待当前 CPU 写入结束，并报告源帧非黑像素范围。150秒实机 hold0，页可拍摄，显示发布到首帧间隔120.599秒。源非黑区域366×176，BB/SB重复采到 v34 的两条锁等待。见 [CPU 写屏诊断](../evidence/display/scanout-drain-v35/README.md)。
 
 BOOT `c9c49879…` 已刷入并请求重启，保留150秒报告。终止诊断尝试在 Legacy work loop 内取得 scanout，防止后续 CPU 帧覆盖，同时显示发布和首次复制完成的毫秒时间。实机 hold1，页停留一秒多。显示发布到首次 CPU 复制间隔124.690秒，完成5次帧退役。BB 已在 BackBoard bundle 的显示滤镜回调内，SB 仍采在 LaunchServices 上下文锁。见 [诊断页保留](../evidence/display/display-hold-v34/README.md)。

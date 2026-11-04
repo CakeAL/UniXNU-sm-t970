@@ -1,0 +1,127 @@
+{
+  "cache_uuid": "590d839a82d230f1a17d0cc053420f73",
+  "backboardd": {
+    "sampled_return": "0x18969af3c",
+    "lock_call": "0x18969af38",
+    "preceding_first_lock": "0x18969af24",
+    "second_mutex_offset": "0x18",
+    "code": {
+      "sha256": "26bebf560a078b9412d88de8146276568b86ba9439ffd1c1c9788f7e77df6899",
+      "instructions": [
+        [
+          "0x18969af10",
+          "130440f9",
+          "ldr",
+          "x19, [x0, #8]"
+        ],
+        [
+          "0x18969af14",
+          "730500b4",
+          "cbz",
+          "x19, #0x18969afc0"
+        ],
+        [
+          "0x18969af18",
+          "f40302aa",
+          "mov",
+          "x20, x2"
+        ],
+        [
+          "0x18969af1c",
+          "f50300aa",
+          "mov",
+          "x21, x0"
+        ],
+        [
+          "0x18969af20",
+          "e00313aa",
+          "mov",
+          "x0, x19"
+        ],
+        [
+          "0x18969af24",
+          "9ca30194",
+          "bl",
+          "#0x189703d94"
+        ],
+        [
+          "0x18969af28",
+          "a80640f9",
+          "ldr",
+          "x8, [x21, #8]"
+        ],
+        [
+          "0x18969af2c",
+          "152140f9",
+          "ldr",
+          "x21, [x8, #0x40]"
+        ],
+        [
+          "0x18969af30",
+          "b6620091",
+          "add",
+          "x22, x21, #0x18"
+        ],
+        [
+          "0x18969af34",
+          "e00316aa",
+          "mov",
+          "x0, x22"
+        ],
+        [
+          "0x18969af38",
+          "97a30194",
+          "bl",
+          "#0x189703d94"
+        ]
+      ]
+    }
+  },
+  "springboard": {
+    "sampled_return": "0x187c8d228",
+    "lock_call": "0x187c8d224",
+    "lock_unslid_address": "0x1f4884878",
+    "code": {
+      "sha256": "dd4d046323aaef06d1e1d1473b450bd938314888f28859a114256485bd7713e8",
+      "instructions": [
+        [
+          "0x187c8d218",
+          "a05f36f0",
+          "adrp",
+          "x0, #0x1f4884000"
+        ],
+        [
+          "0x187c8d21c",
+          "00e02191",
+          "add",
+          "x0, x0, #0x878"
+        ],
+        [
+          "0x187c8d220",
+          "01008052",
+          "mov",
+          "w1, #0"
+        ],
+        [
+          "0x187c8d224",
+          "3b967795",
+          "bl",
+          "#0x18da72b10"
+        ],
+        [
+          "0x187c8d228",
+          "a05f36f0",
+          "adrp",
+          "x0, #0x1f4884000"
+        ],
+        [
+          "0x187c8d22c",
+          "00e02191",
+          "add",
+          "x0, x0, #0x878"
+        ]
+      ]
+    }
+  },
+  "limitation": "Both independent samples resolve to identical unslid return sites. Static instructions identify the awaited lock locations, not the live owner, duration, or a cycle."
+}

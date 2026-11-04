@@ -1,0 +1,13 @@
+{
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/data-bringup/ui-peer-stacks-v36/boot-partition.img"
+  ],
+  "boot_sha256": "a30af66e477130dc9b7d760d577ddd9c34fe87012f2163c28d78414f8c660aab",
+  "exit_code": 0,
+  "reboot_requested": true,
+  "readback_verified": false,
+  "hardware_result_pending": true
+}

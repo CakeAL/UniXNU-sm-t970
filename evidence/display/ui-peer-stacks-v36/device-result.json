@@ -1,0 +1,47 @@
+{
+  "boot_sha256": "a30af66e477130dc9b7d760d577ddd9c34fe87012f2163c28d78414f8c660aab",
+  "photo": "screen-target150.jpg",
+  "photo_sha256": "2545bcadf2d59eabe3fee619f334cbe00db335e1fbcecb20a5a93527e2a3b24f",
+  "association": "Owner photo after successful BOOT upload, identified by target150/stacks5. No device hash readback.",
+  "display": {
+    "hold": 1,
+    "published_ms": 19431,
+    "first_cpu_copy_ms": 145291,
+    "publish_to_first_copy_ms": 125860,
+    "open": 7,
+    "swap_ok": 5,
+    "transfers": 4,
+    "copies": 4,
+    "retired": 4,
+    "first_lit_source_extent": [
+      366,
+      176
+    ]
+  },
+  "runtime": {
+    "target_seconds": 150,
+    "main": 1,
+    "cpu": 8,
+    "processes": 113
+  },
+  "sample": {
+    "cache_slide": "0x7a40000",
+    "backboardd_total": 20,
+    "backboardd_visited": 8,
+    "visible_processes": [
+      "MobileGestaltHelper",
+      "backboardd"
+    ],
+    "springboard_visible": false,
+    "end_marker_visible": false
+  },
+  "observations": [
+    "BackBoard b3 ID 0x2ce has QuartzCore IOMFB server display_timer_callback -> render_for_time -> IOMFB finish_update -> kern_SwapEnd -> IOKit call.",
+    "BackBoard b4 ID 0x581 is in dispatch_group_wait. BackBoard b1 is in CFRunLoop.",
+    "Hold1 means a tracked scanout reservation did not drain during the bounded wait. The v36 report does not identify its holder."
+  ],
+  "limitations": [
+    "Screen clipping prevents conclusions about the unshown SpringBoard and end marker.",
+    "Samples preceded the drain result and are not one frozen snapshot. No causal association between b3 and hold1 is established."
+  ]
+}

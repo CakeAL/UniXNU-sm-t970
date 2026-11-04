@@ -937,6 +937,7 @@ id = "display"
 status = "planned"
 components = []
 paths = [
+  "evidence/display/ui-peer-stacks-v36/**",
   "evidence/display/scanout-drain-v35/**",
   "tests/test_display_scanout_hold.py",
   "evidence/display/display-hold-v34/**",
@@ -1074,10 +1075,13 @@ limits = [
   "Framebuffer physical address, stride, pixel format and UEFI GOP handoff are not verified by the mode list.",
 ]
 next_action = [
-  "V31 confirmed spare RAM Data capacity at target125. V35 reports hold0 and reproduces the v34 BB QuartzCore mutex and SB LaunchServices context waits. Use a wider same-kernel thread sample around target150 to identify concurrent queue activity. Compare source extent with a straight-on photo only if both show the same frame.",
+  "V31 confirmed spare RAM Data capacity at target125. V35 reports hold0 and reproduces the v34 BB QuartzCore mutex and SB LaunchServices context waits. V36 shows SwapEnd and dispatch group wait in BackBoard, but screen clips before SpringBoard. Use a compact two-process sample and report the scanout writer thread ID. Compare source extent with a straight-on photo only if both show the same frame.",
 ]
 
 evidence = [
+  { kind = "host", reference = "evidence/display/ui-peer-stacks-v36/preparation.json", revision = "6a618273f63cb30ff8aad462b2086efb66164526", command = "python3.14 evidence/display/ui-peer-stacks-v36/prepare.py", result = "BOOTa30af66e changes only the v35 stack mode to 5. Final FAT confirms the same kernel, ADT, trust cache and Data seed." },
+  { kind = "device", reference = "evidence/display/ui-peer-stacks-v36/device-result.json", revision = "6a618273f63cb30ff8aad462b2086efb66164526", command = "Owner photo after BOOTa30af66e upload, target150 mode5", result = "Display output clips before SpringBoard. BackBoard render thread is sampled in IOMFB SwapEnd, and hold1 is reported separately. The tracked writer ID is unavailable." },
+  { kind = "device", reference = "evidence/display/ui-peer-stacks-v36/upload.json", revision = "6a618273f63cb30ff8aad462b2086efb66164526", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/ui-peer-stacks-v36/boot-partition.img", result = "BOOT-only upload exit0 and reboot request. Device readback and target150 screen result pending." },
   { kind = "host", reference = "evidence/display/scanout-drain-v35/preparation.json", revision = "836ecae2682b3c36b47f7f27d3126cea370987eb", command = "python3.14 evidence/display/scanout-drain-v35/prepare.py", result = "BOOT0c99c6d4 denies new CPU writes and samples the first source-frame lit bounds. Prelink and final FAT checks passed against the unchanged v34 configuration." },
   { kind = "device", reference = "evidence/display/scanout-drain-v35/device-result.json", revision = "836ecae2682b3c36b47f7f27d3126cea370987eb", command = "Owner photo after BOOT0c99c6d4 upload, target150", result = "Hold0, three frame retirements, 120599 ms from display publication to first CPU copy, and source lit extent 366x176. BB and SB wait chains repeat v34. Desktop unverified." },
   { kind = "device", reference = "evidence/display/scanout-drain-v35/upload.json", revision = "836ecae2682b3c36b47f7f27d3126cea370987eb", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/scanout-drain-v35/boot-partition.img", result = "BOOT-only upload exit0 and reboot request. Readback and v35 screen result pending." },
