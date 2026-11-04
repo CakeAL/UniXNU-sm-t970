@@ -7,5 +7,6 @@
   "only_argument_change": "runtime target90 -> 125",
   "independent_payload_check": true,
   "final_fat_roundtrip": true,
-  "hardware_result_pending": true
+  "hardware_result_pending": false,
+  "device_result": "device-result.json"
 }

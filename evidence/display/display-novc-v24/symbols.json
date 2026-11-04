@@ -1,0 +1,96 @@
+{
+  "cache_slide": "0x1ff08000",
+  "cache_uuid": "590d839a82d230f1a17d0cc053420f73",
+  "local_symbols_uuid_matches": true,
+  "live_sample": true,
+  "frames": [
+    {
+      "address": "0x1eb688b58",
+      "unslid_va": "0x1cb780b58",
+      "image": "/usr/lib/system/libsystem_kernel.dylib",
+      "nearest_symbol": "_mach_msg2_trap",
+      "symbol_table": "exported",
+      "offset": 8,
+      "original_instruction_bytes": "c0035fd6f0058092"
+    },
+    {
+      "address": "0x1a7b95228",
+      "unslid_va": "0x187c8d228",
+      "image": "/System/Library/Frameworks/CoreServices.framework/CoreServices",
+      "nearest_local_symbol": "__ZL20_LSContextInitCommonP9LSContextP17_LSDServiceDomainmPU15__autoreleasingP7NSError",
+      "offset": 760,
+      "nearest_symbol": "__ZL20_LSContextInitCommonP9LSContextP17_LSDServiceDomainmPU15__autoreleasingP7NSError",
+      "symbol_table": "local",
+      "original_instruction_bytes": "a05f36f000e02191"
+    },
+    {
+      "address": "0x1a7b94eb8",
+      "unslid_va": "0x187c8ceb8",
+      "image": "/System/Library/Frameworks/CoreServices.framework/CoreServices",
+      "nearest_local_symbol": "__ZN14LaunchServices8Database7Context4_getEP17_LSDServiceDomainm",
+      "offset": 108,
+      "nearest_symbol": "__ZN14LaunchServices8Database7Context4_getEP17_LSDServiceDomainm",
+      "symbol_table": "local",
+      "original_instruction_bytes": "fa0300aaf90740f9"
+    },
+    {
+      "address": "0x1a7b94ac8",
+      "unslid_va": "0x187c8cac8",
+      "image": "/System/Library/Frameworks/CoreServices.framework/CoreServices",
+      "nearest_local_symbol": "-[LSApplicationRecord _initWithNode:bundleIdentifier:placeholderBehavior:systemPlaceholder:itemID:forceInBundleContainer:context:error:]",
+      "offset": 276,
+      "nearest_symbol": "-[LSApplicationRecord _initWithNode:bundleIdentifier:placeholderBehavior:systemPlaceholder:itemID:forceInBundleContainer:context:error:]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "fa0300aabc0f40f9"
+    },
+    {
+      "address": "0x1a7bb7d10",
+      "unslid_va": "0x187cafd10",
+      "image": "/System/Library/Frameworks/CoreServices.framework/CoreServices",
+      "nearest_local_symbol": "-[LSApplicationRecord initWithBundleIdentifier:fetchingPlaceholder:error:]",
+      "offset": 48,
+      "nearest_symbol": "-[LSApplicationRecord initWithBundleIdentifier:fetchingPlaceholder:error:]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "fd7b41a9ff830091"
+    },
+    {
+      "address": "0x220c91ce0",
+      "unslid_va": "0x200d89ce0",
+      "image": "/System/Library/PrivateFrameworks/ControlCenterServices.framework/ControlCenterServices",
+      "nearest_local_symbol": "___81-[CCSModuleRepository _queue_filterModuleMetadataByAssociatedBundleAvailability:]_block_invoke",
+      "offset": 84,
+      "nearest_symbol": "___81-[CCSModuleRepository _queue_filterModuleMetadataByAssociatedBundleAvailability:]_block_invoke",
+      "symbol_table": "local",
+      "original_instruction_bytes": "f50300aae80740f9"
+    },
+    {
+      "address": "0x1af6100e8",
+      "unslid_va": "0x18f7080e8",
+      "image": "/System/Library/PrivateFrameworks/BaseBoard.framework/BaseBoard",
+      "offset": 216,
+      "nearest_symbol": "_BSCollectionFilter",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "80000034e00315aa"
+    },
+    {
+      "address": "0x220c916b8",
+      "unslid_va": "0x200d896b8",
+      "image": "/System/Library/PrivateFrameworks/ControlCenterServices.framework/ControlCenterServices",
+      "nearest_local_symbol": "-[CCSModuleRepository _queue_filterModuleMetadataByAssociatedBundleAvailability:]",
+      "offset": 48,
+      "nearest_symbol": "-[CCSModuleRepository _queue_filterModuleMetadataByAssociatedBundleAvailability:]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "d2d69195f30300aa"
+    },
+    {
+      "address": "0x220c915b0",
+      "unslid_va": "0x200d895b0",
+      "image": "/System/Library/PrivateFrameworks/ControlCenterServices.framework/ControlCenterServices",
+      "nearest_local_symbol": "-[CCSModuleRepository _queue_updateAvailableModuleMetadataForAllModuleMetadata:]",
+      "offset": 52,
+      "nearest_symbol": "-[CCSModuleRepository _queue_updateAvailableModuleMetadataForAllModuleMetadata:]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "14d79195f50300aa"
+    }
+  ]
+}

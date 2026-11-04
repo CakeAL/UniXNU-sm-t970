@@ -1,0 +1,15 @@
+{
+  "boot_sha256": "08b90255b96ff8a81c6d598cb55fa5e1dccfd8a00ef79f035d470ae8cba68833",
+  "photo": "\u622a\u5c4f2026-11-04 13.11.45.jpg",
+  "photo_sha256": "17314380bb2aac2d6499eb37bb5fa62351beab6c4527e89e9c328da63414d3c4",
+  "association": "owner photo after upload",
+  "panic": "Invalid spinlock; locks_arm.c:343",
+  "frames": {
+    "0xfffffff007401f44": "lck_spin_assert+0x90",
+    "0xfffffff0073d67e8": "initialize_screen+0x69c",
+    "0xfffffff007963aa0": "PE_initialize_console+0x4c",
+    "0xfffffff0079a0108": "native_legacy_prepare_scanout+0x30",
+    "0xfffffff00799dd2c": "NativeLegacyDisplay::kickSwapQueue+0x6c4"
+  },
+  "interpretation": "A user client submitted a swap and reached the first CPU scanout handoff. Frame copy and retirement were not observed."
+}

@@ -211,8 +211,12 @@ extern "C" bool native_legacy_gop_mapping_observed(IOService *, IOMemoryMap *map
 
 extern "C" bool native_legacy_prepare_scanout(void) {
     if (!consoleReleased) {
-        IOLog("T970 display: first CPU frame, releasing text console\n");
-        PE_initialize_console(nullptr, kPEDisableScreen);
+        unsigned int noVideoConsole = 0;
+        // Match arm_init: presence of t970-novc skips text console setup.
+        if (!PE_parse_boot_argn("t970-novc", &noVideoConsole, sizeof(noVideoConsole))) {
+            IOLog("T970 display: first CPU frame, releasing text console\n");
+            PE_initialize_console(nullptr, kPEDisableScreen);
+        }
         consoleReleased = true;
     }
     return true;

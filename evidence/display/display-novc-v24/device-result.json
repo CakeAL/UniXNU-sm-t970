@@ -1,0 +1,14 @@
+{
+  "boot_sha256": "bb4d847476d455c0a49d28ffea03492e8e0f2b5fd0f2480ed2eb34dc5604912e",
+  "photo": "\u622a\u5c4f2026-11-04 14.40.13.jpg",
+  "photo_sha256": "ebb8d526a4d3d34b41ab842854065ce2d5e6bc4f29901745fdf75acac8164dd9",
+  "owner_observed_apple_logo": true,
+  "target": 125,
+  "client_open": 7,
+  "swap_ok": 2,
+  "swap_bad": 0,
+  "transfers": 2,
+  "copies": 2,
+  "retired": 2,
+  "desktop_verified": false
+}

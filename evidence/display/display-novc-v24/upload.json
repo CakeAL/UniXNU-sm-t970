@@ -1,0 +1,13 @@
+{
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/data-bringup/display-novc-memory768-v1/boot-partition.img"
+  ],
+  "boot_sha256": "bb4d847476d455c0a49d28ffea03492e8e0f2b5fd0f2480ed2eb34dc5604912e",
+  "exit_code": 0,
+  "reboot_requested": true,
+  "readback_verified": false,
+  "hardware_result_pending": true
+}

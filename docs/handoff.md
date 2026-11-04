@@ -3,6 +3,10 @@
 接手者请先读本页，再看 `porting.toml`、`docs/bring-up.md`、`docs/storage.md` 和
 `evidence/bring-up/README.md`。
 
+## 最新：Apple logo 与首帧完成（2026-11-04）
+
+BOOTbb4d8474 owner observed Apple logo; photo14:40:13 shows swap2/0, transfer2, copies2, retire2. BOOT08b90255 previously panicked on uninitialized vc_progress_lock via first swap console handoff. Guard now matches t970-novc bootstrap. SpringBoard sample reaches LaunchServices database context from Control Center module discovery; sustained desktop pending.
+
 ## 最新：T733 CPU 出帧对照与 QuartzCore 等待（2026-11-04）
 
 BOOT e44011cb 照片 03:08:38 绑定的符号确认 BB 在 CAMetalContextCreate 轮询 IOAcceleratorES，SB 等待主屏幕信息。原版轮询每次 100ms，最多约 30 秒。T733 48f 实机有 CPU 出帧记录，显示端通过 NativeLegacyDisplay 复制 IOSurface。当前 T970 open6、swap0，继续核对首帧前的软件渲染选择。

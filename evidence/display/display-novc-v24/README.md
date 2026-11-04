@@ -1,0 +1,1 @@
+BOOTbb4d8474 owner observed Apple logo; photo14:40:13 shows swap2/0, transfer2, copies2, retire2. BOOT08b90255 previously panicked on uninitialized vc_progress_lock via first swap console handoff. Guard now matches t970-novc bootstrap. SpringBoard sample reaches LaunchServices database context from Control Center module discovery; sustained desktop pending.
