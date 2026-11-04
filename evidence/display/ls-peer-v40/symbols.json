@@ -1,0 +1,376 @@
+{
+  "cache_slide": "0x9520000",
+  "cache_uuid": "590d839a82d230f1a17d0cc053420f73",
+  "local_symbols_uuid_matches": true,
+  "live_sample": true,
+  "frames": [
+    {
+      "address": "0x1d4ca08c0",
+      "unslid_va": "0x1cb7808c0",
+      "image": "/usr/lib/system/libsystem_kernel.dylib",
+      "nearest_symbol": "_kevent_id",
+      "symbol_table": "exported",
+      "offset": 8,
+      "original_instruction_bytes": "e3000054fd7bbfa9"
+    },
+    {
+      "address": "0x198ac3628",
+      "unslid_va": "0x18f5a3628",
+      "image": "/usr/lib/system/libdispatch.dylib",
+      "nearest_local_symbol": "__dispatch_kq_poll",
+      "offset": 224,
+      "nearest_symbol": "__dispatch_kq_poll",
+      "symbol_table": "local",
+      "original_instruction_bytes": "1f040031c1050054"
+    },
+    {
+      "address": "0x198ac3ff8",
+      "unslid_va": "0x18f5a3ff8",
+      "image": "/usr/lib/system/libdispatch.dylib",
+      "nearest_local_symbol": "__dispatch_event_loop_wait_for_ownership$VARIANT$armv81",
+      "offset": 432,
+      "nearest_symbol": "__dispatch_event_loop_wait_for_ownership$VARIANT$armv81",
+      "symbol_table": "local",
+      "original_instruction_bytes": "e80300aa1f040071"
+    },
+    {
+      "address": "0x198ab96dc",
+      "unslid_va": "0x18f5996dc",
+      "image": "/usr/lib/system/libdispatch.dylib",
+      "nearest_local_symbol": "___DISPATCH_WAIT_FOR_QUEUE__",
+      "offset": 312,
+      "nearest_symbol": "___DISPATCH_WAIT_FOR_QUEUE__",
+      "symbol_table": "local",
+      "original_instruction_bytes": "0700001460820191"
+    },
+    {
+      "address": "0x198ab92f8",
+      "unslid_va": "0x18f5992f8",
+      "image": "/usr/lib/system/libdispatch.dylib",
+      "nearest_local_symbol": "__dispatch_sync_f_slow",
+      "offset": 140,
+      "nearest_symbol": "__dispatch_sync_f_slow",
+      "symbol_table": "local",
+      "original_instruction_bytes": "e82340f9e80000b4"
+    },
+    {
+      "address": "0x1912e5384",
+      "unslid_va": "0x187dc5384",
+      "image": "/System/Library/Frameworks/CoreServices.framework/CoreServices",
+      "nearest_local_symbol": "-[_LSInstallProgressService performJournalRecovery]",
+      "offset": 88,
+      "nearest_symbol": "-[_LSInstallProgressService performJournalRecovery]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "602640f9f40300f9"
+    },
+    {
+      "address": "0x1d4ca08e8",
+      "unslid_va": "0x1cb7808e8",
+      "image": "/usr/lib/system/libsystem_kernel.dylib",
+      "nearest_symbol": "___workq_kernreturn",
+      "symbol_table": "exported",
+      "offset": 8,
+      "original_instruction_bytes": "e3000054fd7bbfa9"
+    },
+    {
+      "address": "0x1e6b42580",
+      "unslid_va": "0x1dd622580",
+      "image": "/usr/lib/system/libsystem_pthread.dylib",
+      "offset": 360,
+      "nearest_symbol": "__pthread_wqthread",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "68ae80b9f457bfa9"
+    },
+    {
+      "address": "0x1e6b3fccc",
+      "unslid_va": "0x1dd61fccc",
+      "image": "/usr/lib/system/libsystem_pthread.dylib",
+      "nearest_symbol": "_start_wqthread",
+      "symbol_table": "exported",
+      "offset": 8,
+      "original_instruction_bytes": "200020d4ff7fbfa9"
+    },
+    {
+      "address": "0x1d4ca6bdc",
+      "unslid_va": "0x1cb786bdc",
+      "image": "/usr/lib/system/libsystem_kernel.dylib",
+      "offset": 8,
+      "nearest_symbol": "___ulock_wait",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "e3000054fd7bbfa9"
+    },
+    {
+      "address": "0x198aa73ec",
+      "unslid_va": "0x18f5873ec",
+      "image": "/usr/lib/system/libdispatch.dylib",
+      "nearest_local_symbol": "__dlock_wait",
+      "offset": 52,
+      "nearest_symbol": "__dlock_wait",
+      "symbol_table": "local",
+      "original_instruction_bytes": "1f0000716c020054"
+    },
+    {
+      "address": "0x198aa7784",
+      "unslid_va": "0x18f587784",
+      "image": "/usr/lib/system/libdispatch.dylib",
+      "nearest_local_symbol": "__dispatch_group_wait_slow",
+      "offset": 52,
+      "nearest_symbol": "__dispatch_group_wait_slow",
+      "symbol_table": "local",
+      "original_instruction_bytes": "c8fedf881f01156b"
+    },
+    {
+      "address": "0x1912df050",
+      "unslid_va": "0x187dbf050",
+      "image": "/System/Library/Frameworks/CoreServices.framework/CoreServices",
+      "nearest_local_symbol": "-[_LSInstallProgressService restoreInactiveInstalls]",
+      "offset": 120,
+      "nearest_symbol": "-[_LSInstallProgressService restoreInactiveInstalls]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "fccd72956219fc97"
+    },
+    {
+      "address": "0x198ad5c9c",
+      "unslid_va": "0x18f5b5c9c",
+      "image": "/usr/lib/system/libdispatch.dylib",
+      "nearest_local_symbol": "__dispatch_call_block_and_release",
+      "offset": 24,
+      "nearest_symbol": "__dispatch_call_block_and_release",
+      "symbol_table": "local",
+      "original_instruction_bytes": "e00313aafd7b41a9"
+    },
+    {
+      "address": "0x198ad6cc0",
+      "unslid_va": "0x18f5b6cc0",
+      "image": "/usr/lib/system/libdispatch.dylib",
+      "nearest_local_symbol": "__dispatch_client_callout",
+      "offset": 16,
+      "nearest_symbol": "__dispatch_client_callout",
+      "symbol_table": "local",
+      "original_instruction_bytes": "fd7b41a9f44fc2a8"
+    },
+    {
+      "address": "0x19129cb08",
+      "unslid_va": "0x187d7cb08",
+      "image": "/System/Library/Frameworks/CoreServices.framework/CoreServices",
+      "nearest_local_symbol": "___LAUNCH_SERVICES_CLIENTS_ARE_WAITING_FOR_THE_DATABASE_TO_FINISH_SEEDING__",
+      "offset": 32,
+      "nearest_symbol": "___LAUNCH_SERVICES_CLIENTS_ARE_WAITING_FOR_THE_DATABASE_TO_FINISH_SEEDING__",
+      "symbol_table": "local",
+      "original_instruction_bytes": "48d77395fd7b41a9"
+    },
+    {
+      "address": "0x19129ca24",
+      "unslid_va": "0x187d7ca24",
+      "image": "/System/Library/Frameworks/CoreServices.framework/CoreServices",
+      "nearest_local_symbol": "-[LSDatabaseBlockingFetchClient getServerStoreBlockingWithCompletionHandler:]",
+      "offset": 92,
+      "nearest_symbol": "-[LSDatabaseBlockingFetchClient getServerStoreBlockingWithCompletionHandler:]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "880640f9f2d77395"
+    },
+    {
+      "address": "0x1903f0490",
+      "unslid_va": "0x186ed0490",
+      "image": "/System/Library/Frameworks/Foundation.framework/Foundation",
+      "nearest_local_symbol": "___NSXPCCONNECTION_IS_CALLING_OUT_TO_EXPORTED_OBJECT_S1__",
+      "offset": 12,
+      "nearest_symbol": "___NSXPCCONNECTION_IS_CALLING_OUT_TO_EXPORTED_OBJECT_S1__",
+      "symbol_table": "local",
+      "original_instruction_bytes": "fd7bc1a8c0035fd6"
+    },
+    {
+      "address": "0x1d4ca0b58",
+      "unslid_va": "0x1cb780b58",
+      "image": "/usr/lib/system/libsystem_kernel.dylib",
+      "nearest_symbol": "_mach_msg2_trap",
+      "symbol_table": "exported",
+      "offset": 8,
+      "original_instruction_bytes": "c0035fd6f0058092"
+    },
+    {
+      "address": "0x1d4ca4224",
+      "unslid_va": "0x1cb784224",
+      "image": "/usr/lib/system/libsystem_kernel.dylib",
+      "offset": 76,
+      "nearest_symbol": "_mach_msg2_internal",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "00050034fa013037"
+    },
+    {
+      "address": "0x1d4ca41b0",
+      "unslid_va": "0x1cb7841b0",
+      "image": "/usr/lib/system/libsystem_kernel.dylib",
+      "offset": 492,
+      "nearest_symbol": "_mach_msg_overwrite",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "fd7b51a9f44f50a9"
+    },
+    {
+      "address": "0x1d4ca3fb8",
+      "unslid_va": "0x1cb783fb8",
+      "image": "/usr/lib/system/libsystem_kernel.dylib",
+      "offset": 20,
+      "nearest_symbol": "_mach_msg",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "fd7b41a9ff830091"
+    },
+    {
+      "address": "0x198aa9538",
+      "unslid_va": "0x18f589538",
+      "image": "/usr/lib/system/libdispatch.dylib",
+      "nearest_local_symbol": "__dispatch_mach_send_and_wait_for_reply",
+      "offset": 524,
+      "nearest_symbol": "__dispatch_mach_send_and_wait_for_reply",
+      "symbol_table": "local",
+      "original_instruction_bytes": "f70300aa1f00136b"
+    },
+    {
+      "address": "0x198aa98d4",
+      "unslid_va": "0x18f5898d4",
+      "image": "/usr/lib/system/libdispatch.dylib",
+      "nearest_local_symbol": "_dispatch_mach_send_with_result_and_wait_for_reply$VARIANT$armv81",
+      "offset": 56,
+      "nearest_symbol": "_dispatch_mach_send_with_result_and_wait_for_reply$VARIANT$armv81",
+      "symbol_table": "local",
+      "original_instruction_bytes": "e83f403988010034"
+    },
+    {
+      "address": "0x1913e1a6c",
+      "unslid_va": "0x187ec1a6c",
+      "image": "/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation",
+      "nearest_local_symbol": "___CFRunLoopServiceMachPort",
+      "offset": 156,
+      "nearest_symbol": "___CFRunLoopServiceMachPort",
+      "symbol_table": "local",
+      "original_instruction_bytes": "fa0300aac00240f9"
+    },
+    {
+      "address": "0x1913e10dc",
+      "unslid_va": "0x187ec10dc",
+      "image": "/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation",
+      "nearest_local_symbol": "___CFRunLoopRun",
+      "offset": 1208,
+      "nearest_symbol": "___CFRunLoopRun",
+      "symbol_table": "local",
+      "original_instruction_bytes": "e86740b91f01186b"
+    },
+    {
+      "address": "0x192964a54",
+      "unslid_va": "0x189444a54",
+      "image": "/System/Library/Frameworks/QuartzCore.framework/QuartzCore",
+      "nearest_local_symbol": "__ZN2CA6Render6Server13server_threadEPv",
+      "offset": 572,
+      "nearest_symbol": "__ZN2CA6Render6Server13server_threadEPv",
+      "symbol_table": "local",
+      "original_instruction_bytes": "c0050034f30300aa"
+    },
+    {
+      "address": "0x192bdfe28",
+      "unslid_va": "0x1896bfe28",
+      "image": "/System/Library/Frameworks/QuartzCore.framework/QuartzCore",
+      "nearest_local_symbol": "__ZL10thread_funPv",
+      "offset": 28,
+      "nearest_symbol": "__ZL10thread_funPv",
+      "symbol_table": "local",
+      "original_instruction_bytes": "000080d2fd7b41a9"
+    },
+    {
+      "address": "0x1994cc504",
+      "unslid_va": "0x18ffac504",
+      "image": "/System/Library/Frameworks/IOKit.framework/Versions/A/IOKit",
+      "nearest_local_symbol": "_io_connect_method",
+      "offset": 520,
+      "nearest_symbol": "_io_connect_method",
+      "symbol_table": "local",
+      "original_instruction_bytes": "f40300aac8ff9f52"
+    },
+    {
+      "address": "0x1994d7ae0",
+      "unslid_va": "0x18ffb7ae0",
+      "image": "/System/Library/Frameworks/IOKit.framework/Versions/A/IOKit",
+      "offset": 172,
+      "nearest_symbol": "_IOConnectCallMethod",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "160000147f0540f1"
+    },
+    {
+      "address": "0x1994d7a28",
+      "unslid_va": "0x18ffb7a28",
+      "image": "/System/Library/Frameworks/IOKit.framework/Versions/A/IOKit",
+      "offset": 52,
+      "nearest_symbol": "_IOConnectCallStructMethod",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "fd7b41a9ff830091"
+    },
+    {
+      "address": "0x1bf8f1f08",
+      "unslid_va": "0x1b63d1f08",
+      "image": "/System/Library/PrivateFrameworks/IOMobileFramebuffer.framework/IOMobileFramebuffer",
+      "nearest_local_symbol": "_kern_SwapEnd",
+      "offset": 48,
+      "nearest_symbol": "_kern_SwapEnd",
+      "symbol_table": "local",
+      "original_instruction_bytes": "f40300aa613a46f9"
+    },
+    {
+      "address": "0x1d4ca0970",
+      "unslid_va": "0x1cb780970",
+      "image": "/usr/lib/system/libsystem_kernel.dylib",
+      "nearest_symbol": "___ulock_wait2",
+      "symbol_table": "exported",
+      "offset": 8,
+      "original_instruction_bytes": "e3000054fd7bbfa9"
+    },
+    {
+      "address": "0x1e6a8c0e0",
+      "unslid_va": "0x1dd56c0e0",
+      "image": "/usr/lib/system/libsystem_platform.dylib",
+      "nearest_local_symbol": "__os_unfair_lock_lock_slow",
+      "offset": 184,
+      "nearest_symbol": "__os_unfair_lock_lock_slow",
+      "symbol_table": "local",
+      "original_instruction_bytes": "4001f836e803004b"
+    },
+    {
+      "address": "0x1911ad228",
+      "unslid_va": "0x187c8d228",
+      "image": "/System/Library/Frameworks/CoreServices.framework/CoreServices",
+      "nearest_local_symbol": "__ZL20_LSContextInitCommonP9LSContextP17_LSDServiceDomainmPU15__autoreleasingP7NSError",
+      "offset": 760,
+      "nearest_symbol": "__ZL20_LSContextInitCommonP9LSContextP17_LSDServiceDomainmPU15__autoreleasingP7NSError",
+      "symbol_table": "local",
+      "original_instruction_bytes": "a05f36f000e02191"
+    },
+    {
+      "address": "0x1911aceb8",
+      "unslid_va": "0x187c8ceb8",
+      "image": "/System/Library/Frameworks/CoreServices.framework/CoreServices",
+      "nearest_local_symbol": "__ZN14LaunchServices8Database7Context4_getEP17_LSDServiceDomainm",
+      "offset": 108,
+      "nearest_symbol": "__ZN14LaunchServices8Database7Context4_getEP17_LSDServiceDomainm",
+      "symbol_table": "local",
+      "original_instruction_bytes": "fa0300aaf90740f9"
+    },
+    {
+      "address": "0x1911acac8",
+      "unslid_va": "0x187c8cac8",
+      "image": "/System/Library/Frameworks/CoreServices.framework/CoreServices",
+      "nearest_local_symbol": "-[LSApplicationRecord _initWithNode:bundleIdentifier:placeholderBehavior:systemPlaceholder:itemID:forceInBundleContainer:context:error:]",
+      "offset": 276,
+      "nearest_symbol": "-[LSApplicationRecord _initWithNode:bundleIdentifier:placeholderBehavior:systemPlaceholder:itemID:forceInBundleContainer:context:error:]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "fa0300aabc0f40f9"
+    },
+    {
+      "address": "0x1911cfd10",
+      "unslid_va": "0x187cafd10",
+      "image": "/System/Library/Frameworks/CoreServices.framework/CoreServices",
+      "nearest_local_symbol": "-[LSApplicationRecord initWithBundleIdentifier:fetchingPlaceholder:error:]",
+      "offset": 48,
+      "nearest_symbol": "-[LSApplicationRecord initWithBundleIdentifier:fetchingPlaceholder:error:]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "fd7b41a9ff830091"
+    }
+  ]
+}

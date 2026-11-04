@@ -1,0 +1,9 @@
+{
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/ls-lock-owner-v38/boot-partition.img --no-reboot",
+  "exit_code": 0,
+  "boot_sha256": "a2b519e4cb9c380a6eeb7d7e9f0c10bc4cdcee985634044e2d608a7113ef2c57",
+  "finished_at": "2026-11-04T11:02:23.014824+00:00",
+  "device_revision": "2116ead08f49b8de9220df1d9411448361fee2c3",
+  "reboot": "flashed with --no-reboot; device left download mode by user power cycle",
+  "device_observation": "device-result.json"
+}

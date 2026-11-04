@@ -1,0 +1,162 @@
+{
+  "boot_sha256": "3aed42ee1e8902752d99de7894b5dc9b4f747cbd880e997202d86d258a03686d",
+  "kernel_sha256": "7fc60f572a239f4b0d6ddfbbcd26a26e5145404baf08f3b3c781959f4f4a9730",
+  "photo": "screen-target150.jpg",
+  "photo_sha256": "d298bdfbf402b5a84709fe70dfb89bd379362d4dc551795e8c99b33aea807822",
+  "sample": {
+    "cache_slide": "0x9520000",
+    "target_seconds": 150,
+    "processes": 107,
+    "lsd": {
+      "pid": 100,
+      "threads": 6,
+      "visited": 6
+    },
+    "backboardd": {
+      "pid": 57,
+      "threads": 20,
+      "visited": 8
+    },
+    "springboard": {
+      "pid": 27,
+      "threads": 5,
+      "visited": 5
+    }
+  },
+  "lock": {
+    "reported_address": "0x1fdda4878",
+    "unslid_address": "0x1f4884878",
+    "address_check": "0x1f4884878 + 0x9520000 == 0x1fdda4878 and the three task rows print slide=9520000",
+    "waits": 1,
+    "waiter_tid": "0x125",
+    "owner_tid": "0x576",
+    "reproduction": "third boot, same waiter/owner roles"
+  },
+  "register_column": {
+    "finding": "x0 is not the ulock address",
+    "evidence": [
+      "SpringBoard S1 in __ulock_wait2 reports a0=0x1000002 while the LS lock address is 0x1fdda4878",
+      "lsd l3/l4 in __ulock_wait report a0=0x1000001",
+      "the op-word values are uniform across waiters, so x0 carries the ulock operation and x1 carries the address"
+    ],
+    "consequence": "the sampler already captures x1 as arg1; the next image prints a1 as an extra column"
+  },
+  "lsd": {
+    "l1": {
+      "state": 1,
+      "chain": [
+        "__dispatch_kq_poll",
+        "___DISPATCH_WAIT_FOR_QUEUE__",
+        "__dispatch_sync_f_slow",
+        "-[_LSInstallProgressService performJournalRecovery]"
+      ]
+    },
+    "l2": {
+      "state": 1,
+      "chain": [
+        "__workq_kernreturn",
+        "__pthread_wqthread"
+      ],
+      "note": "idle workqueue thread"
+    },
+    "l3": {
+      "state": 65,
+      "chain": [
+        "__ulock_wait",
+        "__dlock_wait",
+        "__dispatch_group_wait_slow",
+        "-[_LSInstallProgressService restoreInactiveInstalls]"
+      ]
+    },
+    "l4": {
+      "state": 65,
+      "chain": [
+        "__ulock_wait",
+        "__dlock_wait",
+        "__dispatch_group_wait_slow",
+        "___LAUNCH_SERVICES_CLIENTS_ARE_WAITING_FOR_THE_DATABASE_TO_FINISH_SEEDING__",
+        "-[LSDatabaseBlockingFetchClient getServerStoreBlockingWithCompletionHandler:]",
+        "-[NSXPCConnection _decodeAndInvokeMessageWithEvent:reply:flags:]"
+      ]
+    },
+    "l5": {
+      "state": 1,
+      "chain": [
+        "_mach_msg2_trap",
+        "__dispatch_mach_send_and_wait_for_reply",
+        "__dispatch_mach_send_with_result_and_wait_for_reply"
+      ],
+      "note": "lsd itself waits for a synchronous Mach reply"
+    },
+    "l6": {
+      "state": 65,
+      "chain": [
+        "__workq_kernreturn"
+      ],
+      "note": "idle workqueue thread"
+    }
+  },
+  "springboard": {
+    "S1": {
+      "state": 1,
+      "chain": [
+        "__ulock_wait2",
+        "__os_unfair_lock_lock_slow",
+        "_LSContextInitCommon",
+        "LaunchServices::Database::Context::_get",
+        "-[LSApplicationRecord initWithBundleIdentifier:...]"
+      ]
+    },
+    "S2": {
+      "state": 65,
+      "chain": [
+        "_mach_msg2_trap",
+        "__dispatch_mach_send_and_wait_for_reply"
+      ],
+      "role": "lock owner"
+    },
+    "S3_S5": "idle workqueue threads"
+  },
+  "backboardd": {
+    "b3": {
+      "state": 4,
+      "tid": "0x2ab",
+      "chain": [
+        "_io_connect_method",
+        "_IOConnectCallMethod",
+        "_IOConnectCallStructMethod",
+        "_kern_SwapEnd"
+      ]
+    },
+    "b1_b2_b4_b8": "CFRunLoop and CA render server threads"
+  },
+  "display": {
+    "hold": 0,
+    "published_ms": 32840,
+    "first_cpu_copy_ms": 153411,
+    "writer": 0,
+    "transfers": 4,
+    "copies": 4,
+    "retired": 4,
+    "swaps": "4/0",
+    "vsync": {
+      "start": 1,
+      "arm": 0,
+      "idle": 0,
+      "late": 0,
+      "refresh": 0,
+      "notify": 0
+    }
+  },
+  "observations": [
+    "The LaunchServices lock contention reproduced a third time with the same roles.",
+    "lsd's install-progress subsystem holds four of six sampled threads in dispatch group or queue-ownership waits, and a fifth waits for a synchronous Mach reply.",
+    "backboardd keeps one thread inside the IOMFB SwapEnd IOKit call in every sample while hold flips between 0 and 1, so hold and the SwapEnd caller are not the same fact.",
+    "The x0 column falsified the register assumption: ulock waiters report the operation word there, not the lock address."
+  ],
+  "limitations": [
+    "Six of six lsd threads were sampled this boot, but lsd's population changed from 13 threads to 6 between v39 and v40, so the v39 syncRead contention is boot dependent.",
+    "The report still cannot show which lock each ulock waiter targets; v41 adds the x1 column for that.",
+    "Thread kstates are one bounded sample, not a frozen snapshot."
+  ]
+}

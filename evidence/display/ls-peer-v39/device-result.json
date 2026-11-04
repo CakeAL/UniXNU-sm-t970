@@ -1,0 +1,167 @@
+{
+  "boot_sha256": "f6797cc258f0ad1e712796c0311979ac2c262be811c7d4f0425571ed20ef2df1",
+  "kernel_sha256": "5130a520bdd87c1e8408c0d8ea9d373c569b6c12d31adec9d28505770cce349d",
+  "photo": "screen-target150.jpg",
+  "association": "Owner photo after BOOT flash exit 0 with automatic reboot; identified by stacks=10, the lsd block and UI batch end processes=3.",
+  "sample": {
+    "cache_slide": "0x1c70c000",
+    "target_seconds": 150,
+    "processes": 109,
+    "lsd": {
+      "pid": 97,
+      "threads": 13,
+      "visited": 6
+    },
+    "backboardd": {
+      "pid": 57,
+      "threads": 20,
+      "visited": 8
+    },
+    "springboard": {
+      "pid": 27,
+      "threads": 5,
+      "visited": 5
+    }
+  },
+  "lock": {
+    "reported_address": "0x210f90878",
+    "unslid_address": "0x1f4884878",
+    "address_check": "0x1f4884878 + 0x1c70c000 == 0x210f90878, page aligned, equals the slide printed for all three sampled tasks",
+    "waits": 1,
+    "waiter_tid": "0x125",
+    "owner_tid": "0x522"
+  },
+  "lsd": {
+    "l1": {
+      "state": 1,
+      "chain": [
+        "__dispatch_kq_poll",
+        "___DISPATCH_WAIT_FOR_QUEUE__",
+        "__dispatch_sync_f_slow",
+        "-[_LSInstallProgressService performJournalRecovery]"
+      ]
+    },
+    "l2": {
+      "state": 65,
+      "chain": [
+        "__dlock_wait",
+        "__dispatch_group_wait_slow",
+        "___LAUNCH_SERVICES_CLIENTS_ARE_WAITING_FOR_THE_DATABASE_TO_FINISH_SEEDING__",
+        "-[LSDatabaseBlockingFetchClient getServerStoreBlockingWithCompletionHandler:]",
+        "-[NSXPCConnection _decodeAndInvokeMessageWithEvent:reply:flags:]",
+        "-[_LSInstallProgressService restoreInactiveInstalls]"
+      ]
+    },
+    "l3": {
+      "state": 65,
+      "chain": [
+        "__dlock_wait",
+        "__dispatch_group_wait_slow",
+        "___LAUNCH_SERVICES_CLIENTS_ARE_WAITING_FOR_THE_DATABASE_TO_FINISH_SEEDING__",
+        "-[_LSInstallProgressService restoreInactiveInstalls]"
+      ]
+    },
+    "l4": {
+      "state": 9,
+      "chain": [
+        "-[_LSLazyPropertyList objectForKey:ofClass:]",
+        "-[_LSStringsFileContent subscriptLoctableWithLocale:]",
+        "-[_LSStringLocalizer enumerateLocalizedStringsForKeys:usingBlock:]",
+        "+[_LSStringLocalizer gatherLocalizedStringsForCFBundle:...]_block_invoke_2"
+      ]
+    },
+    "l5": {
+      "state": 1,
+      "chain": [
+        "__workq_kernreturn",
+        "__pthread_wqthread"
+      ],
+      "note": "idle workqueue thread"
+    },
+    "l6": {
+      "state": 65,
+      "chain": [
+        "__ulock_wait2",
+        "__os_unfair_lock_lock_slow",
+        "-[LSDBExecutionContext syncRead:]",
+        "-[_LSDReadClient invokeServiceInvocation:isReply:]",
+        "-[_LSDService connection:handleInvocation:isReply:]"
+      ]
+    }
+  },
+  "springboard": {
+    "S1": {
+      "state": 1,
+      "chain": [
+        "__ulock_wait2",
+        "__os_unfair_lock_lock_slow",
+        "_LSContextInitCommon",
+        "LaunchServices::Database::Context::_get",
+        "-[LSApplicationRecord initWithBundleIdentifier:...]"
+      ]
+    },
+    "S2": {
+      "state": 65,
+      "chain": [
+        "_mach_msg2_trap",
+        "__dispatch_mach_send_and_wait_for_reply",
+        "__dispatch_mach_send_with_result_and_wait_for_reply"
+      ],
+      "role": "lock owner, waiting for a synchronous XPC reply"
+    },
+    "S3": {
+      "state": 73,
+      "chain": [
+        "+[BSSecTask _taskForAuditToken:]_block_invoke",
+        "__dispatch_source_invoke",
+        "__dispatch_worker_thread2"
+      ]
+    },
+    "S4_S5": "idle workqueue threads"
+  },
+  "backboardd": {
+    "b3": {
+      "state": 4,
+      "tid": "0x314",
+      "chain": [
+        "_io_connect_method",
+        "_IOConnectCallMethod",
+        "_IOConnectCallStructMethod",
+        "_kern_SwapEnd"
+      ],
+      "note": "the same tid printed as FB writer, so the undrained scanout reservation belongs to this SwapEnd caller"
+    },
+    "b1_b5_b8": "CFRunLoop service threads",
+    "b2": "CA render server thread on mach_msg",
+    "b4": "idle workqueue thread"
+  },
+  "display": {
+    "hold": 1,
+    "published_ms": 32824,
+    "first_cpu_copy_ms": 157840,
+    "writer_tid": "0x314",
+    "transfers": 5,
+    "copies": 5,
+    "retired": 5,
+    "swaps": "6/0",
+    "vsync": {
+      "start": 1,
+      "arm": 0,
+      "idle": 0,
+      "late": 0,
+      "refresh": 0,
+      "notify": 0
+    }
+  },
+  "conclusion": [
+    "The LaunchServices deadlock reproduced with the same waiter and owner roles under a different slide.",
+    "lsd, the peer SpringBoard waits for, is itself stuck: its seeding path waits on a dispatch group named for clients waiting for database seeding, its journal recovery performs a synchronous dispatch, and its XPC read path blocks on an unfair lock.",
+    "lsd l4 is uninterruptible inside bundle localization/string loading, which is one candidate keeping the seeding group open.",
+    "backboardd b3 is the FB writer tid and sits inside the IOMFB SwapEnd IOKit call, tying hold=1 to a specific thread for the first time."
+  ],
+  "limitations": [
+    "The row set is a bounded sample of six lsd threads out of thirteen and eight of twenty, not a frozen snapshot.",
+    "Whether lsd l6 waits on the shared LaunchServices context lock or on an lsd-internal lock is not visible: the report prints no ulock address per row.",
+    "One photo cannot order the memory wait in l4 against the group wait in l2/l3."
+  ]
+}

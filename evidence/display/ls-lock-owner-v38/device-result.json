@@ -1,0 +1,99 @@
+{
+  "boot_sha256": "a2b519e4cb9c380a6eeb7d7e9f0c10bc4cdcee985634044e2d608a7113ef2c57",
+  "kernel_sha256": "5f9fd43e19545a034c68d1c9ec56a8edf3f15a16f01a3227bf325c9b3fab5084",
+  "photo": "screen-target150.jpg",
+  "association": "Owner photo after BOOT flash exit 0; identified by target150, LS waits line and stacks=9. No device hash readback.",
+  "sample": {
+    "cache_slide": "0x17b64000",
+    "runtime": {
+      "target_seconds": 150,
+      "main": 1,
+      "cpu": 8,
+      "processes": 108
+    },
+    "backboardd_threads": 26,
+    "backboardd_visited": 8,
+    "springboard_threads": 3,
+    "springboard_visited": 3
+  },
+  "lock": {
+    "reported_address": "0x20c3e8878",
+    "unslid_address": "0x1f4884878",
+    "address_check": "0x1f4884878 + 0x17b64000 == 0x20c3e8878, page aligned, matches the slide printed for both sampled tasks",
+    "waits": 1,
+    "waiter_tid": "0x125",
+    "owner_tid": "0x1b6",
+    "waiter_match": "SpringBoard S1 id=0x125",
+    "owner_match": "SpringBoard S2 id=0x1b6"
+  },
+  "springboard": {
+    "S1": {
+      "waits_on": "ulock 0x20c3e8878",
+      "top": "__ulock_wait2",
+      "chain": [
+        "_os_unfair_lock_lock_slow",
+        "_LSContextInitCommon",
+        "LaunchServices::Database::Context::_get",
+        "-[LSApplicationRecord _initWithNode:...]",
+        "-[LSApplicationRecord initWithBundleIdentifier:...]"
+      ]
+    },
+    "S2": {
+      "holds": "ulock 0x20c3e8878",
+      "top": "_mach_msg2_trap",
+      "chain": [
+        "_dispatch_mach_send_and_wait_for_reply",
+        "_dispatch_mach_send_with_result_and_wait_for_reply"
+      ]
+    },
+    "S3": {
+      "top": "__workq_kernreturn",
+      "note": "idle workqueue thread"
+    }
+  },
+  "backboardd": {
+    "b1": "CFRunLoop service",
+    "b2": "IOHIDEventSystemConnectionSetQueue block",
+    "b3": "CA render server thread on mach_msg",
+    "b4": {
+      "top": "_mach_msg2_trap",
+      "chain": [
+        "_io_connect_method",
+        "_IOConnectCallMethod",
+        "_IOConnectCallStructMethod",
+        "_kern_SwapEnd"
+      ],
+      "note": "still inside the IOMFB SwapEnd IOKit call at the 150 s report"
+    },
+    "b5_b8": "four CFRunLoop service threads"
+  },
+  "display": {
+    "hold": 0,
+    "published_ms": 18914,
+    "first_cpu_copy_ms": 140020,
+    "writer": 0,
+    "transfers": 5,
+    "copies": 6,
+    "retired": 5,
+    "swaps": "8/0",
+    "vsync": {
+      "start": 1,
+      "arm": 0,
+      "idle": 0,
+      "late": 0,
+      "refresh": 0,
+      "notify": 0
+    }
+  },
+  "observations": [
+    "The SpringBoard LaunchServices lock at 0x1f4884878 is confirmed held by SpringBoard's own S2 thread, which is blocked waiting for a synchronous libdispatch mach reply.",
+    "backboardd has one thread inside the IOMFB kern_SwapEnd IOKit call for the whole 150 s window.",
+    "The synthetic 60 Hz refresh timer was created once and never armed, so no vsync notification was ever sent.",
+    "First CPU copy of a compositor frame happened 140.0 s after the display was published."
+  ],
+  "limitations": [
+    "The owner/waiter tuple is the last successful sample, not a proof the lock was still held at report time.",
+    "The synchronous reply peer is unknown: the report does not name the destination service.",
+    "One photo cannot order the SwapEnd stall against the LaunchServices deadlock."
+  ]
+}

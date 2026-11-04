@@ -1,0 +1,14 @@
+{
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/ls-lock-owner-v38/boot-partition.img --no-reboot",
+  "started_at_unrecorded": true,
+  "finished_at": "2026-11-04T11:02:23.014824+00:00",
+  "exit_code": 0,
+  "boot_sha256": "a2b519e4cb9c380a6eeb7d7e9f0c10bc4cdcee985634044e2d608a7113ef2c57",
+  "heimdall_sha256": "75337a7c6ad9a5e18c0730fa474c81133587cc04cbe08dd3f270c860128a6c6f",
+  "device_revision": "2116ead08f49b8de9220df1d9411448361fee2c3",
+  "partition": "BOOT",
+  "no_reboot": true,
+  "device_observation_pending": true,
+  "userdata_written": false,
+  "boot_report": "BOOT upload successful; session ended without reboot request"
+}

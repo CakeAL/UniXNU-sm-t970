@@ -1,0 +1,14 @@
+{
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/ls-peer-v39/boot-partition.img",
+  "finished_at": "2026-11-04T11:15:36.254142+00:00",
+  "exit_code": 0,
+  "boot_sha256": "f6797cc258f0ad1e712796c0311979ac2c262be811c7d4f0425571ed20ef2df1",
+  "kernel_sha256": "5130a520bdd87c1e8408c0d8ea9d373c569b6c12d31adec9d28505770cce349d",
+  "heimdall_sha256": "75337a7c6ad9a5e18c0730fa474c81133587cc04cbe08dd3f270c860128a6c6f",
+  "device_revision": "2116ead08f49b8de9220df1d9411448361fee2c3",
+  "partition": "BOOT",
+  "no_reboot": false,
+  "boot_report": "BOOT upload successful; session ended with reboot request",
+  "device_observation_pending": true,
+  "userdata_written": false
+}

@@ -1,0 +1,17 @@
+{
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/ls-timeout-300-v44/boot-partition.img",
+  "finished_at": "2026-11-04T11:41:56.644029+00:00",
+  "exit_code": 0,
+  "boot_sha256": "eb079f75b52c88c30f246b19553d76b46a6a065ced6896ff6043b52112cd2aee",
+  "kernel_sha256": "82e71977803d3f6fe4fbd63e84dc5bafef7281e2d56adae7cb9cb6a4a2582a9f",
+  "device_revision": "2116ead08f49b8de9220df1d9411448361fee2c3",
+  "partition": "BOOT",
+  "no_reboot": false,
+  "boot_report": "BOOT upload successful; session ended with reboot request",
+  "rejected_predecessor": {
+    "boot_sha256": "2df53e121481824f04b1d69b7ff050bc088221e1e9950b8c2d28afb8ec88161c",
+    "reason": "kernel rejects report intervals outside 5..300 s"
+  },
+  "device_observation_pending": true,
+  "userdata_written": false
+}

@@ -1,0 +1,87 @@
+--- a/bsd/kern/sys_ulock.c
++++ b/bsd/kern/sys_ulock.c
+@@ -501,6 +501,43 @@
+ 	return sys_ulock_wait2(p, &args2, retval);
+ }
+ 
++/* T970 opt-in: sample only the known 21H461 LaunchServices lock range.
++ * An identical page offset is only a candidate until the task slide agrees. */
++#define T970_LS_LOCK_BASE 0x1f4884878ULL
++#define T970_LS_CACHE_MAX_SLIDE 0x20000000ULL
++static unsigned t970_ls_sample_busy;
++static struct { uint64_t addr, waiter, owner, count; } t970_ls_sample;
++
++static void
++native_t970_ls_owner_note(uint64_t addr, thread_t self, thread_t owner)
++{
++	if (__atomic_exchange_n(&t970_ls_sample_busy, 1, __ATOMIC_ACQUIRE)) {
++		return;
++	}
++	t970_ls_sample.addr = addr;
++	t970_ls_sample.waiter = thread_tid(self);
++	t970_ls_sample.owner = thread_tid(owner);
++	++t970_ls_sample.count;
++	__atomic_store_n(&t970_ls_sample_busy, 0, __ATOMIC_RELEASE);
++}
++
++void
++native_t970_ls_owner_text(char *out, unsigned length)
++{
++	if (__atomic_exchange_n(&t970_ls_sample_busy, 1, __ATOMIC_ACQUIRE)) {
++		snprintf(out, length, "\nLS owner sample busy");
++		return;
++	}
++	uint64_t addr = t970_ls_sample.addr;
++	uint64_t waiter = t970_ls_sample.waiter;
++	uint64_t owner = t970_ls_sample.owner;
++	uint64_t count = t970_ls_sample.count;
++	__atomic_store_n(&t970_ls_sample_busy, 0, __ATOMIC_RELEASE);
++	snprintf(out, length, "\nLS waits=%llu addr=%llx waiter=%llx owner=%llx",
++	    (unsigned long long)count, (unsigned long long)addr,
++	    (unsigned long long)waiter, (unsigned long long)owner);
++}
++
+ int
+ sys_ulock_wait2(struct proc *p, struct ulock_wait2_args *args, int32_t *retval)
+ {
+@@ -509,6 +546,15 @@
+ 
+ 	if (flags & ULF_WAIT_CANCEL_POINT) {
+ 		__pthread_testcancel(1);
++	}
++
++	bool t970_ls_trace = false;
++	if (opcode == UL_UNFAIR_LOCK && args->addr >= T970_LS_LOCK_BASE &&
++	    args->addr - T970_LS_LOCK_BASE <= T970_LS_CACHE_MAX_SLIDE &&
++	    !((args->addr - T970_LS_LOCK_BASE) & 0xfff) &&
++	    !strcmp(p->p_comm, "SpringBoard")) {
++		unsigned trace = 0;
++		t970_ls_trace = PE_parse_boot_argn("t970-ls-owner", &trace, sizeof(trace)) && trace == 1;
+ 	}
+ 
+ 	int ret = 0;
+@@ -760,6 +806,9 @@
+ 	turnstile_update_inheritor_complete(ts, TURNSTILE_INTERLOCK_NOT_HELD);
+ 
+ 	if (wr == THREAD_WAITING) {
++		if (t970_ls_trace && owner_thread != THREAD_NULL) {
++			native_t970_ls_owner_note(args->addr, self, owner_thread);
++		}
+ 		if (set_owner && owner_thread != THREAD_NULL) {
+ 			thread_handoff_parameter(owner_thread, ulock_wait_continue, ull, THREAD_HANDOFF_NONE);
+ 		} else {
+--- a/bsd/kern/kern_exec.c
++++ b/bsd/kern/kern_exec.c
+@@ -8305,6 +8305,12 @@
+ 			size_t used = strlen(display_state);
+ 			native_t970_display_timing(display_state + used, sizeof(display_state) - used, hold);
+ 		}
++		unsigned ls_owner = 0;
++		if (PE_parse_boot_argn("t970-ls-owner", &ls_owner, sizeof(ls_owner)) && ls_owner == 1) {
++			extern void native_t970_ls_owner_text(char *, unsigned);
++			size_t used = strlen(display_state);
++			native_t970_ls_owner_text(display_state + used, sizeof(display_state) - used);
++		}
+ 		unsigned batch_mode=0;
+ 		PE_parse_boot_argn("t970-ui-stack", &batch_mode, sizeof(batch_mode));
+ 		if(batch_mode==5 || batch_mode==6 || batch_mode==9 || batch_mode==10) {

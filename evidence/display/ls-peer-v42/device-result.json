@@ -1,0 +1,65 @@
+{
+  "boot_sha256": "cf766dbede227acd7c14be02f55bd7fc82f86d24e04a05f49372ab640ba20b06",
+  "kernel_sha256": "82e71977803d3f6fe4fbd63e84dc5bafef7281e2d56adae7cb9cb6a4a2582a9f",
+  "photo": "screen-target150.jpg",
+  "photo_sha256": "4501a492f3f3ec67d060740d1394152987a6ada8c15999b6c65268bc31c994ea",
+  "sample": {
+    "cache_slide": "0x8f44000",
+    "target_seconds": 150,
+    "processes": 107,
+    "lsd": {
+      "pid": 98,
+      "threads": 5,
+      "visited": 5
+    },
+    "backboardd": {
+      "pid": 57,
+      "threads": 18,
+      "visited": 8
+    },
+    "springboard": {
+      "pid": 27,
+      "threads": 3,
+      "visited": 3
+    }
+  },
+  "lock": {
+    "reported_address": "0x1fd7c8878",
+    "unslid_address": "0x1f4884878",
+    "address_check": "0x1f4884878 + 0x8f44000 == 0x1fd7c8878",
+    "waits": 1,
+    "waiter_tid": "0x125",
+    "owner_tid": "0x5d7",
+    "register_check": "SpringBoard S1 a1 equals the LS lock address, so x1 is the ulock address"
+  },
+  "wait_channel": {
+    "row": "backboardd b1 id=184 st=9 w=fffffff5415408c8 x16=1e64adb80",
+    "user_chain": [
+      "_AXXIPCSendData",
+      "_XSendData",
+      "_mshMIGPerform",
+      "__CFRUNLOOP_IS_CALLING_OUT_TO_A_SOURCE1_PERFORM_FUNCTION__"
+    ],
+    "interpretation": [
+      "w is a kernel heap address, above kernel text (0xfffffff007...) and outside named data globals, so no symbol can name it",
+      "x16 is a shared-cache-range value, not a syscall number, so this thread is on an exception or fault entry, not inside a syscall",
+      "the only uninterruptible thread in this boot is backboardd's, while v39 and v41 showed lsd's instead"
+    ]
+  },
+  "lsd": {
+    "l1": "dispatch sync wait in -[_LSInstallProgressService performJournalRecovery]",
+    "l2_l4": "dispatch group wait at lsd lock 0x101105ee4 for the database seeding group",
+    "l3": "synchronous mach reply wait, message flags 0x40700420e",
+    "l5": "idle workqueue thread"
+  },
+  "observations": [
+    "Fourth reproduction of the LaunchServices lock with the same waiter/owner roles.",
+    "The uninterruptible thread moved from lsd to backboardd between boots while the seeding and lock waits stayed, which fits a shared lower layer rather than one process's logic.",
+    "The kernel wait channel is a heap object, so naming the subsystem needs zone or kernel-stack evidence, not symbols."
+  ],
+  "limitations": [
+    "A heap wait event has no symbol; zone/object introspection is required to name it.",
+    "Only threads whose kstate carries the uninterruptible bit printed w, so interruptible waiters stay invisible.",
+    "Five of five lsd threads were sampled this boot, but lsd's thread population still changes between boots."
+  ]
+}
