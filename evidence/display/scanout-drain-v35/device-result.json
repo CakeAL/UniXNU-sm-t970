@@ -1,0 +1,51 @@
+{
+  "boot_sha256": "0c99c6d4e218ee18879d122a24e13fb05e0a82f91e92170567f4c73e4684e2cf",
+  "photo": "screen-target150.jpg",
+  "photo_sha256": "de39eb0548e584d959d0d20885e127b0c5f887b78e3953cae04589e0c6de7577",
+  "association": "Owner photo following BOOT upload, identified by FB hold and src-lit. Device BOOT hash was not read back.",
+  "runtime": {
+    "target_seconds": 150,
+    "main": 1,
+    "processes": 110,
+    "cpu": 8,
+    "secondary": 7
+  },
+  "display": {
+    "hold": 0,
+    "published_ms": 23919,
+    "first_cpu_copy_ms": 144518,
+    "publish_to_first_copy_ms": 120599,
+    "open": 8,
+    "swap_ok": 4,
+    "swap_bad": 0,
+    "transfers": 3,
+    "copies": 3,
+    "retired": 3,
+    "vsync_start": 1,
+    "vsync_arm": 0,
+    "vsync_notify": 0,
+    "first_lit_source_extent": [
+      366,
+      176
+    ]
+  },
+  "data": {
+    "rc": 0,
+    "phase": 1,
+    "support": "0x1d0",
+    "available_blocks": 78252,
+    "block_bytes": 4096,
+    "available_bytes": 320520192
+  },
+  "sample": {
+    "cache_slide": "0x4500000",
+    "symbols": "symbols.json",
+    "backboardd": "AX display filter -> QuartzCore setInvertsColors: -> pthread mutex wait",
+    "springboard": "Control Center module availability lookup -> LaunchServices context -> unfair lock wait"
+  },
+  "limitations": [
+    "hold=0 means no tracked CPU writer was left when admission closed. Owner supplied a readable photo; display duration was not reported.",
+    "First nonblack IOSurface extent is not independently identified as the Apple logo.",
+    "Repeated stack positions across independent boots do not establish a permanent deadlock or identify either lock owner."
+  ]
+}

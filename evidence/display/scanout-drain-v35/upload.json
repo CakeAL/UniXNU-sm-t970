@@ -1,0 +1,13 @@
+{
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/data-bringup/scanout-drain-v35/boot-partition.img"
+  ],
+  "boot_sha256": "0c99c6d4e218ee18879d122a24e13fb05e0a82f91e92170567f4c73e4684e2cf",
+  "exit_code": 0,
+  "reboot_requested": true,
+  "readback_verified": false,
+  "hardware_result_pending": true
+}

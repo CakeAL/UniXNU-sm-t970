@@ -1,0 +1,50 @@
+{
+  "source_sha256": "374ea016a75d77f3794c92d41cea6a5e51a17fcd99a0d8095cd6174d0b2abe4e",
+  "geometry_header_sha256": "857bba99be57e8ffc3ee9ce14250fea4f2bc08a951e053986cebc433d2d4b117",
+  "compile_recipe_sha256": "9fc5352fc5fb5e911bc6a9a877b11b1b78d5fd64cd724a60a6aba9b58b95e180",
+  "object_sha256": "89c40e916b94cbf7236c62cd190c7f88d0cdf48f3ae52da2ecc6b7ce11c7bdfc",
+  "gop_object_sha256": "54e56f545f2fccecd9a6161bc1d841b978543acbc56dfae97642d0a25761859a",
+  "board_callbacks_resolved": [
+    "_native_legacy_backend_guard",
+    "_native_legacy_client_enter",
+    "_native_legacy_client_observed",
+    "_native_legacy_copy_timing_observed",
+    "_native_legacy_frame_colors_observed",
+    "_native_legacy_frame_observed",
+    "_native_legacy_gop_mapping_observed",
+    "_native_legacy_gpu_fallback_observed",
+    "_native_legacy_gpu_offer",
+    "_native_legacy_pm_observed",
+    "_native_legacy_prepare_scanout",
+    "_native_legacy_registration_observed",
+    "_native_legacy_retirement_observed",
+    "_native_legacy_surface_rejected",
+    "_native_legacy_swap_stage",
+    "_native_legacy_swap_validation_observed",
+    "_native_legacy_transfer_observed",
+    "_native_legacy_vsync_observed"
+  ],
+  "pending_original_aliases": [
+    "_native_legacy_set_refresh_properties",
+    "_native_legacy_surface_allocation",
+    "_native_legacy_surface_descriptor",
+    "_native_legacy_surface_format",
+    "_native_legacy_surface_height",
+    "_native_legacy_surface_planes",
+    "_native_legacy_surface_stride",
+    "_native_legacy_surface_width",
+    "_native_legacy_vsync_notify"
+  ],
+  "compiled": true,
+  "linked": false,
+  "runtime_display_verified": false,
+  "device_base": "836ecae2682b3c36b47f7f27d3126cea370987eb",
+  "framework": "2c834e313d25482c78d38d703eff1f8d190f2597",
+  "only_board_archive_member_replaced": true,
+  "kernel_prelink_passed": true,
+  "kernel_sha256": "fe4fe9c4fc76ef9aad86f455b683dfd7af2739fdc669e7fc24cc4881bb570a18",
+  "host_tests": [
+    "test_display_state.py",
+    "test_display_scanout_hold.py"
+  ]
+}
