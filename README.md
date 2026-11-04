@@ -23,7 +23,7 @@ BOOT6b83f4e6已恢复真实PMGR，并越过强制的可写APFS Data挂载检查�
 2 GiB 对照镜像 v62 已实测八核、220 个进程及 1,950 MiB 受管理内存。SpringBoard 主线程在
 CFRunLoop，BackBoard 完成 4 次 GOP 帧复制与退役。首帧仍在显示发布后约 94 秒出现。
 v63 实机显示 Hello 后转黑。防调暗实验 v68 实测到 360 秒诊断仍有帧更新，未再转黑。
-持续启动版 v69 已上传，触控和主屏幕仍待验证。板级默认仍为 512 MiB。
+持续启动版 v69 实机保持 Hello 可见，手指上滑和电源键无响应，主屏幕仍待验证。板级默认仍为 512 MiB。
 见 [v62 实测](evidence/display/owned-window-2g-v62/README.md)与
 [v69 持续启动](evidence/display/springboard-dim-continuous-v69/README.md)。
 

@@ -1,0 +1,11 @@
+{
+  "boot_sha256": "99218ca01e79bd89b2ac785622afd15b892954d4454808fb33f24ad3a38d2a7a",
+  "observation_source": "owner report after matching BOOT upload and reboot request",
+  "hello_screen_observed": true,
+  "hello_remained_visible": true,
+  "observation_duration_seconds": null,
+  "touch_swipe_responded": false,
+  "short_power_press_responded": false,
+  "home_screen_observed": false,
+  "photo_available": false
+}
