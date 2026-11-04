@@ -1,0 +1,16 @@
+{
+  "boot_sha256": "0afd75bce74cbfeb6e2af61d3f3b04dd5d79304db232588ff26d66b7add9c26c",
+  "photo": "screen-sleep-wake-panic.jpg",
+  "photo_sha256": "261d411d9e6af265ff4fdcd2b1aa4a5f3d5fc53d9458285b55644f37d756c6d6",
+  "photo_time_local": "2026-11-04T22:55:43+08:00",
+  "panic": "Sleep/Wake hang detected @IOPMrootDomain.cpp:12812",
+  "caller": {
+    "return_address": "0xfffffff0078c6b18",
+    "symbol": "IOService::watchdog_timer_expired",
+    "offset": "0x60"
+  },
+  "managed_pages": "0x79e2e",
+  "free_pages": "0x1a61",
+  "terminal_report_observed": false,
+  "initiating_service_identified": false
+}

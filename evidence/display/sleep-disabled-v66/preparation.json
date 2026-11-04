@@ -1,0 +1,19 @@
+{
+  "base_boot_sha256": "ed1868cf958317f4ce9ec8e67bc0fa4df90e17a767c8089a67b19fb7d4fe3dd1",
+  "boot_sha256": "a3460abae20480f172a7a4d7436ce24e7003e0c3c42bb42a6be0d0b23d16322e",
+  "boot_bytes": 71303168,
+  "requested_bytes": 2147483648,
+  "unchanged_payload_sha256": {
+    "unixnu.toml": "db27907a19b70a6134baa78dbc733b383590429e87a7f14dbfdbcbb12fff5961",
+    "Payloads/kernel.macho": "133077bd5e26b100baf7f4f392e659a17370479b3ebb8e462806661126d37c60",
+    "Payloads/kernel.macho.trustcache": "7416ca4f8377146626bb284e2133c76bee6cb4e3ee0af5d648b186235a7323a7",
+    "Payloads/scratch-data.img": "4591566eccd77f0f9d13a1338ecaf3c73ce86cd04aeea732d91db6b2e100ca3a"
+  },
+  "unchanged_header_firmware_dtb_tail": true,
+  "uploaded": false,
+  "base_adt_sha256": "53b27905f329af319e7da5552306ef2b56beb46f9201e69d8afee73769e0bdaf",
+  "adt_sha256": "b32ba77d5083d2d8d4f12c5b8e1dcded456e64b888f1f5a50115279015c71997",
+  "only_adt_property_changed": "/defaults/sleep-disabled",
+  "sleep_disabled": 1,
+  "terminal_runtime_report": false
+}

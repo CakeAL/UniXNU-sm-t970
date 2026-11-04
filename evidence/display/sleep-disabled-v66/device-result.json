@@ -1,0 +1,9 @@
+{
+  "boot_sha256": "a3460abae20480f172a7a4d7436ce24e7003e0c3c42bb42a6be0d0b23d16322e",
+  "observation_source": "owner report after matching BOOT upload and reboot request",
+  "hello_screen_observed": true,
+  "hello_visible_seconds_approx": 10,
+  "screen_went_black": true,
+  "panic_result": "not reported",
+  "interpretation": "The shared ADT policy did not keep the T970 Setup screen visible. This observation does not identify the failing transition."
+}

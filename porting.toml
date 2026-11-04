@@ -945,6 +945,8 @@ id = "display"
 status = "planned"
 components = []
 paths = [
+  "evidence/display/sleep-disabled-v66/**",
+  "evidence/display/no-idle-v65/**",
   "evidence/display/hello-black-v64/**",
   "evidence/display/owned-window-2g-continuous-v63/**",
   "evidence/display/owned-window-2g-v62/**",
@@ -1022,6 +1024,8 @@ procedure = [
   "Collect DRM modes, panel type and brightness limits; read only display-selection tokens from /proc/cmdline and match the selected S6TUUM3 node in the live DT.",
 ]
 findings = [
+  "v65 with noidle=1 still shows Hello and then turns black after about ten seconds. The owner photo shows no panic text. v66 uses the sleep-disabled ADT default also used on T733 and dada; it retains noidle and adds only that property to the tested payload.",
+  "v64 owner photo confirms Sleep/Wake hang detected at IOPMrootDomain.cpp:12812. The linked stack reaches IOService::watchdog_timer_expired; this timer belongs to the PM root domain. The original triggering request and blocked child are unknown. v65 changes only noidle=1 on the continuous v63 image and preserves the power watchdog.",
   "v64 changes the board observation callbacks only in the reviewed display archive, then relinks and repacks the v63 layout with a 240-second runtime report. The new fields track the latest completed CPU copy, explicit blank fill and sampled black source. The source scan is bounded and occurs before copying.",
   "The owner target120 reference shows GOP published, three swaps/copies/retirements, first copy at 114.231 seconds and software vsync start1/arm0. SpringBoard and BackBoard are active, with no desktop observation. The photo has no matching upload receipt. v62 reaches 220 processes with four copies and SpringBoard S1 in a CFRunLoop Mach receive. Publish to first copy remains about 94 seconds. v63 removes the terminal report and reaches visible Hello setup per the owner. Animation stutters and the screen goes black about four seconds later. A short power press did not restore it. v64 adds last copy, blank-fill and dark-source timing in a 240-second diagnostic. The home screen remains unverified.",
   "V37 mode9 limits the report to two processes and one line per sampled thread. It records the current CPU scanout writer thread ID. Host row/line budget and final FAT checks pass. BOOTea3e7c10 owner photo shows both processes and clipped0. Hold0/writer0, two frame retirements. BackBoard samples setGrayscale and SwapEnd. SpringBoard samples the recurring LaunchServices lock and a synchronous Mach wait.",
@@ -1091,13 +1095,17 @@ limits = [
   "Framebuffer physical address, stride, pixel format and UEFI GOP handoff are not verified by the mode list.",
 ]
 next_action = [
-  "Read the v64 FB line after the observed Hello-to-black transition. Compare last successful copy with explicit blank or dark source timestamps, and keep panel state and input as separate measurements.",
+  "v66 still turned black about ten seconds after Hello. Capture the root-domain state, wait reason and pending service class on the next PM watchdog expiry.",
   "V31 confirmed spare RAM Data capacity at target125. V35 reports hold0 and reproduces the v34 BB QuartzCore mutex and SB LaunchServices context waits. V36 shows SwapEnd and dispatch group wait in BackBoard, but screen clips before SpringBoard. V37 fits both processes on screen. Capture the resolved SpringBoard unfair-lock owner, then map that ID to the peer stacks. Compare source extent with a straight-on photo only if both show the same frame.",
 ]
 
 evidence = [
+  { kind = "device", reference = "evidence/display/no-idle-v65/device-result.json", revision = "2fb4fc1eb578ae3640396e5308aeb277ac7f7da2", command = "Owner observation after BOOTed1868cf upload", result = "Hello appeared and the panel went black about ten seconds later, with no visible panic text." },
+  { kind = "device", reference = "evidence/display/sleep-disabled-v66/upload.json", revision = "2fb4fc1eb578ae3640396e5308aeb277ac7f7da2", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/sleep-disabled-v66/boot-partition.img", result = "BOOT upload and reboot request succeeded. Owner later reports black screen about ten seconds after Hello." },
+  { kind = "device", reference = "evidence/display/hello-black-v64/device-result.json", revision = "2fb4fc1eb578ae3640396e5308aeb277ac7f7da2", command = "Owner photo after BOOT0afd75bc upload and xcrun nm -n -m of the linked kernel", result = "Root-domain power watchdog panic at IOPMrootDomain.cpp:12812; the 240-second report was not reached." },
+  { kind = "device", reference = "evidence/display/no-idle-v65/upload.json", revision = "2fb4fc1eb578ae3640396e5308aeb277ac7f7da2", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/no-idle-v65/boot-partition.img", result = "BOOT upload and reboot request succeeded. Owner later observed Hello followed by black after about ten seconds." },
   { kind = "host", reference = "evidence/display/hello-black-v64/preparation.json", revision = "2561e445a386b33b3dc4069a3f5ee43234d9fe05", command = "python3.14 evidence/display/hello-black-v64/build-kernel.py && python3.14 evidence/display/hello-black-v64/prepare.py", result = "Display archive member audit, kernel prelink and final FAT verification pass. The 2 GiB ADT, Data seed and trust cache are unchanged." },
-  { kind = "device", reference = "evidence/display/hello-black-v64/upload.json", revision = "2561e445a386b33b3dc4069a3f5ee43234d9fe05", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/hello-black-v64/boot-partition.img", result = "BOOT-only upload completed and reboot requested. Black-screen snapshot pending." },
+  { kind = "device", reference = "evidence/display/hello-black-v64/upload.json", revision = "2561e445a386b33b3dc4069a3f5ee43234d9fe05", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/hello-black-v64/boot-partition.img", result = "BOOT-only upload completed and reboot requested. The scheduled snapshot was superseded by a Sleep/Wake panic." },
   { kind = "device", reference = "evidence/display/owned-window-2g-continuous-v63/device-result.json", revision = "2561e445a386b33b3dc4069a3f5ee43234d9fe05", command = "Owner observation after BOOT4ba79c66 upload", result = "Visible iPadOS Hello setup with slow animation. Screen went black about four seconds later and did not relight on a short power press. Main screen, touch and GPU remain unverified." },
   { kind = "device", reference = "evidence/display/owned-window-2g-v62/device-result.json", revision = "2561e445a386b33b3dc4069a3f5ee43234d9fe05", command = "Owner photo after BOOT07f38ad9 upload, target120", result = "Five accepted swaps, four copies and retirements, and first copy at 126.532 seconds. SpringBoard main sample in CFRunLoop and BackBoard b4 in SwapEnd. No desktop evidence." },
   { kind = "device", reference = "evidence/display/owned-window-2g-continuous-v63/upload.json", revision = "2561e445a386b33b3dc4069a3f5ee43234d9fe05", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/owned-window-2g-continuous-v63/boot-partition.img", result = "BOOT-only upload completed and reboot requested. The final FAT confirms that the only configuration change is removal of the terminal report. Owner later reports visible Hello followed by a black screen." },
@@ -1325,6 +1333,9 @@ id = "power"
 status = "planned"
 components = []
 paths = [
+  "evidence/display/sleep-disabled-v66/**",
+  "evidence/display/no-idle-v65/**",
+  "evidence/display/hello-black-v64/**",
   "evidence/adb-2026-11-01/power.txt",
 ]
 inputs = [
@@ -1340,18 +1351,24 @@ procedure = [
   "Read selected power-supply attributes, available sleep states and thermal-zone names; do not write charging, regulator or suspend controls.",
 ]
 findings = [
+  "v65 with noidle=1 still shows Hello and then turns black after about ten seconds. The owner photo shows no panic text. v66 uses the sleep-disabled ADT default also used on T733 and dada; it retains noidle and adds only that property to the tested payload.",
+  "v64 owner photo confirms Sleep/Wake hang detected at IOPMrootDomain.cpp:12812. The linked stack reaches IOService::watchdog_timer_expired; this timer belongs to the PM root domain. The original triggering request and blocked child are unknown. v65 changes only noidle=1 on the continuous v63 image and preserves the power watchdog.",
   "Advertised Android sleep states and power-supply entries do not establish UniXNU suspend, charging support or physical presence of every listed supply type.",
 ]
 completion = [
   "Battery units match measurements, charging and thermal controls operate correctly, and each supported sleep/resume transition restores dependent peripherals.",
 ]
 limits = [
-  "Vendor battery units, firmware ownership and state transitions remain unverified; no suspend/resume or charging-control experiment was run.",
+  "Vendor battery units, firmware ownership and state transitions remain unverified; The v64 panic identifies a PM timeout but does not establish suspend or resume functionality.",
 ]
 next_action = [
   "Read the matching battery/charger driver sources to establish units and ownership, then map required regulators and clocks for the first boot path.",
 ]
 evidence = [
+  { kind = "device", reference = "evidence/display/no-idle-v65/device-result.json", revision = "2fb4fc1eb578ae3640396e5308aeb277ac7f7da2", command = "Owner observation after BOOTed1868cf upload", result = "Hello appeared and the panel went black about ten seconds later, with no visible panic text." },
+  { kind = "device", reference = "evidence/display/sleep-disabled-v66/upload.json", revision = "2fb4fc1eb578ae3640396e5308aeb277ac7f7da2", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/sleep-disabled-v66/boot-partition.img", result = "BOOT upload and reboot request succeeded. Owner later reports black screen about ten seconds after Hello." },
+  { kind = "device", reference = "evidence/display/hello-black-v64/device-result.json", revision = "2fb4fc1eb578ae3640396e5308aeb277ac7f7da2", command = "Owner photo after BOOT0afd75bc upload and xcrun nm -n -m of the linked kernel", result = "Root-domain power watchdog panic at IOPMrootDomain.cpp:12812; the 240-second report was not reached." },
+  { kind = "device", reference = "evidence/display/no-idle-v65/upload.json", revision = "2fb4fc1eb578ae3640396e5308aeb277ac7f7da2", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/no-idle-v65/boot-partition.img", result = "BOOT upload and reboot request succeeded. Owner later observed Hello followed by black after about ten seconds." },
   { kind = "device", reference = "evidence/adb-2026-11-01/power.txt", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Saved charger/fuel-gauge paths, raw battery snapshot, sleep-state declarations and thermal-zone names.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },
   { kind = "device", reference = "evidence/adb-2026-11-01/live-device-tree.dts", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Board battery, charger, regulator and RPMh input declarations.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },
 ]

@@ -1,0 +1,11 @@
+{
+  "boot_sha256": "ed1868cf958317f4ce9ec8e67bc0fa4df90e17a767c8089a67b19fb7d4fe3dd1",
+  "observation_source": "owner report after matching BOOT upload and reboot request",
+  "hello_screen_observed": true,
+  "hello_visible_seconds_approx": 10,
+  "screen_went_black": true,
+  "photo_sha256": "8a3b786aacfe671a85725eb38e115d8ad123a5218506ad00abdbb5856facc970",
+  "photo_time_local": "2026-11-04T23:01:41+08:00",
+  "panic_text_visible": false,
+  "interpretation": "The noidle comparison did not keep Setup visible. The black-screen photograph does not establish whether the v64 panic recurred."
+}
