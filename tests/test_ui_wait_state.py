@@ -133,6 +133,9 @@ int main(void){
  captureStarted=captureDone=0;userStacks=7;copiesBefore=copies;strcpy(processes[2].name,"lsd");
  text=native_t970_ui_wait_text();assert(strstr(text,"stacks=7")&&strstr(text,"SpringBoard p0")&&strstr(text,"lsd p2")&&strstr(text,"S4 FP=")&&strstr(text,"l4 FP=")&&!strstr(text,"S5 st=")&&!strstr(text,"l5 st=")&&!strstr(text,"backboardd p")&&strstr(text,"UI batch end processes=2 clipped=0"));
  assert(copies==copiesBefore+8&&strstr(text,"n=8 e=0")&&!map_storage.refs);
+ captureStarted=captureDone=0;userStacks=8;copiesBefore=copies;
+ text=native_t970_ui_wait_text();assert(strstr(text,"stacks=8")&&strstr(text,"lsd p2")&&strstr(text,"l5 FP=")&&strstr(text,"l8 FP=")&&!strstr(text,"l4 st=")&&!strstr(text,"l9 st=")&&!strstr(text,"SpringBoard p")&&strstr(text,"UI batch end processes=1 clipped=0"));
+ assert(copies==copiesBefore+4&&strstr(text,"n=16 e=0")&&!map_storage.refs);
  waitCount=0;userStacks=1;
  captureStarted=captureDone=0;workerError=17;text=native_t970_ui_wait_text();assert(strstr(text,"worker start error=17"));workerError=0;
  captureStarted=captureDone=0;stalled=1;text=native_t970_ui_wait_text();assert(waitCount==20&&strstr(text,"partial rows hidden"));

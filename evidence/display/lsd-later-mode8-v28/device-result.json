@@ -1,0 +1,49 @@
+{
+  "boot_sha256": "f69965a7eefcfe6213b3f0a65f63fa558b61389dcb39512aa5d197dfaf655a3a",
+  "photo": "screen-target90.jpg",
+  "photo_sha256": "15a00d50be23ee2e374778886cacb8730039a63824908abf6fb8ae30a65f34f2",
+  "association": "owner photo following successful BOOT upload; no device hash readback",
+  "runtime": {
+    "target": 90,
+    "main": 1,
+    "processes": 112,
+    "cpu": 8,
+    "secondary": 7,
+    "sb_pid": 27,
+    "bb_pid": 57,
+    "lsd_pid": 99,
+    "verified_blocks": 1035137
+  },
+  "display": {
+    "client_open": 5,
+    "swap_ok": 0,
+    "copy": 0,
+    "retire": 0
+  },
+  "sample": {
+    "mode": 8,
+    "lsd_threads": 7,
+    "lsd_visited": 7,
+    "lsd_busy": 0,
+    "sampled": [
+      5,
+      6,
+      7
+    ],
+    "processes": 1,
+    "clipped": 0,
+    "cache_slide": "0xf414000"
+  },
+  "observations": [
+    "lsd thread 5 handles an exported XPC request and waits for database seeding through dispatch_group_wait",
+    "lsd threads 6 and 7 are in workqueue entry"
+  ],
+  "limitations": [
+    "live sample is not atomic",
+    "thread order differs between boots",
+    "sampled waiters do not identify the seeding worker or its dependency",
+    "no Wi-Fi lookup observed",
+    "before first frame in this run"
+  ],
+  "symbols": "symbols.json"
+}

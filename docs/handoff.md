@@ -5,6 +5,8 @@
 
 ## 最新：首帧后的持续运行对照（2026-11-04）
 
+约 90 秒诊断 BOOT `f69965a7…` 的机主照片显示 lsd7线程、完整采到第5–7：第5经 XPC 等待数据库 seeding，第6/7处于工作队列入口。没有捕获 seeding 执行线程或 Wi-Fi 查询；跨启动顺序可能变化。见 [lsd 后半采样](../evidence/display/lsd-later-mode8-v28/README.md)。
+
 参考 Poco F1 移植遇到几乎相同的 SB → LaunchServices → 锁等待，进一步采样 lsd 并查到 Wi-Fi 地址查询。T970 的 21H461 MobileGestalt 含相关字符串、v24 ADT 缺少相应地址属性，但这不证明同一根因。约 90 秒 BOOT `aeb13ffc…` 已经实机显示 lsd7线程、采前4，其中线程3等待数据库 seeding、线程1/2处于安装记录恢复与队列/group 等待；SB仍等待 BackBoard 屏幕信息、swap0。lsd5–7 未采到，不能证明 Wi-Fi 查询是原因。对照和符号见 [UI 启动对照](ui-reference-comparison.md) 与 [采样说明](../evidence/display/springboard-mode7-v27/README.md)。
 
 诊断 BOOT `e82eec17…` 基于 `bb4d8474…`，只把终止报告目标从 125 秒延至 300 秒。机主授权后仅 BOOT 上传成功、未设备读回；照片显示 main1、CPU8、open7、swap/copy/retire 各7。SB 首线程等 unfair lock，上层 LaunchServices/Control Center 栈与 125 秒照片相同；BB 首线程在 CFRunLoop Mach 接收。两次为独立启动，不能证明持续刷新或永久死锁。机主要求后续缩短等待，详见 [300 秒对照](../evidence/display/display-late-v26/README.md)。

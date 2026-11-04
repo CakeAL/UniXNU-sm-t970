@@ -12,6 +12,8 @@
 
 实机 `aeb13ffc` 的 90 秒样本显示 lsd7线程、采前4，其中一条通过 XPC 进入等待数据库 seeding 的函数，另两条在安装记录恢复及 dispatch group 等待；SpringBoard 仍在等待 BackBoard 主屏幕信息、尚无 swap。采样没有覆盖 lsd5–7，不能认定数据库由 Wi-Fi 地址阻塞。照片和符号见 `evidence/display/springboard-mode7-v27/`。
 
+独立启动 `f69965a7` 采 lsd5–7：第5也在经 XPC 等待 seeding，第6/7在工作队列入口；该样本没有捕获 seeding 执行线程，也没有证明 Wi-Fi 查询。参考项目的属性在 ADT 中是两项各6字节的本地管理地址；任何此类值在本板只能是显式的隔离诊断输入，不能作为真实设备身份或 Wi-Fi 功能证据。见 `evidence/display/lsd-later-mode8-v28/` 及 [参考属性实现](https://github.com/ry-diffusion/Bergamota/blob/37a7a7a917fc09945ed2f7d1ae68b84d4525b4cb/tools/mkadt.py)。
+
 本轮重新通过GitHub连接读取固定提交的实际代码，范围不止README。
 具体提交、文件与blob见`evidence/display/ui-call-v9/reference-sources.json`。
 

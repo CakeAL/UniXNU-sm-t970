@@ -1,0 +1,23 @@
+
+out/data-bringup/sm-t970/ipados-17.7.11-21H461/sm-t970_data/kernel/kernel.macho:	file format mach-o arm64
+
+Disassembly of section __TEXT_EXEC,__text:
+
+fffffff0079a16d0 <_native_t970_ui_wait_text>:
+fffffff0079a16d0: d10183ff     	sub	sp, sp, #0x60
+fffffff0079a16d4: a9025ff8     	stp	x24, x23, [sp, #0x20]
+fffffff0079a16d8: a90357f6     	stp	x22, x21, [sp, #0x30]
+fffffff0079a16dc: a9044ff4     	stp	x20, x19, [sp, #0x40]
+fffffff0079a16e0: a9057bfd     	stp	x29, x30, [sp, #0x50]
+fffffff0079a16e4: 910143fd     	add	x29, sp, #0x50
+fffffff0079a16e8: b9001fff     	str	wzr, [sp, #0x1c]
+fffffff0079a16ec: d0ffb940     	adrp	x0, 0xfffffff0070cb000 <_native_t970_cs_note.hex+0x2c47>
+fffffff0079a16f0: 9107d000     	add	x0, x0, #0x1f4
+fffffff0079a16f4: 910073e1     	add	x1, sp, #0x1c
+fffffff0079a16f8: 52800082     	mov	w2, #0x4        ; =4
+fffffff0079a16fc: 97ff013a     	bl	0xfffffff007961be4 <_PE_parse_boot_argn>
+fffffff0079a1700: b9401fe8     	ldr	w8, [sp, #0x1c]
+fffffff0079a1704: 51000508     	sub	w8, w8, #0x1
+fffffff0079a1708: 7100001f     	cmp	w0, #0x0
+fffffff0079a170c: 7a471902     	ccmp	w8, #0x7, #0x2, ne
+fffffff0079a1710: 54000669     	b.ls	0xfffffff0079a17dc <_native_t970_ui_wait_text+0x10c>

@@ -1,0 +1,14 @@
+{
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/data-bringup/lsd-later-mode8-memory768-v1/boot-partition.img"
+  ],
+  "boot_sha256": "f69965a7eefcfe6213b3f0a65f63fa558b61389dcb39512aa5d197dfaf655a3a",
+  "exit_code": 0,
+  "reboot_requested": true,
+  "readback_verified": false,
+  "hardware_result_pending": false,
+  "device_result": "device-result.json"
+}

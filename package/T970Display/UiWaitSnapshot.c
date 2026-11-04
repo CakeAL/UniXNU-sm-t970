@@ -44,7 +44,7 @@ static int ui_user_address(uint64_t address,unsigned size) {
  return address>=4096 && address<(UINT64_C(1)<<39) && size<=(UINT64_C(1)<<39)-address;
 }
 static int ui_stack_selected(const char *name,unsigned index) {
- return readUserStacks==5 || readUserStacks==7 ? 1 : readUserStacks==1 ? index==1 : readUserStacks==4 ? 1 : readUserStacks==3 ? index<=2 : readUserStacks==2 && name[0]=='b' && index>1;
+ return readUserStacks==5 || readUserStacks==7 || readUserStacks==8 ? 1 : readUserStacks==1 ? index==1 : readUserStacks==4 ? 1 : readUserStacks==3 ? index<=2 : readUserStacks==2 && name[0]=='b' && index>1;
 }
 static void ui_stack_read(struct native_t970_ui_wait_row *row,vm_map_t map) {
  uint64_t fp=row->fp;
@@ -82,7 +82,9 @@ static int native_t970_ui_wait_collect(proc_t p,void *context)
  struct native_t970_ui_wait_buffer *out=context;
  char name[17]={0};int pid=proc_pid(p);proc_name(pid,name,sizeof(name));name[sizeof(name)-1]=0;
  unsigned gestalt=!strncmp(name,"MobileGestalt",13) || !strncmp(name,"mobilegestalt",13);
- if(readUserStacks==7) {
+ if(readUserStacks==8) {
+  if(strcmp(name,"lsd"))return PROC_RETURNED;
+ } else if(readUserStacks==7) {
   if(strcmp(name,"SpringBoard") && strcmp(name,"lsd"))return PROC_RETURNED;
  } else if(readUserStacks==5 || readUserStacks==6) {
   if(!gestalt && strcmp(name,"SpringBoard") && strcmp(name,"backboardd"))return PROC_RETURNED;
@@ -120,8 +122,8 @@ static int native_t970_ui_wait_collect(proc_t p,void *context)
   if(readUserStacks && task->map){map=task->map;vm_map_reference(map);}
   thread_t thread;
   queue_iterate(&task->threads,thread,thread_t,task_threads) {
-   if(visited>=((readUserStacks==4 || readUserStacks==5)?8:4))break;
-   ++visited;if(readUserStacks==4 && visited<=4)continue;
+   if(visited>=((readUserStacks==4 || readUserStacks==5 || readUserStacks==8)?8:4))break;
+   ++visited;if((readUserStacks==4 || readUserStacks==8) && visited<=4)continue;
    boolean_t irq=ml_set_interrupts_enabled(FALSE);
    if(!simple_lock_try(&thread->sched_lock,&thread_lck_grp)){++busy;ml_set_interrupts_enabled(irq);continue;}
    arm_saved_state_t *state=thread->machine.upcb;
@@ -190,7 +192,7 @@ static int native_t970_ui_wait_collect(proc_t p,void *context)
    }
   }
  }
- return out->selected>=(readUserStacks==5?3U:2U)?PROC_RETURNED_DONE:PROC_RETURNED;
+ return out->selected>=(readUserStacks==5?3U:readUserStacks==8?1U:2U)?PROC_RETURNED_DONE:PROC_RETURNED;
 }
 static void ui_collect(void) {
  memset(&capture,0,sizeof(capture));
@@ -211,7 +213,7 @@ static void ui_stack_worker(void *parameter,wait_result_t result) {
 const char *native_t970_ui_wait_text(void)
 {
  unsigned enabled=0;
- unsigned stackMode=PE_parse_boot_argn("t970-ui-stack",&enabled,sizeof(enabled)) && (enabled>=1 && enabled<=7);
+ unsigned stackMode=PE_parse_boot_argn("t970-ui-stack",&enabled,sizeof(enabled)) && (enabled>=1 && enabled<=8);
  if(!stackMode){readUserStacks=0;ui_collect();return capture.text;}
  static char pending[128];
  if(!__atomic_exchange_n(&captureStarted,1,__ATOMIC_ACQ_REL)) {

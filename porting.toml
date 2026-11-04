@@ -927,6 +927,7 @@ id = "display"
 status = "planned"
 components = []
 paths = [
+  "evidence/display/lsd-later-mode8-v28/**",
   "evidence/display/springboard-mode7-v27/**",
   "scripts/check-mobilegestalt-reference.py",
   "evidence/display/display-late-v26/**",
@@ -987,6 +988,7 @@ procedure = [
   "Collect DRM modes, panel type and brightness limits; read only display-selection tokens from /proc/cmdline and match the selected S6TUUM3 node in the live DT.",
 ]
 findings = [
+  "Mode8 BOOTf69965a7 target90 photo captures lsd threads5-7: thread5 handles an XPC request waiting for database seeding, threads6/7 are in workqueue entry; report end marker unclipped. The seeding worker and Wi-Fi lookup were not observed, and thread order can change across boots. See evidence/display/lsd-later-mode8-v28.",
   "Poco F1 iOS16 port reports the same Control Center/LaunchServices/unfair-lock caller chain and traced its stall through lsd seeding and a Wi-Fi address wait. Original 21H461 MobileGestalt contains relevant address and IONetworkController strings; actual T970 v24 ADT lacks both address properties. BOOTaeb13ffc target90 photo shows lsd7 threads, first4 sampled: install journal recovery/dispatch queue, inactive installs/dispatch group, and an XPC call waiting for database seeding. SB still waits for BackBoard screen info, swap0. lsd5-7, seeding owner and cause are unobserved; strings do not prove Wi-Fi lookup. See docs/ui-reference-comparison.md and evidence/display/springboard-mode7-v27.",
   "BOOTe82eec17 target300 owner photo shows main1, CPU8, open7, swap7/0, copy7 and retire7; upload was successful but not read back. SB waits on an unfair lock under the same LaunchServices/Control Center caller chain sampled in the independent target125 boot. BB first thread is in CFRunLoop Mach receive. These two snapshots neither prove continuous refresh nor establish a permanent deadlock. Owner requests shorter future waits. See evidence/display/display-late-v26.",
   "Host prepared BOOTb6e55159 from observed BOOTbb4d8474, removing only the terminal 125-second runtime report argument. FAT roundtrip passes. After two failed pre-upload attempts the authorized BOOT upload succeeded without readback. Owner observed unchanged Apple logo for over three minutes following reboot, without other screen or reboot; background progress, frame updates and desktop remain unverified. check-platform stops before DT/ADT because the sibling framework HEAD differs from the reviewed pin. See evidence/display/display-continuous-v25.",
@@ -1047,10 +1049,13 @@ limits = [
   "Framebuffer physical address, stride, pixel format and UEFI GOP handoff are not verified by the mode list.",
 ]
 next_action = [
-  "Capture lsd threads 5-7 and inspect the database seeding path; assess the reference Wi-Fi-address hypothesis and Data free space before attributing the unchanged Apple logo to a specific cause.",
+  "Assess the reference Wi-Fi-address hypothesis with an isolated controlled comparison and investigate Data free space before attributing the unchanged Apple logo to a specific cause. Do not treat a synthetic address as hardware identity or Wi-Fi support.",
 ]
 
 evidence = [
+  { kind = "host", reference = "evidence/display/lsd-later-mode8-v28/preparation.json", revision = "ae278f227831fe64e360fcd9826d2a806aaa1749", command = "python3.14 evidence/display/lsd-later-mode8-v28/build-image.py", result = "Mode8 target90 BOOTf69965a7 built and FAT roundtrip passed; sampler host tests and private ABI compile passed. No device result. Platform check stopped before DT/ADT due to mismatched reviewed framework revision." },
+  { kind = "device", reference = "evidence/display/lsd-later-mode8-v28/upload.json", revision = "ae278f227831fe64e360fcd9826d2a806aaa1749", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/lsd-later-mode8-memory768-v1/boot-partition.img", result = "Owner authorized BOOT upload and reboot; Heimdall reported success and requested reboot. No device readback." },
+  { kind = "device", reference = "evidence/display/lsd-later-mode8-v28/device-result.json", revision = "ae278f227831fe64e360fcd9826d2a806aaa1749", command = "Owner photo after BOOTf69965a7 upload and reboot", result = "Target90 captures lsd5 waiting for database seeding via XPC and lsd6/7 at workqueue entry; no seeding worker or Wi-Fi lookup established." },
   { kind = "host", reference = "evidence/display/springboard-mode7-v27/preparation.json", revision = "7157ffdcccc1fdf4993ae5b04e637a81840d6d12", command = "python3.14 evidence/display/springboard-mode7-v27/build-image.py", result = "Mode7 target90 BOOTaeb13ffc built and FAT roundtrip passed. Actual helper ASan/UBSan and Mach-private compile passed; no hardware result. Platform check refused mismatched reviewed framework revision before DT/ADT verification." },
   { kind = "device", reference = "evidence/display/springboard-mode7-v27/upload.json", revision = "7157ffdcccc1fdf4993ae5b04e637a81840d6d12", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/springboard-lsd-mode7-memory768-v1/boot-partition.img", result = "Owner authorized BOOT upload and reboot; Heimdall reported success and requested reboot. No device readback." },
   { kind = "device", reference = "evidence/display/springboard-mode7-v27/device-result.json", revision = "7157ffdcccc1fdf4993ae5b04e637a81840d6d12", command = "Owner photo after BOOTaeb13ffc upload and reboot", result = "Target90, both requested processes sampled and end marker unclipped. lsd thread3 waits for database seeding via an XPC call; threads5-7 and the cause are unobserved. SB waits for BackBoard screen info; no frames yet." },
