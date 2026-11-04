@@ -948,6 +948,7 @@ id = "display"
 status = "planned"
 components = []
 paths = [
+  "evidence/display/springboard-dim-continuous-v69/**",
   "evidence/display/springboard-dim-v68/**",
   "evidence/display/pm-watchdog-v67/**",
   "patches/xnu/t970-pm-watchdog-detail.patch",
@@ -1030,7 +1031,7 @@ procedure = [
   "Collect DRM modes, panel type and brightness limits; read only display-selection tokens from /proc/cmdline and match the selected S6TUUM3 node in the live DT.",
 ]
 findings = [
-  "v68 compares matched RAM-Data BOOT images with and without the three SpringBoard idle/dim preferences used by Sirius. The 21H461 cache has direct references from SBIdleTimerDefaults and SBPowerDefaults. The BOOTs share kernel, ADT, trust cache, arguments and firmware. The treatment was uploaded; runtime preference use and display outcome await device observation.",
+  "v68 compares matched RAM-Data BOOT images with and without the three SpringBoard idle/dim preferences used by Sirius. The 21H461 cache has direct references from SBIdleTimerDefaults and SBPowerDefaults. The BOOTs share kernel, ADT, trust cache, arguments and firmware. The owner reports that the treatment did not go black. At target360 there are 253 successful CPU copies and retirements with blank/dark=0/0; the last copy was at 379990 ms. The paired RAM control is still unbooted, so the effect cannot yet be attributed solely to the preferences. v69 removes only the terminal report.",
   "v67 adds an opt-in root-domain watchdog panic detail with PM machine state, wait reason, current and requested power states, pending count and first pending service class. It also retains a 240-second frame report if no watchdog fires. Kernel prelink and final BOOT FAT checks pass. The device reaches target240 with a completed blank GOP fill 28 ms after the last normal CPU copy. No PM watchdog panic occurred before the report.",
   "v65 with noidle=1 still shows Hello and then turns black after about ten seconds. The owner photo shows no panic text. v66 uses the sleep-disabled ADT default also used on T733 and dada; it retains noidle and adds only that property to the tested payload.",
   "v64 owner photo confirms Sleep/Wake hang detected at IOPMrootDomain.cpp:12812. The linked stack reaches IOService::watchdog_timer_expired; this timer belongs to the PM root domain. The original triggering request and blocked child are unknown. v65 changes only noidle=1 on the continuous v63 image and preserves the power watchdog.",
@@ -1103,12 +1104,14 @@ limits = [
   "Framebuffer physical address, stride, pixel format and UEFI GOP handoff are not verified by the mode list.",
 ]
 next_action = [
-  "Compare Hello duration and final blank-fill timestamp between v68 SpringBoard preference treatment and RAM-Data control. Keep power timeout and input verification separate.",
+  "Verify extended screen visibility on the v69 continuous image. Test touch and Setup completion separately. The v68 matched RAM-Data control is retained for attribution.",
   "V31 confirmed spare RAM Data capacity at target125. V35 reports hold0 and reproduces the v34 BB QuartzCore mutex and SB LaunchServices context waits. V36 shows SwapEnd and dispatch group wait in BackBoard, but screen clips before SpringBoard. V37 fits both processes on screen. Capture the resolved SpringBoard unfair-lock owner, then map that ID to the peer stacks. Compare source extent with a straight-on photo only if both show the same frame.",
 ]
 
 evidence = [
-  { kind = "device", reference = "evidence/display/springboard-dim-v68/upload.json", revision = "2e16664c9230a3788e028fb5f90f777e24671be2", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/springboard-dim-v68/anti-dim/boot-partition.img", result = "BOOT upload completed and reboot requested. Treatment behavior is pending." },
+  { kind = "device", reference = "evidence/display/springboard-dim-v68/device-result.json", revision = "22a355b6bf7d7fce3f1290c4d97daedef741614b", command = "Owner photo after BOOT26915396 upload, target360", result = "No black screen reported. 253 copies and retirements, blank/dark=0/0. The matched control has not run." },
+  { kind = "device", reference = "evidence/display/springboard-dim-continuous-v69/upload.json", revision = "22a355b6bf7d7fce3f1290c4d97daedef741614b", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/springboard-dim-continuous-v69/boot-partition.img", result = "Only the timed terminal report was removed. Upload and reboot request succeeded; extended display and input are pending." },
+  { kind = "device", reference = "evidence/display/springboard-dim-v68/upload.json", revision = "2e16664c9230a3788e028fb5f90f777e24671be2", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/springboard-dim-v68/anti-dim/boot-partition.img", result = "BOOT upload completed and reboot requested. The target360 owner photo and report confirm no observed black screen." },
   { kind = "host", reference = "evidence/display/springboard-dim-v68/preparation.json", revision = "2e16664c9230a3788e028fb5f90f777e24671be2", command = "python3.14 evidence/display/springboard-dim-v68/prepare.py --output out/data-bringup/springboard-dim-v68", result = "The final FAT verification confirms matching kernel, ADT, trust cache and configuration. The same-size Data seeds retain the volume UUID and differ only by the three intended SpringBoard keys and APFS edit metadata." },
   { kind = "host", reference = "evidence/display/pm-watchdog-v67/preparation.json", revision = "a1af20bddd4d35ff2c18758946c74b8d32c59e5f", command = "python3.14 evidence/display/hello-black-v64/build-kernel.py --cached-headers --output out/data-bringup/pm-watchdog-v67-build && python3.14 evidence/display/hello-black-v64/prepare.py --pm-watchdog", result = "Kernel prelink includes both report markers. Final FAT retains the v66 2 GiB ADT, trust cache and Data seed." },
   { kind = "device", reference = "evidence/display/pm-watchdog-v67/upload.json", revision = "a1af20bddd4d35ff2c18758946c74b8d32c59e5f", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/pm-watchdog-v67/boot-partition.img", result = "BOOT upload and reboot request succeeded. Owner photo captures target240 with last CPU copy at 158554 ms and explicit blank GOP fill at 158582 ms. No PM panic preceded this report." },
@@ -1201,6 +1204,7 @@ procedure = [
   "Read /proc/bus/input/devices, getevent -lp and bound I2C driver links; correlate them with the exact touch and Wacom DT nodes.",
 ]
 findings = [
+  "T970 touch I2C uses QUP SE5 at 0x994000 and GPIO12/13, with the stock GPI0 controller at 0x900000 and SMMU SID 0x5b6. The hardware-tested umi ST FTM5 path uses SE at 0xa94000 and a different GPI wrapper. Compare the exact T970 chip identity and event format before reusing the transport or HID path.",
   "The actual boot kernel contains all three named input firmware blobs. A unique common image base and 24-byte builtin_fw layout are reconstructed through AArch64 RELATIVE relocations; source offsets, lengths and SHA256 are recorded in builtin-firmware.json.",
   "The disabled board I2C nodes describe measured controller/IRQ resources and input firmware names/coordinate properties; clock/regulator/HID implementations remain planned.",
   "The filesystem-only capture did not find the three input assets; the subsequent builtin-kernel inspection above resolves their source and hashes.",

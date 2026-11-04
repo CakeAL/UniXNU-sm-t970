@@ -1,0 +1,36 @@
+{
+  "boot_sha256": "269153961cb22368642fe2a9bed76675ce46ee35f8914d060b9bff16c463d030",
+  "photo": "screen-target360.jpg",
+  "photo_sha256": "1c85a8dec52a08e42ddfa1e512a017b78dfc1ba5c61397364d51c397f9da0b6e",
+  "photo_time_local": "2026-11-04T23:29:06+08:00",
+  "target_seconds": 360,
+  "owner_observation": "The display did not turn black before the report.",
+  "terminal_runtime_report_observed": true,
+  "process_count": 256,
+  "springboard_pid": 27,
+  "backboardd_pid": 57,
+  "cpus": 8,
+  "display": {
+    "publish_ms": 18690,
+    "first_copy_ms": 131014,
+    "last_copy_ms": 379990,
+    "last_blank_ms": 0,
+    "last_dark_source_ms": 0,
+    "swaps_ok": 254,
+    "swaps_bad": 0,
+    "transfers": 253,
+    "copies": 253,
+    "retired": 253,
+    "vsync_started": 1,
+    "vsync_armed": 0
+  },
+  "data": {
+    "report_rc": 0,
+    "free_blocks": 15448,
+    "block_bytes": 4096
+  },
+  "limitations": [
+    "The RAM-Data control has not been booted. The v67 comparison also changes Data history and backend.",
+    "The photo is a terminal diagnostic; a longer continuous session and touch response require separate verification."
+  ]
+}

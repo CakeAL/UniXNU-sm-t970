@@ -16,6 +16,8 @@ DEVICE = Path(__file__).resolve().parents[3]
 FRAMEWORK = DEVICE.parent / 'UniXNU'
 BASE = DEVICE / 'out/data-bringup/pm-watchdog-v67/boot-partition.img'
 BASE_SHA = '32fa945786c2afc6e21ddddde1f629736d90c26416de6629e87e2e786b3ca3cc'
+TREATMENT = DEVICE / 'out/data-bringup/springboard-dim-v68/anti-dim/boot-partition.img'
+TREATMENT_SHA = '269153961cb22368642fe2a9bed76675ce46ee35f8914d060b9bff16c463d030'
 FAT = '::/EFI/UniXNU/'
 SEED = 'Payloads/scratch-data.img'
 CONFIG = 'unixnu.toml'
@@ -72,12 +74,9 @@ def seed_with_preferences(original, output):
     return dict(metadata, volume_uuid=uuid, preferences=PREFS, previous_values={key: old.get(key) for key in PREFS})
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--output', required=True, type=Path)
-    root = parser.parse_args().output.resolve()
-    boot = BASE.read_bytes()
-    require(sha(boot) == BASE_SHA and boot[:8] == b'ANDROID!', 'Wrong v67 BOOT')
+def read_boot(path, expected_sha):
+    boot = path.read_bytes()
+    require(sha(boot) == expected_sha and boot[:8] == b'ANDROID!', 'Unqualified source BOOT')
     kernel_size, = struct.unpack_from('<I', boot, 8)
     payload_size, = struct.unpack_from('<I', boot, 16)
     page, version = struct.unpack_from('<II', boot, 36)
@@ -85,28 +84,63 @@ def main():
     start = page + ((kernel_size + page - 1) // page) * page
     end = start + payload_size
     require(start < end < len(boot), 'Invalid FAT bounds')
-    root.mkdir(parents=True)
-    original_fat = root / 'baseline.fat'
-    original_fat.write_bytes(boot[start:end])
+    return boot, start, end
 
-    def read(fat, path):
-        return subprocess.check_output(['mcopy', '-i', str(fat), FAT + path, '-'])
 
-    cfg = read(original_fat, CONFIG).decode()
+def read(fat, path):
+    return subprocess.check_output(['mcopy', '-i', str(fat), FAT + path, '-'])
+
+
+def update_arguments(cfg, replacements):
     entries = tomllib.loads(cfg)
     xnu = [e for e in entries['entry'] if e['type'] == 'xnu']
     require(len(xnu) == 1 and xnu[0]['initrd'] == SEED, 'Unexpected XNU boot entry')
     args = xnu[0]['args'].split()
-    require(args.count('sheng-data-persist=2') == 1, 'Expected persistent v67 base')
-    require(args.count('t970-runtime-report=240') == 1, 'Expected v67 runtime report')
+    for arg in replacements:
+        require(args.count(arg) == 1, 'Expected exact source argument: ' + arg)
     line = 'args = "' + xnu[0]['args'] + '"'
     require(cfg.count(line) == 1, 'Ambiguous XNU boot arguments')
-    # Both images use disposable RAM Data and the same longer report deadline.
-    args[args.index('sheng-data-persist=2')] = 'sheng-data-persist=0'
-    args[args.index('t970-runtime-report=240')] = 't970-runtime-report=360'
-    xnu[0]['args'] = ' '.join(args)
+    xnu[0]['args'] = ' '.join(new for arg in args if (new := replacements.get(arg, arg)))
     updated = cfg.replace(line, 'args = "' + xnu[0]['args'] + '"')
     require(tomllib.loads(updated) == entries, 'Unexpected boot argument change')
+    return updated
+
+
+def pack_boot(boot, start, end, fat, output):
+    require(fat.stat().st_size == end - start, 'FAT size changed')
+    output.write_bytes(boot[:start] + fat.read_bytes() + boot[end:])
+    result = output.read_bytes()
+    require(result[:start] == boot[:start] and result[end:] == boot[end:], 'Unexpected BOOT difference')
+    fat.write_bytes(result[start:end])
+    return result
+
+
+def prepare_continuous(root):
+    boot, start, end = read_boot(TREATMENT, TREATMENT_SHA)
+    root.mkdir(parents=True)
+    fat = root / 'payload.img'
+    fat.write_bytes(boot[start:end])
+    fixed = {name: sha(read(fat, name)) for name in (*UNCHANGED, SEED)}
+    config = root / CONFIG
+    config.write_text(update_arguments(read(fat, CONFIG).decode(), {'t970-runtime-report=360': None}))
+    subprocess.run(['mcopy', '-o', '-i', str(fat), str(config), FAT + CONFIG], check=True)
+    result = pack_boot(boot, start, end, fat, root / 'boot-partition.img')
+    require(read(fat, CONFIG) == config.read_bytes(), 'Final FAT settings mismatch')
+    require(all(sha(read(fat, name)) == digest for name, digest in fixed.items()), 'Final FAT changed an input')
+    return dict(base_boot_sha256=TREATMENT_SHA, boot_sha256=sha(result), boot_bytes=len(result),
+                removed_argument='t970-runtime-report=360', terminal_runtime_report=False,
+                unchanged_payload_sha256=fixed, config_sha256=sha(config.read_bytes()))
+
+
+def prepare_pair(root):
+    boot, start, end = read_boot(BASE, BASE_SHA)
+    root.mkdir(parents=True)
+    original_fat = root / 'baseline.fat'
+    original_fat.write_bytes(boot[start:end])
+    updated = update_arguments(read(original_fat, CONFIG).decode(), {
+        'sheng-data-persist=2': 'sheng-data-persist=0',
+        't970-runtime-report=240': 't970-runtime-report=360',
+    })
     config = root / CONFIG
     config.write_text(updated)
     original_seed = read(original_fat, SEED)
@@ -123,21 +157,25 @@ def main():
         subprocess.run(['mcopy', '-o', '-i', str(fat), str(config), FAT + CONFIG], check=True)
         if name == 'anti-dim':
             subprocess.run(['mcopy', '-o', '-i', str(fat), str(seed), FAT + SEED], check=True)
-        require(fat.stat().st_size == payload_size, 'FAT size changed')
-        packed = case / 'boot-partition.img'
-        packed.write_bytes(boot[:start] + fat.read_bytes() + boot[end:])
-        result = packed.read_bytes()
-        require(result[:start] == boot[:start] and result[end:] == boot[end:], 'Unexpected BOOT difference')
-        fat.write_bytes(result[start:end])
+        result = pack_boot(boot, start, end, fat, case / 'boot-partition.img')
         expected_seed = seed.read_bytes() if name == 'anti-dim' else original_seed
         require(read(fat, CONFIG) == config.read_bytes() and read(fat, SEED) == expected_seed,
                 'Final FAT settings or Data seed mismatch')
         require(all(sha(read(fat, path)) == digest for path, digest in fixed.items()),
                 'Final FAT changed a common input')
         images[name] = dict(boot_sha256=sha(result), boot_bytes=len(result), seed_sha256=sha(expected_seed))
-    report = dict(base_boot_sha256=BASE_SHA, data_mode=0, report_seconds=360,
-                  shared_payload_sha256={**fixed, CONFIG: sha(config.read_bytes())},
-                  treatment_seed=seed_metadata, images=images)
+    return dict(base_boot_sha256=BASE_SHA, data_mode=0, report_seconds=360,
+                shared_payload_sha256={**fixed, CONFIG: sha(config.read_bytes())},
+                treatment_seed=seed_metadata, images=images)
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--output', required=True, type=Path)
+    parser.add_argument('--continuous', action='store_true', help='Remove the qualified v68 terminal report')
+    args = parser.parse_args()
+    root = args.output.resolve()
+    report = prepare_continuous(root) if args.continuous else prepare_pair(root)
     (root / 'preparation.json').write_text(json.dumps(report, indent=2) + '\n')
     print(json.dumps(report, indent=2))
 
