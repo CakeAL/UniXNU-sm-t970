@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Pack the v63 black-screen capture with a 240-second terminal report."""
+"""Pack a display, power, or touch-bus bring-up diagnostic."""
 import argparse
 import hashlib
 import json
@@ -34,16 +34,24 @@ def require(condition, message):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--pm-watchdog', action='store_true', help='Start from the v66 sleep control')
-    pm_watchdog = parser.parse_args().pm_watchdog
+    modes = parser.add_mutually_exclusive_group()
+    modes.add_argument('--pm-watchdog', action='store_true', help='Start from the v66 sleep control')
+    modes.add_argument('--touch-bus', action='store_true', help='Start from the v69 continuous display image')
+    args = parser.parse_args()
     base, base_report, build, output = BASE, BASE_REPORT, BUILD, OUTPUT
     arguments = [REPORT_ARG]
-    if pm_watchdog:
+    if args.pm_watchdog:
         base = OUT / 'sleep-disabled-v66/boot-partition.img'
         base_report = DEVICE / 'evidence/display/sleep-disabled-v66/preparation.json'
         build = OUT / 'pm-watchdog-v67-build'
         output = OUT / 'pm-watchdog-v67'
         arguments.append('t970-pm-watchdog-detail=1')
+    if args.touch_bus:
+        base = OUT / 'springboard-dim-continuous-v69/boot-partition.img'
+        base_report = DEVICE / 'evidence/display/springboard-dim-continuous-v69/preparation.json'
+        build = OUT / 'touch-bus-v70-build'
+        output = OUT / 'touch-bus-v70'
+        arguments = ['t970-runtime-report=75', 't970-touch-bus-report=1']
     baseline = json.loads(base_report.read_text())
     source = base.read_bytes()
     require(source[:8] == b'ANDROID!' and digest(source) == baseline['boot_sha256'],
@@ -63,7 +71,7 @@ def main():
         return subprocess.check_output(['mcopy', '-i', str(payload), PREFIX + name, '-'])
 
     config = read_fat(CONFIG)
-    config_sha = baseline['unchanged_payload_sha256'][CONFIG] if pm_watchdog else baseline['config_sha256']
+    config_sha = baseline['unchanged_payload_sha256'][CONFIG] if args.pm_watchdog else baseline['config_sha256']
     require(digest(config) == config_sha, 'Unexpected source boot configuration')
     expected = tomllib.loads(config.decode())
     xnu = [entry for entry in expected['entry'] if entry['type'] == 'xnu']
@@ -81,8 +89,10 @@ def main():
     shutil.copyfile(build / 'kernel.macho', replacement)
     kernel = replacement.read_bytes()
     require(b'blank/dark=' in kernel, 'Missing linked frame counters')
-    if pm_watchdog:
+    if args.pm_watchdog:
         require(b'T970 PM timeout state=' in kernel, 'Missing linked PM watchdog details')
+    if args.touch_bus:
+        require(b'Touch RO vote=' in kernel, 'Missing linked touch-bus report')
     env = dict(os.environ, UNIXNU_UEFI=str(DEVICE / '.cache/uefi-source/Mu-Silicium'))
     subprocess.run(['python3.14', str(TREE / 'scripts/patch-xnu-entry-probe.py'),
                     str(replacement), '--panic-screen', '--no-reset'], env=env, check=True)
@@ -99,7 +109,7 @@ def main():
             'Final BOOT config or kernel differs')
     unchanged = {name: sha for name, sha in baseline['unchanged_payload_sha256'].items()
                  if name not in (CONFIG, KERNEL)}
-    if pm_watchdog:
+    if args.pm_watchdog:
         unchanged[KERNEL + '.adt'] = baseline['adt_sha256']
     for name, sha in unchanged.items():
         require(digest(read_fat(name)) == sha, 'Unexpected final BOOT input: ' + name)

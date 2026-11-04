@@ -13,6 +13,7 @@
 #include <machine/machine_routines.h>
 #include <pexpert/pexpert.h>
 #include "T970GopGeometry.h"
+#include "../T970Touch/BusSnapshot.h"
 
 
 
@@ -274,6 +275,8 @@ extern "C" void native_t970_display_timing(char *out, unsigned length, int hold)
              (unsigned long long)(darkNs / 1000000),
              extent >> 16, extent & 0xffff,
              (unsigned long long)__atomic_load_n(&scanoutWriter, __ATOMIC_SEQ_CST));
+    size_t used = strlen(out);
+    t970_touch::reportBus(out + used, length - used);
 }
 
 extern "C" __attribute__((noreturn)) void native_legacy_backend_guard(unsigned slot, void *object, void *caller) {

@@ -1,0 +1,20 @@
+{
+  "boot_sha256": "c2ecb08fa0fa9b0c18fd9b151cd429dc936db18e24e404a1e4ff1159642bf99f",
+  "photo": "screen-target75.jpg",
+  "photo_sha256": "412850aa39ff768df3d4519ba5ac1a7888b8ca470ccfdc92e1ddd5cee0ec6f79",
+  "photo_time_local": "2026-11-04T23:52:44+08:00",
+  "target_seconds": 75,
+  "gcc_vote": "0x041007c0",
+  "se5_clock": "0x80004220",
+  "master_ahb_clock": "0x00000000",
+  "slave_ahb_clock": "0x80000002",
+  "gpio_config": [
+    "0x1",
+    "0x1",
+    "0x1"
+  ],
+  "gpio_levels": 0,
+  "geni_sampled": false,
+  "i2c_identity_verified": false,
+  "interpretation": "SE5 lacks its enable vote. Wrapper master AHB runs; slave AHB reports off with HWCG set. GPIO12/13 still select GPIO and read low. No SE registers or sensor were read."
+}
