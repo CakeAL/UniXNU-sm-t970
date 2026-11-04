@@ -1,0 +1,47 @@
+{
+  "boot_sha256": "ea3e7c1032bc4dec6efed15b665b929e4f7d95d1c1b8fb54b5e407874b9c2828",
+  "photo": "screen-target150.jpg",
+  "photo_sha256": "c97d5f72e56baea2aac687b1ef10e50b6af4cbccde059e1f4b28bb590e3b4943",
+  "association": "Owner photo after BOOT upload, identified by stacks=9 and writer field. Device hash was not read back.",
+  "runtime": {
+    "target_seconds": 150,
+    "main": 1,
+    "processes": 112,
+    "cpu": 8
+  },
+  "display": {
+    "hold": 0,
+    "writer_tid": 0,
+    "published_ms": 18513,
+    "first_cpu_copy_ms": 142323,
+    "publish_to_first_copy_ms": 123810,
+    "open": 7,
+    "swap_ok": 3,
+    "transfers": 2,
+    "copies": 2,
+    "retired": 2,
+    "first_lit_source_extent": [
+      366,
+      176
+    ]
+  },
+  "sample": {
+    "cache_slide": "0x5658000",
+    "backboardd": {
+      "threads": 19,
+      "visited": 8
+    },
+    "springboard": {
+      "threads": 5,
+      "visited": 5
+    },
+    "end_processes": 2,
+    "clipped": 0,
+    "symbols": "symbols.json"
+  },
+  "observations": [
+    "BackBoard b1 waits in QuartzCore setGrayscale: called by AXBDisplayFilterManager, b3 is in IOMFB SwapEnd.",
+    "SpringBoard S1 repeats the LaunchServices context lock. S2 is in synchronous dispatch Mach reply wait; the abbreviated stack does not identify the service.",
+    "Hold0 writer0 does not identify a writer in the previous boot or prove the sampled SwapEnd was stalled on a framebuffer copy."
+  ]
+}

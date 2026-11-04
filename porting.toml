@@ -937,6 +937,8 @@ id = "display"
 status = "planned"
 components = []
 paths = [
+  "evidence/display/ui-compact-v37/**",
+  "patches/xnu/t970-ui-compact-report.patch",
   "evidence/display/ui-peer-stacks-v36/**",
   "evidence/display/scanout-drain-v35/**",
   "tests/test_display_scanout_hold.py",
@@ -1009,6 +1011,7 @@ procedure = [
   "Collect DRM modes, panel type and brightness limits; read only display-selection tokens from /proc/cmdline and match the selected S6TUUM3 node in the live DT.",
 ]
 findings = [
+  "V37 mode9 limits the report to two processes and one line per sampled thread. It records the current CPU scanout writer thread ID. Host row/line budget and final FAT checks pass. BOOTea3e7c10 owner photo shows both processes and clipped0. Hold0/writer0, two frame retirements. BackBoard samples setGrayscale and SwapEnd. SpringBoard samples the recurring LaunchServices lock and a synchronous Mach wait.",
   "V34 adds an opt-in terminal scanout hold synchronized with the Legacy work loop, and reports display publication and first CPU surface copy times. Host compile, prelink and final FAT checks passed. BOOTc9c49879 uploaded and reboot requested. Owner photo shows hold1 after bounded retries, publication at 18527 ms and first CPU copy at 143217 ms, with five retirements. BackBoard accessibility bundle code executes. Home screen remains unverified.",
   "V32 adds board-side counters for the existing GopFramebuffer software vsync events. BOOT6b692880 rebuilt and passed prelink and final FAT verification against v31, retaining the same arguments and non-kernel inputs. Owner photo shows timer start1/arm0/notify0, open7 and three successful frame retirements. At 60 Hz refresh0 matches the component gate.",
   "BOOTc96f86d7 is a 125-second comparison to BOOTbb4d8474 adding only a synthetic Wi-Fi address. Owner photo shows the same open7/swap2/copy2/retire2 as baseline; SB sample is in the Control Center default module-list property-list path versus a LaunchServices lookup in baseline. Independent live snapshots do not establish relative progress or causality. No confirmed UI improvement; stop repeating address comparisons. See evidence/display/wifi-address-125-v30.",
@@ -1075,10 +1078,13 @@ limits = [
   "Framebuffer physical address, stride, pixel format and UEFI GOP handoff are not verified by the mode list.",
 ]
 next_action = [
-  "V31 confirmed spare RAM Data capacity at target125. V35 reports hold0 and reproduces the v34 BB QuartzCore mutex and SB LaunchServices context waits. V36 shows SwapEnd and dispatch group wait in BackBoard, but screen clips before SpringBoard. Use a compact two-process sample and report the scanout writer thread ID. Compare source extent with a straight-on photo only if both show the same frame.",
+  "V31 confirmed spare RAM Data capacity at target125. V35 reports hold0 and reproduces the v34 BB QuartzCore mutex and SB LaunchServices context waits. V36 shows SwapEnd and dispatch group wait in BackBoard, but screen clips before SpringBoard. V37 fits both processes on screen. Capture the resolved SpringBoard unfair-lock owner, then map that ID to the peer stacks. Compare source extent with a straight-on photo only if both show the same frame.",
 ]
 
 evidence = [
+  { kind = "host", reference = "evidence/display/ui-compact-v37/preparation.json", revision = "cda6534114a31667424bc64fd0197b792bf3dfd4", command = "python3.14 evidence/display/ui-compact-v37/prepare.py", result = "BOOTea3e7c10 enables the compact mode9 sampler and writer ID reporting. Final FAT verifies the packed kernel and the unchanged ADT, trust cache and Data seed." },
+  { kind = "device", reference = "evidence/display/ui-compact-v37/device-result.json", revision = "cda6534114a31667424bc64fd0197b792bf3dfd4", command = "Owner photo after BOOTea3e7c10 upload, target150 mode9", result = "Two process headings and clipped0 visible. Hold0 writer0. BackBoard sampled in grayscale mutex wait and SwapEnd, SpringBoard in LS context lock and synchronous Mach wait. Lock owners unknown." },
+  { kind = "device", reference = "evidence/display/ui-compact-v37/upload.json", revision = "cda6534114a31667424bc64fd0197b792bf3dfd4", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/ui-compact-v37/boot-partition.img", result = "BOOT-only upload exit0 and reboot request. Device hash readback and target150 screen result pending." },
   { kind = "host", reference = "evidence/display/ui-peer-stacks-v36/preparation.json", revision = "6a618273f63cb30ff8aad462b2086efb66164526", command = "python3.14 evidence/display/ui-peer-stacks-v36/prepare.py", result = "BOOTa30af66e changes only the v35 stack mode to 5. Final FAT confirms the same kernel, ADT, trust cache and Data seed." },
   { kind = "device", reference = "evidence/display/ui-peer-stacks-v36/device-result.json", revision = "6a618273f63cb30ff8aad462b2086efb66164526", command = "Owner photo after BOOTa30af66e upload, target150 mode5", result = "Display output clips before SpringBoard. BackBoard render thread is sampled in IOMFB SwapEnd, and hold1 is reported separately. The tracked writer ID is unavailable." },
   { kind = "device", reference = "evidence/display/ui-peer-stacks-v36/upload.json", revision = "6a618273f63cb30ff8aad462b2086efb66164526", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/ui-peer-stacks-v36/boot-partition.img", result = "BOOT-only upload exit0 and reboot request. Device readback and target150 screen result pending." },

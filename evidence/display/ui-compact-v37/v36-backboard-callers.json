@@ -1,0 +1,21 @@
+{
+  "original_sha256": "6e362a46a2b46eb2741ecc6fcb50ffecb2fbc299641159045475361e62b34634",
+  "inferred_executable_slide": "0x7000",
+  "stack_matches": [
+    {
+      "thread": "b1",
+      "sampled_return": "0x10002a288",
+      "original_return": "0x100023288",
+      "preceding_call": "CFRunLoopRunInMode"
+    },
+    {
+      "thread": "b4",
+      "sampled_return": "0x1000373e4",
+      "original_return": "0x1000303e4",
+      "preceding_call": "dispatch_group_wait",
+      "timeout": "DISPATCH_TIME_FOREVER"
+    }
+  ],
+  "b4_after_wait": "Tail call to Objective-C selector _queue_applyDefinitions:",
+  "limitation": "Two matching calls support the inferred slide for this boot. They do not identify the dispatch group producer or relate this thread to the scanout reservation."
+}

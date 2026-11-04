@@ -44,12 +44,13 @@ static int ui_user_address(uint64_t address,unsigned size) {
  return address>=4096 && address<(UINT64_C(1)<<39) && size<=(UINT64_C(1)<<39)-address;
 }
 static int ui_stack_selected(const char *name,unsigned index) {
- return readUserStacks==5 || readUserStacks==7 || readUserStacks==8 ? 1 : readUserStacks==1 ? index==1 : readUserStacks==4 ? 1 : readUserStacks==3 ? index<=2 : readUserStacks==2 && name[0]=='b' && index>1;
+ return readUserStacks==5 || readUserStacks==7 || readUserStacks==8 || readUserStacks==9 ? 1 : readUserStacks==1 ? index==1 : readUserStacks==4 ? 1 : readUserStacks==3 ? index<=2 : readUserStacks==2 && name[0]=='b' && index>1;
 }
 static void ui_stack_read(struct native_t970_ui_wait_row *row,vm_map_t map) {
  uint64_t fp=row->fp;
  if(!map){row->frame_error=4;return;}
- for(unsigned i=0;i<((readUserStacks==1 || readUserStacks==7)?8:T970_UI_STACK_FRAMES) && fp;++i) {
+ unsigned limit=readUserStacks==9?4:(readUserStacks==1 || readUserStacks==7)?8:T970_UI_STACK_FRAMES;
+ for(unsigned i=0;i<limit && fp;++i) {
   uint64_t pair[2]={0};
   if(!ui_user_address(fp,sizeof(pair)) || (fp&15)){row->frame_error=2;break;}
   if(vm_map_read_user(map,fp,pair,sizeof(pair))!=KERN_SUCCESS){row->frame_error=1;break;}
@@ -122,7 +123,7 @@ static int native_t970_ui_wait_collect(proc_t p,void *context)
   if(readUserStacks && task->map){map=task->map;vm_map_reference(map);}
   thread_t thread;
   queue_iterate(&task->threads,thread,thread_t,task_threads) {
-   if(visited>=((readUserStacks==4 || readUserStacks==5 || readUserStacks==8)?8:4))break;
+   if(visited>=((readUserStacks==4 || readUserStacks==5 || readUserStacks==8 || readUserStacks==9)?8:4))break;
    ++visited;if((readUserStacks==4 || readUserStacks==8) && visited<=4)continue;
    boolean_t irq=ml_set_interrupts_enabled(FALSE);
    if(!simple_lock_try(&thread->sched_lock,&thread_lck_grp)){++busy;ml_set_interrupts_enabled(irq);continue;}
@@ -130,6 +131,7 @@ static int native_t970_ui_wait_collect(proc_t p,void *context)
    if(state && is_saved_state64(state)) {
     struct native_t970_ui_wait_row *r=&rows[count++];r->index=visited;r->kstate=thread->state;
     if(readUserStacks==5){r->tid=thread_tid(thread);r->wait=thread->wait_event;r->priority=thread->sched_pri;r->base=thread->base_pri;}
+    if(readUserStacks==9)r->tid=thread_tid(thread);
     r->pc=get_saved_state_pc(state);r->lr=get_saved_state_lr(state);r->fp=get_saved_state_fp(state);
     r->trap=get_saved_state_reg(state,16);r->arg1=get_saved_state_reg(state,1);r->arg3=get_saved_state_reg(state,3);
    }
@@ -161,6 +163,17 @@ static int native_t970_ui_wait_collect(proc_t p,void *context)
  }
  for(unsigned i=0;i<count && out->used<sizeof(out->text)-1;++i) {
   struct native_t970_ui_wait_row *r=&rows[i];left=sizeof(out->text)-out->used;
+  if(readUserStacks==9) {
+   n=snprintf(out->text+out->used,left,"\n%c%u id=%llx st=%x pc=%llx lr=%llx e=%u F",
+    name[0],r->index,(unsigned long long)r->tid,r->kstate,(unsigned long long)r->pc,(unsigned long long)r->lr,r->frame_error);
+   if(n>0)out->used+=(unsigned)n<left?(unsigned)n:left-1;
+   for(unsigned j=0;j<r->frames_used && out->used<sizeof(out->text)-1;++j) {
+    left=sizeof(out->text)-out->used;
+    n=snprintf(out->text+out->used,left," %llx",(unsigned long long)r->frames[j]);
+    if(n>0)out->used+=(unsigned)n<left?(unsigned)n:left-1;
+   }
+   continue;
+  }
   if(readUserStacks==5) {
    n=snprintf(out->text+out->used,left,"\n%c%u id=%llx st=%x w=%llx p=%d/%d pc=%llx lr=%llx",name[0],r->index,(unsigned long long)r->tid,r->kstate,(unsigned long long)r->wait,r->priority,r->base,(unsigned long long)r->pc,(unsigned long long)r->lr);
    if(n>0)out->used+=(unsigned)n<left?(unsigned)n:left-1;
@@ -213,7 +226,7 @@ static void ui_stack_worker(void *parameter,wait_result_t result) {
 const char *native_t970_ui_wait_text(void)
 {
  unsigned enabled=0;
- unsigned stackMode=PE_parse_boot_argn("t970-ui-stack",&enabled,sizeof(enabled)) && (enabled>=1 && enabled<=8);
+ unsigned stackMode=PE_parse_boot_argn("t970-ui-stack",&enabled,sizeof(enabled)) && (enabled>=1 && enabled<=9);
  if(!stackMode){readUserStacks=0;ui_collect();return capture.text;}
  static char pending[128];
  if(!__atomic_exchange_n(&captureStarted,1,__ATOMIC_ACQ_REL)) {

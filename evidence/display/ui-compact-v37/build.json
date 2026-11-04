@@ -1,0 +1,67 @@
+{
+  "device_base": "cda6534114a31667424bc64fd0197b792bf3dfd4",
+  "framework": "2c834e313d25482c78d38d703eff1f8d190f2597",
+  "board": {
+    "source_sha256": "ba931c895e8dbc32095e7f8b15b4e4c1c9597a4e313fd390927f10ea7ef146b8",
+    "geometry_header_sha256": "857bba99be57e8ffc3ee9ce14250fea4f2bc08a951e053986cebc433d2d4b117",
+    "compile_recipe_sha256": "9fc5352fc5fb5e911bc6a9a877b11b1b78d5fd64cd724a60a6aba9b58b95e180",
+    "object_sha256": "a9f66385fdfc59f77cb69987686cb8c40fc33560ebb7a08f3cb8fa76f5dfd095",
+    "gop_object_sha256": "54e56f545f2fccecd9a6161bc1d841b978543acbc56dfae97642d0a25761859a",
+    "board_callbacks_resolved": [
+      "_native_legacy_backend_guard",
+      "_native_legacy_client_enter",
+      "_native_legacy_client_observed",
+      "_native_legacy_copy_timing_observed",
+      "_native_legacy_frame_colors_observed",
+      "_native_legacy_frame_observed",
+      "_native_legacy_gop_mapping_observed",
+      "_native_legacy_gpu_fallback_observed",
+      "_native_legacy_gpu_offer",
+      "_native_legacy_pm_observed",
+      "_native_legacy_prepare_scanout",
+      "_native_legacy_registration_observed",
+      "_native_legacy_retirement_observed",
+      "_native_legacy_surface_rejected",
+      "_native_legacy_swap_stage",
+      "_native_legacy_swap_validation_observed",
+      "_native_legacy_transfer_observed",
+      "_native_legacy_vsync_observed"
+    ],
+    "pending_original_aliases": [
+      "_native_legacy_set_refresh_properties",
+      "_native_legacy_surface_allocation",
+      "_native_legacy_surface_descriptor",
+      "_native_legacy_surface_format",
+      "_native_legacy_surface_height",
+      "_native_legacy_surface_planes",
+      "_native_legacy_surface_stride",
+      "_native_legacy_surface_width",
+      "_native_legacy_vsync_notify"
+    ],
+    "compiled": true,
+    "linked": false,
+    "runtime_display_verified": false
+  },
+  "sampler": {
+    "source_sha256": "6cf2fb5229249f12ace497bcdeba10ef3284b20d70273b09f516eb01e23c9f09",
+    "object_sha256": "bfbdfeb19a4838425046aee68a3bc41f726111ba118ce5373a6d55adf4309d46",
+    "compile_recipe_sha256": "2fe39a2b1a5d3f4cc66f07ac3cbae843f78c38956942ef87a8e5de0b3a0b45e0",
+    "mach_private_recipe": true,
+    "reads_user_memory": "opt-in t970-ui-stack=1/2/3/4/5/7/8/9, isolated worker",
+    "suspends_tasks": false,
+    "stack_frames_per_selected_thread": "mode1/7:8; mode2/3/4/5/8:16; mode9:4",
+    "stack_selection": "mode1: first UI threads; mode2: other BB threads; mode3: Gestalt helper first2; mode4: helper threads5-8; mode5: all UI/helper first8; mode6: queue-only two samples 500ms apart, no user reads; mode7: SpringBoard and lsd first4 each; mode8: lsd threads5-8; mode9: compact BB and SB first8",
+    "report_wait_deadlines": 40,
+    "report_wait_interval_ms": 100,
+    "thread_limit_per_process": 8,
+    "runtime_verified": false
+  },
+  "only_display_and_sampler_archive_members_replaced": true,
+  "kernel_prelink_passed": true,
+  "kernel_sha256": "d82a9b29b219f1626b622c1597d9432ba8d0e80f246c26df57b4a920470c3005",
+  "host_tests": [
+    "test_ui_wait_state.py",
+    "test_display_scanout_hold.py"
+  ],
+  "platform_check": "Stopped before DT/ADT due to mismatched reviewed framework revision."
+}

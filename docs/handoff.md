@@ -5,6 +5,8 @@
 
 ## 最新：首帧后的持续运行对照（2026-11-04）
 
+BOOT `ea3e7c10…` 已刷入并请求重启。mode9 只采 BB/SB，各最多8线程、每线程一行，FB 行新增写屏线程 ID。150秒整页实测两进程 clipped0，hold0/writer0，BB 在 setGrayscale: 及 SwapEnd，SB 在 LS 锁及同步 Mach 等待。见 [单屏线程诊断](../evidence/display/ui-compact-v37/README.md)。
+
 BOOT `a30af66e…` 已上传并请求重启。沿用 v35 内核和150秒报告，只切换到 mode5 扩大采样。机主照片在 BB 后截断，SB 未显示。BB 渲染线程在 SwapEnd，hold1 的实际写入线程仍待核对。见 [线程对照](../evidence/display/ui-peer-stacks-v36/README.md)。
 
 BOOT `0c99c6d4…` 已刷入并请求重启。v35 先关闭新写屏准入，再等待当前 CPU 写入结束，并报告源帧非黑像素范围。150秒实机 hold0，页可拍摄，显示发布到首帧间隔120.599秒。源非黑区域366×176，BB/SB重复采到 v34 的两条锁等待。见 [CPU 写屏诊断](../evidence/display/scanout-drain-v35/README.md)。

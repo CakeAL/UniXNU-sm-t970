@@ -1,0 +1,22 @@
+{
+  "base_boot_sha256": "0c99c6d4e218ee18879d122a24e13fb05e0a82f91e92170567f4c73e4684e2cf",
+  "boot_sha256": "ea3e7c1032bc4dec6efed15b665b929e4f7d95d1c1b8fb54b5e407874b9c2828",
+  "boot_bytes": 71303168,
+  "kernel_sha256": "d82a9b29b219f1626b622c1597d9432ba8d0e80f246c26df57b4a920470c3005",
+  "payload_kernel_sha256": "80b9fc1414ceb53619b31cc369dfb1f2fa91cc43942dc7067726a94c58278162",
+  "unchanged_payload_sha256": {
+    "Payloads/kernel.macho.adt": "778cc0f6f2d9fdb6cd9896aac1e51ce6496858a80e083339afd1775ec7a0c0cd",
+    "Payloads/kernel.macho.trustcache": "7416ca4f8377146626bb284e2133c76bee6cb4e3ee0af5d648b186235a7323a7",
+    "Payloads/scratch-data.img": "4591566eccd77f0f9d13a1338ecaf3c73ce86cd04aeea732d91db6b2e100ca3a"
+  },
+  "original_panic_screen_reproduced": true,
+  "final_boot_fat_roundtrip": true,
+  "header_fd_dtb_tail_unchanged": true,
+  "target_seconds": 150,
+  "ui_stack_mode": 9,
+  "cpus_requested": 8,
+  "owned_bytes": 805306368,
+  "terminal_runtime_report": true,
+  "uploaded": false,
+  "hardware_result_pending": true
+}

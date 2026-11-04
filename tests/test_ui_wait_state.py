@@ -136,6 +136,15 @@ int main(void){
  captureStarted=captureDone=0;userStacks=8;copiesBefore=copies;
  text=native_t970_ui_wait_text();assert(strstr(text,"stacks=8")&&strstr(text,"lsd p2")&&strstr(text,"l5 FP=")&&strstr(text,"l8 FP=")&&!strstr(text,"l4 st=")&&!strstr(text,"l9 st=")&&!strstr(text,"SpringBoard p")&&strstr(text,"UI batch end processes=1 clipped=0"));
  assert(copies==copiesBefore+4&&strstr(text,"n=16 e=0")&&!map_storage.refs);
+ captureStarted=captureDone=0;userStacks=9;readsBefore=map_storage.reads;
+ text=native_t970_ui_wait_text();
+ assert(strstr(text,"stacks=9")&&strstr(text,"S8 id=")&&strstr(text,"b8 id=")&&!strstr(text,"lsd p"));
+ assert(strstr(text,"UI batch end processes=2 clipped=0")&&!strstr(text,"180001010"));
+ unsigned lines=1,cols=0;
+ for(const char *c=text;*c;++c) {
+  if(*c=='\n'){++lines;cols=0;}else assert(++cols<=128);
+ }
+ assert(lines==20&&map_storage.reads-readsBefore<=16*4&&!map_storage.refs);
  waitCount=0;userStacks=1;
  captureStarted=captureDone=0;workerError=17;text=native_t970_ui_wait_text();assert(strstr(text,"worker start error=17"));workerError=0;
  captureStarted=captureDone=0;stalled=1;text=native_t970_ui_wait_text();assert(waitCount==20&&strstr(text,"partial rows hidden"));

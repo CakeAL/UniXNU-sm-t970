@@ -52,7 +52,7 @@ extern "C" void native_t970_display_state(char *out, unsigned length) {
 static bool consoleReleased;
 static bool reportTracksScanout;
 static bool reportOwnsScanout;
-static thread_t scanoutWriter;
+static uint64_t scanoutWriter;
 static uint64_t publishedAt, firstCopyAt;
 static uint32_t firstLitExtent;
 static uint32_t completedFrames;
@@ -225,16 +225,16 @@ extern "C" bool native_legacy_gop_mapping_observed(IOService *, IOMemoryMap *map
 
 // The CPU surface path checks prepare twice on the same thread. Its terminal
 // transfer callback runs after the store barrier or on each rejection.
-static bool reserveScanout(thread_t self) {
+static bool reserveScanout(uint64_t self) {
     if (__atomic_load_n(&reportOwnsScanout, __ATOMIC_SEQ_CST)) return false;
-    thread_t previous = THREAD_NULL;
+    uint64_t previous = 0;
     if (!__atomic_compare_exchange_n(&scanoutWriter, &previous, self, false,
                                      __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST) && previous != self) return false;
     return !__atomic_load_n(&reportOwnsScanout, __ATOMIC_SEQ_CST);
 }
 
-static void releaseScanout(thread_t self) {
-    __atomic_compare_exchange_n(&scanoutWriter, &self, THREAD_NULL, false,
+static void releaseScanout(uint64_t self) {
+    __atomic_compare_exchange_n(&scanoutWriter, &self, 0, false,
                                 __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);
 }
 
@@ -243,11 +243,11 @@ extern "C" int native_t970_display_hold(void) {
     // Close admission before checking for an in-flight writer. A writer
     // claiming the slot concurrently must recheck admission before copying.
     __atomic_store_n(&reportOwnsScanout, true, __ATOMIC_SEQ_CST);
-    return __atomic_load_n(&scanoutWriter, __ATOMIC_SEQ_CST) != THREAD_NULL;
+    return __atomic_load_n(&scanoutWriter, __ATOMIC_SEQ_CST) != 0;
 }
 
 extern "C" bool native_legacy_prepare_scanout(void) {
-    if (__atomic_load_n(&reportTracksScanout, __ATOMIC_ACQUIRE) && !reserveScanout(current_thread())) return false;
+    if (__atomic_load_n(&reportTracksScanout, __ATOMIC_ACQUIRE) && !reserveScanout(thread_tid(current_thread()))) return false;
     if (!consoleReleased) {
         unsigned int noVideoConsole = 0;
         // Match arm_init: presence of t970-novc skips text console setup.
@@ -265,9 +265,10 @@ extern "C" void native_t970_display_timing(char *out, unsigned length, int hold)
     absolutetime_to_nanoseconds(__atomic_load_n(&publishedAt, __ATOMIC_RELAXED), &publishNs);
     absolutetime_to_nanoseconds(__atomic_load_n(&firstCopyAt, __ATOMIC_RELAXED), &copyNs);
     uint32_t extent = __atomic_load_n(&firstLitExtent, __ATOMIC_RELAXED);
-    snprintf(out, length, "\nFB hold=%d publish/first-copy ms=%llu/%llu src-lit=%ux%u",
+    snprintf(out, length, "\nFB hold=%d publish/first-copy ms=%llu/%llu src-lit=%ux%u writer=%llx",
              hold, (unsigned long long)(publishNs / 1000000), (unsigned long long)(copyNs / 1000000),
-             extent >> 16, extent & 0xffff);
+             extent >> 16, extent & 0xffff,
+             (unsigned long long)__atomic_load_n(&scanoutWriter, __ATOMIC_SEQ_CST));
 }
 
 extern "C" __attribute__((noreturn)) void native_legacy_backend_guard(unsigned slot, void *object, void *caller) {
@@ -313,7 +314,7 @@ extern "C" void native_legacy_surface_rejected(uint64_t width, uint64_t height, 
 }
 
 extern "C" void native_legacy_transfer_observed(IOReturn status, const void *, uint64_t bytes) {
-    if (__atomic_load_n(&reportTracksScanout, __ATOMIC_ACQUIRE)) releaseScanout(current_thread());
+    if (__atomic_load_n(&reportTracksScanout, __ATOMIC_ACQUIRE)) releaseScanout(thread_tid(current_thread()));
     note(transfers); __atomic_store_n(&lastTransferStatus,(uint32_t)status,__ATOMIC_RELAXED);
     if (status || completedFrames < 4) {
         IOLog("T970 display: CPU transfer status=%x bytes=%llu\n", status, bytes);

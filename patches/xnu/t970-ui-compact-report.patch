@@ -1,0 +1,11 @@
+--- a/bsd/kern/kern_exec.c
++++ b/bsd/kern/kern_exec.c
+@@ -8307,7 +8307,7 @@
+ 		}
+ 		unsigned batch_mode=0;
+ 		PE_parse_boot_argn("t970-ui-stack", &batch_mode, sizeof(batch_mode));
+-		if(batch_mode==5 || batch_mode==6) {
++		if(batch_mode==5 || batch_mode==6 || batch_mode==9) {
+ 			panic("runtime target=%u main=%d n=%u wd=%d sb=%d bb=%d rb=%d D=%d W=%d S=%d blocks=%llu cpu=%u sec=%u\n%s\n%s",
+ 			    seconds,native_t970_initproc_main(),snapshot.count,snapshot.watchdog,snapshot.springboard,
+ 			    snapshot.backboard,snapshot.runningboard,native_owner_data_status,native_t970_watchdog_policy_status,

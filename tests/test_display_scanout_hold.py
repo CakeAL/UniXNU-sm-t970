@@ -11,26 +11,25 @@ class DisplayScanoutHold(unittest.TestCase):
         functions = source[source.index('static bool reserveScanout'):source.index('extern "C" bool native_legacy_prepare_scanout')]
         program = r'''
 #include <cassert>
-using thread_t = int *;
-#define THREAD_NULL nullptr
+#include <cstdint>
 static bool reportTracksScanout;
 static bool reportOwnsScanout;
-static thread_t scanoutWriter;
+static uint64_t scanoutWriter;
 ''' + functions + r'''
 int main() {
-    int writer = 0, other = 0;
+    uint64_t writer = 0x2ce, other = 0x581;
     assert(native_t970_display_hold() == -1);
     reportTracksScanout = true;
-    assert(reserveScanout(&writer));
-    assert(reserveScanout(&writer)); // surface path checks twice
-    assert(!reserveScanout(&other));
-    releaseScanout(&other); // rejected transfer cannot clear the active writer
+    assert(reserveScanout(writer));
+    assert(reserveScanout(writer)); // surface path checks twice
+    assert(!reserveScanout(other));
+    releaseScanout(other); // rejected transfer cannot clear the active writer
     assert(native_t970_display_hold() == 1);
-    assert(!reserveScanout(&other));
-    assert(!reserveScanout(&writer)); // a later check sees the closed admission
-    releaseScanout(&writer);
+    assert(!reserveScanout(other));
+    assert(!reserveScanout(writer)); // a later check sees the closed admission
+    releaseScanout(writer);
     assert(native_t970_display_hold() == 0);
-    assert(!reserveScanout(&writer)); // admission stays closed after draining
+    assert(!reserveScanout(writer)); // admission stays closed after draining
 }
 '''
         with tempfile.TemporaryDirectory() as temp:

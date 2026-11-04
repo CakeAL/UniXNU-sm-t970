@@ -1,0 +1,13 @@
+{
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/data-bringup/ui-compact-v37/boot-partition.img"
+  ],
+  "boot_sha256": "ea3e7c1032bc4dec6efed15b665b929e4f7d95d1c1b8fb54b5e407874b9c2828",
+  "exit_code": 0,
+  "reboot_requested": true,
+  "readback_verified": false,
+  "hardware_result_pending": true
+}
