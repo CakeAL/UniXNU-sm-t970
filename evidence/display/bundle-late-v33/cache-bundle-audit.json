@@ -1,0 +1,23 @@
+{
+  "cache_uuid": "590d839a82d230f1a17d0cc053420f73",
+  "bundle_executable": "/System/Library/AccessibilityBundles/BackBoard.axbundle/BackBoard",
+  "cache_image": {
+    "unslid_address": "0x21c137000",
+    "text_bytes": 196608
+  },
+  "root_bundle_executable_entry_present": false,
+  "root_bundle_info_plist_present": true,
+  "v24_return_candidate": "0x100812b44",
+  "v24_inferred_executable_slide": "0x7a4000",
+  "v24_symbol_report_sha256": "5cf639858224977c952d5190b646c9423024cd74056e1d50fef029b6c62d5fc1",
+  "interpretation": "The original bundle metadata points to an executable present in the original shared cache. V24 adds a third compatible stack, in Objective-C image class enumeration. Both executable slide attribution and actual cache-image use on the device remain unverified.",
+  "backboard_dispatch_once_block": {
+    "block_address": "0x1000e3618",
+    "invoke_pointer_address": "0x1000e3628",
+    "invoke_chained_rebase": "0x1000000006eae4",
+    "invoke_address": "0x10006eae4",
+    "block_reference_instruction": "0x10002359c adr x1, #0x1000e3618",
+    "dispatch_once_tail_call": "0x1000235a4 b 0x1000976b0",
+    "corroboration": "The v24 live stack includes dispatch_once_callout immediately below dispatch_client_callout and the bundle-load return candidate."
+  }
+}

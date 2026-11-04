@@ -937,6 +937,7 @@ id = "display"
 status = "planned"
 components = []
 paths = [
+  "evidence/display/bundle-late-v33/**",
   "evidence/display/vsync-stages-v32/**",
   "evidence/display/wifi-address-125-v30/**",
   "evidence/display/mobilegestalt-wifi-audit/**",
@@ -1068,10 +1069,13 @@ limits = [
   "Framebuffer physical address, stride, pixel format and UEFI GOP handoff are not verified by the mode list.",
 ]
 next_action = [
-  "V31 confirmed spare RAM Data capacity at target125. V32 confirms timer creation with no observed arm and identifies a repeated bundle-load stack. Compare a 150-second report on the same v32 kernel before selecting the next registration or userspace probe.",
+  "V31 confirmed spare RAM Data capacity at target125. V33 report appeared for less than half a second before the Apple logo replaced it. Serialize the terminal diagnostic with existing GOP writers before repeating the snapshot. Measure stage timestamps and compare source pixels with physical scanout to investigate first-logo latency and aspect.",
 ]
 
 evidence = [
+  { kind = "host", reference = "evidence/display/bundle-late-v33/preparation.json", revision = "1e0d74546470bc763b87f573a4fd2256c41a0ed1", command = "python3.14 evidence/display/bundle-late-v33/prepare.py", result = "BOOT2a6e95a2 moves the v32 terminal sample from target125 to target150. Final FAT verifies the same kernel, ADT, trust cache and Data seed. Firmware and outside payload bytes match." },
+  { kind = "device", reference = "evidence/display/bundle-late-v33/device-result.json", revision = "1e0d74546470bc763b87f573a4fd2256c41a0ed1", command = "Owner observation after BOOT2a6e95a2 upload and reboot", result = "About two minutes from magenta to Apple logo. Diagnostic screen visible for less than half a second, then replaced by the logo. Counters and stacks unreadable. Logo looked flattened to the owner." },
+  { kind = "device", reference = "evidence/display/bundle-late-v33/upload.json", revision = "1e0d74546470bc763b87f573a4fd2256c41a0ed1", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/bundle-late-v33/boot-partition.img", result = "BOOT upload successful and reboot requested, exit 0. Device readback and target150 screen result pending." },
   { kind = "device", reference = "evidence/display/vsync-stages-v32/device-result.json", revision = "61d51aef2416634abf5964e807d1d6897fbbdfe0", command = "Owner photo after BOOT6b692880 upload, target125 terminal report", result = "Timer start1/arm0/notify0, three completed frame retirements and 323383296 bytes available on RAM Data. No vsync client registration result captured." },
   { kind = "device", reference = "evidence/display/vsync-stages-v32/upload.json", revision = "61d51aef2416634abf5964e807d1d6897fbbdfe0", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/vsync-stages-v32/boot-partition.img", result = "Owner authorized direct BOOT flashing. Heimdall reported successful upload and requested reboot. Device readback and screen result pending." },
   { kind = "host", reference = "evidence/display/vsync-stages-v32/preparation.json", revision = "61d51aef2416634abf5964e807d1d6897fbbdfe0", command = "python3.14 evidence/display/vsync-stages-v32/prepare.py", result = "BOOT6b692880 contains the new software vsync stage report. Final FAT independently confirms the packed kernel and unchanged v31 args, ADT, trust cache and seed. Hardware pending." },

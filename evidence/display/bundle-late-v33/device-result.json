@@ -1,0 +1,18 @@
+{
+  "boot_sha256": "2a6e95a22aa95421a9e34d84b20f06c763d355165b748d577245ecab06111ead",
+  "association": "Owner observation following successful BOOT-only upload and reboot request. Device BOOT hash was not read back.",
+  "configured_report_seconds": 150,
+  "owner_observation": {
+    "magenta_to_apple_logo_seconds_approximate": 120,
+    "diagnostic_page_visible_seconds_upper_bound": 0.5,
+    "diagnostic_page_followed_by": "Apple logo",
+    "logo_appearance": "Visually somewhat flattened"
+  },
+  "captured_counters_or_stacks": false,
+  "limitations": [
+    "The configured report deadline is relative to the report thread, not measured from the magenta bar.",
+    "The page was too brief to read. No frame counts, process stacks or exact first-frame time can be attributed to v33.",
+    "The panic-screen shim parks the reporting CPU before normal XNU debugger coordination. A later framebuffer write is consistent with the observation, but its writer and whether a reset occurred were not measured.",
+    "No logo frame was captured for geometric comparison."
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "command": [
+    ".cache/heimdall/build/bin/heimdall",
+    "flash",
+    "--BOOT",
+    "out/data-bringup/bundle-late-v33/boot-partition.img"
+  ],
+  "boot_sha256": "2a6e95a22aa95421a9e34d84b20f06c763d355165b748d577245ecab06111ead",
+  "exit_code": 0,
+  "reboot_requested": true,
+  "readback_verified": false,
+  "hardware_result_pending": true
+}
