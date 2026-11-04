@@ -1,0 +1,61 @@
+{
+  "boot_sha256": "07f38ad95b31fac15da857c9495f322c327b9509ee6e2b8e330dfb286ea5f800",
+  "photo": "screen-target120.jpg",
+  "photo_sha256": "23040abab98ecc20a3cb4c625df8ad9e189595fffcca184662e59355d0282898",
+  "photo_time_local": "2026-11-04T22:39:59+08:00",
+  "target_seconds": 120,
+  "system": {
+    "launchd_main": true,
+    "cpu": 8,
+    "secondary_cpu": 7,
+    "processes": 220,
+    "springboard_pid": 27,
+    "springboard_threads": 31,
+    "backboardd_pid": 57,
+    "backboardd_threads": 20,
+    "runningboardd_pid": 26,
+    "verified_blocks": 1115551
+  },
+  "memory": {
+    "managed_pages": 499248,
+    "free_pages": 6722,
+    "page_bytes": 4096,
+    "managed_mib": 1950.1875,
+    "free_mib": 26.2578125,
+    "uninterruptible_threads": 4
+  },
+  "data": {
+    "report_rc": 0,
+    "blocks": 131072,
+    "free_blocks": 15402,
+    "block_bytes": 4096,
+    "free_mib": 60.1640625
+  },
+  "display": {
+    "published": true,
+    "publish_ms": 32945,
+    "first_copy_ms": 126532,
+    "publish_to_first_copy_ms": 93587,
+    "swaps_ok": 5,
+    "swaps_bad": 0,
+    "copies": 4,
+    "retired": 4,
+    "vsync_started": 1,
+    "vsync_armed": 0,
+    "vsync_notifications": 0
+  },
+  "launchservices": {
+    "waits": 1,
+    "reported_address": "0x1febd4878",
+    "cache_slide": "0xa350000",
+    "unslid_address": "0x1f4884878",
+    "waiter": "0xadd",
+    "owner": "0xada"
+  },
+  "limitations": [
+    "The user supplied this photo after the exact-image v62 upload and reboot request. No partition readback.",
+    "The two boots differ in Data contents, and the earlier owner photo lacks a matching upload receipt.",
+    "The first copy happened later by elapsed timestamp; the publish-to-copy interval differs by only 277 ms.",
+    "The diagnostic stops execution intentionally. No lock screen, home screen, touch or GPU verification."
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/owned-window-2g-continuous-v63/boot-partition.img",
+  "finished_at": "2026-11-04T14:43:56+00:00",
+  "boot_sha256": "4ba79c66534e6fc70b80788360dc4a6d560228c2cb8f6e84aa3537fe0071a394",
+  "partition": "BOOT",
+  "exit_code": 0,
+  "transfer_log_sha256": "3634cb6a721690ebec51de2aae82b631e02d349f10201c5a1708783765e0f6ac",
+  "transfer_confirmed": true,
+  "reboot_requested": true,
+  "partition_readback": false,
+  "userdata_partition_uploaded": false
+}

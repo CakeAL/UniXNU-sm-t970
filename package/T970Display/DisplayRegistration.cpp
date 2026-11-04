@@ -53,7 +53,7 @@ static bool consoleReleased;
 static bool reportTracksScanout;
 static bool reportOwnsScanout;
 static uint64_t scanoutWriter;
-static uint64_t publishedAt, firstCopyAt;
+static uint64_t publishedAt, firstCopyAt, lastCopyAt, lastBlankAt, lastDarkSourceAt;
 static uint32_t firstLitExtent;
 static uint32_t completedFrames;
 static uint32_t rejectedFrames;
@@ -261,12 +261,17 @@ extern "C" bool native_legacy_prepare_scanout(void) {
 }
 
 extern "C" void native_t970_display_timing(char *out, unsigned length, int hold) {
-    uint64_t publishNs = 0, copyNs = 0;
+    uint64_t publishNs = 0, firstNs = 0, lastNs = 0, blankNs = 0, darkNs = 0;
     absolutetime_to_nanoseconds(__atomic_load_n(&publishedAt, __ATOMIC_RELAXED), &publishNs);
-    absolutetime_to_nanoseconds(__atomic_load_n(&firstCopyAt, __ATOMIC_RELAXED), &copyNs);
+    absolutetime_to_nanoseconds(__atomic_load_n(&firstCopyAt, __ATOMIC_RELAXED), &firstNs);
+    absolutetime_to_nanoseconds(__atomic_load_n(&lastCopyAt, __ATOMIC_RELAXED), &lastNs);
+    absolutetime_to_nanoseconds(__atomic_load_n(&lastBlankAt, __ATOMIC_RELAXED), &blankNs);
+    absolutetime_to_nanoseconds(__atomic_load_n(&lastDarkSourceAt, __ATOMIC_RELAXED), &darkNs);
     uint32_t extent = __atomic_load_n(&firstLitExtent, __ATOMIC_RELAXED);
-    snprintf(out, length, "\nFB hold=%d publish/first-copy ms=%llu/%llu src-lit=%ux%u writer=%llx",
-             hold, (unsigned long long)(publishNs / 1000000), (unsigned long long)(copyNs / 1000000),
+    snprintf(out, length, "\nFB hold=%d pub/first/last ms=%llu/%llu/%llu blank/dark=%llu/%llu lit=%ux%u writer=%llx",
+             hold, (unsigned long long)(publishNs / 1000000), (unsigned long long)(firstNs / 1000000),
+             (unsigned long long)(lastNs / 1000000), (unsigned long long)(blankNs / 1000000),
+             (unsigned long long)(darkNs / 1000000),
              extent >> 16, extent & 0xffff,
              (unsigned long long)__atomic_load_n(&scanoutWriter, __ATOMIC_SEQ_CST));
 }
@@ -330,9 +335,11 @@ extern "C" void native_legacy_retirement_observed(IOService *) {
 }
 
 extern "C" void native_legacy_copy_timing_observed(uint64_t ticks, uint64_t bytes) {
+    const uint64_t now = mach_absolute_time();
+    __atomic_store_n(&lastCopyAt, now, __ATOMIC_RELAXED);
     if (!__atomic_load_n(&firstCopyAt, __ATOMIC_RELAXED)) {
         uint64_t unset = 0;
-        __atomic_compare_exchange_n(&firstCopyAt, &unset, mach_absolute_time(),
+        __atomic_compare_exchange_n(&firstCopyAt, &unset, now,
                                     false, __ATOMIC_RELAXED, __ATOMIC_RELAXED);
     }
     note(copies);
@@ -361,7 +368,18 @@ extern "C" void native_legacy_swap_stage(unsigned) {
 
 extern "C" void native_legacy_frame_observed(unsigned stage, uint64_t count,
                                              uint64_t minX, uint64_t minY, uint64_t maxX, uint64_t maxY) {
-    if (stage || !count || maxX < minX || maxY < minY || maxX >= 2800 || maxY >= 1752) return;
+    // The shared presenter reports stage 1 after completing a blank GOP fill.
+    if (stage == 1) {
+        __atomic_store_n(&lastBlankAt, mach_absolute_time(), __ATOMIC_RELAXED);
+        return;
+    }
+    if (stage) return;
+    // Source scans are bounded and run before copy. A dark source alone is not a completed frame.
+    if (!count) {
+        __atomic_store_n(&lastDarkSourceAt, mach_absolute_time(), __ATOMIC_RELAXED);
+        return;
+    }
+    if (maxX < minX || maxY < minY || maxX >= 2800 || maxY >= 1752) return;
     uint32_t extent = ((maxX - minX + 1) << 16) | (maxY - minY + 1);
     uint32_t unset = 0;
     __atomic_compare_exchange_n(&firstLitExtent, &unset, extent, false, __ATOMIC_RELAXED, __ATOMIC_RELAXED);

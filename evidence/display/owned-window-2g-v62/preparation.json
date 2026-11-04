@@ -1,0 +1,20 @@
+{
+  "base_boot_sha256": "33abac1d790f9ee977d27f48f0f40489bcbf1a77b779c3db61cbc30f35d31659",
+  "boot_sha256": "07f38ad95b31fac15da857c9495f322c327b9509ee6e2b8e330dfb286ea5f800",
+  "boot_bytes": 71303168,
+  "base_adt_sha256": "778cc0f6f2d9fdb6cd9896aac1e51ce6496858a80e083339afd1775ec7a0c0cd",
+  "adt_sha256": "53b27905f329af319e7da5552306ef2b56beb46f9201e69d8afee73769e0bdaf",
+  "old_requested_bytes": 805306368,
+  "requested_bytes": 2147483648,
+  "only_adt_property_changed": "/chosen/darwinboot-memory-size",
+  "unchanged_payload_sha256": {
+    "unixnu.toml": "3ab1753d75d9c5e67c64a8d87b0ac12cfb6696baa66c00bc6b29809cba840517",
+    "Payloads/kernel.macho": "133077bd5e26b100baf7f4f392e659a17370479b3ebb8e462806661126d37c60",
+    "Payloads/kernel.macho.trustcache": "7416ca4f8377146626bb284e2133c76bee6cb4e3ee0af5d648b186235a7323a7",
+    "Payloads/scratch-data.img": "4591566eccd77f0f9d13a1338ecaf3c73ce86cd04aeea732d91db6b2e100ca3a"
+  },
+  "unchanged_header_firmware_dtb_tail": true,
+  "target_report_seconds": 120,
+  "hardware_allocation_verified": false,
+  "uploaded": false
+}

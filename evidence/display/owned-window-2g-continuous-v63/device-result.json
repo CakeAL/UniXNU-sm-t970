@@ -1,0 +1,14 @@
+{
+  "boot_sha256": "4ba79c66534e6fc70b80788360dc4a6d560228c2cb8f6e84aa3537fe0071a394",
+  "observation_source": "owner report after matching BOOT upload and reboot request",
+  "apple_logo_observed": true,
+  "hello_screen_observed": true,
+  "hello_animation_slow": true,
+  "hello_visible_seconds_approx": 4,
+  "screen_went_black": true,
+  "short_power_press_relit_panel": false,
+  "home_screen_observed": false,
+  "photograph_available": false,
+  "partition_readback": false,
+  "interpretation": "iPadOS Setup was visibly rendered. The owner report does not establish why the screen went black or whether XNU kept running."
+}
