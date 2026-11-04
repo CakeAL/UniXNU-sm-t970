@@ -1,0 +1,25 @@
+{
+  "base_boot_sha256": "a3460abae20480f172a7a4d7436ce24e7003e0c3c42bb42a6be0d0b23d16322e",
+  "boot_sha256": "32fa945786c2afc6e21ddddde1f629736d90c26416de6629e87e2e786b3ca3cc",
+  "boot_bytes": 71303168,
+  "kernel_sha256": "5a3ce6eaa3c07df37fb86201eb19f9d7cf03b72e5ed5cb3d19d0f999f9934197",
+  "payload_kernel_sha256": "1a19d6ede83a13a2ea37588afa48f90ecf61dbed80bb4258408ead8ea635ce1b",
+  "added_arguments": [
+    "t970-runtime-report=240",
+    "t970-pm-watchdog-detail=1"
+  ],
+  "unchanged_payload_sha256": {
+    "Payloads/kernel.macho.trustcache": "7416ca4f8377146626bb284e2133c76bee6cb4e3ee0af5d648b186235a7323a7",
+    "Payloads/scratch-data.img": "4591566eccd77f0f9d13a1338ecaf3c73ce86cd04aeea732d91db6b2e100ca3a",
+    "Payloads/kernel.macho.adt": "b32ba77d5083d2d8d4f12c5b8e1dcded456e64b888f1f5a50115279015c71997"
+  },
+  "unchanged_header_firmware_dtb_tail": true,
+  "terminal_runtime_report": true,
+  "uploaded": false,
+  "build": {
+    "device_base_revision": "a1af20bddd4d35ff2c18758946c74b8d32c59e5f",
+    "unixnu_revision": "2c834e313d25482c78d38d703eff1f8d190f2597",
+    "kernel_log_sha256": "6bf1a057d1904cc18eb5878b1c6020d8b6892cfc02152d5fdfacd4bbd01872ad",
+    "input_scope": "Retained v55 resolved config, component tree and local build inputs, including pre-existing changes."
+  }
+}

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Relink the qualified v55 kernel with the board's new display counters."""
+import argparse
 import hashlib
 import json
 import os
@@ -28,11 +29,16 @@ def ar(option, archive, *args):
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--output', type=Path, default=BUILD)
+    parser.add_argument('--cached-headers', action='store_true')
+    args = parser.parse_args()
+    build = args.output.resolve()
     kernel = WORK / 'kernel/kernel.macho'
     if sha(kernel) != BASE_KERNEL_SHA or sha(LIVE / ARCHIVE) != BASE_ARCHIVE_SHA:
         raise ValueError('Expected the v55 kernel and display archive')
-    BUILD.mkdir()
-    registration = BUILD / 'registration'
+    build.mkdir()
+    registration = build / 'registration'
     subprocess.run(['python3.14', str(DEVICE / 'scripts/build-display-registration.py'),
                     '--tree', str(WORK / 'tree'),
                     '--gop-object', str(OUT / 'display-object-cf3b429/NativeLegacyDisplay.o'),
@@ -43,7 +49,7 @@ def main():
     report['source_sha256'][str(source)] = sha(source)
     report['registration_object_sha256'] = sha(replacement)
 
-    archive = BUILD / ARCHIVE
+    archive = build / ARCHIVE
     shutil.copy2(LIVE / ARCHIVE, archive)
     members = ar('-t', archive).decode().splitlines()
     if members.count(MEMBER) != 1:
@@ -58,30 +64,33 @@ def main():
         if ar('-p', archive, member) != expected:
             raise ValueError('Unexpected archive change: ' + member)
     report['archive_sha256'] = sha(archive)
-    (BUILD / REPORT).write_text(json.dumps(report, indent=2) + '\n')
+    (build / REPORT).write_text(json.dumps(report, indent=2) + '\n')
 
-    saved = BUILD / 'baseline'
+    saved = build / 'baseline'
     saved.mkdir()
     targets = (LIVE / ARCHIVE, LIVE / REPORT, kernel, kernel.with_suffix('.json'))
     for target in targets:
         shutil.copy2(target, saved / target.name)
     env = dict(os.environ)
     env['PATH'] = str(DEVICE / '.cache/bin') + ':/opt/homebrew/opt/llvm/bin:/opt/homebrew/opt/lld/bin:' + env['PATH']
-    command = ['python3.14', str(DEVICE.parent / 'UniXNU/unixnu'), 'build', 'kernel',
+    launcher = DEVICE.parent / 'UniXNU/unixnu'
+    if args.cached_headers:
+        launcher = DEVICE / '.cache/run-kernel-with-cached-headers.py'
+    command = ['python3.14', str(launcher), 'build', 'kernel',
                '-D', '.', '--out', str(OUT), '--local-module', 'driver:ArmCpu=' + str(DEVICE / '.cache/armcpu-sgi-asm')]
     try:
         for name in (ARCHIVE, REPORT):
-            shutil.copy2(BUILD / name, LIVE / name)
-        with (BUILD / 'kernel.log').open('w') as log:
+            shutil.copy2(build / name, LIVE / name)
+        with (build / 'kernel.log').open('w') as log:
             subprocess.run(command, cwd=DEVICE, env=env, stdout=log, stderr=subprocess.STDOUT, check=True)
         if b'blank/dark=' not in kernel.read_bytes():
             raise ValueError('Display counters absent from prelinked kernel')
         for target in targets[2:]:
-            shutil.copy2(target, BUILD / target.name)
+            shutil.copy2(target, build / target.name)
     finally:
         for target in targets:
             shutil.copy2(saved / target.name, target)
-    print(sha(BUILD / 'kernel.macho'))
+    print(sha(build / 'kernel.macho'))
 
 
 if __name__ == '__main__':

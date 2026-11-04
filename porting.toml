@@ -945,6 +945,8 @@ id = "display"
 status = "planned"
 components = []
 paths = [
+  "evidence/display/pm-watchdog-v67/**",
+  "patches/xnu/t970-pm-watchdog-detail.patch",
   "evidence/display/sleep-disabled-v66/**",
   "evidence/display/no-idle-v65/**",
   "evidence/display/hello-black-v64/**",
@@ -1024,6 +1026,7 @@ procedure = [
   "Collect DRM modes, panel type and brightness limits; read only display-selection tokens from /proc/cmdline and match the selected S6TUUM3 node in the live DT.",
 ]
 findings = [
+  "v67 adds an opt-in root-domain watchdog panic detail with PM machine state, wait reason, current and requested power states, pending count and first pending service class. It also retains a 240-second frame report if no watchdog fires. Kernel prelink and final BOOT FAT checks pass. The device reaches target240 with a completed blank GOP fill 28 ms after the last normal CPU copy. No PM watchdog panic occurred before the report.",
   "v65 with noidle=1 still shows Hello and then turns black after about ten seconds. The owner photo shows no panic text. v66 uses the sleep-disabled ADT default also used on T733 and dada; it retains noidle and adds only that property to the tested payload.",
   "v64 owner photo confirms Sleep/Wake hang detected at IOPMrootDomain.cpp:12812. The linked stack reaches IOService::watchdog_timer_expired; this timer belongs to the PM root domain. The original triggering request and blocked child are unknown. v65 changes only noidle=1 on the continuous v63 image and preserves the power watchdog.",
   "v64 changes the board observation callbacks only in the reviewed display archive, then relinks and repacks the v63 layout with a 240-second runtime report. The new fields track the latest completed CPU copy, explicit blank fill and sampled black source. The source scan is bounded and occurs before copying.",
@@ -1095,11 +1098,13 @@ limits = [
   "Framebuffer physical address, stride, pixel format and UEFI GOP handoff are not verified by the mode list.",
 ]
 next_action = [
-  "v66 still turned black about ten seconds after Hello. Capture the root-domain state, wait reason and pending service class on the next PM watchdog expiry.",
+  "Trace the compositor blank submission and compare SpringBoard display policy with the sirius port. v67 reaches target240 after explicit GOP black fill. Keep watch for a separate PM timeout.",
   "V31 confirmed spare RAM Data capacity at target125. V35 reports hold0 and reproduces the v34 BB QuartzCore mutex and SB LaunchServices context waits. V36 shows SwapEnd and dispatch group wait in BackBoard, but screen clips before SpringBoard. V37 fits both processes on screen. Capture the resolved SpringBoard unfair-lock owner, then map that ID to the peer stacks. Compare source extent with a straight-on photo only if both show the same frame.",
 ]
 
 evidence = [
+  { kind = "host", reference = "evidence/display/pm-watchdog-v67/preparation.json", revision = "a1af20bddd4d35ff2c18758946c74b8d32c59e5f", command = "python3.14 evidence/display/hello-black-v64/build-kernel.py --cached-headers --output out/data-bringup/pm-watchdog-v67-build && python3.14 evidence/display/hello-black-v64/prepare.py --pm-watchdog", result = "Kernel prelink includes both report markers. Final FAT retains the v66 2 GiB ADT, trust cache and Data seed." },
+  { kind = "device", reference = "evidence/display/pm-watchdog-v67/upload.json", revision = "a1af20bddd4d35ff2c18758946c74b8d32c59e5f", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/pm-watchdog-v67/boot-partition.img", result = "BOOT upload and reboot request succeeded. Owner photo captures target240 with last CPU copy at 158554 ms and explicit blank GOP fill at 158582 ms. No PM panic preceded this report." },
   { kind = "device", reference = "evidence/display/no-idle-v65/device-result.json", revision = "2fb4fc1eb578ae3640396e5308aeb277ac7f7da2", command = "Owner observation after BOOTed1868cf upload", result = "Hello appeared and the panel went black about ten seconds later, with no visible panic text." },
   { kind = "device", reference = "evidence/display/sleep-disabled-v66/upload.json", revision = "2fb4fc1eb578ae3640396e5308aeb277ac7f7da2", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/sleep-disabled-v66/boot-partition.img", result = "BOOT upload and reboot request succeeded. Owner later reports black screen about ten seconds after Hello." },
   { kind = "device", reference = "evidence/display/hello-black-v64/device-result.json", revision = "2fb4fc1eb578ae3640396e5308aeb277ac7f7da2", command = "Owner photo after BOOT0afd75bc upload and xcrun nm -n -m of the linked kernel", result = "Root-domain power watchdog panic at IOPMrootDomain.cpp:12812; the 240-second report was not reached." },
@@ -1333,6 +1338,8 @@ id = "power"
 status = "planned"
 components = []
 paths = [
+  "evidence/display/pm-watchdog-v67/**",
+  "patches/xnu/t970-pm-watchdog-detail.patch",
   "evidence/display/sleep-disabled-v66/**",
   "evidence/display/no-idle-v65/**",
   "evidence/display/hello-black-v64/**",
@@ -1351,6 +1358,7 @@ procedure = [
   "Read selected power-supply attributes, available sleep states and thermal-zone names; do not write charging, regulator or suspend controls.",
 ]
 findings = [
+  "v67 adds an opt-in root-domain watchdog panic detail with PM machine state, wait reason, current and requested power states, pending count and first pending service class. It also retains a 240-second frame report if no watchdog fires. Kernel prelink and final BOOT FAT checks pass. The device reaches target240 with a completed blank GOP fill 28 ms after the last normal CPU copy. No PM watchdog panic occurred before the report.",
   "v65 with noidle=1 still shows Hello and then turns black after about ten seconds. The owner photo shows no panic text. v66 uses the sleep-disabled ADT default also used on T733 and dada; it retains noidle and adds only that property to the tested payload.",
   "v64 owner photo confirms Sleep/Wake hang detected at IOPMrootDomain.cpp:12812. The linked stack reaches IOService::watchdog_timer_expired; this timer belongs to the PM root domain. The original triggering request and blocked child are unknown. v65 changes only noidle=1 on the continuous v63 image and preserves the power watchdog.",
   "Advertised Android sleep states and power-supply entries do not establish UniXNU suspend, charging support or physical presence of every listed supply type.",
@@ -1365,6 +1373,8 @@ next_action = [
   "Read the matching battery/charger driver sources to establish units and ownership, then map required regulators and clocks for the first boot path.",
 ]
 evidence = [
+  { kind = "host", reference = "evidence/display/pm-watchdog-v67/preparation.json", revision = "a1af20bddd4d35ff2c18758946c74b8d32c59e5f", command = "python3.14 evidence/display/hello-black-v64/build-kernel.py --cached-headers --output out/data-bringup/pm-watchdog-v67-build && python3.14 evidence/display/hello-black-v64/prepare.py --pm-watchdog", result = "Kernel prelink includes both report markers. Final FAT retains the v66 2 GiB ADT, trust cache and Data seed." },
+  { kind = "device", reference = "evidence/display/pm-watchdog-v67/upload.json", revision = "a1af20bddd4d35ff2c18758946c74b8d32c59e5f", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/pm-watchdog-v67/boot-partition.img", result = "BOOT upload and reboot request succeeded. Owner photo captures target240 with last CPU copy at 158554 ms and explicit blank GOP fill at 158582 ms. No PM panic preceded this report." },
   { kind = "device", reference = "evidence/display/no-idle-v65/device-result.json", revision = "2fb4fc1eb578ae3640396e5308aeb277ac7f7da2", command = "Owner observation after BOOTed1868cf upload", result = "Hello appeared and the panel went black about ten seconds later, with no visible panic text." },
   { kind = "device", reference = "evidence/display/sleep-disabled-v66/upload.json", revision = "2fb4fc1eb578ae3640396e5308aeb277ac7f7da2", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/sleep-disabled-v66/boot-partition.img", result = "BOOT upload and reboot request succeeded. Owner later reports black screen about ten seconds after Hello." },
   { kind = "device", reference = "evidence/display/hello-black-v64/device-result.json", revision = "2fb4fc1eb578ae3640396e5308aeb277ac7f7da2", command = "Owner photo after BOOT0afd75bc upload and xcrun nm -n -m of the linked kernel", result = "Root-domain power watchdog panic at IOPMrootDomain.cpp:12812; the 240-second report was not reached." },

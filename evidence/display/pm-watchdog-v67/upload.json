@@ -1,0 +1,12 @@
+{
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/pm-watchdog-v67/boot-partition.img",
+  "finished_at": "2026-11-04T15:11:45+00:00",
+  "boot_sha256": "32fa945786c2afc6e21ddddde1f629736d90c26416de6629e87e2e786b3ca3cc",
+  "partition": "BOOT",
+  "exit_code": 0,
+  "transfer_log_sha256": "3634cb6a721690ebec51de2aae82b631e02d349f10201c5a1708783765e0f6ac",
+  "transfer_confirmed": true,
+  "reboot_requested": true,
+  "partition_readback": false,
+  "userdata_partition_uploaded": false
+}

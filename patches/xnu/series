@@ -29,3 +29,4 @@ t970-data-space-report.patch
 t970-display-report-hold.patch
 t970-ui-compact-report.patch
 t970-ls-lock-owner.patch
+t970-pm-watchdog-detail.patch

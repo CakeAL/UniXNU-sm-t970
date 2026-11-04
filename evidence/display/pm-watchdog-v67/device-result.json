@@ -1,0 +1,37 @@
+{
+  "boot_sha256": "32fa945786c2afc6e21ddddde1f629736d90c26416de6629e87e2e786b3ca3cc",
+  "photo": "screen-target240.jpg",
+  "photo_sha256": "1227fad230228e8ab22242eb6839d1ddc5fcd5649a4921cf7cc623343df0aea8",
+  "photo_time_local": "2026-11-04T23:16:25+08:00",
+  "target_seconds": 240,
+  "owner_observation": "Hello appeared and turned black about ten seconds later.",
+  "pm_timeout_reported": false,
+  "terminal_runtime_report_observed": true,
+  "process_count": 243,
+  "springboard_pid": 27,
+  "backboardd_pid": 57,
+  "cpus": 8,
+  "display": {
+    "publish_ms": 18757,
+    "first_copy_ms": 110499,
+    "last_copy_ms": 158554,
+    "last_blank_ms": 158582,
+    "last_dark_source_ms": 0,
+    "blank_after_last_copy_ms": 28,
+    "swaps_ok": 11,
+    "swaps_bad": 0,
+    "transfers": 11,
+    "copies": 9,
+    "retired": 11,
+    "vsync_started": 1,
+    "vsync_armed": 0
+  },
+  "data": {
+    "report_rc": 0,
+    "free_blocks": 10255,
+    "block_bytes": 4096
+  },
+  "launchservices_waits": 0,
+  "conclusion": "GOP explicitly filled black after the last surface copy. The same boot reached the terminal report; the earlier watchdog panic did not precede this black screen.",
+  "limitation": "The exact client and userland reason for the blank swap remain unidentified."
+}

@@ -1,0 +1,32 @@
+--- a/iokit/Kernel/IOServicePM.cpp
++++ b/iokit/Kernel/IOServicePM.cpp
+@@ -5824,12 +5824,29 @@
+ {
+ 	IOService * me = (IOService *) arg0;
+ 	bool expired;
++	unsigned int detail = 0;
++	PE_parse_boot_argn("t970-pm-watchdog-detail", &detail, sizeof(detail));
++	const char *blockedClass = "-";
++	unsigned int blockedCount = 0;
+
+ 	IOLockLock(me->fWatchdogLock);
+ 	expired = me->fWatchdogDeadline && (me->fWatchdogDeadline <= mach_absolute_time());
++	if (expired && detail == 1) {
++		blockedCount = me->fBlockedArray->getCount();
++		if (blockedCount) {
++			// The array retains the pending service; class names have static lifetime.
++			blockedClass = me->fBlockedArray->getObject(0)->getMetaClass()->getClassName();
++		}
++	}
+ 	IOLockUnlock(me->fWatchdogLock);
+ 	if (!expired) {
+ 		return;
++	}
++	if (detail == 1) {
++		panic("T970 PM timeout state=%u wait=%u power=%u->%u blocked=%u class=%s",
++		    (unsigned int)me->fMachineState, (unsigned int)me->fWaitReason,
++		    (unsigned int)me->fCurrentPowerState, (unsigned int)me->fHeadNotePowerState,
++		    blockedCount, blockedClass);
+ 	}
+
+ 	gIOPMWatchDogThread = current_thread();
