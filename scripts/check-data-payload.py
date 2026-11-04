@@ -34,6 +34,7 @@ def main():
                         help='Require the explicit RAM-only watchdog launch policy argument and symbols')
     parser.add_argument('--runtime-report-seconds', type=int, default=0,
                         help='Require the explicit terminal runtime sampler interval (5..300)')
+    parser.add_argument('--data-space', action='store_true', help='Require the opt-in bounded Data capacity sampler')
     parser.add_argument('--smp-observer', action='store_true',
                         help='Require per-core counters and the read-only reset-context accessor')
     parser.add_argument('--publish-reset-state', action='store_true',
@@ -76,6 +77,10 @@ def main():
     if args.runtime_report_seconds:
         require({'_native_t970_runtime_collect', '_native_t970_runtime_report',
                  '_native_t970_initproc_main'} <= names, 'Kernel lacks the runtime sampler')
+    if args.data_space:
+        require(args.runtime_report_seconds and args.cache_trace and
+                '_native_t970_data_space_worker' in names and b'Data space rc=' in kernel.read_bytes(),
+                'Data capacity sampler requires the linked worker and runtime cache report')
     if args.smp_observer:
         require((args.runtime_report_seconds or args.cpu_present) and {'_native_t970_reset_context', '_processor_avail_count',
                 '_armcpu_smp_step', '_armcpu_smp_psci_rc', '_armcpu_smp_fail',
@@ -97,6 +102,8 @@ def main():
     expected_args = base_args + (['t970-disable-watchdogd=1'] if args.watchdog_policy else [])
     if args.runtime_report_seconds:
         expected_args += [f't970-runtime-report={args.runtime_report_seconds}']
+    if args.data_space:
+        expected_args += ['t970-data-space=1']
     if args.publish_reset_state:
         expected_args += ['t970-smp-publish-state=1']
         require(b't970-smp-publish-state\0' in kernel.read_bytes(), 'Kernel lacks publication opt-in')

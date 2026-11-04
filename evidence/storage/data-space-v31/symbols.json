@@ -1,0 +1,227 @@
+{
+  "cache_slide": "0x5a4000",
+  "cache_uuid": "590d839a82d230f1a17d0cc053420f73",
+  "local_symbols_uuid_matches": true,
+  "live_sample": true,
+  "frames": [
+    {
+      "address": "0x1806a5a68",
+      "unslid_va": "0x180101a68",
+      "image": "/usr/lib/libobjc.A.dylib",
+      "nearest_local_symbol": "_map_images_nolock",
+      "offset": 4840,
+      "nearest_symbol": "_map_images_nolock",
+      "symbol_table": "local",
+      "original_instruction_bytes": "fc0240f9884740b9"
+    },
+    {
+      "address": "0x1806a5a34",
+      "unslid_va": "0x180101a34",
+      "image": "/usr/lib/libobjc.A.dylib",
+      "nearest_local_symbol": "_map_images_nolock",
+      "offset": 4788,
+      "nearest_symbol": "_map_images_nolock",
+      "symbol_table": "local",
+      "original_instruction_bytes": "28fc43d31f0000f1"
+    },
+    {
+      "address": "0x1806b01bc",
+      "unslid_va": "0x18010c1bc",
+      "image": "/usr/lib/libobjc.A.dylib",
+      "nearest_local_symbol": "_map_images",
+      "offset": 116,
+      "nearest_symbol": "_map_images",
+      "symbol_table": "local",
+      "original_instruction_bytes": "e81a40b9c97e5f88"
+    },
+    {
+      "address": "0x1a99d8214",
+      "unslid_va": "0x1a9434214",
+      "image": "/usr/lib/dyld",
+      "nearest_local_symbol": "__ZN5dyld412RuntimeState10notifyLoadERKNSt3__14spanIPKNS_6LoaderELm18446744073709551615EEE",
+      "offset": 944,
+      "nearest_symbol": "__ZN5dyld412RuntimeState10notifyLoadERKNSt3__14spanIPKNS_6LoaderELm18446744073709551615EEE",
+      "symbol_table": "local",
+      "original_instruction_bytes": "880640f908f54239"
+    },
+    {
+      "address": "0x1a99ec7c0",
+      "unslid_va": "0x1a94487c0",
+      "image": "/usr/lib/dyld",
+      "nearest_local_symbol": "__ZN5dyld44APIs11dlopen_fromEPKciPv",
+      "offset": 964,
+      "nearest_symbol": "__ZN5dyld44APIs11dlopen_fromEPKciPv",
+      "symbol_table": "local",
+      "original_instruction_bytes": "a08350f8e10315aa"
+    },
+    {
+      "address": "0x188502ecc",
+      "unslid_va": "0x187f5eecc",
+      "image": "/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation",
+      "nearest_local_symbol": "__CFBundleDlfcnLoadBundle",
+      "offset": 188,
+      "nearest_symbol": "__CFBundleDlfcnLoadBundle",
+      "symbol_table": "local",
+      "original_instruction_bytes": "f80300aab7feff97"
+    },
+    {
+      "address": "0x188501f5c",
+      "unslid_va": "0x187f5df5c",
+      "image": "/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation",
+      "offset": 316,
+      "nearest_symbol": "__CFBundleLoadExecutableAndReturnError",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "23000014c84736b0"
+    },
+    {
+      "address": "0x1874fffa8",
+      "unslid_va": "0x186f5bfa8",
+      "image": "/System/Library/Frameworks/Foundation.framework/Foundation",
+      "nearest_local_symbol": "-[NSBundle loadAndReturnError:]",
+      "offset": 308,
+      "nearest_symbol": "-[NSBundle loadAndReturnError:]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "600e0034a0048052"
+    },
+    {
+      "address": "0x100455b44",
+      "unslid_va": "0xffeb1b44",
+      "image": null
+    },
+    {
+      "address": "0x18fb5acc0",
+      "unslid_va": "0x18f5b6cc0",
+      "image": "/usr/lib/system/libdispatch.dylib",
+      "nearest_local_symbol": "__dispatch_client_callout",
+      "offset": 16,
+      "nearest_symbol": "__dispatch_client_callout",
+      "symbol_table": "local",
+      "original_instruction_bytes": "fd7b41a9f44fc2a8"
+    },
+    {
+      "address": "0x1cbd248e8",
+      "unslid_va": "0x1cb7808e8",
+      "image": "/usr/lib/system/libsystem_kernel.dylib",
+      "nearest_symbol": "___workq_kernreturn",
+      "symbol_table": "exported",
+      "offset": 8,
+      "original_instruction_bytes": "e3000054fd7bbfa9"
+    },
+    {
+      "address": "0x1ddbc6580",
+      "unslid_va": "0x1dd622580",
+      "image": "/usr/lib/system/libsystem_pthread.dylib",
+      "offset": 360,
+      "nearest_symbol": "__pthread_wqthread",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "68ae80b9f457bfa9"
+    },
+    {
+      "address": "0x1cbd24b58",
+      "unslid_va": "0x1cb780b58",
+      "image": "/usr/lib/system/libsystem_kernel.dylib",
+      "nearest_symbol": "_mach_msg2_trap",
+      "symbol_table": "exported",
+      "offset": 8,
+      "original_instruction_bytes": "c0035fd6f0058092"
+    },
+    {
+      "address": "0x1cbd28224",
+      "unslid_va": "0x1cb784224",
+      "image": "/usr/lib/system/libsystem_kernel.dylib",
+      "offset": 76,
+      "nearest_symbol": "_mach_msg2_internal",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "00050034fa013037"
+    },
+    {
+      "address": "0x1d01f42bc",
+      "unslid_va": "0x1cfc502bc",
+      "image": "/System/Library/PrivateFrameworks/SpringBoard.framework/SpringBoard",
+      "nearest_local_symbol": "+[UISDeviceContext(SpringBoard) sb_defaultContext]",
+      "offset": 64,
+      "nearest_symbol": "+[UISDeviceContext(SpringBoard) sb_defaultContext]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "08e947f9030140f9"
+    },
+    {
+      "address": "0x1d01f42b4",
+      "unslid_va": "0x1cfc502b4",
+      "image": "/System/Library/PrivateFrameworks/SpringBoard.framework/SpringBoard",
+      "nearest_local_symbol": "+[UISDeviceContext(SpringBoard) sb_defaultContext]",
+      "offset": 56,
+      "nearest_symbol": "+[UISDeviceContext(SpringBoard) sb_defaultContext]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "f40300aac8d10df0"
+    },
+    {
+      "address": "0x1d01f45c0",
+      "unslid_va": "0x1cfc505c0",
+      "image": "/System/Library/PrivateFrameworks/SpringBoard.framework/SpringBoard",
+      "nearest_local_symbol": "+[UISApplicationInitializationContext(SpringBoard) sb_embeddedDisplayDefaultContext]",
+      "offset": 100,
+      "nearest_symbol": "+[UISApplicationInitializationContext(SpringBoard) sb_embeddedDisplayDefaultContext]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "8be43c95f70300aa"
+    },
+    {
+      "address": "0x1d0323dd8",
+      "unslid_va": "0x1cfd7fdd8",
+      "image": "/System/Library/PrivateFrameworks/SpringBoard.framework/SpringBoard",
+      "nearest_local_symbol": "-[SBApplicationSupportServiceDelegate _rebuildDefaultContext]",
+      "offset": 32,
+      "nearest_symbol": "-[SBApplicationSupportServiceDelegate _rebuildDefaultContext]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "85263895e20300aa"
+    },
+    {
+      "address": "0x1d0323ce0",
+      "unslid_va": "0x1cfd7fce0",
+      "image": "/System/Library/PrivateFrameworks/SpringBoard.framework/SpringBoard",
+      "nearest_local_symbol": "-[SBApplicationSupportServiceDelegate init]",
+      "offset": 100,
+      "nearest_symbol": "-[SBApplicationSupportServiceDelegate init]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "600640f97f302194"
+    },
+    {
+      "address": "0x1d0324a94",
+      "unslid_va": "0x1cfd80a94",
+      "image": "/System/Library/PrivateFrameworks/SpringBoard.framework/SpringBoard",
+      "nearest_local_symbol": "___52+[SBApplicationSupportServiceSingleton startService]_block_invoke",
+      "offset": 20,
+      "nearest_symbol": "___52+[SBApplicationSupportServiceSingleton startService]_block_invoke",
+      "symbol_table": "local",
+      "original_instruction_bytes": "68ca12f0019946f9"
+    },
+    {
+      "address": "0x18fb2c0e4",
+      "unslid_va": "0x18f5880e4",
+      "image": "/usr/lib/system/libdispatch.dylib",
+      "nearest_local_symbol": "__dispatch_once_callout",
+      "offset": 28,
+      "nearest_symbol": "__dispatch_once_callout",
+      "symbol_table": "local",
+      "original_instruction_bytes": "68d03bd5081940b9"
+    },
+    {
+      "address": "0x1cfffa208",
+      "unslid_va": "0x1cfa56208",
+      "image": "/System/Library/PrivateFrameworks/SpringBoard.framework/SpringBoard",
+      "nearest_local_symbol": "+[SpringBoard initializeSystemServicesBeforeApplicationDidFinishLaunching]",
+      "offset": 128,
+      "nearest_symbol": "+[SpringBoard initializeSystemServicesBeforeApplicationDidFinishLaunching]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "a8560dd0007d44f9"
+    },
+    {
+      "address": "0x1a769c548",
+      "unslid_va": "0x1a70f8548",
+      "image": "/System/Library/PrivateFrameworks/FrontBoard.framework/FrontBoard",
+      "offset": 572,
+      "nearest_symbol": "_FBSystemShellInitialize",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "800745f9dd1d0194"
+    }
+  ]
+}

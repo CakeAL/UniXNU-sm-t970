@@ -1,0 +1,8 @@
+{
+  "seed_sha256": "3a6c07b2d50391697b60bf3c65e382dbfa62794220652db05183ec408d2c1278",
+  "attached_read_only": true,
+  "capacity_bytes": 536870912,
+  "free_bytes": 534294528,
+  "volume_count": 1,
+  "limitation": "Initial host seed only; runtime writes and Data free space are not measured."
+}

@@ -675,6 +675,11 @@ id = "storage"
 status = "implemented"
 components = ["ShengUfs", "VirtioMmioBlock", "RamBlock", "VerifiedRoot"]
 paths = [
+  "patches/xnu/t970-data-space-report.patch",
+  "tests/test_data_space_report.py",
+  "scripts/check-data-seed-space.py",
+  "evidence/storage/data-space-v31/**",
+  "evidence/storage/data-space-survey/**",
   "patches/xnu/t970-runtime-report.patch",
   "scripts/check-runtime-report.py",
   "scripts/boot-state-probe.py",
@@ -766,6 +771,7 @@ procedure = [
   "Read block sysfs and by-name links; read each LUN's primary GPT header and entry array and validate their CRC32 values without writing any block device.",
 ]
 findings = [
+  "The verified 512 MiB APFS seed reports 534294528 free bytes when attached read-only on the host, before any device writes. This is not runtime free space. BOOTe0a2d858 adds an opt-in bounded worker that checks the actual RAM Data device and requests APFS block counts, while preserving display counters in the 125-second terminal report. Host helper, BSD compile, kernel/prelink and packing checks pass; owner photo after successful BOOT upload shows rc0/phase1/support1d0 and 78135 available blocks of 4096 bytes (320040960 bytes). At the target125 snapshot the mounted RAM Data APFS has free capacity. See evidence/storage/data-space-v31.",
   "BOOT705d4160 mode6 owner photo02:38:12 captures all three processes/end marker unclipped. Constrained cap/active/busy=0/0/0; MG done35->37 while BB25/SB53 unchanged across 500ms deadlines. Runtime callback continues; investigate EDGE E/P counts versus current SMP topology before any scheduling change. See evidence/display/ui-queue-progress-v20/device-result.json.",
   "First boot of7e60f7c9 refused UFS handoff NOP at stage0, before NOP submission; CB0=100ff/1/e0, GFSR0 and historical FSR400. Owner rebooted the same image and root reads recovered. Exact stage0 predicate remains unknown; no storage gate or mappings were relaxed. Both photos are retained in evidence/cpu/smp-bringup/ipi-check/device-result.json.",
   "BOOTeeeba83b owner photo19:36:40 shows requested120-second runtime report: genuine main1,109 processes, watchdogd absent, SpringBoard27/backboardd56/runningboardd26, Data0/policy0/stage4,964876 verified blocks. Kernel deadline-wait/report executed; rate accuracy unmeasured. Interface-service process presence is not proof of rendering or functional services. Display backend remains disabled; next phase is display handoff/provider and independent staged SMP qualification.",
@@ -836,8 +842,12 @@ limits = [
   "Root image and corrected carrier writes were explicitly authorized, completed and readback-verified in their respective receipts. Readonly root and SystemOS preparation reached before-init-exec; writable Data, persistence and sustained XNU storage operation remain unverified.",
   "Current corrected runtime carriers authenticate the published OS/SystemOS windows; prior empty-policy publication reports are historical. Latest repeat has bootloader-only output, without a usable exec-return observation.",
 ]
-next_action = ["Read BOOTeeeba83b runtime sample: genuine main, named service PIDs, Data/policy status and read count. Treat absent output as unresolved timer/scheduling/startup, and process presence as a snapshot rather than UI success. Restore normal2387e904 after capture."]
+next_action = ["Track persistent Data separately from the v31 RAM Data result. Reopen the capacity hypothesis if a write operation reports ENOSPC or a later sample shows exhaustion."]
 evidence = [
+  { kind = "device", reference = "evidence/storage/data-space-v31/device-result.json", revision = "657a9404016124564be3af25531daad80c286448", command = "Owner photo after BOOTe0a2d858 upload, target125 terminal report", result = "Writable RAM Data APFS capacity returned all requested fields, 320040960 bytes available. Open7/swap2/copy2/retire2/vsync0; home screen unverified." },
+  { kind = "host", reference = "evidence/storage/data-space-survey/initial-seed.json", revision = "657a9404016124564be3af25531daad80c286448", command = "python3.14 scripts/check-data-seed-space.py --seed <raw-seed> --expected-sha256 <reviewed-hash> --output <report>", result = "Verified initial 512 MiB seed, attached it read-only, measured 534294528 bytes free, and detached. No runtime Data capacity is implied." },
+  { kind = "host", reference = "evidence/storage/data-space-v31/preparation.json", revision = "657a9404016124564be3af25531daad80c286448", command = "python3.14 evidence/storage/data-space-v31/build-image.py", result = "BOOTe0a2d858 contains the opt-in Data space worker and 125-second terminal report; helper tests, BSD compile, prelink and final FAT checks passed. See the separate owner photo result." },
+  { kind = "device", reference = "evidence/storage/data-space-v31/upload.json", revision = "657a9404016124564be3af25531daad80c286448", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/data-space-v31-memory768-v1/boot-partition.img", result = "Owner authorized BOOT upload and reboot; Heimdall reported success and requested reboot. Device BOOT readback unavailable. See the separate owner photo result." },
   { kind = "device", reference = "evidence/storage/watchdogd/runtime-report/device-result.json", revision = "2fcc9f9a4237a50af2d85bfd8f6ec27459291a0e", command = "BOOTeeeba83b, target120-second one-shot runtime report; owner photo19:36:40", result = "109 processes including SpringBoard27/backboardd56/runningboardd26, watchdogd not observed, genuine main1 and D0/W0/S4. Timer wait and sampler executed; no calibrated timing/rendering/desktop proof." },
   { kind = "host", reference = "evidence/storage/watchdogd/runtime-report/build.json", revision = "95050554b3de986d8b254217fec17ca420701c04", command = "Build with t970-runtime-report=120; check-runtime-report.py; check-data-payload.py --watchdog-policy --runtime-report-seconds 120", result = "Sourceab84b0ca and full BOOTeeeba83b build/host verification pass; kernel helper and policy regression pass. Upload exit0; timer/physical process snapshot pending." },
   { kind = "device", reference = "evidence/storage/watchdogd/boot-state-main/device-result.json", revision = "387cef760da554ccefd0a5e1ab37e5d2ebbc50b3", command = "BOOT28268af5 terminal readonly main/Data/policy observer; owner photo19:10:24", result = "main1 e0 D0 W0 S4 proves genuine main after successful Data and policy installer writes, not later launchd policy consumption or services. Normal2387e904 restored afterward." },
@@ -1056,10 +1066,11 @@ limits = [
   "Framebuffer physical address, stride, pixel format and UEFI GOP handoff are not verified by the mode list.",
 ]
 next_action = [
-  "Do not repeat the synthetic address comparison without new evidence. Investigate the actual lsd seeding worker, runtime Data free space or display dependencies with a focused method that can change the next implementation decision.",
+  "V31 confirmed spare RAM Data capacity at target125. Distinguish software vsync timer creation, arm and notification on the existing display path, then follow the first missing stage.",
 ]
 
 evidence = [
+  { kind = "device", reference = "evidence/storage/data-space-v31/device-result.json", revision = "657a9404016124564be3af25531daad80c286448", command = "Owner photo after BOOTe0a2d858 upload, target125 terminal report", result = "Writable RAM Data APFS capacity returned all requested fields, 320040960 bytes available. Open7/swap2/copy2/retire2/vsync0; home screen unverified." },
   { kind = "host", reference = "evidence/display/wifi-address-125-v30/preparation.json", revision = "fd8c980bfe6b578928ea9e61e71f74218ada4cf9", command = "python3.14 evidence/display/wifi-address-125-v30/prepare.py", result = "Diagnostic BOOTc96f86d7 adds one synthetic locally administered Wi-Fi address property to 125-second BOOTbb4d8474; FAT roundtrip and independently decoded ADT comparison pass. Host checks do not establish device execution." },
   { kind = "device", reference = "evidence/display/wifi-address-125-v30/upload.json", revision = "fd8c980bfe6b578928ea9e61e71f74218ada4cf9", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/wifi-address-125-v30/boot-partition.img", result = "Owner authorized BOOT upload and reboot; Heimdall reported success and requested reboot. No device readback." },
   { kind = "device", reference = "evidence/display/wifi-address-125-v30/device-result.json", revision = "fd8c980bfe6b578928ea9e61e71f74218ada4cf9", command = "Owner photo after BOOTc96f86d7 upload and reboot", result = "At target125 open7/swap2/copy2/retire2 match no-address baseline. SB is sampled in Control Center default module list loading; snapshots alone do not establish relative progress or causality." },

@@ -5,6 +5,8 @@
 
 ## 最新：首帧后的持续运行对照（2026-11-04）
 
+BOOT `e0a2d858…` 的机主照片在 125 秒确认可写 RAM Data APFS 查询成功，512 MiB 中约 305.2 MiB 可用。同屏 open7、swap/copy/retire 各2，vsync0。UUID 匹配符号显示 SB 正采到默认显示上下文构建，BB 正采到 bundle 加载。继续区分软件 vsync timer 创建、arm 和通知阶段。见 [Data 空间诊断](../evidence/storage/data-space-v31/README.md)。
+
 首帧阶段的单因素对照 BOOT `c96f86d7…`：基于已有 Apple logo 及2次成功帧的 `bb4d8474…`，只增加随机本地管理 Wi-Fi 测试地址，保留原125秒报告与其余输入。机主照片 open7、swap/copy/retire 各2，和基线计数相同；SB 此次在控制中心默认模块列表的 property list 路径，基线处于同组件 LaunchServices 查询路径，不能从瞬时栈判断进度或因果。90秒对照也未见明显阶段改善；不继续重复地址对照。见 [125秒对照](../evidence/display/wifi-address-125-v30/README.md)。
 
 本机 21H461 原始 MobileGestalt 静态核查已确认条件路径包含 `/chosen` Wi-Fi 属性、无线节点及网络控制器回退，结构与 Poco F1 参考相近；不证明实际执行或本机因它等待，见 [核查](../evidence/display/mobilegestalt-wifi-audit/README.md)。

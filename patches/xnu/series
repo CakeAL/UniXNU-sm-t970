@@ -25,3 +25,4 @@ t970-ui-spawn-calls.patch
 t970-ui-wait-state.patch
 t970-ui-batch-detail.patch
 t970-edge-smp-parallelism.patch
+t970-data-space-report.patch

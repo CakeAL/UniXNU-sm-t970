@@ -1,0 +1,90 @@
+--- a/bsd/kern/kern_exec.c
++++ b/bsd/kern/kern_exec.c
+@@ -8179,5 +8179,71 @@
+ 	return s->count >= 512 ? PROC_RETURNED_DONE : PROC_RETURNED;
+ }
++/* T970_DATA_SPACE_BEGIN: optional, bounded, read-only APFS capacity sample. */
++extern void thread_terminate_self(void);
++static unsigned native_t970_data_space_done;
++static struct { int error; unsigned phase; uint64_t supported, block_size, blocks, free, available; } native_t970_data_space_result;
++static void
++native_t970_data_space_worker(void *unused, wait_result_t result)
++{
++ (void)unused; (void)result;
++ vnode_t root = NULLVP, device = NULLVP;
++ struct vfs_attr attr = {0};
++ int error = vnode_lookup("/private/var", 0, &root, vfs_context_kernel());
++ if (error) goto done;
++ mount_t mp = vnode_mount(root);
++ device = vfs_devvp(mp);
++ if (!device || vnode_specrdev(device) != native_owner_data_device ||
++     (vfs_flags(mp) & MNT_RDONLY) || strcmp(vfs_statfs(mp)->f_fstypename, "apfs")) {
++  error = EINVAL; goto done;
++ }
++ native_t970_data_space_result.phase = 1;
++ VFSATTR_INIT(&attr); VFSATTR_WANTED(&attr, f_bsize); VFSATTR_WANTED(&attr, f_blocks);
++ VFSATTR_WANTED(&attr, f_bfree); VFSATTR_WANTED(&attr, f_bavail);
++ error = vfs_getattr(mp, &attr, vfs_context_kernel());
++ if (!error) {
++  native_t970_data_space_result.supported = attr.f_supported;
++  native_t970_data_space_result.block_size = attr.f_bsize;
++  native_t970_data_space_result.blocks = attr.f_blocks;
++  native_t970_data_space_result.free = attr.f_bfree;
++  native_t970_data_space_result.available = attr.f_bavail;
++ }
++done:
++ if (device) vnode_put(device);
++ if (root) vnode_put(root);
++ native_t970_data_space_result.error = error;
++ __atomic_store_n(&native_t970_data_space_done, 1, __ATOMIC_RELEASE);
++ thread_terminate_self();
++}
++static void
++native_t970_data_space_text(char *out, size_t length)
++{
++ unsigned enabled = 0;
++ if (!PE_parse_boot_argn("t970-data-space", &enabled, sizeof(enabled)) || enabled != 1) return;
++ thread_t worker = THREAD_NULL;
++ kern_return_t err = kernel_thread_start(native_t970_data_space_worker, NULL, &worker);
++ if (err != KERN_SUCCESS) { strlcat(out, "\nData space worker start failed", length); return; }
++ thread_deallocate(worker);
++ for (unsigned i = 0; i < 20 && !__atomic_load_n(&native_t970_data_space_done, __ATOMIC_ACQUIRE); ++i) {
++  uint64_t deadline = 0; clock_interval_to_deadline(100, NSEC_PER_MSEC, &deadline);
++  if (assert_wait_deadline((event_t)&native_t970_data_space_done, THREAD_UNINT, deadline) == THREAD_WAITING)
++   (void)thread_block(THREAD_CONTINUE_NULL);
++ }
++ char row[192];
++ if (!__atomic_load_n(&native_t970_data_space_done, __ATOMIC_ACQUIRE)) {
++  snprintf(row, sizeof(row), "\nData space pending");
++ } else {
++  snprintf(row, sizeof(row), "\nData space rc=%d phase=%u support=%llx bsize=%llu blocks=%llu free=%llu avail=%llu",
++   native_t970_data_space_result.error, native_t970_data_space_result.phase,
++   (unsigned long long)native_t970_data_space_result.supported,
++   (unsigned long long)native_t970_data_space_result.block_size,
++   (unsigned long long)native_t970_data_space_result.blocks,
++   (unsigned long long)native_t970_data_space_result.free,
++   (unsigned long long)native_t970_data_space_result.available);
++ }
++ strlcat(out, row, length);
++}
++/* T970_DATA_SPACE_END */
++
+ static void
+ native_t970_runtime_report(void *parameter, wait_result_t result)
+ {
+@@ -8211,13 +8277,14 @@
+ 	if (PE_parse_boot_argn("t970-runtime-cache-trace", &cache_trace, sizeof(cache_trace)) && cache_trace == 1) {
+ 		extern const char *native_t970_cache_trace_text(void);
+ 		extern void native_t970_display_state(char *, unsigned) __attribute__((weak_import));
+-		char display_state[640] = "display backend absent";
++		char display_state[896] = "display backend absent";
+ 		if (native_t970_display_state) native_t970_display_state(display_state, sizeof(display_state));
+ 		extern void native_t970_ui_spawn_state(char *, unsigned);
+ 		size_t display_used = strlen(display_state);
+ 		native_t970_ui_spawn_state(display_state + display_used, sizeof(display_state) - display_used);
+ 		extern const char *native_t970_ui_calls_text(void);
+ 		strlcat(display_state, native_t970_ui_calls_text(), sizeof(display_state));
++		native_t970_data_space_text(display_state, sizeof(display_state));
+ 		extern const char *native_t970_ui_wait_text(void);
+ 		unsigned ui_wait=0;
+ 		const char *trace=native_t970_cache_trace_text();
