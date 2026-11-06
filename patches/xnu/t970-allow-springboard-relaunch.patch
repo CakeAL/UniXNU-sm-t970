@@ -1,0 +1,20 @@
+--- a/bsd/kern/kern_exit.c
++++ b/bsd/kern/kern_exit.c
+@@ -1516,7 +1516,16 @@
+ 	 * Debug boot-arg: panic here if matching process is exiting with non-zero code.
+ 	 * Example usage: panic_on_error_exit=launchd,logd,watchdogd
+ 	 */
+-	if (rv && strnstr(panic_on_eexit_pcomms, p->p_comm, sizeof(panic_on_eexit_pcomms))) {
++	/* Language selection requests a SpringBoard relaunch on 21H461. */
++	bool setup_relaunch = false;
++	if (rv == W_EXITCODE(0, SIGKILL) && exit_reason &&
++	    exit_reason->osr_namespace == OS_REASON_SPRINGBOARD &&
++	    exit_reason->osr_code == 0x5bc1ea44 && !strcmp(p->p_comm, "SpringBoard")) {
++		unsigned allow = 0;
++		setup_relaunch = PE_parse_boot_argn("t970-allow-sb-relaunch", &allow, sizeof(allow)) && allow == 1;
++	}
++	if (!setup_relaunch && rv &&
++	    strnstr(panic_on_eexit_pcomms, p->p_comm, sizeof(panic_on_eexit_pcomms))) {
+ 		unsigned report = 0;
+ 		if (PE_parse_boot_argn("t970-ui-exit-reason", &report, sizeof(report)) && report == 1) {
+ 			unsigned ns = exit_reason ? exit_reason->osr_namespace : 0;

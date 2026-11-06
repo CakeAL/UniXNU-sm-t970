@@ -1,0 +1,12 @@
+{
+  "boot_sha256": "9c03ea76ef377b04e7c76ac9ebc58c4d32b9f826afe2339c2fee1499b34d96f0",
+  "source": "Device owner report in the bring-up conversation",
+  "report_date_local": "2026-11-06",
+  "language_selection_completed": true,
+  "reached_transfer_apps_and_data": true,
+  "selected_no_transfer": true,
+  "owner_observation": "After selecting no transfer, the upper-right spinner persisted. Interaction remained very slow.",
+  "next_page_confirmed": false,
+  "spinner_wait_duration_measured": false,
+  "render_latency_measured": false
+}

@@ -33,3 +33,4 @@ t970-pm-watchdog-detail.patch
 t970-ufs-timing.patch
 t970-setup-lifecycle.patch
 t970-ui-exit-reason.patch
+t970-allow-springboard-relaunch.patch

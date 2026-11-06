@@ -948,6 +948,8 @@ id = "display"
 status = "planned"
 components = []
 paths = [
+  "evidence/display/setup-relaunch-v81/**",
+  "patches/xnu/t970-allow-springboard-relaunch.patch",
   "evidence/display/setup-exit-v80/**",
   "patches/xnu/t970-ui-exit-reason.patch",
   "evidence/display/setup-lifecycle-v79/**",
@@ -1038,6 +1040,7 @@ procedure = [
   "Collect DRM modes, panel type and brightness limits; read only display-selection tokens from /proc/cmdline and match the selected S6TUUM3 node in the live DT.",
 ]
 findings = [
+  "v81 allows the exact 21H461 SpringBoard relaunch. The owner completed language selection and reached Transfer Your Apps & Data. Selecting no transfer produced a persistent spinner and the interface remained slow. No frame or thread sample is available for that transition.",
   "v80 reproduces SpringBoard SIGKILL on the plain-copy baseline. The reason is SpringBoard namespace 10 code 0x5bc1ea44, flags 5 and jetsam flags 0. The constant resolves to SBRestartManager _doRestartForTransition: in the 21H461 shared cache. A later photo shows a timeout in task_restartable_ranges_synchronize. Its relationship to the earlier diagnostic panic is unverified.",
   "v79 builds and packs an opt-in Setup lifecycle recorder on the plain-copy v77 baseline. The compact report can select the recorded SpringBoard lock owner by TID, capture the last launchd exec result and process exit reason, and retain the v77 frame and storage diagnostics. Device testing is pending.",
   "v78 adds sheng-fb-diff=1 to the exact v77 kernel. After a language tap, SpringBoard PID 27 exits with raw wait status 0x9. The linked kernel stack reaches exit_with_reason via postsig_locked and bsd_ast. The configured exit panic preempts the timed report. Sender and copy latency remain unobserved.",
@@ -1116,11 +1119,14 @@ limits = [
   "Framebuffer physical address, stride, pixel format and UEFI GOP handoff are not verified by the mode list.",
 ]
 next_action = [
-  "Allow the verified SpringBoard language-change relaunch and check that Setup returns. Record the next visible page and check whether the restartable-ranges timeout recurs.",
+  "Retain v81 as the language-change baseline. Capture Setup and its service waits after selecting no transfer. Measure write-to-scanout latency separately.",
   "V31 confirmed spare RAM Data capacity at target125. V35 reports hold0 and reproduces the v34 BB QuartzCore mutex and SB LaunchServices context waits. V36 shows SwapEnd and dispatch group wait in BackBoard, but screen clips before SpringBoard. V37 fits both processes on screen. Capture the resolved SpringBoard unfair-lock owner, then map that ID to the peer stacks. Compare source extent with a straight-on photo only if both show the same frame.",
 ]
 
 evidence = [
+  { kind = "host", reference = "evidence/display/setup-relaunch-v81/preparation.json", revision = "a29a2ef8a56e6fa868a8a11282dadde9762aa0eb", command = "python3.14 evidence/display/hello-black-v64/prepare.py --setup-relaunch", result = "The exact reason and process predicate passed host tests. Linked and read back BOOT9c03ea76 with the opt-in exception and continuous startup." },
+  { kind = "device", reference = "evidence/display/setup-relaunch-v81/upload.json", revision = "a29a2ef8a56e6fa868a8a11282dadde9762aa0eb", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/setup-relaunch-v81/boot-partition.img --verbose", result = "Heimdall confirmed BOOT upload and requested reboot." },
+  { kind = "device", reference = "evidence/display/setup-relaunch-v81/device-result.json", revision = "a29a2ef8a56e6fa868a8a11282dadde9762aa0eb", command = "Owner completed language selection and attempted setup without data transfer after BOOT9c03ea76 upload", result = "Setup reached Transfer Your Apps & Data. The owner reports a persistent spinner after choosing no transfer, with slow interaction." },
   { kind = "host", reference = "evidence/display/setup-exit-v80/preparation.json", revision = "f59a80ca9af05ea77bf3d8fba7d7a118fc84a515", command = "python3.14 evidence/display/hello-black-v64/prepare.py --setup-exit", result = "Linked and verified the UI exit reason and lifecycle probes in BOOT708d44b9. Original HID binding check passed." },
   { kind = "device", reference = "evidence/display/setup-exit-v80/upload.json", revision = "f59a80ca9af05ea77bf3d8fba7d7a118fc84a515", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/setup-exit-v80/boot-partition.img --verbose", result = "Heimdall confirmed BOOT upload and requested reboot." },
   { kind = "device", reference = "evidence/display/setup-exit-v80/device-result.json", revision = "f59a80ca9af05ea77bf3d8fba7d7a118fc84a515", command = "Owner photos after BOOT708d44b9 upload and symbolication against the packed kernel and 21H461 shared cache", result = "SpringBoard SIGKILL reason 10/0x5bc1ea44 matches SBRestartManager. Later photo shows a restartable-ranges acknowledgement timeout." },
