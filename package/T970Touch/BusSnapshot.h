@@ -3,6 +3,7 @@
 
 #include <IOKit/IODeviceMemory.h>
 #include <IOKit/IOLib.h>
+#include <machine/machine_routines.h>
 #include <pexpert/pexpert.h>
 
 namespace t970_touch {
@@ -19,6 +20,12 @@ static uint32_t read(IOMemoryMap &map, unsigned offset) {
     return *reinterpret_cast<const volatile uint32_t *>(bytes + offset);
 }
 
+static void write(IOMemoryMap &map, unsigned offset, uint32_t value) {
+    auto *bytes = reinterpret_cast<volatile uint8_t *>(map.getVirtualAddress());
+    *reinterpret_cast<volatile uint32_t *>(bytes + offset) = value;
+    __asm__ volatile("dsb sy" ::: "memory");
+}
+
 // SM8250 GCC wrapper 0 branches. The vote register is shared.
 constexpr unsigned voteReg = 0x52008;
 constexpr unsigned seBranch = 0x175fc;
@@ -30,10 +37,7 @@ constexpr uint32_t seVote = 1u << 15;
 constexpr uint32_t slaveHwcg = 1u << 1;
 
 static void writeMasked(IOMemoryMap &map, unsigned offset, uint32_t mask, uint32_t value) {
-    auto *bytes = reinterpret_cast<volatile uint8_t *>(map.getVirtualAddress());
-    auto *reg = reinterpret_cast<volatile uint32_t *>(bytes + offset);
-    *reg = (*reg & ~mask) | (value & mask);
-    __asm__ volatile("dsb sy" ::: "memory");
+    write(map, offset, (read(map, offset) & ~mask) | (value & mask));
 }
 
 struct EngineSnapshot {
@@ -249,12 +253,209 @@ static void reportIdentity(char *out, size_t length) {
              bus.stopped, restored);
 }
 
-// Mode 1 samples firmware state, mode 2 probes clocks, and mode 3 reads ID.
+// Qualcomm command DB: offsets are relative to the data following the header.
+static bool readTouchRailAddresses(IOMemoryMap &db, uint32_t &analog, uint32_t &digital) {
+    constexpr unsigned dbBytes = 0x20000;
+    constexpr unsigned dataOffset = 0x90;
+    constexpr unsigned entryBytes = 24;
+    if (read(db, 4) != 0x0c0330db) return false;
+
+    for (unsigned slot = 0; slot < 8; ++slot) {
+        unsigned header = 8 + 16 * slot;
+        uint32_t tag = read(db, header);
+        if ((tag & 0xffff) != 4) continue; // VRM slave
+        unsigned offset = tag >> 16;
+        unsigned count = read(db, header + 4) >> 16;
+        if ((offset & 3) || offset > dbBytes - dataOffset ||
+            count > (dbBytes - dataOffset - offset) / entryBytes) return false;
+        for (unsigned i = 0; i < count; ++i) {
+            unsigned entry = dataOffset + offset + entryBytes * i;
+            if (read(db, entry) != 0x616f646c) continue; // "ldoa"
+            uint32_t suffix = read(db, entry + 4);
+            if (suffix != 0x3331 && suffix != 0x3431) continue;
+            uint32_t address = read(db, entry + 16);
+            uint32_t &rail = suffix == 0x3331 ? analog : digital;
+            if (rail || (address & 3) || address < 0x40000 || address > 0x4fff4) return false;
+            rail = address;
+        }
+    }
+    return analog && digital && analog != digital;
+}
+
+static void reportRails(char *out, size_t length) {
+    auto db = mapMmio(0x80860000, 0x20000);
+    if (!db || !db->getVirtualAddress()) {
+        snprintf(out, length, "\nTouch RAIL command DB map failed");
+        return;
+    }
+    uint32_t analog = 0, digital = 0;
+    uint32_t version = read(*db, 0);
+    if (!readTouchRailAddresses(*db, analog, digital)) {
+        snprintf(out, length, "\nTouch RAIL invalid DB ver=%x l13=%x l14=%x", version, analog, digital);
+        return;
+    }
+
+    // T970 stock DT selects APPS RSC DRV2 with TCS at +0xd00.
+    auto rsc = mapMmio(0x18220000, 0x2000);
+    if (!rsc || !rsc->getVirtualAddress()) {
+        snprintf(out, length, "\nTouch RAIL db=%x l13=%x l14=%x RSC map failed", version, analog, digital);
+        return;
+    }
+    uint32_t id = read(*rsc, 0);
+    uint32_t config = read(*rsc, 0x0c);
+    if (((config >> 12) & 0x3f) != 8 || ((config >> 27) & 0x1f) != 16) {
+        snprintf(out, length, "\nTouch RAIL db=%x l13=%x l14=%x rsc=%x/%x layout mismatch",
+                 version, analog, digital, id, config);
+        return;
+    }
+
+    constexpr unsigned first = 0xd00;
+    constexpr unsigned second = first + 0x2a0;
+    snprintf(out, length,
+             "\nTouch RAIL db=%x l13=%x l14=%x rsc=%x/%x irq=%x/%x"
+             "\nTouch TCS st/ctl/en/wait=%x/%x/%x/%x %x/%x/%x/%x",
+             version, analog, digital, id, config, read(*rsc, first), read(*rsc, first + 4),
+             read(*rsc, first + 0x18), read(*rsc, first + 0x14),
+             read(*rsc, first + 0x1c), read(*rsc, first + 0x10),
+             read(*rsc, second + 0x18), read(*rsc, second + 0x14),
+             read(*rsc, second + 0x1c), read(*rsc, second + 0x10));
+}
+
+// APPS RSC DRV2 TCS1 was empty, idle and IRQ-masked in v73. Borrow it
+// only under those conditions. A timed-out slot remains armed and masked.
+static const char *voteTouchRail(IOMemoryMap &rsc, uint32_t rail, uint32_t millivolts,
+                                uint32_t (&status)[3]) {
+    constexpr unsigned irqEnable = 0xd00, irqStatus = 0xd04, irqClear = 0xd08;
+    constexpr unsigned slot = 0xfa0;
+    constexpr unsigned wait = slot + 0x10, control = slot + 0x14;
+    constexpr unsigned state = slot + 0x18, enable = slot + 0x1c;
+    constexpr uint32_t irq = 2, allCommands = 7, mode = 1u << 16, trigger = 1u << 24;
+    constexpr uint32_t writeResponse = 0x10108, completed = 0x10100;
+    if ((read(rsc, irqEnable) & 3) != 1 || (read(rsc, irqStatus) & 3) ||
+        read(rsc, 0xd18) != 1 || read(rsc, 0xd14) || read(rsc, 0xd1c) || read(rsc, 0xd10) ||
+        read(rsc, state) != 1 ||
+        read(rsc, control) || read(rsc, enable) || read(rsc, wait)) return "busy";
+
+    // VRM indices: voltage in mV, PMIC5 LDO HPM, then enable.
+    const uint32_t address[] = {rail, rail + 8, rail + 4};
+    const uint32_t data[] = {millivolts, 7, 1};
+    uint32_t saved[3][3];
+    for (unsigned i = 0; i < 3; ++i) {
+        unsigned cmd = slot + 0x30 + 20 * i;
+        for (unsigned j = 0; j < 3; ++j) saved[i][j] = read(rsc, cmd + 4 * j);
+        write(rsc, cmd, writeResponse);
+        write(rsc, cmd + 4, address[i]);
+        write(rsc, cmd + 8, data[i]);
+    }
+    write(rsc, wait, allCommands);
+    write(rsc, enable, allCommands);
+    writeMasked(rsc, irqEnable, irq, irq);
+    write(rsc, control, mode);
+
+    bool ready = read(rsc, control) == mode && read(rsc, enable) == allCommands &&
+                 read(rsc, wait) == allCommands && (read(rsc, irqEnable) & irq);
+    for (unsigned i = 0; i < 3; ++i) {
+        unsigned cmd = slot + 0x30 + 20 * i;
+        ready &= read(rsc, cmd) == writeResponse && read(rsc, cmd + 4) == address[i] &&
+                 read(rsc, cmd + 8) == data[i];
+    }
+    const char *result = "readback";
+    if (ready) {
+        write(rsc, control, mode | trigger);
+        bool finished = false;
+        for (unsigned us = 0; us < 10000; ++us) {
+            if ((read(rsc, irqStatus) & irq) && (read(rsc, state) & 1)) {
+                finished = true;
+                break;
+            }
+            IODelay(1);
+        }
+        bool acknowledged = true;
+        for (unsigned i = 0; i < 3; ++i) {
+            status[i] = read(rsc, slot + 0x3c + 20 * i);
+            acknowledged &= (status[i] & completed) == completed;
+        }
+        if (!finished) {
+            writeMasked(rsc, irqEnable, irq, 0);
+            return (read(rsc, irqEnable) & irq) ? "timeout-irq" : "timeout";
+        }
+        result = acknowledged ? "ack" : "no-ack";
+    }
+
+    write(rsc, control, mode);
+    if (read(rsc, control) != mode) {
+        writeMasked(rsc, irqEnable, irq, 0);
+        return "restore-trigger";
+    }
+    write(rsc, control, 0);
+    if (read(rsc, control)) {
+        writeMasked(rsc, irqEnable, irq, 0);
+        return "restore-mode";
+    }
+    writeMasked(rsc, irqEnable, irq, 0);
+    write(rsc, irqClear, irq);
+    write(rsc, enable, 0);
+    write(rsc, wait, 0);
+    bool restored = !(read(rsc, irqEnable) & irq) && !(read(rsc, irqStatus) & irq) &&
+                    !read(rsc, enable) && !read(rsc, wait);
+    for (unsigned i = 0; i < 3; ++i) {
+        unsigned cmd = slot + 0x30 + 20 * i;
+        for (unsigned j = 0; j < 3; ++j) {
+            write(rsc, cmd + 4 * j, saved[i][j]);
+            restored &= read(rsc, cmd + 4 * j) == saved[i][j];
+        }
+    }
+    return restored ? result : "restore";
+}
+
+static void reportPoweredIdentity(char *out, size_t length) {
+    auto db = mapMmio(0x80860000, 0x20000);
+    uint32_t analog = 0, digital = 0;
+    if (!db || !db->getVirtualAddress() || read(*db, 0) != 1 || (read(*db, 0x8c) & 1u) ||
+        !readTouchRailAddresses(*db, analog, digital) || analog != 0x40a00 || digital != 0x42100) {
+        snprintf(out, length, "\nTouch PWR refused DB l13=%x l14=%x", analog, digital);
+        return;
+    }
+    auto rsc = mapMmio(0x18220000, 0x2000, 0);
+    if (!rsc || !rsc->getVirtualAddress() || read(*rsc, 0) != 0x20000 || read(*rsc, 0x0c) != 0x800c8104) {
+        snprintf(out, length, "\nTouch PWR refused RSC");
+        return;
+    }
+
+    uint32_t avdd[3] = {}, dvdd[3] = {};
+    bool interrupts = ml_set_interrupts_enabled(false);
+    const char *a = voteTouchRail(*rsc, analog, 3300, avdd);
+    ml_set_interrupts_enabled(interrupts);
+    const char *d = "skip";
+    if (!strcmp(a, "ack")) {
+        IOSleep(1);
+        interrupts = ml_set_interrupts_enabled(false);
+        d = voteTouchRail(*rsc, digital, 1800, dvdd);
+        ml_set_interrupts_enabled(interrupts);
+    }
+    int written = snprintf(out, length, "\nTouch PWR A=%s:%x/%x/%x D=%s:%x/%x/%x",
+                           a, avdd[0], avdd[1], avdd[2], d, dvdd[0], dvdd[1], dvdd[2]);
+    // Leave the verified stock voltage/enable votes in place until reset.
+    if (!strcmp(d, "ack") && written > 0 && static_cast<size_t>(written) < length) {
+        IOSleep(100);
+        reportIdentity(out + written, length - written);
+    }
+}
+
+// Modes 1–5 cover firmware state, clocks, identity, rail resources and power.
 static void reportBus(char *out, size_t length) {
     unsigned enabled = 0;
     if (!PE_parse_boot_argn("t970-touch-bus-report", &enabled, sizeof(enabled))) return;
     if (enabled == 3) {
         reportIdentity(out, length);
+        return;
+    }
+    if (enabled == 4) {
+        reportRails(out, length);
+        return;
+    }
+    if (enabled == 5) {
+        reportPoweredIdentity(out, length);
         return;
     }
     if (enabled != 1 && enabled != 2) return;

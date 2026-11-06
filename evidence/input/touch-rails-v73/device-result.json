@@ -1,0 +1,27 @@
+{
+  "boot_sha256": "07b48f15f9b0c07638e53748bfe03e9e1e3ba9cccfe052ce08f4e58efcee3c42",
+  "photo": "screen-target75.jpg",
+  "photo_sha256": "c255f6b211c4e7d6d936c510240cae4d932e01fe2261057cde0f656a07cac9b9",
+  "photo_time_local": "2026-11-06T15:12:03+08:00",
+  "target_seconds": 75,
+  "command_db_version": 1,
+  "avdd_resource": "0x40a00",
+  "dvdd_resource": "0x42100",
+  "rsc_id": "0x00020000",
+  "rsc_config": "0x800c8104",
+  "irq_enable": 1,
+  "irq_status": 0,
+  "tcs0": [
+    1,
+    0,
+    0,
+    0
+  ],
+  "tcs1": [
+    1,
+    0,
+    0,
+    0
+  ],
+  "rail_voltage_measured": false
+}

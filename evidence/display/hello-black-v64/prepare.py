@@ -39,6 +39,8 @@ def main():
     modes.add_argument('--touch-bus', action='store_true', help='Start from the v69 continuous display image')
     modes.add_argument('--touch-clock', action='store_true', help='Probe SE5 with a temporary clock vote')
     modes.add_argument('--touch-id', action='store_true', help='Try one GPIO open-drain touch identity read')
+    modes.add_argument('--touch-rails', action='store_true', help='Read the touch rail resources and RSC state')
+    modes.add_argument('--touch-power', action='store_true', help='Vote the qualified rails, then try one identity read')
     args = parser.parse_args()
     base, base_report, build, output = BASE, BASE_REPORT, BUILD, OUTPUT
     arguments = [REPORT_ARG]
@@ -48,20 +50,21 @@ def main():
         build = OUT / 'pm-watchdog-v67-build'
         output = OUT / 'pm-watchdog-v67'
         arguments.append('t970-pm-watchdog-detail=1')
-    if args.touch_bus or args.touch_clock or args.touch_id:
+    touch_modes = (
+        (args.touch_bus, 'touch-bus-v70', 1, b'Touch RO vote='),
+        (args.touch_clock, 'touch-clock-v71', 2, b'Touch CLK vote='),
+        (args.touch_id, 'touch-id-v72', 3, b'Touch ID idle='),
+        (args.touch_rails, 'touch-rails-v73', 4, b'Touch RAIL db='),
+        (args.touch_power, 'touch-power-v74', 5, b'Touch PWR A='),
+    )
+    touch = next((entry for entry in touch_modes if entry[0]), None)
+    if touch:
+        _, name, mode, marker = touch
         base = OUT / 'springboard-dim-continuous-v69/boot-partition.img'
         base_report = DEVICE / 'evidence/display/springboard-dim-continuous-v69/preparation.json'
-        build = OUT / 'touch-bus-v70-build'
-        output = OUT / 'touch-bus-v70'
-        arguments = ['t970-runtime-report=75', 't970-touch-bus-report=1']
-        if args.touch_clock:
-            build = OUT / 'touch-clock-v71-build'
-            output = OUT / 'touch-clock-v71'
-            arguments[-1] = 't970-touch-bus-report=2'
-        if args.touch_id:
-            build = OUT / 'touch-id-v72-build'
-            output = OUT / 'touch-id-v72'
-            arguments[-1] = 't970-touch-bus-report=3'
+        build = OUT / (name + '-build')
+        output = OUT / name
+        arguments = ['t970-runtime-report=75', f't970-touch-bus-report={mode}']
     baseline = json.loads(base_report.read_text())
     source = base.read_bytes()
     require(source[:8] == b'ANDROID!' and digest(source) == baseline['boot_sha256'],
@@ -101,12 +104,8 @@ def main():
     require(b'blank/dark=' in kernel, 'Missing linked frame counters')
     if args.pm_watchdog:
         require(b'T970 PM timeout state=' in kernel, 'Missing linked PM watchdog details')
-    if args.touch_bus:
-        require(b'Touch RO vote=' in kernel, 'Missing linked touch-bus report')
-    if args.touch_clock:
-        require(b'Touch CLK vote=' in kernel, 'Missing linked touch-clock report')
-    if args.touch_id:
-        require(b'Touch ID idle=' in kernel, 'Missing linked touch identity report')
+    if touch:
+        require(marker in kernel, 'Missing linked touch report')
     env = dict(os.environ, UNIXNU_UEFI=str(DEVICE / '.cache/uefi-source/Mu-Silicium'))
     subprocess.run(['python3.14', str(TREE / 'scripts/patch-xnu-entry-probe.py'),
                     str(replacement), '--panic-screen', '--no-reset'], env=env, check=True)

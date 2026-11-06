@@ -1,0 +1,29 @@
+{
+  "boot_sha256": "82bac61adbdaa15fcaf0962671b88207427a7d6dcc179671d39f3bab5c3826bd",
+  "photo": "screen-target75.jpg",
+  "photo_sha256": "5865669943207cef8f1d163c30aeeed12edcfab84939a172a949835d5f27ae70",
+  "photo_time_local": "2026-11-06T16:04:27+08:00",
+  "target_seconds": 75,
+  "avdd_completion": [
+    "0x10101",
+    "0x10101",
+    "0x10101"
+  ],
+  "dvdd_completion": [
+    "0x10101",
+    "0x10101",
+    "0x10101"
+  ],
+  "idle_lines_high": true,
+  "identity_bytes": [
+    "0x53",
+    "0x54",
+    "0x39",
+    "0x36",
+    "0x03"
+  ],
+  "gpio_controls_restored": true,
+  "stop": true,
+  "contacts_tested": false,
+  "hid_tested": false
+}
