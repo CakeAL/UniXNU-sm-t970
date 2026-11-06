@@ -1,0 +1,23 @@
+{
+  "boot_sha256": "9738c64d2695e78d7003a7f4d0973ff30176cab7502628c8e883151472d21ab9",
+  "photo": "screen-target75.jpg",
+  "photo_sha256": "eb7de2be326cca2a12c68a1501cb73644e3924787c9b94d832f6a291cb09acd6",
+  "photo_time_local": "2026-11-04T23:58:19+08:00",
+  "target_seconds": 75,
+  "votes": [
+    "0x041007c0",
+    "0x041087c0",
+    "0x041007c0"
+  ],
+  "active_clocks": [
+    "0x4220",
+    "0x0",
+    "0x0"
+  ],
+  "clock_controls_restored": true,
+  "se_firmware": "0x303",
+  "protocol": 3,
+  "fifo_disabled": true,
+  "se_status": 0,
+  "identity_verified": false
+}

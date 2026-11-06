@@ -1,0 +1,25 @@
+{
+  "base_boot_sha256": "99218ca01e79bd89b2ac785622afd15b892954d4454808fb33f24ad3a38d2a7a",
+  "boot_sha256": "9738c64d2695e78d7003a7f4d0973ff30176cab7502628c8e883151472d21ab9",
+  "boot_bytes": 71303168,
+  "kernel_sha256": "e985921369cccaa5a205ab8cda84bb31d0a8bcd6015f79b3dea98e6848173de4",
+  "payload_kernel_sha256": "fa21827ecaf917e39819a8e29bcd8ea959f973db6040b9d3b2ab694e1c9baf6f",
+  "added_arguments": [
+    "t970-runtime-report=75",
+    "t970-touch-bus-report=2"
+  ],
+  "unchanged_payload_sha256": {
+    "Payloads/kernel.macho.adt": "b32ba77d5083d2d8d4f12c5b8e1dcded456e64b888f1f5a50115279015c71997",
+    "Payloads/kernel.macho.trustcache": "7416ca4f8377146626bb284e2133c76bee6cb4e3ee0af5d648b186235a7323a7",
+    "Payloads/scratch-data.img": "86064cf9f6b7706ca4b11a7114350a495ff9a5d9514a8cf81ffca8a379f7fb29"
+  },
+  "unchanged_header_firmware_dtb_tail": true,
+  "terminal_runtime_report": true,
+  "uploaded": false,
+  "build": {
+    "device_base_revision": "37b439d75ded02edf01c0ed7f357ba0f746a811d",
+    "unixnu_revision": "2c834e313d25482c78d38d703eff1f8d190f2597",
+    "kernel_log_sha256": "8ec58001f06534e5163fd37f1303e45303df768d2855518218ff7b0ef5216123",
+    "bus_probe_source_sha256": "2915ceead5722cfa7c4a961bf1fd8bf0dceb2baaba587507800a91d1c3941c6b"
+  }
+}

@@ -37,6 +37,7 @@ def main():
     modes = parser.add_mutually_exclusive_group()
     modes.add_argument('--pm-watchdog', action='store_true', help='Start from the v66 sleep control')
     modes.add_argument('--touch-bus', action='store_true', help='Start from the v69 continuous display image')
+    modes.add_argument('--touch-clock', action='store_true', help='Probe SE5 with a temporary clock vote')
     args = parser.parse_args()
     base, base_report, build, output = BASE, BASE_REPORT, BUILD, OUTPUT
     arguments = [REPORT_ARG]
@@ -46,12 +47,16 @@ def main():
         build = OUT / 'pm-watchdog-v67-build'
         output = OUT / 'pm-watchdog-v67'
         arguments.append('t970-pm-watchdog-detail=1')
-    if args.touch_bus:
+    if args.touch_bus or args.touch_clock:
         base = OUT / 'springboard-dim-continuous-v69/boot-partition.img'
         base_report = DEVICE / 'evidence/display/springboard-dim-continuous-v69/preparation.json'
         build = OUT / 'touch-bus-v70-build'
         output = OUT / 'touch-bus-v70'
         arguments = ['t970-runtime-report=75', 't970-touch-bus-report=1']
+        if args.touch_clock:
+            build = OUT / 'touch-clock-v71-build'
+            output = OUT / 'touch-clock-v71'
+            arguments[-1] = 't970-touch-bus-report=2'
     baseline = json.loads(base_report.read_text())
     source = base.read_bytes()
     require(source[:8] == b'ANDROID!' and digest(source) == baseline['boot_sha256'],
@@ -93,6 +98,8 @@ def main():
         require(b'T970 PM timeout state=' in kernel, 'Missing linked PM watchdog details')
     if args.touch_bus:
         require(b'Touch RO vote=' in kernel, 'Missing linked touch-bus report')
+    if args.touch_clock:
+        require(b'Touch CLK vote=' in kernel, 'Missing linked touch-clock report')
     env = dict(os.environ, UNIXNU_UEFI=str(DEVICE / '.cache/uefi-source/Mu-Silicium'))
     subprocess.run(['python3.14', str(TREE / 'scripts/patch-xnu-entry-probe.py'),
                     str(replacement), '--panic-screen', '--no-reset'], env=env, check=True)
