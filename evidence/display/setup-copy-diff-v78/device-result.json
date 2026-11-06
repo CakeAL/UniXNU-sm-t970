@@ -1,0 +1,66 @@
+{
+  "boot_sha256": "eaa25d24b04aa16f4acf7c7c0ea3c59f13f4bfd57b18787b6853d0fc16dddf8f",
+  "photo": "screen-early-exit.jpg",
+  "photo_sha256": "9559625929c5dd572fe41d8053936ace9e35101d93f2b9b1edafcbe6b90a6c6d",
+  "photo_time_local": "2026-11-06T22:53:34+08:00",
+  "owner_observation": "The owner tapped the language setting and saw this screen. The six-minute diagnostic did not appear.",
+  "terminal_runtime_report_observed": false,
+  "panic": {
+    "function": "exit_with_reason",
+    "source": "kern_exit.c:1521",
+    "process": "SpringBoard",
+    "pid": 27,
+    "raw_wait_status": 9,
+    "signal": "SIGKILL",
+    "frames": [
+      {
+        "pc": "0xfffffff0076fb154",
+        "symbol": "exit_with_reason",
+        "offset": 552
+      },
+      {
+        "pc": "0xfffffff007714bf0",
+        "symbol": "postsig_locked",
+        "offset": 860
+      },
+      {
+        "pc": "0xfffffff007714f28",
+        "symbol": "bsd_ast",
+        "offset": 772
+      },
+      {
+        "pc": "0xfffffff0072799bc",
+        "symbol": "ast_taken_user",
+        "offset": 248
+      },
+      {
+        "pc": "0xfffffff0074049fc",
+        "symbol": "user_take_ast",
+        "offset": 12
+      },
+      {
+        "pc": "0xfffffff007404b98",
+        "symbol": "thread_exception_return",
+        "offset": 48
+      },
+      {
+        "pc": "0xfffffff007405af4",
+        "symbol": "thread_syscall_return",
+        "offset": 124
+      },
+      {
+        "pc": "0xfffffff007408604",
+        "symbol": "Call_continuation",
+        "offset": 68
+      }
+    ],
+    "symbolication": "xcrun atos -o out/data-bringup/setup-copy-diff-v78/kernel.macho -arch arm64"
+  },
+  "memory": {
+    "managed_pages": 499183,
+    "free_pages": 14223,
+    "page_bytes": 4096
+  },
+  "copy_latency_sampled": false,
+  "signal_sender_identified": false
+}

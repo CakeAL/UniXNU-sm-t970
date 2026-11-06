@@ -44,6 +44,7 @@ def main():
     modes.add_argument('--touch-events', action='store_true', help='Sample the powered touch FIFO for 20 seconds')
     modes.add_argument('--touch-hid', action='store_true', help='Enable continuous touchscreen HID delivery')
     modes.add_argument('--setup-probe', action='store_true', help='Sample the language transition with v76 HID')
+    modes.add_argument('--setup-copy-diff', action='store_true', help='Enable differential copies on the exact v77 kernel')
     args = parser.parse_args()
     base, base_report, build, output = BASE, BASE_REPORT, BUILD, OUTPUT
     arguments = [REPORT_ARG]
@@ -77,6 +78,11 @@ def main():
         build = OUT / 'setup-language-v77-build'
         output = OUT / 'setup-language-v77'
         arguments = ['t970-setup-probe=1', 't970-runtime-report=360']
+    if args.setup_copy_diff:
+        base = OUT / 'setup-language-v77/boot-partition.img'
+        base_report = DEVICE / 'evidence/display/setup-language-v77/preparation.json'
+        output = OUT / 'setup-copy-diff-v78'
+        arguments = ['sheng-fb-diff=1']
     baseline = json.loads(base_report.read_text())
     source = base.read_bytes()
     require(source[:8] == b'ANDROID!' and digest(source) == baseline['boot_sha256'],
@@ -96,15 +102,21 @@ def main():
         return subprocess.check_output(['mcopy', '-i', str(payload), PREFIX + name, '-'])
 
     config = read_fat(CONFIG)
-    if args.setup_probe:
+    if args.setup_probe or args.setup_copy_diff:
         config_sha = digest((base.parent / CONFIG).read_bytes())
     else:
         config_sha = baseline['unchanged_payload_sha256'][CONFIG] if args.pm_watchdog else baseline['config_sha256']
     require(digest(config) == config_sha, 'Unexpected source boot configuration')
     expected = tomllib.loads(config.decode())
     xnu = [entry for entry in expected['entry'] if entry['type'] == 'xnu']
-    require(len(xnu) == 1 and 't970-runtime-report' not in xnu[0]['args'],
-            'Expected one continuous XNU entry')
+    require(len(xnu) == 1, 'Expected one XNU entry')
+    if args.setup_copy_diff:
+        boot_args = xnu[0]['args'].split()
+        require(set(baseline['added_arguments']) <= set(boot_args) and
+                not any(arg.startswith('sheng-fb-diff=') for arg in boot_args),
+                'Expected the v77 Setup report with plain copies')
+    else:
+        require('t970-runtime-report' not in xnu[0]['args'], 'Expected continuous startup')
     if args.setup_probe:
         require({'t970-touch-hid=1', 't970-ui-stack=10', 't970-ui-wait=1'} <= set(xnu[0]['args'].split()),
                 'Expected v76 HID and compact UI sampler')
@@ -118,8 +130,15 @@ def main():
     config_path.write_bytes(updated)
 
     replacement = output / 'kernel.macho'
-    shutil.copyfile(build / 'kernel.macho', replacement)
-    kernel = replacement.read_bytes()
+    if args.setup_copy_diff:
+        kernel = read_fat(KERNEL)
+        require(digest(kernel) == baseline['payload_kernel_sha256'], 'Expected the exact packed v77 kernel')
+        replacement.write_bytes(kernel)
+        kernel_sha = baseline['kernel_sha256']
+    else:
+        shutil.copyfile(build / 'kernel.macho', replacement)
+        kernel = replacement.read_bytes()
+        kernel_sha = digest(kernel)
     require(b'blank/dark=' in kernel, 'Missing linked frame counters')
     if args.pm_watchdog:
         require(b'T970 PM timeout state=' in kernel, 'Missing linked PM watchdog details')
@@ -128,10 +147,13 @@ def main():
     if args.setup_probe:
         require(all(marker in kernel for marker in (b'Setup down ms=', b'Setup r0=', b'T970 touch: FTS scanning')),
                 'Missing linked Setup or HID markers')
-    env = dict(os.environ, UNIXNU_UEFI=str(DEVICE / '.cache/uefi-source/Mu-Silicium'))
-    subprocess.run(['python3.14', str(TREE / 'scripts/patch-xnu-entry-probe.py'),
-                    str(replacement), '--panic-screen', '--no-reset'], env=env, check=True)
-    for name, path in ((CONFIG, config_path), (KERNEL, replacement)):
+    files = [(CONFIG, config_path)]
+    if not args.setup_copy_diff:
+        env = dict(os.environ, UNIXNU_UEFI=str(DEVICE / '.cache/uefi-source/Mu-Silicium'))
+        subprocess.run(['python3.14', str(TREE / 'scripts/patch-xnu-entry-probe.py'),
+                        str(replacement), '--panic-screen', '--no-reset'], env=env, check=True)
+        files.append((KERNEL, replacement))
+    for name, path in files:
         subprocess.run(['mcopy', '-o', '-i', str(payload), str(path), PREFIX + name], check=True)
     require(payload.stat().st_size == payload_size, 'Payload size changed')
     boot = output / 'boot-partition.img'
@@ -149,7 +171,7 @@ def main():
     for name, sha in unchanged.items():
         require(digest(read_fat(name)) == sha, 'Unexpected final BOOT input: ' + name)
     report = dict(base_boot_sha256=baseline['boot_sha256'], boot_sha256=digest(result),
-                  boot_bytes=len(result), kernel_sha256=digest(kernel),
+                  boot_bytes=len(result), kernel_sha256=kernel_sha,
                   payload_kernel_sha256=digest(read_fat(KERNEL)), added_arguments=arguments,
                   unchanged_payload_sha256=unchanged, unchanged_header_firmware_dtb_tail=True,
                   terminal_runtime_report=not args.touch_hid, uploaded=False)
