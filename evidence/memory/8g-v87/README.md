@@ -34,3 +34,27 @@ XNU 的 `SecureDTGetProperty` 用的是 `unsigned int *`（`pexpert/pexpert/devi
 `pages=` 应从 `0x79dab` 升到约 `0x1E0000`–`0x1F0000`（7.5–7.8 GiB）。若仍不变，
 说明 `dram-size` 在 `arm_vm_init` 时还读不到（DT 未初始化或属性名不同），下一次
 改为打印 `dram_envelope` 与 DT 返回码，再定位。
+
+## 实机结果：卡在品红条（失败）
+
+刷入后停在第 2 阶段品红条（MMU 打开前），没有进入内核控制台，也没有运行时报告。
+原因不是补丁语法，而是**改错了层**：内核把托管范围直接扩到物理 DRAM 的 8 GiB 信封，
+而 DarwinBoot 实际只分配了约 2 GiB 的 owned window 并把 `boot_args.memSize` 设成它；
+`arm_vm_init` 于是把窗口之外的保留区和空洞一并当作受管内存去建页表，启动早期就停了。
+
+已回滚：`heimdall flash --BOOT out/data-bringup/setup-8g-v86/boot-partition.img`
+（v86 `3f5065ad`），平板恢复正常。
+
+## 下一步（v88 的正确层次）
+
+1. `boot_args.memSize` / `memSizeActual` 在 arm64 头里是 **uint64**（`pexpert/pexpert/arm64/boot.h:58-58`），
+   8 GiB 本来就能表达；之前按 `arm/boot.h` 的 uint32 判断是错的。
+2. 托管大小 = DarwinBoot 的 owned window，窗口大小来自 ADT `/chosen/darwinboot-memory-size`
+   （`darwinboot-memory-size`，`DarwinBoot.c:264`），当前被设成 2 GiB（v62）。
+3. 板级 DTS 只声明了 2 GiB DRAM（`dts/sm-t970.dts:12`），而整机实测内存节点是三段：
+   `0x80000000+0x3BB00000`、`0xC0000000+0xC0000000`、`0x180000000+0x100000000`。
+4. 三段里只有最高 4 GiB `[0x180000000, 0x280000000)` 不被 stock 保留区占用；中间 3 GiB 段被
+   `sec_debug_rdx_bootdev@0`（0x100000000 + 0xAD00000）切断，低段到 0xBBB00000 结束。
+   所以单窗口最多约 4 GiB。要更多需要 XNU 多 bank 支持，属于后续工作。
+5. v88 计划：撤掉本补丁，DTS 改成 stock 三段，ADT 把 `darwinboot-memory-size` 设到
+   0xF0000000（3.75 GiB，留 256 MiB 余量），由 Loader 传正确的 `memSize`，内核不再改托管范围。

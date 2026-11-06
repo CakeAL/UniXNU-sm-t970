@@ -1,0 +1,201 @@
+Heimdall v1.4.2
+
+Copyright (c) 2010-2017 Benjamin Dobell, Glass Echidna
+http://www.glassechidna.com.au/
+
+This software is provided free of charge. Copying and redistribution is
+encouraged.
+
+If you appreciate this software and you would like to support future
+development please consider donating:
+http://www.glassechidna.com.au/donate/
+
+Initialising connection...
+Detecting device...
+      Manufacturer: "Samsung"
+           Product: "SM8250"
+
+            length: 18
+      device class: 2
+               S/N: 0
+           VID:PID: 04E8:685D
+         bcdDevice: 021B
+   iMan:iProd:iSer: 1:2:0
+          nb confs: 1
+
+interface[0].altsetting[0]: num endpoints = 1
+   Class.SubClass.Protocol: 02.02.01
+       endpoint[0].address: 82
+           max packet size: 0010
+          polling interval: 09
+
+interface[1].altsetting[0]: num endpoints = 2
+   Class.SubClass.Protocol: 0A.00.00
+       endpoint[0].address: 01
+           max packet size: 0200
+          polling interval: 00
+       endpoint[1].address: 81
+           max packet size: 0200
+          polling interval: 00
+Claiming interface...
+Setting up interface...
+
+Initialising protocol...
+Protocol initialisation successful.
+
+Beginning session...
+
+Some devices may take up to 2 minutes to respond.
+Please be patient!
+
+Session begun.
+
+Downloading device's PIT file...
+WARNING: Empty bulk transfer after receiving packet failed. Continuing anyway...
+PIT file download successful.
+
+Uploading BOOT
+0%
+1%
+
+2%
+
+4%
+
+5%
+
+7%
+
+8%
+
+10%
+
+11%
+
+13%
+
+14%
+
+16%
+
+17%
+
+19%
+
+20%
+
+22%
+
+23%
+
+25%
+
+26%
+
+27%
+
+29%
+
+30%
+
+32%
+
+33%
+
+35%
+
+36%
+
+38%
+
+39%
+
+41%
+
+42%
+
+44%
+
+45%
+
+47%
+
+48%
+
+50%
+
+51%
+
+52%
+
+54%
+
+55%
+
+57%
+
+58%
+
+60%
+
+61%
+
+63%
+
+64%
+
+66%
+
+67%
+
+69%
+
+70%
+
+72%
+
+73%
+
+75%
+
+76%
+
+77%
+
+79%
+
+80%
+
+82%
+
+83%
+
+85%
+
+86%
+
+88%
+
+89%
+
+91%
+
+92%
+
+94%
+
+95%
+
+97%
+
+98%
+
+100%
+BOOT upload successful
+
+Ending session...
+WARNING: Empty bulk transfer after sending packet failed. Continuing anyway...
+Rebooting device...
+WARNING: Empty bulk transfer after sending packet failed. Continuing anyway...
+Releasing device interface...
+
