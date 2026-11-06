@@ -1,0 +1,32 @@
+{
+  "base_boot_sha256": "99218ca01e79bd89b2ac785622afd15b892954d4454808fb33f24ad3a38d2a7a",
+  "boot_sha256": "03f21401d48aea2066f8d8188478c456f32d7f5750043d0fbce09a4e2d9db88b",
+  "boot_bytes": 71303168,
+  "kernel_sha256": "76ce2012fa3690e64effd0a926db45929a61926f006f2f86834fb4d8b275be0e",
+  "payload_kernel_sha256": "ebb047d8cdc2d3e7505f96620edd61fe782ec353ddb82264a9eb5041c24bcd50",
+  "added_arguments": [
+    "t970-touch-hid=1"
+  ],
+  "unchanged_payload_sha256": {
+    "Payloads/kernel.macho.adt": "b32ba77d5083d2d8d4f12c5b8e1dcded456e64b888f1f5a50115279015c71997",
+    "Payloads/kernel.macho.trustcache": "7416ca4f8377146626bb284e2133c76bee6cb4e3ee0af5d648b186235a7323a7",
+    "Payloads/scratch-data.img": "86064cf9f6b7706ca4b11a7114350a495ff9a5d9514a8cf81ffca8a379f7fb29"
+  },
+  "unchanged_header_firmware_dtb_tail": true,
+  "terminal_runtime_report": false,
+  "uploaded": false,
+  "build": {
+    "device_base_revision": "b6ff231724dc116577e821625447f398e7d4646d",
+    "unixnu_revision": "2c834e313d25482c78d38d703eff1f8d190f2597",
+    "kernel_log_sha256": "8a579bafb42f4372eaea42f9035fb77889e99aaf50e3b54103d7ad823d57debc",
+    "registration_object_sha256": "c5c09ebbccbf858a233c2f3bbd51d3434fd2d246ebbc8b2b1d9f8a43822c4e37",
+    "hid_object_sha256": "6203b442cad20c66d0bce243f9e11b28440d297e20d155b24f2fd14d669ed614",
+    "hid_bindings_sha256": "aff5e7bc01fe224496d3ed160e1b4d80b1c3b1d76c24c62b0889f52c735ea0b4",
+    "touch_source_sha256": {
+      "package/T970Touch/TouchHidABI.h": "3d60e5ed170d88cfa86188c6295471c202121b4198e20a3f9563a4c180d0dc5c",
+      "package/T970Touch/BusSnapshot.h": "c0cfb8b11f90236718be69a92e7ec23e531504e92f04569d8933b92686870508",
+      "package/T970Touch/TouchHid.h": "385285920b50ca392c6eb37606068a659b9bf27a460404b7795560a1d489a3d8",
+      "package/T970Touch/TouchHid.cpp": "8437374b1479e0ae6cd93cd5c96f5e8f1f60cf3905ba2120345fce0016f024ea"
+    }
+  }
+}

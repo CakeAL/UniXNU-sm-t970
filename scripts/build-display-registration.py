@@ -13,6 +13,7 @@ def main():
     p.add_argument('--tree', type=Path, required=True)
     p.add_argument('--gop-object', type=Path, required=True)
     p.add_argument('--output', type=Path, required=True)
+    p.add_argument('--touch-hid', action='store_true')
     a = p.parse_args()
     approved = json.loads((DEVICE / 'evidence/display/abi21h461/object-check.json').read_text())
     if hashlib.sha256(a.gop_object.read_bytes()).hexdigest() != approved['object_sha256']:
@@ -46,6 +47,8 @@ def main():
                     '-Wno-deprecated-enum-enum-conversion',
                     '-Wno-unnecessary-virtual-specifier', '-Wno-missing-include-dirs',
                     '-I', str(tree / '.cache/xnu-work/osfmk')])
+    if a.touch_hid:
+        command.append('-DT970_TOUCH_HID=1')
     (out / 'command.json').write_text(json.dumps(command, indent=2)+'\n')
     with (out / 'compile.log').open('w') as log:
         subprocess.run(command, cwd=r['directory'], stdout=log, stderr=subprocess.STDOUT, check=True)

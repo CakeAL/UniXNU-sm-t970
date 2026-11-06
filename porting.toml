@@ -948,6 +948,7 @@ id = "display"
 status = "planned"
 components = []
 paths = [
+  "evidence/input/touch-hid-v76/**",
   "evidence/display/springboard-dim-continuous-v69/**",
   "evidence/display/springboard-dim-v68/**",
   "evidence/display/pm-watchdog-v67/**",
@@ -1031,6 +1032,7 @@ procedure = [
   "Collect DRM modes, panel type and brightness limits; read only display-selection tokens from /proc/cmdline and match the selected S6TUUM3 node in the live DT.",
 ]
 findings = [
+  "v76 advances from Hello to the next Setup page via real touch. The owner reports slow screen updates and an apparent stall after tapping a language. No v76 frame cadence or stall snapshot has been captured.",
   "v68 compares matched RAM-Data BOOT images with and without the three SpringBoard idle/dim preferences used by Sirius. The 21H461 cache has direct references from SBIdleTimerDefaults and SBPowerDefaults. The BOOTs share kernel, ADT, trust cache, arguments and firmware. The owner reports that the treatment did not go black. At target360 there are 253 successful CPU copies and retirements with blank/dark=0/0; the last copy was at 379990 ms. The paired RAM control is still unbooted, so the effect cannot yet be attributed solely to the preferences. v69 removes only the terminal report. The owner confirms Hello remains visible; swipe and power press do not respond.",
   "v67 adds an opt-in root-domain watchdog panic detail with PM machine state, wait reason, current and requested power states, pending count and first pending service class. It also retains a 240-second frame report if no watchdog fires. Kernel prelink and final BOOT FAT checks pass. The device reaches target240 with a completed blank GOP fill 28 ms after the last normal CPU copy. No PM watchdog panic occurred before the report.",
   "v65 with noidle=1 still shows Hello and then turns black after about ten seconds. The owner photo shows no panic text. v66 uses the sleep-disabled ADT default also used on T733 and dada; it retains noidle and adds only that property to the tested payload.",
@@ -1104,11 +1106,12 @@ limits = [
   "Framebuffer physical address, stride, pixel format and UEFI GOP handoff are not verified by the mode list.",
 ]
 next_action = [
-  "Keep v69 as the visible Setup baseline. Implement and verify touch and Setup completion separately. The v68 matched RAM-Data control is retained for attribution.",
+  "Keep v76 as the interactive Setup baseline. After a language tap, capture swap acceptance, rejection reason, surface and rectangle geometry, copy latency and Setup, BackBoard and LaunchServices waits. Distinguish a frozen frame from a blocked Setup transition.",
   "V31 confirmed spare RAM Data capacity at target125. V35 reports hold0 and reproduces the v34 BB QuartzCore mutex and SB LaunchServices context waits. V36 shows SwapEnd and dispatch group wait in BackBoard, but screen clips before SpringBoard. V37 fits both processes on screen. Capture the resolved SpringBoard unfair-lock owner, then map that ID to the peer stacks. Compare source extent with a straight-on photo only if both show the same frame.",
 ]
 
 evidence = [
+  { kind = "device", reference = "evidence/input/touch-hid-v76/device-result.json", revision = "b6ff231724dc116577e821625447f398e7d4646d", command = "Owner swipe and language tap after BOOT03f21401 upload", result = "Hello advances to the next Setup page. The owner reports slow updates and an apparent stall after selecting a language." },
   { kind = "device", reference = "evidence/display/springboard-dim-continuous-v69/device-result.json", revision = "66414792da446156892ef7d9be5dfb38b4460796", command = "Owner observation after BOOT99218ca0 upload", result = "Hello stays visible without the timed report. Swipe and power press produce no visible response; Setup remains incomplete." },
   { kind = "device", reference = "evidence/display/springboard-dim-v68/device-result.json", revision = "22a355b6bf7d7fce3f1290c4d97daedef741614b", command = "Owner photo after BOOT26915396 upload, target360", result = "No black screen reported. 253 copies and retirements, blank/dark=0/0. The matched control has not run." },
   { kind = "device", reference = "evidence/display/springboard-dim-continuous-v69/upload.json", revision = "22a355b6bf7d7fce3f1290c4d97daedef741614b", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/springboard-dim-continuous-v69/boot-partition.img", result = "Only the timed terminal report was removed. Upload and reboot request succeeded; Owner later confirms sustained Hello visibility, with no swipe or power-key response." },
@@ -1187,9 +1190,10 @@ evidence = [
 
 [[area]]
 id = "input"
-status = "planned"
+status = "implemented"
 components = []
 paths = [
+  "evidence/input/touch-hid-v76/**",
   "evidence/input/touch-events-v75/**",
   "evidence/input/touch-rails-v73/**",
   "evidence/input/touch-power-v74/**",
@@ -1213,6 +1217,7 @@ procedure = [
   "Read /proc/bus/input/devices, getevent -lp and bound I2C driver links; correlate them with the exact touch and Wacom DT nodes.",
 ]
 findings = [
+  "v76 enables the board FTS polling worker and 21H461 HID digitizer in a continuous image. The owner advanced past Hello with a physical swipe. This verifies end-to-end finger event delivery for the tested gesture.",
   "v75 records one scan echo, 28 presses, 356 moves, 27 releases and 27 complete same-ID drags after physical swipes. Scan-off and GPIO restoration succeed. The display service is published with zero GOP copies at this terminal checkpoint.",
   "v73 confirms L13A 0x40a00, L14A 0x42100 and empty ACTIVE TCS0/1. v74 sends the stock voltage, HPM and enable sequence with an isolated TCS1. Both triplets acknowledge; the lines rise and GPIO I2C returns 53 54 39 36 03 with STOP and restored pin controls. Finger events and HID remain unverified.",
   "The Tab S6 mainline fts1ba90a driver matches the exact identity and SEC touch event layout (16-byte records, event type in the low two bits). Use its scan/FIFO protocol reference. Umi and T733 are separate XNU HID and integration references.",
@@ -1232,12 +1237,15 @@ completion = [
   "Touch contacts preserve stable IDs and releases, coordinates map correctly to the display, and keys/pen produce the expected HID reports.",
 ]
 limits = [
-  "Firmware hashes and static I2C/IRQ inputs are established. The powered identity read and raw finger events are device-verified. Coordinate orientation and XNU HID delivery still need device verification.",
+  "The powered identity read, raw finger events and Hello gesture are device-verified. Full coordinate calibration, pen and power-key behavior remain unverified.",
 ]
 next_action = [
-  "Connect the qualified SEC FIFO contact stream to the 21H461 HID path in a continuous boot image. Verify coordinate mapping and the Hello swipe. Map PM8150 PON keys separately.",
+  "Preserve the v76 input baseline while diagnosing the slow language transition. Verify full coordinate coverage and map PM8150 PON keys separately.",
 ]
 evidence = [
+  { kind = "host", reference = "evidence/input/touch-hid-v76/preparation.json", revision = "b6ff231724dc116577e821625447f398e7d4646d", command = "python3.14 evidence/display/hello-black-v64/prepare.py --touch-hid", result = "The original 21H461 HID binding audit and BOOT03f21401 FAT readback passed. Continuous boot enables the T970 HID worker." },
+  { kind = "device", reference = "evidence/input/touch-hid-v76/upload.json", revision = "b6ff231724dc116577e821625447f398e7d4646d", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/touch-hid-v76/boot-partition.img --verbose", result = "Heimdall confirmed BOOT upload and requested reboot." },
+  { kind = "device", reference = "evidence/input/touch-hid-v76/device-result.json", revision = "b6ff231724dc116577e821625447f398e7d4646d", command = "Owner swipe after BOOT03f21401 upload", result = "Physical swipe advanced from Hello to the next Setup page, verifying HID event delivery." },
   { kind = "device", reference = "evidence/input/touch-events-v75/device-result.json", revision = "b2123eda18d72725bf55aea9f7bab82092f22f8d", command = "Owner swipes and photo after BOOT668f075b upload, target75", result = "One scan echo and 27 complete same-ID drags. FIFO and scan-off succeed. Zero GOP copies at this checkpoint." },
   { kind = "host", reference = "evidence/input/touch-events-v75/preparation.json", revision = "b2123eda18d72725bf55aea9f7bab82092f22f8d", command = "python3.14 evidence/display/hello-black-v64/prepare.py --touch-events", result = "Linked FIFO probe and final BOOT668f075b FAT checks passed." },
   { kind = "device", reference = "evidence/input/touch-events-v75/upload.json", revision = "b2123eda18d72725bf55aea9f7bab82092f22f8d", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/touch-events-v75/boot-partition.img --verbose", result = "Heimdall confirmed BOOT upload and requested reboot on the second attempt." },

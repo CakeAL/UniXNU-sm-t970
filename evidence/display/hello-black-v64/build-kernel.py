@@ -32,6 +32,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, default=BUILD)
     parser.add_argument('--cached-headers', action='store_true')
+    parser.add_argument('--touch-hid', action='store_true')
     args = parser.parse_args()
     build = args.output.resolve()
     kernel = WORK / 'kernel/kernel.macho'
@@ -39,10 +40,13 @@ def main():
         raise ValueError('Expected the v55 kernel and display archive')
     build.mkdir()
     registration = build / 'registration'
-    subprocess.run(['python3.14', str(DEVICE / 'scripts/build-display-registration.py'),
-                    '--tree', str(WORK / 'tree'),
-                    '--gop-object', str(OUT / 'display-object-cf3b429/NativeLegacyDisplay.o'),
-                    '--output', str(registration)], check=True)
+    registration_command = ['python3.14', str(DEVICE / 'scripts/build-display-registration.py'),
+                            '--tree', str(WORK / 'tree'),
+                            '--gop-object', str(OUT / 'display-object-cf3b429/NativeLegacyDisplay.o'),
+                            '--output', str(registration)]
+    if args.touch_hid:
+        registration_command.append('--touch-hid')
+    subprocess.run(registration_command, check=True)
     replacement = registration / MEMBER
     report = json.loads((LIVE / REPORT).read_text())
     source = DEVICE / 'package/T970Display/DisplayRegistration.cpp'
@@ -63,6 +67,15 @@ def main():
         expected = replacement.read_bytes() if member == MEMBER else ar('-p', LIVE / ARCHIVE, member)
         if ar('-p', archive, member) != expected:
             raise ValueError('Unexpected archive change: ' + member)
+    if args.touch_hid:
+        hid = build / 'touch-hid'
+        hid_command = ['python3.14', str(DEVICE / 'scripts/build-touch-hid.py'),
+                       '--registration', str(registration), '--output', str(hid)]
+        subprocess.run(hid_command, check=True)
+        ar('-r', archive, str(hid / 'TouchHid.late.o'), str(hid / 'touch-hid-bindings.o'))
+        for path in (DEVICE / 'package/T970Touch').glob('*'):
+            if path.suffix in ('.h', '.cpp'):
+                report['source_sha256'][str(path)] = sha(path)
     report['archive_sha256'] = sha(archive)
     (build / REPORT).write_text(json.dumps(report, indent=2) + '\n')
 
@@ -85,6 +98,8 @@ def main():
             subprocess.run(command, cwd=DEVICE, env=env, stdout=log, stderr=subprocess.STDOUT, check=True)
         if b'blank/dark=' not in kernel.read_bytes():
             raise ValueError('Display counters absent from prelinked kernel')
+        if args.touch_hid:
+            subprocess.run([*hid_command, '--verify', str(kernel)], check=True)
         for target in targets[2:]:
             shutil.copy2(target, build / target.name)
     finally:

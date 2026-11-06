@@ -1,0 +1,13 @@
+{
+  "boot_sha256": "03f21401d48aea2066f8d8188478c456f32d7f5750043d0fbce09a4e2d9db88b",
+  "report_date_local": "2026-11-06",
+  "source": "Device owner report in the bring-up conversation",
+  "owner_observation": "Swiping past Hello entered the next Setup page. Interaction and screen updates were very slow. Setup appeared stuck after tapping a language.",
+  "hello_swipe_advanced_setup": true,
+  "hid_delivery_verified": true,
+  "language_tap_attempted": true,
+  "language_selection_completed": null,
+  "render_cadence_measured": false,
+  "setup_wait_captured": false,
+  "coordinate_calibration_verified": false
+}

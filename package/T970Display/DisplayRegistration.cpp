@@ -180,6 +180,9 @@ extern "C" void native_legacy_display_late_probe(void) {
         activeProvider = provider;
         OSSafeReleaseNULL(treeParent);
         IOLog("T970 display: CPU framebuffer service ready 2800x1752 stride=%lu\n", video.v_rowBytes);
+#if defined(T970_TOUCH_HID)
+        t970_touch::startHid();
+#endif
         return;
     }
 

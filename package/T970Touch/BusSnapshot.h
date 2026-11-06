@@ -3,8 +3,15 @@
 
 #include <IOKit/IODeviceMemory.h>
 #include <IOKit/IOLib.h>
+#include <kern/clock.h>
+#include <kern/thread.h>
 #include <machine/machine_routines.h>
 #include <pexpert/pexpert.h>
+#include "TouchHid.h"
+
+#if defined(T970_TOUCH_HID)
+extern "C" void thread_terminate_self(void);
+#endif
 
 namespace t970_touch {
 
@@ -245,37 +252,86 @@ struct EventSample {
     }
 };
 
-static const char *sampleEvents(ProbeBus &bus, IOMemoryMap &irqPin, EventSample &sample) {
+static const char *enableScan(ProbeBus &bus) {
     constexpr uint8_t touchFunctions[] = {0x30, 0x61, 0};
     constexpr uint8_t clearFifo = 0x62;
     constexpr uint8_t scanOn[] = {0xa0, 0, 1};
-    constexpr uint8_t readOne = 0x60, readRest = 0x61;
-    constexpr unsigned eventSize = 16, fifoMax = 32;
     if (!bus.transfer(touchFunctions, sizeof(touchFunctions))) return "functions";
     IOSleep(10);
     if (!bus.transfer(&clearFifo, 1)) return "clear";
     if (!bus.transfer(scanOn, sizeof(scanOn))) return "scan";
+    return nullptr;
+}
+
+struct FifoBatch {
+    static constexpr unsigned eventSize = 16, capacity = 32;
+    uint8_t bytes[capacity * eventSize];
+    unsigned count = 0;
+
+    const uint8_t *event(unsigned index) const { return bytes + index * eventSize; }
+
+    const char *readFrom(ProbeBus &bus) {
+        constexpr uint8_t readOne = 0x60, readRest = 0x61;
+        if (!bus.transfer(&readOne, 1, bytes, eventSize)) return "read";
+        unsigned left = bytes[7] & 0x3fu;
+        if (left >= capacity) left = capacity - 1;
+        count = 1;
+        if (left && !bus.transfer(&readRest, 1, bytes + eventSize, left * eventSize)) return "drain";
+        count += left;
+        return nullptr;
+    }
+};
+
+static const char *sampleEvents(ProbeBus &bus, IOMemoryMap &irqPin, EventSample &sample) {
+    if (const char *failure = enableScan(bus)) return failure;
 
     uint64_t deadline = 0;
     clock_interval_to_deadline(20, NSEC_PER_SEC, &deadline);
     for (; sample.polls < 500 && mach_absolute_time() < deadline; ++sample.polls) {
         if (!(read(irqPin, 4) & 1u)) ++sample.irqLow;
-        uint8_t event[eventSize];
-        if (!bus.transfer(&readOne, 1, event, sizeof(event))) return "read";
-        sample.record(event);
-        unsigned left = event[7] & 0x3fu;
-        if (left >= fifoMax) left = fifoMax - 1;
-        if (left) {
-            uint8_t rest[(fifoMax - 1) * eventSize];
-            if (!bus.transfer(&readRest, 1, rest, left * eventSize)) return "drain";
-            for (unsigned i = 0; i < left; ++i) sample.record(rest + i * eventSize);
-        }
+        FifoBatch batch;
+        const char *failure = batch.readFrom(bus);
+        for (unsigned i = 0; i < batch.count; ++i) sample.record(batch.event(i));
+        if (failure) return failure;
         IOSleep(40);
     }
     return "done";
 }
 
-static void reportIdentity(char *out, size_t length, bool captureEvents = false) {
+#if defined(T970_TOUCH_HID)
+static const char *deliverEvents(ProbeBus &bus, IOMemoryMap &irqPin, EventSample &) {
+    if (const char *failure = enableScan(bus)) return failure;
+    IOLog("T970 touch: FTS scanning\n");
+    T970TouchFrame frame;
+    bool pending = false;
+    unsigned idlePolls = 0;
+    unsigned failures = 0;
+    for (;;) {
+        // Read even if IRQ stays high so a missed or masked IRQ cannot stall input.
+        if (!(read(irqPin, 4) & 1u) || ++idlePolls >= 16) {
+            idlePolls = 0;
+            FifoBatch batch;
+            if (const char *failure = batch.readFrom(bus)) {
+                // Release host contacts after a bus error before trying to recover.
+                frame.active = frame.down = 0;
+                pending = !t970_touch_hid_frame(frame);
+                if (++failures >= 3 || !bus.stopped) return failure;
+            } else {
+                failures = 0;
+                for (unsigned i = 0; i < batch.count; ++i) {
+                    if (frame.apply(batch.event(i))) pending = !t970_touch_hid_frame(frame);
+                }
+            }
+        }
+        if (pending) pending = !t970_touch_hid_frame(frame);
+        IOSleep(8);
+    }
+}
+#endif
+
+using Scan = const char *(*)(ProbeBus &, IOMemoryMap &, EventSample &);
+
+static void reportIdentity(char *out, size_t length, Scan scan = nullptr) {
     auto gcc = mapMmio(0x100000, 0x53000);
     if (!gcc || !gcc->getVirtualAddress() ||
         (read(*gcc, voteReg) & seVote) || !(read(*gcc, seBranch) & clockOff)) {
@@ -316,7 +372,7 @@ static void reportIdentity(char *out, size_t length, bool captureEvents = false)
     const char *identityFault = "none";
     const char *scanOff = "skip";
     EventSample sample;
-    auto irqPin = captureEvents ? mapMmio(0x0f90f000, 0x1000) : OSSharedPtr<IOMemoryMap>{};
+    auto irqPin = scan ? mapMmio(0x0f90f000, 0x1000) : OSSharedPtr<IOMemoryMap>{};
     if (idle == 3) {
         writeMasked(*pins, 0x0004, outputLatch, 0);
         writeMasked(*pins, 0x1004, outputLatch, 0);
@@ -326,9 +382,9 @@ static void reportIdentity(char *out, size_t length, bool captureEvents = false)
             identityStop = bus.stopped;
             identityLength = bus.bytesRead;
             identityFault = bus.fault;
-            if (captureEvents && identified && !memcmp(bytes, expectedId, sizeof(bytes))) {
+            if (scan && identified && !memcmp(bytes, expectedId, sizeof(bytes))) {
                 if (irqPin && irqPin->getVirtualAddress()) {
-                    eventStage = sampleEvents(bus, *irqPin, sample);
+                    eventStage = scan(bus, *irqPin, sample);
                     eventFault = bus.fault;
                     if (bus.stopped && strcmp(eventStage, "functions") && strcmp(eventStage, "clear")) {
                         constexpr uint8_t stopScan[] = {0xa0, 0, 0};
@@ -353,7 +409,7 @@ static void reportIdentity(char *out, size_t length, bool captureEvents = false)
                            "\nTouch ID idle=%x stage=%s err=%s n=%u id=%02x%02x%02x%02x%02x stop=%u restore=%u",
                            idle, stage, identityFault, identityLength, bytes[0], bytes[1], bytes[2],
                            bytes[3], bytes[4], identityStop, restored);
-    if (captureEvents && written > 0 && static_cast<size_t>(written) < length) {
+    if (scan && written > 0 && static_cast<size_t>(written) < length) {
         snprintf(out + written, length - written,
                  "\nTouch FIFO %s/%s off=%s poll/irq/echo=%u/%u/%u status=%04x"
                  "\nTouch P/M/R/drag=%u/%u/%u/%u last=%u:%u,%u",
@@ -518,7 +574,7 @@ static const char *voteTouchRail(IOMemoryMap &rsc, uint32_t rail, uint32_t milli
     return restored ? result : "restore";
 }
 
-static void reportPoweredIdentity(char *out, size_t length, bool captureEvents) {
+static void reportPoweredIdentity(char *out, size_t length, Scan scan) {
     auto db = mapMmio(0x80860000, 0x20000);
     uint32_t analog = 0, digital = 0;
     if (!db || !db->getVirtualAddress() || read(*db, 0) != 1 || (read(*db, 0x8c) & 1u) ||
@@ -548,9 +604,30 @@ static void reportPoweredIdentity(char *out, size_t length, bool captureEvents) 
     // Leave the verified stock voltage/enable votes in place until reset.
     if (!strcmp(d, "ack") && written > 0 && static_cast<size_t>(written) < length) {
         IOSleep(100);
-        reportIdentity(out + written, length - written, captureEvents);
+        reportIdentity(out + written, length - written, scan);
     }
 }
+
+#if defined(T970_TOUCH_HID)
+static void hidWorker(void *, wait_result_t) {
+    if (t970_touch_hid_start()) {
+        char state[384] = {};
+        reportPoweredIdentity(state, sizeof(state), deliverEvents);
+        IOLog("T970 touch: FTS worker stopped%s\n", state);
+    }
+    thread_terminate_self();
+}
+
+static void startHid() {
+    unsigned enabled = 0, diagnostic = 0;
+    if (!PE_parse_boot_argn("t970-touch-hid", &enabled, sizeof(enabled)) || enabled != 1 ||
+        PE_parse_boot_argn("t970-touch-bus-report", &diagnostic, sizeof(diagnostic))) return;
+    thread_t worker = THREAD_NULL;
+    if (kernel_thread_start(hidWorker, nullptr, &worker) == KERN_SUCCESS) {
+        thread_deallocate(worker);
+    }
+}
+#endif
 
 // Modes 1–6 cover firmware state, clocks, identity, rail resources, power and events.
 static void reportBus(char *out, size_t length) {
@@ -565,7 +642,7 @@ static void reportBus(char *out, size_t length) {
         return;
     }
     if (enabled == 5 || enabled == 6) {
-        reportPoweredIdentity(out, length, enabled == 6);
+        reportPoweredIdentity(out, length, enabled == 6 ? sampleEvents : nullptr);
         return;
     }
     if (enabled != 1 && enabled != 2) return;

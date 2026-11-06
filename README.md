@@ -23,9 +23,10 @@ BOOT6b83f4e6已恢复真实PMGR，并越过强制的可写APFS Data挂载检查�
 2 GiB 对照镜像 v62 已实测八核、220 个进程及 1,950 MiB 受管理内存。SpringBoard 主线程在
 CFRunLoop，BackBoard 完成 4 次 GOP 帧复制与退役。首帧仍在显示发布后约 94 秒出现。
 v63 实机显示 Hello 后转黑。防调暗实验 v68 实测到 360 秒诊断仍有帧更新，未再转黑。
-持续启动版 v69 实机保持 Hello 可见，手指上滑和电源键无响应，主屏幕仍待验证。板级默认仍为 512 MiB。
+持续启动版 v69 实机保持 Hello 可见。v76 接入手指触控，实测可上滑进入下一页。画面更新慢，
+点击语言后停住，主屏幕仍待验证。板级默认仍为 512 MiB。
 见 [v62 实测](evidence/display/owned-window-2g-v62/README.md)与
-[v69 持续启动](evidence/display/springboard-dim-continuous-v69/README.md)。
+[v76 触控实测](evidence/input/touch-hid-v76/README.md)。
 
 两个仓库并列放置，普通构建命令在主仓库执行：
 
@@ -47,7 +48,7 @@ vsc/
 
 显式组件为 `ArmDTPlatform`、`ArmCpu`、`SoftwareAES`、`VirtioMmioBlock`、`RamBlock`、`XnuPrelink`、`DarwinBoot`；
 archive 还接入了设备内 UFS 副本、带固定公钥的 VerifiedRoot 与真实 PMGR ABI 桥接。
-这些构建输入不等于功能验证通过；GPU、触控、音频、无线尚未适配。
+GPU、音频和无线尚未适配。
 
 ## 检查与构建
 

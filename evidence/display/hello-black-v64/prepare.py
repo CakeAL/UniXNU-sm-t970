@@ -42,6 +42,7 @@ def main():
     modes.add_argument('--touch-rails', action='store_true', help='Read the touch rail resources and RSC state')
     modes.add_argument('--touch-power', action='store_true', help='Vote the qualified rails, then try one identity read')
     modes.add_argument('--touch-events', action='store_true', help='Sample the powered touch FIFO for 20 seconds')
+    modes.add_argument('--touch-hid', action='store_true', help='Enable continuous touchscreen HID delivery')
     args = parser.parse_args()
     base, base_report, build, output = BASE, BASE_REPORT, BUILD, OUTPUT
     arguments = [REPORT_ARG]
@@ -58,6 +59,7 @@ def main():
         (args.touch_rails, 'touch-rails-v73', 4, b'Touch RAIL db='),
         (args.touch_power, 'touch-power-v74', 5, b'Touch PWR A='),
         (args.touch_events, 'touch-events-v75', 6, b'Touch FIFO '),
+        (args.touch_hid, 'touch-hid-v76', None, b'T970 touch: FTS scanning'),
     )
     touch = next((entry for entry in touch_modes if entry[0]), None)
     if touch:
@@ -66,7 +68,8 @@ def main():
         base_report = DEVICE / 'evidence/display/springboard-dim-continuous-v69/preparation.json'
         build = OUT / (name + '-build')
         output = OUT / name
-        arguments = ['t970-runtime-report=75', f't970-touch-bus-report={mode}']
+        arguments = (['t970-touch-hid=1'] if args.touch_hid else
+                     ['t970-runtime-report=75', f't970-touch-bus-report={mode}'])
     baseline = json.loads(base_report.read_text())
     source = base.read_bytes()
     require(source[:8] == b'ANDROID!' and digest(source) == baseline['boot_sha256'],
@@ -132,7 +135,7 @@ def main():
                   boot_bytes=len(result), kernel_sha256=digest(kernel),
                   payload_kernel_sha256=digest(read_fat(KERNEL)), added_arguments=arguments,
                   unchanged_payload_sha256=unchanged, unchanged_header_firmware_dtb_tail=True,
-                  terminal_runtime_report=True, uploaded=False)
+                  terminal_runtime_report=not args.touch_hid, uploaded=False)
     (output / 'preparation.json').write_text(json.dumps(report, indent=2) + '\n')
     print(json.dumps(report, indent=2))
 
