@@ -12,6 +12,7 @@
 #if defined(T970_TOUCH_HID)
 extern "C" void thread_terminate_self(void);
 extern "C" void native_t970_touch_down();
+extern "C" void native_t970_runtime_report_request();
 #endif
 
 namespace t970_touch {
@@ -300,11 +301,35 @@ static const char *sampleEvents(ProbeBus &bus, IOMemoryMap &irqPin, EventSample 
 }
 
 #if defined(T970_TOUCH_HID)
+struct SetupReportHold {
+    uint16_t contacts = 0;
+    uint64_t deadline = 0;
+    bool requested = false;
+
+    bool update(uint16_t active) {
+        if (requested) return false;
+        if (contacts != active) {
+            contacts = active;
+            deadline = 0;
+        }
+        if (__builtin_popcount(contacts) != 3) return false;
+        if (!deadline) {
+            clock_interval_to_deadline(2, NSEC_PER_SEC, &deadline);
+            return false;
+        }
+        requested = mach_absolute_time() >= deadline;
+        return requested;
+    }
+};
+
 static const char *deliverEvents(ProbeBus &bus, IOMemoryMap &irqPin, EventSample &) {
     if (const char *failure = enableScan(bus)) return failure;
     IOLog("T970 touch: FTS scanning\n");
     T970TouchFrame frame;
     bool pending = false;
+    unsigned report = 0;
+    const bool reportOnHold = PE_parse_boot_argn("t970-setup-report-touch", &report, sizeof(report)) && report == 1;
+    SetupReportHold reportHold;
     unsigned idlePolls = 0;
     unsigned failures = 0;
     for (;;) {
@@ -328,6 +353,7 @@ static const char *deliverEvents(ProbeBus &bus, IOMemoryMap &irqPin, EventSample
             }
         }
         if (pending) pending = !t970_touch_hid_frame(frame);
+        if (reportOnHold && reportHold.update(frame.active)) native_t970_runtime_report_request();
         IOSleep(8);
     }
 }

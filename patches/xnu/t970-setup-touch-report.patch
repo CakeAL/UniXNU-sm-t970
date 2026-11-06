@@ -1,0 +1,66 @@
+--- a/bsd/kern/kern_exec.c
++++ b/bsd/kern/kern_exec.c
+@@ -8308,10 +8308,12 @@
+ {
+ 	(void)result;
+ 	unsigned seconds = (unsigned)(uintptr_t)parameter;
+-	uint64_t deadline = 0;
+-	clock_interval_to_deadline(seconds, NSEC_PER_SEC, &deadline);
+-	if (assert_wait_deadline((event_t)&native_t970_runtime_started, THREAD_UNINT, deadline) == THREAD_WAITING) {
+-		(void)thread_block(THREAD_CONTINUE_NULL);
++	if (seconds) {
++		uint64_t deadline = 0;
++		clock_interval_to_deadline(seconds, NSEC_PER_SEC, &deadline);
++		if (assert_wait_deadline((event_t)&native_t970_runtime_started, THREAD_UNINT, deadline) == THREAD_WAITING) {
++			(void)thread_block(THREAD_CONTINUE_NULL);
++		}
+ 	}
+ 	struct native_t970_ipi_snapshot ipi = {0};
+ 	native_t970_ipi_check(&ipi);
+@@ -8423,6 +8425,32 @@
+ 	    (unsigned long long)reset[0], (unsigned long long)reset[1], (unsigned long long)reset[2],
+ 	    (unsigned long long)reset[3], (unsigned long long)reset[4], (unsigned long long)reset[5], snapshot.names);
+ }
++static kern_return_t
++native_t970_runtime_report_schedule(unsigned seconds)
++{
++	if (__atomic_exchange_n(&native_t970_runtime_started, 1, __ATOMIC_ACQ_REL)) {
++		return KERN_ALREADY_WAITING;
++	}
++	thread_t thread = THREAD_NULL;
++	kern_return_t error = kernel_thread_start(native_t970_runtime_report, (void *)(uintptr_t)seconds, &thread);
++	if (error != KERN_SUCCESS) {
++		__atomic_store_n(&native_t970_runtime_started, 0, __ATOMIC_RELEASE);
++		return error;
++	}
++	thread_deallocate(thread);
++	return KERN_SUCCESS;
++}
++
++void native_t970_runtime_report_request(void);
++void
++native_t970_runtime_report_request(void)
++{
++	kern_return_t error = native_t970_runtime_report_schedule(0);
++	if (error != KERN_SUCCESS && error != KERN_ALREADY_WAITING) {
++		printf("T970: Setup touch report scheduling failed: %d\n", error);
++	}
++}
++
+ static void
+ native_t970_runtime_report_start(void)
+ {
+@@ -8431,11 +8459,8 @@
+ 	/* Board bring-up: the first LaunchServices pass runs far past five minutes, so
+ 	 * a late report is the only way to see the state when the panel goes dark. */
+ 	if (seconds < 5 || seconds > 1800) panic("runtime report interval invalid: %u", seconds);
+-	if (__atomic_exchange_n(&native_t970_runtime_started, 1, __ATOMIC_ACQ_REL)) return;
+-	thread_t thread = THREAD_NULL;
+-	kern_return_t error = kernel_thread_start(native_t970_runtime_report, (void *)(uintptr_t)seconds, &thread);
+-	if (error != KERN_SUCCESS) panic("runtime report thread failed: %d", error);
+-	thread_deallocate(thread);
++	kern_return_t error = native_t970_runtime_report_schedule(seconds);
++	if (error != KERN_SUCCESS && error != KERN_ALREADY_WAITING) panic("runtime report thread failed: %d", error);
+ }
+ 
+ static int

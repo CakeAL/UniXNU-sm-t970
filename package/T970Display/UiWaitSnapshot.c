@@ -41,6 +41,7 @@ int native_t970_workqueue_detail(proc_t,uint64_t *);
 static unsigned readUserStacks,captureStarted,captureDone,capturePhase,capturePid;
 static unsigned censusTotal,censusRun,censusWait,censusUnint,censusOther,censusBusy;
 static unsigned captureSetupLife;
+static unsigned captureTransfer;
 static uint64_t setupLockOwner;
 uint64_t native_t970_ls_owner_tid(void);
 void native_t970_setup_life_text(char *, unsigned);
@@ -92,8 +93,10 @@ static int native_t970_ui_wait_collect(proc_t p,void *context)
  {task_t ct=proc_task(p);if(ct && task_lock_try(ct)){thread_t t;queue_iterate(&ct->threads,t,thread_t,task_threads){++censusTotal;if(t->state & TH_RUN)++censusRun;else if(t->state & TH_WAIT){if(t->state & TH_UNINT)++censusUnint;else ++censusWait;}else ++censusOther;}task_unlock(ct);}else ++censusBusy;}
  unsigned gestalt=!strncmp(name,"MobileGestalt",13) || !strncmp(name,"mobilegestalt",13);
  if(readUserStacks==setupStacks) {
-  if(out->selected>=4)return PROC_RETURNED;
-  if(strcmp(name,"Setup") && strcmp(name,"SpringBoard") && strcmp(name,"backboardd") && strcmp(name,"lsd"))return PROC_RETURNED;
+  if(out->selected>=(captureTransfer?6U:4U))return PROC_RETURNED;
+  int accountService=captureTransfer && (!strcmp(name,"accountsd") || !strcmp(name,"akd"));
+  if(!accountService && strcmp(name,"Setup") && strcmp(name,"SpringBoard") &&
+     strcmp(name,"backboardd") && strcmp(name,"lsd"))return PROC_RETURNED;
  } else if(readUserStacks==8) {
   if(strcmp(name,"lsd"))return PROC_RETURNED;
  } else if(readUserStacks==10) {
@@ -141,6 +144,7 @@ static int native_t970_ui_wait_collect(proc_t p,void *context)
    unsigned cap=(readUserStacks==4 || readUserStacks==5 || readUserStacks==8 || readUserStacks==9)?8:4;
    if(readUserStacks==10)cap=!strcmp(name,"backboardd")?6:5;
    if(readUserStacks==setupStacks)cap=!strcmp(name,"Setup")?3:!strcmp(name,"SpringBoard")?1:2;
+   if(readUserStacks==setupStacks && captureTransfer)cap=!strcmp(name,"Setup")?6:1;
    if(visited>=(owner?64:cap))break;
    ++visited;if((readUserStacks==4 || readUserStacks==8) && visited<=4)continue;
    if(owner && visited>1 && thread_tid(thread)!=owner)continue;
@@ -277,11 +281,14 @@ const char *native_t970_ui_wait_text(void)
  if(!__atomic_exchange_n(&captureStarted,1,__ATOMIC_ACQ_REL)) {
   readUserStacks=enabled;
   captureSetupLife=0;
+  captureTransfer=0;
   unsigned setup=0;
   if(enabled==10 && PE_parse_boot_argn("t970-setup-probe",&setup,sizeof(setup)) && setup==1) {
    readUserStacks=setupStacks;
    unsigned life=0;
    captureSetupLife=PE_parse_boot_argn("t970-setup-life",&life,sizeof(life)) && life==1;
+   unsigned transfer=0;
+   captureTransfer=PE_parse_boot_argn("t970-setup-report-touch",&transfer,sizeof(transfer)) && transfer==1;
   }
   __atomic_store_n(&captureDone,0,__ATOMIC_RELAXED);
   thread_t worker=THREAD_NULL;

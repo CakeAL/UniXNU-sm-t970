@@ -32,7 +32,7 @@ typedef struct task { thread_t threads; unsigned thread_count; int busy; unsigne
 typedef struct proc { int pid; char name[17]; task_t task; } *proc_t;
 static int irq=1,entry_irq=1,taskHeld,schedHeld,thread_lck_grp;
 static unsigned copies,visits;
-static struct proc processes[5];
+static struct proc processes[7];
 static unsigned processCount=3;
 static int proc_pid(proc_t p){return p->pid;}
 static void proc_name(int pid,char *out,unsigned size){assert(pid>=0&&(unsigned)pid<processCount);snprintf(out,size,"%s",processes[pid].name);}
@@ -67,14 +67,15 @@ typedef void *event_t;
 #define THREAD_WAITING 1
 #define THREAD_CONTINUE_NULL NULL
 #define NSEC_PER_MSEC 1000000
-static unsigned userStacks,setupProbe,setupLife,workerStarts,workerDrops,workerStops,waitCount,stalled;
+static unsigned userStacks,setupProbe,setupLife,setupTransfer,workerStarts,workerDrops,workerStops,waitCount,stalled;
 static uint64_t mockOwner;
 static int workerError;
 static int PE_parse_boot_argn(const char *name,void *out,unsigned size){
  assert(size==4);
  if(!strcmp(name,"t970-ui-stack")){*(unsigned*)out=userStacks;return userStacks!=0;}
  if(!strcmp(name,"t970-setup-probe")){*(unsigned*)out=setupProbe;return setupProbe!=0;}
- assert(!strcmp(name,"t970-setup-life"));*(unsigned*)out=setupLife;return setupLife!=0;
+ if(!strcmp(name,"t970-setup-life")){*(unsigned*)out=setupLife;return setupLife!=0;}
+ assert(!strcmp(name,"t970-setup-report-touch"));*(unsigned*)out=setupTransfer;return setupTransfer!=0;
 }
 static void vm_map_reference(vm_map_t map){assert(taskHeld);++map->refs;}
 static void vm_map_deallocate(vm_map_t map){assert(!taskHeld&&!schedHeld&&map->refs);--map->refs;}
@@ -169,6 +170,14 @@ int main(void){
  text=native_t970_ui_wait_text();
  assert(strstr(text,"seen=1")&&strstr(text,"S9 id=")&&strstr(text,"Setup life sample"));
  assert(copies==copiesBefore+9&&!map_storage.refs);
+ processCount=7;
+ processes[5]=(struct proc){5,"accountsd",&task};
+ processes[6]=(struct proc){6,"akd",&task};
+ captureStarted=captureDone=0;setupTransfer=1;copiesBefore=copies;
+ text=native_t970_ui_wait_text();
+ assert(strstr(text,"accountsd p5")&&strstr(text,"akd p6")&&strstr(text,"S6 id="));
+ assert(strstr(text,"UI batch end processes=6 clipped=0")&&copies==copiesBefore+12&&!map_storage.refs);
+ setupTransfer=0;
  captureStarted=captureDone=0;setupProbe=0;text=native_t970_ui_wait_text();
  assert(strstr(text,"stacks=10")&&!strstr(text,"Setup p3")&&strstr(text,"UI batch end processes=3 clipped=0"));
  waitCount=0;userStacks=1;

@@ -1,0 +1,13 @@
+{
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/setup-transfer-v82/boot-partition.img --verbose",
+  "finished_at_local": "2026-11-07T00:01+08:00",
+  "boot_sha256": "81f47cd6a07f6ee1f12fbe8eed6e5af396fde87587ed37035663875a20f5d9f7",
+  "partition": "BOOT",
+  "exit_code": 0,
+  "transfer_confirmed": true,
+  "reboot_requested": true,
+  "partition_readback": false,
+  "userdata_partition_uploaded": false,
+  "transfer_log": null,
+  "log_note": "Flash completion was read from the live command output; no separate log file was retained."
+}

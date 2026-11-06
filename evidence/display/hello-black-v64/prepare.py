@@ -48,6 +48,7 @@ def main():
     modes.add_argument('--setup-lifecycle', action='store_true', help='Capture Setup lifecycle and the LaunchServices owner')
     modes.add_argument('--setup-exit', action='store_true', help='Report the reason behind early UI process termination')
     modes.add_argument('--setup-relaunch', action='store_true', help='Allow the 21H461 language-change relaunch')
+    modes.add_argument('--setup-transfer', action='store_true', help='Capture Setup on a three-finger hold')
     args = parser.parse_args()
     base, base_report, build, output = BASE, BASE_REPORT, BUILD, OUTPUT
     arguments = [REPORT_ARG]
@@ -101,6 +102,12 @@ def main():
         build = OUT / 'setup-relaunch-v81-build'
         output = OUT / 'setup-relaunch-v81'
         arguments = ['t970-allow-sb-relaunch=1']
+    if args.setup_transfer:
+        base = OUT / 'setup-relaunch-v81/boot-partition.img'
+        base_report = DEVICE / 'evidence/display/setup-relaunch-v81/preparation.json'
+        build = OUT / 'setup-transfer-v82-build'
+        output = OUT / 'setup-transfer-v82'
+        arguments = ['t970-setup-report-touch=1']
     baseline = json.loads(base_report.read_text())
     source = base.read_bytes()
     require(source[:8] == b'ANDROID!' and digest(source) == baseline['boot_sha256'],
@@ -120,7 +127,8 @@ def main():
         return subprocess.check_output(['mcopy', '-i', str(payload), PREFIX + name, '-'])
 
     config = read_fat(CONFIG)
-    if args.setup_probe or args.setup_copy_diff or args.setup_lifecycle or args.setup_exit or args.setup_relaunch:
+    if (args.setup_probe or args.setup_copy_diff or args.setup_lifecycle or
+            args.setup_exit or args.setup_relaunch or args.setup_transfer):
         config_sha = digest((base.parent / CONFIG).read_bytes())
     else:
         config_sha = baseline['unchanged_payload_sha256'][CONFIG] if args.pm_watchdog else baseline['config_sha256']
@@ -141,6 +149,9 @@ def main():
                 'Expected the v77 Setup report with plain copies')
     else:
         require('t970-runtime-report' not in xnu[0]['args'], 'Expected continuous startup')
+    if args.setup_transfer:
+        require({'t970-allow-sb-relaunch=1', 't970-touch-hid=1', 't970-setup-life=1',
+                 't970-ui-stack=10'} <= set(xnu[0]['args'].split()), 'Expected the v81 Setup baseline')
     if args.setup_probe:
         require({'t970-touch-hid=1', 't970-ui-stack=10', 't970-ui-wait=1'} <= set(xnu[0]['args'].split()),
                 'Expected v76 HID and compact UI sampler')
@@ -183,6 +194,10 @@ def main():
         require(all(marker in kernel for marker in (b't970-allow-sb-relaunch', b'T970 UI exit ',
                                                     b'T970 touch: FTS scanning')),
                 'Missing linked relaunch, exit reason or HID path')
+    if args.setup_transfer:
+        require(all(marker in kernel for marker in (b't970-setup-report-touch', b'Setup touch report scheduling',
+                                                    b'accountsd', b'Setup life exec=')),
+                'Missing linked manual Setup report or account sampler')
     files = [(CONFIG, config_path)]
     if not args.setup_copy_diff:
         env = dict(os.environ, UNIXNU_UEFI=str(DEVICE / '.cache/uefi-source/Mu-Silicium'))
@@ -210,9 +225,12 @@ def main():
                   boot_bytes=len(result), kernel_sha256=kernel_sha,
                   payload_kernel_sha256=digest(read_fat(KERNEL)), added_arguments=arguments,
                   unchanged_payload_sha256=unchanged, unchanged_header_firmware_dtb_tail=True,
-                  terminal_runtime_report=not (args.touch_hid or args.setup_relaunch), uploaded=False)
+                  terminal_runtime_report=not (args.touch_hid or args.setup_relaunch or args.setup_transfer),
+                  uploaded=False)
     if args.setup_relaunch:
         report['removed_arguments'] = ['t970-runtime-report=360']
+    if args.setup_transfer:
+        report['manual_terminal_report'] = True
     (output / 'preparation.json').write_text(json.dumps(report, indent=2) + '\n')
     print(json.dumps(report, indent=2))
 
