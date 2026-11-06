@@ -1,0 +1,101 @@
+{
+  "boot_sha256": "b739e1ca32ac6a6359611f5b85564048ce96d5804b3a35eb3716c251a52ea9bc",
+  "source": "Owner photo of the panic report screen",
+  "report_date_local": "2026-11-07",
+  "trigger": "Three-finger hold on the transfer page after choosing no transfer",
+  "device_page": "Transfer Your Apps & Data; the upper-right spinner was still animating",
+  "report_header": {
+    "runtime_target": 0,
+    "main": 1,
+    "processes": 254,
+    "watchdogd": 0,
+    "springboard_pid": 332,
+    "backboardd_pid": 57,
+    "runningboardd_pid": 26,
+    "cpu_available": 8,
+    "smp_running": 7
+  },
+  "setup_relaunch": {
+    "exec_count": 2,
+    "last_exec_pid": 360,
+    "exec_error": 0,
+    "exit_count": 1,
+    "exit_pid": 273,
+    "exit_status": 9,
+    "exit_reason": "10/0x5bc1ea44"
+  },
+  "frame_copy": {
+    "published_ms": 19872,
+    "first_frame_ms": 131993,
+    "last_frame_ms": 617258,
+    "client_open": 23,
+    "client_failed": 0,
+    "swaps_accepted": 1158,
+    "swaps_rejected": 0,
+    "transfers": 1157,
+    "copies": 1157,
+    "retired": 1157,
+    "setup_swaps": 1134,
+    "setup_copies": 1133,
+    "copy_us_last": 46419,
+    "copy_us_max": 69991,
+    "first_lit_extent": "366x176",
+    "blank_fill": 0,
+    "dark_source": 0
+  },
+  "comparison_with_v82": {
+    "copy_us_last_v82": 326897,
+    "copy_us_max_v82": 331681,
+    "copy_us_last_v83": 46419,
+    "copy_us_max_v83": 69991,
+    "speedup_last": 7.0,
+    "speedup_max": 4.7
+  },
+  "derived": {
+    "frames_per_second": 2.4,
+    "frame_interval_seconds": 0.42,
+    "copy_duty_percent": 11,
+    "copy_megabytes_per_second_last": 422,
+    "copy_megabytes_per_second_max": 280,
+    "note": "The copy no longer sets the frame interval: 46 ms of a 420 ms frame. The producer (Setup) presents about 2.4 frames per second."
+  },
+  "setup_process": {
+    "pid": 360,
+    "threads": 4,
+    "visited": 4,
+    "busy": 0,
+    "waiting": 4,
+    "thread_1": "mach_msg2_trap -> __CFRunLoopServiceMachPort -> __CFRunLoopRun",
+    "thread_2": "mach_msg2_trap -> __CFRunLoopServiceMachPort -> __CFRunLoopRun",
+    "thread_3": "mach_msg2_trap -> dispatch_mach_send_and_wait_for_reply (synchronous reply)",
+    "thread_4": "pc/lr zero: no saved user state"
+  },
+  "services": {
+    "accountsd": {"pid": 327, "threads": 3, "visited": 1},
+    "akd": {"pid": 133, "threads": 3, "visited": 1},
+    "lsd": {"pid": 325, "threads": 2, "visited": 1},
+    "backboardd": {"pid": 57, "threads": 22, "visited": 1},
+    "springboard": {"pid": 332, "threads": 15, "visited": 15}
+  },
+  "launch_services": {
+    "waits": 2,
+    "wait_address": "0x20e6d4878",
+    "waiter_tid": "0x11a4",
+    "waiter": "SpringBoard first sampled thread",
+    "owner_tid": "0x11c5",
+    "owner_sampled": false,
+    "read_ms": 77903,
+    "reads": 551453
+  },
+  "symbolication": {
+    "cache_slide": "0x19e50000",
+    "cache_uuid": "590d839a82d230f1a17d0cc053420f73",
+    "file": "symbols.json"
+  },
+  "owner_observation": "The spinner kept turning after 'Don't Transfer Apps & Data' and the page did not advance.",
+  "limits": [
+    "One sample only; the page may advance after a longer wait.",
+    "The LaunchServices lock owner thread 0x11c5 was not sampled, and only one thread per service was visited.",
+    "The dispatch_mach reply peer is not identified by registers alone."
+  ]
+}
