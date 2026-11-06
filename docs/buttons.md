@@ -37,3 +37,12 @@ intr   0xe700000 0xa0000    periph_irq = <PDC 1>
 - 读错 APID 或窗口可能同步外部中止（其他端口有先例），所以第一步只读、只碰 PON 与已确认的 GPIO PPID。
 - 电源键若被注入 HID，会真的锁屏；探针阶段只读，不会改变系统状态。
 - 仲裁器版本必须核对：`core[0]` 落在 `0x5xxxxxxx` 才按 v5 偏移使用，v7 布局的 `+0x2000`/`+0x00` 偏移不同（sheng 的实现）。
+
+## 接入步骤（下一轮实施）
+
+1. `scripts/build-key-probe.py`：照 `build-ui-wait-snapshot.py` 的配方编译 `package/T970Input/KeyProbe.c`，输出 `KeyProbe.o`。
+2. `build-kernel.py --keys`：把 `KeyProbe.o` 作为新成员加进 `libNativeLegacyDisplay.late.a`（和 `UiWaitSnapshot.o` 同样的替换路径）。
+3. 启动：`DisplayRegistration.cpp` 在 `t970-keys=1` 时调用 `native_t970_key_start()`（weak_import），映射 `core/cnfg/obsrvr` 三个窗口。
+4. 报告：`native_t970_display_timing()` 追加 `native_t970_key_state()` 的一行，校验 `version/APID/掩码/计数`。
+5. 实机：按电源、音量加、音量减各一次，再按住三指取报告，确认 `Keys:` 行的计数与掩码。
+6. 通过后再做 HID：先确认 21H461 绑定能否承载 report 2，否则参考 sheng 的 `NativeHidInput` 建独立 device。
