@@ -1,0 +1,15 @@
+{
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/persist-write-v52/boot-partition.img",
+  "finished_at": "2026-11-04T13:04:45.619825+00:00",
+  "exit_code": 0,
+  "boot_sha256": "22686faef4e1e3fe772313e1409d167207e17b17584bfd7eec8a4532ac96b8fd",
+  "kernel_sha256": "3e31c0825c9ac8c2c0e27952f297c4bf8406096c72686f15cb2a3cdad7d95829",
+  "device_revision": "2561e445a386b33b3dc4069a3f5ee43234d9fe05",
+  "partition": "BOOT",
+  "no_reboot": false,
+  "boot_report": "BOOT upload successful; session ended with reboot request",
+  "userdata_written": true,
+  "userdata_scope": "sheng-data-persist=2 opens a bounded window at the end of userdata, clear of the root image plus 4 MiB, at most a quarter of the partition",
+  "device_observation_pending": true,
+  "purpose": "pay the LaunchServices seeding and container creation once, then reboot without changing the image"
+}

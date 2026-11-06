@@ -1,0 +1,14 @@
+{
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/ufs-bench-v49/boot-partition.img",
+  "finished_at": "2026-11-04T12:39:24.907734+00:00",
+  "exit_code": 0,
+  "boot_sha256": "49e40613964a7138a63acabdef54b0d722ec4359e8f9e53507c9ed0213b71827",
+  "kernel_sha256": "ea43d97dbe015f42f4c01f1c8c66f62f282ab80120ade9cab0e0fb73b679ce63",
+  "device_revision": "2561e445a386b33b3dc4069a3f5ee43234d9fe05",
+  "partition": "BOOT",
+  "no_reboot": false,
+  "boot_report": "BOOT upload successful; session ended with reboot request",
+  "device_observation_pending": true,
+  "userdata_written": false,
+  "predecessor_note": "v48 read LBA 1..64 outside the open window and broke the Data mount; v49 times the caller's own range instead"
+}

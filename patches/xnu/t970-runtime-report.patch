@@ -1,6 +1,6 @@
 --- a/bsd/kern/kern_exec.c
 +++ b/bsd/kern/kern_exec.c
-@@ -8058,6 +8058,70 @@
+@@ -8058,6 +8058,72 @@
  	return error;
  }
  
@@ -60,7 +60,9 @@
 +{
 +	unsigned seconds = 0;
 +	if (!PE_parse_boot_argn("t970-runtime-report", &seconds, sizeof(seconds)) || !seconds) return;
-+	if (seconds < 5 || seconds > 300) panic("runtime report interval invalid: %u", seconds);
++	/* Board bring-up: the first LaunchServices pass runs far past five minutes, so
++	 * a late report is the only way to see the state when the panel goes dark. */
++	if (seconds < 5 || seconds > 1800) panic("runtime report interval invalid: %u", seconds);
 +	if (__atomic_exchange_n(&native_t970_runtime_started, 1, __ATOMIC_ACQ_REL)) return;
 +	thread_t thread = THREAD_NULL;
 +	kern_return_t error = kernel_thread_start(native_t970_runtime_report, (void *)(uintptr_t)seconds, &thread);

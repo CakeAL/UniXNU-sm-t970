@@ -1,0 +1,9 @@
+{
+  "base_boot_sha256": "40943388fb4c6ce01eca7f28f904556408e03f51d08bc201e81b0327d383789f",
+  "boot_sha256": "33abac1d790f9ee977d27f48f0f40489bcbf1a77b779c3db61cbc30f35d31659",
+  "boot_bytes": 71303168,
+  "change": "ADT restored to the 512 MiB original; report stays at 120 s",
+  "purpose": "isolate whether the hand-written ADT value patch is what stops the hand-off",
+  "uploaded": false,
+  "hardware_result_pending": true
+}

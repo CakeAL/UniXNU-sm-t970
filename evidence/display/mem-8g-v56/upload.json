@@ -1,0 +1,13 @@
+{
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/mem-8g-v56/boot-partition.img",
+  "finished_at": "2026-11-04T14:17:30.058923+00:00",
+  "exit_code": 0,
+  "boot_sha256": "503986a7301988cb03707e24a876f104e4d25e8330ae7e8989b01015e6dbb96f",
+  "partition": "BOOT",
+  "no_reboot": false,
+  "boot_report": "BOOT upload successful; session ended with reboot request",
+  "userdata_written": false,
+  "change": "darwinboot-memory-size 512 MiB -> 8 GiB (ADT patch in Payloads/kernel.macho.adt, kernel unchanged)",
+  "risk": "the firmware may not have 8 GiB of EfiConventionalMemory; a failed hand-off shows as no kernel output, and the fallback is 4 GiB or 2 GiB",
+  "device_observation_pending": true
+}

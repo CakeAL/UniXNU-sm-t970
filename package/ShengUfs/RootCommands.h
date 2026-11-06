@@ -268,19 +268,61 @@ static IOReturn hostQueryRead (uint8_t opcode, uint8_t idn, uint32_t *value)
 }
 
 // Read `blocks` (<= kDataMax / 4096) 4096-byte blocks of LUN `lun` starting at `lba` into dst.
+// Sequential read-ahead. The block layer asks for 4 KiB at a time and one
+// command costs about 108 us regardless of size, so a sequential run is fetched
+// 32 blocks ahead in a single command and later reads are served from the
+// transfer buffer. Any write, or any non-sequential jump, drops the window.
+static bool hostInWindow (uint64_t lba, uint32_t blocks);
+static uint64_t gRaFirst = 0, gRaBlocks = 0;
+// Several readers interleave their 4 KiB requests, so one "last end" cannot
+// recognise continuation. Keep the ends of the last few streams instead.
+static const unsigned kRaStreams = 8;
+static uint64_t gRaEnd[kRaStreams] = {0};
+static unsigned gRaNext = 0;
+static void hostRaInvalidate (void) { gRaBlocks = 0; for (unsigned i = 0; i < kRaStreams; i++) gRaEnd[i] = 0; }
+static bool hostRaContinues (uint64_t lba)
+{
+  for (unsigned i = 0; i < kRaStreams; i++) {
+    if (gRaEnd[i] && gRaEnd[i] == lba) return true;
+  }
+  return false;
+}
+static void hostRaAdvance (uint64_t end)
+{
+  gRaEnd[gRaNext] = end;
+  gRaNext = (gRaNext + 1) % kRaStreams;
+}
+
 static IOReturn hostRead4k (uint8_t lun, uint64_t lba, uint32_t blocks, void *dst)
 {
   if (!gHost.ready || !dst || !blocks || blocks > kDataMax / 4096 || lba > 0xffffffffULL - (blocks - 1)) {
     return kIOReturnBadArgument;
   }
+  const uint32_t ahead = kDataMax / 4096;
   IOLockLock (gHost.lock);
+  if (gRaBlocks && lba >= gRaFirst && lba + blocks <= gRaFirst + gRaBlocks) {
+    memcpy (dst, gHost.virt + kDataOffset + (size_t) (lba - gRaFirst) * 4096, blocks * 4096U);
+    __atomic_fetch_add (&::native_ufs_ra_hits, 1, __ATOMIC_RELAXED);
+    IOLockUnlock (gHost.lock);
+    return kIOReturnSuccess;
+  }
+  /* Measured on board: 3771 prefetches produced 35 hits, so the extra reads only
+   * cost bandwidth. The continuation table stays for the counters, not for I/O. */
+  uint32_t want = blocks;
+  (void)hostRaContinues (lba);
   gRootDiagnostic.lba = lba;
   uint8_t cdb[10] = { 0x28, 0, uint8_t (lba >> 24), uint8_t (lba >> 16), uint8_t (lba >> 8), uint8_t (lba),
-                      0, uint8_t (blocks >> 8), uint8_t (blocks), 0 };
+                      0, uint8_t (want >> 8), uint8_t (want), 0 };
   uint32_t scsi = 0;
-  IOReturn status = hostScsi (lun, cdb, 10, true, blocks * 4096U, 1000000, &scsi);
+  IOReturn status = hostScsi (lun, cdb, 10, true, want * 4096U, 1000000, &scsi);
   if (status == kIOReturnSuccess) {
     memcpy (dst, gHost.virt + kDataOffset, blocks * 4096U);
+    gRaFirst = lba;
+    gRaBlocks = want;
+    hostRaAdvance (lba + want);
+    if (want > blocks) __atomic_fetch_add (&::native_ufs_ra_ahead, 1, __ATOMIC_RELAXED);
+  } else {
+    hostRaInvalidate ();
   }
   IOLockUnlock (gHost.lock);
   return status;
@@ -332,6 +374,7 @@ static IOReturn hostWrite4k (uint8_t lun, uint64_t lba, uint32_t blocks, const v
     return kIOReturnBadArgument;
   }
   IOLockLock (gHost.lock);
+  hostRaInvalidate ();
   gRootDiagnostic.lba = lba;
   memcpy (gHost.virt + kDataOffset, src, blocks * 4096U);
   uint8_t cdb[10] = { 0x2a, uint8_t (fua ? 0x08 : 0), uint8_t (lba >> 24), uint8_t (lba >> 16), uint8_t (lba >> 8), uint8_t (lba),

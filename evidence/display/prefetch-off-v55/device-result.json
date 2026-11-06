@@ -1,0 +1,39 @@
+{
+  "boot_sha256": "be371677cc9d76027873139a25bd402811da5e807100f8a2cfedcab35faa71e8",
+  "photo": "screen-target900.jpg",
+  "photo_sha256": "5e1482ed13b9e3fd4018d70f62f39a1c216b3c50f9a4baff3ab8dc3c1960deca",
+  "target_seconds": 900,
+  "ufs": {
+    "reads": 5328939,
+    "failures": 0,
+    "read_ms": 684051,
+    "us_per_block": 128,
+    "bench_single_us": 157,
+    "bench_bulk_us": 256,
+    "bench_blocks": 8,
+    "readahead_hits": 20,
+    "readahead_prefetches": 0
+  },
+  "system": {
+    "processes": 133,
+    "ufs_blocks": 7341569,
+    "ui_spawn_total": 558,
+    "display_client_open": 31,
+    "swaps": "9/0",
+    "copies": 7,
+    "data_free_blocks": 13907
+  },
+  "lock": {
+    "waits": 1,
+    "waiter": "0x125",
+    "owner": "0x57",
+    "note": "the LaunchServices contention reappeared, so the previous run's clear state was transient"
+  },
+  "findings": [
+    "Disabling the prefetch removed it completely (ah=0) but the read time barely moved: 684051 ms against 684320 ms.",
+    "Read volume keeps climbing: 5.3 M block reads in 900 s is about 21 GB at 4 KiB, all at 128 us each.",
+    "The Data volume is nearly full: 13907 free blocks of 131072, about 54 MiB, so the persistent store is running out of room.",
+    "The LaunchServices wait came back, so the v54 observation of waits=0 was a transient state rather than a milestone."
+  ],
+  "conclusion": "driver-level read-ahead and prefetch are both dead ends here; the remaining costs are the per-4KiB command price and the capacity of the Data volume"
+}

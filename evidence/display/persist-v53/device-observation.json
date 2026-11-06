@@ -1,0 +1,14 @@
+{
+  "boot_sha256": "774af36ad584305ad3b3dbd358b270555edca938479d0e16b04f13b255781d5b",
+  "observation": "owner reports the panel went black after about ten minutes of the first persistent-data boot",
+  "candidates": [
+    "the first boot finished the seeding work and the compositor has nothing to present yet, so the panel shows black",
+    "backboardd stopped presenting or the display path lost its scanout buffer",
+    "the kernel died after the console was handed to userland, so no panic text appears"
+  ],
+  "decision": "the planned power cycle separates these: a second boot that advances past the logo means persistence worked; an identical repeat means the same failure recurs",
+  "follow_up_if_repeated": "boot with sheng-log=1 so the kernel log persists in the last 32 MiB of userdata, then export it on the host with .cache/archive-logexporter.py",
+  "noted_at": "2026-11-04T13:32:59.361858+00:00",
+  "second_boot": "owner reports the second boot repeated the same sequence: Apple logo, then a black panel after a while",
+  "second_boot_note": "persistence did not change the visible outcome, so the next image moves the report to 900 s to record the state at the moment the panel goes dark"
+}

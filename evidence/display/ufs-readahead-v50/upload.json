@@ -1,0 +1,14 @@
+{
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/ufs-readahead-v50/boot-partition.img",
+  "finished_at": "2026-11-04T12:50:33.027477+00:00",
+  "exit_code": 0,
+  "boot_sha256": "6187725d2f9f4009b4561529b396ff594e87fc80baef690cfc025e62f8be2d96",
+  "kernel_sha256": "0f5647adeed1bee517c7a52695162d4cfd08f92f4be3ad0e738911cadad21005",
+  "device_revision": "2561e445a386b33b3dc4069a3f5ee43234d9fe05",
+  "partition": "BOOT",
+  "no_reboot": false,
+  "boot_report": "BOOT upload successful; session ended with reboot request",
+  "device_observation_pending": true,
+  "userdata_written": false,
+  "change": "sequential read-ahead window (32 blocks) in package/ShengUfs/RootCommands.h"
+}

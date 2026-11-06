@@ -1,0 +1,14 @@
+{
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/no-report-v47/boot-partition.img",
+  "finished_at": "2026-11-04T12:09:26.928475+00:00",
+  "exit_code": 0,
+  "boot_sha256": "af2ccdc8529fc69a7faca27fdc01bbb8bb0c0b021a0ca0a6de90cd0a3198e792",
+  "kernel_sha256": "8dda45adfcc1ef277951dd4e59547a16e86832e31023bfd925668990207d046d",
+  "device_revision": "2561e445a386b33b3dc4069a3f5ee43234d9fe05",
+  "partition": "BOOT",
+  "no_reboot": false,
+  "boot_report": "BOOT upload successful; session ended with reboot request",
+  "device_observation_pending": true,
+  "userdata_written": false,
+  "purpose": "no terminal report: the boot runs to its own end instead of panicking at 300 s"
+}

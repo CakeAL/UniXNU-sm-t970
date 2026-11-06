@@ -1,0 +1,30 @@
+--- a/bsd/kern/kern_exec.c
++++ b/bsd/kern/kern_exec.c
+@@ -8311,6 +8311,27 @@
+ 			size_t used = strlen(display_state);
+ 			native_t970_ls_owner_text(display_state + used, sizeof(display_state) - used);
+ 		}
++		unsigned ufs_time = 0;
++		if (PE_parse_boot_argn("t970-ufs-time", &ufs_time, sizeof(ufs_time)) && ufs_time == 1) {
++			extern volatile uint64_t native_ufs_block_reads, native_ufs_block_failures;
++			extern volatile uint64_t native_ufs_read_ticks;
++			extern volatile uint64_t native_ufs_bench_single_us, native_ufs_bench_bulk_us, native_ufs_bench_blocks;
++			extern volatile uint64_t native_ufs_ra_hits, native_ufs_ra_ahead;
++			uint64_t read_ns = 0;
++			absolutetime_to_nanoseconds(native_ufs_read_ticks, &read_ns);
++			size_t used = strlen(display_state);
++			snprintf(display_state + used, sizeof(display_state) - used,
++			    " U r=%llu f=%llu ms=%llu us=%llu b1=%llu bn=%llu n=%llu h=%llu ah=%llu",
++			    (unsigned long long)native_ufs_block_reads,
++			    (unsigned long long)native_ufs_block_failures,
++			    (unsigned long long)(read_ns / 1000000),
++			    (unsigned long long)(native_ufs_block_reads ? read_ns / native_ufs_block_reads / 1000 : 0),
++			    (unsigned long long)native_ufs_bench_single_us,
++			    (unsigned long long)native_ufs_bench_bulk_us,
++			    (unsigned long long)native_ufs_bench_blocks,
++			    (unsigned long long)native_ufs_ra_hits,
++			    (unsigned long long)native_ufs_ra_ahead);
++		}
+ 		unsigned batch_mode=0;
+ 		PE_parse_boot_argn("t970-ui-stack", &batch_mode, sizeof(batch_mode));
+ 		if(batch_mode==5 || batch_mode==6 || batch_mode==9 || batch_mode==10) {

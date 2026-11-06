@@ -1,0 +1,13 @@
+{
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/prefetch-off-v55/boot-partition.img",
+  "finished_at": "2026-11-04T13:57:41.295962+00:00",
+  "exit_code": 0,
+  "boot_sha256": "be371677cc9d76027873139a25bd402811da5e807100f8a2cfedcab35faa71e8",
+  "kernel_sha256": "136e024bdc12b6c8b120ed40e7993fe21ac257b666767481a94d38b39099bd64",
+  "partition": "BOOT",
+  "no_reboot": false,
+  "boot_report": "BOOT upload successful; session ended with request",
+  "userdata_written": false,
+  "change": "read-ahead prefetch disabled after 3771 prefetches produced 35 hits",
+  "deferred": "the forced vsync arm was reverted: the archive's NativeLegacyDisplay.late.o cannot be rebuilt from the stored object recipe (it lacks __GLOBAL__sub_I_NativeLegacyDisplay.cpp), so the live archive was restored from pre-display-vsync-v55"
+}

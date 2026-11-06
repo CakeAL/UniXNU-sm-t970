@@ -1,0 +1,14 @@
+{
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/ufs-readahead-v51/boot-partition.img",
+  "finished_at": "2026-11-04T12:57:52.610554+00:00",
+  "exit_code": 0,
+  "boot_sha256": "1bf9f41ce8bc22a951d99b70f567b233ee8ee0610f8af67221fe2a5bb4614b56",
+  "kernel_sha256": "3e31c0825c9ac8c2c0e27952f297c4bf8406096c72686f15cb2a3cdad7d95829",
+  "device_revision": "2561e445a386b33b3dc4069a3f5ee43234d9fe05",
+  "partition": "BOOT",
+  "no_reboot": false,
+  "boot_report": "BOOT upload successful; session ended with reboot request",
+  "device_observation_pending": true,
+  "userdata_written": false,
+  "change": "eight-stream continuation table instead of a single last end"
+}

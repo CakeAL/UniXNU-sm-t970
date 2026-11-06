@@ -1,0 +1,15 @@
+{
+  "boot_sha256": "af2ccdc8529fc69a7faca27fdc01bbb8bb0c0b021a0ca0a6de90cd0a3198e792",
+  "kernel_sha256": "8dda45adfcc1ef277951dd4e59547a16e86832e31023bfd925668990207d046d",
+  "observation": "owner reports the panel left the diagnostic console text and showed the Apple logo for at least 15 minutes with no further change",
+  "noted_at": "2026-11-04T12:26:34.122553+00:00",
+  "interpretation": [
+    "the kernel console text was replaced by a userland-presented frame, so the display pipeline crossed from kernel console to compositor-owned presentation",
+    "the same image panicked at 300 s in v44 and never reached this state, so the terminal report had been ending the boot before it could get here",
+    "with 1.57 M block reads at 131 us each and 6.1 GB total in the timing build, block I/O remains the dominant cost, and the container and LaunchServices work that follows is thousands of small writes through the same single-lock polled path"
+  ],
+  "limitations": [
+    "no on-screen counters in this image by design, so the internal progress at that moment is not recorded",
+    "the observation is from the owner's screen, not a captured frame"
+  ]
+}

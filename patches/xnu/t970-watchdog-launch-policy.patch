@@ -1,6 +1,6 @@
 --- a/bsd/kern/kern_exec.c
 +++ b/bsd/kern/kern_exec.c
-@@ -7976,6 +7976,88 @@
+@@ -7976,6 +7976,92 @@
  	vnode_put(vp);
  }
  
@@ -44,17 +44,21 @@
 +	extern unsigned native_ufs_store_mode(void);
 +	vfs_context_t ctx = vfs_context_current();
 +	/* Refuse before touching files if the mounted RAM Data or credentials differ. */
-+	if (!XNU_NATIVE_RAM_BLOCK || native_ufs_store_mode() != 0 ||
++	if (!XNU_NATIVE_RAM_BLOCK || native_ufs_store_mode() == 1 ||
 +	    native_owner_data_stage != 4 || native_owner_data_readonly != 0 ||
 +	    kauth_cred_getuid(vfs_context_ucred(ctx)) != 0) return EPERM;
-+	/* Never truncate an existing launch policy or migration marker. */
++	/* Never truncate an existing launch policy or migration marker. A persistent
++	 * Data store keeps both across boots, so an already prepared pair is success. */
 +	const char *paths[] = { policy, marker };
++	int present = 0;
 +	for (unsigned i = 0; i < 2; ++i) {
 +		vnode_t vp = NULLVP;
 +		int error = vnode_lookup(paths[i], VNODE_LOOKUP_NOFOLLOW, &vp, ctx);
-+		if (!error) { vnode_put(vp); return EEXIST; }
++		if (!error) { vnode_put(vp); ++present; continue; }
 +		if (error != ENOENT) return error;
 +	}
++	if (present == 2) return 0;
++	if (present == 1) return EEXIST;
 +	native_t970_watchdog_policy_stage = 1;
 +	struct mkdir_args request = { .path = scratch + 0xa00, .mode = 0755 };
 +	int32_t result = 0;

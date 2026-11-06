@@ -1,0 +1,10 @@
+{
+  "base_boot_sha256": "be371677cc9d76027873139a25bd402811da5e807100f8a2cfedcab35faa71e8",
+  "boot_sha256": "503986a7301988cb03707e24a876f104e4d25e8330ae7e8989b01015e6dbb96f",
+  "boot_bytes": 71303168,
+  "change": "darwinboot-memory-size 512 MiB -> 8 GiB in Payloads/kernel.macho.adt",
+  "adt_value_offset": 12753,
+  "kernel_identical": true,
+  "uploaded": false,
+  "hardware_result_pending": true
+}

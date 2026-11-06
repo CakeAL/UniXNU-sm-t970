@@ -1,0 +1,12 @@
+{
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/mem-8g-fast-v57/boot-partition.img",
+  "finished_at": "2026-11-04T14:18:10.607308+00:00",
+  "exit_code": 0,
+  "boot_sha256": "40943388fb4c6ce01eca7f28f904556408e03f51d08bc201e81b0327d383789f",
+  "partition": "BOOT",
+  "no_reboot": false,
+  "boot_report": "BOOT upload successful; session ended with reboot request",
+  "userdata_written": false,
+  "change": "report interval 120 s with the 8 GiB owned memory window",
+  "device_observation_pending": true
+}

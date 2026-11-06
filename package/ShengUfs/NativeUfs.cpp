@@ -1024,6 +1024,9 @@ void NativeUfs::inspectContextBanks (void)
 // Nothing here writes to the storage: only INQUIRY-class and READ(10) commands are built, plus
 // the single START STOP UNIT that wakes the device from the power-down the firmware left.
 // ======================================================================================
+// Read-ahead accounting. Kept at global scope so the kernel report can read them;
+// RootCommands.h runs inside an anonymous namespace and refers to them as ::names.
+volatile uint64_t native_ufs_ra_hits = 0, native_ufs_ra_ahead = 0;
 namespace {
 #include "RootTransportLayout.h"
 
@@ -2552,9 +2555,44 @@ bool NativeUfsBlock::start (IOService *provider)
   return true;
 }
 
+// Board diagnostic: time one read of the caller's own range as N single-block
+// commands and as one multi-block command. It never reads outside the range the
+// caller already asked for, so no window or GPT state is touched.
+volatile uint64_t native_ufs_bench_single_us = 0, native_ufs_bench_bulk_us = 0, native_ufs_bench_blocks = 0;
+static bool gUfsBenchDone = false;
+static void nativeUfsBenchmark (uint64_t block, uint64_t count, void *scratch)
+{
+  if (gUfsBenchDone) return;
+  unsigned enabled = 0;
+  PE_parse_boot_argn ("t970-ufs-bench", &enabled, sizeof (enabled));
+  if (enabled != 1 || !gHost.ready || !scratch) return;
+  const uint64_t lba4k = (block * 512) / 4096;
+  const uint64_t blocks4k = (count * 512) / 4096;
+  if (blocks4k < 8) return;
+  const uint32_t probe = 8;
+  uint64_t t0 = timerTicks ();
+  for (uint32_t index = 0; index < probe; index++) {
+    if (hostRead4k (0, lba4k + index, 1, scratch) != kIOReturnSuccess) return;
+  }
+  uint64_t t1 = timerTicks ();
+  if (hostRead4k (0, lba4k, probe, scratch) != kIOReturnSuccess) return;
+  uint64_t t2 = timerTicks ();
+  uint64_t singleNs = 0, bulkNs = 0;
+  absolutetime_to_nanoseconds (t1 - t0, &singleNs);
+  absolutetime_to_nanoseconds (t2 - t1, &bulkNs);
+  native_ufs_bench_single_us = singleNs / probe / 1000;
+  native_ufs_bench_bulk_us = bulkNs / 1000;
+  native_ufs_bench_blocks = probe;
+  gUfsBenchDone = true;
+  IOLog ("NativeUfs bench: single=%llu us/4k bulk=%llu us/%u-blocks\n",
+         (unsigned long long)native_ufs_bench_single_us,
+         (unsigned long long)native_ufs_bench_bulk_us, (unsigned)probe);
+}
+
 IOReturn NativeUfsBlock::doAsyncReadWrite (IOMemoryDescriptor *buffer, UInt64 block, UInt64 count,
                                            IOStorageAttributes *, IOStorageCompletion *completion)
 {
+  nativeUfsBenchmark (block, count, bounce);
   if (!buffer || !completion || !completion->action || !count || block >= bytes / 512 ||
       count > bytes / 512 - block || buffer->getLength () < count * 512) {
     return kIOReturnBadArgument;

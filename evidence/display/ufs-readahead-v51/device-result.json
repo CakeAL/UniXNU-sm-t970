@@ -1,0 +1,20 @@
+{
+  "boot_sha256": "1bf9f41ce8bc22a951d99b70f567b233ee8ee0610f8af67221fe2a5bb4614b56",
+  "kernel_sha256": "3e31c0825c9ac8c2c0e27952f297c4bf8406096c72686f15cb2a3cdad7d95829",
+  "photo": "screen-target300.jpg",
+  "photo_sha256": "5d08f7186ec6933d95ad49f40ab67d0e558d599511da0de86fef5d70822845b9",
+  "ufs": {
+    "reads": 1543711,
+    "failures": 0,
+    "read_ms": 205340,
+    "us_per_block": 133,
+    "bench_single_us": 135,
+    "bench_bulk_us": 324,
+    "bench_blocks": 8,
+    "readahead_hits": 19,
+    "readahead_prefetches": 0
+  },
+  "verdict": "the eight-stream continuation table changed nothing: 19 hits and zero prefetches, identical to the single-end version",
+  "inference": "at this layer the 4 KiB requests do not continue the previous request's end address, so LBA-continuation is not a usable signal; the block layer is not issuing a sequential stream the driver can see",
+  "consequence": "read-ahead at the driver level is dropped as a direction; the next step is persistence instead of re-creation on every boot"
+}

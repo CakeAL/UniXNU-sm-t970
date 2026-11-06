@@ -1,0 +1,13 @@
+{
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/late-report-v54/boot-partition.img",
+  "finished_at": "2026-11-04T13:36:51.298713+00:00",
+  "exit_code": 0,
+  "boot_sha256": "1dc165ae17eefa6f9489ef2e3d0718a3f8c3f5b94ffd7d1868f9567681b42294",
+  "kernel_sha256": "ee554b6b02af8bef37de5c4541b7215e22454ce83097aecd7a80a0861a35a61a",
+  "partition": "BOOT",
+  "no_reboot": false,
+  "boot_report": "BOOT upload successful; session ended with reboot request",
+  "userdata_written": true,
+  "change": "report interval cap raised to 1800 s; report at 900 s while persistent Data stays on",
+  "purpose": "record the kernel state at the moment the panel goes dark"
+}

@@ -1,0 +1,28 @@
+{
+  "base_boot_sha256": "eb079f75b52c88c30f246b19553d76b46a6a065ced6896ff6043b52112cd2aee",
+  "boot_sha256": "265986ac7be0bbdde0bc6dcec39bbdc7664848aab09e05b419d88c94ce2b6c0a",
+  "boot_bytes": 71303168,
+  "kernel_sha256": "4f23ea7474dbe3c79d60b1fd599aec51c3a23de22d75859548cd96e9af507c97",
+  "payload_kernel_sha256": "c6b236524a5c49745552fedb49da69f071890b1ccbace236b922d974ccb0f963",
+  "unchanged_payload_sha256": {
+    "Payloads/kernel.macho.adt": "778cc0f6f2d9fdb6cd9896aac1e51ce6496858a80e083339afd1775ec7a0c0cd",
+    "Payloads/kernel.macho.trustcache": "7416ca4f8377146626bb284e2133c76bee6cb4e3ee0af5d648b186235a7323a7",
+    "Payloads/scratch-data.img": "4591566eccd77f0f9d13a1338ecaf3c73ce86cd04aeea732d91db6b2e100ca3a"
+  },
+  "base_payload_matches_v38": true,
+  "final_boot_fat_roundtrip": true,
+  "header_fd_dtb_tail_unchanged": true,
+  "changed_argument": null,
+  "target_seconds": 300,
+  "ui_stack_mode": 10,
+  "sampled_processes": [
+    "backboardd",
+    "SpringBoard",
+    "lsd"
+  ],
+  "cpus_requested": 8,
+  "owned_bytes": 805306368,
+  "terminal_runtime_report": true,
+  "uploaded": false,
+  "hardware_result_pending": true
+}

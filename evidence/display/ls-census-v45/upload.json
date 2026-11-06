@@ -1,0 +1,13 @@
+{
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/ls-census-v45/boot-partition.img",
+  "finished_at": "2026-11-04T11:51:53.787492+00:00",
+  "exit_code": 0,
+  "boot_sha256": "265986ac7be0bbdde0bc6dcec39bbdc7664848aab09e05b419d88c94ce2b6c0a",
+  "kernel_sha256": "4f23ea7474dbe3c79d60b1fd599aec51c3a23de22d75859548cd96e9af507c97",
+  "device_revision": "2561e445a386b33b3dc4069a3f5ee43234d9fe05",
+  "partition": "BOOT",
+  "no_reboot": false,
+  "boot_report": "BOOT upload successful; session ended with reboot request",
+  "device_observation_pending": true,
+  "userdata_written": false
+}

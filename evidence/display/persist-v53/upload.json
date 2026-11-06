@@ -1,0 +1,18 @@
+{
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/persist-write-v53/boot-partition.img",
+  "finished_at": "2026-11-04T13:09:01.691879+00:00",
+  "exit_code": 0,
+  "boot_sha256": "774af36ad584305ad3b3dbd358b270555edca938479d0e16b04f13b255781d5b",
+  "kernel_sha256": "17011aeae2bcb0e4af86a72602b86cb7a5ad6f5955de15f28498e093f1cf08dc",
+  "device_revision": "2561e445a386b33b3dc4069a3f5ee43234d9fe05",
+  "partition": "BOOT",
+  "no_reboot": false,
+  "boot_report": "BOOT upload successful; session ended with reboot request",
+  "userdata_written": true,
+  "change": "watchdog launch policy helper now accepts persistent Data (store mode 2) and treats an already prepared policy pair as success",
+  "predecessor": {
+    "boot_sha256": "22686faef4e1e3fe772313e1409d167207e17b17584bfd7eec8a4532ac96b8fd",
+    "result": "watchdog launch policy err=1 stage=0 at kern_exec.c:8622, refused before touching files"
+  },
+  "device_observation_pending": true
+}

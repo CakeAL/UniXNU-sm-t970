@@ -1,0 +1,9 @@
+{
+  "base_boot_sha256": "503986a7301988cb03707e24a876f104e4d25e8330ae7e8989b01015e6dbb96f",
+  "boot_sha256": "40943388fb4c6ce01eca7f28f904556408e03f51d08bc201e81b0327d383789f",
+  "boot_bytes": 71303168,
+  "changed_argument": "t970-runtime-report=900 -> 120",
+  "kept": "8 GiB darwinboot-memory-size from mem-8g-v56",
+  "uploaded": false,
+  "hardware_result_pending": true
+}

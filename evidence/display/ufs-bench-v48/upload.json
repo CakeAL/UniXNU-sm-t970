@@ -1,0 +1,14 @@
+{
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/ufs-bench-v48/boot-partition.img",
+  "finished_at": "2026-11-04T12:33:02.108763+00:00",
+  "exit_code": 0,
+  "boot_sha256": "b4c5f4da97483e1681e9248b6bb491f968ec6e6806b39bab59c236b91aaf84e9",
+  "kernel_sha256": "949fe763aa8bc64a9c4139907c64170b8a6eda5a7879c43526d34f54e9708cde",
+  "device_revision": "2561e445a386b33b3dc4069a3f5ee43234d9fe05",
+  "partition": "BOOT",
+  "no_reboot": false,
+  "boot_report": "BOOT upload successful; session ended with reboot request",
+  "device_observation_pending": true,
+  "userdata_written": false,
+  "note": "first attempt edited a .cache copy that the build never compiles; the benchmark now lives in package/ShengUfs/NativeUfs.cpp"
+}

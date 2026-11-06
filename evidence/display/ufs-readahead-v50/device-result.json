@@ -1,0 +1,25 @@
+{
+  "boot_sha256": "6187725d2f9f4009b4561529b396ff594e87fc80baef690cfc025e62f8be2d96",
+  "kernel_sha256": "0f5647adeed1bee517c7a52695162d4cfd08f92f4be3ad0e738911cadad21005",
+  "photo_sha256": "4dda59bda99b578137599251518c59abf84910f67054f42c23d36199f6d51dc0",
+  "ufs": {
+    "reads": 1561151,
+    "failures": 0,
+    "read_ms": 206262,
+    "us_per_block": 132,
+    "bench_single_us": 135,
+    "bench_bulk_us": 323,
+    "bench_blocks": 8,
+    "readahead_hits": 19,
+    "readahead_prefetches": 0
+  },
+  "census": {
+    "total": 557,
+    "run": 1,
+    "wait": 373,
+    "unint": 183
+  },
+  "verdict": "the read-ahead window almost never fired: 19 hits and no prefetch at all, so the per-block cost stayed at 132 us",
+  "cause": "continuation was judged against a single last-end value while several readers interleave their 4 KiB requests, so lba never matched the stored end",
+  "next": "v51 keeps the ends of the last eight streams; a match on any of them triggers the 32-block prefetch"
+}

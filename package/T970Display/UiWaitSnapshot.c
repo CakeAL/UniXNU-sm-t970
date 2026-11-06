@@ -39,6 +39,7 @@ _Static_assert(sizeof(struct proc_workqueueinfo)==16,"proc workqueue ABI");
 int fill_procworkqueue(proc_t,struct proc_workqueueinfo *);
 int native_t970_workqueue_detail(proc_t,uint64_t *);
 static unsigned readUserStacks,captureStarted,captureDone,capturePhase,capturePid;
+static unsigned censusTotal,censusRun,censusWait,censusUnint,censusOther,censusBusy;
 const char *native_t970_ui_wait_text(void);
 static int ui_user_address(uint64_t address,unsigned size) {
  return address>=4096 && address<(UINT64_C(1)<<39) && size<=(UINT64_C(1)<<39)-address;
@@ -82,6 +83,7 @@ static int native_t970_ui_wait_collect(proc_t p,void *context)
 {
  struct native_t970_ui_wait_buffer *out=context;
  char name[17]={0};int pid=proc_pid(p);proc_name(pid,name,sizeof(name));name[sizeof(name)-1]=0;
+ {task_t ct=proc_task(p);if(ct && task_lock_try(ct)){thread_t t;queue_iterate(&ct->threads,t,thread_t,task_threads){++censusTotal;if(t->state & TH_RUN)++censusRun;else if(t->state & TH_WAIT){if(t->state & TH_UNINT)++censusUnint;else ++censusWait;}else ++censusOther;}task_unlock(ct);}else ++censusBusy;}
  unsigned gestalt=!strncmp(name,"MobileGestalt",13) || !strncmp(name,"mobilegestalt",13);
  if(readUserStacks==8) {
   if(strcmp(name,"lsd"))return PROC_RETURNED;
@@ -126,7 +128,7 @@ static int native_t970_ui_wait_collect(proc_t p,void *context)
   thread_t thread;
   queue_iterate(&task->threads,thread,thread_t,task_threads) {
    unsigned cap=(readUserStacks==4 || readUserStacks==5 || readUserStacks==8 || readUserStacks==9)?8:4;
-   if(readUserStacks==10)cap=!strcmp(name,"backboardd")?8:6;
+   if(readUserStacks==10)cap=!strcmp(name,"backboardd")?6:5;
    if(visited>=cap)break;
    ++visited;if((readUserStacks==4 || readUserStacks==8) && visited<=4)continue;
    boolean_t irq=ml_set_interrupts_enabled(FALSE);
@@ -226,6 +228,11 @@ static void ui_collect(void) {
   unsigned clipped=capture.used>=sizeof(capture.text)-96;
   if(clipped)capture.used=sizeof(capture.text)-96;
   snprintf(capture.text+capture.used,sizeof(capture.text)-capture.used,"\nUI batch end processes=%u clipped=%u",capture.selected,clipped);
+  if(capture.used<sizeof(capture.text)-96) {
+   unsigned left=sizeof(capture.text)-capture.used;
+   int n=snprintf(capture.text+capture.used,left,"\nT tot=%u run=%u wait=%u unint=%u other=%u busy=%u",censusTotal,censusRun,censusWait,censusUnint,censusOther,censusBusy);
+   if(n>0)capture.used+=(unsigned)n<left?(unsigned)n:left-1;
+  }
  }
  __atomic_store_n(&capturePhase,0,__ATOMIC_RELAXED);
  __atomic_store_n(&captureDone,1,__ATOMIC_RELEASE);

@@ -1,0 +1,9 @@
+{
+  "base_boot_sha256": "40943388fb4c6ce01eca7f28f904556408e03f51d08bc201e81b0327d383789f",
+  "boot_sha256": "a4e3b658ead788057d62466257af43740e83766bcf850e4f80b40b1a8d1221b7",
+  "boot_bytes": 71303168,
+  "change": "darwinboot-memory-size 512 MiB -> 4 GiB",
+  "report_seconds": 120,
+  "uploaded": false,
+  "hardware_result_pending": true
+}

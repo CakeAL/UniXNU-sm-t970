@@ -1,0 +1,75 @@
+{
+  "boot_sha256": "265986ac7be0bbdde0bc6dcec39bbdc7664848aab09e05b419d88c94ce2b6c0a",
+  "kernel_sha256": "4f23ea7474dbe3c79d60b1fd599aec51c3a23de22d75859548cd96e9af507c97",
+  "photo": "screen-target300.jpg",
+  "photo_sha256": "b524ca3eb21c87cfd7b4a116ae5d57bf61f8e526693d39347583a6b8320cb652",
+  "census": {
+    "total": 644,
+    "run": 1,
+    "wait": 435,
+    "unint_exact": 208,
+    "other": 0,
+    "busy": 0,
+    "reading": "one runnable thread out of 644 on eight CPUs, with 208 threads in uninterruptible waits, so the boot is blocked rather than CPU bound"
+  },
+  "sample": {
+    "cache_slide": "0x16180000",
+    "processes": 121,
+    "lsd": {
+      "pid": 97,
+      "threads": 6,
+      "visited": 6
+    },
+    "backboardd": {
+      "pid": 57,
+      "threads": 24,
+      "visited": 8
+    },
+    "springboard": {
+      "pid": 27,
+      "threads": 5,
+      "visited": 5
+    }
+  },
+  "lock": {
+    "reported_address": "0x20aa04878",
+    "unslid_address": "0x1f4884878",
+    "address_check": "0x1f4884878 + 0x16180000 == 0x20aa04878",
+    "waits": 1,
+    "waiter_tid": "0x125",
+    "owner_tid": "0x578",
+    "reproduction": "sixth boot, same waiter/owner roles"
+  },
+  "uninterruptible_rows": [
+    {
+      "row": "lsd l2",
+      "w": "fffffff3a3c511598",
+      "x16": "20af03c20"
+    },
+    {
+      "row": "backboardd b2",
+      "w": "fffffff5709fd3f8",
+      "x16": "1f36efe38"
+    }
+  ],
+  "report_layout": {
+    "lines_emitted": 37,
+    "lines_visible": 35,
+    "clipped": [
+      "frames",
+      "pages",
+      "free"
+    ],
+    "note": "the terminal report outgrew the panel, so the next image merges the new counters into an existing line and shortens the thread table"
+  },
+  "observations": [
+    "The thread census converts 'slow' from an inference into a measurement: the machine is almost entirely blocked, not spinning.",
+    "Uninterruptible waiters reach 208 threads, which is consistent with a systemic pager or block-read stall rather than per-process logic.",
+    "The LaunchServices lock reproduced a sixth time while every other counter kept advancing."
+  ],
+  "limitations": [
+    "The census is one instant; it cannot say whether the 208 threads share one wait object.",
+    "Two rows carried w this boot; both are heap addresses, so neither names a kernel subsystem.",
+    "The report now exceeds the panel height, so three trailing lines were off screen."
+  ]
+}

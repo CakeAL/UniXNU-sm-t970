@@ -1,0 +1,7 @@
+{
+  "source": "../UniXNU/out/t970-data-bringup/boot-4g.img",
+  "boot_sha256": "1974c3f7324ecb6ef9ad44e8e258e7c1e6f5476119e15731ca765466ec11455f",
+  "boot_bytes": 62713856,
+  "change": "4 GiB owned window from build payload; args 120 s report + persist 2 + cpus 8",
+  "uploaded": false
+}

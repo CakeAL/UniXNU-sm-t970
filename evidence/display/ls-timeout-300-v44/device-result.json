@@ -1,0 +1,68 @@
+{
+  "boot_sha256": "eb079f75b52c88c30f246b19553d76b46a6a065ced6896ff6043b52112cd2aee",
+  "kernel_sha256": "82e71977803d3f6fe4fbd63e84dc5bafef7281e2d56adae7cb9cb6a4a2582a9f",
+  "photo": "screen-target300.jpg",
+  "photo_sha256": "4d0150323222e31beaec87d3937ba4ce121a7de2b61dfed90c42daee622ea73c",
+  "comparison": {
+    "baseline": "v42 at 150 s, same kernel",
+    "processes": {
+      "150s": 107,
+      "300s": 127
+    },
+    "ufs_blocks": {
+      "150s": 1527267,
+      "300s": 2708111
+    },
+    "ui_spawn_total": {
+      "150s": 197,
+      "300s": 306
+    },
+    "key_state_calls": {
+      "150s": 250,
+      "300s": 384
+    },
+    "swaps_ok": {
+      "150s": 4,
+      "300s": 7
+    },
+    "transfers_copies_retired": {
+      "150s": "4/4/4",
+      "300s": "7/7/7"
+    },
+    "data_free_blocks": {
+      "150s": 77804,
+      "300s": 76061
+    },
+    "publish_to_first_copy_ms": {
+      "150s": "19510/147383",
+      "300s": "18524/138570"
+    }
+  },
+  "lock": {
+    "reported_address": "0x209b4c878",
+    "unslid_address": "0x1f4884878",
+    "address_check": "0x1f4884878 + 0x152c8000 == 0x209b4c878",
+    "waits": 1,
+    "waiter_tid": "0x125",
+    "owner_tid": "0x5b1",
+    "reproduction": "fifth boot, same waiter/owner roles"
+  },
+  "springboard": {
+    "threads": 6,
+    "note": "S1 still waits on the LS lock, S2 still waits for the synchronous reply, S6 exists with no saved state yet"
+  },
+  "lsd": {
+    "threads": 6,
+    "note": "journal recovery sync dispatch, seeding group waits at 0x101238ced, and one synchronous reply wait persist"
+  },
+  "conclusion": [
+    "Every counter grew between 150 s and 300 s: processes 107 to 127, spawns 197 to 306, key-state calls 250 to 384, swaps 4 to 7, and Data free blocks fell by 1743, so the volume is being written.",
+    "The machine is progressing, not deadlocked: the boot is roughly 15 times slower than a normal launchd boot instead of being stuck.",
+    "SpringBoard's LaunchServices wait is unchanged across 150 s, so that path is not releasing on its own; it is one of the serial costs rather than a frozen state."
+  ],
+  "limitations": [
+    "Two single-point samples, not a timeline; the growth rate is inferred from two points only.",
+    "The counters come from different boots, so per-boot variation is mixed into the comparison.",
+    "Nothing here identifies which resource is saturated."
+  ]
+}

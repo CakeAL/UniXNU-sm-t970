@@ -1,0 +1,60 @@
+{
+  "boot_sha256": "1dc165ae17eefa6f9489ef2e3d0718a3f8c3f5b94ffd7d1868f9567681b42294",
+  "photo": "screen-target900.jpg",
+  "photo_sha256": "b1c310f534f894306c466cd056b730c52f1a22fc613630558ddbe7556a43e70c",
+  "target_seconds": 900,
+  "system": {
+    "processes": 123,
+    "ufs_blocks": 7279076,
+    "ui_spawn_total": 597,
+    "display_client_open": 69,
+    "key_state_calls": 1136,
+    "data_free_blocks": 26400,
+    "data_free_was": 75000
+  },
+  "lock": {
+    "waits": 0,
+    "note": "the LaunchServices lock is no longer contended at 900 s"
+  },
+  "springboard": {
+    "threads": 34,
+    "main_thread": "CFRunLoop service",
+    "state": "idle in its run loop"
+  },
+  "lsd": {
+    "threads": 4,
+    "state": "one mach message wait and three idle work queue threads"
+  },
+  "display": {
+    "swaps": "6/0",
+    "transfers": 6,
+    "copies": 4,
+    "retired": 6,
+    "vsync": {
+      "start": 1,
+      "arm": 0,
+      "idle": 0,
+      "late": 0,
+      "refresh": 0,
+      "notify": 0
+    }
+  },
+  "ufs": {
+    "reads": 5305926,
+    "failures": 0,
+    "read_ms": 684320,
+    "us_per_block": 128,
+    "bench_single_us": 161,
+    "bench_bulk_us": 253,
+    "bench_blocks": 8,
+    "readahead_hits": 35,
+    "readahead_prefetches": 3771
+  },
+  "findings": [
+    "The LaunchServices deadlock is gone at 900 s: waits=0 and SpringBoard's main thread sits in its run loop with 34 threads alive.",
+    "The persistent Data store is being written: free blocks fell from about 78k to 26.4k, roughly 200 MiB of changes.",
+    "The panel is black because the display path barely presents: six swaps in 900 s, four copies, and the synthetic vsync was never armed or notified.",
+    "Read-ahead is counterproductive here: 3771 prefetches produced only 35 hits, so it added roughly 480 MiB of extra reads."
+  ],
+  "conclusion": "the boot reaches a running SpringBoard; the remaining blocker for a visible UI is frame presentation and vsync, not the userland lock chain"
+}
