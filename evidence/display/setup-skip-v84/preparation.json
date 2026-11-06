@@ -1,0 +1,27 @@
+{
+  "base_boot_sha256": "b739e1ca32ac6a6359611f5b85564048ce96d5804b3a35eb3716c251a52ea9bc",
+  "boot_sha256": "215edec49f9ebf641b2b312f954416eb35e0d4347473b4bf97dd5581857b68cb",
+  "boot_bytes": 71303168,
+  "kernel_sha256": "30b3cb67b44c3713415d6c3ec61cf310975ff7afced1e88cb16f0e41949f88f4",
+  "seed_sha256": "9a0005a5c520412006589e068264b611c3484af123547d13103387a9fb7c0afa",
+  "seed_bytes": 1458304,
+  "source_seed_sha256": "86064cf9f6b7706ca4b11a7114350a495ff9a5d9514a8cf81ffca8a379f7fb29",
+  "setup_skipped": true,
+  "preferences": [
+    "com.apple.migration",
+    "com.apple.springboard",
+    "com.apple.purplebuddy",
+    "com.apple.purplebuddy.notbackedup",
+    "com.apple.managedconfiguration.notbackedup"
+  ],
+  "build": "21H461",
+  "unchanged_payload_sha256": {
+    "unixnu.toml": "8e846744387f69f156fef09a3e1bf042198d4fcaaa62e92ef1697339df0900e5",
+    "Payloads/kernel.macho": "30b3cb67b44c3713415d6c3ec61cf310975ff7afced1e88cb16f0e41949f88f4",
+    "Payloads/kernel.macho.adt": "b32ba77d5083d2d8d4f12c5b8e1dcded456e64b888f1f5a50115279015c71997",
+    "Payloads/kernel.macho.trustcache": "7416ca4f8377146626bb284e2133c76bee6cb4e3ee0af5d648b186235a7323a7"
+  },
+  "unchanged_header_firmware_dtb_tail": true,
+  "terminal_runtime_report": false,
+  "uploaded": false
+}
