@@ -21,6 +21,9 @@ typedef int boolean_t;
 #define PROC_RETURNED_DONE 1
 #define PROC_ALLPROCLIST 1
 #define PROC_NOWAITTRANS 4
+#define TH_WAIT 1
+#define TH_RUN 4
+#define TH_UNINT 8
 typedef struct state { uint64_t pc,lr,fp,regs[17]; int is64; } arm_saved_state_t;
 typedef struct thread { struct thread *next; int sched_lock; unsigned state; uint64_t wait_event; int sched_pri,base_pri; struct {arm_saved_state_t *upcb;} machine; } *thread_t;
 typedef struct test_map {unsigned refs,reads;int fail;} *vm_map_t;
@@ -29,9 +32,10 @@ typedef struct task { thread_t threads; unsigned thread_count; int busy; unsigne
 typedef struct proc { int pid; char name[17]; task_t task; } *proc_t;
 static int irq=1,entry_irq=1,taskHeld,schedHeld,thread_lck_grp;
 static unsigned copies,visits;
-static struct proc processes[3];
+static struct proc processes[5];
+static unsigned processCount=3;
 static int proc_pid(proc_t p){return p->pid;}
-static void proc_name(int pid,char *out,unsigned size){assert(pid>=0&&pid<3);snprintf(out,size,"%s",processes[pid].name);}
+static void proc_name(int pid,char *out,unsigned size){assert(pid>=0&&(unsigned)pid<processCount);snprintf(out,size,"%s",processes[pid].name);}
 static uint64_t thread_tid(thread_t th){return (uint64_t)(uintptr_t)th;}
 static task_t proc_task(proc_t p){return p->task;}
 static int ml_get_interrupts_enabled(void){return irq;}
@@ -48,7 +52,7 @@ static uint64_t get_saved_state_reg(arm_saved_state_t *s,unsigned n){return s->r
 #define queue_iterate(head,thread,type,field) for(thread=*(head);thread;thread=thread->next)
 static void proc_iterate(unsigned flags,int (*callback)(proc_t,void *),void *context,void *filter,void *arg){
  assert(flags==(PROC_ALLPROCLIST|PROC_NOWAITTRANS)&&!filter&&!arg);
- for(unsigned i=0;i<3;++i){++visits;if(callback(&processes[i],context)==PROC_RETURNED_DONE)break;}
+ for(unsigned i=0;i<processCount;++i){++visits;if(callback(&processes[i],context)==PROC_RETURNED_DONE)break;}
 }
 static int unlocked_snprintf(char *out,size_t size,const char *format,...){
  assert(!taskHeld&&!schedHeld&&irq==entry_irq);
@@ -63,9 +67,13 @@ typedef void *event_t;
 #define THREAD_WAITING 1
 #define THREAD_CONTINUE_NULL NULL
 #define NSEC_PER_MSEC 1000000
-static unsigned userStacks,workerStarts,workerDrops,workerStops,waitCount,stalled;
+static unsigned userStacks,setupProbe,workerStarts,workerDrops,workerStops,waitCount,stalled;
 static int workerError;
-static int PE_parse_boot_argn(const char *name,void *out,unsigned size){assert(!strcmp(name,"t970-ui-stack")&&size==4);*(unsigned*)out=userStacks;return userStacks!=0;}
+static int PE_parse_boot_argn(const char *name,void *out,unsigned size){
+ assert(size==4);
+ if(!strcmp(name,"t970-ui-stack")){*(unsigned*)out=userStacks;return userStacks!=0;}
+ assert(!strcmp(name,"t970-setup-probe"));*(unsigned*)out=setupProbe;return setupProbe!=0;
+}
 static void vm_map_reference(vm_map_t map){assert(taskHeld);++map->refs;}
 static void vm_map_deallocate(vm_map_t map){assert(!taskHeld&&!schedHeld&&map->refs);--map->refs;}
 static int vm_map_read_user(vm_map_t map,uint64_t address,void *out,unsigned size){
@@ -142,9 +150,19 @@ int main(void){
  assert(strstr(text,"UI batch end processes=2 clipped=0")&&!strstr(text,"180001010"));
  unsigned lines=1,cols=0;
  for(const char *c=text;*c;++c) {
-  if(*c=='\n'){++lines;cols=0;}else assert(++cols<=128);
+  if(*c=='\n'){++lines;cols=0;}else assert(++cols<=144);
  }
- assert(lines==20&&map_storage.reads-readsBefore<=16*4&&!map_storage.refs);
+ assert(lines==21&&map_storage.reads-readsBefore<=16*4&&!map_storage.refs);
+ processCount=5;
+ processes[3]=(struct proc){3,"Setup",&task};
+ processes[4]=(struct proc){4,"ignored",&task};
+ captureStarted=captureDone=censusTotal=0;userStacks=10;setupProbe=1;copiesBefore=copies;readsBefore=map_storage.reads;
+ text=native_t970_ui_wait_text();
+ assert(strstr(text,"stacks=11")&&strstr(text,"Setup p3")&&strstr(text,"b2 id=")&&!strstr(text,"b3 id="));
+ assert(strstr(text,"UI batch end processes=4 clipped=0")&&strstr(text,"T tot=50 ")&&!strstr(text,"ignored p"));
+ assert(copies==copiesBefore+8&&map_storage.reads-readsBefore<=8*4&&!map_storage.refs);
+ captureStarted=captureDone=0;setupProbe=0;text=native_t970_ui_wait_text();
+ assert(strstr(text,"stacks=10")&&!strstr(text,"Setup p3")&&strstr(text,"UI batch end processes=3 clipped=0"));
  waitCount=0;userStacks=1;
  captureStarted=captureDone=0;workerError=17;text=native_t970_ui_wait_text();assert(strstr(text,"worker start error=17"));workerError=0;
  captureStarted=captureDone=0;stalled=1;text=native_t970_ui_wait_text();assert(waitCount==20&&strstr(text,"partial rows hidden"));

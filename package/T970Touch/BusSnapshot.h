@@ -11,6 +11,7 @@
 
 #if defined(T970_TOUCH_HID)
 extern "C" void thread_terminate_self(void);
+extern "C" void native_t970_touch_down();
 #endif
 
 namespace t970_touch {
@@ -319,7 +320,10 @@ static const char *deliverEvents(ProbeBus &bus, IOMemoryMap &irqPin, EventSample
             } else {
                 failures = 0;
                 for (unsigned i = 0; i < batch.count; ++i) {
-                    if (frame.apply(batch.event(i))) pending = !t970_touch_hid_frame(frame);
+                    if (frame.apply(batch.event(i))) {
+                        if (frame.down) native_t970_touch_down();
+                        pending = !t970_touch_hid_frame(frame);
+                    }
                 }
             }
         }

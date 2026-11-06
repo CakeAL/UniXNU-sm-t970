@@ -59,6 +59,53 @@ static uint32_t firstLitExtent;
 static uint32_t completedFrames;
 static uint32_t rejectedFrames;
 
+// Packed request fields from the pinned 21H461 GopFramebuffer validator.
+extern "C" uint64_t native_legacy_surface_width(OSObject *);
+extern "C" uint64_t native_legacy_surface_height(OSObject *);
+static bool setupProbe;
+static bool setupSampleBusy;
+static struct {
+    uint64_t downAt, rejectAt, geometryAt;
+    uint32_t acceptedAtDown, rejectedAtDown, copiedAtDown;
+    uint32_t reason, source[4], destination[4];
+    uint64_t surfaceWidth, surfaceHeight;
+} setupSample;
+static uint64_t lastCopyTicks, maxCopyTicks;
+
+static unsigned long long ticksIn(uint64_t ticks, unsigned divisor) {
+    uint64_t ns = 0;
+    absolutetime_to_nanoseconds(ticks, &ns);
+    return ns / divisor;
+}
+
+static void reportSetup(char *out, size_t length) {
+    if (!setupProbe || __atomic_exchange_n(&setupSampleBusy, true, __ATOMIC_ACQUIRE)) return;
+    const auto state = setupSample;
+    __atomic_store_n(&setupSampleBusy, false, __ATOMIC_RELEASE);
+    snprintf(out, length,
+             "\nSetup down ms=%llu swap/bad/copy=%u/%u/%u copy us last/max=%llu/%llu"
+             "\nSetup reject=%u at=%llu geo=%llu surf=%llux%llu"
+             "\nSetup r0=%u,%u,%u,%u r1=%u,%u,%u,%u",
+             ticksIn(state.downAt, 1000000), state.acceptedAtDown, state.rejectedAtDown,
+             state.copiedAtDown, ticksIn(__atomic_load_n(&lastCopyTicks, __ATOMIC_RELAXED), 1000),
+             ticksIn(__atomic_load_n(&maxCopyTicks, __ATOMIC_RELAXED), 1000), state.reason,
+             ticksIn(state.rejectAt, 1000000), ticksIn(state.geometryAt, 1000000),
+             (unsigned long long)state.surfaceWidth, (unsigned long long)state.surfaceHeight,
+             state.source[0], state.source[1], state.source[2], state.source[3],
+             state.destination[0], state.destination[1], state.destination[2], state.destination[3]);
+}
+
+#if defined(T970_TOUCH_HID)
+extern "C" void native_t970_touch_down() {
+    if (!setupProbe || __atomic_exchange_n(&setupSampleBusy, true, __ATOMIC_ACQUIRE)) return;
+    setupSample.downAt = mach_absolute_time();
+    setupSample.acceptedAtDown = sample(swapsAccepted);
+    setupSample.rejectedAtDown = sample(swapsRejected);
+    setupSample.copiedAtDown = sample(copies);
+    __atomic_store_n(&setupSampleBusy, false, __ATOMIC_RELEASE);
+}
+#endif
+
 static bool videoAvailable(PE_Video &video) {
     return !PE_current_console(&video) &&
         t970GopGeometry(video.v_baseAddr, video.v_width, video.v_height,
@@ -79,6 +126,8 @@ extern "C" void native_legacy_display_probe(void) {
         return;
     }
     initialized = true;
+    unsigned setup = 0;
+    setupProbe = PE_parse_boot_argn("t970-setup-probe", &setup, sizeof(setup)) && setup == 1;
     t970_keystore_start();
     displayStage=1;
 
@@ -280,6 +329,8 @@ extern "C" void native_t970_display_timing(char *out, unsigned length, int hold)
              (unsigned long long)__atomic_load_n(&scanoutWriter, __ATOMIC_SEQ_CST));
     size_t used = strlen(out);
     t970_touch::reportBus(out + used, length - used);
+    used = strlen(out);
+    reportSetup(out + used, length - used);
 }
 
 extern "C" __attribute__((noreturn)) void native_legacy_backend_guard(unsigned slot, void *object, void *caller) {
@@ -308,9 +359,25 @@ extern "C" void native_legacy_client_observed(IOReturn status, IOUserClient *) {
     IOLog("T970 display: user client status=%x\n", status);
 }
 
-extern "C" void native_legacy_swap_validation_observed(bool accepted, unsigned reason, const void *, const void *) {
+extern "C" void native_legacy_swap_validation_observed(bool accepted, unsigned reason,
+                                                      const void *request, const void *surface) {
     note(accepted ? swapsAccepted : swapsRejected);
     __atomic_store_n(&lastSwapReason,reason,__ATOMIC_RELAXED);
+    if (setupProbe && !accepted && !__atomic_exchange_n(&setupSampleBusy, true, __ATOMIC_ACQUIRE)) {
+        setupSample.rejectAt = mach_absolute_time();
+        setupSample.reason = reason;
+        if ((reason == 3 || reason == 4) && request && surface) {
+            // At these stages the validator has already matched a single IOSurface.
+            auto *bytes = static_cast<const uint8_t *>(request);
+            auto *object = static_cast<OSObject *>(const_cast<void *>(surface));
+            memcpy(setupSample.source, bytes + 17, sizeof(setupSample.source));
+            memcpy(setupSample.destination, bytes + 81, sizeof(setupSample.destination));
+            setupSample.surfaceWidth = native_legacy_surface_width(object);
+            setupSample.surfaceHeight = native_legacy_surface_height(object);
+            setupSample.geometryAt = setupSample.rejectAt;
+        }
+        __atomic_store_n(&setupSampleBusy, false, __ATOMIC_RELEASE);
+    }
     if (!accepted && rejectedFrames++ < 16) {
         IOLog("T970 display: rejected swap reason=%u\n", reason);
     }
@@ -349,6 +416,12 @@ extern "C" void native_legacy_copy_timing_observed(uint64_t ticks, uint64_t byte
                                     false, __ATOMIC_RELAXED, __ATOMIC_RELAXED);
     }
     note(copies);
+    if (setupProbe) {
+        __atomic_store_n(&lastCopyTicks, ticks, __ATOMIC_RELAXED);
+        uint64_t peak = __atomic_load_n(&maxCopyTicks, __ATOMIC_RELAXED);
+        while (peak < ticks && !__atomic_compare_exchange_n(&maxCopyTicks, &peak, ticks,
+                                                           false, __ATOMIC_RELAXED, __ATOMIC_RELAXED)) {}
+    }
     if (completedFrames < 4) {
         IOLog("T970 display: CPU copy ticks=%llu bytes=%llu\n", ticks, bytes);
     }

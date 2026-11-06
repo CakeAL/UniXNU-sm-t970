@@ -1,0 +1,34 @@
+{
+  "base_boot_sha256": "03f21401d48aea2066f8d8188478c456f32d7f5750043d0fbce09a4e2d9db88b",
+  "boot_sha256": "d44b077ee9ce3602351dd472f1b873df15074a0320e03161bc1f58c41393e9fb",
+  "boot_bytes": 71303168,
+  "kernel_sha256": "4255352623868b32f2e83d6e6e25f25e6f05d2ec084ead44acadd20d10aa878b",
+  "payload_kernel_sha256": "f134ef68605873d9fa34d474984a02210b90d76a28cd18fe113d417497c7d996",
+  "added_arguments": [
+    "t970-setup-probe=1",
+    "t970-runtime-report=360"
+  ],
+  "unchanged_payload_sha256": {
+    "Payloads/kernel.macho.adt": "b32ba77d5083d2d8d4f12c5b8e1dcded456e64b888f1f5a50115279015c71997",
+    "Payloads/kernel.macho.trustcache": "7416ca4f8377146626bb284e2133c76bee6cb4e3ee0af5d648b186235a7323a7",
+    "Payloads/scratch-data.img": "86064cf9f6b7706ca4b11a7114350a495ff9a5d9514a8cf81ffca8a379f7fb29"
+  },
+  "unchanged_header_firmware_dtb_tail": true,
+  "terminal_runtime_report": true,
+  "uploaded": false,
+  "build": {
+    "device_base_revision": "920ff535dc94f7d0afe6aac52217a8f02fff7a14",
+    "unixnu_revision": "2c834e313d25482c78d38d703eff1f8d190f2597",
+    "kernel_log_sha256": "c8df15b245cd483325410952787bb31e28200b8c4284d464936a1be9a9f6499a",
+    "archive_sha256": "8295d816a866da49c1ab70439e8772663bc806e67751dc4dd9b80fc9c25c2c5d",
+    "replaced_archive_members": [
+      "DisplayRegistration.o",
+      "UiWaitSnapshot.o"
+    ],
+    "source_sha256": {
+      "package/T970Display/DisplayRegistration.cpp": "236f76c83aebd1ceef1dce9e224da9b8185375bbc82a30c5cf2ead91b84ded9e",
+      "package/T970Display/UiWaitSnapshot.c": "2ada818b8645d4677e87bf875cd30c344296854b0ec1fbbe4fcb9f02098d763b",
+      "package/T970Touch/BusSnapshot.h": "0a725251e48763c39d45569d559ac8916c7c869009fb866aaa5569922b97fd90"
+    }
+  }
+}

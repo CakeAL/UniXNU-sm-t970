@@ -40,17 +40,19 @@ int fill_procworkqueue(proc_t,struct proc_workqueueinfo *);
 int native_t970_workqueue_detail(proc_t,uint64_t *);
 static unsigned readUserStacks,captureStarted,captureDone,capturePhase,capturePid;
 static unsigned censusTotal,censusRun,censusWait,censusUnint,censusOther,censusBusy;
+/* Internal profile 11 preserves the compact panic format selected by boot mode 10. */
+enum { setupStacks = 11 };
 const char *native_t970_ui_wait_text(void);
 static int ui_user_address(uint64_t address,unsigned size) {
  return address>=4096 && address<(UINT64_C(1)<<39) && size<=(UINT64_C(1)<<39)-address;
 }
 static int ui_stack_selected(const char *name,unsigned index) {
- return readUserStacks==5 || readUserStacks==7 || readUserStacks==8 || readUserStacks==9 || readUserStacks==10 ? 1 : readUserStacks==1 ? index==1 : readUserStacks==4 ? 1 : readUserStacks==3 ? index<=2 : readUserStacks==2 && name[0]=='b' && index>1;
+ return readUserStacks==5 || readUserStacks==7 || readUserStacks==8 || readUserStacks>=9 ? 1 : readUserStacks==1 ? index==1 : readUserStacks==4 ? 1 : readUserStacks==3 ? index<=2 : readUserStacks==2 && name[0]=='b' && index>1;
 }
 static void ui_stack_read(struct native_t970_ui_wait_row *row,vm_map_t map) {
  uint64_t fp=row->fp;
  if(!map){row->frame_error=4;return;}
- unsigned limit=(readUserStacks==9 || readUserStacks==10)?4:(readUserStacks==1 || readUserStacks==7)?8:T970_UI_STACK_FRAMES;
+ unsigned limit=readUserStacks>=9?4:(readUserStacks==1 || readUserStacks==7)?8:T970_UI_STACK_FRAMES;
  for(unsigned i=0;i<limit && fp;++i) {
   uint64_t pair[2]={0};
   if(!ui_user_address(fp,sizeof(pair)) || (fp&15)){row->frame_error=2;break;}
@@ -85,7 +87,10 @@ static int native_t970_ui_wait_collect(proc_t p,void *context)
  char name[17]={0};int pid=proc_pid(p);proc_name(pid,name,sizeof(name));name[sizeof(name)-1]=0;
  {task_t ct=proc_task(p);if(ct && task_lock_try(ct)){thread_t t;queue_iterate(&ct->threads,t,thread_t,task_threads){++censusTotal;if(t->state & TH_RUN)++censusRun;else if(t->state & TH_WAIT){if(t->state & TH_UNINT)++censusUnint;else ++censusWait;}else ++censusOther;}task_unlock(ct);}else ++censusBusy;}
  unsigned gestalt=!strncmp(name,"MobileGestalt",13) || !strncmp(name,"mobilegestalt",13);
- if(readUserStacks==8) {
+ if(readUserStacks==setupStacks) {
+  if(out->selected>=4)return PROC_RETURNED;
+  if(strcmp(name,"Setup") && strcmp(name,"SpringBoard") && strcmp(name,"backboardd") && strcmp(name,"lsd"))return PROC_RETURNED;
+ } else if(readUserStacks==8) {
   if(strcmp(name,"lsd"))return PROC_RETURNED;
  } else if(readUserStacks==10) {
   if(strcmp(name,"SpringBoard") && strcmp(name,"backboardd") && strcmp(name,"lsd"))return PROC_RETURNED;
@@ -129,6 +134,7 @@ static int native_t970_ui_wait_collect(proc_t p,void *context)
   queue_iterate(&task->threads,thread,thread_t,task_threads) {
    unsigned cap=(readUserStacks==4 || readUserStacks==5 || readUserStacks==8 || readUserStacks==9)?8:4;
    if(readUserStacks==10)cap=!strcmp(name,"backboardd")?6:5;
+   if(readUserStacks==setupStacks)cap=!strcmp(name,"Setup")?3:!strcmp(name,"SpringBoard")?1:2;
    if(visited>=cap)break;
    ++visited;if((readUserStacks==4 || readUserStacks==8) && visited<=4)continue;
    boolean_t irq=ml_set_interrupts_enabled(FALSE);
@@ -137,7 +143,7 @@ static int native_t970_ui_wait_collect(proc_t p,void *context)
    if(state && is_saved_state64(state)) {
     struct native_t970_ui_wait_row *r=&rows[count++];r->index=visited;r->kstate=thread->state;
     if(readUserStacks==5){r->tid=thread_tid(thread);r->wait=thread->wait_event;r->priority=thread->sched_pri;r->base=thread->base_pri;}
-    if(readUserStacks==9 || readUserStacks==10)r->tid=thread_tid(thread);
+    if(readUserStacks>=9)r->tid=thread_tid(thread);
     r->wait=thread->wait_event;
     r->pc=get_saved_state_pc(state);r->lr=get_saved_state_lr(state);r->fp=get_saved_state_fp(state);
     r->trap=get_saved_state_reg(state,16);r->arg0=get_saved_state_reg(state,0);r->arg1=get_saved_state_reg(state,1);r->arg3=get_saved_state_reg(state,3);
@@ -170,7 +176,7 @@ static int native_t970_ui_wait_collect(proc_t p,void *context)
  }
  for(unsigned i=0;i<count && out->used<sizeof(out->text)-1;++i) {
   struct native_t970_ui_wait_row *r=&rows[i];left=sizeof(out->text)-out->used;
-  if(readUserStacks==9 || readUserStacks==10) {
+  if(readUserStacks>=9) {
    n=snprintf(out->text+out->used,left,"\n%c%u id=%llx st=%x pc=%llx lr=%llx a0=%llx a1=%llx e=%u F",
     name[0],r->index,(unsigned long long)r->tid,r->kstate,(unsigned long long)r->pc,(unsigned long long)r->lr,(unsigned long long)r->arg0,(unsigned long long)r->arg1,r->frame_error);
    if(n>0)out->used+=(unsigned)n<left?(unsigned)n:left-1;
@@ -217,7 +223,8 @@ static int native_t970_ui_wait_collect(proc_t p,void *context)
    }
   }
  }
- return out->selected>=(readUserStacks==5 || readUserStacks==10?3U:readUserStacks==8?1U:2U)?PROC_RETURNED_DONE:PROC_RETURNED;
+ unsigned processLimit=readUserStacks==5 || readUserStacks==10?3U:readUserStacks==8?1U:2U;
+ return readUserStacks!=setupStacks && out->selected>=processLimit?PROC_RETURNED_DONE:PROC_RETURNED;
 }
 static void ui_collect(void) {
  memset(&capture,0,sizeof(capture));
@@ -227,7 +234,9 @@ static void ui_collect(void) {
  if(readUserStacks>=5) {
   unsigned clipped=capture.used>=sizeof(capture.text)-96;
   if(clipped)capture.used=sizeof(capture.text)-96;
-  snprintf(capture.text+capture.used,sizeof(capture.text)-capture.used,"\nUI batch end processes=%u clipped=%u",capture.selected,clipped);
+  unsigned left=sizeof(capture.text)-capture.used;
+  int n=snprintf(capture.text+capture.used,left,"\nUI batch end processes=%u clipped=%u",capture.selected,clipped);
+  if(n>0)capture.used+=(unsigned)n<left?(unsigned)n:left-1;
   if(capture.used<sizeof(capture.text)-96) {
    unsigned left=sizeof(capture.text)-capture.used;
    int n=snprintf(capture.text+capture.used,left,"\nT tot=%u run=%u wait=%u unint=%u other=%u busy=%u",censusTotal,censusRun,censusWait,censusUnint,censusOther,censusBusy);
@@ -248,6 +257,8 @@ const char *native_t970_ui_wait_text(void)
  static char pending[128];
  if(!__atomic_exchange_n(&captureStarted,1,__ATOMIC_ACQ_REL)) {
   readUserStacks=enabled;
+  unsigned setup=0;
+  if(enabled==10 && PE_parse_boot_argn("t970-setup-probe",&setup,sizeof(setup)) && setup==1)readUserStacks=setupStacks;
   __atomic_store_n(&captureDone,0,__ATOMIC_RELAXED);
   thread_t worker=THREAD_NULL;
   kern_return_t error=kernel_thread_start(ui_stack_worker,NULL,&worker);

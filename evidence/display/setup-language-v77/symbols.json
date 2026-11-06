@@ -1,0 +1,111 @@
+{
+  "cache_slide": "0x16a74000",
+  "cache_uuid": "590d839a82d230f1a17d0cc053420f73",
+  "local_symbols_uuid_matches": true,
+  "live_sample": true,
+  "frames": [
+    {
+      "address": "0x1e21f4b58",
+      "unslid_va": "0x1cb780b58",
+      "image": "/usr/lib/system/libsystem_kernel.dylib",
+      "nearest_symbol": "_mach_msg2_trap",
+      "symbol_table": "exported",
+      "offset": 8,
+      "original_instruction_bytes": "c0035fd6f0058092"
+    },
+    {
+      "address": "0x1e21f8224",
+      "unslid_va": "0x1cb784224",
+      "image": "/usr/lib/system/libsystem_kernel.dylib",
+      "offset": 76,
+      "nearest_symbol": "_mach_msg2_internal",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "00050034fa013037"
+    },
+    {
+      "address": "0x1e21f81b0",
+      "unslid_va": "0x1cb7841b0",
+      "image": "/usr/lib/system/libsystem_kernel.dylib",
+      "offset": 492,
+      "nearest_symbol": "_mach_msg_overwrite",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "fd7b51a9f44f50a9"
+    },
+    {
+      "address": "0x1e21f7fb8",
+      "unslid_va": "0x1cb783fb8",
+      "image": "/usr/lib/system/libsystem_kernel.dylib",
+      "offset": 20,
+      "nearest_symbol": "_mach_msg",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "fd7b41a9ff830091"
+    },
+    {
+      "address": "0x19e935a6c",
+      "unslid_va": "0x187ec1a6c",
+      "image": "/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation",
+      "nearest_local_symbol": "___CFRunLoopServiceMachPort",
+      "offset": 156,
+      "nearest_symbol": "___CFRunLoopServiceMachPort",
+      "symbol_table": "local",
+      "original_instruction_bytes": "fa0300aac00240f9"
+    },
+    {
+      "address": "0x19e9350dc",
+      "unslid_va": "0x187ec10dc",
+      "image": "/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation",
+      "nearest_local_symbol": "___CFRunLoopRun",
+      "offset": 1208,
+      "nearest_symbol": "___CFRunLoopRun",
+      "symbol_table": "local",
+      "original_instruction_bytes": "e86740b91f01186b"
+    },
+    {
+      "address": "0x1e21f48e8",
+      "unslid_va": "0x1cb7808e8",
+      "image": "/usr/lib/system/libsystem_kernel.dylib",
+      "nearest_symbol": "___workq_kernreturn",
+      "symbol_table": "exported",
+      "offset": 8,
+      "original_instruction_bytes": "e3000054fd7bbfa9"
+    },
+    {
+      "address": "0x1f4096580",
+      "unslid_va": "0x1dd622580",
+      "image": "/usr/lib/system/libsystem_pthread.dylib",
+      "offset": 360,
+      "nearest_symbol": "__pthread_wqthread",
+      "symbol_table": "exported",
+      "original_instruction_bytes": "68ae80b9f457bfa9"
+    },
+    {
+      "address": "0x1f4093ccc",
+      "unslid_va": "0x1dd61fccc",
+      "image": "/usr/lib/system/libsystem_pthread.dylib",
+      "nearest_symbol": "_start_wqthread",
+      "symbol_table": "exported",
+      "offset": 8,
+      "original_instruction_bytes": "200020d4ff7fbfa9"
+    },
+    {
+      "address": "0x1a5ffd538",
+      "unslid_va": "0x18f589538",
+      "image": "/usr/lib/system/libdispatch.dylib",
+      "nearest_local_symbol": "__dispatch_mach_send_and_wait_for_reply",
+      "offset": 524,
+      "nearest_symbol": "__dispatch_mach_send_and_wait_for_reply",
+      "symbol_table": "local",
+      "original_instruction_bytes": "f70300aa1f00136b"
+    },
+    {
+      "address": "0x1a5ffd8d4",
+      "unslid_va": "0x18f5898d4",
+      "image": "/usr/lib/system/libdispatch.dylib",
+      "nearest_local_symbol": "_dispatch_mach_send_with_result_and_wait_for_reply$VARIANT$armv81",
+      "offset": 56,
+      "nearest_symbol": "_dispatch_mach_send_with_result_and_wait_for_reply$VARIANT$armv81",
+      "symbol_table": "local",
+      "original_instruction_bytes": "e83f403988010034"
+    }
+  ]
+}

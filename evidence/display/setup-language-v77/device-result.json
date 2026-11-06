@@ -1,0 +1,61 @@
+{
+  "boot_sha256": "d44b077ee9ce3602351dd472f1b873df15074a0320e03161bc1f58c41393e9fb",
+  "photo": "screen-target360.jpg",
+  "photo_sha256": "d8b3116d07c5e504875dd51c7ae0e8db893009e789fa1bc2fe0ae7066545b454",
+  "photo_time_local": "2026-11-06T22:41:55+08:00",
+  "target_seconds": 360,
+  "display": {
+    "published_ms": 18208,
+    "first_copy_ms": 130375,
+    "last_copy_ms": 281911,
+    "swaps_accepted": 18,
+    "swaps_rejected": 0,
+    "copies": 18,
+    "retired": 18,
+    "copy_last_us": 265972,
+    "copy_max_us": 292623,
+    "last_rejection_ms": 0,
+    "last_rejected_geometry_ms": 0
+  },
+  "last_fts_press": {
+    "ms": 271043,
+    "swaps_accepted": 15,
+    "swaps_rejected": 0,
+    "copies": 15,
+    "additional_copies_at_report": 3,
+    "ms_to_last_copy": 10868
+  },
+  "data": {
+    "block_size": 4096,
+    "free_blocks": 31864,
+    "available_bytes": 130514944
+  },
+  "memory": {
+    "managed_pages": 499183,
+    "free_pages": 1035,
+    "page_bytes": 4096
+  },
+  "ufs": {
+    "reads": 577196,
+    "failures": 0,
+    "read_ms": 80659,
+    "mean_read_us": 139
+  },
+  "threads": {
+    "total": 769,
+    "running": 14,
+    "waiting_interruptible": 681,
+    "waiting_uninterruptible": 74
+  },
+  "launchservices": {
+    "cache_slide": "0x16a74000",
+    "waits_recorded": 1,
+    "lock_address": "0x20b2f8878",
+    "waiter_tid": "0x12a",
+    "owner_tid": "0x72f",
+    "waiter_saved_stack": "S1: mach_msg2_trap via dispatch_mach_send_and_wait_for_reply",
+    "owner_sampled": false
+  },
+  "setup_process_sampled": false,
+  "interpretation": "Three more frames were accepted and copied after the last raw press, with no validation rejection. The last copy alone took 265972 us. The snapshot does not identify the selected locale or a Setup process wait. The recorded lock is the known 21H461 LaunchServices address at the sampled slide, but the historical owner was outside the sampled thread rows."
+}

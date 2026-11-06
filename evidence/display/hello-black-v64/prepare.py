@@ -43,6 +43,7 @@ def main():
     modes.add_argument('--touch-power', action='store_true', help='Vote the qualified rails, then try one identity read')
     modes.add_argument('--touch-events', action='store_true', help='Sample the powered touch FIFO for 20 seconds')
     modes.add_argument('--touch-hid', action='store_true', help='Enable continuous touchscreen HID delivery')
+    modes.add_argument('--setup-probe', action='store_true', help='Sample the language transition with v76 HID')
     args = parser.parse_args()
     base, base_report, build, output = BASE, BASE_REPORT, BUILD, OUTPUT
     arguments = [REPORT_ARG]
@@ -70,6 +71,12 @@ def main():
         output = OUT / name
         arguments = (['t970-touch-hid=1'] if args.touch_hid else
                      ['t970-runtime-report=75', f't970-touch-bus-report={mode}'])
+    if args.setup_probe:
+        base = OUT / 'touch-hid-v76/boot-partition.img'
+        base_report = DEVICE / 'evidence/input/touch-hid-v76/preparation.json'
+        build = OUT / 'setup-language-v77-build'
+        output = OUT / 'setup-language-v77'
+        arguments = ['t970-setup-probe=1', 't970-runtime-report=360']
     baseline = json.loads(base_report.read_text())
     source = base.read_bytes()
     require(source[:8] == b'ANDROID!' and digest(source) == baseline['boot_sha256'],
@@ -89,15 +96,22 @@ def main():
         return subprocess.check_output(['mcopy', '-i', str(payload), PREFIX + name, '-'])
 
     config = read_fat(CONFIG)
-    config_sha = baseline['unchanged_payload_sha256'][CONFIG] if args.pm_watchdog else baseline['config_sha256']
+    if args.setup_probe:
+        config_sha = digest((base.parent / CONFIG).read_bytes())
+    else:
+        config_sha = baseline['unchanged_payload_sha256'][CONFIG] if args.pm_watchdog else baseline['config_sha256']
     require(digest(config) == config_sha, 'Unexpected source boot configuration')
     expected = tomllib.loads(config.decode())
     xnu = [entry for entry in expected['entry'] if entry['type'] == 'xnu']
     require(len(xnu) == 1 and 't970-runtime-report' not in xnu[0]['args'],
             'Expected one continuous XNU entry')
+    if args.setup_probe:
+        require({'t970-touch-hid=1', 't970-ui-stack=10', 't970-ui-wait=1'} <= set(xnu[0]['args'].split()),
+                'Expected v76 HID and compact UI sampler')
     line = ('args = "' + xnu[0]['args'] + '"').encode()
     require(config.count(line) == 1, 'Ambiguous XNU entry')
     xnu[0]['args'] += ' ' + ' '.join(arguments)
+    require(len(xnu[0]['args'].encode()) < 1024, 'Boot arguments exceed DarwinBoot capacity')
     updated = config.replace(line, ('args = "' + xnu[0]['args'] + '"').encode())
     require(tomllib.loads(updated.decode()) == expected, 'Unexpected boot configuration difference')
     config_path = output / CONFIG
@@ -111,6 +125,9 @@ def main():
         require(b'T970 PM timeout state=' in kernel, 'Missing linked PM watchdog details')
     if touch:
         require(marker in kernel, 'Missing linked touch report')
+    if args.setup_probe:
+        require(all(marker in kernel for marker in (b'Setup down ms=', b'Setup r0=', b'T970 touch: FTS scanning')),
+                'Missing linked Setup or HID markers')
     env = dict(os.environ, UNIXNU_UEFI=str(DEVICE / '.cache/uefi-source/Mu-Silicium'))
     subprocess.run(['python3.14', str(TREE / 'scripts/patch-xnu-entry-probe.py'),
                     str(replacement), '--panic-screen', '--no-reset'], env=env, check=True)

@@ -32,47 +32,70 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, default=BUILD)
     parser.add_argument('--cached-headers', action='store_true')
-    parser.add_argument('--touch-hid', action='store_true')
+    variants = parser.add_mutually_exclusive_group()
+    variants.add_argument('--touch-hid', action='store_true')
+    variants.add_argument('--setup-probe', action='store_true')
     args = parser.parse_args()
     build = args.output.resolve()
     kernel = WORK / 'kernel/kernel.macho'
     if sha(kernel) != BASE_KERNEL_SHA or sha(LIVE / ARCHIVE) != BASE_ARCHIVE_SHA:
         raise ValueError('Expected the v55 kernel and display archive')
+    archive_source = LIVE
+    if args.setup_probe:
+        archive_source = OUT / 'touch-hid-v76-build'
+        v76 = json.loads((DEVICE / 'evidence/input/touch-hid-v76/preparation.json').read_text())
+        if sha(archive_source / 'kernel.macho') != v76['kernel_sha256']:
+            raise ValueError('Expected the device-tested v76 kernel')
+        if sha(archive_source / 'touch-hid/TouchHid.late.o') != v76['build']['hid_object_sha256']:
+            raise ValueError('Expected the device-tested v76 HID object')
+    report = json.loads((archive_source / REPORT).read_text())
+    if sha(archive_source / ARCHIVE) != report['archive_sha256']:
+        raise ValueError('Source archive does not match its report')
     build.mkdir()
     registration = build / 'registration'
     registration_command = ['python3.14', str(DEVICE / 'scripts/build-display-registration.py'),
                             '--tree', str(WORK / 'tree'),
                             '--gop-object', str(OUT / 'display-object-cf3b429/NativeLegacyDisplay.o'),
                             '--output', str(registration)]
-    if args.touch_hid:
+    if args.touch_hid or args.setup_probe:
         registration_command.append('--touch-hid')
     subprocess.run(registration_command, check=True)
     replacement = registration / MEMBER
-    report = json.loads((LIVE / REPORT).read_text())
     source = DEVICE / 'package/T970Display/DisplayRegistration.cpp'
     report['source_sha256'][str(source)] = sha(source)
     report['registration_object_sha256'] = sha(replacement)
+    replacements = {MEMBER: replacement}
+    if args.setup_probe:
+        ui = build / 'ui-wait'
+        subprocess.run(['python3.14', str(DEVICE / 'scripts/build-ui-wait-snapshot.py'),
+                        '--tree', str(WORK / 'tree'), '--output', str(ui)], check=True)
+        replacements['UiWaitSnapshot.o'] = ui / 'UiWaitSnapshot.o'
+        sampler = json.loads((ui / 'report.json').read_text())
+        report['source_sha256'][str(source.with_name('UiWaitSnapshot.c'))] = sampler['source_sha256']
+        report['ui_wait'] = sampler
 
     archive = build / ARCHIVE
-    shutil.copy2(LIVE / ARCHIVE, archive)
+    shutil.copy2(archive_source / ARCHIVE, archive)
     members = ar('-t', archive).decode().splitlines()
-    if members.count(MEMBER) != 1:
-        raise ValueError('Expected one board registration archive member')
-    ar('-r', archive, str(replacement))
+    if any(members.count(member) != 1 for member in replacements):
+        raise ValueError('Expected unique archive members to replace')
+    ar('-r', archive, *(str(path) for path in replacements.values()))
     if members != ar('-t', archive).decode().splitlines():
         raise ValueError('Archive layout changed')
     for member in members:
         if member.startswith('__.SYMDEF'):
             continue
-        expected = replacement.read_bytes() if member == MEMBER else ar('-p', LIVE / ARCHIVE, member)
+        expected = (replacements[member].read_bytes() if member in replacements
+                    else ar('-p', archive_source / ARCHIVE, member))
         if ar('-p', archive, member) != expected:
             raise ValueError('Unexpected archive change: ' + member)
-    if args.touch_hid:
-        hid = build / 'touch-hid'
+    if args.touch_hid or args.setup_probe:
+        hid = (archive_source if args.setup_probe else build) / 'touch-hid'
         hid_command = ['python3.14', str(DEVICE / 'scripts/build-touch-hid.py'),
                        '--registration', str(registration), '--output', str(hid)]
-        subprocess.run(hid_command, check=True)
-        ar('-r', archive, str(hid / 'TouchHid.late.o'), str(hid / 'touch-hid-bindings.o'))
+        if args.touch_hid:
+            subprocess.run(hid_command, check=True)
+            ar('-r', archive, str(hid / 'TouchHid.late.o'), str(hid / 'touch-hid-bindings.o'))
         for path in (DEVICE / 'package/T970Touch').glob('*'):
             if path.suffix in ('.h', '.cpp'):
                 report['source_sha256'][str(path)] = sha(path)
@@ -98,7 +121,7 @@ def main():
             subprocess.run(command, cwd=DEVICE, env=env, stdout=log, stderr=subprocess.STDOUT, check=True)
         if b'blank/dark=' not in kernel.read_bytes():
             raise ValueError('Display counters absent from prelinked kernel')
-        if args.touch_hid:
+        if args.touch_hid or args.setup_probe:
             subprocess.run([*hid_command, '--verify', str(kernel)], check=True)
         for target in targets[2:]:
             shutil.copy2(target, build / target.name)
