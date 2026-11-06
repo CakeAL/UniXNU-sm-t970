@@ -1,0 +1,17 @@
+{
+  "boot_sha256": "5687b857752a7b90f3a22d5b7f8986f333ae856fa95cace2b9ca22e9fe1cf0fd",
+  "photo": "screen-target75.jpg",
+  "photo_sha256": "d1a3a1a9d28ccfc6a683575f2529973e09b97618e0ea7371822b4d870c815184",
+  "photo_time_local": "2026-11-06T14:27:57+08:00",
+  "target_seconds": 75,
+  "sda_high": false,
+  "scl_high": false,
+  "stage": "idle",
+  "error": "none",
+  "bytes_read": 0,
+  "stop_sent": false,
+  "pin_controls_restored": true,
+  "transaction_attempted": false,
+  "identity_verified": false,
+  "interpretation": "No line rose after removing the GPIO pull-downs. The guarded transaction did not start; this is not an address NACK or direct voltage measurement."
+}

@@ -1190,6 +1190,7 @@ id = "input"
 status = "planned"
 components = []
 paths = [
+  "evidence/input/touch-id-v72/**",
   "evidence/input/touch-clock-v71/**",
   "package/T970Touch/**",
   "evidence/input/touch-bus-v70/**",
@@ -1209,6 +1210,7 @@ procedure = [
   "Read /proc/bus/input/devices, getevent -lp and bound I2C driver links; correlate them with the exact touch and Wacom DT nodes.",
 ]
 findings = [
+  "v72 temporarily releases the GPIO12/13 pull-downs while SE5 is off. Neither line rises. The probe correctly skips its bounded GPIO identity transfer and restores the pin controls. No ACK or sensor power state can be inferred.",
   "v71 temporarily enables SE5 and verifies firmware 0x303 (I2C protocol 3), FIFO interface disabled, and status 0. The owner photo confirms restored clock control bits. No sensor transaction was performed.",
   "The stock fts1ba90a family uses command 0x22 followed by a five-byte identity read, expected bytes 39 36, and 16-byte FIFO records. The T970 firmware name and stock board wiring match this reference. v70 first samples GCC branch state and GPIO12/13/15 without transactions. It skips the GENI engine if any required clock reports off.",
   "v69 owner reports swipe and power-key presses do not affect the visible Hello screen. No XNU touch or key service has been wired for this image. Stock Android enumerates KEY_POWER on PM8150 PON separately from touch.",
@@ -1227,9 +1229,10 @@ limits = [
   "Firmware hashes and static I2C/IRQ inputs are established. Protocol transactions, sequencing and XNU event delivery remain untested; no input events were injected.",
 ]
 next_action = [
-  "Qualify a bounded 0x49 identity transaction. The inherited GENI FIFO interface is disabled; a GPIO open-drain diagnostic can first test whether the lines rise with their internal pulls removed. Map PM8150 PON keys separately.",
+  "Resolve the stock L13A/L14A resources and APPS RSC state before requesting touch power. Retry the guarded identity transaction only once the lines can idle high. Map PM8150 PON keys separately.",
 ]
 evidence = [
+  { kind = "device", reference = "evidence/input/touch-id-v72/device-result.json", revision = "2bd9629fa34d72b4f48dac4a8c3951a80dfe7f4e", command = "Owner photo after BOOT5687b857 upload, target75", result = "idle=0 stage=idle n=0 restore=1. The probe does not send a transaction on low lines." },
   { kind = "device", reference = "evidence/input/touch-clock-v71/device-result.json", revision = "37b439d75ded02edf01c0ed7f357ba0f746a811d", command = "Owner photo after BOOT9738c64d upload, target75", result = "SE5 firmware0x303, FIFO disabled, engine status0 and original clock control bits restored. Sensor ID remains unverified." },
   { kind = "host", reference = "evidence/input/touch-bus-v70/preparation.json", revision = "6a26f4530e1fb7ee2c14dfcf35379cda4790afbb", command = "python3.14 evidence/display/hello-black-v64/prepare.py --touch-bus", result = "Touch read-only markers present in the linked kernel. BOOT FAT verifies unchanged anti-dim Data, ADT and trust cache." },
   { kind = "device", reference = "evidence/input/touch-bus-v70/upload.json", revision = "6a26f4530e1fb7ee2c14dfcf35379cda4790afbb", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/touch-bus-v70/boot-partition.img", result = "BOOT upload completed and reboot requested. Owner photo shows SE5 and wrapper slave AHB reporting off, GPIO12/13 in GPIO mode. SE register reads were skipped." },
