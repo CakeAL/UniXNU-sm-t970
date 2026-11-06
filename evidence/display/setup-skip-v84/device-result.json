@@ -1,0 +1,75 @@
+{
+  "boot_sha256": "215edec49f9ebf641b2b312f954416eb35e0d4347473b4bf97dd5581857b68cb",
+  "source": "Owner photo of the home screen with the manual runtime report over it",
+  "report_date_local": "2026-11-07",
+  "desktop_reached": true,
+  "status_bar": "4:08 PM Wed Dec 31",
+  "report_header": {
+    "runtime_target": 0,
+    "main": 1,
+    "processes": 278,
+    "threads": 983,
+    "watchdogd": 0,
+    "springboard_pid": 27,
+    "backboardd_pid": 57,
+    "runningboardd_pid": 26,
+    "cpu_available": 8,
+    "smp_running": 7
+  },
+  "setup_skipped": {
+    "setup_life_exec": "0/0/0",
+    "setup_life_exit": "0/0/0",
+    "note": "Setup.app never launched on this boot; the Data seed's purplebuddy flags took effect."
+  },
+  "display": {
+    "stage": 8,
+    "mapped": 1,
+    "published": 1,
+    "client_open": 13,
+    "client_failed": 0,
+    "swaps_accepted": 277,
+    "swaps_rejected": 0,
+    "transfers": 276,
+    "copies": 276,
+    "retired": 276,
+    "copy_us_last": 42531,
+    "copy_us_max": 49297,
+    "first_frame_ms": 129340,
+    "last_frame_ms": 537807,
+    "blank_fill": 0,
+    "dark_source": 0
+  },
+  "derived": {
+    "frames_per_second": 0.68,
+    "note": "276 frames over 408 s of mostly static home screen at 42-49 ms per copy."
+  },
+  "processes": {
+    "springboard": {"pid": 27, "threads": 17, "visited": 17},
+    "backboardd": {"pid": 57, "threads": 23, "visited": 1},
+    "accountsd": {"pid": 118, "threads": 6, "visited": 1},
+    "akd": {"pid": 109, "threads": 3, "visited": 1},
+    "lsd": {"pid": 100, "threads": 3, "visited": 1}
+  },
+  "launch_services": {
+    "waits": 1,
+    "wait_address": "0x207c94878",
+    "waiter_tid": "0x129",
+    "waiter": "SpringBoard first sampled thread",
+    "owner_tid": "0x7f4",
+    "owner_sampled": false
+  },
+  "keystore": {"open": 175, "refused": 0, "calls": 3910},
+  "data_space": {"blocks": 131072, "free": 17087, "available": 17087},
+  "symbolication": {
+    "cache_slide": "0x13410000",
+    "cache_uuid": "590d839a82d230f1a17d0cc053420f73",
+    "file": "symbols.json"
+  },
+  "owner_observation": "The device booted to the home screen with the status bar and app icons visible.",
+  "limits": [
+    "A single static home screen was observed; no app launch, gesture or animation was sampled.",
+    "Brightness control is not verified, so display completion remains open.",
+    "The clock reads Wed Dec 31 4:08 PM; time was never synchronised.",
+    "The LaunchServices lock owner 0x7f4 was not sampled, and only one thread per service was visited."
+  ]
+}

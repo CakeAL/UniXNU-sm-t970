@@ -16,3 +16,15 @@ python3.14 evidence/display/setup-skip-v84/prepare.py
 BOOT 哈希为 `215edec49f9ebf641b2b312f954416eb35e0d4347473b4bf97dd5581857b68cb`，Data 种子 `9a0005a5c520412006589e068264b611c3484af123547d13103387a9fb7c0afa`。内核、配置、ADT、信任缓存和固件字节均未变，BOOT 头部与分区尾部回读一致；Heimdall 确认上传并请求重启。
 
 实机待确认：是否直接进入 SpringBoard 主屏。若进了主屏，可以再按住三指取一次运行时报告；若仍是设置助手或黑屏，报告会给出卡点。
+
+## 实机结果
+
+机主确认进入桌面，状态栏显示 `4:08 PM Wed Dec 31`，SpringBoard PID 27。 [桌面照片](screen-home-screen.jpg) · [机主读数](device-result.json) · [符号化](symbols.json)
+
+- `Setup life exec=0/0/0`：本次启动 Setup.app 根本没有运行，种子里的 purplebuddy 标记生效。
+- 显示：13 个客户端、277 次 swap、276 次拷贝与退休、0 拒绝；拷贝 `42531/49297` us，与 v83 一致，缓存设置继续生效。
+- 278 个进程、983 个线程；accountsd 6 线程、backboardd 23 线程、SpringBoard 17 线程。
+- 桌面 408 秒里 276 帧（约 0.68 帧/秒），静态主屏足够；应用启动动画会明显吃紧。
+- LaunchServices 仍有 1 个等待者（SpringBoard 首线程 `0x129`），持有者 `0x7f4` 未采到。
+
+至此显示领域从 `planned` 升到 `implemented`：用户态呈现已在实机证实，亮度控制和持续动画仍未验证。
