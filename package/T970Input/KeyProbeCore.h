@@ -127,3 +127,49 @@ static inline int t970_key_update(struct t970_key_state *k, int down, int usable
     ++k->releases;
     return 2;
 }
+
+// One report line: "Keys: v=50000000 pon=8 gpio=4c3 mask=5 power=1/1 up=0/1 down=0/0".
+// Self-contained formatting so the same header builds in the kernel and on the host.
+static inline char *t970_key_hex(char *out, uint32_t value, unsigned digits)
+{
+    static const char hex[] = "0123456789abcdef";
+    for (unsigned i = 0; i < digits; ++i) out[digits - 1 - i] = hex[(value >> (4 * i)) & 15];
+    out[digits] = 0;
+    return out + digits;
+}
+
+static inline char *t970_key_dec(char *out, uint32_t value)
+{
+    char digits[10];
+    unsigned n = 0;
+    do { digits[n++] = (char)('0' + value % 10); value /= 10; } while (value);
+    while (n) *out++ = digits[--n];
+    *out = 0;
+    return out;
+}
+
+static inline void t970_keys_text(char *out, unsigned size, uint32_t version, uint32_t pon_apid,
+                                 uint32_t gpio_apid, uint32_t mask, const struct t970_key_state k[3])
+{
+    char *p = out, *end = out + size - 1;
+    const char *prefix = "Keys: v=";
+    while (*prefix && p < end) *p++ = *prefix++;
+    p = t970_key_hex(p, version, 8);
+    const char *body = " pon=";
+    while (*body) *p++ = *body++;
+    p = t970_key_dec(p, pon_apid);
+    body = " gpio=";
+    while (*body) *p++ = *body++;
+    p = t970_key_hex(p, gpio_apid, 3);
+    body = " mask=";
+    while (*body) *p++ = *body++;
+    p = t970_key_dec(p, mask);
+    for (unsigned i = 0; i < 3 && p < end; ++i) {
+        const char *names[3] = {" power=", " up=", " down="};
+        for (const char *q = names[i]; *q; ++q) *p++ = *q;
+        p = t970_key_dec(p, k[i].presses);
+        *p++ = '/';
+        p = t970_key_dec(p, k[i].releases);
+    }
+    *p = 0;
+}

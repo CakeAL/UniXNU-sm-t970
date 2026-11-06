@@ -92,6 +92,11 @@ int main(void) {
     assert(t970_key_update(&h, 0, 1) == 0);      /* first low sample */
     assert(t970_key_update(&h, 0, 1) == 0);      /* steady low arms live */
     assert(h.live == 1 && h.presses == 0);
+    /* Report line. */
+    struct t970_key_state line[3] = {{.presses = 1, .releases = 1}, {.releases = 1}, {0}};
+    char text[256];
+    t970_keys_text(text, sizeof text, 0x50000000, 8, 0x4c3, 5, line);
+    assert(strcmp(text, "Keys: v=50000000 pon=8 gpio=4c3 mask=5 power=1/1 up=0/1 down=0/0") == 0);
     puts("ok");
     return 0;
 }
