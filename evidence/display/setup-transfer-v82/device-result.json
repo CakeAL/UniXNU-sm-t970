@@ -1,0 +1,92 @@
+{
+  "boot_sha256": "81f47cd6a07f6ee1f12fbe8eed6e5af396fde87587ed37035663875a20f5d9f7",
+  "source": "Owner photo of the panic report screen",
+  "report_date_local": "2026-11-07",
+  "trigger": "Three-finger hold on the transfer page after choosing no transfer",
+  "device_page": "Transfer Your Apps & Data; the upper-right spinner was still animating",
+  "report_header": {
+    "runtime_target": 0,
+    "main": 1,
+    "processes": 251,
+    "watchdogd": 0,
+    "springboard_pid": 366,
+    "backboardd_pid": 57,
+    "runningboardd_pid": 26,
+    "cpu_available": 8,
+    "smp_running": 7
+  },
+  "setup_relaunch": {
+    "exec_count": 2,
+    "last_exec_pid": 394,
+    "exec_error": 0,
+    "exit_count": 1,
+    "exit_pid": 273,
+    "exit_status": 9,
+    "exit_reason": "10/0x5bc1ea44",
+    "note": "The language-change restart also killed Setup, which relaunched as PID 394. The SBRestartManager code matches the SpringBoard exit seen in v80."
+  },
+  "frame_copy": {
+    "published_ms": 18716,
+    "first_frame_ms": 134385,
+    "last_frame_ms": 471595,
+    "client_open": 22,
+    "client_failed": 0,
+    "swaps_accepted": 549,
+    "swaps_rejected": 0,
+    "transfers": 548,
+    "copies": 548,
+    "retired": 548,
+    "setup_swaps": 541,
+    "setup_copies": 540,
+    "copy_us_last": 326897,
+    "copy_us_max": 331681,
+    "first_lit_extent": "366x176",
+    "blank_fill": 0,
+    "dark_source": 0,
+    "vsync_start": 1,
+    "vsync_arm": 0
+  },
+  "setup_process": {
+    "pid": 394,
+    "threads": 4,
+    "visited": 4,
+    "busy": 0,
+    "waiting": 4,
+    "thread_1": "mach_msg2_trap -> __CFRunLoopServiceMachPort -> __CFRunLoopRun",
+    "thread_2": "mach_msg2_trap -> __CFRunLoopServiceMachPort -> __CFRunLoopRun",
+    "thread_3": "mach_msg2_trap -> dispatch_mach_send_and_wait_for_reply (synchronous reply)",
+    "thread_4": "workq_kernreturn (idle workqueue)"
+  },
+  "services": {
+    "accountsd": {"pid": 370, "threads": 2, "visited": 1, "sampled_thread": "CFRunLoop wait"},
+    "akd": {"pid": 128, "threads": 3, "visited": 1, "sampled_thread": "CFRunLoop wait"},
+    "lsd": {"pid": 364, "threads": 2, "visited": 1},
+    "backboardd": {"pid": 57, "threads": 21, "visited": 1},
+    "springboard": {"pid": 366, "threads": 15, "visited": 15}
+  },
+  "launch_services": {
+    "waits": 4,
+    "wait_address": "0x1f95cc878",
+    "waiter_tid": "0x16da",
+    "owner_tid": "0x1531",
+    "owner_sampled": false,
+    "read_ms": 92986,
+    "reads": 665289
+  },
+  "symbolication": {
+    "cache_slide": "0x4d48000",
+    "cache_uuid": "590d839a82d230f1a17d0cc053420f73",
+    "file": "symbols.json"
+  },
+  "owner_observation": "The spinner kept turning after 'Don't Transfer Apps & Data' and taps were still answered very slowly.",
+  "derived": {
+    "frame_interval_seconds": 0.61,
+    "copy_megabytes_per_second": 60.0,
+    "note": "548 copies carry a 19.6 MB full frame each, so the copy is about 327 ms regardless of the 366x176 changed area. accountsd and akd are idle in CFRunLoop waits, so they are not handling a Setup request at the sample."
+  },
+  "limits": [
+    "Only one thread per service was visited, so a request on another accountsd or akd thread would not be visible.",
+    "The panic-screen report is a single sample; it does not show whether the transfer page would advance later.",
+    "The 21H461 cache symbols identify the wait functions, not the peer that would answer the Setup dispatch_mach request."
+  ]
+}
