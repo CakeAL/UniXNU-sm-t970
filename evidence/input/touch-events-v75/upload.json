@@ -1,0 +1,13 @@
+{
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/touch-events-v75/boot-partition.img --verbose",
+  "finished_at": "2026-11-06T14:02:29+00:00",
+  "boot_sha256": "668f075b6520ef91c1a41d75d0af3ee0acfdeab1a314a1eb358edfc9d2468675",
+  "partition": "BOOT",
+  "exit_code": 0,
+  "transfer_log": "heimdall-20261106T140222Z.log",
+  "transfer_log_sha256": "824fc8d79a903a58e0ade19516cc546ed24fda571d62d465cc66ed14d759ee9b",
+  "transfer_confirmed": true,
+  "reboot_requested": true,
+  "partition_readback": false,
+  "userdata_partition_uploaded": false
+}

@@ -41,6 +41,7 @@ def main():
     modes.add_argument('--touch-id', action='store_true', help='Try one GPIO open-drain touch identity read')
     modes.add_argument('--touch-rails', action='store_true', help='Read the touch rail resources and RSC state')
     modes.add_argument('--touch-power', action='store_true', help='Vote the qualified rails, then try one identity read')
+    modes.add_argument('--touch-events', action='store_true', help='Sample the powered touch FIFO for 20 seconds')
     args = parser.parse_args()
     base, base_report, build, output = BASE, BASE_REPORT, BUILD, OUTPUT
     arguments = [REPORT_ARG]
@@ -56,6 +57,7 @@ def main():
         (args.touch_id, 'touch-id-v72', 3, b'Touch ID idle='),
         (args.touch_rails, 'touch-rails-v73', 4, b'Touch RAIL db='),
         (args.touch_power, 'touch-power-v74', 5, b'Touch PWR A='),
+        (args.touch_events, 'touch-events-v75', 6, b'Touch FIFO '),
     )
     touch = next((entry for entry in touch_modes if entry[0]), None)
     if touch:

@@ -1,0 +1,33 @@
+{
+  "boot_sha256": "668f075b6520ef91c1a41d75d0af3ee0acfdeab1a314a1eb358edfc9d2468675",
+  "photo": "screen-target75.jpg",
+  "photo_sha256": "c79a2baa3d3c7b804d66a788eabe4de658c01f8584f8b4b6c60c9f208308173f",
+  "photo_time_local": "2026-11-06T22:05:07+08:00",
+  "target_seconds": 75,
+  "owner_observation": "The owner did not see the Apple logo and still performed swipes.",
+  "display_published": true,
+  "gop_copies": 0,
+  "first_copy_ms": 0,
+  "analog_vote": "ack:10101/10101/10101",
+  "digital_vote": "ack:10101/10101/10101",
+  "identity": "5354393603",
+  "identity_stop": true,
+  "gpio_restored": true,
+  "fifo_stage": "done",
+  "fifo_fault": "none",
+  "scan_off": "ok",
+  "polls": 298,
+  "irq_low_polls": 49,
+  "scan_echo": 1,
+  "status_hex": "4305",
+  "press": 28,
+  "move": 356,
+  "release": 27,
+  "complete_drags": 27,
+  "last": {
+    "slot": 0,
+    "x": 281,
+    "y": 1196
+  },
+  "hid_delivery_verified": false
+}

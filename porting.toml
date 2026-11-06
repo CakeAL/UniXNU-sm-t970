@@ -1190,6 +1190,7 @@ id = "input"
 status = "planned"
 components = []
 paths = [
+  "evidence/input/touch-events-v75/**",
   "evidence/input/touch-rails-v73/**",
   "evidence/input/touch-power-v74/**",
   "evidence/input/touch-id-v72/**",
@@ -1212,6 +1213,7 @@ procedure = [
   "Read /proc/bus/input/devices, getevent -lp and bound I2C driver links; correlate them with the exact touch and Wacom DT nodes.",
 ]
 findings = [
+  "v75 records one scan echo, 28 presses, 356 moves, 27 releases and 27 complete same-ID drags after physical swipes. Scan-off and GPIO restoration succeed. The display service is published with zero GOP copies at this terminal checkpoint.",
   "v73 confirms L13A 0x40a00, L14A 0x42100 and empty ACTIVE TCS0/1. v74 sends the stock voltage, HPM and enable sequence with an isolated TCS1. Both triplets acknowledge; the lines rise and GPIO I2C returns 53 54 39 36 03 with STOP and restored pin controls. Finger events and HID remain unverified.",
   "The Tab S6 mainline fts1ba90a driver matches the exact identity and SEC touch event layout (16-byte records, event type in the low two bits). Use its scan/FIFO protocol reference. Umi and T733 are separate XNU HID and integration references.",
   "v72 temporarily releases the GPIO12/13 pull-downs while SE5 is off. Neither line rises. The probe correctly skips its bounded GPIO identity transfer and restores the pin controls. No ACK or sensor power state can be inferred.",
@@ -1230,12 +1232,15 @@ completion = [
   "Touch contacts preserve stable IDs and releases, coordinates map correctly to the display, and keys/pen produce the expected HID reports.",
 ]
 limits = [
-  "Firmware hashes and static I2C/IRQ inputs are established. Protocol transactions, sequencing and XNU event delivery remain untested; no input events were injected.",
+  "Firmware hashes and static I2C/IRQ inputs are established. The powered identity read and raw finger events are device-verified. Coordinate orientation and XNU HID delivery still need device verification.",
 ]
 next_action = [
-  "Enable fts1ba90a scan in a bounded probe and observe press, move and release events. Then qualify coordinate mapping and 21H461 HID dispatch. Map PM8150 PON keys separately.",
+  "Connect the qualified SEC FIFO contact stream to the 21H461 HID path in a continuous boot image. Verify coordinate mapping and the Hello swipe. Map PM8150 PON keys separately.",
 ]
 evidence = [
+  { kind = "device", reference = "evidence/input/touch-events-v75/device-result.json", revision = "b2123eda18d72725bf55aea9f7bab82092f22f8d", command = "Owner swipes and photo after BOOT668f075b upload, target75", result = "One scan echo and 27 complete same-ID drags. FIFO and scan-off succeed. Zero GOP copies at this checkpoint." },
+  { kind = "host", reference = "evidence/input/touch-events-v75/preparation.json", revision = "b2123eda18d72725bf55aea9f7bab82092f22f8d", command = "python3.14 evidence/display/hello-black-v64/prepare.py --touch-events", result = "Linked FIFO probe and final BOOT668f075b FAT checks passed." },
+  { kind = "device", reference = "evidence/input/touch-events-v75/upload.json", revision = "b2123eda18d72725bf55aea9f7bab82092f22f8d", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/touch-events-v75/boot-partition.img --verbose", result = "Heimdall confirmed BOOT upload and requested reboot on the second attempt." },
   { kind = "device", reference = "evidence/input/touch-power-v74/device-result.json", revision = "2979bba55ca7bef2b2379de97390e8d9eae27ad8", command = "Owner photo after BOOT82bac61a upload, target75", result = "Both RPMh rail requests completed with 10101 for all commands. 0x49 returns 5354393603; STOP and GPIO restoration verified." },
   { kind = "device", reference = "evidence/input/touch-rails-v73/device-result.json", revision = "2979bba55ca7bef2b2379de97390e8d9eae27ad8", command = "Owner photo after BOOT07b48f15 upload, target75", result = "Command DB1 identifies L13A 0x40a00 and L14A 0x42100; APPS RSC DRV2 TCS0/1 idle, TCS1 IRQ masked." },
   { kind = "source", reference = "https://github.com/Bentlybro/gts6l-mainline-linux/blob/41fa9b85bfb55f9ee671a1dcb8161a5d90a2d542/kernel/drivers/fts1ba90a.c", result = "Same-chip SEC touch scan and 16-byte FIFO reference. Linux input integration differs from 21H461 XNU." },

@@ -91,7 +91,7 @@ static void reportClockProbe(IOMemoryMap &gcc, char *out, size_t length) {
 }
 
 // Probe-only software I2C. GPIO12 and GPIO13 are QUP5 lanes 0 and 1.
-class IdentityBus {
+class ProbeBus {
     static constexpr unsigned sda = 0;
     static constexpr unsigned scl = 0x1000;
     static constexpr uint32_t oe = 1u << 9;
@@ -154,6 +154,7 @@ class IdentityBus {
 
     bool readByte(uint8_t &byte, bool last) {
         bool value;
+        byte = 0;
         for (unsigned i = 0; i < 8; ++i) {
             if (!bit(true, value)) return false;
             byte = static_cast<uint8_t>((byte << 1) | value);
@@ -161,13 +162,17 @@ class IdentityBus {
         return bit(last, value);
     }
 
-    const char *readIdentity(uint8_t (&bytes)[5]) {
+    const char *exchange(const uint8_t *command, unsigned commandLength,
+                         uint8_t *bytes, unsigned length) {
         if (!writeByte(0x49 << 1)) return "addr-w";
-        if (!writeByte(0x22)) return "command";
+        for (unsigned i = 0; i < commandLength; ++i) {
+            if (!writeByte(command[i])) return "command";
+        }
+        if (!length) return "done";
         if (!start()) return "restart";
         if (!writeByte((0x49 << 1) | 1)) return "addr-r";
-        for (; bytesRead < sizeof(bytes); ++bytesRead) {
-            if (!readByte(bytes[bytesRead], bytesRead + 1 == sizeof(bytes))) return "read";
+        for (; bytesRead < length; ++bytesRead) {
+            if (!readByte(bytes[bytesRead], bytesRead + 1 == length)) return "read";
         }
         return "done";
     }
@@ -177,12 +182,16 @@ public:
     unsigned bytesRead = 0;
     bool stopped = false;
 
-    explicit IdentityBus(IOMemoryMap &gpio) : pins(gpio) {}
+    explicit ProbeBus(IOMemoryMap &gpio) : pins(gpio) {}
 
-    const char *transfer(uint8_t (&bytes)[5]) {
-        if (!start()) return "start";
-        const char *stage = readIdentity(bytes);
-        if (strcmp(fault, "arbitration") != 0) {
+    bool transfer(const uint8_t *command, unsigned commandLength,
+                  uint8_t *bytes = nullptr, unsigned length = 0) {
+        fault = "none";
+        bytesRead = 0;
+        stopped = false;
+        bool started = start();
+        stage = started ? exchange(command, commandLength, bytes, length) : "start";
+        if (started && strcmp(fault, "arbitration") != 0) {
             low(scl);
             low(sda);
             IODelay(5);
@@ -195,11 +204,78 @@ public:
         }
         release(sda);
         release(scl);
-        return stage;
+        return !strcmp(stage, "done") && !strcmp(fault, "none") && stopped;
+    }
+
+    const char *stage = "idle";
+};
+
+// SEC fts1ba90a FIFO as used by the stock T970 driver and Galaxy Tab S6.
+struct EventSample {
+    unsigned polls = 0;
+    unsigned count[4] = {};
+    unsigned drags = 0;
+    unsigned slot = 0, x = 0, y = 0;
+    unsigned echo = 0, irqLow = 0, status = 0;
+    unsigned pressed = 0, moved = 0;
+
+    void record(const uint8_t *event) {
+        if (event[0] == 0x43 && event[1] == 1 &&
+            event[2] == 0xa0 && event[3] == 0 && event[4] == 1) {
+            ++echo;
+        } else if ((event[0] & 3u) != 0) {
+            status = (event[0] << 8) | event[1];
+        } else if (unsigned action = event[0] >> 6) {
+            slot = (event[0] >> 2) & 15u;
+            x = (event[1] << 4) | (event[3] >> 4);
+            y = (event[2] << 4) | (event[3] & 15u);
+            ++count[action];
+            unsigned mask = 1u << slot;
+            if (action == 1) {
+                pressed |= mask;
+                moved &= ~mask;
+            } else if (action == 2) {
+                moved |= pressed & mask;
+            } else {
+                if (moved & mask) ++drags;
+                pressed &= ~mask;
+                moved &= ~mask;
+            }
+        }
     }
 };
 
-static void reportIdentity(char *out, size_t length) {
+static const char *sampleEvents(ProbeBus &bus, IOMemoryMap &irqPin, EventSample &sample) {
+    constexpr uint8_t touchFunctions[] = {0x30, 0x61, 0};
+    constexpr uint8_t clearFifo = 0x62;
+    constexpr uint8_t scanOn[] = {0xa0, 0, 1};
+    constexpr uint8_t readOne = 0x60, readRest = 0x61;
+    constexpr unsigned eventSize = 16, fifoMax = 32;
+    if (!bus.transfer(touchFunctions, sizeof(touchFunctions))) return "functions";
+    IOSleep(10);
+    if (!bus.transfer(&clearFifo, 1)) return "clear";
+    if (!bus.transfer(scanOn, sizeof(scanOn))) return "scan";
+
+    uint64_t deadline = 0;
+    clock_interval_to_deadline(20, NSEC_PER_SEC, &deadline);
+    for (; sample.polls < 500 && mach_absolute_time() < deadline; ++sample.polls) {
+        if (!(read(irqPin, 4) & 1u)) ++sample.irqLow;
+        uint8_t event[eventSize];
+        if (!bus.transfer(&readOne, 1, event, sizeof(event))) return "read";
+        sample.record(event);
+        unsigned left = event[7] & 0x3fu;
+        if (left >= fifoMax) left = fifoMax - 1;
+        if (left) {
+            uint8_t rest[(fifoMax - 1) * eventSize];
+            if (!bus.transfer(&readRest, 1, rest, left * eventSize)) return "drain";
+            for (unsigned i = 0; i < left; ++i) sample.record(rest + i * eventSize);
+        }
+        IOSleep(40);
+    }
+    return "done";
+}
+
+static void reportIdentity(char *out, size_t length, bool captureEvents = false) {
     auto gcc = mapMmio(0x100000, 0x53000);
     if (!gcc || !gcc->getVirtualAddress() ||
         (read(*gcc, voteReg) & seVote) || !(read(*gcc, seBranch) & clockOff)) {
@@ -228,14 +304,40 @@ static void reportIdentity(char *out, size_t length) {
     writeMasked(*pins, 0x1000, pull, 0);
     IODelay(100);
     unsigned idle = ((read(*pins, 0x0004) & 1u) << 1) | (read(*pins, 0x1004) & 1u);
-    IdentityBus bus(*pins);
+    ProbeBus bus(*pins);
     uint8_t bytes[5] = {};
+    constexpr uint8_t identityCommand = 0x22;
+    constexpr uint8_t expectedId[] = {0x53, 0x54, 0x39, 0x36, 0x03};
     const char *stage = "idle";
+    const char *eventStage = "id";
+    const char *eventFault = "none";
+    bool identityStop = false;
+    unsigned identityLength = 0;
+    const char *identityFault = "none";
+    const char *scanOff = "skip";
+    EventSample sample;
+    auto irqPin = captureEvents ? mapMmio(0x0f90f000, 0x1000) : OSSharedPtr<IOMemoryMap>{};
     if (idle == 3) {
         writeMasked(*pins, 0x0004, outputLatch, 0);
         writeMasked(*pins, 0x1004, outputLatch, 0);
         if (!((read(*pins, 0x0004) | read(*pins, 0x1004)) & outputLatch)) {
-            stage = bus.transfer(bytes);
+            bool identified = bus.transfer(&identityCommand, 1, bytes, sizeof(bytes));
+            stage = bus.stage;
+            identityStop = bus.stopped;
+            identityLength = bus.bytesRead;
+            identityFault = bus.fault;
+            if (captureEvents && identified && !memcmp(bytes, expectedId, sizeof(bytes))) {
+                if (irqPin && irqPin->getVirtualAddress()) {
+                    eventStage = sampleEvents(bus, *irqPin, sample);
+                    eventFault = bus.fault;
+                    if (bus.stopped && strcmp(eventStage, "functions") && strcmp(eventStage, "clear")) {
+                        constexpr uint8_t stopScan[] = {0xa0, 0, 0};
+                        scanOff = bus.transfer(stopScan, sizeof(stopScan)) ? "ok" : "fail";
+                    }
+                } else {
+                    eventStage = "irq-map";
+                }
+            }
         } else {
             stage = "latch";
         }
@@ -247,10 +349,18 @@ static void reportIdentity(char *out, size_t length) {
     bool restored = read(*pins, 0x0000) == sdaConfig && read(*pins, 0x1000) == sclConfig &&
                     (read(*pins, 0x0004) & outputLatch) == sdaLatch &&
                     (read(*pins, 0x1004) & outputLatch) == sclLatch;
-    snprintf(out, length,
-             "\nTouch ID idle=%x stage=%s err=%s n=%u id=%02x%02x%02x%02x%02x stop=%u restore=%u",
-             idle, stage, bus.fault, bus.bytesRead, bytes[0], bytes[1], bytes[2], bytes[3], bytes[4],
-             bus.stopped, restored);
+    int written = snprintf(out, length,
+                           "\nTouch ID idle=%x stage=%s err=%s n=%u id=%02x%02x%02x%02x%02x stop=%u restore=%u",
+                           idle, stage, identityFault, identityLength, bytes[0], bytes[1], bytes[2],
+                           bytes[3], bytes[4], identityStop, restored);
+    if (captureEvents && written > 0 && static_cast<size_t>(written) < length) {
+        snprintf(out + written, length - written,
+                 "\nTouch FIFO %s/%s off=%s poll/irq/echo=%u/%u/%u status=%04x"
+                 "\nTouch P/M/R/drag=%u/%u/%u/%u last=%u:%u,%u",
+                 eventStage, eventFault, scanOff, sample.polls, sample.irqLow, sample.echo, sample.status,
+                 sample.count[1], sample.count[2], sample.count[3], sample.drags,
+                 sample.slot, sample.x, sample.y);
+    }
 }
 
 // Qualcomm command DB: offsets are relative to the data following the header.
@@ -408,7 +518,7 @@ static const char *voteTouchRail(IOMemoryMap &rsc, uint32_t rail, uint32_t milli
     return restored ? result : "restore";
 }
 
-static void reportPoweredIdentity(char *out, size_t length) {
+static void reportPoweredIdentity(char *out, size_t length, bool captureEvents) {
     auto db = mapMmio(0x80860000, 0x20000);
     uint32_t analog = 0, digital = 0;
     if (!db || !db->getVirtualAddress() || read(*db, 0) != 1 || (read(*db, 0x8c) & 1u) ||
@@ -438,11 +548,11 @@ static void reportPoweredIdentity(char *out, size_t length) {
     // Leave the verified stock voltage/enable votes in place until reset.
     if (!strcmp(d, "ack") && written > 0 && static_cast<size_t>(written) < length) {
         IOSleep(100);
-        reportIdentity(out + written, length - written);
+        reportIdentity(out + written, length - written, captureEvents);
     }
 }
 
-// Modes 1–5 cover firmware state, clocks, identity, rail resources and power.
+// Modes 1–6 cover firmware state, clocks, identity, rail resources, power and events.
 static void reportBus(char *out, size_t length) {
     unsigned enabled = 0;
     if (!PE_parse_boot_argn("t970-touch-bus-report", &enabled, sizeof(enabled))) return;
@@ -454,8 +564,8 @@ static void reportBus(char *out, size_t length) {
         reportRails(out, length);
         return;
     }
-    if (enabled == 5) {
-        reportPoweredIdentity(out, length);
+    if (enabled == 5 || enabled == 6) {
+        reportPoweredIdentity(out, length, enabled == 6);
         return;
     }
     if (enabled != 1 && enabled != 2) return;
