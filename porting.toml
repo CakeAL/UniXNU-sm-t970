@@ -1248,6 +1248,7 @@ id = "input"
 status = "implemented"
 components = []
 paths = [
+  "docs/buttons.md",
   "evidence/input/touch-hid-v76/**",
   "evidence/input/touch-events-v75/**",
   "evidence/input/touch-rails-v73/**",
@@ -1272,6 +1273,7 @@ procedure = [
   "Read /proc/bus/input/devices, getevent -lp and bound I2C driver links; correlate them with the exact touch and Wacom DT nodes.",
 ]
 findings = [
+  "Side buttons map to the PM8150 PON (power, volume down) and PM8150L SPMI GPIO 3 (volume up, active low) from the live DT and the Android input devices. The SM-T970 SPMI arbiter is at core 0xc440000, chnls 0xc600000, obsrvr 0xe600000, intr 0xe700000, cnfg 0xc40a000 with periph_irq on PDC pin 1; PPIDs are 0x008 (PON) and 0x4c3 (PM8150L GPIO3). sheng, mondrian and alioth provide the read-only observer protocol and HID report 2 mapping. A read-only probe is the next step; nothing has been run on the device.",
   "The opt-in v77 Setup capture timestamps the latest FTS press before HID submission and records display counters at that point. v77 retains the v76 HID archive object.",
   "v76 enables the board FTS polling worker and 21H461 HID digitizer in a continuous image. The owner advanced past Hello with a physical swipe. This verifies end-to-end finger event delivery for the tested gesture.",
   "v75 records one scan echo, 28 presses, 356 moves, 27 releases and 27 complete same-ID drags after physical swipes. Scan-off and GPIO restoration succeed. The display service is published with zero GOP copies at this terminal checkpoint.",
@@ -1296,6 +1298,7 @@ limits = [
   "The powered identity read, raw finger events and Hello gesture are device-verified. Full coordinate calibration, pen and power-key behavior remain unverified.",
 ]
 next_action = [
+  "Build the read-only SPMI key probe (PON 0x008 RT_STS bits 7/6 and PM8150L GPIO3 0x4c3 bit 0), report the mask and press counts, then decide the HID report path.",
   "Preserve the v76 input baseline while diagnosing the slow language transition. Verify full coordinate coverage and map PM8150 PON keys separately.",
 ]
 evidence = [
