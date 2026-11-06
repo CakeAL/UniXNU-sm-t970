@@ -1,0 +1,73 @@
+{
+  "boot_sha256": "708d44b95fa26fe16ec055650b66af7e9bfad5f88c6dff30fca361718c8653ad",
+  "photos": [
+    {
+      "name": "screen-ui-exit.jpg",
+      "sha256": "df62560a330c1c8ca6aaac7b14605ac769604b23f5a2ec373523ac33ebab12e1",
+      "time_local": "2026-11-06T23:12:54+08:00"
+    },
+    {
+      "name": "screen-restartable-wait.jpg",
+      "sha256": "818615c73abe4eef1e6d298e431bea933e92fc5f1bde52ab80e9714bd03ba058",
+      "time_local": "2026-11-06T23:13:22+08:00"
+    }
+  ],
+  "ui_exit": {
+    "process": "SpringBoard",
+    "pid": 27,
+    "raw_wait_status": 9,
+    "signal": 9,
+    "exit_status": 0,
+    "reason_namespace": 10,
+    "reason_code": "0x5bc1ea44",
+    "reason_flags": 5,
+    "jetsam_flags": 0,
+    "exit_context": "SpringBoard/27",
+    "description_prefix": "<RBSTerminateContext| domain:10 code:0x5BC1EA44 explanation:SBRe",
+    "frames": [
+      "exit_with_reason",
+      "postsig_locked",
+      "bsd_ast",
+      "ast_taken_user"
+    ],
+    "free_pages": 12345
+  },
+  "later_screen": {
+    "panic": "wait_while_equals32 timeout",
+    "source": "locks.c:807",
+    "value": "0x00010000",
+    "elapsed_ticks": 12585311,
+    "timeout_ticks": 12582912,
+    "frames": [
+      {
+        "pc": "0xfffffff0072a4cb8",
+        "symbol": "hw_wait_while_equals64_panic"
+      },
+      {
+        "pc": "0xfffffff0079c6220",
+        "symbol": "hw_spin_should_keep_spinning"
+      },
+      {
+        "pc": "0xfffffff0072a1dc0",
+        "symbol": "hw_wait_while_equals32"
+      },
+      {
+        "pc": "0xfffffff0072b26e4",
+        "symbol": "task_restartable_ranges_synchronize"
+      },
+      {
+        "pc": "0xfffffff007317388",
+        "symbol": "_Xtask_restartable_ranges_synchronize"
+      },
+      {
+        "pc": "0xfffffff00728c948",
+        "symbol": "ipc_kobject_server"
+      }
+    ],
+    "free_pages": 1761,
+    "relationship_to_ui_exit_unverified": true
+  },
+  "symbolication": "xcrun atos -o out/data-bringup/setup-exit-v80/kernel.macho -arch arm64",
+  "comparison": "Sirius records the identical reason namespace and code followed by SpringBoard and Setup relaunch.",
+  "original_21h461_code": "relaunch-code-symbols.json"
+}

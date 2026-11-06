@@ -67,12 +67,14 @@ typedef void *event_t;
 #define THREAD_WAITING 1
 #define THREAD_CONTINUE_NULL NULL
 #define NSEC_PER_MSEC 1000000
-static unsigned userStacks,setupProbe,workerStarts,workerDrops,workerStops,waitCount,stalled;
+static unsigned userStacks,setupProbe,setupLife,workerStarts,workerDrops,workerStops,waitCount,stalled;
+static uint64_t mockOwner;
 static int workerError;
 static int PE_parse_boot_argn(const char *name,void *out,unsigned size){
  assert(size==4);
  if(!strcmp(name,"t970-ui-stack")){*(unsigned*)out=userStacks;return userStacks!=0;}
- assert(!strcmp(name,"t970-setup-probe"));*(unsigned*)out=setupProbe;return setupProbe!=0;
+ if(!strcmp(name,"t970-setup-probe")){*(unsigned*)out=setupProbe;return setupProbe!=0;}
+ assert(!strcmp(name,"t970-setup-life"));*(unsigned*)out=setupLife;return setupLife!=0;
 }
 static void vm_map_reference(vm_map_t map){assert(taskHeld);++map->refs;}
 static void vm_map_deallocate(vm_map_t map){assert(!taskHeld&&!schedHeld&&map->refs);--map->refs;}
@@ -95,6 +97,8 @@ static int thread_block(void *continuation){assert(!continuation);++waitCount;re
 static unsigned wqCalls;static int wqError;
 int fill_procworkqueue(proc_t p,struct proc_workqueueinfo *info){(void)p;assert(!taskHeld&&!schedHeld&&irq);++wqCalls;if(wqError)return wqError;*info=(struct proc_workqueueinfo){7,1,6,4};return 0;}
 int native_t970_workqueue_detail(proc_t p,uint64_t *out){(void)p;assert(!taskHeld&&!schedHeld&&irq);out[0]=2;out[6]=100;out[5]=40;return 0;}
+uint64_t native_t970_ls_owner_tid(void){assert(!taskHeld&&!schedHeld);return mockOwner;}
+void native_t970_setup_life_text(char *out,unsigned size){assert(!taskHeld&&!schedHeld);snprintf(out,size,"\nSetup life sample");}
 int main(void){
  struct state states[10];struct thread threads[10];memset(states,0,sizeof(states));memset(threads,0,sizeof(threads));
  for(unsigned i=0;i<10;++i){states[i].is64=1;states[i].pc=UINT64_MAX;states[i].lr=UINT64_MAX;states[i].regs[16]=UINT64_MAX;states[i].regs[1]=UINT64_MAX;states[i].regs[3]=UINT64_MAX;threads[i].state=1;threads[i].machine.upcb=&states[i];threads[i].next=i==9?NULL:&threads[i+1];}
@@ -161,6 +165,10 @@ int main(void){
  assert(strstr(text,"stacks=11")&&strstr(text,"Setup p3")&&strstr(text,"b2 id=")&&!strstr(text,"b3 id="));
  assert(strstr(text,"UI batch end processes=4 clipped=0")&&strstr(text,"T tot=50 ")&&!strstr(text,"ignored p"));
  assert(copies==copiesBefore+8&&map_storage.reads-readsBefore<=8*4&&!map_storage.refs);
+ captureStarted=captureDone=0;setupLife=1;mockOwner=thread_tid(&threads[8]);copiesBefore=copies;
+ text=native_t970_ui_wait_text();
+ assert(strstr(text,"seen=1")&&strstr(text,"S9 id=")&&strstr(text,"Setup life sample"));
+ assert(copies==copiesBefore+9&&!map_storage.refs);
  captureStarted=captureDone=0;setupProbe=0;text=native_t970_ui_wait_text();
  assert(strstr(text,"stacks=10")&&!strstr(text,"Setup p3")&&strstr(text,"UI batch end processes=3 clipped=0"));
  waitCount=0;userStacks=1;

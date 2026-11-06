@@ -45,6 +45,8 @@ def main():
     modes.add_argument('--touch-hid', action='store_true', help='Enable continuous touchscreen HID delivery')
     modes.add_argument('--setup-probe', action='store_true', help='Sample the language transition with v76 HID')
     modes.add_argument('--setup-copy-diff', action='store_true', help='Enable differential copies on the exact v77 kernel')
+    modes.add_argument('--setup-lifecycle', action='store_true', help='Capture Setup lifecycle and the LaunchServices owner')
+    modes.add_argument('--setup-exit', action='store_true', help='Report the reason behind early UI process termination')
     args = parser.parse_args()
     base, base_report, build, output = BASE, BASE_REPORT, BUILD, OUTPUT
     arguments = [REPORT_ARG]
@@ -78,11 +80,20 @@ def main():
         build = OUT / 'setup-language-v77-build'
         output = OUT / 'setup-language-v77'
         arguments = ['t970-setup-probe=1', 't970-runtime-report=360']
-    if args.setup_copy_diff:
+    if args.setup_copy_diff or args.setup_lifecycle or args.setup_exit:
         base = OUT / 'setup-language-v77/boot-partition.img'
         base_report = DEVICE / 'evidence/display/setup-language-v77/preparation.json'
-        output = OUT / 'setup-copy-diff-v78'
-        arguments = ['sheng-fb-diff=1']
+        if args.setup_copy_diff:
+            output = OUT / 'setup-copy-diff-v78'
+            arguments = ['sheng-fb-diff=1']
+        elif args.setup_exit:
+            build = OUT / 'setup-exit-v80-build'
+            output = OUT / 'setup-exit-v80'
+            arguments = ['t970-setup-life=1', 't970-ui-exit-reason=1']
+        else:
+            build = OUT / 'setup-lifecycle-v79-build'
+            output = OUT / 'setup-lifecycle-v79'
+            arguments = ['t970-setup-life=1']
     baseline = json.loads(base_report.read_text())
     source = base.read_bytes()
     require(source[:8] == b'ANDROID!' and digest(source) == baseline['boot_sha256'],
@@ -102,7 +113,7 @@ def main():
         return subprocess.check_output(['mcopy', '-i', str(payload), PREFIX + name, '-'])
 
     config = read_fat(CONFIG)
-    if args.setup_probe or args.setup_copy_diff:
+    if args.setup_probe or args.setup_copy_diff or args.setup_lifecycle or args.setup_exit:
         config_sha = digest((base.parent / CONFIG).read_bytes())
     else:
         config_sha = baseline['unchanged_payload_sha256'][CONFIG] if args.pm_watchdog else baseline['config_sha256']
@@ -110,7 +121,7 @@ def main():
     expected = tomllib.loads(config.decode())
     xnu = [entry for entry in expected['entry'] if entry['type'] == 'xnu']
     require(len(xnu) == 1, 'Expected one XNU entry')
-    if args.setup_copy_diff:
+    if args.setup_copy_diff or args.setup_lifecycle or args.setup_exit:
         boot_args = xnu[0]['args'].split()
         require(set(baseline['added_arguments']) <= set(boot_args) and
                 not any(arg.startswith('sheng-fb-diff=') for arg in boot_args),
@@ -147,6 +158,12 @@ def main():
     if args.setup_probe:
         require(all(marker in kernel for marker in (b'Setup down ms=', b'Setup r0=', b'T970 touch: FTS scanning')),
                 'Missing linked Setup or HID markers')
+    if args.setup_lifecycle or args.setup_exit:
+        require(all(marker in kernel for marker in (b'Setup life exec=', b' owner=%llx seen=%u',
+                                                    b'Setup down ms=', b'T970 touch: FTS scanning')),
+                'Missing linked Setup lifecycle, owner, display or HID markers')
+    if args.setup_exit:
+        require(b'T970 UI exit ' in kernel, 'Missing linked UI exit reason capture')
     files = [(CONFIG, config_path)]
     if not args.setup_copy_diff:
         env = dict(os.environ, UNIXNU_UEFI=str(DEVICE / '.cache/uefi-source/Mu-Silicium'))

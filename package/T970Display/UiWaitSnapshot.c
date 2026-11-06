@@ -40,6 +40,10 @@ int fill_procworkqueue(proc_t,struct proc_workqueueinfo *);
 int native_t970_workqueue_detail(proc_t,uint64_t *);
 static unsigned readUserStacks,captureStarted,captureDone,capturePhase,capturePid;
 static unsigned censusTotal,censusRun,censusWait,censusUnint,censusOther,censusBusy;
+static unsigned captureSetupLife;
+static uint64_t setupLockOwner;
+uint64_t native_t970_ls_owner_tid(void);
+void native_t970_setup_life_text(char *, unsigned);
 /* Internal profile 11 preserves the compact panic format selected by boot mode 10. */
 enum { setupStacks = 11 };
 const char *native_t970_ui_wait_text(void);
@@ -123,6 +127,8 @@ static int native_t970_ui_wait_collect(proc_t p,void *context)
  __atomic_store_n(&capturePhase,2,__ATOMIC_RELAXED);
  struct native_t970_ui_wait_row rows[T970_UI_WAIT_THREADS]={0};
  unsigned count=0,visited=0,busy=0,total=0,slide=0;int status=0;task_t task=proc_task(p);
+ uint64_t owner=readUserStacks==setupStacks && !strcmp(name,"SpringBoard")?setupLockOwner:0;
+ unsigned ownerCaptured=0;
  vm_map_t map=NULL;
  if(!ml_get_interrupts_enabled())status=1;
  else if(!task)status=2;
@@ -135,8 +141,9 @@ static int native_t970_ui_wait_collect(proc_t p,void *context)
    unsigned cap=(readUserStacks==4 || readUserStacks==5 || readUserStacks==8 || readUserStacks==9)?8:4;
    if(readUserStacks==10)cap=!strcmp(name,"backboardd")?6:5;
    if(readUserStacks==setupStacks)cap=!strcmp(name,"Setup")?3:!strcmp(name,"SpringBoard")?1:2;
-   if(visited>=cap)break;
+   if(visited>=(owner?64:cap))break;
    ++visited;if((readUserStacks==4 || readUserStacks==8) && visited<=4)continue;
+   if(owner && visited>1 && thread_tid(thread)!=owner)continue;
    boolean_t irq=ml_set_interrupts_enabled(FALSE);
    if(!simple_lock_try(&thread->sched_lock,&thread_lck_grp)){++busy;ml_set_interrupts_enabled(irq);continue;}
    arm_saved_state_t *state=thread->machine.upcb;
@@ -144,11 +151,13 @@ static int native_t970_ui_wait_collect(proc_t p,void *context)
     struct native_t970_ui_wait_row *r=&rows[count++];r->index=visited;r->kstate=thread->state;
     if(readUserStacks==5){r->tid=thread_tid(thread);r->wait=thread->wait_event;r->priority=thread->sched_pri;r->base=thread->base_pri;}
     if(readUserStacks>=9)r->tid=thread_tid(thread);
+    if(owner && r->tid==owner)ownerCaptured=1;
     r->wait=thread->wait_event;
     r->pc=get_saved_state_pc(state);r->lr=get_saved_state_lr(state);r->fp=get_saved_state_fp(state);
     r->trap=get_saved_state_reg(state,16);r->arg0=get_saved_state_reg(state,0);r->arg1=get_saved_state_reg(state,1);r->arg3=get_saved_state_reg(state,3);
    }
    thread_unlock(thread);ml_set_interrupts_enabled(irq);
+   if(ownerCaptured)break;
   }
   task_unlock(task);
  }
@@ -162,6 +171,11 @@ static int native_t970_ui_wait_collect(proc_t p,void *context)
  unsigned left=sizeof(out->text)-out->used;
  int n=snprintf(out->text+out->used,left,"\n%.12s p%d status=%d threads=%u visited=%u busy=%u slide=%x",name,pid,status,total,visited,busy,slide);
  if(n>0)out->used+=(unsigned)n<left?(unsigned)n:left-1;
+ if(owner && out->used<sizeof(out->text)-1) {
+  left=sizeof(out->text)-out->used;
+  n=snprintf(out->text+out->used,left," owner=%llx seen=%u",(unsigned long long)owner,ownerCaptured);
+  if(n>0)out->used+=(unsigned)n<left?(unsigned)n:left-1;
+ }
  if(readUserStacks==5 && out->used<sizeof(out->text)-1) {
   left=sizeof(out->text)-out->used;
   n=snprintf(out->text+out->used,left," wq=%d:%u/%u/%u/%x",wqStatus,wq.pwq_nthreads,wq.pwq_runthreads,wq.pwq_blockedthreads,wq.pwq_state);
@@ -229,8 +243,13 @@ static int native_t970_ui_wait_collect(proc_t p,void *context)
 static void ui_collect(void) {
  memset(&capture,0,sizeof(capture));
  capture.used=(unsigned)snprintf(capture.text,sizeof(capture.text),"UI saved-regs: queue order; live/best-effort; stacks=%u",readUserStacks);
+ setupLockOwner=captureSetupLife?native_t970_ls_owner_tid():0;
  __atomic_store_n(&capturePhase,1,__ATOMIC_RELAXED);
  proc_iterate(PROC_ALLPROCLIST|PROC_NOWAITTRANS,native_t970_ui_wait_collect,&capture,NULL,NULL);
+ if(captureSetupLife && capture.used<sizeof(capture.text)-96) {
+  native_t970_setup_life_text(capture.text+capture.used,sizeof(capture.text)-capture.used);
+  capture.used=(unsigned)strlen(capture.text);
+ }
  if(readUserStacks>=5) {
   unsigned clipped=capture.used>=sizeof(capture.text)-96;
   if(clipped)capture.used=sizeof(capture.text)-96;
@@ -257,8 +276,13 @@ const char *native_t970_ui_wait_text(void)
  static char pending[128];
  if(!__atomic_exchange_n(&captureStarted,1,__ATOMIC_ACQ_REL)) {
   readUserStacks=enabled;
+  captureSetupLife=0;
   unsigned setup=0;
-  if(enabled==10 && PE_parse_boot_argn("t970-setup-probe",&setup,sizeof(setup)) && setup==1)readUserStacks=setupStacks;
+  if(enabled==10 && PE_parse_boot_argn("t970-setup-probe",&setup,sizeof(setup)) && setup==1) {
+   readUserStacks=setupStacks;
+   unsigned life=0;
+   captureSetupLife=PE_parse_boot_argn("t970-setup-life",&life,sizeof(life)) && life==1;
+  }
   __atomic_store_n(&captureDone,0,__ATOMIC_RELAXED);
   thread_t worker=THREAD_NULL;
   kern_return_t error=kernel_thread_start(ui_stack_worker,NULL,&worker);

@@ -1,0 +1,105 @@
+--- a/bsd/kern/kern_exec.c
++++ b/bsd/kern/kern_exec.c
+@@ -3544,6 +3544,56 @@
+  *		Handle posix_spawnattr_t
+  *		Handle posix_spawn_file_actions_t
+  */
++/* Opt-in Setup lifecycle recorder. Retain bounded numeric fields only. */
++static unsigned t970_setup_life_busy;
++static struct {
++ unsigned launches, exits, reason_ns;
++ int exec_pid, exec_error, exit_pid, wait_status;
++ uint64_t reason_code;
++} t970_setup_life;
++
++static void
++native_t970_setup_exec_note(proc_t child, int error)
++{
++ unsigned enabled = 0;
++ if (!PE_parse_boot_argn("t970-setup-life", &enabled, sizeof(enabled)) || enabled != 1) return;
++ if (__atomic_exchange_n(&t970_setup_life_busy, 1, __ATOMIC_ACQUIRE)) return;
++ ++t970_setup_life.launches;
++ t970_setup_life.exec_pid = child ? proc_getpid(child) : -1;
++ t970_setup_life.exec_error = error;
++ __atomic_store_n(&t970_setup_life_busy, 0, __ATOMIC_RELEASE);
++}
++
++void native_t970_setup_exit_note(int, int, unsigned, uint64_t);
++void
++native_t970_setup_exit_note(int pid, int status, unsigned reason_ns, uint64_t reason_code)
++{
++ unsigned enabled = 0;
++ if (!PE_parse_boot_argn("t970-setup-life", &enabled, sizeof(enabled)) || enabled != 1) return;
++ if (__atomic_exchange_n(&t970_setup_life_busy, 1, __ATOMIC_ACQUIRE)) return;
++ ++t970_setup_life.exits;
++ t970_setup_life.exit_pid = pid;
++ t970_setup_life.wait_status = status;
++ t970_setup_life.reason_ns = reason_ns;
++ t970_setup_life.reason_code = reason_code;
++ __atomic_store_n(&t970_setup_life_busy, 0, __ATOMIC_RELEASE);
++}
++
++void native_t970_setup_life_text(char *, unsigned);
++void
++native_t970_setup_life_text(char *out, unsigned length)
++{
++ if (__atomic_exchange_n(&t970_setup_life_busy, 1, __ATOMIC_ACQUIRE)) {
++  snprintf(out, length, "\nSetup lifecycle busy");
++  return;
++ }
++ __typeof__(t970_setup_life) state = t970_setup_life;
++ __atomic_store_n(&t970_setup_life_busy, 0, __ATOMIC_RELEASE);
++ snprintf(out, length, "\nSetup life exec=%u/%d/%d exit=%u/%d/%x reason=%u/%llx",
++     state.launches, state.exec_pid, state.exec_error, state.exits, state.exit_pid,
++     state.wait_status, state.reason_ns, (unsigned long long)state.reason_code);
++}
++
+ /* T970_UI_SPAWN_BEGIN: bounded kernel-owned executable path only. */
+ static unsigned native_t970_ui_spawns, native_t970_ui_seen[2];
+ static int native_t970_ui_pid[2], native_t970_ui_error[2], native_t970_ui_exec[2];
+@@ -3569,6 +3619,11 @@
+  if(length>MAXPATHLEN) length=MAXPATHLEN;
+  const char *end=memchr(path,0,length);
+  if(!end) return;
++ const char setup[] = "/Setup.app/Setup";
++ if ((size_t)(end - path) >= sizeof(setup) - 1 &&
++     !memcmp(end - (sizeof(setup) - 1), setup, sizeof(setup))) {
++  native_t970_setup_exec_note(child, error);
++ }
+  int slot=-1;
+  if(!strcmp(path,"/usr/libexec/backboardd")) slot=0;
+  if(!strcmp(path,"/System/Library/CoreServices/SpringBoard.app/SpringBoard")) slot=1;
+--- a/bsd/kern/kern_exit.c
++++ b/bsd/kern/kern_exit.c
+@@ -2214,6 +2214,12 @@
+ 	proc_unlock(p);
+ 	pid = proc_getpid(p);
+ 	exitval = p->p_xstat;
++	if (!strcmp(p->p_comm, "Setup")) {
++		extern void native_t970_setup_exit_note(int, int, unsigned, uint64_t);
++		os_reason_t reason = p->p_exit_reason;
++		native_t970_setup_exit_note(pid, exitval,
++		    reason ? reason->osr_namespace : 0, reason ? reason->osr_code : 0);
++	}
+ 	KERNEL_DEBUG_CONSTANT_IST(KDEBUG_COMMON,
+ 	    BSDDBG_CODE(DBG_BSD_PROC, BSD_PROC_EXIT) | DBG_FUNC_START,
+ 	    pid, exitval, 0, 0, 0);
+--- a/bsd/kern/sys_ulock.c
++++ b/bsd/kern/sys_ulock.c
+@@ -521,6 +521,16 @@
+ 	__atomic_store_n(&t970_ls_sample_busy, 0, __ATOMIC_RELEASE);
+ }
+ 
++uint64_t native_t970_ls_owner_tid(void);
++uint64_t
++native_t970_ls_owner_tid(void)
++{
++ if (__atomic_exchange_n(&t970_ls_sample_busy, 1, __ATOMIC_ACQUIRE)) return 0;
++ uint64_t owner = t970_ls_sample.owner;
++ __atomic_store_n(&t970_ls_sample_busy, 0, __ATOMIC_RELEASE);
++ return owner;
++}
++
+ void
+ native_t970_ls_owner_text(char *out, unsigned length)
+ {

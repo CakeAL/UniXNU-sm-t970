@@ -1,0 +1,23 @@
+{
+  "cache_slide": "0x0",
+  "cache_uuid": "590d839a82d230f1a17d0cc053420f73",
+  "local_symbols_uuid_matches": true,
+  "live_sample": false,
+  "frames": [
+    {
+      "address": "0x1d0012718",
+      "unslid_va": "0x1d0012718",
+      "image": "/System/Library/PrivateFrameworks/SpringBoard.framework/SpringBoard",
+      "nearest_local_symbol": "-[SBRestartManager _doRestartForTransition:]",
+      "offset": 344,
+      "nearest_symbol": "-[SBRestartManager _doRestartForTransition:]",
+      "symbol_table": "local",
+      "original_instruction_bytes": "82489d522278ab72"
+    }
+  ],
+  "method": "Scan aligned ARM64 MOVZ/MOVK immediate loads in the 21H461 shared cache and resolve the matching local symbol.",
+  "decoded": [
+    "mov w2, #0xea44",
+    "movk w2, #0x5bc1, lsl #16"
+  ]
+}

@@ -1,0 +1,49 @@
+--- a/bsd/kern/kern_exit.c
++++ b/bsd/kern/kern_exit.c
+@@ -1517,6 +1517,46 @@
+ 	 * Example usage: panic_on_error_exit=launchd,logd,watchdogd
+ 	 */
+ 	if (rv && strnstr(panic_on_eexit_pcomms, p->p_comm, sizeof(panic_on_eexit_pcomms))) {
++		unsigned report = 0;
++		if (PE_parse_boot_argn("t970-ui-exit-reason", &report, sizeof(report)) && report == 1) {
++			unsigned ns = exit_reason ? exit_reason->osr_namespace : 0;
++			uint64_t code = exit_reason ? exit_reason->osr_code : 0;
++			uint64_t flags = exit_reason ? exit_reason->osr_flags : 0;
++			pid_t sender_pid = -1;
++			char sender[17] = {};
++			char description[65] = {};
++			if (exit_reason && exit_reason->osr_kcd_buf) {
++				kcdata_iter_t data = kcdata_iter(exit_reason->osr_kcd_buf, exit_reason->osr_bufsize);
++				if (kcdata_iter_valid(data) && kcdata_iter_type(data) == KCDATA_BUFFER_BEGIN_OS_REASON) {
++					if (ns == OS_REASON_SIGNAL) {
++						kcdata_iter_t pid = kcdata_iter_find_type(data, KCDATA_TYPE_PID);
++						if (kcdata_iter_valid(pid) && kcdata_iter_size(pid) >= sizeof(sender_pid)) {
++							memcpy(&sender_pid, kcdata_iter_payload(pid), sizeof(sender_pid));
++						}
++						kcdata_iter_t name = kcdata_iter_find_type(data, KCDATA_TYPE_PROCNAME);
++						if (kcdata_iter_valid(name)) {
++							memcpy(sender, kcdata_iter_payload(name), MIN(sizeof(sender) - 1, kcdata_iter_size(name)));
++						}
++					}
++					kcdata_iter_t desc = kcdata_iter_find_type(data, EXIT_REASON_USER_DESC);
++					if (kcdata_iter_valid(desc)) {
++						const unsigned char *bytes = kcdata_iter_payload(desc);
++						size_t size = MIN(sizeof(description) - 1, kcdata_iter_size(desc));
++						for (size_t i = 0; i < size && bytes[i]; ++i) {
++							description[i] = bytes[i] >= ' ' && bytes[i] <= '~' ? bytes[i] : '.';
++						}
++					}
++				}
++			}
++			proc_t caller = current_proc();
++			panic("T970 UI exit %s p%d status=%x signal=%d exit=%d"
++			    "\nreason=%u/%llx flags=%llx jetsam=%x caller=%s/%d"
++			    "\nsignal metadata=%s/%d desc=%s",
++			    p->p_comm, proc_getpid(p), rv, WTERMSIG(rv), WEXITSTATUS(rv),
++			    ns, (unsigned long long)code, (unsigned long long)flags, jetsam_flags,
++			    caller ? caller->p_comm : "-", caller ? proc_getpid(caller) : -1,
++			    sender[0] ? sender : "-", sender_pid, description[0] ? description : "-");
++		}
+ 		panic("%s: Process %s with pid %d exited on error with code 0x%x.",
+ 		    __FUNCTION__, p->p_comm, proc_getpid(p), rv);
+ 	}
