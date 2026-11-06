@@ -1,0 +1,13 @@
+{
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/setup-fb-cache-v83/boot-partition.img --verbose",
+  "finished_at_local": "2026-11-07T00:35+08:00",
+  "boot_sha256": "b739e1ca32ac6a6359611f5b85564048ce96d5804b3a35eb3716c251a52ea9bc",
+  "partition": "BOOT",
+  "exit_code": 0,
+  "transfer_confirmed": true,
+  "reboot_requested": true,
+  "partition_readback": false,
+  "userdata_partition_uploaded": false,
+  "transfer_log": "heimdall-20261106T163415Z.log",
+  "transfer_log_sha256": "824fc8d79a903a58e0ade19516cc546ed24fda571d62d465cc66ed14d759ee9b"
+}

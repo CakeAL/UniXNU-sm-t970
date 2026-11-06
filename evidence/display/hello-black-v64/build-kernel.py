@@ -32,6 +32,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, default=BUILD)
     parser.add_argument('--cached-headers', action='store_true')
+    parser.add_argument('--gop-fork', action='store_true',
+                        help='Link the audited GopFramebuffer fork object (scanout and source cache options)')
     variants = parser.add_mutually_exclusive_group()
     variants.add_argument('--touch-hid', action='store_true')
     variants.add_argument('--setup-probe', action='store_true')
@@ -53,9 +55,15 @@ def main():
         raise ValueError('Source archive does not match its report')
     build.mkdir()
     registration = build / 'registration'
+    gop_object = OUT / 'display-object-cf3b429/NativeLegacyDisplay.o'
+    approved = DEVICE / 'evidence/display/abi21h461/object-check.json'
+    if args.gop_fork:
+        gop_object = OUT / 'display-object-fbcache/NativeLegacyDisplay.o'
+        approved = DEVICE / 'evidence/display/gop-fb-cache/object-check.json'
     registration_command = ['python3.14', str(DEVICE / 'scripts/build-display-registration.py'),
                             '--tree', str(WORK / 'tree'),
-                            '--gop-object', str(OUT / 'display-object-cf3b429/NativeLegacyDisplay.o'),
+                            '--gop-object', str(gop_object),
+                            '--approved', str(approved),
                             '--output', str(registration)]
     if args.touch_hid or args.setup_probe:
         registration_command.append('--touch-hid')
@@ -65,6 +73,14 @@ def main():
     report['source_sha256'][str(source)] = sha(source)
     report['registration_object_sha256'] = sha(replacement)
     replacements = {MEMBER: replacement}
+    if args.gop_fork:
+        late = build / 'NativeLegacyDisplay.late.o'
+        subprocess.run(['/opt/homebrew/opt/llvm/bin/llvm-objcopy',
+                        '--remove-section=__DATA,__mod_init_func',
+                        '--globalize-symbol=__GLOBAL__sub_I_NativeLegacyDisplay.cpp',
+                        str(gop_object), str(late)], check=True)
+        replacements['NativeLegacyDisplay.late.o'] = late
+        report['gop_object_sha256'] = sha(gop_object)
     if args.setup_probe:
         ui = build / 'ui-wait'
         subprocess.run(['python3.14', str(DEVICE / 'scripts/build-ui-wait-snapshot.py'),
@@ -80,7 +96,8 @@ def main():
     if any(members.count(member) != 1 for member in replacements):
         raise ValueError('Expected unique archive members to replace')
     ar('-r', archive, *(str(path) for path in replacements.values()))
-    if members != ar('-t', archive).decode().splitlines():
+    after = ar('-t', archive).decode().splitlines()
+    if len(after) != len(members) or set(after) != set(members):
         raise ValueError('Archive layout changed')
     for member in members:
         if member.startswith('__.SYMDEF'):

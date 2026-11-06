@@ -1,0 +1,28 @@
+{
+  "base_gop_revision": "cf3b42979a9c44219e7bb149543e6fc3388b58ed",
+  "base_source_sha256": "09d7811db8fc6b659e12a05690867326e851f0d11bec7ffbb36b72c33ea035ca",
+  "base_object_sha256": "54e56f545f2fccecd9a6161bc1d841b978543acbc56dfae97642d0a25761859a",
+  "patch": "patches/gop/t970-fb-cache.patch",
+  "fork_source_sha256": "baaba7ffb1ee618e0eb36b103e3c76b14e74d80fbfc30a05e51de3e9724e7149",
+  "generated_header_sha256": "8465dbcff188e88e66fdbe9a5e24b102c093b06d17f879f7a55fa3d1c58f8016",
+  "compile_recipe": "evidence/display/abi21h461/compile-command.json with the fork source and object paths",
+  "compile_cwd": "tree/build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/iokit/DEVELOPMENT",
+  "compile_exit_code": 0,
+  "imports_added": [
+    "_flush_dcache64"
+  ],
+  "imports_removed": [],
+  "global_symbol_count": [
+    22,
+    22
+  ],
+  "global_symbol_order_unchanged": true,
+  "actual_compiled_virtual_entries": 358,
+  "notes": [
+    "Only two call sites change: the scanout mapping option (kIOMapWriteCombineCache with t970-fb-wc=1) and the source surface mapping option (kIOMapCopybackCache with t970-fb-cached=1) followed by flush_dcache64 over the source.",
+    "Without either boot argument the object behaves as the audited cf3b429 object except for the added flush_dcache64 import."
+  ],
+  "compiled_object_sha256": "0b3c2d5e983fec5e2272518bf676d36e011b0071dc1f30c8e2e912f337f1e33c",
+  "late_object_sha256": "f375cfe34ae8d8016baee6cb3c0466893a2552ed96e368ee044bec2cd19223ef",
+  "late_step": "llvm-objcopy --remove-section=__DATA,__mod_init_func --globalize-symbol=__GLOBAL__sub_I_NativeLegacyDisplay.cpp"
+}

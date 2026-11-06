@@ -14,8 +14,10 @@ def main():
     p.add_argument('--gop-object', type=Path, required=True)
     p.add_argument('--output', type=Path, required=True)
     p.add_argument('--touch-hid', action='store_true')
+    p.add_argument('--approved', type=Path,
+                   default=DEVICE / 'evidence/display/abi21h461/object-check.json')
     a = p.parse_args()
-    approved = json.loads((DEVICE / 'evidence/display/abi21h461/object-check.json').read_text())
+    approved = json.loads(a.approved.read_text())
     if hashlib.sha256(a.gop_object.read_bytes()).hexdigest() != approved['object_sha256']:
         raise ValueError('Use the previously audited cf3b429 GOP object')
     tree, out = a.tree.resolve(), a.output.resolve()

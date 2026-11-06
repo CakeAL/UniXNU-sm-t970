@@ -1,0 +1,38 @@
+--- a/drivers/GopFramebuffer/NativeLegacyDisplay.cpp
++++ b/drivers/GopFramebuffer/NativeLegacyDisplay.cpp
+@@ -32,6 +32,8 @@
+ extern "C" bool native_legacy_prepare_scanout(void);
+ extern "C" void native_legacy_transfer_observed(IOReturn,const void *,uint64_t);
+ extern "C" void native_legacy_copy_timing_observed(uint64_t ticks,uint64_t bytes);
++/* T970: clean and invalidate the source surface to the point of coherency before the CPU reads it through a cacheable mapping. */
++extern "C" void flush_dcache64(uint64_t,unsigned,int);
+ extern "C" void native_legacy_retirement_observed(IOService *);
+ // GPU hand-off (boot-arg sheng-fb-gpu=1): the frame is offered to the privileged GPU client instead of being copied; the swap retires when the
+ // client reports the GPU copy done (native_legacy_gpu_complete). A refused offer or a failed copy uses the CPU copy below and is counted.
+@@ -308,10 +310,13 @@
+             }
+             return;
+         }
+-        IOMemoryMap *source=memory->map(kIOMapAnywhere|kIOMapReadOnly);
++        static int cachedSource=-1;
++        if(cachedSource<0){unsigned value=0;cachedSource=PE_parse_boot_argn("t970-fb-cached",&value,sizeof(value)) && value==1;}
++        IOMemoryMap *source=memory->map(kIOMapAnywhere|kIOMapReadOnly|(cachedSource?kIOMapCopybackCache:0));
+         if(!source || !source->getVirtualAddress() || source->getLength()<allocation) {
+             OSSafeReleaseNULL(source);native_legacy_transfer_observed(kIOReturnNoMemory,request,0);return;
+         }
++        if(cachedSource)flush_dcache64((uint64_t)(uintptr_t)source->getVirtualAddress(),(unsigned)source->getLength(),0);
+         if(!native_legacy_copy_layout(reinterpret_cast<volatile void *>(bootMapping->getVirtualAddress()),
+             bootMapping->getLength(),video.v_rowBytes,reinterpret_cast<const void *>(source->getVirtualAddress()),
+             source->getLength(),sourceStride,width,height)) {
+@@ -495,7 +500,10 @@
+            !video.v_width || !video.v_height || video.v_depth!=32 || video.v_rotate ||
+            video.v_width>16384 || video.v_height>16384 || video.v_rowBytes<video.v_width*4 ||
+            video.v_rowBytes>UINT64_MAX/video.v_height)return false;
+-        IOMemoryMap *mapping=provider->mapDeviceMemoryWithIndex(0,kIOMapInhibitCache);
++        unsigned fbWc=0;
++        IOOptionBits scanoutOptions=PE_parse_boot_argn("t970-fb-wc",&fbWc,sizeof(fbWc)) && fbWc==1
++            ? kIOMapWriteCombineCache : kIOMapInhibitCache;
++        IOMemoryMap *mapping=provider->mapDeviceMemoryWithIndex(0,scanoutOptions);
+         if(!mapping)return false;
+         bool valid=mapping->getVirtualAddress() && mapping->getPhysicalAddress()==video.v_baseAddr &&
+                    mapping->getLength()==video.v_rowBytes*video.v_height;
