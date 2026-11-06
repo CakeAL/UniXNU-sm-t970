@@ -97,3 +97,33 @@ static inline uint32_t t970_keys_mask(uint32_t pon_status, uint32_t gpio_status)
     if (pon_status & T970_PON_RESIN) mask |= 1u << 2;
     return mask;
 }
+
+// One key's edge state. `last` keeps the raw level, `live` ignores the level the
+// key already had when the probe started (a held key must be released first),
+// `down` is the reported state and `presses`/`releases` count accepted edges.
+struct t970_key_state {
+    uint8_t last, live, down;
+    uint32_t presses, releases;
+};
+
+// 0 = no accepted change, 1 = press, 2 = release. Bounce is rejected because an
+// edge only counts once two samples agree.
+static inline int t970_key_update(struct t970_key_state *k, int down, int usable)
+{
+    down = down != 0;
+    int steady = (k->last == down);
+    k->last = (uint8_t)down;
+    if (!usable || !steady) return 0;
+    if (!k->live) {
+        if (!down) k->live = 1;
+        return 0;
+    }
+    if (k->down == down) return 0;
+    k->down = (uint8_t)down;
+    if (down) {
+        ++k->presses;
+        return 1;
+    }
+    ++k->releases;
+    return 2;
+}

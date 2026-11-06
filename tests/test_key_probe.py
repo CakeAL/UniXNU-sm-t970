@@ -66,6 +66,32 @@ int main(void) {
     assert(t970_keys_mask(0, 0) == 2);
     assert(t970_keys_mask(T970_PON_RESIN, T970_GPIO_ACTIVE_LOW) == 4);
     assert(t970_keys_mask(T970_PON_POWER | T970_PON_RESIN, 0) == 7);
+
+    /* Edge state: two agreeing samples are needed, so bounce is rejected. */
+    struct t970_key_state k = {0};
+    assert(t970_key_update(&k, 0, 1) == 0);      /* first release sample arms it */
+    assert(t970_key_update(&k, 1, 1) == 0);      /* first high sample */
+    assert(t970_key_update(&k, 1, 1) == 1);      /* steady: press */
+    assert(k.presses == 1 && k.down == 1);
+    assert(t970_key_update(&k, 1, 1) == 0);      /* held: no repeat */
+    assert(t970_key_update(&k, 0, 1) == 0);      /* first low sample */
+    assert(t970_key_update(&k, 0, 1) == 2);      /* steady: release */
+    assert(k.releases == 1 && k.down == 0);
+    /* Bounce: a single opposite sample drops the edge. */
+    assert(t970_key_update(&k, 1, 1) == 0);
+    assert(t970_key_update(&k, 0, 1) == 0);
+    assert(t970_key_update(&k, 1, 1) == 0);
+    assert(t970_key_update(&k, 1, 1) == 1);
+    /* Unusable keys never change state. */
+    struct t970_key_state u = {0};
+    assert(t970_key_update(&u, 1, 0) == 0 && t970_key_update(&u, 1, 0) == 0);
+    assert(u.presses == 0 && u.down == 0);
+    /* A key already down at start is not reported as a press. */
+    struct t970_key_state h = {.last = 1, .live = 0, .down = 0};
+    assert(t970_key_update(&h, 1, 1) == 0);      /* steady but live=0 */
+    assert(t970_key_update(&h, 0, 1) == 0);      /* first low sample */
+    assert(t970_key_update(&h, 0, 1) == 0);      /* steady low arms live */
+    assert(h.live == 1 && h.presses == 0);
     puts("ok");
     return 0;
 }
