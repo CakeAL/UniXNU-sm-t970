@@ -1,0 +1,16 @@
+{
+  "base_boot_sha256": "1436f2f1",
+  "boot_sha256": "3f5065adcc3ddf6d558d8583815fdda1954d5b903d859d3f7cc0650af62a3780",
+  "boot_bytes": 71303168,
+  "kernel_sha256": "95d5d45e094637b9083ee1353cbe24a4ee105a3656014a28d4b7610df175165f",
+  "kernel_build_sha256": "be38b01d40cfe50d4b7a511511e00bec32a8cdfe17b7a0f2667801c492b19e38",
+  "adt_sha256": "be41464a2b48b9ba465c7986bf47d9b0cc641f0a01b55546ddf6e2bda1ca46e6",
+  "dram_size": "0x200000000",
+  "unchanged": {
+    "adt": true,
+    "seed": true,
+    "config": true,
+    "trust": true
+  },
+  "uploaded": false
+}
