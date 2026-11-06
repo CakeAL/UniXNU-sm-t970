@@ -530,6 +530,10 @@ id = "memory"
 status = "implemented"
 components = []
 paths = [
+  "evidence/memory/8g-v85/**",
+  "scripts/patch-adt-dram-size.py",
+  "tests/test_adt_patch.py",
+  "patches/xnu/t970-8g-bootstrap-tables.patch",
   "evidence/display/owned-window-2g-v62/**",
   "evidence/display/memory768-v11/**",
   "evidence/display/key-state-v10/prepare-memory768.py",
@@ -594,6 +598,7 @@ procedure = [
   "Capture root-readable /proc/iomem and the live DT, then compare physical memory and reserved-memory reg values.",
 ]
 findings = [
+  "v85 raises the XNU DRAM envelope from 2 GiB to 8 GiB by rewriting only /chosen/dram-size in the packed ADT, keeping the booted 8-CPU, PSCI, identity and memory-map bytes. The 4K bootstrap page-table pool grows from 16 to 32 pages for the larger physical aperture. Host tests cover the single-property rewrite; the device page count is pending.",
   "The original 3 GiB and 4 GiB banks are adjacent, with a separate lower bank. Even before exclusions the maximum contiguous range is 7 GiB. The current loader requires one EFI conventional memory allocation. The largest actually available run is unmeasured.",
   "The 768 MiB v60 BOOT was repacked as v62 with a structurally verified 2 GiB DarwinBoot request. v57 through v59 still encode 768 MiB and fail full ADT decoding. v62 preserves the base kernel, arguments, trust cache, Data seed, firmware and DTB. At target120 XNU reports 0x79e30 managed pages, about 1950 MiB. This verifies the larger managed-memory window on the tested image.",
   "Isolated BOOTf6fd6636 changes only darwinboot-memory-size512->768MiB; final FAT round-trip, unchanged kernel/arguments/trust/seed/DTS/reservations pass. Device target60 main1/cpu8 and pages0x2b187 confirm about689.5MiB managed RAM. Free0x13b alone is not OOM evidence. Default remains512MiB and no high-memory map is enabled.",
@@ -637,6 +642,9 @@ next_action = [
   "Capture the actual owned-window physical base/size and EFI memory map on the next observable boot; do not reclaim the rest of the ADT envelope.",
 ]
 evidence = [
+  { kind = "host", reference = "evidence/memory/8g-v85/preparation.json", revision = "0a1ef40803761c3b7520f92539254d9fc2c0cfcc", command = "python3.14 evidence/memory/8g-v85/prepare.py", result = "Packed BOOT1436f2f1 from the v84 image: kernel 6e8b011b with 32 bootstrap-table pages and ADT be41464a with dram-size 0x200000000. Data seed, config, trust cache and firmware unchanged." },
+  { kind = "device", reference = "evidence/memory/8g-v85/upload.json", revision = "0a1ef40803761c3b7520f92539254d9fc2c0cfcc", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/setup-8g-v85/boot-partition.img --verbose", result = "Heimdall confirmed BOOT upload and requested reboot." },
+
   { kind = "device", reference = "evidence/display/owned-window-2g-v62/device-result.json", revision = "2561e445a386b33b3dc4069a3f5ee43234d9fe05", command = "Owner photo after BOOT07f38ad9 upload, target120", result = "XNU manages 0x79e30 4 KiB pages on the tested 2 GiB request, versus 0x2b187 in the historical 768 MiB test." },
   { kind = "host", reference = "evidence/display/owned-window-2g-v62/preparation.json", revision = "2561e445a386b33b3dc4069a3f5ee43234d9fe05", command = "python3.14 evidence/display/owned-window-2g-v62/prepare.py --output out/data-bringup/owned-window-2g-v62", result = "Final BOOT FAT round trip verifies the only decoded ADT difference is the 2 GiB request. Hardware allocation is unverified." },
   { kind = "device", reference = "evidence/display/owned-window-2g-v62/upload.json", revision = "2561e445a386b33b3dc4069a3f5ee43234d9fe05", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/owned-window-2g-v62/boot-partition.img", result = "BOOT upload completed and Heimdall requested reboot; no partition readback." },

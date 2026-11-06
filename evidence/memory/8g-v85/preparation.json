@@ -1,0 +1,15 @@
+{
+  "base_boot_sha256": "215edec49f9ebf641b2b312f954416eb35e0d4347473b4bf97dd5581857b68cb",
+  "boot_sha256": "1436f2f16723458ad2328b8b463f74993ccf97048a02392e9c8e3d65a74097ec",
+  "boot_bytes": 71303168,
+  "kernel_sha256": "6e8b011b47c10c7d57737759bd501b5fe173fdaa248109fb379f52df9942a45c",
+  "kernel_build_sha256": "716a21e0730b25a579165cc6ab2c87b7f79417dc689eaf10d2ffbdab998df552",
+  "adt_sha256": "be41464a2b48b9ba465c7986bf47d9b0cc641f0a01b55546ddf6e2bda1ca46e6",
+  "source_adt_sha256": "b32ba77d5083d2d8d4f12c5b8e1dcded456e64b888f1f5a50115279015c71997",
+  "dram_size": "0x200000000",
+  "data_seed_sha256": "9a0005a5c520412006589e068264b611c3484af123547d13103387a9fb7c0afa",
+  "config_sha256": "8e846744387f69f156fef09a3e1bf042198d4fcaaa62e92ef1697339df0900e5",
+  "trust_cache_sha256": "7416ca4f8377146626bb284e2133c76bee6cb4e3ee0af5d648b186235a7323a7",
+  "unchanged_header_firmware_dtb_tail": true,
+  "uploaded": false
+}

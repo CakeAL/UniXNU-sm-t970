@@ -1,0 +1,13 @@
+{
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/setup-8g-v85/boot-partition.img --verbose",
+  "finished_at_local": "2026-11-07T01:10+08:00",
+  "boot_sha256": "1436f2f16723458ad2328b8b463f74993ccf97048a02392e9c8e3d65a74097ec",
+  "partition": "BOOT",
+  "exit_code": 0,
+  "transfer_confirmed": true,
+  "reboot_requested": true,
+  "partition_readback": false,
+  "userdata_partition_uploaded": false,
+  "transfer_log": "heimdall-20261106T171005Z.log",
+  "transfer_log_sha256": "824fc8d79a903a58e0ade19516cc546ed24fda571d62d465cc66ed14d759ee9b"
+}

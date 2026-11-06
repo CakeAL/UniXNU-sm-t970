@@ -22,7 +22,7 @@
     "Only two call sites change: the scanout mapping option (kIOMapWriteCombineCache with t970-fb-wc=1) and the source surface mapping option (kIOMapCopybackCache with t970-fb-cached=1) followed by flush_dcache64 over the source.",
     "Without either boot argument the object behaves as the audited cf3b429 object except for the added flush_dcache64 import."
   ],
-  "compiled_object_sha256": "0b3c2d5e983fec5e2272518bf676d36e011b0071dc1f30c8e2e912f337f1e33c",
   "late_object_sha256": "f375cfe34ae8d8016baee6cb3c0466893a2552ed96e368ee044bec2cd19223ef",
-  "late_step": "llvm-objcopy --remove-section=__DATA,__mod_init_func --globalize-symbol=__GLOBAL__sub_I_NativeLegacyDisplay.cpp"
+  "late_step": "llvm-objcopy --remove-section=__DATA,__mod_init_func --globalize-symbol=__GLOBAL__sub_I_NativeLegacyDisplay.cpp",
+  "object_sha256": "0b3c2d5e983fec5e2272518bf676d36e011b0071dc1f30c8e2e912f337f1e33c"
 }
