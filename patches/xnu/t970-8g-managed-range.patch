@@ -1,18 +1,60 @@
+diff --git a/osfmk/arm64/arm_vm_init.c b/osfmk/arm64/arm_vm_init.c
+index 985370e..295d3d8 100644
+--- a/osfmk/arm64/arm_vm_init.c
++++ b/osfmk/arm64/arm_vm_init.c
+@@ -1835,10 +1835,21 @@ arm_vm_init(uint64_t memory_size, boot_args * args)
+ 	 */
+ 	gVirtBase = args->virtBase;
+ 	gPhysBase = args->physBase;
++	/* T970: read the 64-bit DRAM envelope here; arm_init assigns gDramSize only after this call. */
++	uint64_t dram_envelope = args->memSize;
++	{
++		DTEntry chosen;
++		unsigned int dt_entry_size;
++		unsigned long const *dram_size;
++		if (SecureDTLookupEntry(NULL, "/chosen", &chosen) == kSuccess &&
++		    SecureDTGetProperty(chosen, "dram-size", (void const **)&dram_size, &dt_entry_size) == kSuccess) {
++			dram_envelope = *dram_size;
++		}
++	}
+ #if KASAN
+ 	real_phys_size = args->memSize + (shadow_ptop - shadow_pbase);
+ #else
+-	real_phys_size = args->memSize;
++	real_phys_size = dram_envelope;
+ #endif
+ 	/*
+ 	 * Ensure the physical region we specify for the VM to manage ends on a
+@@ -1849,9 +1860,9 @@ arm_vm_init(uint64_t memory_size, boot_args * args)
+ 	 * completely own.  The KASAN shadow region, if present, is managed entirely
+ 	 * in units of the hardware page size and should not need similar treatment.
+ 	 */
+-	gPhysSize = mem_size = ((gPhysBase + args->memSize) & ~PAGE_MASK) - gPhysBase;
++	gPhysSize = mem_size = ((gPhysBase + dram_envelope) & ~PAGE_MASK) - gPhysBase;
+ 
+-	mem_actual = args->memSizeActual ? args->memSizeActual : mem_size;
++	mem_actual = (args->memSizeActual && args->memSizeActual >= mem_size) ? args->memSizeActual : mem_size;
+ 
+ 	if ((memory_size != 0) && (mem_size > memory_size)) {
+ 		mem_size = memory_size;
+diff --git a/osfmk/arm64/sptm/arm_init_sptm.c b/osfmk/arm64/sptm/arm_init_sptm.c
+index 55a9add..5e04d6c 100644
 --- a/osfmk/arm64/sptm/arm_init_sptm.c
 +++ b/osfmk/arm64/sptm/arm_init_sptm.c
-@@ -1531,12 +1531,22 @@
+@@ -1531,12 +1531,23 @@ arm_vm_init(uint64_t memory_size, boot_args * args)
  	/* Get the virtual and physical kernel-managed memory base from boot_args */
  	gVirtBase = args->virtBase;
  	gPhysBase = args->physBase;
 +	/* T970: read the 64-bit DRAM envelope here; arm_init assigns gDramSize only after this call. */
 +	uint64_t dram_envelope = args->memSize;
 +	{
-+		DTEntry chosen = NULL;
-+		unsigned long const *size = NULL;
-+		DTEntrySize length = 0;
-+		if (SecureDTLookupEntry(NULL, "chosen", &chosen) == kSuccess &&
-+		    SecureDTGetProperty(chosen, "dram-size", (void const **)&size, &length) == kSuccess &&
-+		    length == sizeof(*size)) dram_envelope = *size;
++		DTEntry chosen;
++		unsigned int dt_entry_size;
++		unsigned long const *dram_size;
++		if (SecureDTLookupEntry(NULL, "/chosen", &chosen) == kSuccess &&
++		    SecureDTGetProperty(chosen, "dram-size", (void const **)&dram_size, &dt_entry_size) == kSuccess) {
++			dram_envelope = *dram_size;
++		}
 +	}
  
  	/* Get the memory size */
@@ -24,7 +66,7 @@
  #endif
  
  	/**
-@@ -1548,10 +1558,10 @@
+@@ -1548,10 +1559,10 @@ arm_vm_init(uint64_t memory_size, boot_args * args)
  	 * completely own.  The KASAN shadow region, if present, is managed entirely
  	 * in units of the hardware page size and should not need similar treatment.
  	 */
@@ -33,43 +75,6 @@
  
  	/* Obtain total memory size, including non-managed memory */
 -	mem_actual = args->memSizeActual ? args->memSizeActual : mem_size;
-+	mem_actual = (args->memSizeActual && args->memSizeActual >= mem_size) ? args->memSizeActual : mem_size;
- 
- 	if ((memory_size != 0) && (mem_size > memory_size)) {
- 		mem_size = memory_size;
---- a/osfmk/arm64/arm_vm_init.c
-+++ b/osfmk/arm64/arm_vm_init.c
-@@ -1835,10 +1835,20 @@
- 	 */
- 	gVirtBase = args->virtBase;
- 	gPhysBase = args->physBase;
-+	/* T970: read the 64-bit DRAM envelope here; arm_init assigns gDramSize only after this call. */
-+	uint64_t dram_envelope = args->memSize;
-+	{
-+		DTEntry chosen = NULL;
-+		unsigned long const *size = NULL;
-+		DTEntrySize length = 0;
-+		if (SecureDTLookupEntry(NULL, "chosen", &chosen) == kSuccess &&
-+		    SecureDTGetProperty(chosen, "dram-size", (void const **)&size, &length) == kSuccess &&
-+		    length == sizeof(*size)) dram_envelope = *size;
-+	}
- #if KASAN
- 	real_phys_size = args->memSize + (shadow_ptop - shadow_pbase);
- #else
--	real_phys_size = args->memSize;
-+	real_phys_size = dram_envelope;
- #endif
- 	/*
- 	 * Ensure the physical region we specify for the VM to manage ends on a
-@@ -1849,9 +1859,9 @@
- 	 * completely own.  The KASAN shadow region, if present, is managed entirely
- 	 * in units of the hardware page size and should not need similar treatment.
- 	 */
--	gPhysSize = mem_size = ((gPhysBase + args->memSize) & ~PAGE_MASK) - gPhysBase;
--
--	mem_actual = args->memSizeActual ? args->memSizeActual : mem_size;
-+	gPhysSize = mem_size = ((gPhysBase + dram_envelope) & ~PAGE_MASK) - gPhysBase;
-+
 +	mem_actual = (args->memSizeActual && args->memSizeActual >= mem_size) ? args->memSizeActual : mem_size;
  
  	if ((memory_size != 0) && (mem_size > memory_size)) {
