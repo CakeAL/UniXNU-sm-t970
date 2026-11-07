@@ -6,6 +6,9 @@
 namespace t970_gpu {
 
 constexpr unsigned cbBarChanged = 1u << 3;
+// Arm IHI 0062D.c: FSR[10:9] describes the translation table format.
+constexpr uint32_t cbFsrFormatMask = 0x600;
+constexpr uint32_t cbFsrAarch64 = 0x400;
 
 struct CbGuards {
     uint32_t id0 = 0, id1 = 0, gfsr = 0, fsr = 0, bar = 0, scr0 = 0, sctlr = 0;
@@ -13,7 +16,8 @@ struct CbGuards {
 
     unsigned flags() const {
         return (id0 != 0x4c017e06 || id1 != 0x20000005 ? 1u : 0u) |
-               (gfsr ? 2u : 0u) | (fsr ? 4u : 0u) | (bar ? cbBarChanged : 0u) |
+               (gfsr ? 2u : 0u) | ((fsr & ~cbFsrFormatMask) ? 4u : 0u) |
+               (bar ? cbBarChanged : 0u) |
                (scr0 & (1u << 3) ? 16u : 0u) | (sctlr & 1u ? 32u : 0u) |
                (smrs ? 64u : 0u);
     }
@@ -79,7 +83,7 @@ static void pulseCbFormat(IOMemoryMap &smmu, SmmuSnapshot &result) {
     result.format = "refuse";
     result.va64Before = readSmmu32(smmu, 0x1800);
     result.guard = readCbGuards(smmu);
-    if (result.changed || result.va64Before || result.guard.flags()) return;
+    if (result.changed || result.va64Before || result.guard.flags() || result.guard.fsr) return;
     writeCbFormat(smmu, 1);
     result.va64Active = readSmmu32(smmu, 0x1800);
     result.guard = readCbGuards(smmu);
@@ -101,7 +105,7 @@ static void pulseCbFormat(IOMemoryMap &smmu, SmmuSnapshot &result) {
     }
     if (result.restoreDiff) return;
     result.holdParents = false;
-    result.format = result.va64Active == 1 ? "ok" : "readback";
+    result.format = result.va64Active == 1 && result.guard.fsr == cbFsrAarch64 ? "ok" : "readback";
 }
 
 static void sampleSmmu(SmmuSnapshot &result, bool format) {

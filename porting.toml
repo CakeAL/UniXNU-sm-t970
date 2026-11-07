@@ -1400,6 +1400,7 @@ procedure = [
   "Read KGSL identity and frequency nodes, list GPU firmware files and calculate the GMU/SQE hashes without executing GPU commands.",
 ]
 findings = [
+  "v114 BOOTa3c7e5fc isolates the post-set guard to CB0 FSR=0x400, the AArch64 Format field. v115 masks Format in the fault predicate, requires VA64=1 with FSR=0x400 for active readback success, and compares the original raw FSR and all CB0 words on rollback.",
   "v113 BOOTcc2fb731 confirms VA64=1, then hits a post-set idle guard before any restoration. v114 records all guard values with separate-register LDR/UXTW reads, permits exact VA64 rollback after a CBAR-only view change with empty streams and disabled translation, and still requires the full original context on return.",
   "v112 BOOTf9df94f3 confirms the lmi GPU SMMU layout, six zero SMRs, CB0 disabled, no global or CB0 fault and three stable reads. v113 tests only the CBA2R.VA64 format write with real W-register accesses, then compares the full CB0 snapshot.",
   "v111 BOOT50deea9b confirms the 200 MHz RCG configuration 1/100602/1 with UPDATE clear and restored DIV_GATE, RSC, XO and CX. v112 uses the stock DT GPU SMMU clocks and a read-only SMMU/CB0 snapshot. The stock GMU kernel uses SID5 with mask 0x400.",
@@ -1427,7 +1428,7 @@ limits = [
   "No GMU bring-up, command submission, DMA/SMMU ownership or Metal rendering was tested under UniXNU.",
 ]
 next_action = [
-  "Capture v114 GPU cbfmt and CB guard. Decode the post-set predicate and confirm rb=1 with matching CB0 state before connecting ArmSmmu4K to T970-owned GMU/HFI pages and SID5.",
+  "Capture v115 GPU cbfmt and CB guard. Require VA64 0/1/0, rb=1, guard=0/0 and diff=0 before connecting ArmSmmu4K to T970-owned GMU/HFI pages and SID5.",
 ]
 evidence = [
   { kind = "device", reference = "evidence/gpu/cbguard-v114/device-result.json", revision = "b131239bd36b3bd34af86d42ab2d92c0ecc738c5", command = "BOOTa3c7e5fc; owner three-finger report screenshot", result = "VA64=1, guard=4 only, raw CB0 FSR=0x400 (Format), global faults zero, no SMRs and SCTLR.M clear. Restore did not run. Eight CPUs and 42 GOP copies/retirements." },
@@ -1725,6 +1726,7 @@ procedure = [
   "Read BuildManifest.plist from the local IPSW using Python zipfile and plistlib to identify its OS version, build and product types.",
 ]
 findings = [
+  "v115 validates exact v114 BOOT and replaces the kernel and GPU mode in FAT. ADT, Data seed, trust cache and bytes outside FAT are preserved.",
   "v114 validates exact v113 BOOT and replaces only the kernel and GPU mode in FAT. ADT, Data seed, trust cache and bytes outside FAT are preserved.",
   "v113 validates exact v112 BOOT and replaces the kernel and GPU mode in FAT. ADT, Data seed, trust cache and bytes outside FAT are preserved.",
   "v112 validates the tested v111 BOOT and replaces the kernel and GPU mode in FAT. ADT, Data seed, trust cache and bytes outside FAT are preserved.",
