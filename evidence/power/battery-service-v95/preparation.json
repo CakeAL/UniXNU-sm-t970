@@ -1,0 +1,19 @@
+{
+  "base_boot_sha256": "6d5c4c60b69a1e160fe02a2e25ad553837d01e6268c013f6ba724dcad47206c6",
+  "boot_sha256": "01e85687885b0a07d3f34442d132d89107e0203b976e95381a93df5358512d3b",
+  "boot_bytes": 71303168,
+  "kernel_sha256": "be4e071a805064d16da9bab772218dd1b8f7e4ecf9d6718d1d4d3fa68cec04d3",
+  "kernel_build_sha256": "093784f277847eeab6a22b1f561c2a114e9c4cd2bc0d04a3fc798f1633464eb9",
+  "adt_sha256": "ccf520425d90445a5415425f714ba12065daa4b6a70ce1e30b740437d6de85b6",
+  "dram_size": "0x200000000",
+  "data_seed_sha256": "9a0005a5c520412006589e068264b611c3484af123547d13103387a9fb7c0afa",
+  "config_sha256": "1adef602df3f80815ac17eb3faa0fde2b9663d6d426c3a23d0a6c60d15fd5411",
+  "trust_cache_sha256": "7416ca4f8377146626bb284e2133c76bee6cb4e3ee0af5d648b186235a7323a7",
+  "unchanged_adt_seed_trust": true,
+  "battery_service": true,
+  "battery_boot_arg": "t970-battery=1",
+  "battery_report_arg": "t970-battery-ro=3",
+  "read_only_service": true,
+  "unchanged_header_firmware_dtb_tail": true,
+  "uploaded": false
+}

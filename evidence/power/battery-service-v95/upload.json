@@ -1,0 +1,12 @@
+{
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/battery-service-v95/boot-partition.img",
+  "finished_at": "2026-11-07T05:28:24.606029+00:00",
+  "boot_sha256": "01e85687885b0a07d3f34442d132d89107e0203b976e95381a93df5358512d3b",
+  "partition": "BOOT",
+  "exit_code": 0,
+  "transfer_confirmed": true,
+  "reboot_requested": true,
+  "partition_readback": false,
+  "userdata_partition_uploaded": false,
+  "transfer_log_sha256": "3634cb6a721690ebec51de2aae82b631e02d349f10201c5a1708783765e0f6ac"
+}

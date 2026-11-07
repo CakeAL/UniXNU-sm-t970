@@ -1,0 +1,13 @@
+--- a/bsd/kern/bsd_init.c
++++ b/bsd/kern/bsd_init.c
+@@ -777,6 +777,10 @@
+ 	extern void sheng_pmgr_run(void);
+ 	sheng_pmgr_run();
+ #endif
++	{
++		extern void t970_battery_start(void);
++		t970_battery_start();
++	}
+ 
+ 	/*
+ 	 * Initialize the calendar.

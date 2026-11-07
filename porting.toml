@@ -6,7 +6,7 @@ schema_version = 1
 name = "sm-t970"
 soc = "SM8250"
 os_profile = "ipados-17.7.11-21H461"
-summary = "SM-T970/iPadOS21H461 reaches SpringBoard desktop and opens apps. v88 verifies a3840MiB EFI request with3713.86MiB managed and8 CPUs. v90 verifies all3 raw side keys with2/2 press-release edges and0 errors; v91 Consumer HID is under device test. Full usable8GB, Wi-Fi, brightness, battery and sustained validation remain unfinished; GPU deferred."
+summary = "SM-T970/iPadOS21H461 reaches SpringBoard desktop and opens apps. v88 verifies a3840MiB EFI request with3713.86MiB managed and8 CPUs. v90 verifies all3 raw side keys with2/2 press-release edges and0 errors; v91 Consumer HID is under device test. v94 reads the MAX77705 gauge on device (60.49%,3925mV,28.2C) and v95 uploads a read-only IOPMPowerSource service whose runtime result is pending. Full usable8GB, Wi-Fi, brightness, charging, status-bar battery and sustained validation remain unfinished; GPU deferred."
 
 [[area]]
 id = "configuration"
@@ -534,7 +534,7 @@ evidence = [
 id = "memory"
 status = "implemented"
 components = []
-paths = ["evidence/power/battery-clock-v93/**", "evidence/power/battery-gauge-v94/**",
+paths = ["evidence/power/battery-clock-v93/**", "evidence/power/battery-gauge-v94/**", "evidence/power/battery-service-v95/**",
   "evidence/power/battery-ro-v92/**",
   "package/T970Memory/**",
   "evidence/memory/owned-window-v88/**",
@@ -1478,12 +1478,15 @@ evidence = [
 
 [[area]]
 id = "power"
-status = "planned"
+status = "host-verified"
 components = []
-paths = ["evidence/power/battery-clock-v93/**", "evidence/power/battery-gauge-v94/**", "tests/test_battery_clock_probe.py", "tests/test_gauge_probe.py", "tests/test_gpio_i2c.py",
+paths = ["evidence/power/battery-clock-v93/**", "evidence/power/battery-gauge-v94/**", "evidence/power/battery-service-v95/**", "tests/test_battery_clock_probe.py", "tests/test_gauge_probe.py", "tests/test_gpio_i2c.py",
   "evidence/power/battery-ro-v92/**",
   "package/T970Power/**",
   "tests/test_battery_measurements.py",
+  "scripts/build-platform-power.py",
+  "patches/xnu/t970-battery-power.patch",
+  "tests/test_battery_service.py",
   "evidence/display/pm-watchdog-v67/**",
   "patches/xnu/t970-pm-watchdog-detail.patch",
   "evidence/display/sleep-disabled-v66/**",
@@ -1504,7 +1507,8 @@ procedure = [
   "Read selected power-supply attributes, available sleep states and thermal-zone names; do not write charging, regulator or suspend controls.",
 ]
 findings = [
-  "v92 BOOT43258b3c reports QUP0 SE0 vote0x041007c0, branch0x4220, masterAHB0, slaveAHB0x80000002,GPIO28/29 configs7/7 and high inputs. v93 BOOTbb5bd9d0 temporarily clears only slaveAHB HWCG and restores it: SE firmware0x303 means I2C protocol3/version3, FIFO enabled,status0. v94 BOOT6d5c4c60 qualifies this idle protocol before a bounded GPIO open-drain read of PMIC0x66, gauge0x36 and charger0x69; it restores GPIO mux/latches and does not write PMIC configuration. Gauge/charger measurements and system publication await hardware evidence.",
+  "v95 BOOT01e85687 adds the read-only T970Battery IOPMPowerSource. bsd_init registers the class behind t970-battery=1, the worker waits for IOBSD and polls the existing bounded GPIO I2C path every 5 s, and the archive carries the object beside the PMGR bridge. Complete samples update capacity/voltage/current/temperature/external/charging; incomplete samples keep the previous fields and set MAX77705ReadIncomplete. The terminal report formats the last committed sample plus Battery svc counters and does not start a transfer in the panic path. Charger writes, the expired watchdog and the IRQ remain out of scope.",
+  "v92 BOOT43258b3c reports QUP0 SE0 vote0x041007c0, branch0x4220, masterAHB0, slaveAHB0x80000002,GPIO28/29 configs7/7 and high inputs. v93 BOOTbb5bd9d0 temporarily clears only slaveAHB HWCG and restores it: SE firmware0x303 means I2C protocol3/version3, FIFO enabled,status0. v94 BOOT6d5c4c60 qualifies this idle protocol before a bounded GPIO open-drain read of PMIC0x66, gauge0x36 and charger0x69; it restores GPIO mux/latches and does not write PMIC configuration. On device the gauge 15/02 returns all seven valid words (60.49%, 3925312 uV, 0 uA, 28199 mC, 5442/8787 mAh), each recomputable from its raw value, and GPIO/OE restore reads back 1. The charger reports CHGIN valid (b3 bits6:5=3, CHGIN_OK set) while b4&0xf=0xB is the vendor charger-watchdog-expired detail, so charging is inactive. This is one terminal-report sample: continuous refresh, stale/error handling and IOPMPowerSource publication are not implemented.",
   "Added opt-in t970-battery-ro=1 handoff inspection for QUP0 clocks and NORTH GPIO28/29. The observer maps read-only and skips SE0 register reads unless its SE and both AHB clocks report running with the expected votes. It sends no I2C transfers or charger writes; gauge/device results remain pending.",
   "The board uses MAX77705 on QUP0/SE0 at0x980000 via NORTH GPIO28/29; the MFD source creates gauge0x36 and charger0x69 behind PMIC0x66. A read-only measurement decoder now handles per-field validity, little-endian words, signed current/temperature and vendor fg_resistor=5 scaling. ASan/UBSan vectors cover 4250mV,75.5%,positive/negative current and temperature,10090mAh and absent/failed samples. It is not linked to a transport or OS battery service yet.",
   "v67 adds an opt-in root-domain watchdog panic detail with PM machine state, wait reason, current and requested power states, pending count and first pending service class. It also retains a 240-second frame report if no watchdog fires. Kernel prelink and final BOOT FAT checks pass. The device reaches target240 with a completed blank GOP fill 28 ms after the last normal CPU copy. No PM watchdog panic occurred before the report.",
@@ -1517,11 +1521,15 @@ completion = [
 ]
 limits = [
   "Vendor battery units, firmware ownership and state transitions remain unverified; The v64 panic identifies a PM timeout but does not establish suspend or resume functionality.",
+  "The charger watchdog is expired on the measured boot, so charging is inactive while external power is present. Feeding or disabling the watchdog and configuring charge current/voltage are not implemented; v94 deliberately performs no charger write.",
 ]
-next_action = ["Capture v94 Gauge/Bat raw readings and restoration result; verify units and charger status, then implement serialized refresh and IOPMPowerSource publication with stale/error handling."]
+next_action = ["Observe v95 on device: confirm Battery svc samples/published and the Gauge/Bat values in the three-finger report, then check whether the status bar reflects the power source; only afterwards wire the charger IRQ and watchdog service."]
 evidence = [
   { kind = "device", reference = "evidence/power/battery-clock-v93/device-result.json", revision = "b700a694021722740e7212cfe4e28c24adce0f31", command = "BOOTbb5bd9d0; owner three-finger photo2026-11-07 12:47:35+08:00", result = "Source snapshot identified by preparation.json. Idle SE0 reports I2C protocol3/version3, FIFO enabled and status0 after temporary slaveAHB HWCG clear; restoration1. No gauge measurement in v93." },
-  { kind = "host", reference = "evidence/power/battery-gauge-v94/preparation.json", revision = "b700a694021722740e7212cfe4e28c24adce0f31", command = "build-kernel.py --cached-headers --setup-probe --gop-fork --keys --refresh-hid; battery-gauge-v94/prepare.py", result = "BOOT6d5c4c60 compiled/linked/prelinked with preserved source snapshot hashes; exact v93 ADT,seed,trust,firmware,DTB/header/tail retained. Upload receipt is separate; gauge/OS runtime remains pending." },
+  { kind = "host", reference = "evidence/power/battery-gauge-v94/preparation.json", revision = "b700a694021722740e7212cfe4e28c24adce0f31", command = "build-kernel.py --cached-headers --setup-probe --gop-fork --keys --refresh-hid; battery-gauge-v94/prepare.py", result = "BOOT6d5c4c60 compiled/linked/prelinked with preserved source snapshot hashes; exact v93 ADT,seed,trust,firmware,DTB/header/tail retained. Upload receipt and device photo are separate; the gauge measurement is confirmed, OS publication is not." },
+  { kind = "device", reference = "evidence/power/battery-gauge-v94/device-result.json", revision = "91f89daf71ea03578698fbe94649182138cb6e3d", command = "BOOT6d5c4c60; owner three-finger photo2026-11-07T13:07:58+08:00", result = "Desktop reached (SpringBoard27, backboardd57). Gauge id15/02 valid7f; soc1006049, uV3925312, uA0, mC28199, cap5442/8787. Charger INT_OK0xcf, DETAILS_000xe0 (CHGIN valid), DETAILS_010x3b (watchdog expired), so external power present and charging inactive. GPIO restore1, no PMIC/gauge/charger writes." },
+  { kind = "host", reference = "evidence/power/battery-service-v95/host-validation.json", revision = "766fe6786931e948b060f325b8a2b62befcfe86f", command = "python3.14 -m unittest discover -s tests; battery-service-v95/prepare.py", result = "68 tests ran, 10 skipped, OK (4 battery-service tests). BOOT01e85687 carries the battery object in libShengPlatformPower.a, the kernel defines _t970_battery_start/_t970_battery_report/__ZTV11T970Battery, bsd_init references the start call, and the 971-byte argument list keeps t970-battery=1 beside t970-battery-ro=3." },
+  { kind = "device", reference = "evidence/power/battery-service-v95/upload.json", revision = "766fe6786931e948b060f325b8a2b62befcfe86f", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/battery-service-v95/boot-partition.img", result = "BOOT-only upload exited 0 and requested reboot; no partition readback. Runtime service state, report line and status-bar battery remain unobserved." },
   { kind = "host", reference = "evidence/power/battery-ro-v92/preparation.json", result = "Read-only battery bus handoff and64-bit Loader-owned-memory report compiled/prelinked; original HID bindings checked; payload command line within1000bytes. Image prepared, not uploaded or device verified.", command = "python3.14 evidence/display/hello-black-v64/build-kernel.py --cached-headers --setup-probe --gop-fork --keys --refresh-hid --output out/data-bringup/battery-ro-v92-build; python3.14 evidence/power/battery-ro-v92/prepare.py", revision = "0e66aca5f5543246138f541b57d8a50dc5ab6a5c" },
   { kind = "host", reference = "evidence/peripherals/source-audit/checks.json", result = "The MAX77705 measurement encoding harness passed with ASan/UBSan. No XNU gauge read or battery service was exercised.", command = "python3.14 -m unittest discover -s tests -p test_battery_measurements.py", revision = "0e66aca5f5543246138f541b57d8a50dc5ab6a5c" },
   { kind = "host", reference = "evidence/display/pm-watchdog-v67/preparation.json", revision = "a1af20bddd4d35ff2c18758946c74b8d32c59e5f", command = "python3.14 evidence/display/hello-black-v64/build-kernel.py --cached-headers --output out/data-bringup/pm-watchdog-v67-build && python3.14 evidence/display/hello-black-v64/prepare.py --pm-watchdog", result = "Kernel prelink includes both report markers. Final FAT retains the v66 2 GiB ADT, trust cache and Data seed." },

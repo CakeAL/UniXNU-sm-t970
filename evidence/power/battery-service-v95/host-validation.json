@@ -1,0 +1,41 @@
+{
+  "boot_sha256": "01e85687885b0a07d3f34442d132d89107e0203b976e95381a93df5358512d3b",
+  "kernel_build_sha256": "093784f277847eeab6a22b1f561c2a114e9c4cd2bc0d04a3fc798f1633464eb9",
+  "tests": {
+    "command": "python3.14 -m unittest discover -s tests",
+    "ran": 68,
+    "skipped": 10,
+    "result": "OK"
+  },
+  "test_battery_service": {
+    "command": "python3.14 -m unittest tests.test_battery_service -v",
+    "ran": 4,
+    "result": "OK",
+    "covers": "charger CHGIN/CHG_DTLS decode including the measured 0xB watchdog state, power-source property wiring, boot hook, archive members, cached report order"
+  },
+  "archive": {
+    "path": "build/sheng-platform-power/libShengPlatformPower.a",
+    "sha256": "82c61acbca1edd6f623b38cb6b700a33a1e75140d37fdf2f811e518f5b6b3b36",
+    "members": [
+      "ShengPlatformPower.late.o",
+      "original-bindings.o",
+      "BatteryService.late.o"
+    ]
+  },
+  "kernel_symbols": [
+    "_t970_battery_start",
+    "_t970_battery_report",
+    "__ZTV11T970Battery",
+    "__GLOBAL__sub_I_BatteryService.cpp"
+  ],
+  "boot_hook": "bsd_init.o references _t970_battery_start; the prelinked kernel defines it",
+  "markers": [
+    "Gauge id=",
+    "Bat present=",
+    "Battery svc=1 samples=%u errors=%u published=%u age_ms=%llu"
+  ],
+  "kernel_args_bytes": 971,
+  "kernel_args": "t970-battery=1 t970-battery-ro=3 are present; the 1000-byte Loader bound holds",
+  "rebuilt_unchanged": "ADT, Data seed, trust cache, firmware, DTB and partition tail",
+  "runtime": "uploaded and reboot requested; no device runtime result yet"
+}
