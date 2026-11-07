@@ -1,0 +1,52 @@
+{
+  "boot_sha256": "749b7419d42801fd27b22193343824a17ff6b3c96fea3347545a5ad0f7f25f1c",
+  "photo": "screen-runtime.jpg",
+  "photo_sha256": "1e2b1ea58be4615481cccb3a2635e177fdfc410fe2032ec93d9b88c7a3e7bd92",
+  "photo_time_local": "2026-11-07T14:04:20+08:00",
+  "desktop_reached": true,
+  "status_bar_visible": false,
+  "gauge": {
+    "line": "Gauge id=15/02 valid=7f raw=80/3e9f/c4e8/feec/1c33/8cd/d94",
+    "raw": {
+      "status": "0x0080",
+      "repsoc": "0x3e9f",
+      "vcell": "0xc4e8",
+      "current": "0xfeec",
+      "temp": "0x1c33",
+      "repcap": "0x08cd",
+      "fullcap": "0x0df4"
+    }
+  },
+  "battery": {
+    "line": "Bat present=1 soc100=6262 uV=3938125 uA=-215625 mC=28199 cap=5632/8930 chg=1:5f/e0/31 restore=1 done/none reg=0",
+    "state_of_charge_percent": 62.62,
+    "voltage_uv": 3938125,
+    "current_ua": -215625,
+    "temperature_mc": 28199,
+    "remaining_mah": 5632,
+    "full_mah": 8930
+  },
+  "charger": {
+    "line": "Charger cfg=15/5e/13/ec/bb wdtEn=1 chgEn=1 ichg=1500mA iin=1500mA cv=13",
+    "cnfg09": "0xbb",
+    "cnfg06": "0xec",
+    "charge_enabled": true,
+    "status_line": "chg=1:5f/e0/31",
+    "decode": "CHG_OK (INT_OK b4) and CHGIN_OK (b6) are set; CHG_DTLS=1 is the charging state. CNFG_06 reads 0xec after the self-clearing WDTCLR kick, so the preserved-bit verification is the correct one.",
+    "charging": true
+  },
+  "service": {
+    "line": "Battery svc=1 samples=47 errors=0 published=1 age_ms=1733 charge=kicked",
+    "samples": 47,
+    "errors": 0,
+    "published": 1,
+    "age_ms": 1733
+  },
+  "units_check": "16031*100/256=6262, 50408*78125/1000=3938125, -276*15625*5/100=-215625, 7219*1000/256=28199, 2253*5/2=5632, 3572*5/2=8930.",
+  "interpretation": "The kick fix works: charge=kicked, CHG_EN stays 0xbb, and the charger reports CHG_DTLS=1 charging with CHG_OK set. The gauge current is negative (-215.6mA) while CHG_DTLS=1; SOC/capacity/voltage rose slightly across v96-v98 (61.25->62.62pct, 3.932->3.938V), which is consistent with slow charging or gauge relaxation, so the gauge current sign is not yet reconciled with the charger state. No charger mode restart was needed.",
+  "limits": [
+    "The status bar is covered by the panic text; charging icon state is not visible in this photo.",
+    "Gauge current sign vs charger state is unresolved; do not use the published Amperage for time estimates yet.",
+    "Charge current/voltage remain the bootloader profile; no thermal policy."
+  ]
+}

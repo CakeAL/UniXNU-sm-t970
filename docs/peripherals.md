@@ -12,7 +12,7 @@ T733 参考项目的提交与实机范围已核查，见
 | --- | --- | --- | --- |
 | 内存 | Loader 的连续 owned window；v87 托管范围覆盖补丁已撤下 | v88 桌面，3713.86 MiB 管理页，8 核 | 导出实际 EFI 内存图和分配区间，设计多区间管理，压力验证 |
 | 侧键 | PM8150 PON + PM8150L SPMI GPIO，v89/v90 观察器已链接 | v91 三键HID、97报告/0错误；锁屏及再次点亮正常；音量键响应 | 音频路由可用后验证音量值与实际声音；继续电池／内存，分别验证音量和锁屏／唤醒 |
-| 电池 | MAX77705，QUP0 I²C，GPIO28/29；FG 0x36、charger 0x69、PMIC 0x66 | v94 实机读数有效；v95 服务已确认：48 样本/0 错误，状态栏显示电池与 `Not Charging`；v96 配置快照确认 `chgEn=0`；v97 确认 CHG_EN 可写、CHG_DTLS=1；v98 修正 WDTCLR 自清回读，待回报 | 确认稳定充电与电流符号，再接充电中断与亮度 |
+| 电池 | MAX77705，QUP0 I²C，GPIO28/29；FG 0x36、charger 0x69、PMIC 0x66 | v94 实机读数有效；v95 服务已确认：48 样本/0 错误，状态栏显示电池与 `Not Charging`；v96 配置快照确认 `chgEn=0`；v97 确认 CHG_EN 可写、CHG_DTLS=1；v98 修复生效：`charge=kicked`、CHG_DTLS=1 持续充电；gauge 电流符号待核对 | 转亮度（DSI 交接与 S6TUUM3 命令），充电中断后补 |
 | 亮度 | S6TUUM3 AMSA24VU01，DSI command mode，范围 1–355 | GOP 图像已验证，亮度未验证 | 读取 DSI 交接状态；按面板 normal gamma mode 2 命令与映射表实现调节 |
 | Wi-Fi | QCA6390 PCI 17cb:1101，subsystem 17cb:0108，PCIe0 | Android 设备 ID；XNU 尚未训练链路 | SM8250 PCIe0 供电、PHY、复位、BAR、MSI／DMA；然后接 ath11k/MHI/QMI 与 21H461 网络 ABI |
 
@@ -66,6 +66,10 @@ v97 实测 `charge=kick-failed` 暴露出 WDTCLR 写 1 后自清：回读只有 
 v97 拿 0xed 比对，误判失败并每周期撤销 `CHG_EN`，充电反复开关。v98
 `BOOT749b7419` 只校验 CNFG_06 的保留位 bit7:2，写 NACK 时保留充电（看门狗
 到期会自停），保留位变化才撤销 `CHG_EN`。稳定充电与电流符号待回报。
+
+14:04:20 实机确认 `charge=kicked`、`CNFG_09=0xbb`、`CHG_DTLS=1`，charger
+持续报告充电；但 gauge 电流仍为负（-215625 µA），与 SOC/电压上升并存，
+电流符号暂不用于剩余时间。按机主要求，下一阶段转亮度。
 
 v93 实测 SE0 `fw=0x303`（I²C 协议 3）、`status=0`、GPIO28/29 配置 `7/7`。
 临时解除 slave AHB HWCG 后可读引擎，随后恢复。详见

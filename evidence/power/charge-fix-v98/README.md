@@ -29,3 +29,16 @@ python3.14 -m unittest discover -s tests -v
 
 若 `charge=kicked` 但状态仍是 `0xB`，再按原厂顺序做 mode 0x4→延时→0x5
 重启；若长期为负电流，需要单独核对 gauge 电流符号与充电电流实际值。
+
+## 实机结果
+
+14:04:20 照片及 `device-result.json` 确认修复生效：
+
+- `Charger cfg=15/5e/13/ec/bb`、`CNFG_06` 回读 `0xec`，`Battery svc` 行
+  `charge=kicked`：喂狗不再被自清位误判，CHG_EN 保持 1。
+- `Bat` 的 `chg=1:5f/e0/31`：CHG_OK、CHGIN_OK 置位，CHG_DTLS=1，charger
+  报告正在充电；47 个样本 0 错误。
+- 但 gauge 电流仍是 -215625 µA，而 v96→v98 的 SOC/容量/电压是上升的
+  （61.25%→62.62%，3.932→3.938 V）。电流符号与充电状态尚未对齐，暂不把
+  `Amperage` 用于剩余时间估算；充电本身已由 charger 状态确认为使能。
+- 本张照片没有状态栏（被 panic 文本覆盖）。
