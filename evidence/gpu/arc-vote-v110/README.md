@@ -22,4 +22,6 @@ python3.14 ../UniXNU/scripts/porting-record.py check --device .
 
 2026-11-07 17:06（中国标准时间），Heimdall 成功上传 BOOT `f8039496…` 并请求重启。
 详见 [打包记录](preparation.json)、[主机验证](host-validation.json)和 [上传回执](upload.json)。
-启动后三指按住两秒，采集 `GPU vote` 一行。
+机主截图确认 `mx=ack/10101 cx=ack/10101 irq/ctl/st=0/0/1 rsc=ff/ff xo=7/7 cxr=1`。
+两次 selector 2 投票均完成，TCS 回到空闲，RSC/PDC 和时钟控制恢复。同屏八核在线，
+GOP 完成 35 次复制和退役。 [实测记录与截图哈希](device-result.json)

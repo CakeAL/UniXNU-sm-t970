@@ -3,6 +3,7 @@
 #include "A650GmuPower.h"
 #include "../T970Touch/BusSnapshot.h"
 #include "ArcVotes.h"
+#include "GmuRate.h"
 
 namespace t970_gpu {
 
@@ -17,6 +18,7 @@ struct RscSnapshot {
     unsigned programmed = 0, restored = 0;
     bool holdParents = false;
     ArcVotes votes;
+    GmuRate rate;
 };
 
 static uint32_t gmuRscActivity(IOMemoryMap &gmu) {
@@ -82,8 +84,8 @@ static bool rscStillIdle(IOMemoryMap &gmu, IOMemoryMap &rscc, RscSnapshot &state
            readRscIdle(rscc, state) && !state.irqEnable;
 }
 
-static void pulseRscInit(IOMemoryMap &gmu, IOMemoryMap &rscc, IOMemoryMap &pdc, RscSnapshot &result,
-                         bool vote) {
+static void pulseRscInit(IOMemoryMap &gmu, IOMemoryMap &cc, IOMemoryMap &rscc,
+                         IOMemoryMap &pdc, RscSnapshot &result, unsigned power) {
     using namespace t970_touch;
     RscSnapshot state;
     if (!rscCold(result) || !rscStillIdle(gmu, rscc, state) || state.status) {
@@ -112,7 +114,7 @@ static void pulseRscInit(IOMemoryMap &gmu, IOMemoryMap &rscc, IOMemoryMap &pdc, 
         result.state = "busy-hold";
         return;
     }
-    if (vote && result.programmed == 0xff) {
+    if (power >= 7 && result.programmed == 0xff) {
         readRscTables(rscc, state);
         if (state.status == 0x01000000 && rscRouteMatches(state) && !memcmp(state.seq, seq, sizeof(seq)) &&
             read(pdc, 0x4520) == 0 && read(pdc, 0x4500) == 0x80000001) {
@@ -123,6 +125,13 @@ static void pulseRscInit(IOMemoryMap &gmu, IOMemoryMap &rscc, IOMemoryMap &pdc, 
         if (result.votes.holdParents || !rscStillIdle(gmu, rscc, state)) {
             result.state = "arc-hold";
             return;
+        }
+        if (power == 8 && result.votes.mx.ack && result.votes.cx.ack) {
+            result.rate = pulseGmuRate(gmu, cc);
+            if (result.rate.holdParents || !rscStillIdle(gmu, rscc, state)) {
+                result.state = "rate-hold";
+                return;
+            }
         }
     }
     for (unsigned i = attempted; i-- > 0;) {
@@ -150,7 +159,7 @@ static void pulseRscInit(IOMemoryMap &gmu, IOMemoryMap &rscc, IOMemoryMap &pdc, 
 }
 
 // The caller holds CX and all three XO clock branches with CM3 in reset.
-static RscSnapshot sampleRsc(IOMemoryMap &gmu, unsigned power) {
+static RscSnapshot sampleRsc(IOMemoryMap &gmu, IOMemoryMap &cc, unsigned power) {
     using namespace t970_touch;
     RscSnapshot result;
     result.gmuBusy = gmuRscActivity(gmu);
@@ -175,7 +184,7 @@ static RscSnapshot sampleRsc(IOMemoryMap &gmu, unsigned power) {
     result.pdcStart = read(*pdc, 0x4520);
     result.pdcEnable = read(*pdc, 0x4500);
     result.state = "read";
-    if (power >= 6) pulseRscInit(gmu, *rscc, *pdc, result, power == 7);
+    if (power >= 6) pulseRscInit(gmu, cc, *rscc, *pdc, result, power);
     return result;
 }
 
@@ -208,6 +217,25 @@ static void reportRsc(char *out, unsigned length, const RscSnapshot &rsc, bool r
         "\nRSC hidden=%x/%x/%x/%x/%x/%x route=%x/%x/%x/%x/%x seq=%x/%x/%x/%x/%x pdc=%x/%x",
         h[0], h[1], h[2], h[3], h[4], h[5], r[0], r[1], r[2], r[3], r[4],
         s[0], s[1], s[2], s[3], s[4], rsc.pdcStart, rsc.pdcEnable);
+}
+
+static void reportRscMode(char *out, unsigned length, const RscSnapshot &rsc, unsigned power,
+                          unsigned xoRestored, bool cxRestored) {
+    if (power == 8 && rsc.votes.mx.ack && rsc.votes.cx.ack && !rsc.votes.holdParents) {
+        const GmuRate &rate = rsc.rate;
+        snprintf(out, length,
+            "\nGPU rate %s/%s hz=%llu cfg=%x/%x/%x cmd=%x gate=%x/%x/%x rsc=%x/%x xo=7/%x cxr=%u",
+            rsc.state, rate.state, static_cast<unsigned long long>(rate.parentHz),
+            rate.before, rate.active, rate.after, rate.command,
+            rate.gateBefore, rate.gateActive, rate.gateAfter, rsc.programmed, rsc.restored,
+            xoRestored, cxRestored ? 1u : 0u);
+    } else if (power >= 7) {
+        reportArcVotes(out, length, rsc, xoRestored, cxRestored);
+    } else if (power == 6) {
+        reportRscInit(out, length, rsc, xoRestored, cxRestored);
+    } else {
+        reportRsc(out, length, rsc, cxRestored);
+    }
 }
 
 } // namespace t970_gpu

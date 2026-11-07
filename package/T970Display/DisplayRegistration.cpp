@@ -322,7 +322,7 @@ extern "C" bool native_legacy_prepare_scanout(void) {
 
 static void reportGpu(char *out, unsigned length) {
     const unsigned mode = t970_gpu::powerMode();
-    if (mode != 5 && mode != 7) t970_gpu::reportArc(out, length);
+    if (mode != 5 && mode < 7) t970_gpu::reportArc(out, length);
     const size_t used = strlen(out);
     unsigned gpuWrite = 0;
     const bool writeGate = PE_parse_boot_argn("t970-gpu-w", &gpuWrite, sizeof(gpuWrite)) && gpuWrite == 1;

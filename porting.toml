@@ -1080,6 +1080,7 @@ procedure = [
   "Collect DRM modes, panel type and brightness limits; read only display-selection tokens from /proc/cmdline and match the selected S6TUUM3 node in the live DT.",
 ]
 findings = [
+  "GPU report mode 8 replaces the ARC inventory with the GMU rate and restoration report in the terminal buffer.",
   "GPU report mode 7 replaces the ARC table text with the bounded TCS vote report in the existing startup buffer.",
   "The v108 GPU RSC report takes the existing ARC summary slot in the shared terminal buffer, preserving the frame counters and the two display report entry paths.",
   "The v104 diagnostic uses the existing peripheral report slot for a bounded GPU power snapshot and retains the v103 GOP and HID boot baseline.",
@@ -1399,6 +1400,7 @@ procedure = [
   "Read KGSL identity and frequency nodes, list GPU firmware files and calculate the GMU/SQE hashes without executing GPU commands.",
 ]
 findings = [
+  "v110 BOOTf8039496 reports both MX and CX TCS1 acknowledgements at 0x10101 and idle IRQ/control state 0/0/1 with RSC, XO and CX restored. v111 qualifies the GPLL0 divided 200 MHz GMU route after both ARC acknowledgements, then restores XO before releasing the temporary DIV_GATE.",
   "v109 BOOT569ebe5f reports wr=ff restore=ff xo=7/7 cx=1/1, verifying the eight SDE, RSC SRAM and PDC writes and their rollback on the board. v110 uses the programmed state to send MX before CX on GPU DRV0 TCS1, with both selector 2 values validated against command DB and parent dependencies retained on uncertain completion.",
   "v108 BOOT25f846a6 confirms DRV0 config 4000000a, ten idle TCS slots, lmi-matching inherited hidden commands and route, zeroed sequence SRAM and PDC 0/100. v109 applies the lmi mode 24 SDE/SRAM/PDC subset under the exact cold-state guard and verifies reverse restoration.",
   "v107 BOOT5354324f shows GMU reset=1 fw=0 ao=1440/6b66 xo=7/7 cx=1/1. The AO counter advanced by 22310 while CM3 remained held. v108 adds a read-only GPU DRV0/TCS and PDC census under that clock and reset state, before any sequencer or vote programming.",
@@ -1422,9 +1424,10 @@ limits = [
   "No GMU bring-up, command submission, DMA/SMMU ownership or Metal rendering was tested under UniXNU.",
 ]
 next_action = [
-  "Capture the v110 GPU vote line. If MX and CX acknowledge in order and control state restores, qualify the GPLL0 divided GMU 200 MHz route while the verified rail votes are held.",
+  "Capture the v111 GPU rate line. If 200 MHz configuration and XO restoration pass, qualify the T970 GMU SID5 and HFI buffer route while CM3 is still in reset.",
 ]
 evidence = [
+  { kind = "device", reference = "evidence/gpu/arc-vote-v110/device-result.json", revision = "c195d06b196097bcdfa95019bd23f9a4f582310a", command = "BOOTf8039496; owner three-finger report screenshot 2026-11-07T17:10:40+08:00", result = "MX and CX each ack/10101, idle IRQ/control/status=0/0/1, RSC=ff/ff XO=7/7 CX restore=1. Eight CPUs and 35 GOP copies and retirements." },
   { kind = "host", reference = "evidence/gpu/arc-vote-v110/host-validation.json", revision = "c195d06b196097bcdfa95019bd23f9a4f582310a", command = "python3.14 -m unittest discover -s tests; evidence/gpu/power-v104/prepare.py --arc-vote", result = "73 tests ran, 10 skipped, OK. Sanitized ARC vote model, prelink, FAT readback and separate DTS/ADT check passed." },
   { kind = "device", reference = "evidence/gpu/arc-vote-v110/upload.json", revision = "c195d06b196097bcdfa95019bd23f9a4f582310a", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/gpu-arc-vote-v110/boot-partition.img", result = "BOOTf8039496 upload succeeded and requested reboot. Device vote acknowledgement and restoration are pending." },
   { kind = "device", reference = "evidence/gpu/rsc-init-v109/device-result.json", revision = "1c811f799c20a69cf6bfa1ae2047b4c869a2dc1b", command = "BOOT569ebe5f; owner three-finger report screenshot 2026-11-07T16:17:43+08:00", result = "GPU init ok, idle=3ff, wr=ff restore=ff xo=7/7 cx=1/1. Eight CPUs and 29 GOP copies and retirements." },
@@ -1707,6 +1710,7 @@ procedure = [
   "Read BuildManifest.plist from the local IPSW using Python zipfile and plistlib to identify its OS version, build and product types.",
 ]
 findings = [
+  "v111 validates the tested v110 BOOT and replaces the kernel and GPU mode in FAT. ADT, Data seed, trust cache and bytes outside FAT are preserved.",
   "v110 validates exact v109 BOOT and replaces only the kernel and GPU diagnostic mode in FAT. The ADT, Data seed, trust cache and bytes outside FAT are preserved.",
   "v109 validates exact v108 BOOT and replaces the kernel and GPU diagnostic mode in FAT. The ADT, Data seed, trust cache and bytes outside FAT are preserved.",
   "The v108 packer validates exact v107 BOOT and replaces the kernel and t970-gpu-p value in FAT. ADT, Data seed, trust cache and bytes outside FAT are preserved.",
@@ -1995,6 +1999,7 @@ procedure = [
   "Run python3 scripts/collect-adb-inventory.py --root --output evidence/<new-capture>; review per-command stderr, checksums, GPT CRC results and DT sanitization before updating this record.",
 ]
 findings = [
+  "Mode 8 records inherited, active and restored RCG and DIV_GATE values. The GPLL0 calculation is shared with the existing read-only clock report.",
   "Mode 7 prints MX and CX separately, including command status, pending IRQ/control/slot state and the RSC/XO/CX restoration result.",
   "v108 routes both terminal variants through the same GPU reporter and prioritizes RSC/PDC state in mode 5. The ARC and branch write wiring tests still exercise the ordinary diagnostic selection.",
   "The v104 report uses the locked SM8250 register header and checks the inherited CFG AHB state before attempting the read-only GPUCC snapshot.",

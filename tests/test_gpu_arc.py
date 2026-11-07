@@ -72,8 +72,8 @@ int main() {
             subprocess.run([str(exe)], check=True)
 
     def test_gpll0_hz(self):
-        source = (ROOT / 'package/T970Gpu/ClockSnapshot.h').read_text()
-        body = source[source.index('static inline uint64_t gpll0Hz'):source.index('static void reportClock')]
+        source = (ROOT / 'package/T970Gpu/GmuRate.h').read_text()
+        body = source[source.index('static inline uint64_t gpll0Hz'):source.index('static inline bool gpll0Running')]
         cases = r"""
 #include <cassert>
 #include <cstdint>
@@ -98,7 +98,7 @@ int main() {
         self.assertNotIn('writeMasked', header)
         display = (ROOT / 'package/T970Display/DisplayRegistration.cpp').read_text()
         self.assertEqual(display.count('reportGpu(out + used,'), 2)
-        self.assertIn('if (mode != 5 && mode != 7) t970_gpu::reportArc(out, length);', display)
+        self.assertIn('if (mode != 5 && mode < 7) t970_gpu::reportArc(out, length);', display)
         self.assertIn('t970_gpu::reportClock(', display)
         self.assertIn('PE_parse_boot_argn("t970-gpu-w"', display)
 
