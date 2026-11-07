@@ -1,0 +1,66 @@
+{
+  "boot_sha256": "6d5c4c60b69a1e160fe02a2e25ad553837d01e6268c013f6ba724dcad47206c6",
+  "photo": "screen-runtime.jpg",
+  "photo_sha256": "aa20e577861b60ca39805ab48cdecd4a0bb627712de5730c38497c5ee61c95ca",
+  "photo_time_local": "2026-11-07T13:07:58+08:00",
+  "desktop_reached": true,
+  "report_trigger": "three-finger hold on the desktop; the runtime report is an intentional diagnostic panic",
+  "main": 1,
+  "cpu": 8,
+  "springboard_pid": 27,
+  "backboardd_pid": 57,
+  "gauge": {
+    "line": "Gauge id=15/02 valid=7f raw=80/3c7f/c444/0/1c33/881/dbb",
+    "id": "15/02",
+    "valid": "0x7f",
+    "raw": {
+      "status_00": "0x0080",
+      "repsoc_06": "0x3c7f",
+      "vcell_09": "0xc444",
+      "current_0a": "0x0000",
+      "temp_08": "0x1c33",
+      "repcap_05": "0x0881",
+      "fullcap_10": "0x0dbb"
+    }
+  },
+  "battery": {
+    "line": "Bat present=1 soc100=6049 uV=3925312 uA=0 mC=28199 cap=5442/8787 chg=1:cf/e0/3b restore=1 done/none reg=0",
+    "present": 1,
+    "state_of_charge_percent": 60.49,
+    "voltage_uv": 3925312,
+    "current_ua": 0,
+    "temperature_mc": 28199,
+    "remaining_mah": 5442,
+    "full_mah": 8787,
+    "capacity_ratio_percent": 61.94
+  },
+  "charger": {
+    "valid": 1,
+    "int_ok_b2": "0xcf",
+    "details_00_b3": "0xe0",
+    "details_01_b4": "0x3b",
+    "chgin_dtls": 3,
+    "chgin_ok": true,
+    "chg_dtls": 11,
+    "watchdog_expired": true,
+    "external_connected": true,
+    "charging": false,
+    "full": false,
+    "decode": "b2 bit6 CHGIN_OK is set; b3 bits6:5 = 3 means CHGIN is inside its valid range; b4 bits3:0 = 0xB is the charger watchdog-expired detail used by the vendor max77705_chg_get_wdtmr_status(), whose get_charger_state() reports that value as discharging."
+  },
+  "restore": {
+    "gpio_mux_latch_oe": true,
+    "stage": "done",
+    "fault": "none",
+    "failed_register": 0
+  },
+  "units_check": "Every converted value recomputes from its raw word with the pinned decoder: 15487*100/256=6049, 50244*78125/1000=3925312, 7219*1000/256=28199, 2177*5/2=5442, 3515*5/2=8787. Printed units therefore agree with the registers, not with the Android UI snapshot.",
+  "writes": "No PMIC, gauge or charger configuration write. Only GPIO28/29 mux, output latch and OE were borrowed and restored; restore readback is 1.",
+  "interpretation": "The desktop was reached (SpringBoard 27, backboardd 57) and the three-finger report printed the Gauge/Bat lines. All seven gauge words are valid and the MAX77705 identity 15/02 is the expected combination. VBUS is present and valid, so external power is connected, but the charger detail is 0xB (watchdog expired), so charging is not active. The gauge currently updates only this terminal report; nothing is published to the OS battery service.",
+  "limits": [
+    "One sample. It does not establish continuous refresh, plug/unplug updates or error handling.",
+    "The charger watchdog is expired; feeding or disabling it and re-enabling charging are not implemented and were not attempted.",
+    "No IOPMPowerSource publication or system battery display exists for this boot.",
+    "Gauge state of charge 60.49% and REPCAP/FULLCAP 61.94% differ by 1.45 points; neither is the Android UI percentage."
+  ]
+}

@@ -31,9 +31,24 @@ valid 不完整时零初始化字段不是有效测量；`chg=0` 表示状态读
 新增真实代码的 ASan/UBSan 检查覆盖 I²C 地址、重复 START、ACK/NACK、仲裁、
 SCL 超时、时钟恢复、GPIO 恢复及测量单位。见 `host-validation.json`。
 
-2026-11-07 13:02:52 已 BOOT-only 刷入成功并请求重启。尚待桌面和 Gauge/Bat
-实机读数；不能由传输成功认定电池可用。`source/`、`preparation.json` 和
-`upload.json` 保留本轮确切源码、镜像身份和传输记录。
+2026-11-07 13:02:52 已 BOOT-only 刷入成功并请求重启。`source/`、
+`preparation.json` 和 `upload.json` 保留本轮确切源码、镜像身份和传输记录。
+
+13:07:58 机主照片 `screen-runtime.jpg` 及 `device-result.json` 确认桌面
+（SpringBoard 27、backboardd 57）上的三指报告打印了完整两行：
+
+- `Gauge id=15/02 valid=7f raw=80/3c7f/c444/0/1c33/881/dbb`。
+  MAX77705 的 15/02 组合与代码识别的原厂表一致，七项全部有效。
+- `Bat present=1 soc100=6049 uV=3925312 uA=0 mC=28199 cap=5442/8787
+  chg=1:cf/e0/3b restore=1 done/none reg=0`。换算值都能由原始字重算，
+  单位一致：60.49%、3925 mV、0 mA、28.2 °C、5442/8787 mAh。
+- charger 的 `b3` 高两位为 3，表示 CHGIN 在有效范围；`b2` 也置了
+  CHGIN_OK，因此外部电源在位。`b4 & 0x0f = 0xB` 是厂商代码中的充电看门狗
+  过期状态，故本轮 `charging=0`，不是插拔失败。未写 PMIC/gauge/charger
+  配置，GPIO28/29 的多路复用、输出锁存和 OE 恢复读回为 1。
+
+这轮只证明一次只读采样和恢复。连续刷新、插拔更新、过期/错误处理和系统
+`IOPMPowerSource` 发布都还没实现；电池百分比尚未接入系统显示。
 
 未刷的早期编译目录保留：一次 C++ 无标准库 initializer_list 编译失败已改为
 普通循环；一次协议门限误写为 2（UART）已纠正为 3（I²C）后重建本镜像。

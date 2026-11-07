@@ -12,7 +12,7 @@ T733 参考项目的提交与实机范围已核查，见
 | --- | --- | --- | --- |
 | 内存 | Loader 的连续 owned window；v87 托管范围覆盖补丁已撤下 | v88 桌面，3713.86 MiB 管理页，8 核 | 导出实际 EFI 内存图和分配区间，设计多区间管理，压力验证 |
 | 侧键 | PM8150 PON + PM8150L SPMI GPIO，v89/v90 观察器已链接 | v91 三键HID、97报告/0错误；锁屏及再次点亮正常；音量键响应 | 音频路由可用后验证音量值与实际声音；继续电池／内存，分别验证音量和锁屏／唤醒 |
-| 电池 | MAX77705，QUP0 I²C，GPIO28/29；FG 0x36、charger 0x69、PMIC 0x66 | v93 实测 SE0 I²C、空闲及引脚交接；v94 已刷，测量待回报 | 核对 Gauge/Bat 及恢复状态、比较单位，再发布 IOPMPowerSource |
+| 电池 | MAX77705，QUP0 I²C，GPIO28/29；FG 0x36、charger 0x69、PMIC 0x66 | v94 实机读数有效：60.49%、3925 mV、0 mA、28.2 °C、5442/8787 mAh，restore=1；外部电源在位但充电看门狗过期 | 串行刷新、过期／错误处理与 IOPMPowerSource 发布 |
 | 亮度 | S6TUUM3 AMSA24VU01，DSI command mode，范围 1–355 | GOP 图像已验证，亮度未验证 | 读取 DSI 交接状态；按面板 normal gamma mode 2 命令与映射表实现调节 |
 | Wi-Fi | QCA6390 PCI 17cb:1101，subsystem 17cb:0108，PCIe0 | Android 设备 ID；XNU 尚未训练链路 | SM8250 PCIe0 供电、PHY、复位、BAR、MSI／DMA；然后接 ath11k/MHI/QMI 与 21H461 网络 ABI |
 
@@ -31,8 +31,11 @@ DT 的 `fuelgauge,fg_resistor=5` 是厂商软件缩放参数，电流换算按�
 厂商还有容量校准、温度补偿和电流补偿；原始 gauge 百分比不保证等于 Android UI。
 
 `package/T970Power/Max77705Measurements.h` 实现只读字解码，v94 在终端报告路径接入
-有界 GPIO I²C 读。64 项仓库测试中 54 项通过、10 项跳过，包含 ASan／UBSan
-测量及总线恢复检查；测量实机结果和系统服务仍待验证。
+有界 GPIO I²C 读。v94 实机报告确认七项有效：`soc100=6049`、`uV=3925312`、
+`uA=0`、`mC=28199`、`cap=5442/8787`，全部可由原始字重算；GPIO 恢复读回 1。
+charger 读到 `int_ok=0xcf`、`details_00=0xe0`、`details_01=0x3b`：CHGIN 有效
+说明外部电源在位，但 `details_01 & 0xf = 0xB` 是原厂代码中的充电看门狗过期，
+所以充电未进行。本轮不改任何 PMIC／gauge／charger 配置。
 
 v93 实测 SE0 `fw=0x303`（I²C 协议 3）、`status=0`、GPIO28/29 配置 `7/7`。
 临时解除 slave AHB HWCG 后可读引擎，随后恢复。详见
