@@ -103,6 +103,8 @@ v120 实机确认翻译关闭时可以安装、走查并撤销 XNU 页表。v121
 可以完成两次本地 TLB 同步和 CB0 启停。v122 实机确认原厂 DT 的 SID5/mask `0x400`
 可发布至 CB0 并撤销。v123 实机确认固定 A650 固件的 ITCM/DTCM 与 RAM 装载和回读，
 TCM 恢复无差异，版本字为 `0x20010008`。
+v124 复用 T970 的 RSC 路由和 v122 的 SID5，把四队列 HFI 布局随固件发布，
+随后释放 CM3 并检查 FW_INIT 和 HFI 就绪。加载后保留 DMA 内存和依赖至重启。
 CM3 启动阶段需保留 T970 的 RSC 路由，且核对 A650 的 HFI 队列布局。
 锁定的 Sm8250Platform 冷启动序列会写入固定的 hidden 值，集成时需处理与实测路由的差异。
 见 [v109 实测](../evidence/gpu/rsc-init-v109/device-result.json)、
@@ -120,6 +122,7 @@ CM3 启动阶段需保留 T970 的 RSC 路由，且核对 A650 的 HFI 队列布
 [v121 启停实测](../evidence/gpu/cbactivate-v121/device-result.json)、
 [v122 SID5 实测](../evidence/gpu/sid5-v122/device-result.json)、
 [v123 固件装载实测](../evidence/gpu/gmufw-v123/device-result.json)、
+[v124 首启探针](../evidence/gpu/gmuboot-v124/README.md)、
 [lmi RSC 实现](https://github.com/Fsasdddd/lmi-uefi-touch-gpu/blob/0c9398400f937555918a53f1e9a97a90a3345257/tools/lmi-gpu-rsc-init.c)
 和 [SM8250 GMU 实现](https://github.com/FFT-infra/UniXNU-sm8250-common/blob/166235ec2480ff0992627b7aafa15c65ce6b4efa/kits/Sm8250Platform/A650Gmu.c)。
 

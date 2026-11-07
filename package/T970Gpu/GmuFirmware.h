@@ -18,7 +18,8 @@ struct GmuFirmwareProbe {
 
 namespace t970_gpu {
 
-static bool stageGmuFirmware(IOMemoryMap &gmu, GmuTables &tables, GmuFirmwareProbe &result) {
+static bool stageGmuFirmware(IOMemoryMap &gmu, GmuTables &tables, GmuFirmwareProbe &result,
+                             bool keepLoaded = false) {
     using t970_touch::read;
     using t970_touch::write;
     constexpr uint32_t tcmSize = 0x4000, dtcmBase = 0x10004000;
@@ -111,13 +112,18 @@ static bool stageGmuFirmware(IOMemoryMap &gmu, GmuTables &tables, GmuFirmwarePro
                 result.mismatches += read(gmu, at) != firmwareWord(data);
             })) return false;
         result.version = read(gmu, dtcmVersion);
+        const bool loaded = !result.mismatches && result.version == 0x20010008;
+        if (keepLoaded && loaded && stillReset() && read(gmu, retention) == 1) {
+            result.state = "loaded";
+            return true;
+        }
         if (!visitTcm([&](unsigned at, unsigned i, const uint8_t *) { write(gmu, at, saved[i]); }) ||
             !visitTcm([&](unsigned at, unsigned i, const uint8_t *) {
                 result.restoreMismatches += read(gmu, at) != saved[i];
             })) return false;
         if (!original) write(gmu, retention, original);
         if (!stillReset() || read(gmu, retention) != original || result.restoreMismatches) return false;
-        result.state = !result.mismatches && result.version == 0x20010008 ? "ok" : "readback";
+        result.state = loaded ? "ok" : "readback";
         return true;
     }();
     IOFreeData(saved, snapshotBytes);

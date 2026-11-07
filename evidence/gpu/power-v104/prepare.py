@@ -50,8 +50,15 @@ def main():
     variants.add_argument('--cb-activate', action='store_true', help='Pack v121 from the tested v120 BOOT')
     variants.add_argument('--sid5', action='store_true', help='Pack v122 from the tested v121 BOOT')
     variants.add_argument('--gmu-firmware', action='store_true', help='Pack v123 from the tested v122 BOOT')
+    variants.add_argument('--gmu-boot', action='store_true', help='Pack v124 from the tested v123 BOOT')
     options = parser.parse_args()
-    if options.gmu_firmware:
+    if options.gmu_boot:
+        baseline = 'gpu-gmufw-v123'
+        base_sha = '5bce7bb8a8160c67b5c5f40a4400ed3df1e225bb6d02ff2b615077d847ffba28'
+        output = OUT / 'gpu-gmuboot-v124'
+        old, new = b't970-gpu-p=20', b't970-gpu-p=21'
+        markers = (b'GPU boot %s/%s fw=', b'GPU fw %s/%s/%s tcm/ram=')
+    elif options.gmu_firmware:
         baseline = 'gpu-sid5-v122'
         base_sha = '1c7ea2fe56a3f61945340c5e1879a8af781b5390106db882904a3812f497838d'
         output = OUT / 'gpu-gmufw-v123'

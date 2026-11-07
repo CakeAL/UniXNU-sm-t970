@@ -82,6 +82,14 @@ static bool prepareGmuTables(GmuTables &gmu, uint32_t id0, uint32_t id2) {
     return auditGmuTables(gmu, gmu.image.ttbr0);
 }
 
+static void publishGmuTables(const GmuTables &gmu) {
+    // SM8250 uses 64-byte cache lines. Publish the backing at PoC for the GMU.
+    const auto start = reinterpret_cast<uintptr_t>(gmu.tables);
+    for (uintptr_t at = start; at < start + GmuTables::bytes; at += 64)
+        __asm__ volatile("dc cvac, %0" :: "r"(at) : "memory");
+    __asm__ volatile("dsb sy" ::: "memory");
+}
+
 static void reportGmuTables(char *out, unsigned length) {
     if (!length) return;
     GmuTables gmu;

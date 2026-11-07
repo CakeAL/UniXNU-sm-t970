@@ -225,6 +225,20 @@ static void reportRscMode(char *out, unsigned length, const RscSnapshot &rsc, un
         const GmuRate &rate = rsc.rate;
         if (power >= 9 && strcmp(rate.smmu.state, "skip")) {
             const SmmuSnapshot &s = rate.smmu;
+            if (power == cbBootMode) {
+                const auto &b = s.boot;
+                const char *stage = b.state;
+                if (!strcmp(stage, "skip")) {
+                    stage = s.state;
+                    if (strcmp(s.rootState, "skip")) stage = s.rootState;
+                    if (strcmp(s.sid5State, "skip")) stage = s.sid5State;
+                }
+                snprintf(out, length,
+                    "\nGPU boot %s/%s fw=%x hfi=%x/%x rst=%x at=%x f=%x/%x irq=%x/%x held=%u axi=%x",
+                    stage, rate.state, b.fwInit, b.hfiStatus, b.hfiVersion, b.reset, b.offset,
+                    b.globalFault, b.contextFault, b.aoStatus, b.gmuStatus, s.rootHeld ? 1u : 0u, s.ddrAxi);
+                return;
+            }
             if (power == cbFirmwareMode) {
                 const auto &f = s.firmware;
                 snprintf(out, length,

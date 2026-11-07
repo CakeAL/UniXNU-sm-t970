@@ -7,6 +7,7 @@
 #include "GmuTables.h"
 #endif
 #include "GmuFirmware.h"
+#include "GmuBoot.h"
 
 class IOBufferMemoryDescriptor;
 
@@ -21,6 +22,7 @@ constexpr unsigned cbRootMode = 17;
 constexpr unsigned cbActivateMode = 18;
 constexpr unsigned cbSid5Mode = 19;
 constexpr unsigned cbFirmwareMode = 20;
+constexpr unsigned cbBootMode = 21;
 constexpr uint32_t cbBarStage1 = 0x1f300;
 // Arm IHI 0062D.c: FSR[10:9] describes the translation table format.
 constexpr uint32_t cbFsrFormatMask = 0x600;
@@ -69,6 +71,8 @@ struct SmmuSnapshot {
     const char *sid5State = "skip";
     uint32_t sid5Smr = 0, sid5S2cr = 0, sid5SmrAfter = 0, sid5S2crAfter = 0;
     GmuFirmwareProbe firmware;
+    GmuBootProbe boot;
+    uint32_t ddrAxi = 0;
 };
 
 constexpr unsigned cbOffsets[] = {
@@ -121,12 +125,17 @@ static bool sameRoutes(IOMemoryMap &smmu, const uint32_t (&routes)[6]) {
     return true;
 }
 
-static bool barViewIdle(IOMemoryMap &smmu, IOMemoryMap &gmu, const SmmuSnapshot &result,
-                        const uint32_t (&routes)[6], const CbGuards &guards, bool translation = false) {
+static bool barViewMatches(IOMemoryMap &smmu, const SmmuSnapshot &result,
+                           const uint32_t (&routes)[6], const CbGuards &guards, bool translation) {
     const unsigned expected = translation ? cbTranslationEnabled : 0;
     return (guards.flags() & ~cbBarChanged) == expected && guards.fsr == cbFsrAarch64 &&
         guards.scr0 == result.scr0 && readSmmu32(smmu, 0x1800) == 1 &&
-        sameRoutes(smmu, routes) && coldGmu(gmu);
+        sameRoutes(smmu, routes);
+}
+
+static bool barViewIdle(IOMemoryMap &smmu, IOMemoryMap &gmu, const SmmuSnapshot &result,
+                        const uint32_t (&routes)[6], const CbGuards &guards, bool translation = false) {
+    return barViewMatches(smmu, result, routes, guards, translation) && coldGmu(gmu);
 }
 
 #ifdef T970_GPU_GMU_TABLES
@@ -180,7 +189,7 @@ static bool pulseTtbr(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &result,
 }
 
 static bool pulseSid5(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &result,
-                      const uint32_t (&routes)[6], uint32_t sctlr) {
+                      const uint32_t (&routes)[6], uint32_t sctlr, [[maybe_unused]] GmuTables *bootTables) {
     constexpr unsigned smr0 = A650_SMMU_SMR(0), s2cr0 = A650_SMMU_S2CR(0);
     constexpr uint32_t globalPolicy = 0x40f, faultUnmatched = 0x406;
     constexpr uint32_t routeType = 3u << 16, faultRoute = 2u << 16;
@@ -190,15 +199,19 @@ static bool pulseSid5(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &result,
     const uint32_t translated = (routes[0] & ~0x030303ffu) | 0x300u;
     uint32_t expectedRoutes[6];
     memcpy(expectedRoutes, routes, sizeof(expectedRoutes));
-    const auto matches = [&](uint32_t match, uint32_t route) {
+    const auto matches = [&](uint32_t match, uint32_t route, bool requireCold = true) {
         auto current = readCbGuards(smmu);
+        if (!requireCold) {
+            result.boot.globalFault = current.gfsr;
+            result.boot.contextFault = current.fsr;
+        }
         if (current.bar != cbBarStage1 || current.sctlr != sctlr ||
             readSmmu32(smmu, A650_SMMU_ID2) != result.id2 ||
             current.smrs != (match ? 1u : 0u) || readSmmu32(smmu, smr0) != match)
             return false;
         current.smrs = 0;
         expectedRoutes[0] = route;
-        return barViewIdle(smmu, gmu, result, expectedRoutes, current, true);
+        return barViewMatches(smmu, result, expectedRoutes, current, true) && (!requireCold || coldGmu(gmu));
     };
     result.sid5State = "policy";
     if ((result.scr0 & globalPolicy) != faultUnmatched || (routes[0] & routeType) != faultRoute)
@@ -215,6 +228,25 @@ static bool pulseSid5(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &result,
         result.sid5Smr = readSmmu32(smmu, smr0);
         published = result.sid5Smr == sid5Match && matches(sid5Match, translated);
     }
+
+#ifdef T970_GPU_GMU_FIRMWARE
+    if (published && bootTables) {
+        result.boot.reset = t970_touch::read(gmu, 0x14000);
+        const bool safe = stageGmuFirmware(gmu, *bootTables, result.firmware, true);
+        result.boot.state = result.firmware.state;
+        if (!safe || !strcmp(result.firmware.state, "loaded")) {
+            // The loaded image and all live state are kept through reboot.
+            result.boot.keepRoute = true;
+            result.sid5State = "live";
+            if (safe) {
+                result.boot.state = "route";
+                if (matches(sid5Match, translated))
+                    startGmuBoot(gmu, *bootTables, result.boot, [&] { return matches(sid5Match, translated, false); });
+            }
+            return false;
+        }
+    }
+#endif
 
     result.sid5State = "detach";
     if (readSmmu32(smmu, A650_SMMU_ID0) != result.id0 ||
@@ -233,7 +265,7 @@ static bool pulseSid5(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &result,
 
 static bool pulseCbActivation(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &result,
                               const uint32_t (&routes)[6], const ArmSmmu4KContextImage &image,
-                              uint32_t original, bool publishSid5) {
+                              uint32_t original, bool publishSid5, GmuTables *bootTables) {
     constexpr unsigned sctlr = 0x8000, tlbStatus = 0x87f4;
     constexpr uint32_t enable = 1, faultInterrupt = 1u << 6, policyMask = 0x1f7;
     const ArmSmmu4KIo tlbIo = {
@@ -294,7 +326,8 @@ static bool pulseCbActivation(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot 
         contextMatches();
     const bool activeMatch = activeClean && (active.sctlr & policyMask) == (requested & policyMask);
     const bool routeWithdrawn = !publishSid5 || !activeMatch ||
-        (pulseSid5(smmu, gmu, result, routes, active.sctlr) && contextMatches());
+        (pulseSid5(smmu, gmu, result, routes, active.sctlr, bootTables) && contextMatches());
+    if (result.boot.keepRoute) return false;
     if (publishSid5 && !stillOwnsView(readCbGuards(smmu))) return false;
     // Withdraw M even if the active readback failed, before considering
     // any restoration of the root and original control word.
@@ -364,11 +397,8 @@ static bool pulseCbRoot(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &resul
     if (power == cbFirmwareMode && !stageGmuFirmware(gmu, tables, result.firmware)) return false;
 #endif
 
-    // SM8250 cache lines are 64 bytes. Publish the backing at PoC before TTBR0.
-    const auto start = reinterpret_cast<uintptr_t>(tables.tables);
-    for (uintptr_t address = start; address < start + GmuTables::bytes; address += 64)
-        __asm__ volatile("dc cvac, %0" :: "r"(address) : "memory");
-    if (io.barrier(io.cookie) || !idle()) return false;
+    publishGmuTables(tables);
+    if (!idle()) return false;
     for (unsigned i = 0; i < fieldCount; ++i) {
         uint64_t value = 0;
         if (!readField(i, value) || value != saved[i]) return false;
@@ -402,8 +432,10 @@ static bool pulseCbRoot(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &resul
     const bool installed = result.rootInstalled == fullMask;
     const bool audited = installed && auditGmuTables(tables, observed[firstTtbr]);
     if (audited) result.rootLeaves = static_cast<unsigned>(tables.audit.leaf_pages);
-    if (audited && (power == cbActivateMode || power == cbSid5Mode) &&
-        !pulseCbActivation(smmu, gmu, result, routes, tables.image, before.sctlr, power == cbSid5Mode))
+    const bool publishSid5 = power == cbSid5Mode || power == cbBootMode;
+    GmuTables *bootTables = power == cbBootMode ? &tables : nullptr;
+    if (audited && (power == cbActivateMode || publishSid5) &&
+        !pulseCbActivation(smmu, gmu, result, routes, tables.image, before.sctlr, publishSid5, bootTables))
         return false;
 
     // TCR2/TCR precede restoring TTBRs because TCR2 controls ASID width.
@@ -575,6 +607,13 @@ static SmmuSnapshot pulseSmmuBus(IOMemoryMap &gcc, IOMemoryMap &gmu, unsigned po
     constexpr unsigned clocks[] = {gpu + A650_GCC_GPU_MEMNOC_GFX, gpu + A650_GCC_GPU_SNOC_DVM_GFX};
     constexpr uint32_t enable = A650_CBCR_ENABLE;
     SmmuSnapshot result;
+    if (power == cbBootMode) {
+        result.ddrAxi = read(gcc, gpu + A650_GCC_DDRSS_GPU_AXI);
+        if (result.ddrAxi == UINT32_MAX || !A650GpuClockIsOn(result.ddrAxi)) {
+            result.state = "axi";
+            return result;
+        }
+    }
     result.state = "clock";
     uint32_t before[2] = {};
     unsigned visited = 0;
