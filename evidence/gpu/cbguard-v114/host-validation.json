@@ -1,0 +1,16 @@
+{
+  "device_revision": "b131239bd36b3bd34af86d42ab2d92c0ecc738c5",
+  "unixnu_revision": "2c834e313d25482c78d38d703eff1f8d190f2597",
+  "boot_sha256": "a3c7e5fc2c73b168e7b4baee587a371166f877fe28dd184e7b1940966754f72f",
+  "tests": {
+    "command": "python3.14 -m unittest discover -s tests",
+    "ran": 73,
+    "skipped": 10,
+    "result": "OK"
+  },
+  "instructions": "33 LDR/UXTW pairs with distinct address and destination registers in DisplayRegistration.o",
+  "kernel_prelink": "PASS",
+  "fat_readback": "PASS",
+  "check_hardware_description": "PASS with synthetic identity",
+  "check_platform": "Stopped at historical framework revision guard"
+}

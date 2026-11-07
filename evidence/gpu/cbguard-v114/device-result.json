@@ -1,0 +1,36 @@
+{
+  "boot_sha256": "a3c7e5fc2c73b168e7b4baee587a371166f877fe28dd184e7b1940966754f72f",
+  "photo": "screen-runtime.jpg",
+  "photo_sha256": "66ea0858ff63a2bb4699f737c2fa10a9b7f3c8852ca520265a6dff823a6a6c52",
+  "photo_time_local": "2026-11-07T19:42:39+08:00",
+  "lines": [
+    "GPU cbfmt busy-hold/smmu-hold va64=0/1/0 rb=0 guard=4/0 diff=0 bus=3/0 rsc=ff/0 xo=0 cxr=0",
+    "CB guard id=4c017e06/20000005 f=0/400 bar/scr/ctl=0/270406/13cde30a smr=0"
+  ],
+  "va64_set_readback": 1,
+  "restore_attempted": false,
+  "parents_held": true,
+  "cb0_fsr_format_bits": "0x400",
+  "cb0_fsr_other_bits": "0x0",
+  "interpretation": "Arm IHI 0062D.c defines FSR[10:9] as Format. v114 included these bits in the fault predicate. Global fault status, SCTLR.M and all six SMRs read zero.",
+  "boot": {
+    "launchd_main": true,
+    "cpus": 8,
+    "processes": 256,
+    "springboard_pid": 27,
+    "backboardd_pid": 57
+  },
+  "storage": {
+    "data_space_rc": 0,
+    "block_size": 4096,
+    "available_blocks": 36002
+  },
+  "display": {
+    "copies": 42,
+    "retired": 42
+  },
+  "input": {
+    "side_key_sample_errors": 0,
+    "side_key_hid": "1/1/0"
+  }
+}

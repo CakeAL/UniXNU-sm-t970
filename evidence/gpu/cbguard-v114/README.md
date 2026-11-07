@@ -19,3 +19,12 @@ python3.14 evidence/gpu/power-v104/prepare.py --cb-guard
 python3.14 -m unittest discover -s tests
 python3.14 ../UniXNU/scripts/porting-record.py check --device .
 ```
+
+## 实测
+
+[刷写回执](upload.json)与[实机照片及读数](device-result.json)对应 BOOT
+`a3c7e5fc2c73b168e7b4baee587a371166f877fe28dd184e7b1940966754f72f`。
+唯一触发项是位 `4`。置位后 CB0 FSR 为 `0x400`，恰好是
+[Arm SMMUv2 规范](https://documentation-service.arm.com/static/5f900d34f86e16515cdc08fb)
+定义的 AArch64 格式字段，实际故障位、全局故障、SCTLR.M 和 SMR 均为零。
+`rb=0` 表示没有进入恢复，第三个 VA64 数值未实测。
