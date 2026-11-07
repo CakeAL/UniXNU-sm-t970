@@ -1,0 +1,23 @@
+{
+  "boot_sha256": "43258b3cf1c594b3221ccf03493e1ea42abf73b26b39f07b4c50d95852046085",
+  "photo": "screen-runtime.jpg",
+  "photo_sha256": "6c414878551b573345cae0d66d061e8b1914cfbe5683c0637163bf52906e4c17",
+  "photo_time_local": "2026-11-07T12:38:06+08:00",
+  "vote": "0x041007c0",
+  "se0_clock": "0x00004220",
+  "master_ahb_clock": "0x00000000",
+  "slave_ahb_clock": "0x80000002",
+  "gpio28_config": "0x7",
+  "gpio29_config": "0x7",
+  "gpio28_io": "0x1",
+  "gpio29_io": "0x1",
+  "se0_sampled": false,
+  "physical_owned_window_not_reported": true,
+  "report_truncated": true,
+  "managed_pages": "0xe81d9",
+  "main": 1,
+  "cpu": 8,
+  "secondaries": 7,
+  "key_hid": "1/1/0",
+  "interpretation": "SE0 vote present and branch runs. Slave AHB reports CLK_OFF with HWCG set. Pins select QUP0 and both input levels high. Serial-engine sample correctly skipped. The shared896-byte display report buffer clipped the memory line; this is not memory-read failure."
+}

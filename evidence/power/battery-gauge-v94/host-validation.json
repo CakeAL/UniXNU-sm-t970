@@ -1,0 +1,18 @@
+{
+  "command": "python3.14 -m unittest discover -s tests -v",
+  "tests_run": 64,
+  "passed": 54,
+  "skipped": 10,
+  "failed": 0,
+  "gauge_model": "ASan/UBSan actual reportGauge: correct GPIO owner; PMIC identity; gauge and charger read plan; restoration on failures",
+  "i2c_model": "wire protocol covers default touch and PMIC/gauge/charger addressing, repeated START, ACK/NACK, arbitration and stuck SCL",
+  "clock_model": "refusal, timeout, temporary HWCG and masked restoration",
+  "platform_check": {
+    "command": "python3.14 scripts/check-platform.py --unixnu ../UniXNU",
+    "exit_code": 1,
+    "result": "Stopped before DT/ADT validation: UniXNU checkout differs from the reviewed framework revision; no gate weakened."
+  },
+  "snapshot_and_receipt_consistency": "v93 and v94 passed",
+  "porting_record": "13 structured areas checked",
+  "whitespace": "git diff --check passed"
+}

@@ -1,0 +1,31 @@
+{
+  "base_boot_sha256": "bb5bd9d090c20e64bfea37aff50c267f635619db15d178a38b8da3d7ed2637c6",
+  "boot_sha256": "6d5c4c60b69a1e160fe02a2e25ad553837d01e6268c013f6ba724dcad47206c6",
+  "boot_bytes": 71303168,
+  "kernel_sha256": "f7f6a3bb4482781374a9c30aa3431902012a87612cec58508571c6df2f15c2f5",
+  "kernel_build_sha256": "f7519806903e2e939a4a33c4321a58682f53c9df02941fd52d73f7971ae933fb",
+  "adt_sha256": "ccf520425d90445a5415425f714ba12065daa4b6a70ce1e30b740437d6de85b6",
+  "dram_size": "0x200000000",
+  "data_seed_sha256": "9a0005a5c520412006589e068264b611c3484af123547d13103387a9fb7c0afa",
+  "config_sha256": "89448334cd18a5f197275a9f7a07ab16c466397fed53220f2a5f6dd86d56144d",
+  "trust_cache_sha256": "7416ca4f8377146626bb284e2133c76bee6cb4e3ee0af5d648b186235a7323a7",
+  "unchanged_adt_seed_trust": true,
+  "temporary_slave_ahb_hwcg": true,
+  "owned_memory_report": true,
+  "gauge_read_only": true,
+  "gpio_restore": true,
+  "unchanged_header_firmware_dtb_tail": true,
+  "uploaded": false,
+  "build": {
+    "device_base_revision": "b700a694021722740e7212cfe4e28c24adce0f31",
+    "unixnu_revision": "2c834e313d25482c78d38d703eff1f8d190f2597",
+    "kernel_log_sha256": "4cc2f6aa6917d982948234e1764b51331a0f9ab39a451bd87f17b393c5cc6d48",
+    "source_sha256": {
+      "package/T970Touch/BusSnapshot.h": "8f63a88da8bf9d85afb626faeeba86128116558c1b7b5d5df5332de0328a498a",
+      "package/T970Display/DisplayRegistration.cpp": "ba573b1b708d768aef95419c02367c679d3e0fb87bb6fc080003d6e9b4cb62cd",
+      "package/T970Power/Max77705Measurements.h": "4d4a6e3908552780320cd8085e2fed09312f3f0dc83a84329367a384e09a4a72",
+      "package/T970Power/BusSnapshot.h": "cfeff59b3180930a8e021610fc696b1b0e9e5a83c02f41adf84c3ce6493bffbc",
+      "package/T970Power/GaugeProbe.h": "66e54230733c2ddc5c6652bd3d22f03f9c537c05a8818758532aca1f4f98717d"
+    }
+  }
+}

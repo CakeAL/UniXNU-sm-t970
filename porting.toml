@@ -14,7 +14,7 @@ status = "host-verified"
 components = [
   "ArmDTPlatform",
 ]
-paths = [
+paths = ["docs/t733-feature-audit-20261107.md",
   "docs/peripherals.md",
   "docs/buttons.md",
   "evidence/peripherals/**",
@@ -97,6 +97,7 @@ procedure = [
   "Run python3.14 ../UniXNU-sm-t970/scripts/check-platform.py --unixnu . to compare DT/ADT bindings with the captured hardware.",
 ]
 findings = [
+  "v91 device feedback confirms power-key lock and relight, with Consumer HID events for volume but no working volume change. v92/v93 qualify the MAX77705 bus; v94 is BOOT-only uploaded with gated read-only gauge sampling. The T733 reference audit adds future USB CDC/ECM/LLDB, persistent Data, shutdown, MSC and thermal/DVFS goals without importing its board wiring; GPU remains deferred.",
   "Current maintainer scope: full usable 8 GB, Wi-Fi, brightness, side buttons and battery; GPU deferred. docs/peripherals.md separates hardware inputs, host-only implementations and device validation. v88 reached desktop with3713.86MiB; v90 verified all3 raw keys; v91 Consumer HID uploaded, OS behavior pending; v92 battery/memory observers prepared.",
   "BOOT5385b6ce owner photo03:00:42 shows three pending queues drained, MG done134, BB161, SB75->78, display open6/fail0/swap0. No constrained head means Q cap zero is absent data, not a measured cached limit. v22 reuses exact v21 kernel with existing stack mode1 to locate current BB/SB main waits; host image checks pass, hardware stack result pending.",
   "v21 BCM2837 EDGE width fallback uses registered SMP CPU/cluster counts only when E/P counts are both zero. Previous BOOT705d4160 has all eight ADT CPU cluster-type absent (SMP), cached constrained cap0 and callback progress. Actual prepared-function ASan/UBSan tests cover SMP1/8, E/P precedence and non-BCM guard; kernel/prelink/FAT checks pass. BOOT5385b6ce hardware result pending; this is not validated heterogeneous scheduling or desktop. See evidence/display/edge-smp-v21.",
@@ -533,7 +534,7 @@ evidence = [
 id = "memory"
 status = "implemented"
 components = []
-paths = [
+paths = ["evidence/power/battery-clock-v93/**", "evidence/power/battery-gauge-v94/**",
   "evidence/power/battery-ro-v92/**",
   "package/T970Memory/**",
   "evidence/memory/owned-window-v88/**",
@@ -605,6 +606,7 @@ procedure = [
   "Capture root-readable /proc/iomem and the live DT, then compare physical memory and reserved-memory reg values.",
 ]
 findings = [
+  "v93 BOOTbb5bd9d0 photo reports actual arm64 boot_args physBase=0xc007c000, memSize=memSizeActual=0xf0000000 and topOfKernelData=0xc43b8000; managed pages=0xe81d9. This disproves an assumed high-bank-only allocation but does not provide the full EFI map or authorize reclaiming ADT reservations. v94 retains exactly the same ADT and memory request.",
   "Added opt-in t970-memory-report=1 to report the actual64-bit arm64 boot_args physBase/memSize/memSizeActual/topOfKernelData. This is observation only; it does not expand the managed range. Runtime allocation-base evidence is pending on the next report image.",
   "v88 BOOT0c94056e changed only the actual DarwinBoot owned-window request to 3840 MiB on the pre-v87 kernel. Owner desktop confirmation and three-finger photo show 0xe81dc managed 4 KiB pages (3713.859375 MiB), main1, cpu8/sec7. The unsafe t970-8g-managed-range patch was removed from the active series; full 8 GB, physical allocation base/map, carveout integrity and pressure testing remain unverified.",
   "v85 raises the XNU DRAM envelope from 2 GiB to 8 GiB by rewriting only /chosen/dram-size in the packed ADT, keeping the booted 8-CPU, PSCI, identity and memory-map bytes. The 4K bootstrap page-table pool grows from 16 to 32 pages for the larger physical aperture. Host tests cover the single-property rewrite; the device page count is pending.",
@@ -647,11 +649,9 @@ limits = [
   "The saved DT, XBL and iomem describe original software. New UEFI allocations, secure-world ownership, DMA widths and XNU cache/SMMU behavior require separate runtime checks.",
   "Removing board.example completes the concrete input configuration; it does not make the candidate RAM bank device-verified.",
 ]
-next_action = [
-  "Capture the actual Loader allocation base and EFI memory map, reconcile retained owners and static/dynamic reservations, then implement multi-range page enumeration, valid-page checks, bootstrap allocation and DMA bounds before claiming the full 8 GB.",
-  "Capture the actual owned-window physical base/size and EFI memory map on the next observable boot; do not reclaim the rest of the ADT envelope.",
-]
+next_action = ["Export the actual EFI memory map and allocation ownership, reconcile carveouts, then qualify additional ranges and pressure/DMA bounds; actual allocation base/size are now recorded in v93."]
 evidence = [
+  { kind = "device", reference = "evidence/power/battery-clock-v93/device-result.json", revision = "b700a694021722740e7212cfe4e28c24adce0f31", command = "BOOTbb5bd9d0; owner three-finger photo2026-11-07 12:47:35+08:00", result = "Actual64-bit boot_args base0xc007c000, memSize/Actual0xf0000000 and top0xc43b8000; pages0xe81d9. Same compiled source snapshot as preparation.json; not full EFI map/full8GB evidence." },
   { kind = "host", reference = "evidence/power/battery-ro-v92/preparation.json", result = "Read-only battery bus handoff and64-bit Loader-owned-memory report compiled/prelinked; original HID bindings checked; payload command line within1000bytes. Image prepared, not uploaded or device verified.", command = "python3.14 evidence/display/hello-black-v64/build-kernel.py --cached-headers --setup-probe --gop-fork --keys --refresh-hid --output out/data-bringup/battery-ro-v92-build; python3.14 evidence/power/battery-ro-v92/prepare.py", revision = "0e66aca5f5543246138f541b57d8a50dc5ab6a5c" },
   { kind = "device", reference = "evidence/memory/owned-window-v88/device-result.json", result = "SM-T970/iPadOS21H461, BOOT0c94056e, owner confirmed desktop and 3713.859375 MiB managed pages; 8 CPUs. No stress validation.", command = "python3.14 evidence/memory/owned-window-v88/prepare.py; .cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/owned-window-v88/boot-partition.img; owner three-finger runtime report", revision = "0e66aca5f5543246138f541b57d8a50dc5ab6a5c" },
   { kind = "host", reference = "evidence/memory/8g-v85/preparation.json", revision = "0a1ef40803761c3b7520f92539254d9fc2c0cfcc", command = "python3.14 evidence/memory/8g-v85/prepare.py", result = "Packed BOOT1436f2f1 from the v84 image: kernel 6e8b011b with 32 bootstrap-table pages and ADT be41464a with dram-size 0x200000000. Data seed, config, trust cache and firmware unchanged." },
@@ -1066,6 +1066,7 @@ procedure = [
   "Collect DRM modes, panel type and brightness limits; read only display-selection tokens from /proc/cmdline and match the selected S6TUUM3 node in the live DT.",
 ]
 findings = [
+  "v93 prioritizes peripheral diagnostics within the existing 896-byte display report to avoid clipping Memory/Battery lines. The v91 owner confirms power-key lock/relight; hardware panel power-off and brightness are still separate unverified functions. The long magenta-to-logo interval has no phase timestamps yet, so memory size, I/O or probe delays are not established causes.",
   "The active S6TUUM3_AMSA24VU01 panel uses DSI command-mode brightness. The stock normal gamma-mode2 function writes DBV low byte then upper3 bits and changes smoothing state; the UI range1..355 is not a raw linear DBV range. No brightness command has yet been sent by XNU.",
   "v84 boots to the iPadOS home screen. The Data seed marks Setup done, so Setup.app never launches (exec 0/0/0), and SpringBoard PID 27 draws the status bar and icons with 277 swaps, 276 CPU copies at 42531/49297 us and zero rejections. The frame copy stays at about 43 ms. The owner reports that apps open and display correctly, but launching takes some time; no app-side frame, copy or memory sample exists yet. Brightness control and sustained animation remain unobserved.",
   "v84 follows the framework skip-setup guide: the v83 kernel and arguments stay, only the packed Data seed changes so com.apple.purplebuddy marks Setup done and com.apple.migration records 21H461, with auto-dim disabled. BOOT215edec4 was uploaded with a requested reboot; the SpringBoard result is pending.",
@@ -1295,6 +1296,8 @@ procedure = [
   "Read /proc/bus/input/devices, getevent -lp and bound I2C driver links; correlate them with the exact touch and Wacom DT nodes.",
 ]
 findings = [
+  "v91 BOOT65026b21 owner confirms short power locks and relights the screen. Photo12:30:44 shows power4/4,up14/14,down30/30,mask0,errors0,hid1/97/0. Volume keys react but volume adjustment is unavailable; lack of audio backend remains a hypothesis. v92/v93 retain HID; v93 has hid1/15/0 with no input errors.",
+  "v91 owner report and photo on BOOT65026b21 confirm power lock and screen-on, reacting volume keys, power4/4/up14/14/down30/30, released mask0,18626 samples,0 errors and97 successful HID reports(status0). The97 reports match96 key edges plus initial neutral. System volume adjustment is unavailable; actual volume changes and the suspected audio-backend cause are unverified. Hardware suspend/resume is not claimed.",
   "After v90 confirmed all three raw keys, v91 BOOT65026b21 with a separate Consumer HID service was uploaded and rebooted successfully. OS volume, lock and screen-on feedback are pending; transfer is not functional verification.",
   "v90 owner photo on BOOTf72005c4 confirms all three raw keys2/2, released mask0, arbiter0x50010000, PON APID13, GPIO3 APID0x51,15197 samples and0 errors; main1/cpu8/sec7/pages0xe81db. This verifies raw key input only, not OS Consumer HID or wake.",
   "An additional opt-in t970-keys-hid=1 implementation now publishes a separate keyboard/Consumer HID service while preserving the digitizer descriptor and audited207-slot/208-byte IOHIDDevice base ABI. v91 compiled/prelinked and the actual original-family bindings rechecked successfully; packed BOOT65026b21 is unflashed pending v90 raw GPIO qualification. OS volume/lock/wake results remain unknown.",
@@ -1324,14 +1327,10 @@ completion = [
 limits = [
   "The powered identity read, raw finger events and Hello gesture are device-verified. Full coordinate calibration, pen and power-key behavior remain unverified.",
 ]
-next_action = [
-  "Collect v91 OS-visible volume, lock and screen-on results with the hid report/status counters. Preserve or disable HID in the next v92 battery/memory observation image based on that result.",
-  "Confirm all three raw edge counters and neutral mask on v90 before enabling the separately published Consumer HID service. Volume and lock/wake need distinct OS-visible validation.",
-  "On v89, short-press power, volume up and volume down twice and collect the Keys line. Require correct 2/2 edges, final mask0 and errors0 before enabling consumer HID; verify lock/wake and volume separately.",
-  "Build the read-only SPMI key probe (PON 0x008 RT_STS bits 7/6 and PM8150L GPIO3 0x4c3 bit 0), report the mask and press counts, then decide the HID report path.",
-  "Preserve the v76 input baseline while diagnosing the slow language transition. Verify full coordinate coverage and map PM8150 PON keys separately.",
-]
+next_action = ["Keep the verified PMIC bits0/1 and GPIO3 one-based PPID0x4c2 mapping. Validate OS volume values and audible output after an audio route exists; lock/relight is already confirmed, hardware sleep is not."]
 evidence = [
+  { kind = "device", reference = "evidence/input/keys-hid-v91/device-result.json", revision = "b700a694021722740e7212cfe4e28c24adce0f31", command = "BOOT65026b21; owner lock/relight feedback and photo2026-11-07 12:30:44+08:00", result = "Power short press locks and relights; three-key edges4/4,14/14,30/30; HID1/97/0,errors0. Volume key reaction observed but adjustment unavailable. Source hashes in original preparation manifest." },
+  { kind = "device", reference = "evidence/input/keys-hid-v91/device-result.json", result = "SM-T970/iPadOS21H461: owner confirms short-power lock and screen-on; volume keys react but adjustment unavailable. All keys released;97 successful HID reports,0 read errors. No proof of audible volume or suspend/resume.", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/keys-hid-v91/boot-partition.img; owner key tests and three-finger runtime report", revision = "0e66aca5f5543246138f541b57d8a50dc5ab6a5c" },
   { kind = "device", reference = "evidence/input/keys-v90/device-result.json", result = "SM-T970/iPadOS21H461: power, volume-up and volume-down each2/2, neutral mask0,0 errors across15197 samples; raw input verified, no HID.", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/keys-v90/boot-partition.img; owner presses and three-finger runtime report", revision = "0e66aca5f5543246138f541b57d8a50dc5ab6a5c" },
   { kind = "host", reference = "evidence/input/keys-hid-v91/preparation.json", result = "Separate Consumer HID implementation compiled/prelinked and audited original21H461 IOHIDDevice bindings checked. Packed image not uploaded; raw GPIO3 confirmation required first.", command = "python3.14 evidence/display/hello-black-v64/build-kernel.py --cached-headers --setup-probe --gop-fork --keys --refresh-hid --output out/data-bringup/keys-hid-v91-build; python3.14 evidence/input/keys-hid-v91/prepare.py", revision = "0e66aca5f5543246138f541b57d8a50dc5ab6a5c" },
   { kind = "device", reference = "evidence/input/keys-v89/device-result.json", result = "SM-T970/iPadOS21H461: desktop and 3713.86MiB retained, power and volume-down raw2/2, no read errors. Volume-up failed and is corrected in v90; HID not enabled.", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/keys-v89/boot-partition.img; owner presses and three-finger runtime report", revision = "0e66aca5f5543246138f541b57d8a50dc5ab6a5c" },
@@ -1481,7 +1480,7 @@ evidence = [
 id = "power"
 status = "planned"
 components = []
-paths = [
+paths = ["evidence/power/battery-clock-v93/**", "evidence/power/battery-gauge-v94/**", "tests/test_battery_clock_probe.py", "tests/test_gauge_probe.py", "tests/test_gpio_i2c.py",
   "evidence/power/battery-ro-v92/**",
   "package/T970Power/**",
   "tests/test_battery_measurements.py",
@@ -1505,6 +1504,7 @@ procedure = [
   "Read selected power-supply attributes, available sleep states and thermal-zone names; do not write charging, regulator or suspend controls.",
 ]
 findings = [
+  "v92 BOOT43258b3c reports QUP0 SE0 vote0x041007c0, branch0x4220, masterAHB0, slaveAHB0x80000002,GPIO28/29 configs7/7 and high inputs. v93 BOOTbb5bd9d0 temporarily clears only slaveAHB HWCG and restores it: SE firmware0x303 means I2C protocol3/version3, FIFO enabled,status0. v94 BOOT6d5c4c60 qualifies this idle protocol before a bounded GPIO open-drain read of PMIC0x66, gauge0x36 and charger0x69; it restores GPIO mux/latches and does not write PMIC configuration. Gauge/charger measurements and system publication await hardware evidence.",
   "Added opt-in t970-battery-ro=1 handoff inspection for QUP0 clocks and NORTH GPIO28/29. The observer maps read-only and skips SE0 register reads unless its SE and both AHB clocks report running with the expected votes. It sends no I2C transfers or charger writes; gauge/device results remain pending.",
   "The board uses MAX77705 on QUP0/SE0 at0x980000 via NORTH GPIO28/29; the MFD source creates gauge0x36 and charger0x69 behind PMIC0x66. A read-only measurement decoder now handles per-field validity, little-endian words, signed current/temperature and vendor fg_resistor=5 scaling. ASan/UBSan vectors cover 4250mV,75.5%,positive/negative current and temperature,10090mAh and absent/failed samples. It is not linked to a transport or OS battery service yet.",
   "v67 adds an opt-in root-domain watchdog panic detail with PM machine state, wait reason, current and requested power states, pending count and first pending service class. It also retains a 240-second frame report if no watchdog fires. Kernel prelink and final BOOT FAT checks pass. The device reaches target240 with a completed blank GOP fill 28 ms after the last normal CPU copy. No PM watchdog panic occurred before the report.",
@@ -1518,11 +1518,10 @@ completion = [
 limits = [
   "Vendor battery units, firmware ownership and state transitions remain unverified; The v64 panic identifies a PM timeout but does not establish suspend or resume functionality.",
 ]
-next_action = [
-  "Read the SE0/GPIO handoff state, establish bounded gauge/charger reads without changing charging configuration, compare raw units, then publish IOPMPowerSource and test cable changes, staleness and OS-visible state.",
-  "Read the matching battery/charger driver sources to establish units and ownership, then map required regulators and clocks for the first boot path.",
-]
+next_action = ["Capture v94 Gauge/Bat raw readings and restoration result; verify units and charger status, then implement serialized refresh and IOPMPowerSource publication with stale/error handling."]
 evidence = [
+  { kind = "device", reference = "evidence/power/battery-clock-v93/device-result.json", revision = "b700a694021722740e7212cfe4e28c24adce0f31", command = "BOOTbb5bd9d0; owner three-finger photo2026-11-07 12:47:35+08:00", result = "Source snapshot identified by preparation.json. Idle SE0 reports I2C protocol3/version3, FIFO enabled and status0 after temporary slaveAHB HWCG clear; restoration1. No gauge measurement in v93." },
+  { kind = "host", reference = "evidence/power/battery-gauge-v94/preparation.json", revision = "b700a694021722740e7212cfe4e28c24adce0f31", command = "build-kernel.py --cached-headers --setup-probe --gop-fork --keys --refresh-hid; battery-gauge-v94/prepare.py", result = "BOOT6d5c4c60 compiled/linked/prelinked with preserved source snapshot hashes; exact v93 ADT,seed,trust,firmware,DTB/header/tail retained. Upload receipt is separate; gauge/OS runtime remains pending." },
   { kind = "host", reference = "evidence/power/battery-ro-v92/preparation.json", result = "Read-only battery bus handoff and64-bit Loader-owned-memory report compiled/prelinked; original HID bindings checked; payload command line within1000bytes. Image prepared, not uploaded or device verified.", command = "python3.14 evidence/display/hello-black-v64/build-kernel.py --cached-headers --setup-probe --gop-fork --keys --refresh-hid --output out/data-bringup/battery-ro-v92-build; python3.14 evidence/power/battery-ro-v92/prepare.py", revision = "0e66aca5f5543246138f541b57d8a50dc5ab6a5c" },
   { kind = "host", reference = "evidence/peripherals/source-audit/checks.json", result = "The MAX77705 measurement encoding harness passed with ASan/UBSan. No XNU gauge read or battery service was exercised.", command = "python3.14 -m unittest discover -s tests -p test_battery_measurements.py", revision = "0e66aca5f5543246138f541b57d8a50dc5ab6a5c" },
   { kind = "host", reference = "evidence/display/pm-watchdog-v67/preparation.json", revision = "a1af20bddd4d35ff2c18758946c74b8d32c59e5f", command = "python3.14 evidence/display/hello-black-v64/build-kernel.py --cached-headers --output out/data-bringup/pm-watchdog-v67-build && python3.14 evidence/display/hello-black-v64/prepare.py --pm-watchdog", result = "Kernel prelink includes both report markers. Final FAT retains the v66 2 GiB ADT, trust cache and Data seed." },
@@ -1633,6 +1632,7 @@ procedure = [
   "Read BuildManifest.plist from the local IPSW using Python zipfile and plistlib to identify its OS version, build and product types.",
 ]
 findings = [
+  "v93 BOOTbb5bd9d0 and v94 BOOT6d5c4c60 were uploaded to BOOT only with Heimdall success and reboot requested. v94 keeps the exact v93 ADT, Data seed, trust cache, Android-v2 header, firmware, DTB and partition tail; only kernel and battery probe mode2-to3 change. Preparation manifests preserve compiled source snapshots and hashes; upload success is separate from readback and runtime success.",
   "The display relinker now optionally adds the PMIC key object and refreshes the separate Consumer HID wrapper, with original21H461 vtable bindings rechecked after prelink. v88..v92 preserve the exact Android-v2 header, firmware, firmware-DTB and partition tail and audit FAT kernel/ADT/config/seed/trust changes independently. v91 is uploaded; v92 with read-only battery-bus and64-bit owned-window reports is prepared. Every new image, receipt and available owner observation is kept together under evidence; generated binaries remain ignored.",
   "BOOTbb4d8474 owner observed Apple logo; photo14:40:13 shows swap2/0, transfer2, copies2, retire2. BOOT08b90255 previously panicked on uninitialized vc_progress_lock via first swap console handoff. Guard now matches t970-novc bootstrap. SpringBoard sample reaches LaunchServices database context from Control Center module discovery; sustained desktop pending. See evidence/display/display-novc-v24.",
   "BOOTe44011cb photo03:08:38 links BB wait to QuartzCore CAMetalContextCreate polling IOAcceleratorES, at most 300 sleeps of 100ms; SB waits for main screen info, open6/swap0. T733 48f documents CPU frames through NativeLegacyDisplay. BOOT08b90255 keeps kernel and changes report target to 125s; FAT comparison passes, ADT differs only in random-seed. See evidence/display/ui-cpu-fallback-v23.",
@@ -1913,6 +1913,7 @@ procedure = [
   "Run python3 scripts/collect-adb-inventory.py --root --output evidence/<new-capture>; review per-command stderr, checksums, GPT CRC results and DT sanitization before updating this record.",
 ]
 findings = [
+  "v91 lock/relight and v92/v93 bus/memory observations are saved with photo and BOOT hashes. v93 avoids shared896-byte report clipping. v94 adds raw/decoded read-only gauge output, PMIC identity checks, validity mask and GPIO restoration result. Full suite ran64 tests:54 passed,10 skipped; actual GPIO-I2C wire, clock, gauge restoration and numeric cases pass ASan/UBSan. DT/ADT checker remains blocked by framework revision drift.",
   "New diagnostics bind v88 managed-page/desktop photos and v89/v90 PMIC edge samples to exact BOOT hashes and upload receipts. The opt-in key observer/HID reports version, APIDs, mask, edges, sample/error counts and HID status. v92 adds guarded read-only SE0/GPIO handoff and real64-bit boot_args-owned-window reporting; no reset probe or allocator expansion is introduced. Compiled old-source snapshots are preserved for v89..v91. The full DT/ADT checker still refuses framework revision drift before validating the tree; 61 host tests pass with10 skips.",
   "BOOTbb4d8474 owner observed Apple logo; photo14:40:13 shows swap2/0, transfer2, copies2, retire2. BOOT08b90255 previously panicked on uninitialized vc_progress_lock via first swap console handoff. Guard now matches t970-novc bootstrap. SpringBoard sample reaches LaunchServices database context from Control Center module discovery; sustained desktop pending. See evidence/display/display-novc-v24.",
   "BOOTe44011cb photo03:08:38 links BB wait to QuartzCore CAMetalContextCreate polling IOAcceleratorES, at most 300 sleeps of 100ms; SB waits for main screen info, open6/swap0. T733 48f documents CPU frames through NativeLegacyDisplay. BOOT08b90255 keeps kernel and changes report target to 125s; FAT comparison passes, ADT differs only in random-seed. See evidence/display/ui-cpu-fallback-v23.",

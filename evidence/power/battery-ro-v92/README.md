@@ -1,4 +1,4 @@
-# T970 电池总线与实际托管窗口观察 v92（未刷）
+# T970 电池总线与实际托管窗口观察 v92
 
 继承 v91 的 3840 MiB 请求和按键 HID，增加 `t970-battery-ro=1 t970-memory-report=1`。
 只读，不发送 I²C 请求，不改变时钟、引脚、充电器或内存分配。
@@ -21,5 +21,8 @@ BOOT `43258b3cf1c594b3221ccf03493e1ea42abf73b26b39f07b4c50d95852046085`。
   `memSizeActual` 和 `topOfKernelData`。`actual` 仍是 Loader 的拥有窗口大小，
   不是安装的整机 DRAM；此探针不提供完整 EFI 内存图，也不扩大 XNU 托管范围。
 
-当前只已准备。应先取得 v91 的音量／锁屏行为反馈，再决定下一次镜像的 HID 开关。
-观测到总线交接状态后，才开始实际 gauge 0x36 与 charger 0x69 的只读事务。
+已刷入并保留 HID；传输回执见 `upload.json`。本版不读取 gauge 或 charger。
+
+## 实机结果
+
+vote=041007c0，clk=4220/0/80000002，gpio28/29=7/7，io=1/1，SE=gated。SE0和主AHB运行，从AHB有HWCG且报告关闭；引擎未读取。共享display_state只有896字节，Battery行末尾和整条Memory行被截掉，不代表Memory读取失败。v93优先输出外设行，并只临时清除从AHB的HWCG位，采样后恢复。

@@ -105,6 +105,7 @@ class ProbeBus {
     static constexpr unsigned scl = 0x1000;
     static constexpr uint32_t oe = 1u << 9;
     IOMemoryMap &pins;
+    uint8_t address;
 
     bool high(unsigned pin) { return read(pins, pin + 4) & 1u; }
     void release(unsigned pin) { writeMasked(pins, pin, oe, 0); }
@@ -173,13 +174,13 @@ class ProbeBus {
 
     const char *exchange(const uint8_t *command, unsigned commandLength,
                          uint8_t *bytes, unsigned length) {
-        if (!writeByte(0x49 << 1)) return "addr-w";
+        if (!writeByte(static_cast<uint8_t>(address << 1))) return "addr-w";
         for (unsigned i = 0; i < commandLength; ++i) {
             if (!writeByte(command[i])) return "command";
         }
         if (!length) return "done";
         if (!start()) return "restart";
-        if (!writeByte((0x49 << 1) | 1)) return "addr-r";
+        if (!writeByte(static_cast<uint8_t>((address << 1) | 1u))) return "addr-r";
         for (; bytesRead < length; ++bytesRead) {
             if (!readByte(bytes[bytesRead], bytesRead + 1 == length)) return "read";
         }
@@ -191,7 +192,7 @@ public:
     unsigned bytesRead = 0;
     bool stopped = false;
 
-    explicit ProbeBus(IOMemoryMap &gpio) : pins(gpio) {}
+    explicit ProbeBus(IOMemoryMap &gpio, uint8_t target = 0x49) : pins(gpio), address(target) {}
 
     bool transfer(const uint8_t *command, unsigned commandLength,
                   uint8_t *bytes = nullptr, unsigned length = 0) {

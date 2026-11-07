@@ -3,11 +3,16 @@
 目标是使用设备全部 8 GB 中实际可交给 XNU 的内存，实现 Wi-Fi、亮度、音量／锁屏键
 和电池服务；GPU 暂缓。各项以镜像哈希、设备结果和 `porting.toml` 记录验收。
 
+T733 参考项目的提交与实机范围已核查，见
+[2026-11-07 功能核查](t733-feature-audit-20261107.md)。后续还对齐 USB CDC/ECM/LLDB、
+持久 Data、正常关机、MSC 更新、CPU 调频和温度管理；其 README 中的旧状态不能作为
+当前实现清单，参考项目的实测也不能替代 T970 自身验收。
+
 | 项目 | 已确认输入／实现 | 当前实机范围 | 下一步 |
 | --- | --- | --- | --- |
 | 内存 | Loader 的连续 owned window；v87 托管范围覆盖补丁已撤下 | v88 桌面，3713.86 MiB 管理页，8 核 | 导出实际 EFI 内存图和分配区间，设计多区间管理，压力验证 |
-| 侧键 | PM8150 PON + PM8150L SPMI GPIO，v89/v90 观察器已链接 | v90 三键各2/2、松开mask0、15197采样0错误 | v91 消费控制 HID 已刷入，等待系统行为结果，分别验证音量和锁屏／唤醒 |
-| 电池 | MAX77705，QUP0 I²C，GPIO28/29；FG 0x36、charger 0x69、PMIC 0x66 | Android 原始采集，XNU 尚无读数 | 先检查 SE0／GPIO 的交接状态，读取 gauge、比较单位，再发布 IOPMPowerSource |
+| 侧键 | PM8150 PON + PM8150L SPMI GPIO，v89/v90 观察器已链接 | v91 三键HID、97报告/0错误；锁屏及再次点亮正常；音量键响应 | 音频路由可用后验证音量值与实际声音；继续电池／内存，分别验证音量和锁屏／唤醒 |
+| 电池 | MAX77705，QUP0 I²C，GPIO28/29；FG 0x36、charger 0x69、PMIC 0x66 | v93 实测 SE0 I²C、空闲及引脚交接；v94 已刷，测量待回报 | 核对 Gauge/Bat 及恢复状态、比较单位，再发布 IOPMPowerSource |
 | 亮度 | S6TUUM3 AMSA24VU01，DSI command mode，范围 1–355 | GOP 图像已验证，亮度未验证 | 读取 DSI 交接状态；按面板 normal gamma mode 2 命令与映射表实现调节 |
 | Wi-Fi | QCA6390 PCI 17cb:1101，subsystem 17cb:0108，PCIe0 | Android 设备 ID；XNU 尚未训练链路 | SM8250 PCIe0 供电、PHY、复位、BAR、MSI／DMA；然后接 ath11k/MHI/QMI 与 21H461 网络 ABI |
 
@@ -25,7 +30,14 @@ DT 的 `fuelgauge,fg_resistor=5` 是厂商软件缩放参数，电流换算按�
 `signed_raw * 15625 * 5 / 100` µA；不要把它直接解释成 5 mΩ 后套通用公式。
 厂商还有容量校准、温度补偿和电流补偿；原始 gauge 百分比不保证等于 Android UI。
 
-`package/T970Power/Max77705Measurements.h` 已实现独立的只读字解码，61 项仓库测试（10 项跳过）及 ASan／UBSan 编码向量通过；尚未连接 I²C 传输或系统服务。
+`package/T970Power/Max77705Measurements.h` 实现只读字解码，v94 在终端报告路径接入
+有界 GPIO I²C 读。64 项仓库测试中 54 项通过、10 项跳过，包含 ASan／UBSan
+测量及总线恢复检查；测量实机结果和系统服务仍待验证。
+
+v93 实测 SE0 `fw=0x303`（I²C 协议 3）、`status=0`、GPIO28/29 配置 `7/7`。
+临时解除 slave AHB HWCG 后可读引擎，随后恢复。详见
+[v93 结果](../evidence/power/battery-clock-v93/README.md)和
+[v94 测量镜像](../evidence/power/battery-gauge-v94/README.md)。
 
 先仅查询测量与 charger 状态，保留现有充电配置；充电控制、USB-PD、快充和温控
 需要各自建立所有权及实测，不能以“电量已显示”替代。

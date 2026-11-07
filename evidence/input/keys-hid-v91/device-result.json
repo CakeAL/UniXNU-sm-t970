@@ -1,0 +1,43 @@
+{
+  "boot_sha256": "65026b210ef6765aef37e08ddf49e2160a0060a98b04a9da8e3fa194f7dbcac4",
+  "photo": "screen-runtime.jpg",
+  "photo_sha256": "95448af143f7f6022745828886ef708eb96979833a2b4282c4a99b711c6d353e",
+  "photo_time_local": "2026-11-07T12:30:44+08:00",
+  "managed_pages": "0xe81d9",
+  "launchd_main": 1,
+  "cpu": 8,
+  "secondaries": 7,
+  "version": "0x50010000",
+  "pon_apid": 13,
+  "gpio_apid": "0x051",
+  "mask": 0,
+  "power": [
+    4,
+    4
+  ],
+  "up": [
+    14,
+    14
+  ],
+  "down": [
+    30,
+    30
+  ],
+  "stage": 5,
+  "samples": 18626,
+  "errors": 0,
+  "hid_enabled": true,
+  "hid_reports": 97,
+  "hid_last_status": 0,
+  "owner_observations": {
+    "short_power_locks": true,
+    "short_power_lights_screen": true,
+    "volume_keys_react": true,
+    "system_volume_adjustment_available": false
+  },
+  "limits": [
+    "Volume value change and audible volume are unverified. Missing audio backend is a plausible owner hypothesis, not established by this report.",
+    "Lock and screen-on do not establish hardware suspend/resume."
+  ],
+  "interpretation": "97 successful HID reports equal96 accepted press/release edges plus the initial neutral report. All three keys end released. Owner confirms lock and screen-on."
+}

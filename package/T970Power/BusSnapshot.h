@@ -2,16 +2,63 @@
 // Board-only QUP0/NORTH GPIO28/29 handoff snapshot. Reuses the board's MMIO helpers.
 #pragma once
 #include "../T970Touch/BusSnapshot.h"
+#include "GaugeProbe.h"
 
 namespace t970_power {
+static void reportClockProbe(IOMemoryMap &gcc, char *out, unsigned length,
+                             t970_touch::EngineSnapshot *captured = nullptr) {
+    using namespace t970_touch;
+    uint32_t votes = read(gcc, 0x52008);
+    constexpr uint32_t required = (1u << 10) | (1u << 6) | (1u << 7);
+    uint32_t before = read(gcc, 0x17008);
+    if ((votes & required) != required ||
+        ((read(gcc, 0x1700c) | read(gcc, 0x17004)) & (1u << 31))) {
+        snprintf(out, length, "\nBattery CLK refused votes=%x", votes);
+        return;
+    }
+    bool borrowed = (before & ((1u << 31) | 2u)) == ((1u << 31) | 2u);
+    if (borrowed) writeMasked(gcc, 0x17008, 2, 0);
+    for (unsigned us = 0; us < 250 && (read(gcc, 0x17008) & (1u << 31)); ++us) IODelay(1);
+    uint32_t during = read(gcc, 0x17008);
+    EngineSnapshot sample;
+    if (!(during & (1u << 31))) {
+        auto engine = mapMmio(0x980000, 0x4000);
+        if (engine) sample = {"read", read(*engine, 0x68), read(*engine, 0x64) & 1u, read(*engine, 0x40)};
+        else sample.state = "map-fail";
+    }
+    if (borrowed) writeMasked(gcc, 0x17008, 2, before);
+    bool restored = (read(gcc, 0x17008) & 2u) == (before & 2u);
+    if (captured) { *captured = sample; if (!restored) captured->state = "restore-failed"; }
+    snprintf(out, length, "\nBattery CLK slave=%x/%x restore=%u SE=%s fw=%x fifoOff=%u st=%x",
+             before, during, restored, sample.state, sample.firmware, sample.fifoOff, sample.status);
+}
+
 static void reportBus(char *out, unsigned length) {
     unsigned enabled = 0;
-    if (!PE_parse_boot_argn("t970-battery-ro", &enabled, sizeof(enabled)) || enabled != 1) return;
+    if (!PE_parse_boot_argn("t970-battery-ro", &enabled, sizeof(enabled)) || enabled < 1 || enabled > 3) return;
     if (!out || !length) return;
     auto gcc = t970_touch::mapMmio(0x100000, 0x53000);
     auto pins = t970_touch::mapMmio(0x0f91c000, 0x2000);
     if (!gcc || !pins) {
         snprintf(out, length, "\nBattery RO mapping failed");
+        return;
+    }
+    if (enabled == 2 || enabled == 3) {
+        // Only slave AHB HWCG is borrowed; SE0's existing vote and pins are retained.
+        gcc = t970_touch::mapMmio(0x100000, 0x53000, 0);
+        if (gcc) {
+            t970_touch::EngineSnapshot sample;
+            reportClockProbe(*gcc, out, length, &sample);
+            if (enabled == 3) {
+                if (!strcmp(sample.state, "read") && ((sample.firmware >> 8) & 0xffu) == 3 &&
+                    !(sample.status & ((1u << 0) | (1u << 12)))) reportGauge(out, length);
+                else {
+                    size_t used = strlen(out);
+                    snprintf(out + used, length - used, " gauge-refused");
+                }
+            }
+        }
+        else snprintf(out, length, "\nBattery CLK mapping failed");
         return;
     }
     uint32_t votes = t970_touch::read(*gcc, 0x52008);

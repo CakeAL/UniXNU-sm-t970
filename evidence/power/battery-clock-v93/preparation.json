@@ -1,0 +1,27 @@
+{
+  "base_boot_sha256": "43258b3cf1c594b3221ccf03493e1ea42abf73b26b39f07b4c50d95852046085",
+  "boot_sha256": "bb5bd9d090c20e64bfea37aff50c267f635619db15d178a38b8da3d7ed2637c6",
+  "boot_bytes": 71303168,
+  "kernel_sha256": "b2ff153a5ee1c107681412403144c8e0a32750a3ec7627891a5185d2da650b44",
+  "kernel_build_sha256": "4c98f31910f564ddc8fc1666fcf4103420abc28343980ccae81529233e80f266",
+  "adt_sha256": "ccf520425d90445a5415425f714ba12065daa4b6a70ce1e30b740437d6de85b6",
+  "dram_size": "0x200000000",
+  "data_seed_sha256": "9a0005a5c520412006589e068264b611c3484af123547d13103387a9fb7c0afa",
+  "config_sha256": "608cbc86cc7d4425900c5c2822545e9ed6fa47c93eb5c5d422a72deef85c7c56",
+  "trust_cache_sha256": "7416ca4f8377146626bb284e2133c76bee6cb4e3ee0af5d648b186235a7323a7",
+  "unchanged_adt_seed_trust": true,
+  "temporary_slave_ahb_hwcg": true,
+  "owned_memory_report": true,
+  "unchanged_header_firmware_dtb_tail": true,
+  "uploaded": false,
+  "build": {
+    "device_base_revision": "b700a694021722740e7212cfe4e28c24adce0f31",
+    "unixnu_revision": "2c834e313d25482c78d38d703eff1f8d190f2597",
+    "kernel_log_sha256": "76f72f00ef44020b97788c16d943b9d26d933db48d6e04dda0fc075de07e2299",
+    "source_sha256": {
+      "package/T970Power/BusSnapshot.h": "7fe9f46b3f32f468cd4907f5494d38ae82d5696f0181a13a1b7ad0c73c62e9bd",
+      "package/T970Touch/BusSnapshot.h": "8f63a88da8bf9d85afb626faeeba86128116558c1b7b5d5df5332de0328a498a",
+      "package/T970Display/DisplayRegistration.cpp": "ba573b1b708d768aef95419c02367c679d3e0fb87bb6fc080003d6e9b4cb62cd"
+    }
+  }
+}

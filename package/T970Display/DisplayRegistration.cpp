@@ -319,6 +319,19 @@ extern "C" bool native_legacy_prepare_scanout(void) {
 }
 
 extern "C" void native_t970_display_timing(char *out, unsigned length, int hold) {
+    unsigned peripheral = 0;
+    if (PE_parse_boot_argn("t970-battery-ro", &peripheral, sizeof(peripheral))) {
+        // The caller's display buffer is 896 bytes, shared with startup diagnostics.
+        // Prioritize current peripheral evidence instead of appending it after old Setup counters.
+        if (!out || !length) return;
+        out[0] = 0;
+        t970MemoryHandoff(out, length);
+        size_t used = strlen(out);
+        t970_power::reportBus(out + used, static_cast<unsigned>(length - used));
+        used = strlen(out);
+        if (native_t970_key_state) native_t970_key_state(out + used, static_cast<unsigned>(length - used));
+        return;
+    }
     uint64_t publishNs = 0, firstNs = 0, lastNs = 0, blankNs = 0, darkNs = 0;
     absolutetime_to_nanoseconds(__atomic_load_n(&publishedAt, __ATOMIC_RELAXED), &publishNs);
     absolutetime_to_nanoseconds(__atomic_load_n(&firstCopyAt, __ATOMIC_RELAXED), &firstNs);
