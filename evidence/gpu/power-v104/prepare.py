@@ -42,8 +42,15 @@ def main():
     variants.add_argument('--cb-format', action='store_true', help='Pack v113 from the tested v112 BOOT')
     variants.add_argument('--cb-guard', action='store_true', help='Pack v114 from the tested v113 BOOT')
     variants.add_argument('--cb-restore', action='store_true', help='Pack v115 from the tested v114 BOOT')
+    variants.add_argument('--gmu-tables', action='store_true', help='Pack v116 from the tested v115 BOOT')
     options = parser.parse_args()
-    if options.cb_restore:
+    if options.gmu_tables:
+        baseline = 'gpu-cbrestore-v115'
+        base_sha = '789e99a1b42f03b312586e5641e5d11da3b666a36f7a04d2e58245c1add98353'
+        output = OUT / 'gpu-gmu-tables-v116'
+        old, new = b't970-gpu-p=12', b't970-gpu-p=13'
+        markers = (b'GPU tables %s rc=', b'GPU tables backing')
+    elif options.cb_restore:
         baseline = 'gpu-cbguard-v114'
         base_sha = 'a3c7e5fc2c73b168e7b4baee587a371166f877fe28dd184e7b1940966754f72f'
         output = OUT / 'gpu-cbrestore-v115'

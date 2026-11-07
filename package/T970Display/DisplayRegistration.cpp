@@ -16,6 +16,9 @@
 #include "../T970Touch/BusSnapshot.h"
 #include "../T970Gpu/ArcResources.h"
 #include "../T970Gpu/ClockSnapshot.h"
+#ifdef T970_GPU_GMU_TABLES
+#include "../T970Gpu/GmuTables.h"
+#endif
 #include "../T970Power/BusSnapshot.h"
 #include "../T970Memory/Handoff.h"
 
@@ -322,6 +325,12 @@ extern "C" bool native_legacy_prepare_scanout(void) {
 
 static void reportGpu(char *out, unsigned length) {
     const unsigned mode = t970_gpu::powerMode();
+#ifdef T970_GPU_GMU_TABLES
+    if (mode == 13) {
+        t970_gpu::reportGmuTables(out, length);
+        return;
+    }
+#endif
     if (mode != 5 && mode < 7) t970_gpu::reportArc(out, length);
     const size_t used = strlen(out);
     unsigned gpuWrite = 0;

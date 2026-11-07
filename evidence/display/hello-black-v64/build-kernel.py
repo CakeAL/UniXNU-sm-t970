@@ -34,6 +34,7 @@ def main():
     parser.add_argument('--cached-headers', action='store_true')
     parser.add_argument('--keys', action='store_true', help='Link the opt-in T970 PMIC key observer')
     parser.add_argument('--gpu-soc', type=Path, help='Pinned SM8250 checkout for the GPU power snapshot')
+    parser.add_argument('--arm-smmu4k', type=Path, help='ArmSmmu4K Git repository for the GMU table probe')
     parser.add_argument('--refresh-hid', action='store_true', help='Recompile the audited HID wrapper with the setup baseline')
     parser.add_argument('--gop-fork', action='store_true',
                         help='Link the audited GopFramebuffer fork object (scanout and source cache options)')
@@ -43,6 +44,8 @@ def main():
     args = parser.parse_args()
     if args.refresh_hid and not (args.setup_probe or args.touch_hid):
         parser.error('--refresh-hid requires --setup-probe or --touch-hid')
+    if args.arm_smmu4k and not args.gpu_soc:
+        parser.error('--arm-smmu4k requires --gpu-soc')
     build = args.output.resolve()
     kernel = WORK / 'kernel/kernel.macho'
     if sha(kernel) != BASE_KERNEL_SHA or sha(LIVE / ARCHIVE) != BASE_ARCHIVE_SHA:
@@ -74,6 +77,8 @@ def main():
         registration_command.append('--touch-hid')
     if args.gpu_soc:
         registration_command.extend(['--gpu-soc', str(args.gpu_soc)])
+    if args.arm_smmu4k:
+        registration_command.extend(['--arm-smmu4k', str(args.arm_smmu4k)])
     subprocess.run(registration_command, check=True)
     replacement = registration / MEMBER
     source = DEVICE / 'package/T970Display/DisplayRegistration.cpp'
@@ -102,14 +107,24 @@ def main():
     members = ar('-t', archive).decode().splitlines()
     if any(members.count(member) != 1 for member in replacements):
         raise ValueError('Expected unique archive members to replace')
-    ar('-r', archive, *(str(path) for path in replacements.values()))
+    additions = {}
+    if args.arm_smmu4k:
+        smmu = json.loads((registration / 'report.json').read_text())['arm_smmu4k']
+        additions = {name: registration / 'ArmSmmu4K' / name for name in smmu['objects']}
+        if additions.keys() & set(members) or any(
+            sha(path) != smmu['objects'][name] for name, path in additions.items()
+        ):
+            raise ValueError('Unexpected ArmSmmu4K archive members')
+        report['arm_smmu4k'] = smmu
+    updated = replacements | additions
+    ar('-r', archive, *(str(path) for path in updated.values()))
     after = ar('-t', archive).decode().splitlines()
-    if len(after) != len(members) or set(after) != set(members):
+    if len(after) != len(members) + len(additions) or set(after) != set(members) | additions.keys():
         raise ValueError('Archive layout changed')
-    for member in members:
+    for member in after:
         if member.startswith('__.SYMDEF'):
             continue
-        expected = (replacements[member].read_bytes() if member in replacements
+        expected = (updated[member].read_bytes() if member in updated
                     else ar('-p', archive_source / ARCHIVE, member))
         if ar('-p', archive, member) != expected:
             raise ValueError('Unexpected archive change: ' + member)

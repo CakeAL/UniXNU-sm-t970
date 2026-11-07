@@ -1080,6 +1080,7 @@ procedure = [
   "Collect DRM modes, panel type and brightness limits; read only display-selection tokens from /proc/cmdline and match the selected S6TUUM3 node in the live DT.",
 ]
 findings = [
+  "The opt-in v116 build routes GPU mode 13 through the startup report and links the five pinned ArmSmmu4K objects in the diagnostic display archive.",
   "GPU report mode 8 replaces the ARC inventory with the GMU rate and restoration report in the terminal buffer.",
   "GPU report mode 7 replaces the ARC table text with the bounded TCS vote report in the existing startup buffer.",
   "The v108 GPU RSC report takes the existing ARC summary slot in the shared terminal buffer, preserving the frame counters and the two display report entry paths.",
@@ -1400,6 +1401,7 @@ procedure = [
   "Read KGSL identity and frequency nodes, list GPU firmware files and calculate the GMU/SQE hashes without executing GPU commands.",
 ]
 findings = [
+  "v116 builds and audits inactive 4 KiB GMU/HFI tables using the catalog-pinned ArmSmmu4K and XNU-owned wired backing. The CPU walks the encoded root for five A650 RAM windows. No GPU/SMMU MMIO occurs in mode 13.",
   "v114 BOOTa3c7e5fc isolates the post-set guard to CB0 FSR=0x400, the AArch64 Format field. v115 masks Format in the fault predicate, requires VA64=1 with FSR=0x400 for active readback success, and compares the original raw FSR and all CB0 words on rollback.",
   "v113 BOOTcc2fb731 confirms VA64=1, then hits a post-set idle guard before any restoration. v114 records all guard values with separate-register LDR/UXTW reads, permits exact VA64 rollback after a CBAR-only view change with empty streams and disabled translation, and still requires the full original context on return.",
   "v112 BOOTf9df94f3 confirms the lmi GPU SMMU layout, six zero SMRs, CB0 disabled, no global or CB0 fault and three stable reads. v113 tests only the CBA2R.VA64 format write with real W-register accesses, then compares the full CB0 snapshot.",
@@ -1428,7 +1430,7 @@ limits = [
   "No GMU bring-up, command submission, DMA/SMMU ownership or Metal rendering was tested under UniXNU.",
 ]
 next_action = [
-  "Connect the pinned ArmSmmu4K table builder and context encoder to T970-owned GMU/HFI pages. Before stream publication, qualify global fault policy, 64-bit TTBR accesses and the SID5 versus masked 0x405 routing requirement.",
+  "Capture the v116 GPU tables line. If the XNU backing and offline walk pass, qualify disabled CB0 programming and rollback with CM3 in reset. Before publishing a stream, verify global fault policy, TTBR access and the SID5 versus masked 0x405 routing requirement.",
 ]
 evidence = [
   { kind = "device", reference = "evidence/gpu/cbrestore-v115/device-result.json", revision = "0bc3ed847e3d7449593d3fb1c628af1076007e5a", command = "BOOT789e99a1; owner three-finger report screenshot", result = "VA64=0/1/0, rb=1, guard=0/0 diff=0, bus=3/3 rsc=ff/ff xo=7 cxr=1. Eight CPUs, RAM Data query succeeded and five GOP copies/retirements." },
@@ -1729,6 +1731,7 @@ procedure = [
   "Read BuildManifest.plist from the local IPSW using Python zipfile and plistlib to identify its OS version, build and product types.",
 ]
 findings = [
+  "v116 starts from exact v115 BOOT and switches the FAT kernel and diagnostic mode. The packer verifies the retained ADT, Data seed, trust cache and bytes outside FAT.",
   "v115 validates exact v114 BOOT and replaces the kernel and GPU mode in FAT. ADT, Data seed, trust cache and bytes outside FAT are preserved.",
   "v114 validates exact v113 BOOT and replaces only the kernel and GPU mode in FAT. ADT, Data seed, trust cache and bytes outside FAT are preserved.",
   "v113 validates exact v112 BOOT and replaces the kernel and GPU mode in FAT. ADT, Data seed, trust cache and bytes outside FAT are preserved.",

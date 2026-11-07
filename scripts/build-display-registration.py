@@ -8,6 +8,29 @@ import subprocess
 import tomllib
 
 DEVICE = Path(__file__).resolve().parents[1]
+SMMU_REVISION = '8bb168ad058c28d5c04f179ba407875eacba7ef3'
+SMMU_UNITS = ('ArmSmmu4K', 'ArmSmmu4KContext', 'ArmSmmu4KProgram',
+              'ArmSmmu4KAudit', 'ArmSmmu4KTableMemory')
+
+
+def build_smmu(compiler, repository, output, log):
+    kit = output / 'ArmSmmu4K'
+    kit.mkdir()
+    for unit in SMMU_UNITS:
+        for extension in ('.h', '.c'):
+            name = unit + extension
+            (kit / name).write_bytes(subprocess.check_output(
+                ['git', '-C', str(repository), 'show', f'{SMMU_REVISION}:{name}']))
+    commands = []
+    for unit in SMMU_UNITS:
+        command = [compiler, '--target=arm64-apple-ios17.0.0', '-mkernel',
+                   '-ffreestanding', '-O2', '-Wall', '-Wextra', '-Werror',
+                   '-c', str(kit / (unit + '.c')), '-o', str(kit / (unit + '.o'))]
+        subprocess.run(command, stdout=log, stderr=subprocess.STDOUT, check=True)
+        commands.append(command)
+    (kit / 'commands.json').write_text(json.dumps(commands, indent=2) + '\n')
+    return kit
+
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
@@ -16,9 +39,12 @@ def main():
     p.add_argument('--output', type=Path, required=True)
     p.add_argument('--touch-hid', action='store_true')
     p.add_argument('--gpu-soc', type=Path, help='Pinned SM8250 checkout for the GPU power snapshot')
+    p.add_argument('--arm-smmu4k', type=Path, help='ArmSmmu4K Git repository for the GMU table probe')
     p.add_argument('--approved', type=Path,
                    default=DEVICE / 'evidence/display/abi21h461/object-check.json')
     a = p.parse_args()
+    if a.arm_smmu4k and not a.gpu_soc:
+        p.error('--arm-smmu4k requires --gpu-soc')
     approved = json.loads(a.approved.read_text())
     if hashlib.sha256(a.gop_object.read_bytes()).hexdigest() != approved['object_sha256']:
         raise ValueError('Use the previously audited cf3b429 GOP object')
@@ -63,8 +89,11 @@ def main():
         command.append('-DT970_TOUCH_HID=1')
     if a.gpu_soc:
         command.extend(['-DT970_GPU_POWER_SNAPSHOT=1', '-I', str(gpu_kit)])
-    (out / 'command.json').write_text(json.dumps(command, indent=2)+'\n')
     with (out / 'compile.log').open('w') as log:
+        if a.arm_smmu4k:
+            smmu_kit = build_smmu(command[0], a.arm_smmu4k, out, log)
+            command.extend(['-DT970_GPU_GMU_TABLES=1', '-I', str(smmu_kit)])
+        (out / 'command.json').write_text(json.dumps(command, indent=2)+'\n')
         subprocess.run(command, cwd=r['directory'], stdout=log, stderr=subprocess.STDOUT, check=True)
     undefined = set(subprocess.check_output(['xcrun', 'nm', '-u', str(a.gop_object)], text=True).split())
     defined = {line.split()[-1] for line in subprocess.check_output(
@@ -84,6 +113,12 @@ def main():
     if a.gpu_soc:
         report['gpu_soc_revision'] = pin
         report['gpu_soc_header_sha256'] = sha(gpu_header)
+    if a.arm_smmu4k:
+        report['arm_smmu4k'] = {
+            'revision': SMMU_REVISION,
+            'objects': {unit + '.o': sha(smmu_kit / (unit + '.o')) for unit in SMMU_UNITS},
+            'probe_sha256': sha(DEVICE / 'package/T970Gpu/GmuTables.h'),
+        }
     (out / 'report.json').write_text(json.dumps(report, indent=2)+'\n')
     print('PASS: board callbacks compiled; nine native_legacy original-family aliases remain')
 
