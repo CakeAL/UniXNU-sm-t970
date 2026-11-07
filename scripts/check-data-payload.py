@@ -63,14 +63,18 @@ def main():
             pmgr_report['archive_sha256'] == sha(archive.read_bytes()), 'PMGR archive/report mismatch')
     members = subprocess.check_output(['xcrun', 'ar', 't', str(archive)], text=True).splitlines()
     objects = [name for name in members if name not in ('__.SYMDEF', '__.SYMDEF SORTED')]
-    require(len(objects) == 2 and set(objects) == {'ShengPlatformPower.late.o', 'original-bindings.o'},
-            'PMGR contains a stub/unexpected object')
+    require(len(objects) == 3 and set(objects) ==
+            {'ShengPlatformPower.late.o', 'original-bindings.o', 'BatteryService.late.o'},
+            'PMGR archive contains a stub/unexpected object')
     kernel = work / 'kernel/kernel.macho'
     symbols = subprocess.check_output(['/opt/homebrew/opt/llvm/bin/llvm-nm', '--defined-only', str(kernel)], text=True)
     names = {line.split()[-1] for line in symbols.splitlines() if line.split()}
     require({'_sheng_pmgr_run', '__GLOBAL__sub_I_ShengPlatformPower.cpp',
              '__ZTV18ShengPlatformPower', '_native_ram_block_volume_seed'} <= names,
             'Kernel lacks the real PMGR bridge or RamBlock')
+    require({'_t970_battery_start', '_t970_battery_report', '__ZTV11T970Battery',
+             '__GLOBAL__sub_I_BatteryService.cpp'} <= names,
+            'Kernel lacks the read-only battery power source')
     if args.watchdog_policy:
         require({'_native_t970_watchdog_policy_stage', '_native_t970_watchdog_policy_status'} <= names,
                 'Kernel lacks the opt-in watchdog policy implementation')

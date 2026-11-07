@@ -2,6 +2,7 @@
 // Board-only QUP0/NORTH GPIO28/29 handoff snapshot. Reuses the board's MMIO helpers.
 #pragma once
 #include "../T970Touch/BusSnapshot.h"
+#include "BatteryReport.h"
 #include "GaugeProbe.h"
 
 namespace t970_power {
@@ -37,6 +38,9 @@ static void reportBus(char *out, unsigned length) {
     unsigned enabled = 0;
     if (!PE_parse_boot_argn("t970-battery-ro", &enabled, sizeof(enabled)) || enabled < 1 || enabled > 3) return;
     if (!out || !length) return;
+    // An active battery service owns the bus; the panic report only formats its
+    // last committed sample and must not start a new transfer.
+    if (enabled == 3 && t970_battery_report(out, length)) return;
     auto gcc = t970_touch::mapMmio(0x100000, 0x53000);
     auto pins = t970_touch::mapMmio(0x0f91c000, 0x2000);
     if (!gcc || !pins) {

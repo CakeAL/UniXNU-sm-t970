@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 class GaugeProbe(unittest.TestCase):
     def test_gpio_restore_and_register_plan(self):
         source = (ROOT / 'package/T970Power/GaugeProbe.h').read_text()
-        body = source[source.index('static void reportGauge('):source.rfind('\n}')]
+        body = source[source.index('struct GaugeSample {'):source.rfind('\n}')]
         model = r'''
 #include <cassert>
 #include <cstdint>

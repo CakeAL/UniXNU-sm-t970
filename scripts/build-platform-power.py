@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
-"""Build the opt-in, guarded original-PMGR integration of UniXNU-sheng (ShengPlatformPower) for this board.
+"""Build this board's opt-in static kernel extensions: the guarded original-PMGR
+bridge (ShengPlatformPower) and the read-only MAX77705 battery power source.
 
-It is build-sheng-platform-power.py of UniXNU-sheng with these changes. The source is the board kit's copy of
-ShengPlatformPower.cpp. The reference candidate is this board's previous prelinked kernel (out/<board>/kernel), built
-from the same original kernelcache. Without one, a new tree must explicitly receive
-UNIXNU_PMGR_REFERENCE_KERNEL; it must never silently archive a no-op sheng_pmgr_run.
-The original kernelcache the contract audit
-reads is linked from the IPSW cache of the unixnu driver.
+It is build-sheng-platform-power.py of UniXNU-sheng with these changes. The PMGR
+source is the board kit's copy of ShengPlatformPower.cpp; the battery source is
+T970Power/BatteryService.cpp. Both objects share the board's one force-loaded
+archive, so the existing PMGR link dependency also relinks the kernel when the
+battery object changes. The reference candidate is this board's previous
+prelinked kernel (out/<board>/kernel), built from the same original kernelcache.
+Without one, a new tree must explicitly receive UNIXNU_PMGR_REFERENCE_KERNEL; it
+must never silently archive a no-op sheng_pmgr_run or battery start.
 """
 import hashlib
 import json
@@ -23,6 +26,7 @@ sys.path.insert(0, str(ROOT / 'kits/XnuPrelink'))
 from native_prelink import macho, backed_offset, exports
 
 ORIGINAL_KERNELCACHE_SHA256 = 'f18b4df865405f2a287b84977d7aca745e056d656d9fc9df1662970ce2969de7'
+BATTERY_INITIALIZER = b'__GLOBAL__sub_I_BatteryService.cpp'
 
 
 def run(command, **kwargs):
@@ -76,37 +80,53 @@ header += '};\nstatic_assert(sizeof(ApplePMGR)==0x4b8a8,"Original provider stora
 sources = sorted(ROOT.glob('kits/*/ShengPlatformPower.cpp'))
 require(len(sources) == 1, 'Expected one board kit with ShengPlatformPower.cpp')
 source = sources[0]
-obj = OUT / 'ShengPlatformPower.o'
+battery_sources = sorted(ROOT.glob('kits/*/T970Power/BatteryService.cpp'))
+require(len(battery_sources) == 1, 'Expected one board kit with T970Power/BatteryService.cpp')
+battery_source = battery_sources[0]
 record = json.loads((ROOT / 'build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/iokit/DEVELOPMENT/IOPlatformExpert.cpo.json').read_text().strip().rstrip(','))
-command, i = [], 0
-arguments = record['arguments']
-while i < len(arguments):
-    arg = arguments[i]
-    if arg == record['file']:
-        command.append(source)
-    elif arg == '-o':
-        command += ['-o', obj]
+
+
+def compile_source(path, output):
+    command, i = [], 0
+    arguments = record['arguments']
+    while i < len(arguments):
+        arg = arguments[i]
+        if arg == record['file']:
+            command.append(path)
+        elif arg == '-o':
+            command += ['-o', output]
+            i += 1
+        elif arg == '-Xclang' and arguments[i + 1].startswith('-W'):
+            i += 1
+        elif not arg.startswith('-W'):
+            command.append(arg)
         i += 1
-    elif arg == '-Xclang' and arguments[i + 1].startswith('-W'):
-        i += 1
-    elif not arg.startswith('-W'):
-        command.append(arg)
-    i += 1
-command += ['-Wall', '-Wextra', '-Werror', '-Wno-unused-parameter', '-Wno-c99-designator',
-            '-Wno-reorder-init-list', '-Wno-deprecated-enum-enum-conversion',
-            '-Wno-unnecessary-virtual-specifier', '-I', OUT, '-I', ROOT / '.cache/xnu-work/osfmk']
-run(command, cwd=record['directory'])
-raw = obj.read_bytes()
+    command += ['-Wall', '-Wextra', '-Werror', '-Wno-unused-parameter', '-Wno-c99-designator',
+                '-Wno-reorder-init-list', '-Wno-deprecated-enum-enum-conversion',
+                '-Wno-unnecessary-virtual-specifier', '-Wno-unused-function', '-I', OUT, '-I', ROOT / '.cache/xnu-work/osfmk']
+    run(command, cwd=record['directory'])
+    raw = output.read_bytes()
+    info = macho(raw)
+    require(info['kind'] == 1, 'Require actual ARM64 subtype-0 Mach-O object')
+    build_version = [struct.unpack_from('<2I', raw, at + 8) for cmd, at, _ in info['commands'] if cmd == 0x32]
+    require(build_version == [(2, 0x110000)], 'Require iOS17 build target')
+    return raw, info
+
+
+def symbol_names(raw, info):
+    sym_at = next(at for cmd, at, _ in info['commands'] if cmd == 2)
+    at, count, strings, _ = struct.unpack_from('<4I', raw, sym_at + 8)
+    names = []
+    for i in range(count):
+        ix, kind, _, _, address = struct.unpack_from('<IBBHQ', raw, at + i * 16)
+        names.append((raw[strings + ix:raw.index(b'\0', strings + ix)].decode(), address, kind))
+    return names
+
+
+obj = OUT / 'ShengPlatformPower.o'
+raw = compile_source(source, obj)[0]
 info = macho(raw)
-require(info['kind'] == 1, 'Require actual ARM64 subtype-0 Mach-O object')
-build_version = [struct.unpack_from('<2I', raw, at + 8) for cmd, at, _ in info['commands'] if cmd == 0x32]
-require(build_version == [(2, 0x110000)], 'Require iOS17 build target')
-sym_at = next(at for cmd, at, _ in info['commands'] if cmd == 2)
-at, count, strings, _ = struct.unpack_from('<4I', raw, sym_at + 8)
-symbols = []
-for i in range(count):
-    ix, kind, _, _, address = struct.unpack_from('<IBBHQ', raw, at + i * 16)
-    symbols.append((raw[strings + ix:raw.index(b'\0', strings + ix)].decode(), address, kind))
+symbols = symbol_names(raw, info)
 vtable = next(va for name, va, _ in symbols if name == '__ZTV18ShengPlatformPower')
 relocations = {}
 for segment in info['segments']:
@@ -151,8 +171,18 @@ sdk = run(['xcrun', '--sdk', 'iphoneos', '--show-sdk-path'], text=True).strip()
 run(['xcrun', 'clang', '-target', 'arm64-apple-ios17.0', '-isysroot', sdk, '-c', asm, '-o', OUT / 'original-bindings.o'])
 late = OUT / 'ShengPlatformPower.late.o'
 
+battery_obj = OUT / 'BatteryService.o'
+battery_raw = compile_source(battery_source, battery_obj)[0]
+battery_info = macho(battery_raw)
+battery_symbols = symbol_names(battery_raw, battery_info)
+battery_names = {name for name, _, _ in battery_symbols}
+require({'_t970_battery_start', '_t970_battery_report', '__ZTV11T970Battery',
+         '__GLOBAL__sub_I_BatteryService.cpp'} <= battery_names,
+        'Battery object lacks the start/report entry points, class vtable or staged initializer')
+battery_late = OUT / 'BatteryService.late.o'
 
-def stage_late_object(path, output):
+
+def stage_late_object(path, output, initializer):
     """Remove __DATA,__mod_init_func and globalize the staged initializer.
 
     The Linux llvm-objcopy is built without Mach-O section support, so do the
@@ -163,7 +193,7 @@ def stage_late_object(path, output):
     section = next((s for segment in image['segments'] for s in segment['sections']
                     if s['name'] == '__mod_init_func'), None)
     if section is None:
-        raise SystemExit('ShengPlatformPower.o has no __mod_init_func section')
+        raise SystemExit(f'{path.name} has no __mod_init_func section')
     at = section['command_offset']
     struct.pack_into('<Q', data, at + 40, 0)   # size
     struct.pack_into('<I', data, at + 48, 0)   # offset
@@ -181,16 +211,17 @@ def stage_late_object(path, output):
         end = strings.find(b'\0', strx)
         if end < 0:
             raise SystemExit('Unterminated Mach-O symbol name')
-        if strings[strx:end] == b'__GLOBAL__sub_I_ShengPlatformPower.cpp':
+        if strings[strx:end] == initializer:
             struct.pack_into('<B', data, symbol_at + 4, (kind | 0x01) & ~0x10)
             found = True
             break
     if not found:
-        raise SystemExit('ShengPlatformPower.o lacks the staged initializer symbol')
+        raise SystemExit(f'{path.name} lacks the staged initializer symbol')
     output.write_bytes(data)
 
 
-stage_late_object(obj, late)
+stage_late_object(obj, late, b'__GLOBAL__sub_I_ShengPlatformPower.cpp')
+stage_late_object(battery_obj, battery_late, BATTERY_INITIALIZER)
 
 
 def text_section(blob):
@@ -199,13 +230,18 @@ def text_section(blob):
 
 
 require(text_section(raw) == text_section(late.read_bytes()), 'Late registration cannot change instructions')
+require(text_section(battery_raw) == text_section(battery_late.read_bytes()),
+        'Battery late registration cannot change instructions')
 archive = OUT / 'libShengPlatformPower.a'
 archive.unlink(missing_ok=True)
-run(['xcrun', 'ar', 'rcs', archive, late, OUT / 'original-bindings.o'])
+run(['xcrun', 'ar', 'rcs', archive, late, OUT / 'original-bindings.o', battery_late])
 report = {'source_sha256': hashlib.sha256(source.read_bytes()).hexdigest(),
+          'battery_source_sha256': hashlib.sha256(battery_source.read_bytes()).hexdigest(),
           'archive_sha256': hashlib.sha256(archive.read_bytes()).hexdigest(),
           'bindings': {name: hex(va) for name, va in bindings.items()}, 'virtual_entries': 340,
-          'mode': 'opt-in lifecycle/publication/refusal instrument; not a functional power backend',
+          'members': [late.name, 'original-bindings.o', battery_late.name],
+          'mode': 'opt-in PMGR lifecycle/publication instrument plus read-only battery power source',
           'runtime_qualified': False, 'original_executable_modified': False}
 (OUT / 'build-report.json').write_text(json.dumps(report, indent=2) + '\n')
-print('PASS: ordinary ARM64/iOS17 build; exact native and original bindings; unimplemented power slots stop')
+print('PASS: ordinary ARM64/iOS17 build; exact native and original bindings; unimplemented power slots stop; '
+      'battery object carries IOPMPowerSource start/report')
