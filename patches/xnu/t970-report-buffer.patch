@@ -1,0 +1,11 @@
+--- a/bsd/kern/kern_exec.c
++++ b/bsd/kern/kern_exec.c
+@@ -8337,7 +8337,7 @@
+ 	if (PE_parse_boot_argn("t970-runtime-cache-trace", &cache_trace, sizeof(cache_trace)) && cache_trace == 1) {
+ 		extern const char *native_t970_cache_trace_text(void);
+ 		extern void native_t970_display_state(char *, unsigned) __attribute__((weak_import));
+-		char display_state[896] = "display backend absent";
++		char display_state[1280] = "display backend absent";
+ 		if (native_t970_display_state) native_t970_display_state(display_state, sizeof(display_state));
+ 		extern void native_t970_ui_spawn_state(char *, unsigned);
+ 		size_t display_used = strlen(display_state);
