@@ -39,13 +39,12 @@ static void writeMasked(IOMemoryMap &m,unsigned offset,uint32_t mask,uint32_t va
 }
 static uint8_t regs[256];
 static uint16_t tempRaw=0x1980;
+static void resetRegs(){regs[0xb7]=0x15;regs[0xb9]=0x5e;regs[0xbb]=0x13;regs[0xbd]=0xec;regs[0xc0]=0x3b;}
 class ProbeBus {
     unsigned address;
 public:
     const char *fault="none";
-    ProbeBus(IOMemoryMap &,uint8_t a):address(a){
-        if(a==0x69) { regs[0xb7]=0x15;regs[0xb9]=0x5e;regs[0xbb]=0x13;regs[0xbd]=0xec;regs[0xc0]=0x3b; }
-    }
+    ProbeBus(IOMemoryMap &,uint8_t a):address(a){}
     bool transfer(const uint8_t *command,unsigned count,uint8_t *data,unsigned size) {
         assert(count==1 || count==2);
         assert(pins.cfg[0]==3 && pins.cfg[1]==3 && pins.io[0]==1 && pins.io[1]==1);
@@ -53,7 +52,7 @@ public:
         if(address==0x66) { assert(*command==0 && size==2);data[0]=unknown?0:0x15;data[1]=2;return true; }
         if(address==0x69) {
             if(size==3) { assert(*command==0xb2);data[0]=0x40;data[1]=0x60;data[2]=3;return true; }
-            if(size==0) { assert(count==2); regs[command[0]]=command[1]; return true; }
+            if(size==0) { assert(count==2); regs[command[0]]=command[0]==0xbd?(uint8_t)(command[1]&0xfc):command[1]; return true; }
             assert(size==1 && count==1); data[0]=regs[*command]; return true;
         }
         assert(address==0x36 && size==2);
@@ -73,6 +72,7 @@ static void IODelay(unsigned us){assert(us==100);}
         cases = r'''
 int main() {
     char text[512];
+    t970_touch::resetRegs();
     pins.cfg[0]=6;
     reportGauge(text,sizeof text);
     assert(strstr(text,"refused pins=6/7") && writes==0 && transfers==0);
@@ -84,18 +84,32 @@ int main() {
     assert(transfers==14 && pins.cfg[0]==7 && pins.cfg[1]==7 && pins.io[0]==3 && pins.io[1]==3);
     GaugeSample active;
     GaugeAction action; action.enableCharging=true;
+    t970_touch::resetRegs();
     transfers=0;
     assert(readGaugeSample(active,&action));
     assert(active.writeAttempted && active.writeApplied);
     assert(!strcmp(active.chargeResult,"enabled"));
-    assert(t970_touch::regs[0xc0]==0xbb && t970_touch::regs[0xbd]==0xed);
+    assert(t970_touch::regs[0xc0]==0xbb && t970_touch::regs[0xbd]==0xec);
     assert(transfers==18 && active.configValid);
-    t970_touch::tempRaw=0x4000;
+    GaugeSample again;
+    transfers=0;
+    assert(readGaugeSample(again,&action));
+    assert(again.writeApplied && !strcmp(again.chargeResult,"kicked"));
+    assert(transfers==16);
+    t970_touch::resetRegs(); t970_touch::tempRaw=0x4000;
     GaugeSample hot;
     transfers=0;
     assert(readGaugeSample(hot,&action));
     assert(hot.writeAttempted && !hot.writeApplied && !strcmp(hot.chargeResult,"guard"));
     assert(t970_touch::regs[0xc0]==0x3b && transfers==14);
+    t970_touch::resetRegs(); t970_touch::tempRaw=0x1980;
+    GaugeSample warm; readGaugeSample(warm,&action);
+    t970_touch::tempRaw=0x4000;
+    GaugeSample cut;
+    transfers=0;
+    assert(readGaugeSample(cut,&action));
+    assert(cut.writeApplied && !strcmp(cut.chargeResult,"guard-disabled"));
+    assert(t970_touch::regs[0xc0]==0x3b && transfers==16);
     t970_touch::tempRaw=0x1980;
     nack=true;transfers=0;
     reportGauge(text,sizeof text);

@@ -97,16 +97,20 @@ static void applyChargerAction(GaugeSample &sample, const GaugeAction &action,
     }
     if (ok) {
         uint8_t target = static_cast<uint8_t>((config.cnfg06 & ~3u) | 1u);
-        uint8_t readback = 0;
-        if (!writeChargerRegister(writer, 0xbd, target, readback) || readback != target) {
+        uint8_t command[2] = {0xbd, target};
+        bool acked = writer.transfer(command, 2, nullptr, 0);
+        uint8_t readback = 0, reg = 0xbd;
+        bool readbackOk = acked && writer.transfer(&reg, 1, &readback, 1);
+        // WDTCLR is self-clearing: bits 1:0 read back zero even after a
+        // successful kick. Only the preserved CHGPROT/LX_SLOPE bits must match.
+        bool preserved = !readbackOk || (readback & 0xfc) == (config.cnfg06 & 0xfc);
+        if (!acked || !preserved) {
             ok = false;
-            sample.chargeResult = "kick-failed";
-            // Do not leave charging enabled without a kicked watchdog.
-            uint8_t restore = 0;
-            (void)writeChargerRegister(writer, 0xc0, originalEnable, restore);
+            sample.chargeResult = acked ? "kick-corrupt" : "kick-failed";
+            // Leave CHG_EN on: the unkicked watchdog stops charging by itself.
         } else {
-            config.cnfg06 = readback;
-            sample.config[3] = readback;
+            config.cnfg06 = readbackOk ? readback : config.cnfg06;
+            sample.config[3] = config.cnfg06;
         }
     }
     sample.writeApplied = ok;
