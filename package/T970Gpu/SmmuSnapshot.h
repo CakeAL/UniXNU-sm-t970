@@ -4,7 +4,10 @@
 #include "../T970Touch/BusSnapshot.h"
 #ifdef T970_GPU_GMU_TABLES
 #include "ArmSmmu4KMmio.h"
+#include "GmuTables.h"
 #endif
+
+class IOBufferMemoryDescriptor;
 
 namespace t970_gpu {
 
@@ -12,6 +15,7 @@ constexpr unsigned cbBarChanged = 1u << 3;
 constexpr unsigned cbBarMode = 14;
 constexpr unsigned cbBarReleaseMode = 15;
 constexpr unsigned cbTtbrMode = 16;
+constexpr unsigned cbRootMode = 17;
 constexpr uint32_t cbBarStage1 = 0x1f300;
 // Arm IHI 0062D.c: FSR[10:9] describes the translation table format.
 constexpr uint32_t cbFsrFormatMask = 0x600;
@@ -51,6 +55,9 @@ struct SmmuSnapshot {
     unsigned restoreSamples = 0;
     const char *ttbrState = "skip";
     unsigned ttbrRead = 0, ttbrWrite = 0, ttbrRestore = 0;
+    const char *rootState = "skip";
+    unsigned rootInstalled = 0, rootRestored = 0, rootLeaves = 0;
+    bool rootHeld = false;
 };
 
 constexpr unsigned cbOffsets[] = {
@@ -159,10 +166,106 @@ static bool pulseTtbr(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &result,
     result.ttbrState = result.ttbrWrite == 3 ? "ok" : "width";
     return true;
 }
+
+static bool pulseCbRoot(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &result,
+                        const uint32_t (&routes)[6], IOBufferMemoryDescriptor *&wiredRoot) {
+    GmuTables tables;
+    if (!prepareGmuTables(tables, result.id0, result.id2)) {
+        result.rootState = tables.stage;
+        return true;
+    }
+    ArmSmmu4KMmio mmio = {reinterpret_cast<volatile unsigned char *>(smmu.getVirtualAddress()), 0x10000};
+    ArmSmmu4KIo io = {};
+    result.rootState = "bind";
+    if (ArmSmmu4KBindMmio(&mmio, &io)) return true;
+    const auto before = readCbGuards(smmu);
+    const auto idle = [&]() {
+        const auto current = readCbGuards(smmu);
+        return current.bar == cbBarStage1 && current.sctlr == before.sctlr &&
+            barViewIdle(smmu, gmu, result, routes, current);
+    };
+    result.rootState = "guard";
+    if (before.bar != cbBarStage1 || !idle()) return false;
+
+    constexpr unsigned fields[] = {0x8010, 0x8030, 0x8038, 0x803c, 0x8020, 0x8028};
+    constexpr unsigned firstTtbr = 4, fieldCount = 6;
+    const uint64_t requested[] = {tables.image.tcr2, tables.image.tcr, tables.image.mair0,
+                                  tables.image.mair1, tables.image.ttbr0, tables.image.ttbr1};
+    const auto readField = [&](unsigned i, uint64_t &value) {
+        const auto offset = fields[i];
+        if (i < firstTtbr) {
+            value = readSmmu32(smmu, offset);
+            return true;
+        }
+        return !io.read64(io.cookie, offset, &value) && readTtbrWords(smmu, offset) == value;
+    };
+    const auto writeField = [&](unsigned i, uint64_t value) {
+        if (i >= firstTtbr) return !io.write64(io.cookie, fields[i], value) && !io.barrier(io.cookie);
+        writeSmmu32(smmu, fields[i], static_cast<uint32_t>(value));
+        return true;
+    };
+    uint64_t saved[fieldCount] = {};
+    result.rootState = "baseline";
+    for (unsigned i = 0; i < fieldCount; ++i) {
+        if (!readField(i, saved[i])) return true;
+    }
+
+    // SM8250 cache lines are 64 bytes. Publish the backing at PoC before TTBR0.
+    const auto start = reinterpret_cast<uintptr_t>(tables.tables);
+    for (uintptr_t address = start; address < start + GmuTables::bytes; address += 64)
+        __asm__ volatile("dc cvac, %0" :: "r"(address) : "memory");
+    if (io.barrier(io.cookie) || !idle()) return false;
+    for (unsigned i = 0; i < fieldCount; ++i) {
+        uint64_t value = 0;
+        if (!readField(i, value) || value != saved[i]) return false;
+    }
+
+    // Transfer the retain through final CB0 verification. An uncertain
+    // rollback keeps this diagnostic allocation wired until reboot.
+    wiredRoot = tables.memory.detach();
+    result.rootHeld = true;
+    result.rootState = "hold";
+    unsigned attempted = 0;
+    uint64_t observed[fieldCount] = {};
+    for (unsigned i = 0; i < fieldCount; ++i) {
+        ++attempted;
+        const bool wrote = writeField(i, requested[i]);
+        if (!idle()) return false;
+        if (!wrote || !readField(i, observed[i])) break;
+        // The pinned context validator allows TCR2.TBI0/TBI1 to read as set.
+        const uint64_t addedTbi = i == 0 ? observed[i] & ~requested[i] & 0x60 : 0;
+        if ((observed[i] ^ requested[i]) & ~addedTbi) break;
+        result.rootInstalled |= 1u << i;
+    }
+    const unsigned fullMask = (1u << fieldCount) - 1;
+    if (result.rootInstalled == fullMask) {
+        for (unsigned i = 0; i < fieldCount; ++i) {
+            uint64_t value = 0;
+            if (!readField(i, value) || value != observed[i]) result.rootInstalled &= ~(1u << i);
+        }
+    }
+    if (!idle()) return false;
+    const bool installed = result.rootInstalled == fullMask;
+    const bool audited = installed && auditGmuTables(tables, observed[firstTtbr]);
+    if (audited) result.rootLeaves = static_cast<unsigned>(tables.audit.leaf_pages);
+
+    // TCR2/TCR precede restoring TTBRs because TCR2 controls ASID width.
+    for (unsigned i = 0; i < attempted; ++i) {
+        if (!idle() || !writeField(i, saved[i])) return false;
+    }
+    for (unsigned i = 0; i < fieldCount; ++i) {
+        uint64_t value = 0;
+        if (readField(i, value) && value == saved[i]) result.rootRestored |= 1u << i;
+    }
+    if (!idle() || result.rootRestored != fullMask) return false;
+    result.rootState = audited ? "ok" : installed ? tables.stage : "readback";
+    return true;
+}
 #endif
 
 static bool pulseCbBar(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &result,
-                       const uint32_t (&routes)[6], [[maybe_unused]] unsigned power) {
+                       const uint32_t (&routes)[6], [[maybe_unused]] unsigned power,
+                       [[maybe_unused]] IOBufferMemoryDescriptor *&wiredRoot) {
     result.barState = "pre";
     if (result.guard.bar || !barViewIdle(smmu, gmu, result, routes, result.guard))
         return false;
@@ -180,6 +283,8 @@ static bool pulseCbBar(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &result
         const auto after = readCbGuards(smmu);
         if (after.bar != cbBarStage1 || !barViewIdle(smmu, gmu, result, routes, after)) return false;
     }
+    if (power == cbRootMode && active.bar == cbBarStage1 &&
+        !pulseCbRoot(smmu, gmu, result, routes, wiredRoot)) return false;
 #endif
     if (active.bar) writeSmmu32(smmu, 0x1000, 0);
     const CbGuards restored = readCbGuards(smmu);
@@ -211,13 +316,14 @@ static void pulseCbFormat(IOMemoryMap &smmu, SmmuSnapshot &result, IOMemoryMap *
     result.guard = readCbGuards(smmu);
     result.holdParents = true;
     result.format = "busy-hold";
+    IOBufferMemoryDescriptor *wiredRoot = nullptr;
     // A CBAR view change alone grants no route. Permit restoring VA64 with
     // all six SMRs zero, translation disabled and fault state clear.
     if (result.va64Active == UINT32_MAX || result.guard.bar == UINT32_MAX ||
         (result.guard.flags() & ~cbBarChanged)) return;
     if (barGmu) {
         if (result.va64Active == 1 && result.guard.fsr == cbFsrAarch64 &&
-            !pulseCbBar(smmu, *barGmu, result, routes, power) && strcmp(result.barState, "pre")) return;
+            !pulseCbBar(smmu, *barGmu, result, routes, power, wiredRoot) && strcmp(result.barState, "pre")) return;
         const CbGuards beforeRestore = readCbGuards(smmu);
         if ((beforeRestore.flags() & ~cbBarChanged) || beforeRestore.bar == UINT32_MAX ||
             beforeRestore.scr0 != result.scr0 || !sameRoutes(smmu, routes) || !coldGmu(*barGmu)) return;
@@ -252,6 +358,12 @@ static void pulseCbFormat(IOMemoryMap &smmu, SmmuSnapshot &result, IOMemoryMap *
         ++result.restoreSamples;
     }
     if (latched && !releaseLatched) return;
+#ifdef T970_GPU_GMU_TABLES
+    if (wiredRoot) {
+        wiredRoot->release();
+        result.rootHeld = false;
+    }
+#endif
     result.holdParents = false;
     result.format = releaseLatched ? "inert" :
         result.va64Active == 1 && result.guard.fsr == cbFsrAarch64 ? "ok" : "readback";

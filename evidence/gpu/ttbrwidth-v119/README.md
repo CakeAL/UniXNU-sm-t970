@@ -26,4 +26,8 @@ FAT 回读、Mach-O 符号范围及独立 DTS/ADT 检查。完整平台检查停
 
 [镜像清单](preparation.json)与[刷写回执](upload.json)对应 BOOT
 `9e07061db0cdff73c64b48ed88101726021451f515d5bcc22d184038cb655c6a`。
-Heimdall 确认上传成功并请求重启。实机读数待采集。
+Heimdall 确认上传成功并请求重启。
+
+[实机报告](device-result.json)显示 `rd/wr/rb=3/3/3`。两个 TTBR 的原生 64 位
+读取、ASID 置换与恢复均通过，两个快照匹配，所有依赖恢复。八核在线，
+Data 查询成功，GOP 完成 39 次拷贝和回收。

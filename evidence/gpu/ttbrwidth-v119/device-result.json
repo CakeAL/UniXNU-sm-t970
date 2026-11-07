@@ -1,0 +1,32 @@
+{
+  "boot_sha256": "9e07061db0cdff73c64b48ed88101726021451f515d5bcc22d184038cb655c6a",
+  "source": "Owner screenshot attached to the Codex conversation",
+  "photo_time_local": "2026-11-07T22:29:35+08:00",
+  "line": "GPU ttbr ok/inert/ok rd/wr/rb=3/3/3 bar=1f300/1f300 f=8 diff=0 bus=3/3 rsc=ff/ff xo=7 cxr=1 n=2",
+  "ttbr_read_mask": 3,
+  "ttbr_asid_write_mask": 3,
+  "ttbr_restore_mask": 3,
+  "cbar_residual": "0x1f300",
+  "snapshot_passes": 2,
+  "parent_dependencies_restored": true,
+  "boot": {
+    "launchd_main": true,
+    "cpus": 8,
+    "processes": 261,
+    "springboard_pid": 27,
+    "backboardd_pid": 57
+  },
+  "storage": {
+    "data_space_rc": 0,
+    "block_size": 4096,
+    "available_blocks": 44029
+  },
+  "display": {
+    "copies": 39,
+    "retired": 39
+  },
+  "input": {
+    "side_key_sample_errors": 0,
+    "side_key_hid": "1/1/0"
+  }
+}
