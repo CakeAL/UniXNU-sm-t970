@@ -39,4 +39,14 @@ python3.14 evidence/gpu/power-v104/prepare.py --gmu-boot-pf
 python3.14 -m unittest discover -s tests
 ```
 
-取回实机报告后补齐镜像清单、刷写回执和读数。
+## 构建与刷写
+
+[镜像清单](preparation.json)和[刷写回执](upload.json)对应 BOOT
+`986ddf4bc7dfb188bc6048670079d0c0dedb9f9e1ccf2e0d622952205c9855e2`
+（由 v125 BOOT `1cb79acc` 加模式 23 内核生成）。Heimdall 确认上传并请求重启。
+[主机验证](host-validation.json)含 FSR 分类、叶走查边界、单属性修补模型、
+封印固件回读和独立 DTS/ADT 检查；完整平台检查停在历史框架版本校验。
+实机报告待取回。
+
+`rs=1` 表示已重试该事务；若 `fw` 仍为 0，第二行 `GPU pf2` 会说明第二次
+被拒的地址或 `fix=t-`（页表走查故障、非叶/范围外页或三次尝试用尽）。
