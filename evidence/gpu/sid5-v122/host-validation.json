@@ -1,0 +1,21 @@
+{
+  "device_revision": "d8288efb095608706f155af10c5210c48915e8fa",
+  "unixnu_revision": "2c834e313d25482c78d38d703eff1f8d190f2597",
+  "boot_sha256": "1c7ea2fe56a3f61945340c5e1879a8af781b5390106db882904a3812f497838d",
+  "tests": {
+    "command": "python3.14 -m unittest discover -s tests",
+    "ran": 73,
+    "skipped": 10,
+    "result": "OK"
+  },
+  "model": "ASan/UBSan passed for SID5 publish and withdraw, wrong global or slot policy, filtered writes, detach fallback, active fault and earlier modes.",
+  "kernel_prelink": "PASS",
+  "fat_readback": "PASS",
+  "image_symbol_check": {
+    "segments": 15,
+    "symbols_checked": 69487,
+    "result": "PASS"
+  },
+  "check_hardware_description": "PASS with synthetic identity",
+  "check_platform": "Stopped at historical framework revision guard"
+}
