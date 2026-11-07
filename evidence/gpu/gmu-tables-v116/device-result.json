@@ -1,0 +1,33 @@
+{
+  "boot_sha256": "9ea0a92498f038c87798a410ecade65a3592bbdd82d2914f98324f960fd26633",
+  "source": "Owner screenshot attached to the Codex conversation",
+  "photo_time_local": "2026-11-07T21:58:46+08:00",
+  "line": "GPU tables ok rc=0 table/leaf/read=5/42/2560 tcr=8080201c",
+  "table_audit": {
+    "status": 0,
+    "table_pages": 5,
+    "leaf_pages": 42,
+    "descriptor_reads": 2560,
+    "tcr": "8080201c"
+  },
+  "boot": {
+    "launchd_main": true,
+    "cpus": 8,
+    "processes": 256,
+    "springboard_pid": 27,
+    "backboardd_pid": 57
+  },
+  "storage": {
+    "data_space_rc": 0,
+    "block_size": 4096,
+    "available_blocks": 34353
+  },
+  "display": {
+    "copies": 41,
+    "retired": 41
+  },
+  "input": {
+    "side_key_sample_errors": 0,
+    "side_key_hid": "1/1/0"
+  }
+}

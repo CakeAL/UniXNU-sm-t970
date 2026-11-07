@@ -23,4 +23,5 @@ python3.14 -m unittest discover -s tests
 
 [镜像清单](preparation.json)与[刷写回执](upload.json)对应 BOOT
 `9ea0a92498f038c87798a410ecade65a3592bbdd82d2914f98324f960fd26633`。
-Heimdall 确认 BOOT 上传成功并请求重启。实机页表报告待采集。
+Heimdall 确认 BOOT 上传成功并请求重启。[实机报告](device-result.json)确认
+`5/42/2560`，当时八核在线、Data 查询成功、GOP 完成 41 次拷贝和回收。

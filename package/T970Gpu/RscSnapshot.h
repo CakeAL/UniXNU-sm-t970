@@ -225,6 +225,14 @@ static void reportRscMode(char *out, unsigned length, const RscSnapshot &rsc, un
         const GmuRate &rate = rsc.rate;
         if (power >= 9 && strcmp(rate.smmu.state, "skip")) {
             const SmmuSnapshot &s = rate.smmu;
+            if (power == cbBarMode) {
+                snprintf(out, length,
+                    "\nGPU cbar %s/%s/%s bar=%x/%x rb=%u va=%x/%x f=%x diff=%x bus=%x/%x rsc=%x/%x xo=%x cxr=%u",
+                    s.barState, s.format, rate.state, s.barActive, s.barRestored,
+                    s.barRestoreRead ? 1u : 0u, s.va64Active, s.va64After, s.restoreFlags, s.restoreDiff,
+                    s.ready, s.restored, rsc.programmed, rsc.restored, xoRestored, cxRestored ? 1u : 0u);
+                return;
+            }
             if (power >= 10 && strcmp(s.format, "skip")) {
                 snprintf(out, length,
                     "\nGPU cbfmt %s/%s va64=%x/%x/%x rb=%u guard=%x/%x diff=%x bus=%x/%x rsc=%x/%x xo=%x cxr=%u"

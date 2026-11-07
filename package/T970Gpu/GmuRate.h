@@ -27,10 +27,6 @@ struct GmuRate {
     SmmuSnapshot smmu;
 };
 
-static bool coldGmu(IOMemoryMap &gmu) {
-    return t970_touch::read(gmu, 0x14000) == 1 && !t970_touch::read(gmu, 0x14070);
-}
-
 static bool updateGmuRcg(IOMemoryMap &cc, uint32_t cfg, uint32_t &command) {
     using namespace t970_touch;
     command = read(cc, A650_CC_GMU_RCGR);
@@ -86,7 +82,7 @@ static GmuRate pulseGmuRate(IOMemoryMap &gmu, IOMemoryMap &cc, unsigned power) {
         if (!coldGmu(gmu) || result.active == UINT32_MAX) return result;
         if (power >= 9 && result.active == requested && branchRunning(read(cc, A650_CC_AHB_CLK)) &&
             branchRunning(read(cc, A650_CC_CXO_CLK)) && branchRunning(read(cc, A650_CC_CX_GMU_CLK))) {
-            result.smmu = pulseSmmuBus(*gcc, power >= 10);
+            result.smmu = pulseSmmuBus(*gcc, power >= 10, power == cbBarMode ? &gmu : nullptr);
             if (result.smmu.holdParents) {
                 result.state = "smmu-hold";
                 return result;
