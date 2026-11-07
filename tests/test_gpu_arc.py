@@ -14,6 +14,8 @@ class GpuArc(unittest.TestCase):
         model = r'''
 #include <cassert>
 #include <cstdint>
+#include <cstddef>
+#include <cstdio>
 #include <cstring>
 static void put16(uint8_t *p, unsigned v) { p[0]=v; p[1]=v>>8; }
 static void put32(uint8_t *p, unsigned v) { put16(p,v); put16(p+2,v>>16); }
@@ -36,7 +38,10 @@ int main() {
     ArcResource cx, mx;
     assert(parseArc(db, sizeof(db), "cx.lvl\0", cx));
     assert(cx.valid && cx.address == 0x30000 && cx.levels == 4 && cx.minSvs == 3 &&
-           cx.first == 0 && cx.last == 48);
+           cx.first == 0 && cx.last == 48 && cx.level[2] == 32 && cx.level[3] == 48);
+    char list[64];
+    formatArcLevels(cx, list, sizeof(list));
+    assert(!strcmp(list, "0,16,32,48"));
     assert(parseArc(db, sizeof(db), "mx.lvl\0", mx));
     assert(mx.valid && mx.address == 0x38000 && mx.levels == 3 && mx.minSvs == 2);
 
@@ -69,7 +74,7 @@ int main() {
     def test_report_is_read_only_and_integrated(self):
         header = (ROOT / 'package/T970Gpu/ArcResources.h').read_text()
         self.assertIn('mapMmio(0x80860000, 0x20000)', header)
-        self.assertIn('GPU arc db=%x cx=%x lv=%u min=%u mx=%x lv=%u min=%u', header)
+        self.assertIn('GPU arc db=%x cx=%x lv=%u [%s] min=%u mx=%x lv=%u [%s] min=%u', header)
         self.assertNotIn('writeMasked', header)
         display = (ROOT / 'package/T970Display/DisplayRegistration.cpp').read_text()
         self.assertGreaterEqual(display.count('reportArc('), 2)

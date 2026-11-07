@@ -15,6 +15,7 @@ struct ArcResource {
     unsigned minSvs = 0;
     uint16_t first = 0;
     uint16_t last = 0;
+    uint16_t level[16] = {};
 };
 
 static inline uint32_t arcLe16(const volatile uint8_t *p) {
@@ -60,6 +61,7 @@ static bool parseArc(const volatile uint8_t *db, uint32_t bytes, const char *id,
                 if (n && level <= out.last) return false;
                 if (!out.levels) out.first = static_cast<uint16_t>(level);
                 out.last = static_cast<uint16_t>(level);
+                out.level[out.levels] = static_cast<uint16_t>(level);
                 ++out.levels;
                 if (level >= 48 && !out.minSvs) out.minSvs = n;
             }
@@ -68,6 +70,15 @@ static bool parseArc(const volatile uint8_t *db, uint32_t bytes, const char *id,
         }
     }
     return found == 1 && out.valid;
+}
+
+static void formatArcLevels(const ArcResource &resource, char *out, unsigned length) {
+    size_t used = 0;
+    for (unsigned i = 0; i < resource.levels && used + 8 < length; ++i) {
+        int written = snprintf(out + used, length - used, i ? ",%u" : "%u", resource.level[i]);
+        if (written <= 0) break;
+        used += static_cast<size_t>(written);
+    }
 }
 
 // Read-only: the ARC block is already mapped by the touch/RSC path on this board.
@@ -87,9 +98,13 @@ static void reportArc(char *out, unsigned length) {
                  cx.valid ? 1 : 0, cx.address, mx.valid ? 1 : 0, mx.address);
         return;
     }
+    char cxList[64] = {}, mxList[64] = {};
+    formatArcLevels(cx, cxList, sizeof(cxList));
+    formatArcLevels(mx, mxList, sizeof(mxList));
     snprintf(out, length,
-             "\nGPU arc db=%x cx=%x lv=%u min=%u mx=%x lv=%u min=%u",
-             arcLe32(bytes), cx.address, cx.levels, cx.minSvs, mx.address, mx.levels, mx.minSvs);
+             "\nGPU arc db=%x cx=%x lv=%u [%s] min=%u mx=%x lv=%u [%s] min=%u",
+             arcLe32(bytes), cx.address, cx.levels, cxList, cx.minSvs,
+             mx.address, mx.levels, mxList, mx.minSvs);
 }
 
 } // namespace t970_gpu
