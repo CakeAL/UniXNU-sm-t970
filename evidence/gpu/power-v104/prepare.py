@@ -36,8 +36,15 @@ def main():
     variants.add_argument('--gmu-read', action='store_true', help='Pack v107 from the tested v106 BOOT')
     variants.add_argument('--rsc-read', action='store_true', help='Pack v108 from the tested v107 BOOT')
     variants.add_argument('--rsc-init', action='store_true', help='Pack v109 from the tested v108 BOOT')
+    variants.add_argument('--arc-vote', action='store_true', help='Pack v110 from the tested v109 BOOT')
     options = parser.parse_args()
-    if options.rsc_init:
+    if options.arc_vote:
+        baseline = 'gpu-rsc-init-v109'
+        base_sha = '569ebe5fcf875c26aae7fd6b9d544ba9cec8204f0a2df527057184d387899eab'
+        output = OUT / 'gpu-arc-vote-v110'
+        old, new = b't970-gpu-p=6', b't970-gpu-p=7'
+        markers = (b'GPU vote %s/%s', b'arc-hold', b'clear-hold')
+    elif options.rsc_init:
         baseline = 'gpu-rsc-v108'
         base_sha = '25f846a61e86269dc42d97ba863de8bf13ef983dd488e66e56060c29301067ec'
         output = OUT / 'gpu-rsc-init-v109'

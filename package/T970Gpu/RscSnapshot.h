@@ -2,6 +2,7 @@
 #pragma once
 #include "A650GmuPower.h"
 #include "../T970Touch/BusSnapshot.h"
+#include "ArcVotes.h"
 
 namespace t970_gpu {
 
@@ -15,6 +16,7 @@ struct RscSnapshot {
     bool tablesRead = false;
     unsigned programmed = 0, restored = 0;
     bool holdParents = false;
+    ArcVotes votes;
 };
 
 static uint32_t gmuRscActivity(IOMemoryMap &gmu) {
@@ -62,13 +64,16 @@ static void readRscTables(IOMemoryMap &rscc, RscSnapshot &result) {
     result.tablesRead = true;
 }
 
-static bool rscCold(const RscSnapshot &state) {
+static bool rscRouteMatches(const RscSnapshot &state) {
     constexpr uint32_t hidden[] = {0x82204514, 0, 0x82204510, 0, 0x82204520, 0};
     constexpr uint32_t route[] = {1, 0, 0x4520, 0x4510, 0x4514};
+    return !memcmp(state.hidden, hidden, sizeof(hidden)) && !memcmp(state.route, route, sizeof(route));
+}
+
+static bool rscCold(const RscSnapshot &state) {
     constexpr uint32_t empty[5] = {};
     return !state.status && !state.irqEnable && state.pdcStart == 0 && state.pdcEnable == 0x100 &&
-           !memcmp(state.hidden, hidden, sizeof(hidden)) && !memcmp(state.route, route, sizeof(route)) &&
-           !memcmp(state.seq, empty, sizeof(empty));
+           rscRouteMatches(state) && !memcmp(state.seq, empty, sizeof(empty));
 }
 
 static bool rscStillIdle(IOMemoryMap &gmu, IOMemoryMap &rscc, RscSnapshot &state) {
@@ -77,7 +82,8 @@ static bool rscStillIdle(IOMemoryMap &gmu, IOMemoryMap &rscc, RscSnapshot &state
            readRscIdle(rscc, state) && !state.irqEnable;
 }
 
-static void pulseRscInit(IOMemoryMap &gmu, IOMemoryMap &rscc, IOMemoryMap &pdc, RscSnapshot &result) {
+static void pulseRscInit(IOMemoryMap &gmu, IOMemoryMap &rscc, IOMemoryMap &pdc, RscSnapshot &result,
+                         bool vote) {
     using namespace t970_touch;
     RscSnapshot state;
     if (!rscCold(result) || !rscStillIdle(gmu, rscc, state) || state.status) {
@@ -86,10 +92,11 @@ static void pulseRscInit(IOMemoryMap &gmu, IOMemoryMap &rscc, IOMemoryMap &pdc, 
     }
 
     // lmi mode 24, A650 pdc_in_aop. Preserve the inherited hidden commands.
+    constexpr uint32_t seq[] = {0xeaaae5a0, 0xe1a1ebab, 0xa2e0a581, 0xecac82e2, 0x0020edad};
     const struct { IOMemoryMap &bank; unsigned offset; uint32_t before, requested; } writes[] = {
         {rscc, 0x10, 0, 0x01000000},
-        {rscc, 0x600, 0, 0xeaaae5a0}, {rscc, 0x604, 0, 0xe1a1ebab}, {rscc, 0x608, 0, 0xa2e0a581},
-        {rscc, 0x60c, 0, 0xecac82e2}, {rscc, 0x610, 0, 0x0020edad},
+        {rscc, 0x600, 0, seq[0]}, {rscc, 0x604, 0, seq[1]}, {rscc, 0x608, 0, seq[2]},
+        {rscc, 0x60c, 0, seq[3]}, {rscc, 0x610, 0, seq[4]},
         {pdc, 0x4520, 0, 0}, {pdc, 0x4500, 0x100, 0x80000001},
     };
     unsigned attempted = 0;
@@ -104,6 +111,19 @@ static void pulseRscInit(IOMemoryMap &gmu, IOMemoryMap &rscc, IOMemoryMap &pdc, 
     if (!rscStillIdle(gmu, rscc, state)) {
         result.state = "busy-hold";
         return;
+    }
+    if (vote && result.programmed == 0xff) {
+        readRscTables(rscc, state);
+        if (state.status == 0x01000000 && rscRouteMatches(state) && !memcmp(state.seq, seq, sizeof(seq)) &&
+            read(pdc, 0x4520) == 0 && read(pdc, 0x4500) == 0x80000001) {
+            result.votes = voteArcMin(gmu, rscc);
+        } else {
+            result.votes.state = "rsc-profile";
+        }
+        if (result.votes.holdParents || !rscStillIdle(gmu, rscc, state)) {
+            result.state = "arc-hold";
+            return;
+        }
     }
     for (unsigned i = attempted; i-- > 0;) {
         const auto &op = writes[i];
@@ -130,7 +150,7 @@ static void pulseRscInit(IOMemoryMap &gmu, IOMemoryMap &rscc, IOMemoryMap &pdc, 
 }
 
 // The caller holds CX and all three XO clock branches with CM3 in reset.
-static RscSnapshot sampleRsc(IOMemoryMap &gmu, bool init) {
+static RscSnapshot sampleRsc(IOMemoryMap &gmu, unsigned power) {
     using namespace t970_touch;
     RscSnapshot result;
     result.gmuBusy = gmuRscActivity(gmu);
@@ -138,7 +158,7 @@ static RscSnapshot sampleRsc(IOMemoryMap &gmu, bool init) {
         result.state = "gmu-busy";
         return result;
     }
-    const IOOptionBits options = init ? 0 : kIOMapReadOnly;
+    const IOOptionBits options = power >= 6 ? 0 : kIOMapReadOnly;
     auto rscc = mapMmio(A650_GPU_BASE_RSCC, 0x10000, options);
     if (!rscc || !rscc->getVirtualAddress()) {
         result.state = "rscc-map";
@@ -155,8 +175,17 @@ static RscSnapshot sampleRsc(IOMemoryMap &gmu, bool init) {
     result.pdcStart = read(*pdc, 0x4520);
     result.pdcEnable = read(*pdc, 0x4500);
     result.state = "read";
-    if (init) pulseRscInit(gmu, *rscc, *pdc, result);
+    if (power >= 6) pulseRscInit(gmu, *rscc, *pdc, result, power == 7);
     return result;
+}
+
+static void reportArcVotes(char *out, unsigned length, const RscSnapshot &rsc,
+                           unsigned xoRestored, bool cxRestored) {
+    const ArcVotes &v = rsc.votes;
+    snprintf(out, length,
+        "\nGPU vote %s/%s mx=%s/%x cx=%s/%x irq/ctl/st=%x/%x/%x rsc=%x/%x xo=7/%x cxr=%u",
+        rsc.state, v.state, v.mx.state, v.mx.status, v.cx.state, v.cx.status, v.irq, v.control, v.idle,
+        rsc.programmed, rsc.restored, xoRestored, cxRestored ? 1u : 0u);
 }
 
 static void reportRscInit(char *out, unsigned length, const RscSnapshot &rsc,

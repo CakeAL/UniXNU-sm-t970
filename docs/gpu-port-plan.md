@@ -75,10 +75,12 @@ v107 实测 GMU 可读，CM3 仍在 reset、FW_INIT=0，AO 从 `0x1440` 推进�
 见 [v107 实测](../evidence/gpu/gmu-v107/device-result.json)和
 [v108 实测](../evidence/gpu/rsc-v108/device-result.json)。
 
-v109 采用 lmi 的独立初始化顺序，保留继承的 hidden 命令，验证 SDE、五个 RSC SRAM 字
-与 PDC start/enable 的写入和恢复。通过后再用 GPU DRV0 TCS 验证 MX、CX 最低档位投票，
-然后接入 GMU 200 MHz 和固件/HFI。锁定的 Sm8250Platform 冷启动序列会写入固定的 hidden 值，
-集成时需处理与实测路由的差异。见 [v109 方案](../evidence/gpu/rsc-init-v109/README.md)、
+v109 实测 SDE、五个 RSC SRAM 字、PDC start/enable 全部写入并恢复，`wr=ff restore=ff`。
+v110 在这套 RSC/PDC 配置保持期间，借用 GPU DRV0 TCS1 依次请求 MX、CX 的 selector 2，
+检查应答并恢复 TCS 和控制寄存器。两次应答通过后再验证 GMU 200 MHz。
+锁定的 Sm8250Platform 冷启动序列会写入固定的 hidden 值，集成时需处理与实测路由的差异。
+见 [v109 实测](../evidence/gpu/rsc-init-v109/device-result.json)、
+[v110 方案](../evidence/gpu/arc-vote-v110/README.md)、
 [lmi RSC 实现](https://github.com/Fsasdddd/lmi-uefi-touch-gpu/blob/0c9398400f937555918a53f1e9a97a90a3345257/tools/lmi-gpu-rsc-init.c)
 和 [SM8250 GMU 实现](https://github.com/FFT-infra/UniXNU-sm8250-common/blob/166235ec2480ff0992627b7aafa15c65ce6b4efa/kits/Sm8250Platform/A650Gmu.c)。
 

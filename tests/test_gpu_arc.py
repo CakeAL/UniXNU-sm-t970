@@ -98,7 +98,7 @@ int main() {
         self.assertNotIn('writeMasked', header)
         display = (ROOT / 'package/T970Display/DisplayRegistration.cpp').read_text()
         self.assertEqual(display.count('reportGpu(out + used,'), 2)
-        self.assertIn('if (mode != 5) t970_gpu::reportArc(out, length);', display)
+        self.assertIn('if (mode != 5 && mode != 7) t970_gpu::reportArc(out, length);', display)
         self.assertIn('t970_gpu::reportClock(', display)
         self.assertIn('PE_parse_boot_argn("t970-gpu-w"', display)
 

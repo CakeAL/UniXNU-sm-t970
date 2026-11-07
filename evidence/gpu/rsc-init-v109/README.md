@@ -20,4 +20,6 @@ python3.14 ../UniXNU/scripts/porting-record.py check --device .
 
 2026-11-07 16:13（中国标准时间），Heimdall 成功上传 BOOT `569ebe5f…` 并请求重启。
 详见 [打包记录](preparation.json)、[主机验证](host-validation.json)和 [上传回执](upload.json)。
-启动后三指按住两秒，采集 `GPU init` 一行。
+机主截图确认 `GPU init ok cfg=4000000a idle=3ff wr=ff restore=ff xo=7/7 cx=1/1`。
+八处写入与恢复均通过，XO 与 CX 同样恢复。同屏八核在线，GOP 完成 29 次复制和退役。
+[实测记录与截图哈希](device-result.json)

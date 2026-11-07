@@ -89,7 +89,7 @@ static GmuSnapshot sampleGmu(IOMemoryMap &cc, const unsigned (&branches)[3], uns
         if (!cfgAhbReady(read(cc, offset))) return result;
     }
     // lmi mode 4, with the cold FW_INIT guard from its RSC probe.
-    auto gmu = mapMmio(A650_GPU_BASE_GMU, 0x30000, kIOMapReadOnly);
+    auto gmu = mapMmio(A650_GPU_BASE_GMU, 0x30000, power == 7 ? 0 : kIOMapReadOnly);
     if (!gmu || !gmu->getVirtualAddress()) {
         result.state = "map-fail";
         return result;
@@ -108,7 +108,7 @@ static GmuSnapshot sampleGmu(IOMemoryMap &cc, const unsigned (&branches)[3], uns
     IODelay(1000);
     result.counterAfter = read(*gmu, 0x14220);
     result.state = "read";
-    if (power >= 5 && result.counterBefore != result.counterAfter) result.rsc = sampleRsc(*gmu, power == 6);
+    if (power >= 5 && result.counterBefore != result.counterAfter) result.rsc = sampleRsc(*gmu, power);
     return result;
 }
 
@@ -212,6 +212,10 @@ static void reportCxPulse(char *out, unsigned length, IOMemoryMap &gcc, unsigned
     if (clocks) xo = pulseXoClocks(*cc, power);
     const bool rscObserved = power >= 5 && xo.ready == 7 && xo.gmu.counterBefore != xo.gmu.counterAfter;
     if (!xo.canReleaseCx) {
+        if (power == 7 && rscObserved) {
+            reportArcVotes(out, length, xo.gmu.rsc, xo.restored, false);
+            return;
+        }
         if (power == 6 && rscObserved) {
             reportRscInit(out, length, xo.gmu.rsc, xo.restored, false);
             return;
@@ -225,7 +229,8 @@ static void reportCxPulse(char *out, unsigned length, IOMemoryMap &gcc, unsigned
     const CxState after = waitCx(*cc, false);
     const bool restored = after.off() && (after.sw & collapse);
     if (rscObserved) {
-        if (power == 6) reportRscInit(out, length, xo.gmu.rsc, xo.restored, restored);
+        if (power == 7) reportArcVotes(out, length, xo.gmu.rsc, xo.restored, restored);
+        else if (power == 6) reportRscInit(out, length, xo.gmu.rsc, xo.restored, restored);
         else reportRsc(out, length, xo.gmu.rsc, restored);
         return;
     }
@@ -290,7 +295,7 @@ static void reportClock(char *out, unsigned length, bool writeGate, unsigned pow
 static unsigned powerMode() {
 #ifdef T970_GPU_POWER_SNAPSHOT
     unsigned power = 0;
-    if (PE_parse_boot_argn("t970-gpu-p", &power, sizeof(power)) && power >= 1 && power <= 6) return power;
+    if (PE_parse_boot_argn("t970-gpu-p", &power, sizeof(power)) && power >= 1 && power <= 7) return power;
 #endif
     return 0;
 }

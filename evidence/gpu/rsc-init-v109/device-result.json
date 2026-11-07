@@ -1,0 +1,17 @@
+{
+  "boot_sha256": "569ebe5fcf875c26aae7fd6b9d544ba9cec8204f0a2df527057184d387899eab",
+  "photo": "screen-runtime.jpg",
+  "photo_sha256": "ef66b2b0a0160fb97cbf84a898079c1dfa4a2285df15550934cb3e9d7f8d8f30",
+  "photo_time_local": "2026-11-07T16:17:43+08:00",
+  "rsc_init": {
+    "line": "GPU init ok cfg=4000000a idle=3ff wr=ff restore=ff xo=7/7 cx=1/1",
+    "programmed_and_read_back": 8,
+    "restored_and_read_back": 8,
+    "cold_state_reverified": true,
+    "xo_and_cx_restored": true
+  },
+  "boot": {"launchd_main": true, "cpus": 8, "processes": 241, "springboard_pid": 27, "backboardd_pid": 57},
+  "storage": {"data_space_rc": 0, "block_size": 4096, "available_blocks": 48380},
+  "display": {"copies": 29, "retired": 29},
+  "input": {"side_key_sample_errors": 0, "side_key_hid": "1/1/0"}
+}

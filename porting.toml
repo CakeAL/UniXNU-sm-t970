@@ -1080,6 +1080,7 @@ procedure = [
   "Collect DRM modes, panel type and brightness limits; read only display-selection tokens from /proc/cmdline and match the selected S6TUUM3 node in the live DT.",
 ]
 findings = [
+  "GPU report mode 7 replaces the ARC table text with the bounded TCS vote report in the existing startup buffer.",
   "The v108 GPU RSC report takes the existing ARC summary slot in the shared terminal buffer, preserving the frame counters and the two display report entry paths.",
   "The v104 diagnostic uses the existing peripheral report slot for a bounded GPU power snapshot and retains the v103 GOP and HID boot baseline.",
   "v93 prioritizes peripheral diagnostics within the existing 896-byte display report to avoid clipping Memory/Battery lines. The v91 owner confirms power-key lock/relight; hardware panel power-off and brightness are still separate unverified functions. The long magenta-to-logo interval has no phase timestamps yet, so memory size, I/O or probe delays are not established causes.",
@@ -1398,6 +1399,7 @@ procedure = [
   "Read KGSL identity and frequency nodes, list GPU firmware files and calculate the GMU/SQE hashes without executing GPU commands.",
 ]
 findings = [
+  "v109 BOOT569ebe5f reports wr=ff restore=ff xo=7/7 cx=1/1, verifying the eight SDE, RSC SRAM and PDC writes and their rollback on the board. v110 uses the programmed state to send MX before CX on GPU DRV0 TCS1, with both selector 2 values validated against command DB and parent dependencies retained on uncertain completion.",
   "v108 BOOT25f846a6 confirms DRV0 config 4000000a, ten idle TCS slots, lmi-matching inherited hidden commands and route, zeroed sequence SRAM and PDC 0/100. v109 applies the lmi mode 24 SDE/SRAM/PDC subset under the exact cold-state guard and verifies reverse restoration.",
   "v107 BOOT5354324f shows GMU reset=1 fw=0 ao=1440/6b66 xo=7/7 cx=1/1. The AO counter advanced by 22310 while CM3 remained held. v108 adds a read-only GPU DRV0/TCS and PDC census under that clock and reset state, before any sequencer or vote programming.",
   "v106 BOOTd0a4c191 reports rcg=80000000/1 br=1/1/4221 mask=7/7 cx=1/1. The AHB, CXO and CX GMU branches ran on the inherited XO route, and all votes were restored. v107 rechecks CX and all three branches before a read-only GMU mapping, then samples CM3 reset, FW_INIT and the AO counter in that order.",
@@ -1420,9 +1422,10 @@ limits = [
   "No GMU bring-up, command submission, DMA/SMMU ownership or Metal rendering was tested under UniXNU.",
 ]
 next_action = [
-  "Capture the v109 GPU init line. With wr=ff restore=ff xo=7/7 cx=1/1, stage GPU DRV0 TCS votes for the T970 command-DB MX/CX levels while the verified sequence and PDC state are held.",
+  "Capture the v110 GPU vote line. If MX and CX acknowledge in order and control state restores, qualify the GPLL0 divided GMU 200 MHz route while the verified rail votes are held.",
 ]
 evidence = [
+  { kind = "device", reference = "evidence/gpu/rsc-init-v109/device-result.json", revision = "1c811f799c20a69cf6bfa1ae2047b4c869a2dc1b", command = "BOOT569ebe5f; owner three-finger report screenshot 2026-11-07T16:17:43+08:00", result = "GPU init ok, idle=3ff, wr=ff restore=ff xo=7/7 cx=1/1. Eight CPUs and 29 GOP copies and retirements." },
   { kind = "host", reference = "evidence/gpu/rsc-init-v109/host-validation.json", revision = "1c811f799c20a69cf6bfa1ae2047b4c869a2dc1b", command = "python3.14 -m unittest discover -s tests; evidence/gpu/power-v104/prepare.py --rsc-init", result = "73 tests ran, 10 skipped, OK. Sanitized RSC/PDC write/restore model, prelink, FAT readback and separate DTS/ADT check passed." },
   { kind = "device", reference = "evidence/gpu/rsc-init-v109/upload.json", revision = "1c811f799c20a69cf6bfa1ae2047b4c869a2dc1b", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/gpu-rsc-init-v109/boot-partition.img", result = "BOOT569ebe5f upload succeeded and requested reboot. The RSC/PDC write and restore masks await the device report." },
   { kind = "device", reference = "evidence/gpu/rsc-v108/device-result.json", revision = "e21ab3fe563c905362468a4616d68af2b079c91f", command = "BOOT25f846a6; owner three-finger report screenshot 2026-11-07T16:08:23+08:00", result = "DRV0=4000000a idle=3ff, lmi cold route/hidden and PDC values match, XO/CX restore; eight CPUs and 37 GOP copies and retirements." },
@@ -1702,6 +1705,7 @@ procedure = [
   "Read BuildManifest.plist from the local IPSW using Python zipfile and plistlib to identify its OS version, build and product types.",
 ]
 findings = [
+  "v110 validates exact v109 BOOT and replaces only the kernel and GPU diagnostic mode in FAT. The ADT, Data seed, trust cache and bytes outside FAT are preserved.",
   "v109 validates exact v108 BOOT and replaces the kernel and GPU diagnostic mode in FAT. The ADT, Data seed, trust cache and bytes outside FAT are preserved.",
   "The v108 packer validates exact v107 BOOT and replaces the kernel and t970-gpu-p value in FAT. ADT, Data seed, trust cache and bytes outside FAT are preserved.",
   "The v107 packer validates the tested v106 BOOT, then swaps only the kernel and GPU diagnostic mode in FAT. The ADT, Data seed, trust cache and bytes outside FAT are preserved.",
@@ -1989,6 +1993,7 @@ procedure = [
   "Run python3 scripts/collect-adb-inventory.py --root --output evidence/<new-capture>; review per-command stderr, checksums, GPT CRC results and DT sanitization before updating this record.",
 ]
 findings = [
+  "Mode 7 prints MX and CX separately, including command status, pending IRQ/control/slot state and the RSC/XO/CX restoration result.",
   "v108 routes both terminal variants through the same GPU reporter and prioritizes RSC/PDC state in mode 5. The ARC and branch write wiring tests still exercise the ordinary diagnostic selection.",
   "The v104 report uses the locked SM8250 register header and checks the inherited CFG AHB state before attempting the read-only GPUCC snapshot.",
   "v91 lock/relight and v92/v93 bus/memory observations are saved with photo and BOOT hashes. v93 avoids shared896-byte report clipping. v94 adds raw/decoded read-only gauge output, PMIC identity checks, validity mask and GPIO restoration result. Full suite ran64 tests:54 passed,10 skipped; actual GPIO-I2C wire, clock, gauge restoration and numeric cases pass ASan/UBSan. DT/ADT checker remains blocked by framework revision drift.",
