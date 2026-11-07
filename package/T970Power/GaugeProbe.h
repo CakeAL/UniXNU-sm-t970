@@ -24,12 +24,97 @@ struct GaugeSample {
     const char *stage = "lines-low";
     const char *fault = "none";
     unsigned failedRegister = 0;
+    bool writeAttempted = false;
+    bool writeApplied = false;
+    const char *chargeResult = "none";
+    uint8_t chargeReadback06 = 0;
 };
+
+// Optional charger action for one read session. The read re-checks the guards
+// against the words it just read; callers never pass raw register values.
+struct GaugeAction {
+    bool enableCharging = false;
+    bool disableCharging = false;
+};
+
+static bool writeChargerRegister(t970_touch::ProbeBus &bus, uint8_t reg, uint8_t value,
+                                 uint8_t &readback) {
+    uint8_t command[2] = {reg, value};
+    if (!bus.transfer(command, 2, nullptr, 0)) return false;
+    uint8_t next = reg;
+    return bus.transfer(&next, 1, &readback, 1);
+}
 
 // Caller must first qualify an idle I2C SE0 and restore its AHB clock control.
 // Returns true only when the PMIC identity matched and all seven gauge words
 // were read; a partially valid sample still carries the bytes it did read.
-static bool readGaugeSample(GaugeSample &sample) {
+// Set CHG_EN and kick the charger watchdog, or disable charging, behind the
+// same guards. Every write is read back; a failed kick disables charging again
+// instead of leaving an unkicked charger on.
+static void applyChargerAction(GaugeSample &sample, const GaugeAction &action,
+                               IOMemoryMap &pins) {
+    using namespace t970_touch;
+    t970_power::t970_charger_config config =
+        t970_power::t970_charger_config_decode(sample.config, true);
+    const uint8_t originalEnable = config.cnfg09;
+    const bool guard = sample.values.present &&
+        (sample.values.valid & (T970_BAT_PRESENT | T970_BAT_VOLTAGE | T970_BAT_TEMPERATURE)) ==
+            (T970_BAT_PRESENT | T970_BAT_VOLTAGE | T970_BAT_TEMPERATURE) &&
+        sample.values.temperature_mc >= 0 && sample.values.temperature_mc <= 45000 &&
+        sample.values.voltage_uv >= 3000000 && sample.values.voltage_uv <= 4350000 &&
+        ((config.cnfg06 >> 2) & 3u) == 3;
+    sample.writeAttempted = true;
+
+    // The pins are already in GPIO mode for this read session.
+    ProbeBus writer(pins, T970_CHARGER_ADDRESS);
+
+    if (action.disableCharging || !guard) {
+        if (!config.chargeEnabled) {
+            sample.chargeResult = action.disableCharging ? "already-off" : "guard";
+            return;
+        }
+        uint8_t target = originalEnable & ~0x80u, readback = 0;
+        bool ok = writeChargerRegister(writer, 0xc0, target, readback) && readback == target;
+        sample.chargeResult = ok ? "guard-disabled" : "disable-failed";
+        sample.writeApplied = ok;
+        if (ok) { config.cnfg09 = readback; sample.config[4] = readback; }
+        sample.chargeReadback06 = config.cnfg06;
+        return;
+    }
+
+    bool ok = true;
+    if (!config.chargeEnabled) {
+        uint8_t target = originalEnable | 0x80u, readback = 0;
+        if (!writeChargerRegister(writer, 0xc0, target, readback) || readback != target) {
+            ok = false;
+            sample.chargeResult = "enable-failed";
+            uint8_t restore = 0;
+            (void)writeChargerRegister(writer, 0xc0, originalEnable, restore);
+        } else {
+            config.cnfg09 = readback;
+            sample.config[4] = readback;
+        }
+    }
+    if (ok) {
+        uint8_t target = static_cast<uint8_t>((config.cnfg06 & ~3u) | 1u);
+        uint8_t readback = 0;
+        if (!writeChargerRegister(writer, 0xbd, target, readback) || readback != target) {
+            ok = false;
+            sample.chargeResult = "kick-failed";
+            // Do not leave charging enabled without a kicked watchdog.
+            uint8_t restore = 0;
+            (void)writeChargerRegister(writer, 0xc0, originalEnable, restore);
+        } else {
+            config.cnfg06 = readback;
+            sample.config[3] = readback;
+        }
+    }
+    sample.writeApplied = ok;
+    sample.chargeReadback06 = config.cnfg06;
+    if (ok) sample.chargeResult = config.chargeEnabled ? "kicked" : "enabled";
+}
+
+static bool readGaugeSample(GaugeSample &sample, const GaugeAction *action = nullptr) {
     using namespace t970_touch;
     sample = GaugeSample{};
     auto pins = mapMmio(0x0f91c000, 0x2000, 0);
@@ -89,7 +174,7 @@ static bool readGaugeSample(GaugeSample &sample) {
                     sample.stage = "charger-read";
                     sample.fault = charge.fault;
                 } else {
-                    // Read-only configuration snapshot: CNFG_00/02/04/06/09.
+                    // Configuration snapshot: CNFG_00/02/04/06/09.
                     const uint8_t configRegisters[] = {0xb7, 0xb9, 0xbb, 0xbd, 0xc0};
                     ProbeBus config(*pins, T970_CHARGER_ADDRESS);
                     sample.configValid = true;
@@ -100,6 +185,10 @@ static bool readGaugeSample(GaugeSample &sample) {
                             sample.fault = config.fault;
                             break;
                         }
+                    }
+                    if (sample.configValid && action &&
+                        (action->enableCharging || action->disableCharging)) {
+                        applyChargerAction(sample, *action, *pins);
                     }
                 }
             }

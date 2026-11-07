@@ -67,6 +67,8 @@ class ServiceWiring(unittest.TestCase):
         source = (ROOT / 'package/T970Power/BatteryService.cpp').read_text()
         for needle in (
                 'PE_parse_boot_argn("t970-battery"',
+                'PE_parse_boot_argn("t970-charge"',
+                'charge=%s',
                 'class T970Battery : public IOPMPowerSource',
                 'setCurrentCapacity(', 'setMaxCapacity(',
                 'setVoltage(', 'setAmperage(', 'setBatteryInstalled(',
@@ -74,7 +76,7 @@ class ServiceWiring(unittest.TestCase):
                 'setErrorCondition(',
                 'updateStatus()',
                 'registerService()',
-                'readGaugeSample(sample)',
+                'readGaugeSample(sample,',
                 't970_charger_decode(sample.charger, sample.chargerValid)',
                 'IOSleep(kPollMilliseconds)',
                 'Battery svc=1 samples=%u errors=%u published=%u age_ms=%llu',
@@ -96,13 +98,16 @@ class ServiceWiring(unittest.TestCase):
         self.assertIn('BatteryService.late.o', builder)
         self.assertIn('BatteryService.late.o', (ROOT / 'scripts/check-data-payload.py').read_text())
 
-    def test_config_snapshot_is_read_only(self):
+    def test_guarded_charge_action(self):
         gauge = (ROOT / 'package/T970Power/GaugeProbe.h').read_text()
         for needle in ('0xb7', '0xb9', '0xbb', '0xbd', '0xc0',
-                       'Charger cfg=%02x/%02x/%02x/%02x/%02x wdtEn=%u chgEn=%u ichg=%umA iin=%umA cv=%02x'):
+                       'Charger cfg=%02x/%02x/%02x/%02x/%02x wdtEn=%u chgEn=%u ichg=%umA iin=%umA cv=%02x',
+                       'writeChargerRegister', 'applyChargerAction(sample, *action, *pins)', 'originalEnable | 0x80u',
+                       '(config.cnfg06 & ~3u) | 1u', '((config.cnfg06 >> 2) & 3u) == 3',
+                       'sample.values.temperature_mc <= 45000', 'sample.values.voltage_uv <= 4350000'):
             self.assertIn(needle, gauge)
-        # The header may only read the configuration registers; no write helper is used there.
-        self.assertNotIn('writeReg', gauge)
+        # A failed kick must disable charging again instead of leaving it enabled.
+        self.assertIn('originalEnable', gauge)
 
     def test_cached_report_does_not_touch_the_bus(self):
         bus = (ROOT / 'package/T970Power/BusSnapshot.h').read_text()

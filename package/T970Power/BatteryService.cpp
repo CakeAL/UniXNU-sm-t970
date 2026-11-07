@@ -26,6 +26,7 @@ void thread_terminate_self(void);
 
 namespace {
 
+using t970_power::GaugeAction;
 using t970_power::GaugeSample;
 using t970_power::t970_charger_config;
 using t970_power::t970_charger_config_decode;
@@ -33,6 +34,7 @@ using t970_power::t970_charger_decode;
 using t970_power::t970_charger_state;
 
 constexpr unsigned kPollMilliseconds = 5000;
+bool chargeArmed;
 
 // Double-buffered diagnostic snapshot for the terminal report. The worker only
 // overwrites the slot that the published index does not select, so a panic
@@ -44,6 +46,7 @@ struct BatteryState {
     uint32_t samples;
     uint32_t errors;
     uint32_t published;
+    const char *chargeResult;
     uint64_t sampledAt;
 };
 BatteryState state;
@@ -54,6 +57,7 @@ void publishState(const GaugeSample &sample, bool complete) {
     state.sampledAt = mach_absolute_time();
     state.samples++;
     if (!complete) state.errors++;
+    state.chargeResult = sample.chargeResult;
     __atomic_store_n(&state.index, next, __ATOMIC_RELEASE);
     __atomic_store_n(&state.available, 1u, __ATOMIC_RELEASE);
 }
@@ -206,7 +210,9 @@ void batteryWorker(void *, wait_result_t) {
     unsigned count = 0;
     for (;;) {
         GaugeSample sample;
-        bool complete = t970_power::readGaugeSample(sample);
+        GaugeAction action;
+        action.enableCharging = chargeArmed;
+        bool complete = t970_power::readGaugeSample(sample, chargeArmed ? &action : nullptr);
         t970_charger_state charger = t970_charger_decode(sample.charger, sample.chargerValid);
         publishState(sample, complete);
         battery->acceptSample(sample, charger);
@@ -222,6 +228,10 @@ void batteryWorker(void *, wait_result_t) {
                    unsigned(charger.watchdogExpired),
                    __atomic_load_n(&state.published, __ATOMIC_ACQUIRE),
                    unsigned(sample.restored), sample.stage, sample.fault);
+            if (sample.writeAttempted) {
+                printf("T970 battery: charger action result=%s applied=%u cnfg06=%02x\n",
+                       sample.chargeResult, unsigned(sample.writeApplied), sample.chargeReadback06);
+            }
             if (sample.configValid) {
                 t970_charger_config config = t970_charger_config_decode(sample.config, true);
                 printf("T970 battery: charger cfg %02x/%02x/%02x/%02x/%02x wdtEn=%u chgEn=%u ichg=%umA iin=%umA cv=%02x\n",
@@ -252,17 +262,20 @@ extern "C" bool t970_battery_report(char *out, unsigned length) {
     uint64_t now = mach_absolute_time();
     if (now > state.sampledAt) absolutetime_to_nanoseconds(now - state.sampledAt, &age);
     snprintf(out + used, length - used,
-             "\nBattery svc=1 samples=%u errors=%u published=%u age_ms=%llu",
+             "\nBattery svc=1 samples=%u errors=%u published=%u age_ms=%llu charge=%s",
              __atomic_load_n(&state.samples, __ATOMIC_ACQUIRE),
              __atomic_load_n(&state.errors, __ATOMIC_ACQUIRE),
              __atomic_load_n(&state.published, __ATOMIC_ACQUIRE),
-             static_cast<unsigned long long>(age / 1000000));
+             static_cast<unsigned long long>(age / 1000000),
+             state.chargeResult ? state.chargeResult : "none");
     return true;
 }
 
 extern "C" void t970_battery_start(void) {
     unsigned enabled = 0;
     if (!PE_parse_boot_argn("t970-battery", &enabled, sizeof(enabled)) || enabled != 1) return;
+    unsigned charge = 0;
+    chargeArmed = PE_parse_boot_argn("t970-charge", &charge, sizeof(charge)) && charge == 1;
     static uint32_t started;
     if (__atomic_exchange_n(&started, 1u, __ATOMIC_ACQ_REL)) return;
     // Register the class during the single-threaded bsd_init window, before any

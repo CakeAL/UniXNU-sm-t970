@@ -37,29 +37,31 @@ static void writeMasked(IOMemoryMap &m,unsigned offset,uint32_t mask,uint32_t va
     auto &v=(offset&4)?m.io[offset/0x1000]:m.cfg[offset/0x1000];
     v=(v&~mask)|(value&mask);++writes;
 }
+static uint8_t regs[256];
+static uint16_t tempRaw=0x1980;
 class ProbeBus {
     unsigned address;
 public:
     const char *fault="none";
-    ProbeBus(IOMemoryMap &,uint8_t a):address(a){}
+    ProbeBus(IOMemoryMap &,uint8_t a):address(a){
+        if(a==0x69) { regs[0xb7]=0x15;regs[0xb9]=0x5e;regs[0xbb]=0x13;regs[0xbd]=0xec;regs[0xc0]=0x3b; }
+    }
     bool transfer(const uint8_t *command,unsigned count,uint8_t *data,unsigned size) {
-        assert(count==1 && size>0); /* No PMIC configuration writes. */
+        assert(count==1 || count==2);
         assert(pins.cfg[0]==3 && pins.cfg[1]==3 && pins.io[0]==1 && pins.io[1]==1);
         ++transfers;
         if(address==0x66) { assert(*command==0 && size==2);data[0]=unknown?0:0x15;data[1]=2;return true; }
         if(address==0x69) {
             if(size==3) { assert(*command==0xb2);data[0]=0x40;data[1]=0x60;data[2]=3;return true; }
-            assert(size==1);
-            static const uint8_t cfg[5]={0x10,0x28,0x1c,0x00,0x87};
-            unsigned ix=*command==0xb7?0:*command==0xb9?1:*command==0xbb?2:*command==0xbd?3:4;
-            assert(ix<5);data[0]=cfg[ix];return true;
+            if(size==0) { assert(count==2); regs[command[0]]=command[1]; return true; }
+            assert(size==1 && count==1); data[0]=regs[*command]; return true;
         }
         assert(address==0x36 && size==2);
         if(nack){fault="nack";return false;}
         uint16_t value;
         switch(*command) {
         case 0:value=0;break; case 6:value=0x6400;break;case 9:value=0xd480;break;
-        case 10:value=0xfe00;break;case 8:value=0x1980;break;case 5:case 16:value=0xfc4;break;
+        case 10:value=0xfe00;break;case 8:value=tempRaw;break;case 5:case 16:value=0xfc4;break;
         default:assert(false);return false;
         }
         data[0]=value&255;data[1]=value>>8;return true;
@@ -80,6 +82,21 @@ int main() {
     assert(strstr(text,"soc100=10000 uV=4250000 uA=-400000 mC=25500 cap=10090/10090"));
     assert(strstr(text,"chg=1:40/60/03 restore=1 done/none"));
     assert(transfers==14 && pins.cfg[0]==7 && pins.cfg[1]==7 && pins.io[0]==3 && pins.io[1]==3);
+    GaugeSample active;
+    GaugeAction action; action.enableCharging=true;
+    transfers=0;
+    assert(readGaugeSample(active,&action));
+    assert(active.writeAttempted && active.writeApplied);
+    assert(!strcmp(active.chargeResult,"enabled"));
+    assert(t970_touch::regs[0xc0]==0xbb && t970_touch::regs[0xbd]==0xed);
+    assert(transfers==18 && active.configValid);
+    t970_touch::tempRaw=0x4000;
+    GaugeSample hot;
+    transfers=0;
+    assert(readGaugeSample(hot,&action));
+    assert(hot.writeAttempted && !hot.writeApplied && !strcmp(hot.chargeResult,"guard"));
+    assert(t970_touch::regs[0xc0]==0x3b && transfers==14);
+    t970_touch::tempRaw=0x1980;
     nack=true;transfers=0;
     reportGauge(text,sizeof text);
     assert(strstr(text,"valid=0") && strstr(text,"restore=1 gauge-read/nack"));
