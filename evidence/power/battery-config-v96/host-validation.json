@@ -1,0 +1,22 @@
+{
+  "boot_sha256": "3ce997f23f30650f4ffec97edd0e76ce0d9a4ab35d8382a4454a79fb89f98c35",
+  "kernel_build_sha256": "1ad4c59c6e09ada1d3b258b4ba519549b08c10f061c776b15ec1d29d3b9dc5ff",
+  "tests": {
+    "command": "python3.14 -m unittest discover -s tests",
+    "ran": 69,
+    "skipped": 10,
+    "result": "OK"
+  },
+  "test_battery_service": "5 tests: charger state decode, configuration decode (WDTEN/CHG_EN/CHG_CC/CHGIN_LIM), power-source wiring, boot hook, cached report order and read-only configuration snapshot",
+  "config_registers_read_only": [
+    "CNFG_00 0xb7",
+    "CNFG_02 0xb9",
+    "CNFG_04 0xbb",
+    "CNFG_06 0xbd",
+    "CNFG_09 0xc0"
+  ],
+  "report_line": "Charger cfg=%02x/%02x/%02x/%02x/%02x wdtEn=%u chgEn=%u ichg=%umA iin=%umA cv=%02x",
+  "writes": "none; only I2C reads and the GPIO borrow/restore of the existing path",
+  "kernel_args": "unchanged from v95 (971 bytes)",
+  "runtime": "uploaded and reboot requested; device result pending"
+}

@@ -1,0 +1,24 @@
+{
+  "base_boot_sha256": "01e85687885b0a07d3f34442d132d89107e0203b976e95381a93df5358512d3b",
+  "boot_sha256": "3ce997f23f30650f4ffec97edd0e76ce0d9a4ab35d8382a4454a79fb89f98c35",
+  "boot_bytes": 71303168,
+  "kernel_sha256": "79c92297774c8991d8fdbb842b58ffeac524f7a7ff0fbce59121a9fac6cfae46",
+  "kernel_build_sha256": "1ad4c59c6e09ada1d3b258b4ba519549b08c10f061c776b15ec1d29d3b9dc5ff",
+  "adt_sha256": "ccf520425d90445a5415425f714ba12065daa4b6a70ce1e30b740437d6de85b6",
+  "dram_size": "0x200000000",
+  "data_seed_sha256": "9a0005a5c520412006589e068264b611c3484af123547d13103387a9fb7c0afa",
+  "config_sha256": "1adef602df3f80815ac17eb3faa0fde2b9663d6d426c3a23d0a6c60d15fd5411",
+  "trust_cache_sha256": "7416ca4f8377146626bb284e2133c76bee6cb4e3ee0af5d648b186235a7323a7",
+  "unchanged_adt_seed_trust": true,
+  "unchanged_config": true,
+  "battery_service": true,
+  "charger_config_read_only": [
+    "0xb7",
+    "0xb9",
+    "0xbb",
+    "0xbd",
+    "0xc0"
+  ],
+  "unchanged_header_firmware_dtb_tail": true,
+  "uploaded": false
+}
