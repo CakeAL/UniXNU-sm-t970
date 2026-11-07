@@ -71,6 +71,26 @@ int main() {
                             '-fsanitize=address,undefined', str(cpp), '-o', str(exe)], check=True)
             subprocess.run([str(exe)], check=True)
 
+    def test_gpll0_hz(self):
+        source = (ROOT / 'package/T970Gpu/ClockSnapshot.h').read_text()
+        body = source[source.index('static inline uint64_t gpll0Hz'):source.index('static void reportClock')]
+        cases = r"""
+#include <cassert>
+#include <cstdint>
+int main() {
+    assert(gpll0Hz(30, 0) == 576000000ull);
+    assert(gpll0Hz(30, 0x8000) == 585600000ull);
+    assert(gpll0Hz(31, 0) == 595200000ull);
+    assert(gpll0Hz(0, 0xffff) == 19199707ull);
+}
+"""
+        with tempfile.TemporaryDirectory() as tmp:
+            cpp, exe = Path(tmp) / 'clk.cpp', Path(tmp) / 'clk'
+            cpp.write_text('#include <cstdint>\n' + body + cases)
+            subprocess.run(['xcrun', 'clang++', '-std=c++17', '-Wall', '-Wextra', '-Werror',
+                            '-fsanitize=address,undefined', str(cpp), '-o', str(exe)], check=True)
+            subprocess.run([str(exe)], check=True)
+
     def test_report_is_read_only_and_integrated(self):
         header = (ROOT / 'package/T970Gpu/ArcResources.h').read_text()
         self.assertIn('mapMmio(0x80860000, 0x20000)', header)
