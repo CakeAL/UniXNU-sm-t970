@@ -1403,6 +1403,7 @@ procedure = [
   "Read KGSL identity and frequency nodes, list GPU firmware files and calculate the GMU/SQE hashes without executing GPU commands.",
 ]
 findings = [
+  "v124 BOOTa5af785e read DDRSS GPU AXI CBCR 0x80100000 with CLK_OFF set in the first-start scope and returned before SID5 or CM3 activation.",
   "v124 combines the T970 RSC and SID5 path with the hash-matched firmware and four-queue HFI table. It polls FW_INIT and HFI ready after CM3 release and retains backing and power until reboot once the image is loaded.",
   "v123 BOOT5bce7bb8 verified all 18404 TCM and 22888 RAM payload bytes, DTCM version 20010008, zero readback and restore mismatches, and full dependency restoration while CM3 remained in reset.",
   "v122 BOOT1c7ea2fe confirmed SMR0 and S2CR0 publish and revoke for the stock GMU masked match with CM3 in reset. v123 validates the exact stock firmware hash and stages its seven payload blocks with the pinned A650GmuRegions and AdrenoFirmwarePlanGmu.",
@@ -1442,9 +1443,12 @@ limits = [
   "No GMU bring-up, command submission, DMA/SMMU ownership or Metal rendering was tested under UniXNU.",
 ]
 next_action = [
-  "Verify v124 FW_INIT and HFI queue readiness on the T970. Then qualify an FW_VER reply before HFI performance, core and bounded CP submission.",
+  "Enable and verify the DDRSS GPU AXI branch in the first-start scope, then verify FW_INIT and HFI queue readiness before an FW_VER exchange.",
 ]
 evidence = [
+  { kind = "device", reference = "evidence/gpu/gmuboot-v124/device-result.json", revision = "932e7a2f2949c6ae020fdf95a641ea99ef5848e0", command = "BOOTa5af785e and owner three-finger report screenshot", result = "AXI guard returned with CLK_OFF set (80100000). CM3 release was skipped. Eight CPUs, RAM Data query success and 23 GOP copies and retirements." },
+  { kind = "host", reference = "evidence/gpu/gmuboot-v124/host-validation.json", revision = "932e7a2f2949c6ae020fdf95a641ea99ef5848e0", command = "python3.14 -m unittest discover -s tests and evidence/gpu/power-v104/prepare.py --gmu-boot", result = "Sanitized cold-start model, prelink, FAT readback, firmware hash and image symbols passed." },
+  { kind = "device", reference = "evidence/gpu/gmuboot-v124/upload.json", revision = "932e7a2f2949c6ae020fdf95a641ea99ef5848e0", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/gpu-gmuboot-v124/boot-partition.img", result = "BOOTa5af785e transfer succeeded and requested reboot." },
   { kind = "device", reference = "evidence/gpu/gmufw-v123/device-result.json", revision = "23ef1ae8c0240cd038b0c7e339c783161d6cdecf", command = "BOOT5bce7bb8 and owner three-finger report screenshot", result = "TCM/RAM 18404/22888, bad/rb 0/0, version 20010008, CB0 and all dependencies restored. Eight CPUs, RAM Data query success and 16 GOP copies and retirements." },
   { kind = "host", reference = "evidence/gpu/gmufw-v123/host-validation.json", revision = "23ef1ae8c0240cd038b0c7e339c783161d6cdecf", command = "python3.14 -m unittest discover -s tests and evidence/gpu/power-v104/prepare.py --gmu-firmware", result = "Exact stock hash and packaged firmware verified. Sanitized staging model, prelink, FAT readback, image symbols and separate DTS/ADT check passed." },
   { kind = "device", reference = "evidence/gpu/gmufw-v123/upload.json", revision = "23ef1ae8c0240cd038b0c7e339c783161d6cdecf", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/gpu-gmufw-v123/boot-partition.img", result = "BOOT5bce7bb8 transfer succeeded and requested reboot. GMU staging device result pending." },

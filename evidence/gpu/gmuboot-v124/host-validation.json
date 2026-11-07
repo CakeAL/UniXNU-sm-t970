@@ -1,0 +1,39 @@
+{
+  "device_revision": "932e7a2f2949c6ae020fdf95a641ea99ef5848e0",
+  "unixnu_revision": "2c834e313d25482c78d38d703eff1f8d190f2597",
+  "boot_sha256": "a5af785e63a87473fff855937a37222173e7fa9b8c82abcc8cf5f54d92d82224",
+  "tests": {
+    "command": "python3.14 -m unittest discover -s tests",
+    "ran": 73,
+    "skipped": 10,
+    "result": "OK"
+  },
+  "model": {
+    "result": "PASS with ASan/UBSan",
+    "scope": "v122 rollback and v123 firmware staging regression, v124 queue ABI, AXI and SID5 refusal, FW_INIT and HFI timeouts, injected DMA fault, HFI ready and retained route/backing",
+    "hardware_substitutions": "GMU/SMMU MMIO, TLB/clock behavior, cache publication and delays simulated"
+  },
+  "adreno_firmware": {
+    "revision": "20ad3d7aca14bd46aecab6335c780f5413fa054b",
+    "sm8250_revision": "166235ec2480ff0992627b7aafa15c65ce6b4efa",
+    "gmu_sha256": "df79fa8482fcc7587bb239b9c9e2b24bce4729893b990fe3f82b30da8175b01c",
+    "objects": {
+      "AdrenoFirmware.o": "514534a2afd38bf3f09e58471ed0901fbc24f20a7057099f5d4818b68cf1b029",
+      "A650GmuRegions.o": "c05512936d859c8a2ddbf1d066d5147ad9f9632ff243db871675650d328dc8a5"
+    },
+    "probe_sha256": "0768c355c2973a618497da038c9b33ca30f641c29e9ba368f7a78c6f2e13c863"
+  },
+  "firmware_bytes": 41548,
+  "stock_hash_matched": true,
+  "exact_copies_in_packaged_kernel": 1,
+  "exact_copies_in_boot": 1,
+  "kernel_prelink": "PASS",
+  "fat_readback": "PASS",
+  "image_symbol_check": {
+    "segments": 15,
+    "symbols_checked": 69505,
+    "result": "PASS"
+  },
+  "check_hardware_description": "PASS with synthetic identity",
+  "check_platform": "Stopped at historical framework revision guard"
+}

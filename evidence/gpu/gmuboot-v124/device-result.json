@@ -1,0 +1,32 @@
+{
+  "boot_sha256": "a5af785e63a87473fff855937a37222173e7fa9b8c82abcc8cf5f54d92d82224",
+  "source": "Owner screenshot attached to the Codex conversation",
+  "photo_time_local": "2026-11-08T00:29:31+08:00",
+  "photo_sha256": "a8f20938240bce4ba6199b2509899083c638c0173c59623e066f4dd673e7d939",
+  "line": "GPU boot axi/ok fw=0 hfi=0/0 rst=0 at=0 f=0/0 irq=0/0 held=0 axi=80100000",
+  "ddrss_gpu_axi_cbcr": "0x80100000",
+  "ddrss_gpu_axi_clk_off": true,
+  "cm3_released": false,
+  "gmu_firmware_start_attempted": false,
+  "note": "AXI guard returned before SMMU or GMU start. Firmware, reset and fault fields are unobserved defaults.",
+  "boot": {
+    "launchd_main": true,
+    "cpus": 8,
+    "processes": 243,
+    "springboard_pid": 27,
+    "backboardd_pid": 57
+  },
+  "storage": {
+    "data_space_rc": 0,
+    "block_size": 4096,
+    "available_blocks": 45586
+  },
+  "display": {
+    "copies": 23,
+    "retired": 23
+  },
+  "input": {
+    "side_key_sample_errors": 0,
+    "side_key_hid": "1/1/0"
+  }
+}

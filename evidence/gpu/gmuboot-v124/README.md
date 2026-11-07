@@ -22,3 +22,10 @@ python3.14 evidence/display/hello-black-v64/build-kernel.py --cached-headers --s
 python3.14 evidence/gpu/power-v104/prepare.py --gmu-boot
 python3.14 -m unittest discover -s tests
 ```
+
+[镜像清单](preparation.json)、[刷写回执](upload.json)和[实机报告](device-result.json)
+对应 BOOT `a5af785e63a87473fff855937a37222173e7fa9b8c82abcc8cf5f54d92d82224`。
+实机读到 `axi=80100000`，DDR AXI 的 CLK_OFF 置位，探针在 SMMU 设置前返回。
+八核在线，Data 查询成功，GOP 完成 23 次拷贝和回收。
+[主机验证](host-validation.json)含 ASan/UBSan 模型、镜像及独立 DTS/ADT 检查。
+完整平台检查停在历史框架版本校验。
