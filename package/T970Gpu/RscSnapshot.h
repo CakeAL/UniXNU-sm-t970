@@ -127,7 +127,7 @@ static void pulseRscInit(IOMemoryMap &gmu, IOMemoryMap &cc, IOMemoryMap &rscc,
             return;
         }
         if (power >= 8 && result.votes.mx.ack && result.votes.cx.ack) {
-            result.rate = pulseGmuRate(gmu, cc, power);
+            pulseGmuRate(gmu, cc, power, result.rate);
             if (result.rate.holdParents || !rscStillIdle(gmu, rscc, state)) {
                 result.state = "rate-hold";
                 return;
@@ -159,33 +159,31 @@ static void pulseRscInit(IOMemoryMap &gmu, IOMemoryMap &cc, IOMemoryMap &rscc,
 }
 
 // The caller holds CX and all three XO clock branches with CM3 in reset.
-static RscSnapshot sampleRsc(IOMemoryMap &gmu, IOMemoryMap &cc, unsigned power) {
+static void sampleRsc(IOMemoryMap &gmu, IOMemoryMap &cc, unsigned power, RscSnapshot &result) {
     using namespace t970_touch;
-    RscSnapshot result;
     result.gmuBusy = gmuRscActivity(gmu);
     if (result.gmuBusy) {
         result.state = "gmu-busy";
-        return result;
+        return;
     }
     const IOOptionBits options = power >= 6 ? 0 : kIOMapReadOnly;
     auto rscc = mapMmio(A650_GPU_BASE_RSCC, 0x10000, options);
     if (!rscc || !rscc->getVirtualAddress()) {
         result.state = "rscc-map";
-        return result;
+        return;
     }
-    if (!readRscIdle(*rscc, result)) return result;
+    if (!readRscIdle(*rscc, result)) return;
     readRscTables(*rscc, result);
     // T970 stock kgsl_gmu_pdc_cfg. The PDC sequencer is a separate resource.
     auto pdc = mapMmio(0x0b290000, 0x10000, options);
     if (!pdc || !pdc->getVirtualAddress()) {
         result.state = "pdc-map";
-        return result;
+        return;
     }
     result.pdcStart = read(*pdc, 0x4520);
     result.pdcEnable = read(*pdc, 0x4500);
     result.state = "read";
     if (power >= 6) pulseRscInit(gmu, cc, *rscc, *pdc, result, power);
-    return result;
 }
 
 static void reportArcVotes(char *out, unsigned length, const RscSnapshot &rsc,

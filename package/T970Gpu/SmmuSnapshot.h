@@ -609,14 +609,13 @@ static void sampleSmmu(SmmuSnapshot &result, IOMemoryMap &gmu, unsigned power) {
 
 // The T970 stock SMMU DT names MEMNOC, SNOC DVM and GPUCC AHB.
 // The caller already holds GPUCC AHB, CX and the GMU source.
-static SmmuSnapshot pulseSmmuBus(IOMemoryMap &gcc, IOMemoryMap &gmu, unsigned power) {
+static void pulseSmmuBus(IOMemoryMap &gcc, IOMemoryMap &gmu, unsigned power, SmmuSnapshot &result) {
     using namespace t970_touch;
     constexpr unsigned gpu = A650_GPU_BASE_GCC_GPU - 0x100000;
     constexpr unsigned clocks[] = {gpu + A650_GCC_GPU_MEMNOC_GFX, gpu + A650_GCC_GPU_SNOC_DVM_GFX,
                                    gpu + A650_GCC_DDRSS_GPU_AXI};
     constexpr uint32_t enable = A650_CBCR_ENABLE;
     const unsigned count = isBootMode(power) ? 3 : 2;
-    SmmuSnapshot result;
     result.state = "clock";
     uint32_t before[3] = {};
     unsigned visited = 0;
@@ -639,7 +638,7 @@ static SmmuSnapshot pulseSmmuBus(IOMemoryMap &gcc, IOMemoryMap &gmu, unsigned po
         result.ready |= 1u << i;
     }
     if (result.ready == (1u << count) - 1) sampleSmmu(result, gmu, power);
-    if (result.holdParents) return result;
+    if (result.holdParents) return;
     for (unsigned i = count; i-- > 0;) {
         const unsigned bit = 1u << i;
         if (!(visited & bit)) continue;
@@ -655,7 +654,6 @@ static SmmuSnapshot pulseSmmuBus(IOMemoryMap &gcc, IOMemoryMap &gmu, unsigned po
     }
     result.holdParents = result.restored != visited;
     if (result.holdParents) result.state = "bus-hold";
-    return result;
 }
 
 } // namespace t970_gpu

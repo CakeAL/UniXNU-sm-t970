@@ -1403,6 +1403,8 @@ procedure = [
   "Read KGSL identity and frequency nodes, list GPU firmware files and calculate the GMU/SQE hashes without executing GPU commands.",
 ]
 findings = [
+  "v127 keeps mode 23 but compresses the report thread stack: the snapshot functions now fill caller-owned objects and the firmware planner arrays live in BSS. The measured frame sum along the panicked chain drops from 12,768 to 8,288 bytes, leaving about 4 KiB of the 16 KiB kernel stack.",
+  "v126 BOOT986ddf4b panicked in the runtime report thread before the three-finger report: invalid kernel stack pointer (probable overflow), ESR 96000047, FAR in the stack guard page, with the faulting chain ending in A650GmuBuildRegions. The 12.8 KiB probe chain plus the 3.4 KiB report thread frame exceeded the 16 KiB kernel stack, and no GMU or SMMU data was produced.",
   "v126 keeps the first post-release FSR/FAR/FSYNR0/SID and the offending 4 KiB leaf word. It widens only the attribute the syndrome names (AF, AP[2], AP[1] per PNU, XN per IND), invalidates the owned ASID, clears the stalled fault and retries. Translation, external and page-table-walk faults, non-leaf words and pages outside the audited ranges are never patched.",
   "v125 BOOT1cb79acc enabled DDRSS GPU AXI (80100000 to 00100001), published SID5, staged the firmware and released CM3, but FW_INIT stayed 0. CB0 FSR 400 to 40000408 is a permission fault with a stalled stream; the 11 configuration readbacks and both fatal masks stayed clean, so the first GMU bus accesses were rejected by a leaf permission rather than by a register or clock refusal.",
   "v125 requests the DDRSS GPU AXI enable bit and checks CLK_OFF before attempting GMU cold start. The shared clock rollback checks the inherited vote before upstream release.",
@@ -1446,9 +1448,10 @@ limits = [
   "No GMU bring-up, command submission, DMA/SMMU ownership or Metal rendering was tested under UniXNU.",
 ]
 next_action = [
-  "Read the v126 mode 23 three-finger report: the GPU pf line should name the rejected access direction and privilege, the repaired leaf word and rs. Then check whether FW_INIT reaches 0x100 before any HFI or FW_VER exchange.",
+  "Read the v127 mode 23 three-finger report: the GPU pf line should name the rejected access direction and privilege, the repaired leaf word and rs, and the boot line shows whether FW_INIT reaches 0x100 before any HFI or FW_VER exchange.",
 ]
 evidence = [
+  { kind = "device", reference = "evidence/gpu/gmuboot-pf-v126/device-result.json", revision = "b531bbd7c7b1d3d60bb6e29c4a77338b04941542", command = "BOOT986ddf4b and owner screenshot", result = "Panic before the report: invalid kernel stack pointer (probable overflow) in the report thread, symbolicated to the GPU probe chain through A650GmuBuildRegions. No GMU/SMMU data." },
   { kind = "host", reference = "evidence/gpu/gmuboot-pf-v126/host-validation.json", revision = "b531bbd7c7b1d3d60bb6e29c4a77338b04941542", command = "python3.14 -m unittest discover -s tests, evidence/gpu/power-v104/prepare.py --gmu-boot-pf and scripts/check-hardware-description.py", result = "76 tests ran, 10 skipped, OK. ASan/UBSan FSR classification, bounded leaf walk and one-attribute repair model passed. Frozen firmware, ADT and boot arg 23 verified; the platform checker stops at the historical framework guard." },
   { kind = "device", reference = "evidence/gpu/gmuboot-pf-v126/upload.json", revision = "b531bbd7c7b1d3d60bb6e29c4a77338b04941542", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/gpu-gmuboot-pf-v126/boot-partition.img", result = "BOOT986ddf4b transfer succeeded and requested reboot. The mode 23 fault report is pending." },
   { kind = "host", reference = "evidence/gpu/gmuboot-axi-v125/host-validation.json", revision = "7ec6af92c18a7f969864158d1d264d11a0280b80", command = "python3.14 -m unittest discover -s tests and evidence/gpu/power-v104/prepare.py --gmu-boot-axi", result = "ASan/UBSan AXI enable, refusal, rollback/hold and GMU startup model passed. FAT readback, firmware hash and image symbols passed." },
@@ -1781,6 +1784,7 @@ procedure = [
   "Read BuildManifest.plist from the local IPSW using Python zipfile and plistlib to identify its OS version, build and product types.",
 ]
 findings = [
+  "v127 starts from the same exact v125 BOOT, keeps opt-in mode 23 and only changes the kernel stack ownership. The packer verifies the retained ADT, Data seed, trust cache and bytes outside FAT.",
   "v126 uses exact v125 BOOT and selects opt-in mode 23 with the same hash-matched A650 GMU firmware. The packer verifies the retained ADT, Data seed, trust cache and bytes outside FAT.",
   "v125 uses exact v124 BOOT and selects opt-in mode 22 with the same hash-matched A650 GMU firmware. The packer verifies the retained ADT, Data seed, trust cache and bytes outside FAT.",
   "v124 uses exact v123 BOOT and selects opt-in mode 21 with the hash-matched A650 GMU firmware. The packer checks the retained ADT, Data seed, trust cache and bytes outside FAT.",

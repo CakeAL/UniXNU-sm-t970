@@ -1,0 +1,40 @@
+{
+  "boot_sha256": "986ddf4bc7dfb188bc6048670079d0c0dedb9f9e1ccf2e0d622952205c9855e2",
+  "source": "Owner screenshot attached to the Codex conversation",
+  "photo_time_local": "2026-11-08T01:26:43+08:00",
+  "result": "panic before the three-finger report",
+  "panic": {
+    "message": "Invalid kernel stack pointer (probable overflow).",
+    "pc": "0xfffffff0074200c4",
+    "lr": "0xfffffff0079d3754",
+    "esr": "0x96000047",
+    "far": "0xfffffffbf83283cb8",
+    "cpsr": "0x204003c4",
+    "sp": "0xfffffffbf83283cb0",
+    "symbolicated_frames": [
+      "sleh_synchronous_sp1",
+      "handle_recoverable_kernel_trap",
+      "fleh_invalid_stack",
+      "A650GmuBuildRegions",
+      "t970_gpu::stageGmuFirmware",
+      "t970_gpu::pulseSid5",
+      "t970_gpu::pulseCbActivation",
+      "t970_gpu::pulseCbRoot",
+      "t970_gpu::pulseCbBar",
+      "t970_gpu::pulseCbFormat",
+      "t970_gpu::pulseSmmuBus",
+      "t970_gpu::pulseGmuRate",
+      "t970_gpu::pulseRscInit",
+      "t970_gpu::sampleRsc",
+      "t970_gpu::pulseXoClocks",
+      "t970_gpu::reportCxPulse",
+      "reportGpu",
+      "native_t970_display_timing"
+    ]
+  },
+  "interpretation": "The GMU fault probe ran from the runtime report thread and descended into the firmware planner with 13,120 bytes of GPU frames on top of the report thread's own 3,408-byte frame and thread entry. The ESR is a level-3 translation fault on a write, and FAR is in the stack guard page just below the thread's kernel stack, so the thread's 16 KiB stack overflowed. v125 ran the same chain with only a few hundred bytes to spare; the v126 fault record pushed it over. No GMU or SMMU evidence was produced by this image.",
+  "boot": {
+    "panic_screen": true,
+    "three_finger_report": false
+  }
+}

@@ -46,7 +46,22 @@ python3.14 -m unittest discover -s tests
 （由 v125 BOOT `1cb79acc` 加模式 23 内核生成）。Heimdall 确认上传并请求重启。
 [主机验证](host-validation.json)含 FSR 分类、叶走查边界、单属性修补模型、
 封印固件回读和独立 DTS/ADT 检查；完整平台检查停在历史框架版本校验。
-实机报告待取回。
+## 实测
+
+[实机报告](device-result.json)显示该镜像没有到达三指报告：内核在
+`native_t970_runtime_report` 线程里 panic，信息为
+`Invalid kernel stack pointer (probable overflow)`，
+`esr=0x96000047`（第 3 级翻译故障、写），`far=0xfffffffbf83283cb8`
+位于栈底保护页。按 v126 内核逐帧符号化，故障链为
+`native_t970_display_timing → reportGpu → reportCxPulse → pulseXoClocks →
+sampleRsc → pulseRscInit → pulseGmuRate → pulseSmmuBus → pulseCbFormat →
+pulseCbBar → pulseCbRoot → pulseCbActivation → pulseSid5 → stageGmuFirmware →
+A650GmuBuildRegions`，帧和约 12.8 KiB，再加报告线程自身的 3.4 KiB 就超过
+16 KiB。v125 走同一条链只余几百字节，v126 的故障记录把它推过了边界；
+本轮没有产生任何 GMU/SMMU 读数。
+
+[v127](../gmuboot-pf-v127/README.md)保留模式 23 的探测语义，把快照改为
+写入调用者对象、把固件规划数组移到 BSS，链上帧和降到 8.3 KiB。
 
 `rs=1` 表示已重试该事务；若 `fw` 仍为 0，第二行 `GPU pf2` 会说明第二次
 被拒的地址或 `fix=t-`（页表走查故障、非叶/范围外页或三次尝试用尽）。

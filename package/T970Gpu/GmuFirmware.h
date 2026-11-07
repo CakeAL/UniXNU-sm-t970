@@ -26,8 +26,11 @@ static bool stageGmuFirmware(IOMemoryMap &gmu, GmuTables &tables, GmuFirmwarePro
     constexpr unsigned itcmWindow = 0x3000, dtcmWindow = 0x7000;
     constexpr unsigned retention = 0x14730, dtcmVersion = 0xafe0;
     constexpr unsigned snapshotBytes = 18404, externalBytes = 22888;
-    AdrenoFirmwareRegion regions[16];
-    AdrenoFirmwareBlock blocks[16];
+    // The report runs on a kernel thread whose remaining stack is small.
+    // This staging is single-shot and serialized by the display report, so
+    // the planner arrays live in BSS instead of the caller's stack.
+    static AdrenoFirmwareRegion regions[16];
+    static AdrenoFirmwareBlock blocks[16];
     size_t regionCount = 0, blockCount = 0;
     result.state = "plan";
     if (A650GmuBuildRegions(t970GmuFirmware, sizeof(t970GmuFirmware), regions, 16, &regionCount) ||
@@ -38,7 +41,8 @@ static bool stageGmuFirmware(IOMemoryMap &gmu, GmuTables &tables, GmuFirmwarePro
         uint8_t *ram;
         unsigned tcm;
     };
-    Destination targets[16] = {};
+    static Destination targets[16];
+    bzero(targets, sizeof(targets));
     auto *bytes = reinterpret_cast<uint8_t *>(tables.tables);
     for (size_t i = 0; i < blockCount; ++i) {
         const auto &block = blocks[i];

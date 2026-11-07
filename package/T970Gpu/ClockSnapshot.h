@@ -74,35 +74,35 @@ struct GmuSnapshot {
     RscSnapshot rsc;
 };
 
-static GmuSnapshot sampleGmu(IOMemoryMap &cc, const unsigned (&branches)[3], unsigned power) {
+static void sampleGmu(IOMemoryMap &cc, const unsigned (&branches)[3], unsigned power,
+                      GmuSnapshot &result) {
     using namespace t970_touch;
-    GmuSnapshot result;
-    if (!sampleCx(cc).on()) return result;
+    if (!sampleCx(cc).on()) return;
     for (const unsigned offset : branches) {
-        if (!branchRunning(read(cc, offset))) return result;
+        if (!branchRunning(read(cc, offset))) return;
     }
     // lmi mode 4, with the cold FW_INIT guard from its RSC probe.
     auto gmu = mapMmio(A650_GPU_BASE_GMU, 0x30000, power >= 7 ? 0 : kIOMapReadOnly);
     if (!gmu || !gmu->getVirtualAddress()) {
         result.state = "map-fail";
-        return result;
+        return;
     }
     result.reset = read(*gmu, 0x14000);
     if (result.reset != 1) {
         result.state = "reset";
-        return result;
+        return;
     }
     result.fwInit = read(*gmu, 0x14070);
     if (result.fwInit != 0) {
         result.state = "fw";
-        return result;
+        return;
     }
     result.counterBefore = read(*gmu, 0x14220);
     IODelay(1000);
     result.counterAfter = read(*gmu, 0x14220);
     result.state = "read";
-    if (power >= 5 && result.counterBefore != result.counterAfter) result.rsc = sampleRsc(*gmu, cc, power);
-    return result;
+    if (power >= 5 && result.counterBefore != result.counterAfter)
+        sampleRsc(*gmu, cc, power, result.rsc);
 }
 
 struct XoResult {
@@ -114,16 +114,15 @@ struct XoResult {
     GmuSnapshot gmu;
 };
 
-static XoResult pulseXoClocks(IOMemoryMap &cc, unsigned power) {
+static void pulseXoClocks(IOMemoryMap &cc, unsigned power, XoResult &result) {
     using namespace t970_touch;
     constexpr unsigned offsets[] = {A650_CC_AHB_CLK, A650_CC_CXO_CLK, A650_CC_CX_GMU_CLK};
     constexpr uint32_t enable = A650_CBCR_ENABLE;
-    XoResult result{};
     result.cmd = read(cc, A650_CC_GMU_RCGR);
     result.cfg = read(cc, A650_CC_GMU_RCGR + 4);
     // lmi clock_probe: leave the inherited XO source and divider alone.
     if (result.cmd == UINT32_MAX || (result.cmd & A650_RCG_CMD_UPDATE) ||
-        (result.cfg & 0x371fu) != 1) return result;
+        (result.cfg & 0x371fu) != 1) return;
 
     uint32_t before[3] = {};
     unsigned visited = 0;
@@ -147,10 +146,10 @@ static XoResult pulseXoClocks(IOMemoryMap &cc, unsigned power) {
         if (value == UINT32_MAX || !(value & enable) || (i && !A650GpuClockIsOn(value))) break;
         result.ready |= bit;
     }
-    if (power >= 4 && result.ready == 7) result.gmu = sampleGmu(cc, offsets, power);
+    if (power >= 4 && result.ready == 7) sampleGmu(cc, offsets, power, result.gmu);
     if (result.gmu.rsc.holdParents) {
         result.canReleaseCx = false;
-        return result;
+        return;
     }
     for (unsigned i = 3; i-- > 0;) {
         const unsigned bit = 1u << i;
@@ -167,7 +166,6 @@ static XoResult pulseXoClocks(IOMemoryMap &cc, unsigned power) {
     }
     // Keep parent votes until reset when a child vote cannot be restored.
     result.canReleaseCx = result.restored == visited;
-    return result;
 }
 
 static void reportCxPulse(char *out, unsigned length, IOMemoryMap &gcc, unsigned power) {
@@ -202,7 +200,7 @@ static void reportCxPulse(char *out, unsigned length, IOMemoryMap &gcc, unsigned
     const CxState during = waitCx(*cc, true);
     const bool clocks = power >= 3 && during.on();
     XoResult xo{};
-    if (clocks) xo = pulseXoClocks(*cc, power);
+    if (clocks) pulseXoClocks(*cc, power, xo);
     const bool rscObserved = power >= 5 && xo.ready == 7 && xo.gmu.counterBefore != xo.gmu.counterAfter;
     if (!xo.canReleaseCx) {
         if (power >= 6 && rscObserved) {

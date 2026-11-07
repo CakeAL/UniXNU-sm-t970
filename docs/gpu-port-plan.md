@@ -115,6 +115,10 @@ v125 实机把 DDR AXI 从 `80100000` 开到 `00100001` 并释放 CM3，但 `FW_
 v126 在首启轮询中保留该次故障的 FSR/FAR/FSYNR0/SID，并只按故障类型
 放宽对应 4 KiB 叶的 AP/XN 位，清理该 ASID 的 TLB、清除故障后重试；
 非权限故障、页表走查故障或范围外的页一律不修。
+v126 实机在报告线程里踩到栈底保护页：三指探测链的帧和约 12.8 KiB，
+加上报告线程自身超过 16 KiB，panic 为 invalid kernel stack pointer。
+v127 保留模式 23 的语义，把快照改为写入调用者对象、把固件规划数组移入
+BSS，链上帧和降到约 8.3 KiB 后再取首启报告。
 CM3 启动阶段需保留 T970 的 RSC 路由，且核对 A650 的 HFI 队列布局。
 锁定的 Sm8250Platform 冷启动序列会写入固定的 hidden 值，集成时需处理与实测路由的差异。
 见 [v109 实测](../evidence/gpu/rsc-init-v109/device-result.json)、
