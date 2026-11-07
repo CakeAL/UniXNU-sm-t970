@@ -14,3 +14,12 @@ python3.14 evidence/display/hello-black-v64/build-kernel.py --cached-headers --s
 python3.14 evidence/gpu/power-v104/prepare.py --cb-bar
 python3.14 -m unittest discover -s tests
 ```
+
+## 构建和刷写
+
+[主机验证](host-validation.json)包括 CBAR 写入和恢复的 ARM64 指令、守卫模型、
+预链接、FAT 回读、Mach-O 符号范围和独立 DTS/ADT 检查。完整平台检查停在历史框架版本校验。
+
+[镜像清单](preparation.json)与[刷写回执](upload.json)对应 BOOT
+`a9c4860d9fd50e264f00d75c65de75350aa487b9edfcc83249abf7f36974ee92`。
+Heimdall 确认上传成功并请求重启。实机 CBAR 读数待采集。

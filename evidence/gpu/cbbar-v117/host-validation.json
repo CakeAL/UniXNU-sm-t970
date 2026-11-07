@@ -1,0 +1,22 @@
+{
+  "device_revision": "897b0faba3ef5ece91aa95da43443838ffdf6cd9",
+  "unixnu_revision": "2c834e313d25482c78d38d703eff1f8d190f2597",
+  "boot_sha256": "a9c4860d9fd50e264f00d75c65de75350aa487b9edfcc83249abf7f36974ee92",
+  "tests": {
+    "command": "python3.14 -m unittest discover -s tests",
+    "ran": 73,
+    "skipped": 10,
+    "result": "OK"
+  },
+  "guard_model": "ASan and UBSan passed for CBAR round trip, filtered and latched writes, global fault, S2CR drift, CM3 release, ID2 mismatch and v115 format behavior.",
+  "instructions": "DisplayRegistration.o at 0xaeb8 STR W9,[X8] and 0xaf24 STR W8,[X9], each followed by DSB SY. Both addresses are SMMU +0x1000.",
+  "kernel_prelink": "PASS",
+  "fat_readback": "PASS",
+  "image_symbol_check": {
+    "segments": 15,
+    "symbols_checked": 69464,
+    "result": "PASS"
+  },
+  "check_hardware_description": "PASS with synthetic identity",
+  "check_platform": "Stopped at historical framework revision guard"
+}
