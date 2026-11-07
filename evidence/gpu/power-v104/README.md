@@ -16,3 +16,10 @@ python3.14 evidence/gpu/power-v104/prepare.py
 python3.14 -m unittest discover -s tests
 python3.14 ../UniXNU/scripts/porting-record.py check --device .
 ```
+
+内核预链接、FAT 回读、硬件 DTS/ADT 检查及单测通过。完整平台检查停在历史
+UniXNU revision 核对。详见 [主机验证](host-validation.json)。
+
+2026-11-07 15:24（中国标准时间），Heimdall 成功上传 BOOT `031095d5…` 并请求重启。
+镜像哈希及命令见 [打包记录](preparation.json) 和 [上传回执](upload.json)。
+启动后可三指按住两秒触发报告，采集 `GPU pwr` 一行。设备启动和寄存器结果待回传。

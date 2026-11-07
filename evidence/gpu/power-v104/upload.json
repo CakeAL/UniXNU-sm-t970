@@ -1,0 +1,12 @@
+{
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/gpu-power-v104/boot-partition.img",
+  "finished_at": "2026-11-07T15:24:05+08:00",
+  "boot_sha256": "031095d5baf37dae5f3ae7b89e4f1eaffd22683bea218efdf56ffe6e5434f902",
+  "partition": "BOOT",
+  "exit_code": 0,
+  "transfer_confirmed": true,
+  "reboot_requested": true,
+  "partition_readback": false,
+  "userdata_partition_uploaded": false,
+  "transfer_log_sha256": "3634cb6a721690ebec51de2aae82b631e02d349f10201c5a1708783765e0f6ac"
+}
