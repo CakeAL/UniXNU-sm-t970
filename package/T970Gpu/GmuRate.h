@@ -4,6 +4,7 @@
 #include "../T970Touch/BusSnapshot.h"
 #ifdef T970_GPU_POWER_SNAPSHOT
 #include "A650GmuPower.h"
+#include "SmmuSnapshot.h"
 #endif
 
 namespace t970_gpu {
@@ -23,6 +24,7 @@ struct GmuRate {
     uint32_t before = 0, active = 0, after = 0, command = 0;
     uint32_t gateBefore = 0, gateActive = 0, gateAfter = 0;
     bool holdParents = false;
+    SmmuSnapshot smmu;
 };
 
 static bool coldGmu(IOMemoryMap &gmu) {
@@ -44,7 +46,7 @@ static bool updateGmuRcg(IOMemoryMap &cc, uint32_t cfg, uint32_t &command) {
 }
 
 // lmi mode 26. The caller holds the verified ARC votes, CX and XO clocks.
-static GmuRate pulseGmuRate(IOMemoryMap &gmu, IOMemoryMap &cc) {
+static GmuRate pulseGmuRate(IOMemoryMap &gmu, IOMemoryMap &cc, bool readSmmu) {
     using namespace t970_touch;
     GmuRate result;
     result.state = "gcc-map";
@@ -82,6 +84,15 @@ static GmuRate pulseGmuRate(IOMemoryMap &gmu, IOMemoryMap &cc) {
         result.active = read(cc, A650_CC_GMU_RCGR + 4);
         result.state = "xo-hold";
         if (!coldGmu(gmu) || result.active == UINT32_MAX) return result;
+        if (readSmmu && result.active == requested && branchRunning(read(cc, A650_CC_AHB_CLK)) &&
+            branchRunning(read(cc, A650_CC_CXO_CLK)) && branchRunning(read(cc, A650_CC_CX_GMU_CLK))) {
+            result.smmu = pulseSmmuBus(*gcc);
+            if (result.smmu.holdParents) {
+                result.state = "bus-hold";
+                return result;
+            }
+            if (!coldGmu(gmu)) return result;
+        }
         const uint32_t original = (result.active & ~A650_RCG_CFG_CLEAR) |
                                   (result.before & A650_RCG_CFG_CLEAR);
         if (!updateGmuRcg(cc, original, result.command)) return result;

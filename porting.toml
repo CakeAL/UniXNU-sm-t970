@@ -1400,6 +1400,7 @@ procedure = [
   "Read KGSL identity and frequency nodes, list GPU firmware files and calculate the GMU/SQE hashes without executing GPU commands.",
 ]
 findings = [
+  "v111 BOOT50deea9b confirms the 200 MHz RCG configuration 1/100602/1 with UPDATE clear and restored DIV_GATE, RSC, XO and CX. v112 uses the stock DT GPU SMMU clocks and a read-only SMMU/CB0 snapshot. The stock GMU kernel uses SID5 with mask 0x400.",
   "v110 BOOTf8039496 reports both MX and CX TCS1 acknowledgements at 0x10101 and idle IRQ/control state 0/0/1 with RSC, XO and CX restored. v111 qualifies the GPLL0 divided 200 MHz GMU route after both ARC acknowledgements, then restores XO before releasing the temporary DIV_GATE.",
   "v109 BOOT569ebe5f reports wr=ff restore=ff xo=7/7 cx=1/1, verifying the eight SDE, RSC SRAM and PDC writes and their rollback on the board. v110 uses the programmed state to send MX before CX on GPU DRV0 TCS1, with both selector 2 values validated against command DB and parent dependencies retained on uncertain completion.",
   "v108 BOOT25f846a6 confirms DRV0 config 4000000a, ten idle TCS slots, lmi-matching inherited hidden commands and route, zeroed sequence SRAM and PDC 0/100. v109 applies the lmi mode 24 SDE/SRAM/PDC subset under the exact cold-state guard and verifies reverse restoration.",
@@ -1424,7 +1425,7 @@ limits = [
   "No GMU bring-up, command submission, DMA/SMMU ownership or Metal rendering was tested under UniXNU.",
 ]
 next_action = [
-  "Capture the v111 GPU rate line. If 200 MHz configuration and XO restoration pass, qualify the T970 GMU SID5 and HFI buffer route while CM3 is still in reset.",
+  "Capture v112 GPU smmu and CB0. If the stream table is empty, CB0 is idle and stable, and the bus/parent votes restore, use the measured layout to stage the owned HFI/GMU backing and SID5 attach/detach while CM3 is held in reset.",
 ]
 evidence = [
   { kind = "host", reference = "evidence/gpu/gmu-rate-v111/host-validation.json", revision = "0aa54149fce5cf8100d270b8247357a1a5fb39d5", command = "python3.14 -m unittest discover -s tests; evidence/gpu/power-v104/prepare.py --gmu-rate", result = "73 tests ran, 10 skipped, OK. Rate model, prelink, FAT readback and separate DTS/ADT check passed." },
@@ -1713,6 +1714,7 @@ procedure = [
   "Read BuildManifest.plist from the local IPSW using Python zipfile and plistlib to identify its OS version, build and product types.",
 ]
 findings = [
+  "v112 validates the tested v111 BOOT and replaces the kernel and GPU mode in FAT. ADT, Data seed, trust cache and bytes outside FAT are preserved.",
   "v111 validates the tested v110 BOOT and replaces the kernel and GPU mode in FAT. ADT, Data seed, trust cache and bytes outside FAT are preserved.",
   "v110 validates exact v109 BOOT and replaces only the kernel and GPU diagnostic mode in FAT. The ADT, Data seed, trust cache and bytes outside FAT are preserved.",
   "v109 validates exact v108 BOOT and replaces the kernel and GPU diagnostic mode in FAT. The ADT, Data seed, trust cache and bytes outside FAT are preserved.",

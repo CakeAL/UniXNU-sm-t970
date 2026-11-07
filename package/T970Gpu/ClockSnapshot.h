@@ -13,10 +13,6 @@
 namespace t970_gpu {
 
 #ifdef T970_GPU_POWER_SNAPSHOT
-static bool cfgAhbReady(uint32_t cfg) {
-    return cfg != UINT32_MAX && A650GpuCfgAhbIsEnabled(cfg) && A650GpuClockIsOn(cfg);
-}
-
 static void reportPower(char *out, unsigned length, IOMemoryMap &gcc) {
     using namespace t970_touch;
     constexpr unsigned gpu = A650_GPU_BASE_GCC_GPU - 0x100000;
@@ -31,7 +27,7 @@ static void reportPower(char *out, unsigned length, IOMemoryMap &gcc) {
     length -= used;
 
     // Require both the CFG AHB enable vote and an active clock before GPUCC.
-    if (!cfgAhbReady(cfg)) {
+    if (!branchRunning(cfg)) {
         snprintf(out, length, " cc=skip");
         return;
     }
@@ -83,7 +79,7 @@ static GmuSnapshot sampleGmu(IOMemoryMap &cc, const unsigned (&branches)[3], uns
     GmuSnapshot result;
     if (!sampleCx(cc).on()) return result;
     for (const unsigned offset : branches) {
-        if (!cfgAhbReady(read(cc, offset))) return result;
+        if (!branchRunning(read(cc, offset))) return result;
     }
     // lmi mode 4, with the cold FW_INIT guard from its RSC probe.
     auto gmu = mapMmio(A650_GPU_BASE_GMU, 0x30000, power >= 7 ? 0 : kIOMapReadOnly);
@@ -178,7 +174,7 @@ static void reportCxPulse(char *out, unsigned length, IOMemoryMap &gcc, unsigned
     using namespace t970_touch;
     constexpr unsigned gpu = A650_GPU_BASE_GCC_GPU - 0x100000;
     const uint32_t cfg = read(gcc, gpu + A650_GCC_GPU_CFG_AHB);
-    if (!cfgAhbReady(cfg)) {
+    if (!branchRunning(cfg)) {
         snprintf(out, length, "\nGPU cx skip cfg=%x", cfg);
         return;
     }
@@ -286,7 +282,7 @@ static void reportClock(char *out, unsigned length, bool writeGate, unsigned pow
 static unsigned powerMode() {
 #ifdef T970_GPU_POWER_SNAPSHOT
     unsigned power = 0;
-    if (PE_parse_boot_argn("t970-gpu-p", &power, sizeof(power)) && power >= 1 && power <= 8) return power;
+    if (PE_parse_boot_argn("t970-gpu-p", &power, sizeof(power)) && power >= 1 && power <= 9) return power;
 #endif
     return 0;
 }

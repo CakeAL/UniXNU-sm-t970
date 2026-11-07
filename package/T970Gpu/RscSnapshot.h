@@ -126,8 +126,8 @@ static void pulseRscInit(IOMemoryMap &gmu, IOMemoryMap &cc, IOMemoryMap &rscc,
             result.state = "arc-hold";
             return;
         }
-        if (power == 8 && result.votes.mx.ack && result.votes.cx.ack) {
-            result.rate = pulseGmuRate(gmu, cc);
+        if (power >= 8 && result.votes.mx.ack && result.votes.cx.ack) {
+            result.rate = pulseGmuRate(gmu, cc, power == 9);
             if (result.rate.holdParents || !rscStillIdle(gmu, rscc, state)) {
                 result.state = "rate-hold";
                 return;
@@ -221,8 +221,24 @@ static void reportRsc(char *out, unsigned length, const RscSnapshot &rsc, bool r
 
 static void reportRscMode(char *out, unsigned length, const RscSnapshot &rsc, unsigned power,
                           unsigned xoRestored, bool cxRestored) {
-    if (power == 8 && rsc.votes.mx.ack && rsc.votes.cx.ack && !rsc.votes.holdParents) {
+    if (power >= 8 && rsc.votes.mx.ack && rsc.votes.cx.ack && !rsc.votes.holdParents) {
         const GmuRate &rate = rsc.rate;
+        if (power == 9 && strcmp(rate.smmu.state, "skip")) {
+            const SmmuSnapshot &s = rate.smmu;
+            const int used = snprintf(out, length,
+                "\nGPU smmu %s/%s id=%x/%x/%x scr/f=%x/%x sm=%u/%u/%x bus=%x/%x:%x/%x rsc=%x/%x xo=%x cxr=%u",
+                s.state, rate.state, s.id0, s.id1, s.id2, s.scr0, s.gfsr,
+                s.valid, s.nonzero, s.firstS2cr, s.clock[0], s.clock[1], s.ready, s.restored,
+                rsc.programmed, rsc.restored, xoRestored, cxRestored ? 1u : 0u);
+            if (s.contextRead && used >= 0 && static_cast<unsigned>(used) < length) {
+                const auto &c = s.cb;
+                snprintf(out + used, length - used,
+                    "\nCB0 bar/attr=%x/%x ctl=%x/%x tt=%x/%x/%x/%x tcr=%x/%x mair=%x/%x fsr=%x far=%x/%x chg=%u",
+                    c[0], c[1], c[2], c[3], c[4], c[5], c[6], c[7], c[8], c[9],
+                    c[10], c[11], c[12], c[13], c[14], s.changed);
+            }
+            return;
+        }
         snprintf(out, length,
             "\nGPU rate %s/%s hz=%llu cfg=%x/%x/%x cmd=%x gate=%x/%x/%x rsc=%x/%x xo=7/%x cxr=%u",
             rsc.state, rate.state, static_cast<unsigned long long>(rate.parentHz),

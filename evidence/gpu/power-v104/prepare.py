@@ -38,8 +38,15 @@ def main():
     variants.add_argument('--rsc-init', action='store_true', help='Pack v109 from the tested v108 BOOT')
     variants.add_argument('--arc-vote', action='store_true', help='Pack v110 from the tested v109 BOOT')
     variants.add_argument('--gmu-rate', action='store_true', help='Pack v111 from the tested v110 BOOT')
+    variants.add_argument('--smmu-read', action='store_true', help='Pack v112 from the tested v111 BOOT')
     options = parser.parse_args()
-    if options.gmu_rate:
+    if options.smmu_read:
+        baseline = 'gpu-gmu-rate-v111'
+        base_sha = '50deea9b872a75087923157b3696a96d80c7330e06fb037594c9d5a4e5c06888'
+        output = OUT / 'gpu-smmu-v112'
+        old, new = b't970-gpu-p=8', b't970-gpu-p=9'
+        markers = (b'GPU smmu %s/%s id=', b'CB0 bar/attr=')
+    elif options.gmu_rate:
         baseline = 'gpu-arc-vote-v110'
         base_sha = 'f8039496c056aa92d1bd9bf6cd2a24ddc19f8299713a5e019a272d485e33f039'
         output = OUT / 'gpu-gmu-rate-v111'

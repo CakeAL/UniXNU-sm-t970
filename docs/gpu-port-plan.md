@@ -77,12 +77,14 @@ v107 实测 GMU 可读，CM3 仍在 reset、FW_INIT=0，AO 从 `0x1440` 推进�
 
 v109 实测 SDE、五个 RSC SRAM 字、PDC start/enable 全部写入并恢复，`wr=ff restore=ff`。
 v110 实测 GPU DRV0 TCS1 依次完成 MX、CX 的 selector 2 请求，两者应答 `0x10101`，
-TCS 和控制寄存器恢复。v111 在投票完成后验证 GPLL0 / 2 / 1.5 的 GMU 200 MHz 路径，
-先确认恢复 XO，再关闭本轮借用的分频门控。
+TCS 和控制寄存器恢复。v111 实测 GMU 200 MHz 路径回读 `1/100602/1`、UPDATE 清零，
+恢复 XO 和分频门控成功。v112 在这套电源和时钟条件下读取 T970 GPU SMMU 与 CB0 初态，
+核对原厂 DT 的 GMU kernel SID5 / mask `0x400` 及 lmi 的 CB0 布局。
 锁定的 Sm8250Platform 冷启动序列会写入固定的 hidden 值，集成时需处理与实测路由的差异。
 见 [v109 实测](../evidence/gpu/rsc-init-v109/device-result.json)、
 [v110 实测](../evidence/gpu/arc-vote-v110/device-result.json)、
-[v111 方案](../evidence/gpu/gmu-rate-v111/README.md)、
+[v111 实测](../evidence/gpu/gmu-rate-v111/device-result.json)、
+[v112 方案](../evidence/gpu/smmu-v112/README.md)、
 [lmi RSC 实现](https://github.com/Fsasdddd/lmi-uefi-touch-gpu/blob/0c9398400f937555918a53f1e9a97a90a3345257/tools/lmi-gpu-rsc-init.c)
 和 [SM8250 GMU 实现](https://github.com/FFT-infra/UniXNU-sm8250-common/blob/166235ec2480ff0992627b7aafa15c65ce6b4efa/kits/Sm8250Platform/A650Gmu.c)。
 
