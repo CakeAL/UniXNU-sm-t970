@@ -1,0 +1,40 @@
+{
+  "boot_sha256": "031095d5baf37dae5f3ae7b89e4f1eaffd22683bea218efdf56ffe6e5434f902",
+  "photo": "screen-runtime.jpg",
+  "photo_sha256": "88e55206c8ab9a92d8e1edef858a9eecbaa830daa4ddb5469001ea4db4b57e69",
+  "photo_time_local": "2026-11-07T15:31:29+08:00",
+  "image_binding": "v104 BOOT upload and its GPU pwr report in the owner screenshot",
+  "gpu_power": {
+    "line": "GPU pwr cfg/mem/dvm/axi=1/80004221/80000001/100000 cx/hw/gx/ahb/gmu/smmu=222001/5ff4/222001/80000001/80004220/80000000",
+    "cfg_ahb_enabled_and_running": true,
+    "cx_sw_collapse": true,
+    "cx_hw_power_on": false,
+    "gx_sw_collapse": true,
+    "gx_gdscr_power_on": false,
+    "gpucc_ahb_clock_off": true,
+    "cx_gmu_clock_off": true,
+    "smmu_vote_clock_off": true
+  },
+  "boot": {
+    "launchd_main": true,
+    "cpus": 8,
+    "processes": 245,
+    "springboard_pid": 27,
+    "backboardd_pid": 57
+  },
+  "storage": {
+    "data_space_rc": 0,
+    "block_size": 4096,
+    "available_blocks": 43304
+  },
+  "display": {
+    "successful_swaps": 35,
+    "copies": 35,
+    "retired": 35
+  },
+  "input": {
+    "side_key_sample_errors": 0,
+    "side_key_hid": "1/1/0",
+    "three_finger_report_observed": true
+  }
+}

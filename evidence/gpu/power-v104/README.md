@@ -22,4 +22,7 @@ UniXNU revision 核对。详见 [主机验证](host-validation.json)。
 
 2026-11-07 15:24（中国标准时间），Heimdall 成功上传 BOOT `031095d5…` 并请求重启。
 镜像哈希及命令见 [打包记录](preparation.json) 和 [上传回执](upload.json)。
-启动后可三指按住两秒触发报告，采集 `GPU pwr` 一行。设备启动和寄存器结果待回传。
+机主截图确认启动到 launchd main，八核运行，35 次 GOP 帧复制和退役。CFG AHB
+为 `1`，GPUCC 可读。CX/GX GDSCR 都是 `222001`，CX 硬件状态为 `5ff4`。
+CX/GX 的软件 collapse 位为 1，读到的上电位为 0。下一轮单独验证 CX 软件 vote。
+[实测字段和截图哈希](device-result.json)

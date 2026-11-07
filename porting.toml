@@ -1397,6 +1397,7 @@ procedure = [
   "Read KGSL identity and frequency nodes, list GPU firmware files and calculate the GMU/SQE hashes without executing GPU commands.",
 ]
 findings = [
+  "v104 device report on BOOT031095d5 confirms GCC CFG AHB=1 and a readable GPUCC. CX and GX GDSCR=0x222001, CX HW=0x5ff4, and AHB/GMU/SMMU branches report CLK_OFF. v105 therefore exercises CX SW_COLLAPSE alone after guarding the cold software-controlled CX and GX states.",
   "v104 reads the inherited GCC CFG AHB, MEMNOC, DVM and DDRSS AXI branches. It reads the GPUCC CX/GX status and branch clocks only if CFG AHB is enabled and running. GX GDSCR is GPUCC +0x100c and +0x1508 controls the GX clamp.",
   "On BOOT6b124053 the owner photo shows branch=1206d7f div=1 back=1216d7f restore=1, verifying the GCC GPU divided-branch bit can be set and restored. The same snapshot shows eight CPUs, 247 processes and 43 GOP copies and retirements.",
   "The closest XNU references are the MIT T733 Adreno6xx driver (SM7325/A642L, same iPadOS 17.7.11 ABI family: NativeAdreno ABI v1, ring, submit, fences, BO/memory, scheduler, user client) and the MIT lmi-uefi-touch-gpu project (SM8250/A650, iOS 16.5: ARC/RPMh/clock, GMU/HFI, ZAP, CP, SMMU, tile/desktop). Adreno740 is SM8550-only and UniXNU-umi has no GPU backend. The port therefore reuses the A6xx ABI core and writes a new A650 backend from the lmi sequences and the T970 DT.",
@@ -1414,9 +1415,10 @@ limits = [
   "No GMU bring-up, command submission, DMA/SMMU ownership or Metal rendering was tested under UniXNU.",
 ]
 next_action = [
-  "Capture the v104 GPU pwr line. If CFG AHB is off, qualify its enable bit with a bounded restoration probe. If GPUCC is readable, use the measured CX/GX and branch state to stage the board power sequence.",
+  "Capture the v105 GPU cx pre/on/end/ack/restore line. With a qualified CX pulse, stage a separate GMU clock experiment. If the CX hardware status does not respond, compare its state with the software vote and qualify the board CX/MX vote route.",
 ]
 evidence = [
+  { kind = "device", reference = "evidence/gpu/power-v104/device-result.json", revision = "61cde8082a423d1feb5d12315a0de933d9ee6d97", command = "BOOT031095d5; owner three-finger report screenshot 2026-11-07T15:31:29+08:00", result = "CFG AHB=1, CX/GX=222001/222001, CX HW=5ff4. Eight CPUs, 35 GOP copies and retirements, and Data space query rc=0." },
   { kind = "host", reference = "evidence/gpu/power-v104/host-validation.json", revision = "61cde8082a423d1feb5d12315a0de933d9ee6d97", command = "python3.14 -m unittest discover -s tests; evidence/gpu/power-v104/prepare.py", result = "73 tests ran, 10 skipped, OK. Kernel prelink, FAT readback and the separate hardware DTS/ADT check passed. The full platform checker stopped at its historical framework revision guard." },
   { kind = "device", reference = "evidence/gpu/power-v104/upload.json", revision = "61cde8082a423d1feb5d12315a0de933d9ee6d97", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/gpu-power-v104/boot-partition.img", result = "BOOT031095d5 upload succeeded and requested reboot. The GPU power line awaits device observation." },
   { kind = "device", reference = "evidence/gpu/clk-write-v103/device-result.json", revision = "c9a6cf1dc8ccb0e0bbe4f6c3267bc184d91b110b", command = "BOOT6b124053; owner runtime report screenshot", result = "GCC GPU branch 0x1206d7f -> 0x1216d7f and restore=1. Eight CPUs and 43 GOP copies/retirements." },
@@ -1681,6 +1683,7 @@ procedure = [
   "Read BuildManifest.plist from the local IPSW using Python zipfile and plistlib to identify its OS version, build and product types.",
 ]
 findings = [
+  "The v105 packer validates exact v104 BOOT and swaps only the kernel and GPU mode in its FAT. ADT, Data seed, trust cache and bytes outside FAT are preserved.",
   "v104 replaces only the XNU kernel and GPU diagnostic argument in the verified v103 BOOT FAT. ADT, Data seed, trust cache and the bytes outside FAT are preserved.",
   "v93 BOOTbb5bd9d0 and v94 BOOT6d5c4c60 were uploaded to BOOT only with Heimdall success and reboot requested. v94 keeps the exact v93 ADT, Data seed, trust cache, Android-v2 header, firmware, DTB and partition tail; only kernel and battery probe mode2-to3 change. Preparation manifests preserve compiled source snapshots and hashes; upload success is separate from readback and runtime success.",
   "The display relinker now optionally adds the PMIC key object and refreshes the separate Consumer HID wrapper, with original21H461 vtable bindings rechecked after prelink. v88..v92 preserve the exact Android-v2 header, firmware, firmware-DTB and partition tail and audit FAT kernel/ADT/config/seed/trust changes independently. v91 is uploaded; v92 with read-only battery-bus and64-bit owned-window reports is prepared. Every new image, receipt and available owner observation is kept together under evidence; generated binaries remain ignored.",

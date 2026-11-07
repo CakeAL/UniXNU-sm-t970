@@ -40,7 +40,7 @@ CP 提交、GPU 内存映射和最小绘图；Metal/DPU 留到后续阶段。
 | 阶段 | 内容 | 设备证据 |
 | --- | --- | --- |
 | 0 | 资源/固件/候选源对照（v99 起） | 报告 `GPU arc` 行、DT/固件哈希 |
-| 1 | GPUCC/GDSC/供电/TSENS 资格确认 | 只读时钟/电源快照，无挂死 |
+| 1 | GPUCC/GDSC/供电/TSENS 资格确认 | v104 读到 GPUCC；v105 验证 CX 上电与恢复，后续验证 GMU 所需时钟与供电 |
 | 2 | GMU 冷启动 + HFI 版本回读 | `FW_INIT`/HFI 响应 |
 | 3 | ZAP 认证 + secure mode 退出 | 认证结果 |
 | 4 | SMMU/GPU VA + CP ring/fence | GPU 内存写入回读 |
@@ -57,13 +57,16 @@ v99 首次上机时报告缓冲（896 字节）被前面的 display/UI/Data-spac
 GPU arc 行没有写入；v100 把 `display_state` 扩到 1280 字节，保持探测与参数不变。
 
 v103 实测 GPLL0 600 MHz，GCC `0x152000` 的 DIV_GATE 置位和恢复均成功。
-v104 复用锁定的 Sm8250Platform 寄存器定义，先读 GCC 的 CFG AHB、MEMNOC、DVM
-和 DDRSS AXI。只有 CFG AHB 已启用且报告时钟在运行时，才读 GPUCC 的 CX/GX GDSC、
-CX 硬件状态及 AHB、GMU、SMMU 时钟分支。若显示 `cc=skip`，下一步单独验证
-CFG AHB 使能的受控置位和恢复；若成功读到 GPUCC，则用 CX/GX 初态确定电源实验。
-GX 的 `0x3d91508` 是 clamp 控制，后续核对 GX 上电用 `0x3d9100c`。
-见 [v103 实测](../evidence/gpu/clk-write-v103/device-result.json)和
-[v104 复测说明](../evidence/gpu/power-v104/README.md)。
+v104 实测 CFG AHB 为 `0x1`，GPUCC 可读。CX/GX GDSCR 均为 `0x222001`，
+CX 硬件状态 `0x5ff4`，各上电位均为 0。内部 AHB、GMU、SMMU 时钟的 CLK_OFF 位为 1。
+GX 的 `0x3d91508` 是 clamp 控制，GX GDSCR 位于 `0x3d9100c`。
+见 [v103 门控实测](../evidence/gpu/clk-write-v103/device-result.json)和
+[v104 GPUCC 实测](../evidence/gpu/power-v104/device-result.json)。
+
+v105 单独验证 CX 软件 vote，启动后由三指报告触发。若 CX 上电并恢复，下一步
+在独立实验中验证 CX 持有期间的 AHB、CXO 和 CX GMU 分支时钟，再进入 RSC/PDC
+与板级 CX/MX 投票。若 CX 未应答，先比较软件位回读和硬件状态，确认是否需要
+先补足板级投票。见 [v105 方案](../evidence/gpu/cx-v105/README.md)。
 
 ## 风险
 
