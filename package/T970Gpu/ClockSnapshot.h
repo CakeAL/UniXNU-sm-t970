@@ -250,11 +250,12 @@ static void reportClock(char *out, unsigned length, bool writeGate, unsigned pow
     }
 #ifdef T970_GPU_POWER_SNAPSHOT
 #ifdef T970_GPU_GMU_FIRMWARE
-    if (power == cbBootMode) {
+    if (isBootMode(power)) {
         // GMU cold start is a one-shot operation. Subsequent reports reuse
         // the first observation even when the live dependencies were held.
+        // Two fault lines can follow the boot line.
         static unsigned state;
-        static char firstReport[192];
+        static char firstReport[512];
         unsigned fresh = 0;
         if (__atomic_compare_exchange_n(&state, &fresh, 1, false, __ATOMIC_ACQ_REL, __ATOMIC_ACQUIRE)) {
             reportCxPulse(firstReport, sizeof(firstReport), *gcc, power);
@@ -303,7 +304,7 @@ static unsigned powerMode() {
     if (power == 13 || (power >= cbTtbrMode && power <= cbSid5Mode)) return power;
 #endif
 #ifdef T970_GPU_GMU_FIRMWARE
-    if (power == cbFirmwareMode || power == cbBootMode) return power;
+    if (power == cbFirmwareMode || isBootMode(power)) return power;
 #endif
     if ((power >= 1 && power <= 12) || power == cbBarMode || power == cbBarReleaseMode) return power;
 #endif

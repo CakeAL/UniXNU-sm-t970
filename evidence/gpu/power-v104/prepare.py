@@ -52,8 +52,15 @@ def main():
     variants.add_argument('--gmu-firmware', action='store_true', help='Pack v123 from the tested v122 BOOT')
     variants.add_argument('--gmu-boot', action='store_true', help='Pack v124 from the tested v123 BOOT')
     variants.add_argument('--gmu-boot-axi', action='store_true', help='Pack v125 from the tested v124 BOOT')
+    variants.add_argument('--gmu-boot-pf', action='store_true', help='Pack v126 from the tested v125 BOOT')
     options = parser.parse_args()
-    if options.gmu_boot_axi:
+    if options.gmu_boot_pf:
+        baseline = 'gpu-gmuboot-axi-v125'
+        base_sha = '1cb79accad1624cd468373e8fe3421beb1ce08e8a5f076ed2b908bf40b4e38b6'
+        output = OUT / 'gpu-gmuboot-pf-v126'
+        old, new = b't970-gpu-p=22', b't970-gpu-p=23'
+        markers = (b'GPU boot %s/%s fw=', b'GPU pf%u fsr=%x far=')
+    elif options.gmu_boot_axi:
         baseline = 'gpu-gmuboot-v124'
         base_sha = 'a5af785e63a87473fff855937a37222173e7fa9b8c82abcc8cf5f54d92d82224'
         output = OUT / 'gpu-gmuboot-axi-v125'

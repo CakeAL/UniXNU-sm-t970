@@ -1403,6 +1403,8 @@ procedure = [
   "Read KGSL identity and frequency nodes, list GPU firmware files and calculate the GMU/SQE hashes without executing GPU commands.",
 ]
 findings = [
+  "v126 keeps the first post-release FSR/FAR/FSYNR0/SID and the offending 4 KiB leaf word. It widens only the attribute the syndrome names (AF, AP[2], AP[1] per PNU, XN per IND), invalidates the owned ASID, clears the stalled fault and retries. Translation, external and page-table-walk faults, non-leaf words and pages outside the audited ranges are never patched.",
+  "v125 BOOT1cb79acc enabled DDRSS GPU AXI (80100000 to 00100001), published SID5, staged the firmware and released CM3, but FW_INIT stayed 0. CB0 FSR 400 to 40000408 is a permission fault with a stalled stream; the 11 configuration readbacks and both fatal masks stayed clean, so the first GMU bus accesses were rejected by a leaf permission rather than by a register or clock refusal.",
   "v125 requests the DDRSS GPU AXI enable bit and checks CLK_OFF before attempting GMU cold start. The shared clock rollback checks the inherited vote before upstream release.",
   "v124 BOOTa5af785e read DDRSS GPU AXI CBCR 0x80100000 with CLK_OFF set in the first-start scope and returned before SID5 or CM3 activation.",
   "v124 combines the T970 RSC and SID5 path with the hash-matched firmware and four-queue HFI table. It polls FW_INIT and HFI ready after CM3 release and retains backing and power until reboot once the image is loaded.",
@@ -1444,11 +1446,12 @@ limits = [
   "No GMU bring-up, command submission, DMA/SMMU ownership or Metal rendering was tested under UniXNU.",
 ]
 next_action = [
-  "Verify the v125 DDRSS GPU AXI branch readback, FW_INIT and HFI queue readiness before an FW_VER exchange.",
+  "Flash v126 mode 23 and record the CB0 FSR/FAR/FSYNR0/SID pair, the repaired leaf word and whether FW_INIT reaches 0x100 before any HFI or FW_VER exchange.",
 ]
 evidence = [
   { kind = "host", reference = "evidence/gpu/gmuboot-axi-v125/host-validation.json", revision = "7ec6af92c18a7f969864158d1d264d11a0280b80", command = "python3.14 -m unittest discover -s tests and evidence/gpu/power-v104/prepare.py --gmu-boot-axi", result = "ASan/UBSan AXI enable, refusal, rollback/hold and GMU startup model passed. FAT readback, firmware hash and image symbols passed." },
-  { kind = "device", reference = "evidence/gpu/gmuboot-axi-v125/upload.json", revision = "7ec6af92c18a7f969864158d1d264d11a0280b80", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/gpu-gmuboot-axi-v125/boot-partition.img", result = "BOOT1cb79acc transfer succeeded and requested reboot. DDR AXI and first-start result pending." },
+  { kind = "device", reference = "evidence/gpu/gmuboot-axi-v125/upload.json", revision = "7ec6af92c18a7f969864158d1d264d11a0280b80", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/gpu-gmuboot-axi-v125/boot-partition.img", result = "BOOT1cb79acc transfer succeeded and requested reboot. The first-start report is recorded in device-result.json." },
+  { kind = "device", reference = "evidence/gpu/gmuboot-axi-v125/device-result.json", revision = "7ec6af92c18a7f969864158d1d264d11a0280b80", command = "BOOT1cb79acc and owner three-finger report screenshot", result = "DDR AXI 80100000 to 00100001, CM3 released, FW_INIT 0, CB0 FSR 40000408 (AArch64 format, permission fault, stalled stream), GFSR 0 and all 11 configuration readbacks matched. Eight CPUs, RAM Data query success and 85 GOP copies and retirements." },
   { kind = "device", reference = "evidence/gpu/gmuboot-v124/device-result.json", revision = "932e7a2f2949c6ae020fdf95a641ea99ef5848e0", command = "BOOTa5af785e and owner three-finger report screenshot", result = "AXI guard returned with CLK_OFF set (80100000). CM3 release was skipped. Eight CPUs, RAM Data query success and 23 GOP copies and retirements." },
   { kind = "host", reference = "evidence/gpu/gmuboot-v124/host-validation.json", revision = "932e7a2f2949c6ae020fdf95a641ea99ef5848e0", command = "python3.14 -m unittest discover -s tests and evidence/gpu/power-v104/prepare.py --gmu-boot", result = "Sanitized cold-start model, prelink, FAT readback, firmware hash and image symbols passed." },
   { kind = "device", reference = "evidence/gpu/gmuboot-v124/upload.json", revision = "932e7a2f2949c6ae020fdf95a641ea99ef5848e0", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/gpu-gmuboot-v124/boot-partition.img", result = "BOOTa5af785e transfer succeeded and requested reboot." },
@@ -1776,6 +1779,7 @@ procedure = [
   "Read BuildManifest.plist from the local IPSW using Python zipfile and plistlib to identify its OS version, build and product types.",
 ]
 findings = [
+  "v126 uses exact v125 BOOT and selects opt-in mode 23 with the same hash-matched A650 GMU firmware. The packer verifies the retained ADT, Data seed, trust cache and bytes outside FAT.",
   "v125 uses exact v124 BOOT and selects opt-in mode 22 with the same hash-matched A650 GMU firmware. The packer verifies the retained ADT, Data seed, trust cache and bytes outside FAT.",
   "v124 uses exact v123 BOOT and selects opt-in mode 21 with the hash-matched A650 GMU firmware. The packer checks the retained ADT, Data seed, trust cache and bytes outside FAT.",
   "v123 validates exact v122 BOOT and stages the opted-in kernel with a hash-matched A650 GMU firmware input. The packer verifies the retained ADT, Data seed, trust cache and bytes outside FAT.",
@@ -2079,6 +2083,7 @@ procedure = [
   "Run python3 scripts/collect-adb-inventory.py --root --output evidence/<new-capture>; review per-command stderr, checksums, GPT CRC results and DT sanitization before updating this record.",
 ]
 findings = [
+  "The v126 startup report appends up to two GPU pf lines with the FSR, FAR, FSYNR0, CBFRSYNRA, the leaf word before and after the one-attribute repair and whether the transaction was retried.",
   "The v123 startup report shows TCM and RAM bytes, readback and restoration mismatches, and the staged DTCM version.",
   "v119 reports TTBR0 and TTBR1 native read, ASID write and rollback masks through the three-finger startup report.",
   "The v116 three-finger report includes a bounded GMU table-walk result with allocator, backing, build, bind, encode and audit failure labels.",

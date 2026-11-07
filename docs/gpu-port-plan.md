@@ -107,6 +107,14 @@ v124 复用 T970 的 RSC 路由和 v122 的 SID5，把四队列 HFI 布局随固
 随后释放 CM3 并检查 FW_INIT 和 HFI 就绪。加载后保留 DMA 内存和依赖至重启。
 v124 实机在 DDR AXI 时钟关闭时返回。v125 在该范围请求 DDR AXI 时钟，
 回读 ENABLE 与 CLK_OFF 后再进入 GMU 首启。
+v125 实机把 DDR AXI 从 `80100000` 开到 `00100001` 并释放 CM3，但 `FW_INIT`
+未出现；CB0 FSR 由 `0x400` 变为 `0x40000408`，按
+[Linux arm-smmu 的 SMMU-500 定义](https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/iommu/arm/arm-smmu/arm-smmu.h)
+这是 AArch64 格式位加 permission fault（PF）和 stream stalled（SS）。
+首个 GMU 总线访问已被翻译但被叶权限拒绝，11 个配置回读和致命位都正常。
+v126 在首启轮询中保留该次故障的 FSR/FAR/FSYNR0/SID，并只按故障类型
+放宽对应 4 KiB 叶的 AP/XN 位，清理该 ASID 的 TLB、清除故障后重试；
+非权限故障、页表走查故障或范围外的页一律不修。
 CM3 启动阶段需保留 T970 的 RSC 路由，且核对 A650 的 HFI 队列布局。
 锁定的 Sm8250Platform 冷启动序列会写入固定的 hidden 值，集成时需处理与实测路由的差异。
 见 [v109 实测](../evidence/gpu/rsc-init-v109/device-result.json)、
@@ -126,6 +134,7 @@ CM3 启动阶段需保留 T970 的 RSC 路由，且核对 A650 的 HFI 队列布
 [v123 固件装载实测](../evidence/gpu/gmufw-v123/device-result.json)、
 [v124 首启探针](../evidence/gpu/gmuboot-v124/README.md)、
 [v125 DDR AXI 探针](../evidence/gpu/gmuboot-axi-v125/README.md)、
+[v125 首启实测](../evidence/gpu/gmuboot-axi-v125/device-result.json)、
 [lmi RSC 实现](https://github.com/Fsasdddd/lmi-uefi-touch-gpu/blob/0c9398400f937555918a53f1e9a97a90a3345257/tools/lmi-gpu-rsc-init.c)
 和 [SM8250 GMU 实现](https://github.com/FFT-infra/UniXNU-sm8250-common/blob/166235ec2480ff0992627b7aafa15c65ce6b4efa/kits/Sm8250Platform/A650Gmu.c)。
 

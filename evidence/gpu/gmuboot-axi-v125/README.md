@@ -19,6 +19,26 @@ python3.14 -m unittest discover -s tests
 
 [镜像清单](preparation.json)和[刷写回执](upload.json)对应 BOOT
 `1cb79accad1624cd468373e8fe3421beb1ce08e8a5f076ed2b908bf40b4e38b6`。
-Heimdall 确认上传并请求重启。首启结果待实机报告。
+Heimdall 确认上传并请求重启。
 [主机验证](host-validation.json)包括时钟与 GMU 首启模型、封包和独立 DTS/ADT 检查。
 完整平台检查停在历史框架版本校验。
+
+## 实测
+
+[实机报告](device-result.json)对应同一 BOOT。DDR AXI 从 `80100000`
+变为 `00100001`，CLK_OFF 清零，SMMU 三条总线时钟拿到后进入 SID5、
+固件和 CM3 首启。发布后读到：
+
+`GPU boot fw/smmu-hold fw=0 hfi=0/0 rst=1 at=0 f=0/40000408 irq=0/0 held=1 axi=80100000/100001/0`
+
+CM3 已释放，11 个配置寄存器全部读回一致（`at=0`），AO 和 GMU 致命位
+均为 0。`fw=0` 表示 `FW_INIT` 没有出现 `0x100`，失败发生在首启阶段。
+CB0 FSR 从空闲的 `0x400` 变为 `0x40000408`：按
+[Linux arm-smmu 的 SMMU-500 定义](https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/iommu/arm/arm-smmu/arm-smmu.h)，
+`0x400` 是 AArch64 Format，位 3 是 permission fault（PF），位 30 是
+stream stalled（SS）。GFSR 为 0，说明没有未匹配流的全局故障。
+因此第一个 GMU 总线访问已被成功翻译，但被页表权限拒绝；流处于
+stall 状态并一直等待，CM3 因而没有写 `FW_INIT`。该行没有记录 FAR，
+具体地址和读写/取指方向留到下一轮。
+
+八核在线，Data 查询成功，GOP 完成 85 次拷贝和回收。

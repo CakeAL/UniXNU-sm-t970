@@ -23,6 +23,10 @@ constexpr unsigned cbActivateMode = 18;
 constexpr unsigned cbSid5Mode = 19;
 constexpr unsigned cbFirmwareMode = 20;
 constexpr unsigned cbBootMode = 22;
+constexpr unsigned cbBootRepairMode = 23;
+static constexpr bool isBootMode(unsigned power) {
+    return power == cbBootMode || power == cbBootRepairMode;
+}
 constexpr unsigned ddrAxiIndex = 2;
 constexpr uint32_t cbBarStage1 = 0x1f300;
 // Arm IHI 0062D.c: FSR[10:9] describes the translation table format.
@@ -190,7 +194,8 @@ static bool pulseTtbr(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &result,
 }
 
 static bool pulseSid5(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &result,
-                      const uint32_t (&routes)[6], uint32_t sctlr, [[maybe_unused]] GmuTables *bootTables) {
+                      const uint32_t (&routes)[6], uint32_t sctlr,
+                      [[maybe_unused]] GmuTables *bootTables, [[maybe_unused]] unsigned power) {
     constexpr unsigned smr0 = A650_SMMU_SMR(0), s2cr0 = A650_SMMU_S2CR(0);
     constexpr uint32_t globalPolicy = 0x40f, faultUnmatched = 0x406;
     constexpr uint32_t routeType = 3u << 16, faultRoute = 2u << 16;
@@ -242,7 +247,8 @@ static bool pulseSid5(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &result,
             if (safe) {
                 result.boot.state = "route";
                 if (matches(sid5Match, translated))
-                    startGmuBoot(gmu, *bootTables, result.boot, [&] { return matches(sid5Match, translated, false); });
+                    startGmuBoot(gmu, smmu, *bootTables, result.boot, power == cbBootRepairMode,
+                                 [&] { return matches(sid5Match, translated, false); });
             }
             return false;
         }
@@ -266,7 +272,7 @@ static bool pulseSid5(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &result,
 
 static bool pulseCbActivation(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &result,
                               const uint32_t (&routes)[6], const ArmSmmu4KContextImage &image,
-                              uint32_t original, bool publishSid5, GmuTables *bootTables) {
+                              uint32_t original, bool publishSid5, GmuTables *bootTables, unsigned power) {
     constexpr unsigned sctlr = 0x8000, tlbStatus = 0x87f4;
     constexpr uint32_t enable = 1, faultInterrupt = 1u << 6, policyMask = 0x1f7;
     const ArmSmmu4KIo tlbIo = {
@@ -327,7 +333,7 @@ static bool pulseCbActivation(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot 
         contextMatches();
     const bool activeMatch = activeClean && (active.sctlr & policyMask) == (requested & policyMask);
     const bool routeWithdrawn = !publishSid5 || !activeMatch ||
-        (pulseSid5(smmu, gmu, result, routes, active.sctlr, bootTables) && contextMatches());
+        (pulseSid5(smmu, gmu, result, routes, active.sctlr, bootTables, power) && contextMatches());
     if (result.boot.keepRoute) return false;
     if (publishSid5 && !stillOwnsView(readCbGuards(smmu))) return false;
     // Withdraw M even if the active readback failed, before considering
@@ -433,10 +439,11 @@ static bool pulseCbRoot(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &resul
     const bool installed = result.rootInstalled == fullMask;
     const bool audited = installed && auditGmuTables(tables, observed[firstTtbr]);
     if (audited) result.rootLeaves = static_cast<unsigned>(tables.audit.leaf_pages);
-    const bool publishSid5 = power == cbSid5Mode || power == cbBootMode;
-    GmuTables *bootTables = power == cbBootMode ? &tables : nullptr;
+    const bool publishSid5 = power == cbSid5Mode || isBootMode(power);
+    GmuTables *bootTables = isBootMode(power) ? &tables : nullptr;
     if (audited && (power == cbActivateMode || publishSid5) &&
-        !pulseCbActivation(smmu, gmu, result, routes, tables.image, before.sctlr, publishSid5, bootTables))
+        !pulseCbActivation(smmu, gmu, result, routes, tables.image, before.sctlr, publishSid5, bootTables,
+                           power))
         return false;
 
     // TCR2/TCR precede restoring TTBRs because TCR2 controls ASID width.
@@ -608,7 +615,7 @@ static SmmuSnapshot pulseSmmuBus(IOMemoryMap &gcc, IOMemoryMap &gmu, unsigned po
     constexpr unsigned clocks[] = {gpu + A650_GCC_GPU_MEMNOC_GFX, gpu + A650_GCC_GPU_SNOC_DVM_GFX,
                                    gpu + A650_GCC_DDRSS_GPU_AXI};
     constexpr uint32_t enable = A650_CBCR_ENABLE;
-    const unsigned count = power == cbBootMode ? 3 : 2;
+    const unsigned count = isBootMode(power) ? 3 : 2;
     SmmuSnapshot result;
     result.state = "clock";
     uint32_t before[3] = {};

@@ -1,0 +1,57 @@
+{
+  "boot_sha256": "1cb79accad1624cd468373e8fe3421beb1ce08e8a5f076ed2b908bf40b4e38b6",
+  "source": "Owner screenshot attached to the Codex conversation",
+  "photo_time_local": "2026-11-08T01:00:32+08:00",
+  "line": "GPU boot fw/smmu-hold fw=0 hfi=0/0 rst=1 at=0 f=0/40000408 irq=0/0 held=1 axi=80100000/100001/0",
+  "ddrss_gpu_axi": {
+    "before": "0x80100000",
+    "enabled": "0x00100001",
+    "after": "unobserved default 0",
+    "clk_off_before": true,
+    "clk_off_enabled": false,
+    "note": "The third field is the retained default, not a readback: the SMMU clock pulse returned before its rollback loop because the SID5 route and backing are held for the boot."
+  },
+  "cm3": {
+    "first_start_attempted": true,
+    "reset_at_entry": 1,
+    "release_written": true,
+    "fw_init": 0,
+    "hfi_status": 0,
+    "hfi_version": 0,
+    "reset_after_failure": 1,
+    "configuration_readbacks": "11/11 matched (at=0)"
+  },
+  "smmu": {
+    "gfsr": 0,
+    "cb0_fsr": "0x40000408",
+    "cb0_fsr_decode": "FORMAT=2 (AArch64 walk), PF (permission fault), SS (stream stalled)",
+    "cb0_far": "not recorded",
+    "route": "SMR0 0x84000005 and S2CR0 translated, retained"
+  },
+  "gmu_status": {
+    "ao_host_interrupt_status": 0,
+    "gmu2host_interrupt_info": 0
+  },
+  "dependencies_retained": true,
+  "interpretation": "The DDR AXI branch enabled and the GMU firmware reached the CM3 release. FW_INIT never read 0x100: the first GMU bus access after release took a CB0 permission fault that the stalled stream waited on. The AO and CM3 fatal bits stayed clear and every configuration readback matched, so the failure is an access-permission rejection, not a register or clock refusal.",
+  "boot": {
+    "launchd_main": true,
+    "cpus": 8,
+    "processes": 260,
+    "springboard_pid": 27,
+    "backboardd_pid": 57
+  },
+  "storage": {
+    "data_space_rc": 0,
+    "block_size": 4096,
+    "available_blocks": 34201
+  },
+  "display": {
+    "copies": 85,
+    "retired": 85
+  },
+  "input": {
+    "side_key_sample_errors": 0,
+    "side_key_hid": "1/1/0"
+  }
+}
