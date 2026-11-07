@@ -1,0 +1,25 @@
+{
+  "device_revision": "f0e0fdee576ca67bbd2068161d449d7fb73e739d",
+  "unixnu_revision": "2c834e313d25482c78d38d703eff1f8d190f2597",
+  "boot_sha256": "5354324ff1c4b61f86be0a188fece6f8e980cd7d362ae31731071a0b365fba9b",
+  "resolved_os_profile": "ipados-17.7.11-21H461",
+  "resolved_soc_revision": "166235ec2480ff0992627b7aafa15c65ce6b4efa",
+  "tests": {
+    "command": "python3.14 -m unittest discover -s tests",
+    "ran": 73,
+    "skipped": 10,
+    "result": "OK"
+  },
+  "gmu_model": "ASan/UBSan mock MMIO passed for a read-only GMU map, exact register order, non-cold reset, nonzero FW_INIT, map failure, stopped AHB, refused RCG and v106 compatibility. Clock and CX restoration also passed.",
+  "kernel_prelink": "PASS",
+  "fat_readback": "PASS",
+  "check_hardware_description": {
+    "command": "python3.14 scripts/check-hardware-description.py --unixnu ../UniXNU --output out/data-bringup/gpu-gmu-v107-hardware-check",
+    "result": "PASS with synthetic identity"
+  },
+  "check_platform": {
+    "command": "python3.14 scripts/check-platform.py --unixnu ../UniXNU --output out/data-bringup/gpu-gmu-v107-platform-check",
+    "result": "Stopped at historical framework revision guard"
+  },
+  "porting_record": "PASS (13 areas, including changed-path ownership)"
+}

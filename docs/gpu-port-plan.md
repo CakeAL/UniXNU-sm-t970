@@ -73,6 +73,12 @@ v107 复用 lmi 的 GMU 只读路径，在三条时钟与 CX 均通过检查后�
 和 AO 计数器。通过后按 lmi 的 RSC/PDC 与 ARC 投票顺序核对 T970 板级输入，
 再用 SoC 的 A650 GMU/HFI 实现推进固件启动。见 [v107 方案](../evidence/gpu/gmu-v107/README.md)。
 
+RSC 对照需要先读本机的 DRV0 配置、TCS 空闲状态和 hidden 命令。lmi 的独立投票实验
+保留继承的 hidden 命令，锁定的 Sm8250Platform 冷启动序列则会写入固定值。以 T970
+实测决定后续初始化值，GMU/HFI 阶段复用共享实现。见
+[lmi RSC 实现](https://github.com/Fsasdddd/lmi-uefi-touch-gpu/blob/0c9398400f937555918a53f1e9a97a90a3345257/tools/lmi-gpu-rsc-init.c)
+和 [SM8250 GMU 实现](https://github.com/FFT-infra/UniXNU-sm8250-common/blob/166235ec2480ff0992627b7aafa15c65ce6b4efa/kits/Sm8250Platform/A650Gmu.c)。
+
 ## 风险
 
 - GPU/GMU 窗口在未上电时 MMIO 读可能挂死，必须先做时钟/电源资格；

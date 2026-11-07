@@ -1,0 +1,12 @@
+{
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/gpu-gmu-v107/boot-partition.img",
+  "finished_at": "2026-11-07T15:52:31+08:00",
+  "boot_sha256": "5354324ff1c4b61f86be0a188fece6f8e980cd7d362ae31731071a0b365fba9b",
+  "partition": "BOOT",
+  "exit_code": 0,
+  "transfer_confirmed": true,
+  "reboot_requested": true,
+  "partition_readback": false,
+  "userdata_partition_uploaded": false,
+  "transfer_log_sha256": "3634cb6a721690ebec51de2aae82b631e02d349f10201c5a1708783765e0f6ac"
+}
