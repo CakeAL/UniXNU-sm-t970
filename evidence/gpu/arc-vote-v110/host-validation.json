@@ -1,0 +1,25 @@
+{
+  "device_revision": "c195d06b196097bcdfa95019bd23f9a4f582310a",
+  "unixnu_revision": "2c834e313d25482c78d38d703eff1f8d190f2597",
+  "boot_sha256": "f8039496c056aa92d1bd9bf6cd2a24ddc19f8299713a5e019a272d485e33f039",
+  "resolved_os_profile": "ipados-17.7.11-21H461",
+  "resolved_soc_revision": "166235ec2480ff0992627b7aafa15c65ce6b4efa",
+  "tests": {
+    "command": "python3.14 -m unittest discover -s tests",
+    "ran": 73,
+    "skipped": 10,
+    "result": "OK"
+  },
+  "arc_model": "ASan/UBSan mock MMIO passed for DB and slot guards, MX-before-CX, TCS and RPMH restoration, NACK, timeout, rejected arm and retained dependencies on restoration failure.",
+  "kernel_prelink": "PASS",
+  "fat_readback": "PASS",
+  "check_hardware_description": {
+    "command": "python3.14 scripts/check-hardware-description.py --unixnu ../UniXNU --output out/data-bringup/gpu-arc-vote-v110-hardware-check",
+    "result": "PASS with synthetic identity"
+  },
+  "check_platform": {
+    "command": "python3.14 scripts/check-platform.py --unixnu ../UniXNU --output out/data-bringup/gpu-arc-vote-v110-platform-check",
+    "result": "Stopped at historical framework revision guard"
+  },
+  "porting_record": "PASS (13 areas, including changed-path ownership)"
+}
