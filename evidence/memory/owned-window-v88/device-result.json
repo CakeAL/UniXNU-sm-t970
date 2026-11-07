@@ -1,0 +1,23 @@
+{
+  "boot_sha256": "0c94056eca35b7734fb1fe7c08a9d26c7b2e10c49193b8344b3b0967f3906b34",
+  "photo": "screen-runtime.jpg",
+  "photo_sha256": "75f5f190c85780f91ed4cd496f3cfa83e420bc634c387a0833b959a4dc776ca3",
+  "photo_time_local": "2026-11-07T12:08:46+08:00",
+  "owner_observed_home_screen": true,
+  "managed_pages": "0xe81dc",
+  "page_size": 4096,
+  "managed_mib": 3713.859375,
+  "free_pages": "0x1443",
+  "launchd_main": 1,
+  "processes": 257,
+  "cpu": 8,
+  "secondaries": 7,
+  "springboard_pid": 27,
+  "backboardd_pid": 57,
+  "frames_copied": 52,
+  "frames_retired": 52,
+  "rejected_swaps": 0,
+  "last_copy_us": 42460,
+  "max_copy_us": 44807,
+  "notes": "Three-finger terminal diagnostic after user confirmed desktop; no memory stress or additional banks tested."
+}

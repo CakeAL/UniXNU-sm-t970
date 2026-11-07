@@ -32,12 +32,16 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, default=BUILD)
     parser.add_argument('--cached-headers', action='store_true')
+    parser.add_argument('--keys', action='store_true', help='Link the opt-in T970 PMIC key observer')
+    parser.add_argument('--refresh-hid', action='store_true', help='Recompile the audited HID wrapper with the setup baseline')
     parser.add_argument('--gop-fork', action='store_true',
                         help='Link the audited GopFramebuffer fork object (scanout and source cache options)')
     variants = parser.add_mutually_exclusive_group()
     variants.add_argument('--touch-hid', action='store_true')
     variants.add_argument('--setup-probe', action='store_true')
     args = parser.parse_args()
+    if args.refresh_hid and not (args.setup_probe or args.touch_hid):
+        parser.error('--refresh-hid requires --setup-probe or --touch-hid')
     build = args.output.resolve()
     kernel = WORK / 'kernel/kernel.macho'
     if sha(kernel) != BASE_KERNEL_SHA or sha(LIVE / ARCHIVE) != BASE_ARCHIVE_SHA:
@@ -107,16 +111,23 @@ def main():
         if ar('-p', archive, member) != expected:
             raise ValueError('Unexpected archive change: ' + member)
     if args.touch_hid or args.setup_probe:
-        hid = (archive_source if args.setup_probe else build) / 'touch-hid'
+        hid = (archive_source if args.setup_probe and not args.refresh_hid else build) / 'touch-hid'
         hid_command = ['python3.14', str(DEVICE / 'scripts/build-touch-hid.py'),
                        '--registration', str(registration), '--output', str(hid)]
-        if args.touch_hid:
+        if args.touch_hid or args.refresh_hid:
             subprocess.run(hid_command, check=True)
             ar('-r', archive, str(hid / 'TouchHid.late.o'), str(hid / 'touch-hid-bindings.o'))
         for path in (DEVICE / 'package/T970Touch').glob('*'):
             if path.suffix in ('.h', '.cpp'):
                 report['source_sha256'][str(path)] = sha(path)
     report['archive_sha256'] = sha(archive)
+    if args.keys:
+        keys = build / 'keys'
+        subprocess.run(['python3.14', str(DEVICE / 'scripts/build-key-probe.py'),
+                        '--registration', str(registration), '--output', str(keys)], check=True)
+        ar('-r', archive, str(keys / 'KeyProbe.o'))
+        report['keys'] = json.loads((keys / 'report.json').read_text())
+        report['archive_sha256'] = sha(archive)
     (build / REPORT).write_text(json.dumps(report, indent=2) + '\n')
 
     saved = build / 'baseline'

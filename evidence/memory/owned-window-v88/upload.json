@@ -1,0 +1,12 @@
+{
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/owned-window-v88/boot-partition.img",
+  "finished_at": "2026-11-07T04:03:52.460686+00:00",
+  "boot_sha256": "0c94056eca35b7734fb1fe7c08a9d26c7b2e10c49193b8344b3b0967f3906b34",
+  "partition": "BOOT",
+  "exit_code": 0,
+  "transfer_confirmed": true,
+  "reboot_requested": true,
+  "partition_readback": false,
+  "userdata_partition_uploaded": false,
+  "transfer_log_sha256": "3634cb6a721690ebec51de2aae82b631e02d349f10201c5a1708783765e0f6ac"
+}

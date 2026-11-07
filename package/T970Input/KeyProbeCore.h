@@ -2,15 +2,14 @@
 // SM-T970 read-only SPMI PMIC arbiter access for the PON and PM8150L GPIO keys.
 // Version-5 layout (SM8250, EE 0): APID map at core + 0x900, EE owner table at
 // cnfg + 0x700, observer channels at 0x80 per APID. Only extended reads are
-// issued; no PMIC or arbiter register is written.
+// issued; only the observer command register is written, never PMIC state.
 #pragma once
 #include <stdint.h>
 
 enum {
     T970_ARB_V5_MIN = 0x50000000u,
     T970_ARB_V7_MIN = 0x70000000u,
-    T970_ARB_FEATURES = 0x04,
-    T970_ARB_APIDS_MASK = 0x7ffu,
+    T970_ARB_CORE_BYTES = 0x1100,
     T970_ARB_V5_APID_MAP = 0x900,
     T970_ARB_V5_OWNER = 0x700,
     T970_ARB_OBS_STRIDE = 0x80,
@@ -21,11 +20,12 @@ enum {
     T970_ARB_ERRORS = 0xeu,
     T970_ARB_POLLS = 100000,
     T970_PON_PPID = 0x008,
-    T970_GPIO_PPID = 0x4c3,
+    // PMIC GPIO DT bindings are one-based: GPIO3 = 0xc000 + (3-1)*0x100.
+    T970_GPIO_PPID = 0x4c2,
     T970_PON_RT_STS = 0x10,
     T970_GPIO_RT_STS = 0x10,
-    T970_PON_POWER = 1u << 7,
-    T970_PON_RESIN = 1u << 6,
+    T970_PON_POWER = 1u << 0,
+    T970_PON_RESIN = 1u << 1,
     T970_GPIO_ACTIVE_LOW = 1u << 0,
 };
 
@@ -48,8 +48,8 @@ static inline int t970_arb_version(struct t970_arbiter *a, uint32_t *version)
 // Number of APIDs the arbiter serves, bounded by the window the caller mapped.
 static inline int t970_arb_apids(struct t970_arbiter *a, uint32_t *count)
 {
-    uint32_t value = (a->core[T970_ARB_FEATURES / 4] & T970_ARB_APIDS_MASK);
-    if (!value || value > 1024) return 1;
+    // Vendor v5 scans the APID table to core_size, not INT_EN at +4.
+    uint32_t value = (T970_ARB_CORE_BYTES - T970_ARB_V5_APID_MAP) / 4;
     a->apids = value;
     *count = value;
     return 0;
@@ -63,7 +63,7 @@ static inline int t970_arb_find(const struct t970_arbiter *a, uint32_t ppid, uin
         uint32_t map = a->core[(T970_ARB_V5_APID_MAP + 4 * i) / 4];
         if (!map || ((map >> 8) & 0xfff) != ppid) continue;
         uint32_t owner = a->cnfg[(T970_ARB_V5_OWNER + 4 * i) / 4] & 7u;
-        if (found < 0 || owner == 0) found = (int)i;
+        if (owner == 0) found = (int)i;
         if (owner == 0 && (map >> 24) & 1u) break;
     }
     if (found < 0) return 2;
@@ -75,8 +75,12 @@ static inline int t970_arb_find(const struct t970_arbiter *a, uint32_t ppid, uin
 // 1 = no completion, 2 = the arbiter reported an error.
 static inline int t970_arb_read32(const struct t970_arbiter *a, uint32_t apid, uint8_t reg, uint32_t *value)
 {
+    if (apid >= a->apids || reg > 0xfc) return 3;
     volatile uint32_t *ch = a->obs + (T970_ARB_OBS_STRIDE * apid) / 4;
     ch[T970_ARB_CMD / 4] = (1u << 27) | ((uint32_t)reg << 4) | 3u;
+#if defined(__aarch64__)
+    __asm__ volatile("dsb sy" ::: "memory");
+#endif
     for (unsigned n = 0; n < T970_ARB_POLLS; ++n) {
         uint32_t status = ch[T970_ARB_STATUS / 4];
         if (status & T970_ARB_DONE) {
@@ -151,7 +155,10 @@ static inline char *t970_key_dec(char *out, uint32_t value)
 static inline void t970_keys_text(char *out, unsigned size, uint32_t version, uint32_t pon_apid,
                                  uint32_t gpio_apid, uint32_t mask, const struct t970_key_state k[3])
 {
-    char *p = out, *end = out + size - 1;
+    if (!out || !size) return;
+    // Max-width counters fit in this local buffer; copy only what the caller owns.
+    char text[192];
+    char *p = text, *end = text + sizeof(text) - 1;
     const char *prefix = "Keys: v=";
     while (*prefix && p < end) *p++ = *prefix++;
     p = t970_key_hex(p, version, 8);
@@ -172,4 +179,7 @@ static inline void t970_keys_text(char *out, unsigned size, uint32_t version, ui
         p = t970_key_dec(p, k[i].releases);
     }
     *p = 0;
+    unsigned n = 0;
+    while (text[n] && n + 1 < size) { out[n] = text[n]; ++n; }
+    out[n] = 0;
 }

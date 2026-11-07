@@ -23,6 +23,7 @@ int main(void) {
     struct t970_arbiter a = {core, cnfg, obs, 0};
     uint32_t version = 0, count = 0, apid = 0, value = 0;
 
+    assert(T970_GPIO_PPID == 0x4c2); /* physical GPIO3, one-based binding */
     clear();
     core[0] = T970_ARB_V5_MIN;
     assert(t970_arb_version(&a, &version) == 0 && version == T970_ARB_V5_MIN);
@@ -31,10 +32,10 @@ int main(void) {
 
     clear();
     core[0] = T970_ARB_V5_MIN;
-    core[T970_ARB_FEATURES/4] = 0x10;
-    assert(t970_arb_apids(&a, &count) == 0 && count == 0x10 && a.apids == 0x10);
-    core[T970_ARB_FEATURES/4] = 0;
-    assert(t970_arb_apids(&a, &count) == 1);
+    core[1] = 0; /* +4 is INT_EN, never an APID count */
+    assert(t970_arb_apids(&a, &count) == 0 && count == 512 && a.apids == 512);
+    core[1] = 1;
+    assert(t970_arb_apids(&a, &count) == 0 && count == 512);
 
     clear();
     core[0] = T970_ARB_V5_MIN;
@@ -43,6 +44,8 @@ int main(void) {
     *owner(5) = 1;
     *map(9) = (T970_GPIO_PPID << 8) | (1u << 24);
     *owner(9) = 0;
+    assert(t970_arb_find(&a, T970_PON_PPID, &apid) == 2); /* foreign EE refused */
+    *owner(5) = 0;
     assert(t970_arb_find(&a, T970_PON_PPID, &apid) == 0 && apid == 5);
     assert(t970_arb_find(&a, T970_GPIO_PPID, &apid) == 0 && apid == 9);
     assert(t970_arb_find(&a, 0x123, &apid) == 2);
@@ -66,6 +69,10 @@ int main(void) {
     assert(t970_keys_mask(0, 0) == 2);
     assert(t970_keys_mask(T970_PON_RESIN, T970_GPIO_ACTIVE_LOW) == 4);
     assert(t970_keys_mask(T970_PON_POWER | T970_PON_RESIN, 0) == 7);
+
+    assert(t970_keys_mask(1, 1) == 1 && t970_keys_mask(2, 1) == 4);
+    assert(t970_keys_mask(0xc0, 1) == 0); /* bits from another PON generation */
+    assert(t970_arb_read32(&a, 512, 0x10, &value) == 3);
 
     /* Edge state: two agreeing samples are needed, so bounce is rejected. */
     struct t970_key_state k = {0};
@@ -97,6 +104,10 @@ int main(void) {
     char text[256];
     t970_keys_text(text, sizeof text, 0x50000000, 8, 0x4c3, 5, line);
     assert(strcmp(text, "Keys: v=50000000 pon=8 gpio=4c3 mask=5 power=1/1 up=0/1 down=0/0") == 0);
+    char tiny[3] = {1,2,3};
+    t970_keys_text(tiny, sizeof tiny, 0x50000000, 8, 0x4c3, 5, line);
+    assert(!strcmp(tiny, "Ke"));
+    t970_keys_text(NULL, 0, 0, 0, 0, 0, line);
     puts("ok");
     return 0;
 }

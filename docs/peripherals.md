@@ -1,0 +1,51 @@
+# 本轮内存与外设接入
+
+目标是使用设备全部 8 GB 中实际可交给 XNU 的内存，实现 Wi-Fi、亮度、音量／锁屏键
+和电池服务；GPU 暂缓。各项以镜像哈希、设备结果和 `porting.toml` 记录验收。
+
+| 项目 | 已确认输入／实现 | 当前实机范围 | 下一步 |
+| --- | --- | --- | --- |
+| 内存 | Loader 的连续 owned window；v87 托管范围覆盖补丁已撤下 | v88 桌面，3713.86 MiB 管理页，8 核 | 导出实际 EFI 内存图和分配区间，设计多区间管理，压力验证 |
+| 侧键 | PM8150 PON + PM8150L SPMI GPIO，v89/v90 观察器已链接 | v90 三键各2/2、松开mask0、15197采样0错误 | v91 消费控制 HID 已刷入，等待系统行为结果，分别验证音量和锁屏／唤醒 |
+| 电池 | MAX77705，QUP0 I²C，GPIO28/29；FG 0x36、charger 0x69、PMIC 0x66 | Android 原始采集，XNU 尚无读数 | 先检查 SE0／GPIO 的交接状态，读取 gauge、比较单位，再发布 IOPMPowerSource |
+| 亮度 | S6TUUM3 AMSA24VU01，DSI command mode，范围 1–355 | GOP 图像已验证，亮度未验证 | 读取 DSI 交接状态；按面板 normal gamma mode 2 命令与映射表实现调节 |
+| Wi-Fi | QCA6390 PCI 17cb:1101，subsystem 17cb:0108，PCIe0 | Android 设备 ID；XNU 尚未训练链路 | SM8250 PCIe0 供电、PHY、复位、BAR、MSI／DMA；然后接 ath11k/MHI/QMI 与 21H461 网络 ABI |
+
+## 电池
+
+原厂 `drivers/mfd/max77705.c` 建立 FG 子客户端 `0x6c >> 1 = 0x36`。
+DT 的父节点 `max77705@66` 不是 gauge 的地址。charger 在 `0xd2 >> 1 = 0x69`。
+SE0 地址 `0x980000+0x4000`，引脚为 NORTH tile 的 GPIO28/29，不能套触控 SE5 的
+GPIO12/13 或另一 SoC 的 DSP battery-manager 协议。
+
+gauge 的 16 位寄存器按低字节在前读取：STATUS `0x00`（bit 3 表示缺电池）、
+REPSOC `0x06`（1/256 %）、TEMP `0x08`、VCELL `0x09`（78.125 µV/LSB）、
+CURRENT `0x0a`、FULLCAP `0x10`、REMCAP `0x05`。
+DT 的 `fuelgauge,fg_resistor=5` 是厂商软件缩放参数，电流换算按该驱动的
+`signed_raw * 15625 * 5 / 100` µA；不要把它直接解释成 5 mΩ 后套通用公式。
+厂商还有容量校准、温度补偿和电流补偿；原始 gauge 百分比不保证等于 Android UI。
+
+`package/T970Power/Max77705Measurements.h` 已实现独立的只读字解码，61 项仓库测试（10 项跳过）及 ASan／UBSan 编码向量通过；尚未连接 I²C 传输或系统服务。
+
+先仅查询测量与 charger 状态，保留现有充电配置；充电控制、USB-PD、快充和温控
+需要各自建立所有权及实测，不能以“电量已显示”替代。
+
+## 亮度
+
+本机活跃面板是 S6TUUM3。原厂 `ss_brightness_gamma_mode2_normal` 的 DBV 是
+11 位，在线命令参数按低字节、再高 3 位写入；另有平滑开关、HBM、ACL、gamma／
+温度／OTP 校准状态，不能只线性映射 UI 1–355 或套其他面板的 DCS 端序。
+先限定 normal brightness，核对完整命令及映射表，再检查最小／中间／最大亮度和
+设置滑块、渐变、错误恢复。亮度不依赖 GPU 移植。
+
+## Wi-Fi
+
+原厂记录见 `evidence/adb-2026-11-01/network.txt`。现有组件目录的 Ath12kWifi
+针对 WCN7850 等 ath12k 硬件，QCA6390 属于 ath11k，不能只改 PCI ID 选中它。
+可借用其平台回调／网络 ABI 设计，但无线核心及固件协议需要匹配 QCA6390。
+已有设备固件清单保存 amss20.bin、m3.bin、regdb.bin 和多个 bdwlan 变体，尚未确认
+实际 board-data 选择。先验证链路、MSI 和 DMA，再验证固件启动、扫描、WPA2、DHCP、
+双向流量及重连，分别记录。
+
+原厂驱动源码的路径、固定提交和 SHA256 见
+`evidence/peripherals/source-audit/sources.json`；二进制和生成镜像仍在忽略目录。

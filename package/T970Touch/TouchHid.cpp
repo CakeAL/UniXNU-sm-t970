@@ -38,6 +38,18 @@ static const uint8_t descriptor[] = {
 };
 #undef T970_FINGER
 
+// Keyboard identity plus consumer report from ShengHidInput@5f3a37ce (BSD-2-Clause-Patent).
+// This is a separate service: the touchscreen keeps its Digitizer primary usage.
+static const uint8_t buttonDescriptor[] = {
+    0x05,0x01,0x09,0x06,0xa1,0x01,0x85,0x01,
+    0x05,0x07,0x19,0xe0,0x29,0xe7,0x15,0x00,0x25,0x01,
+    0x75,0x01,0x95,0x08,0x81,0x02,0x75,0x08,0x95,0x01,0x81,0x03,
+    0x19,0x00,0x29,0x65,0x15,0x00,0x25,0x65,0x75,0x08,0x95,0x06,0x81,0x00,
+    0x85,0x02,0x05,0x0c,0x09,0x40,0x09,0x30,0x09,0xe9,0x09,0xea,
+    0x15,0x00,0x25,0x01,0x75,0x01,0x95,0x04,0x81,0x02,
+    0x75,0x04,0x95,0x01,0x81,0x03,0xc0
+};
+
 namespace {
 
 // Original IOHIDEventDriver dispatch slots and fields match NativeHidInput's 21H461 ABI.
@@ -195,6 +207,7 @@ class T970TouchHid : public IOHIDDevice {
     unsigned reports = 0;
     unsigned transform = 5;
     struct T970TouchFrame previous = {};
+    bool buttonsOnly = false;
 
     bool bindEvents()
     {
@@ -209,6 +222,7 @@ class T970TouchHid : public IOHIDDevice {
             }
             return false;
         }
+        if (buttonsOnly) { ready = true; return true; }
         uintptr_t *copy = static_cast<uintptr_t *>(IOMalloc(256 * sizeof(uintptr_t)));
         if (!copy) {
             return false;
@@ -314,6 +328,26 @@ class T970TouchHid : public IOHIDDevice {
     }
 
 public:
+    void setButtonsOnly() { buttonsOnly = true; }
+
+    static IOReturn deliverButtons(OSObject *owner, void *input, void *, void *, void *)
+    {
+        T970TouchHid *self = OSDynamicCast(T970TouchHid, owner);
+        if (!self || !self->buttonsOnly || !self->bindEvents()) return kIOReturnNotReady;
+        // Board mask bits 0/1/2 become Consumer Power/Volume Up/Volume Down bits 1/2/3.
+        uint8_t report[] = {2, static_cast<uint8_t>((reinterpret_cast<uintptr_t>(input) & 7u) << 1)};
+        auto *buffer = IOBufferMemoryDescriptor::withBytes(report, sizeof(report), kIODirectionNone);
+        IOReturn result = buffer ? self->handleReport(buffer, 0, 0) : kIOReturnNoMemory;
+        OSSafeReleaseNULL(buffer);
+        return result;
+    }
+
+    IOReturn publishButtons(uint32_t mask)
+    {
+        return loop ? loop->runAction(deliverButtons, this, reinterpret_cast<void *>(uintptr_t(mask)))
+                    : kIOReturnNotReady;
+    }
+
     IOWorkLoop *getWorkLoop() const override
     {
         return loop;
@@ -321,12 +355,12 @@ public:
 
     OSString *newTransportString() const override
     {
-        return OSString::withCString("I2C");
+        return OSString::withCString(buttonsOnly ? "SPMI" : "I2C");
     }
 
     OSString *newProductString() const override
     {
-        return OSString::withCString("Samsung SM-T970 FTS Touchscreen");
+        return OSString::withCString(buttonsOnly ? "Samsung SM-T970 Side Buttons" : "Samsung SM-T970 FTS Touchscreen");
     }
 
     IOReturn newReportDescriptor(IOMemoryDescriptor **out) const override
@@ -334,7 +368,8 @@ public:
         if (!out) {
             return kIOReturnBadArgument;
         }
-        *out = IOBufferMemoryDescriptor::withBytes(descriptor, sizeof(descriptor), kIODirectionNone);
+        *out = IOBufferMemoryDescriptor::withBytes(buttonsOnly ? buttonDescriptor : descriptor,
+            buttonsOnly ? sizeof(buttonDescriptor) : sizeof(descriptor), kIODirectionNone);
         return *out ? kIOReturnSuccess : kIOReturnNoMemory;
     }
 
@@ -350,8 +385,10 @@ public:
         edgeY = 48 * 65536 / ((transform & 1) ? 1752 : 2800);
         setProperty("HIDDefaultBehavior", true);
         setProperty("Built-In", true);
-        setProperty("DisplayIntegrated", true);
-        setProperty("DigitizerCollectionDispatch", kOSBooleanTrue);
+        if (!buttonsOnly) {
+            setProperty("DisplayIntegrated", true);
+            setProperty("DigitizerCollectionDispatch", kOSBooleanTrue);
+        }
         if (!IOHIDDevice::start(provider)) {
             return false;
         }
@@ -375,6 +412,13 @@ public:
 
 OSDefineMetaClassAndStructors(T970TouchHid, IOHIDDevice)
 static T970TouchHid *touchDevice;
+static T970TouchHid *buttonDevice;
+
+extern "C" int native_t970_key_hid_publish(uint32_t mask)
+{
+    auto *device = __atomic_load_n(&buttonDevice, __ATOMIC_ACQUIRE);
+    return device ? device->publishButtons(mask) : kIOReturnNotReady;
+}
 
 bool t970_touch_hid_start()
 {
@@ -426,6 +470,21 @@ bool t970_touch_hid_start()
         OSSafeReleaseNULL(device);
     } else {
         touchDevice = device;
+        unsigned buttons = 0;
+        if (PE_parse_boot_argn("t970-keys-hid", &buttons, sizeof(buttons)) && buttons == 1) {
+            // The original generic keyboard personality matches the separate keyboard usage.
+            T970TouchHid *keys = new T970TouchHid;
+            bool initialized = keys && keys->init();
+            if (initialized) keys->setButtonsOnly();
+            bool keysAttached = initialized && keys->attach(resource);
+            bool keysRunning = keysAttached && keys->start(resource);
+            if (keysRunning) __atomic_store_n(&buttonDevice, keys, __ATOMIC_RELEASE);
+            else {
+                if (keysAttached) keys->detach(resource);
+                OSSafeReleaseNULL(keys);
+            }
+            printf("T970 keys: consumer HID service=%u\n", keysRunning);
+        }
     }
     resource->release();
     return running;

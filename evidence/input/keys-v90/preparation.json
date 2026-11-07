@@ -1,0 +1,30 @@
+{
+  "base_boot_sha256": "7b32d372d46233e314520f30d2523d1b74c72b75dfb2d900e0a4a21f9fed7013",
+  "boot_sha256": "f72005c420b2342ebdcb4b83b883a4e50ebdb5b63158c57d32f0ff3929d5da7f",
+  "boot_bytes": 71303168,
+  "kernel_sha256": "1b4e9acac1fbf22599e65df58ffe6905203e083530004751f5dd0301def0f91d",
+  "kernel_build_sha256": "b939a83e3f81b44f80da79374b2964d76acba6d770fc9890f38f916fa4c218af",
+  "adt_sha256": "ccf520425d90445a5415425f714ba12065daa4b6a70ce1e30b740437d6de85b6",
+  "dram_size": "0x200000000",
+  "data_seed_sha256": "9a0005a5c520412006589e068264b611c3484af123547d13103387a9fb7c0afa",
+  "config_sha256": "2f9b003bb702bb96cde63740d599a9f13945574f1f2cc5c31e29abc9f26d78dc",
+  "trust_cache_sha256": "7416ca4f8377146626bb284e2133c76bee6cb4e3ee0af5d648b186235a7323a7",
+  "unchanged_adt_seed_config_trust": true,
+  "unchanged_header_firmware_dtb_tail": true,
+  "uploaded": false,
+  "build": {
+    "device_base_revision": "0e66aca5f5543246138f541b57d8a50dc5ab6a5c",
+    "unixnu_revision": "2c834e313d25482c78d38d703eff1f8d190f2597",
+    "kernel_log_sha256": "ef83209d0e0b31d1a1be945ac6ccb29266f8e0d12448d072dd7aa490afa8e41e",
+    "key_probe": {
+      "source_sha256": "4faa0ffafff06d52dbd9c4ad64ba8abcb445da12e417ad30fe6273f59fded969",
+      "core_sha256": "5ce3412f4a16e09b624ac4ba26dc7c74c7c915ac547b004cec70c25bf0365f41",
+      "object_sha256": "6723571739ded41ff26d6a0e0803020cf4ca46e357974e11640ac9f3d2f51fc0",
+      "command_sha256": "6e9228db9033b66873e2e341446175278e421481cb4ae2ee896c5fb2ff0eac6c",
+      "pmic_writes": false,
+      "observer_commands": true,
+      "hid_events": false,
+      "runtime_verified": false
+    }
+  }
+}

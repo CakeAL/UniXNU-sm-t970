@@ -1,0 +1,14 @@
+{
+  "base_boot_sha256": "1436f2f16723458ad2328b8b463f74993ccf97048a02392e9c8e3d65a74097ec",
+  "boot_sha256": "0c94056eca35b7734fb1fe7c08a9d26c7b2e10c49193b8344b3b0967f3906b34",
+  "boot_bytes": 71303168,
+  "kernel_sha256": "6e8b011b47c10c7d57737759bd501b5fe173fdaa248109fb379f52df9942a45c",
+  "adt_sha256": "ccf520425d90445a5415425f714ba12065daa4b6a70ce1e30b740437d6de85b6",
+  "owned_memory_size": "0xf0000000",
+  "physical_envelope_size": "0x200000000",
+  "unchanged_kernel_seed_config_trust": true,
+  "unchanged_header_firmware_dtb_tail": true,
+  "source_revision": "0e66aca5f5543246138f541b57d8a50dc5ab6a5c",
+  "device_verified": false,
+  "uploaded": false
+}

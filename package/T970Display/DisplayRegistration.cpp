@@ -14,6 +14,8 @@
 #include <pexpert/pexpert.h>
 #include "T970GopGeometry.h"
 #include "../T970Touch/BusSnapshot.h"
+#include "../T970Power/BusSnapshot.h"
+#include "../T970Memory/Handoff.h"
 
 
 
@@ -23,6 +25,8 @@ extern "C" IOService *native_legacy_display_allocate(void);
 extern "C" kern_return_t OSKextLoadKextWithIdentifier(const char *);
 extern "C" void t970_keystore_start(void);
 extern "C" void native_t970_keystore_state(char *, unsigned);
+extern "C" void native_t970_key_start(void) __attribute__((weak_import));
+extern "C" void native_t970_key_state(char *, unsigned) __attribute__((weak_import));
 
 static IOService *pendingDisplay;
 static IOService *activeDisplay;
@@ -129,6 +133,7 @@ extern "C" void native_legacy_display_probe(void) {
     unsigned setup = 0;
     setupProbe = PE_parse_boot_argn("t970-setup-probe", &setup, sizeof(setup)) && setup == 1;
     t970_keystore_start();
+    if (native_t970_key_start) native_t970_key_start();
     displayStage=1;
 
     PE_Video video = {};
@@ -331,6 +336,12 @@ extern "C" void native_t970_display_timing(char *out, unsigned length, int hold)
     t970_touch::reportBus(out + used, length - used);
     used = strlen(out);
     reportSetup(out + used, length - used);
+    used = strlen(out);
+    if (native_t970_key_state) native_t970_key_state(out + used, length - used);
+    used = strlen(out);
+    t970_power::reportBus(out + used, length - used);
+    used = strlen(out);
+    t970MemoryHandoff(out + used, length - used);
 }
 
 extern "C" __attribute__((noreturn)) void native_legacy_backend_guard(unsigned slot, void *object, void *caller) {

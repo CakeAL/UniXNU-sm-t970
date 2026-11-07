@@ -1,0 +1,32 @@
+{
+  "boot_sha256": "7b32d372d46233e314520f30d2523d1b74c72b75dfb2d900e0a4a21f9fed7013",
+  "photo": "screen-runtime.jpg",
+  "photo_sha256": "02cf1a655b248ae6d0b292a80ab3a0e98dda7cd520007c1f66bfd8b5d76bdc4e",
+  "photo_time_local": "2026-11-07T12:15:57+08:00",
+  "owner_observed_home_screen": true,
+  "managed_pages": "0xe81dc",
+  "launchd_main": 1,
+  "cpu": 8,
+  "secondaries": 7,
+  "version": "0x50010000",
+  "pon_apid": 13,
+  "gpio_apid": "0x052",
+  "mask": 2,
+  "power": [
+    2,
+    2
+  ],
+  "up": [
+    0,
+    0
+  ],
+  "down": [
+    2,
+    2
+  ],
+  "stage": 5,
+  "samples": 13804,
+  "errors": 0,
+  "hid_events": false,
+  "interpretation": "Power and volume down raw edges verified. GPIO PPID0x4c3 was wrong for physical GPIO3: vendor pinctrl uses one-based numbering; correct PPID0x4c2 will be tested next."
+}

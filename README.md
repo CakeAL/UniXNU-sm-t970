@@ -27,6 +27,9 @@ v63 实机显示 Hello 后转黑。防调暗实验 v68 实测到 360 秒诊断�
 点击语言后停住，主屏幕仍待验证。板级默认仍为 512 MiB。
 见 [v62 实测](evidence/display/owned-window-2g-v62/README.md)与
 [v76 触控实测](evidence/input/touch-hid-v76/README.md)。
+后续 v84 已实机进入桌面并打开应用。v88 将 Loader 的实际申请提高到 3840 MiB，
+实测 3713.86 MiB 管理页、八核和桌面；完整 8 GB 与压力测试尚未完成。v90 三个侧键的按下／松开各2/2、0错误；v91已刷入独立HID服务，
+系统音量／锁屏行为、Wi-Fi、亮度和电池服务待验证。详见[本轮外设接入](docs/peripherals.md)。
 
 两个仓库并列放置，普通构建命令在主仓库执行：
 

@@ -1,0 +1,31 @@
+{
+  "boot_sha256": "f72005c420b2342ebdcb4b83b883a4e50ebdb5b63158c57d32f0ff3929d5da7f",
+  "photo": "screen-runtime.jpg",
+  "photo_sha256": "a5bc347223204d004bcec0a57c0466f98450f2505aac8bf0ad715b7cf2da05d8",
+  "photo_time_local": "2026-11-07T12:23:27+08:00",
+  "managed_pages": "0xe81db",
+  "launchd_main": 1,
+  "cpu": 8,
+  "secondaries": 7,
+  "version": "0x50010000",
+  "pon_apid": 13,
+  "gpio_apid": "0x051",
+  "mask": 0,
+  "power": [
+    2,
+    2
+  ],
+  "up": [
+    2,
+    2
+  ],
+  "down": [
+    2,
+    2
+  ],
+  "stage": 5,
+  "samples": 15197,
+  "errors": 0,
+  "hid_events": false,
+  "interpretation": "All three raw press/release pairs verified, released mask0 and no errors. OS volume/lock/wake not exercised by this raw-only build."
+}

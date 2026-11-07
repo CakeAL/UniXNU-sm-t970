@@ -36,4 +36,5 @@ t970-ui-exit-reason.patch
 t970-allow-springboard-relaunch.patch
 t970-setup-touch-report.patch
 t970-8g-bootstrap-tables.patch
-t970-8g-managed-range.patch
+# v87 failed on device: only EFI-owned memory may enter the managed range.
+# t970-8g-managed-range.patch is retained as historical evidence, not applied.

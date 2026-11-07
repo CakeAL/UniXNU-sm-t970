@@ -1,0 +1,6 @@
+{
+  "key_probe_cpp": "../keys-v89/source/KeyProbe.cpp",
+  "key_probe_core": "source/KeyProbeCore.h",
+  "original_touch_hid_revision": "0e66aca5f5543246138f541b57d8a50dc5ab6a5c",
+  "original_touch_hid_path": "package/T970Touch/TouchHid.cpp"
+}

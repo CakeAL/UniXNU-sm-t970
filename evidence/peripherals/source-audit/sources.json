@@ -1,0 +1,50 @@
+{
+  "repository": "https://github.com/mukahraman/kernel_samsung_sm8250",
+  "revision": "97e4a5b907053c98b357da957a48586f66ad59c5",
+  "sources": [
+    {
+      "path": "drivers/spmi/spmi-pmic-arb.c",
+      "sha256": "bedee16415c7290c2c07414623edc8af16b185f475e3512bb963e7c67076754c"
+    },
+    {
+      "path": "drivers/input/misc/qpnp-power-on.c",
+      "sha256": "6bd8635fdb316b63336ca5e48bb49f71d29b41175a26713da864beea538e5fc5"
+    },
+    {
+      "path": "drivers/pinctrl/qcom/pinctrl-spmi-gpio.c",
+      "sha256": "c7285d4e2185becea4f87b2ec52375f2edfae8669b0203c721f4a31786d1f2f2"
+    },
+    {
+      "path": "drivers/battery_v2/max77705_fuelgauge.c",
+      "sha256": "0504dbe839b5aef358b5dc2813ddd49b6732ca7d864ac81c68daa74b5e6c1375"
+    },
+    {
+      "path": "drivers/battery_v2/include/fuelgauge/max77705_fuelgauge.h",
+      "sha256": "8119766c7ef93df67bf20262c1fed2d9475d1c6fb88444476e013ad94cdd4bbe"
+    },
+    {
+      "path": "drivers/battery_v2/max77705_charger.c",
+      "sha256": "2fa870caf2f8a174a72f9440823a007095db3526c60ae6c9f86d1a113afd789f"
+    },
+    {
+      "path": "drivers/mfd/max77705.c",
+      "sha256": "54ecc0aea128957f239a8fbedc54a1b4b2f6a2cfb55c390f9f7c93ecc3760559"
+    },
+    {
+      "path": "include/linux/mfd/max77705-private.h",
+      "sha256": "8d87212e53f1aab24f541ece539bd635b5d72aa55a0b3bc838a20af437f698f3"
+    },
+    {
+      "path": "techpack/display/msm/samsung/S6TUUM3_AMSA24VU01/ss_dsi_panel_S6TUUM3_AMSA24VU01.c",
+      "sha256": "71ffde6042a26c8f9b767029b5003eca7c32496e05f6df4c77f50643ffec5260"
+    },
+    {
+      "path": "techpack/display/msm/dsi/dsi_ctrl_hw_2_0.c",
+      "sha256": "15640b1dfc0e0e8425da6d9bab87e85ca888a5ed9ea9241af68e3024c0388106"
+    },
+    {
+      "path": "techpack/display/msm/dsi/dsi_ctrl_hw_cmn.c",
+      "sha256": "712e127463a3b19167d3b329208c29f61789a03ffa59d58a0942b228d90274db"
+    }
+  ]
+}

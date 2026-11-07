@@ -1,0 +1,29 @@
+{
+  "device_base_revision": "0e66aca5f5543246138f541b57d8a50dc5ab6a5c",
+  "unixnu_revision": "2c834e313d25482c78d38d703eff1f8d190f2597",
+  "commands": [
+    {
+      "command": "python3.14 -m unittest discover -s tests",
+      "result": "61 tests, 10 skipped, passed after memory/battery bus observer additions",
+      "log_sha256": "63ff7d3dbc1b45a92482ed6377721aa7fa5de92e757f94bbb21d44344d5144b6"
+    },
+    {
+      "command": "python3.14 -m unittest discover -s tests -p test_battery_measurements.py",
+      "result": "1 ASan/UBSan encoding harness passed"
+    },
+    {
+      "command": "python3.14 scripts/check-platform.py --unixnu ../UniXNU",
+      "result": "Refused before DT/ADT validation: UniXNU checkout differs from reviewed framework revision",
+      "log_sha256": "83e57b4cbdbc04eb17f8867abcea2ffbe066692f5ab12a556ca53f70e212dd0e"
+    }
+  ],
+  "sources": {
+    "package/T970Input/KeyProbe.cpp": "cc74d8674ea9cf0b212aeb4ac5f64137510cc1dec0ed5e7610e3bf3cb4d72891",
+    "package/T970Input/KeyProbeCore.h": "5ce3412f4a16e09b624ac4ba26dc7c74c7c915ac547b004cec70c25bf0365f41",
+    "scripts/build-key-probe.py": "51993625ec51435aba82ee56fed91ed3d2cce1c40d9aff0eebb0c99e7150e15e",
+    "package/T970Power/Max77705Measurements.h": "4d4a6e3908552780320cd8085e2fed09312f3f0dc83a84329367a384e09a4a72",
+    "package/T970Touch/TouchHid.cpp": "2fff86a4879a2e4a3aa6cbcea4a49f02274ef78f307ec4f0fdd44d1c397771f2",
+    "package/T970Power/BusSnapshot.h": "a7225ece5740a34de3d3be06bef281c83473e8e430295d3f16b38d2197b8939f",
+    "package/T970Memory/Handoff.h": "dc578e055fa50c0c7996c7fa1cb6239cffe94fd118b43b8572b85ea39afb2bdf"
+  }
+}

@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "/Users/cakeal/vsc/UniXNU-sm-t970/scripts/check-platform.py", line 303, in <module>
+    main()
+    ~~~~^^
+  File "/Users/cakeal/vsc/UniXNU-sm-t970/scripts/check-platform.py", line 68, in main
+    require(git(framework, 'rev-parse', 'HEAD') == review['framework']['revision'],
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            'UniXNU checkout differs from the reviewed framework revision')
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/cakeal/vsc/UniXNU-sm-t970/scripts/check-platform.py", line 19, in require
+    raise ValueError(message)
+ValueError: UniXNU checkout differs from the reviewed framework revision
