@@ -26,7 +26,7 @@ CP 提交、GPU 内存映射和最小绘图；Metal/DPU 留到后续阶段。
 
 - 生成枚举与 chip ID：新增 `A650`（DT `qcom,chipid = 0x06050002`；GMU HFI SFR 值按
   lmi 的 `0x06050200` 先核对）；
-- 电源/时钟：GPUCC（`0x3d90000`）、CX/GX GDSC（`0x3d9106c`/`0x3d91508`）、
+- 电源/时钟：GPUCC（`0x3d90000`）、CX/GX GDSC（`0x3d9106c`/`0x3d9100c`）、
   ARC `cx.lvl`/`mx.lvl`、RPMh 投票、OPP（305–670 MHz，7 档）；
 - GMU：`a650_gmu.bin`（41548 B）、GMU 窗口 `0x3d6a000+0x30000`、HFI 队列/版本、
   `a650_sqe.fw`（31632 B）；
@@ -47,7 +47,7 @@ CP 提交、GPU 内存映射和最小绘图；Metal/DPU 留到后续阶段。
 | 5 | tile/GL 探针 | 已知像素精确匹配 |
 | 6 | 桌面/DPU + 17.7.11 Metal ABI | 系统合成上屏 |
 
-## 当前起点（v99）
+## 电源与时钟进度
 
 `package/T970Gpu/ArcResources.h` 只读解析 ARC cmd-db（`0x80860000+0x20000`，
 触摸/RSC 路径已映射过该块），报告新增 `GPU arc db= cx= lv= min= mx= ...`。
@@ -56,8 +56,14 @@ CP 提交、GPU 内存映射和最小绘图；Metal/DPU 留到后续阶段。
 v99 首次上机时报告缓冲（896 字节）被前面的 display/UI/Data-space 文本占满，
 GPU arc 行没有写入；v100 把 `display_state` 扩到 1280 字节，保持探测与参数不变。
 
-下一步：把 ARC 读数与 T970 DT 的 OPP/电源域对照，再做 GPUCC/GDSC 的
-只读资格确认（先确认时钟/电源状态，再读 GPU 窗口），然后进入 GMU 启动。
+v103 实测 GPLL0 600 MHz，GCC `0x152000` 的 DIV_GATE 置位和恢复均成功。
+v104 复用锁定的 Sm8250Platform 寄存器定义，先读 GCC 的 CFG AHB、MEMNOC、DVM
+和 DDRSS AXI。只有 CFG AHB 已启用且报告时钟在运行时，才读 GPUCC 的 CX/GX GDSC、
+CX 硬件状态及 AHB、GMU、SMMU 时钟分支。若显示 `cc=skip`，下一步单独验证
+CFG AHB 使能的受控置位和恢复；若成功读到 GPUCC，则用 CX/GX 初态确定电源实验。
+GX 的 `0x3d91508` 是 clamp 控制，后续核对 GX 上电用 `0x3d9100c`。
+见 [v103 实测](../evidence/gpu/clk-write-v103/device-result.json)和
+[v104 复测说明](../evidence/gpu/power-v104/README.md)。
 
 ## 风险
 

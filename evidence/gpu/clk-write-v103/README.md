@@ -18,10 +18,11 @@ python3.14 -m unittest discover -s tests -v
 .cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/gpu-clk-write-v103/boot-partition.img
 ```
 
-## 待观察
+## 实测
 
-`GPU clk ... div=1 back=<...1216d7f...> restore=1` 表示门控可写且已恢复。
-若 `div=0` 或 `restore=0`，说明该分支位被硬件/固件锁定，需要换路径；
-若报告整屏不再出现，说明写后访问挂死，需要回滚到 v102。
+机主截图中的 `branch=1206d7f div=1 back=1216d7f restore=1` 确认置位期间只差
+bit16，恢复后该位与原值一致。同屏已到 launchd main、八核、247 个进程和
+43 次 GOP 复制与退役。Data 可用 44,345 个 4096 字节块。结果绑定到
+[截图与字段记录](device-result.json)及本轮 BOOT 上传回执。
 
-之后才是 RSC/PDC 与 CX/MX 投票、GPUCC/GDSC 上电，再进入 GMU 启动。
+下一步用 [v104](../power-v104/README.md) 读取继承的 CFG AHB 与 GPUCC 状态。

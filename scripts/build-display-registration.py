@@ -5,6 +5,7 @@ import hashlib
 import json
 from pathlib import Path
 import subprocess
+import tomllib
 
 DEVICE = Path(__file__).resolve().parents[1]
 
@@ -14,12 +15,21 @@ def main():
     p.add_argument('--gop-object', type=Path, required=True)
     p.add_argument('--output', type=Path, required=True)
     p.add_argument('--touch-hid', action='store_true')
+    p.add_argument('--gpu-soc', type=Path, help='Pinned SM8250 checkout for the GPU power snapshot')
     p.add_argument('--approved', type=Path,
                    default=DEVICE / 'evidence/display/abi21h461/object-check.json')
     a = p.parse_args()
     approved = json.loads(a.approved.read_text())
     if hashlib.sha256(a.gop_object.read_bytes()).hexdigest() != approved['object_sha256']:
         raise ValueError('Use the previously audited cf3b429 GOP object')
+    if a.gpu_soc:
+        pin = tomllib.loads((DEVICE / 'unixnu.lock').read_text())['source']['sm8250']['commit']
+        gpu_kit = a.gpu_soc.resolve() / 'kits/Sm8250Platform'
+        gpu_header = gpu_kit / 'A650GmuPower.h'
+        pinned_header = subprocess.check_output(
+            ['git', '-C', str(a.gpu_soc), 'show', f'{pin}:kits/Sm8250Platform/A650GmuPower.h'])
+        if gpu_header.read_bytes() != pinned_header:
+            raise ValueError('SM8250 GPU power header differs from the device lock')
     tree, out = a.tree.resolve(), a.output.resolve()
     if out.exists():
         raise ValueError('Preserve previous outputs')
@@ -51,6 +61,8 @@ def main():
                     '-I', str(tree / '.cache/xnu-work/osfmk')])
     if a.touch_hid:
         command.append('-DT970_TOUCH_HID=1')
+    if a.gpu_soc:
+        command.extend(['-DT970_GPU_POWER_SNAPSHOT=1', '-I', str(gpu_kit)])
     (out / 'command.json').write_text(json.dumps(command, indent=2)+'\n')
     with (out / 'compile.log').open('w') as log:
         subprocess.run(command, cwd=r['directory'], stdout=log, stderr=subprocess.STDOUT, check=True)
@@ -69,6 +81,9 @@ def main():
                   gop_object_sha256=sha(a.gop_object), board_callbacks_resolved=sorted(hooks & defined),
                   pending_original_aliases=sorted(missing), compiled=True, linked=False,
                   runtime_display_verified=False)
+    if a.gpu_soc:
+        report['gpu_soc_revision'] = pin
+        report['gpu_soc_header_sha256'] = sha(gpu_header)
     (out / 'report.json').write_text(json.dumps(report, indent=2)+'\n')
     print('PASS: board callbacks compiled; nine native_legacy original-family aliases remain')
 

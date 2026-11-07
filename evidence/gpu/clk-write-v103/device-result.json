@@ -1,0 +1,37 @@
+{
+  "boot_sha256": "6b1240530b8b702f1ea1083d1f2adb94f2a9ec59203422932a75946399e6ec80",
+  "photo": "screen-runtime.png",
+  "photo_sha256": "ee537e9105559f42f89de81cc1591eea4c155b57742079ad11a8cf7ad4eb40ce",
+  "image_binding": "Latest BOOT-only upload receipt and the matching v103-specific GPU div/back/restore fields in the owner screenshot",
+  "gpu_clock": {
+    "line": "GPU clk gpl0=d810003d/1f/4000/0 branch=1206d7f run=1 post=1 hz=600000000 div=1 back=1216d7f restore=1",
+    "branch_before": "0x1206d7f",
+    "branch_during": "0x1216d7f",
+    "changed_mask": "0x10000",
+    "original_bit_restored": true
+  },
+  "boot": {
+    "launchd_main": true,
+    "cpus": 8,
+    "secondary_cpus": 7,
+    "processes": 247,
+    "springboard_pid": 27,
+    "backboardd_pid": 57
+  },
+  "storage": {
+    "data_space_rc": 0,
+    "block_size": 4096,
+    "available_blocks": 44345
+  },
+  "display": {
+    "successful_swaps": 43,
+    "copies": 43,
+    "retired": 43,
+    "vsync_notifications": 0
+  },
+  "input": {
+    "side_key_sample_errors": 0,
+    "side_key_hid": "1/1/0"
+  },
+  "gpu_limit": "One GCC branch bit qualified. GPUCC, GX/CX power, GMU and GPU work were outside this image's probe."
+}

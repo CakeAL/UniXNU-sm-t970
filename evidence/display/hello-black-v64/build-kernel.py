@@ -33,6 +33,7 @@ def main():
     parser.add_argument('--output', type=Path, default=BUILD)
     parser.add_argument('--cached-headers', action='store_true')
     parser.add_argument('--keys', action='store_true', help='Link the opt-in T970 PMIC key observer')
+    parser.add_argument('--gpu-soc', type=Path, help='Pinned SM8250 checkout for the GPU power snapshot')
     parser.add_argument('--refresh-hid', action='store_true', help='Recompile the audited HID wrapper with the setup baseline')
     parser.add_argument('--gop-fork', action='store_true',
                         help='Link the audited GopFramebuffer fork object (scanout and source cache options)')
@@ -71,6 +72,8 @@ def main():
                             '--output', str(registration)]
     if args.touch_hid or args.setup_probe:
         registration_command.append('--touch-hid')
+    if args.gpu_soc:
+        registration_command.extend(['--gpu-soc', str(args.gpu_soc)])
     subprocess.run(registration_command, check=True)
     replacement = registration / MEMBER
     source = DEVICE / 'package/T970Display/DisplayRegistration.cpp'
