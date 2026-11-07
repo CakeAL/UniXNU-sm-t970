@@ -89,7 +89,8 @@ v116 直接编译 UniXNU 目录固定的 ArmSmmu4K 源码，使用 XNU 分配的
 v117 实测 CBAR 切换到 Stage 1 后保持 `0x1f300`，写回零未生效。
 VA64 已恢复为零，CBAR 守卫仍触发保留。v118 实机确认 Stage 1 精确保持、其余状态
 连续两次匹配，随后释放了上游依赖。v119 实机确认两个 TTBR 的 64 位读、写和恢复。
-v120 在翻译关闭时安装、走查并撤销 XNU 页表。原厂 DT 的 SID5
+v120 实机确认翻译关闭时可以安装、走查并撤销 XNU 页表。v121 在 CM3 复位且无流时
+验证本地 TLB 同步和 CB0 翻译启停。原厂 DT 的 SID5
 使用 mask `0x400`，发布前须验证实际流 ID 和匹配策略。
 锁定的 Sm8250Platform 冷启动序列会写入固定的 hidden 值，集成时需处理与实测路由的差异。
 见 [v109 实测](../evidence/gpu/rsc-init-v109/device-result.json)、
@@ -103,7 +104,8 @@ v120 在翻译关闭时安装、走查并撤销 XNU 页表。原厂 DT 的 SID5
 [v117 CBAR 实测](../evidence/gpu/cbbar-v117/device-result.json)、
 [v118 释放实测](../evidence/gpu/cbrelease-v118/device-result.json)、
 [v119 TTBR 实测](../evidence/gpu/ttbrwidth-v119/device-result.json)、
-[v120 页表接入探针](../evidence/gpu/cbroot-v120/README.md)、
+[v120 页表接入实测](../evidence/gpu/cbroot-v120/device-result.json)、
+[v121 启停探针](../evidence/gpu/cbactivate-v121/README.md)、
 [lmi RSC 实现](https://github.com/Fsasdddd/lmi-uefi-touch-gpu/blob/0c9398400f937555918a53f1e9a97a90a3345257/tools/lmi-gpu-rsc-init.c)
 和 [SM8250 GMU 实现](https://github.com/FFT-infra/UniXNU-sm8250-common/blob/166235ec2480ff0992627b7aafa15c65ce6b4efa/kits/Sm8250Platform/A650Gmu.c)。
 

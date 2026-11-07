@@ -1,0 +1,32 @@
+{
+  "boot_sha256": "e6d8b426b79facd7ebe47b5a6e6100f377542befbf3fc718e9a91c8a3c6d21b6",
+  "source": "Owner screenshot attached to the Codex conversation",
+  "photo_time_local": "2026-11-07T22:41:47+08:00",
+  "line": "GPU root ok/inert/ok cfg/rb=3f/3f leaf=42 held=0 f=8 diff=0 bus=3/3 rsc=ff/ff xo=7 cxr=1 n=2",
+  "installed_mask": "0x3f",
+  "rollback_mask": "0x3f",
+  "audited_leaf_pages": 42,
+  "backing_retained": false,
+  "snapshot_passes": 2,
+  "parent_dependencies_restored": true,
+  "boot": {
+    "launchd_main": true,
+    "cpus": 8,
+    "processes": 244,
+    "springboard_pid": 27,
+    "backboardd_pid": 57
+  },
+  "storage": {
+    "data_space_rc": 0,
+    "block_size": 4096,
+    "available_blocks": 44552
+  },
+  "display": {
+    "copies": 18,
+    "retired": 18
+  },
+  "input": {
+    "side_key_sample_errors": 0,
+    "side_key_hid": "1/1/0"
+  }
+}

@@ -12,10 +12,12 @@ class IOBufferMemoryDescriptor;
 namespace t970_gpu {
 
 constexpr unsigned cbBarChanged = 1u << 3;
+constexpr unsigned cbTranslationEnabled = 1u << 5;
 constexpr unsigned cbBarMode = 14;
 constexpr unsigned cbBarReleaseMode = 15;
 constexpr unsigned cbTtbrMode = 16;
 constexpr unsigned cbRootMode = 17;
+constexpr unsigned cbActivateMode = 18;
 constexpr uint32_t cbBarStage1 = 0x1f300;
 // Arm IHI 0062D.c: FSR[10:9] describes the translation table format.
 constexpr uint32_t cbFsrFormatMask = 0x600;
@@ -29,7 +31,7 @@ struct CbGuards {
         return (id0 != 0x4c017e06 || id1 != 0x20000005 ? 1u : 0u) |
                (gfsr ? 2u : 0u) | ((fsr & ~cbFsrFormatMask) ? 4u : 0u) |
                (bar ? cbBarChanged : 0u) |
-               (scr0 & (1u << 3) ? 16u : 0u) | (sctlr & 1u ? 32u : 0u) |
+               (scr0 & (1u << 3) ? 16u : 0u) | (sctlr & 1u ? cbTranslationEnabled : 0u) |
                (smrs ? 64u : 0u);
     }
 };
@@ -58,6 +60,9 @@ struct SmmuSnapshot {
     const char *rootState = "skip";
     unsigned rootInstalled = 0, rootRestored = 0, rootLeaves = 0;
     bool rootHeld = false;
+    const char *activation = "skip";
+    unsigned tlbSynced = 0, tlbReads = 0;
+    uint32_t ctlOn = 0, ctlOff = 0;
 };
 
 constexpr unsigned cbOffsets[] = {
@@ -111,8 +116,9 @@ static bool sameRoutes(IOMemoryMap &smmu, const uint32_t (&routes)[6]) {
 }
 
 static bool barViewIdle(IOMemoryMap &smmu, IOMemoryMap &gmu, const SmmuSnapshot &result,
-                        const uint32_t (&routes)[6], const CbGuards &guards) {
-    return !(guards.flags() & ~cbBarChanged) && guards.fsr == cbFsrAarch64 &&
+                        const uint32_t (&routes)[6], const CbGuards &guards, bool translation = false) {
+    const unsigned expected = translation ? cbTranslationEnabled : 0;
+    return (guards.flags() & ~cbBarChanged) == expected && guards.fsr == cbFsrAarch64 &&
         guards.scr0 == result.scr0 && readSmmu32(smmu, 0x1800) == 1 &&
         sameRoutes(smmu, routes) && coldGmu(gmu);
 }
@@ -167,8 +173,92 @@ static bool pulseTtbr(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &result,
     return true;
 }
 
+static bool pulseCbActivation(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &result,
+                              const uint32_t (&routes)[6], const ArmSmmu4KContextImage &image,
+                              uint32_t original) {
+    constexpr unsigned sctlr = 0x8000, tlbStatus = 0x87f4;
+    constexpr uint32_t enable = 1, faultInterrupt = 1u << 6, policyMask = 0x1f7;
+    const ArmSmmu4KIo tlbIo = {
+        &smmu, 0x10000,
+        [](void *cookie, size_t offset, uint32_t *value) {
+            *value = readSmmu32(*static_cast<IOMemoryMap *>(cookie), static_cast<unsigned>(offset));
+            return 0;
+        },
+        nullptr,
+        [](void *cookie, size_t offset, uint32_t value) {
+            writeSmmu32(*static_cast<IOMemoryMap *>(cookie), static_cast<unsigned>(offset), value);
+            return 0;
+        },
+        nullptr,
+        [](void *) {
+            __asm__ volatile("dsb sy" ::: "memory");
+            return 0;
+        },
+    };
+    const auto sync = [&](unsigned bit) {
+        ArmSmmu4KProgramResult syncResult = {};
+        const auto status = ArmSmmu4KSyncContextTlb(&tlbIo, sctlr, static_cast<unsigned>(image.ttbr0 >> 48),
+                                                    0, 1000, &syncResult);
+        result.tlbReads += syncResult.poll_reads;
+        if (status || !syncResult.tlb_synchronized) return false;
+        result.tlbSynced |= bit;
+        return true;
+    };
+    const auto stillOwnsView = [&](const CbGuards &guards) {
+        return !(guards.flags() & 1u) && guards.bar == cbBarStage1 && guards.sctlr != UINT32_MAX &&
+            readSmmu32(smmu, 0x1800) == 1;
+    };
+    const auto contextMatches = [&]() {
+        const uint32_t tcr2 = readSmmu32(smmu, 0x8010);
+        const uint32_t addedTbi = tcr2 & ~image.tcr2 & 0x60;
+        return !((tcr2 ^ image.tcr2) & ~addedTbi) && readSmmu32(smmu, 0x8030) == image.tcr &&
+            readSmmu32(smmu, 0x8038) == image.mair0 && readSmmu32(smmu, 0x803c) == image.mair1 &&
+            readTtbrWords(smmu, 0x8020) == image.ttbr0 && readTtbrWords(smmu, 0x8028) == image.ttbr1;
+    };
+    const auto before = readCbGuards(smmu);
+    result.activation = "sync-on";
+    if (!stillOwnsView(before) || before.sctlr != original ||
+        !barViewIdle(smmu, gmu, result, routes, before) || (readSmmu32(smmu, tlbStatus) & 1) ||
+        !sync(1)) return false;
+    const auto ready = readCbGuards(smmu);
+    if (!stillOwnsView(ready) || ready.sctlr != original ||
+        !barViewIdle(smmu, gmu, result, routes, ready) || !contextMatches()) return false;
+
+    // No stream is published and CM3 stays in reset. Use polling for faults
+    // during this pulse, with context fault interrupts disabled.
+    const uint32_t requested = image.sctlr & ~faultInterrupt;
+    writeSmmu32(smmu, sctlr, requested);
+    const auto active = readCbGuards(smmu);
+    result.ctlOn = active.sctlr;
+    result.activation = "disable";
+    if (!stillOwnsView(active)) return false;
+    const bool activeClean = barViewIdle(smmu, gmu, result, routes, active, active.sctlr & enable) &&
+        contextMatches();
+    const bool activeMatch = activeClean && (active.sctlr & policyMask) == (requested & policyMask);
+    // Withdraw M even if the active readback failed, before considering
+    // any restoration of the root and original control word.
+    writeSmmu32(smmu, sctlr, requested & ~enable);
+    const auto disabled = readCbGuards(smmu);
+    result.ctlOff = disabled.sctlr;
+    if (!activeClean || !stillOwnsView(disabled) ||
+        (disabled.sctlr & (enable | faultInterrupt)) || !barViewIdle(smmu, gmu, result, routes, disabled))
+        return false;
+    result.activation = "sync-off";
+    if (!sync(2)) return false;
+    const auto synced = readCbGuards(smmu);
+    if (!stillOwnsView(synced) || synced.sctlr != disabled.sctlr ||
+        !barViewIdle(smmu, gmu, result, routes, synced)) return false;
+    writeSmmu32(smmu, sctlr, original);
+    const auto restored = readCbGuards(smmu);
+    result.activation = "ctl-restore";
+    if (!stillOwnsView(restored) || restored.sctlr != original ||
+        !barViewIdle(smmu, gmu, result, routes, restored)) return false;
+    result.activation = activeMatch ? "ok" : "readback";
+    return true;
+}
+
 static bool pulseCbRoot(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &result,
-                        const uint32_t (&routes)[6], IOBufferMemoryDescriptor *&wiredRoot) {
+                        const uint32_t (&routes)[6], IOBufferMemoryDescriptor *&wiredRoot, bool activate) {
     GmuTables tables;
     if (!prepareGmuTables(tables, result.id0, result.id2)) {
         result.rootState = tables.stage;
@@ -248,6 +338,8 @@ static bool pulseCbRoot(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &resul
     const bool installed = result.rootInstalled == fullMask;
     const bool audited = installed && auditGmuTables(tables, observed[firstTtbr]);
     if (audited) result.rootLeaves = static_cast<unsigned>(tables.audit.leaf_pages);
+    if (audited && activate && !pulseCbActivation(smmu, gmu, result, routes, tables.image, before.sctlr))
+        return false;
 
     // TCR2/TCR precede restoring TTBRs because TCR2 controls ASID width.
     for (unsigned i = 0; i < attempted; ++i) {
@@ -283,8 +375,8 @@ static bool pulseCbBar(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &result
         const auto after = readCbGuards(smmu);
         if (after.bar != cbBarStage1 || !barViewIdle(smmu, gmu, result, routes, after)) return false;
     }
-    if (power == cbRootMode && active.bar == cbBarStage1 &&
-        !pulseCbRoot(smmu, gmu, result, routes, wiredRoot)) return false;
+    if ((power == cbRootMode || power == cbActivateMode) && active.bar == cbBarStage1 &&
+        !pulseCbRoot(smmu, gmu, result, routes, wiredRoot, power == cbActivateMode)) return false;
 #endif
     if (active.bar) writeSmmu32(smmu, 0x1000, 0);
     const CbGuards restored = readCbGuards(smmu);

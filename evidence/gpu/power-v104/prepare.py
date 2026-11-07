@@ -47,8 +47,15 @@ def main():
     variants.add_argument('--cb-release', action='store_true', help='Pack v118 from the tested v117 BOOT')
     variants.add_argument('--ttbr-width', action='store_true', help='Pack v119 from the tested v118 BOOT')
     variants.add_argument('--cb-root', action='store_true', help='Pack v120 from the tested v119 BOOT')
+    variants.add_argument('--cb-activate', action='store_true', help='Pack v121 from the tested v120 BOOT')
     options = parser.parse_args()
-    if options.cb_root:
+    if options.cb_activate:
+        baseline = 'gpu-cbroot-v120'
+        base_sha = 'e6d8b426b79facd7ebe47b5a6e6100f377542befbf3fc718e9a91c8a3c6d21b6'
+        output = OUT / 'gpu-cbactivate-v121'
+        old, new = b't970-gpu-p=17', b't970-gpu-p=18'
+        markers = (b'GPU ctx %s/%s/%s tlb=', b'sync-off')
+    elif options.cb_root:
         baseline = 'gpu-ttbrwidth-v119'
         base_sha = '9e07061db0cdff73c64b48ed88101726021451f515d5bcc22d184038cb655c6a'
         output = OUT / 'gpu-cbroot-v120'

@@ -1402,6 +1402,7 @@ procedure = [
   "Read KGSL identity and frequency nodes, list GPU firmware files and calculate the GMU/SQE hashes without executing GPU commands.",
 ]
 findings = [
+  "v120 BOOTe6d8b426 verified installation and rollback of all six context registers, with a 42-leaf walk rooted in hardware TTBR0. v121 qualifies local TLB synchronization and SCTLR.M activation and withdrawal while all SMRs remain empty and CM3 remains in reset.",
   "v119 BOOT9e07061d verified real 64-bit reads, ASID writes and restores on TTBR0 and TTBR1. v120 installs and audits an XNU-owned root with SCTLR.M clear and no streams, and retains backing on uncertain rollback.",
   "v118 BOOT240b2f38 confirmed two CB0 checks and parent release with only the known CBAR residual. v119 compares direct 64-bit TTBR reads with paired 32-bit reads, toggles and restores ASID bit 48 with translation off, then rechecks both roots and all routes.",
   "v118 uses the v117 selector value as a single allowed CBAR residual. It takes two complete CB0 and route readbacks with CM3 in reset, no valid SMRs and no active translation before allowing parent release.",
@@ -1436,9 +1437,10 @@ limits = [
   "No GMU bring-up, command submission, DMA/SMMU ownership or Metal rendering was tested under UniXNU.",
 ]
 next_action = [
-  "Capture v120 GPU root. After the audited root and rollback pass, qualify local TLB synchronization and CB0 activation with CM3 still held in reset. Before publishing a stream, qualify the global fault policy and SID5 versus masked 0x405 routing.",
+  "Capture v121 GPU ctx. If both TLB syncs, SCTLR.M readbacks and teardown pass, qualify the global fault policy and SID5 versus masked 0x405 routing while CM3 remains in reset.",
 ]
 evidence = [
+  { kind = "device", reference = "evidence/gpu/cbroot-v120/device-result.json", revision = "86b73d93a521e36018b1b71793382e429da8877c", command = "BOOTe6d8b426 and owner three-finger report screenshot", result = "cfg/rb=3f/3f, 42 audited leaves, backing freed, two CB0 readbacks and all parent restores passed. Eight CPUs, RAM Data query success and 18 GOP copies and retirements." },
   { kind = "host", reference = "evidence/gpu/cbroot-v120/host-validation.json", revision = "86b73d93a521e36018b1b71793382e429da8877c", command = "python3.14 -m unittest discover -s tests and evidence/gpu/power-v104/prepare.py --cb-root", result = "Sanitized root and rollback model, prelink, FAT readback, image symbols and separate DTS/ADT check passed." },
   { kind = "device", reference = "evidence/gpu/cbroot-v120/upload.json", revision = "86b73d93a521e36018b1b71793382e429da8877c", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/gpu-cbroot-v120/boot-partition.img", result = "BOOTe6d8b426 transfer succeeded and requested reboot. The CB0 root result is pending." },
   { kind = "device", reference = "evidence/gpu/ttbrwidth-v119/device-result.json", revision = "a38639315dde2e90a0b7143aaabfa9cf8f965f76", command = "BOOT9e07061d and owner three-finger report screenshot", result = "rd/wr/rb=3/3/3, both CB0 readbacks and all parent restores passed. Eight CPUs, RAM Data query success and 39 GOP copies and retirements." },
@@ -1752,6 +1754,7 @@ procedure = [
   "Read BuildManifest.plist from the local IPSW using Python zipfile and plistlib to identify its OS version, build and product types.",
 ]
 findings = [
+  "v121 validates exact v120 BOOT and changes the FAT kernel and opt-in GPU mode. It verifies ADT, Data seed, trust cache and bytes outside FAT.",
   "v120 validates exact v119 BOOT and changes the FAT kernel and opt-in GPU mode. The packer verifies ADT, Data seed, trust cache and bytes outside FAT.",
   "v119 validates exact v118 BOOT and changes the kernel and GPU diagnostic mode in FAT. ADT, Data seed, trust cache and bytes outside FAT are verified.",
   "v118 starts from exact v117 BOOT, replacing the FAT kernel and changing the opt-in diagnostic mode to 15 while verifying the ADT, Data seed, trust cache and all bytes outside FAT.",

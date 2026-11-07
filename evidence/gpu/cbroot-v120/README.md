@@ -26,4 +26,7 @@ python3.14 -m unittest discover -s tests
 
 [镜像清单](preparation.json)与[刷写回执](upload.json)对应 BOOT
 `e6d8b426b79facd7ebe47b5a6e6100f377542befbf3fc718e9a91c8a3c6d21b6`。
-Heimdall 确认上传成功并请求重启。实机读数待采集。
+Heimdall 确认上传成功并请求重启。
+
+[实机报告](device-result.json)显示 `cfg/rb=3f/3f leaf=42 held=0`，两个快照匹配，
+依赖均已恢复。八核在线，Data 查询成功，GOP 完成 18 次拷贝和回收。
