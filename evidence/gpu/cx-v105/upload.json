@@ -1,0 +1,12 @@
+{
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/gpu-cx-v105/boot-partition.img",
+  "finished_at": "2026-11-07T15:36:30+08:00",
+  "boot_sha256": "4ae3bcd1cbf11903cb24ad69cb607368dab1a3edcdd5575769686a8071bf90cb",
+  "partition": "BOOT",
+  "exit_code": 0,
+  "transfer_confirmed": true,
+  "reboot_requested": true,
+  "partition_readback": false,
+  "userdata_partition_uploaded": false,
+  "transfer_log_sha256": "3634cb6a721690ebec51de2aae82b631e02d349f10201c5a1708783765e0f6ac"
+}

@@ -19,3 +19,7 @@ python3.14 evidence/gpu/power-v104/prepare.py --cx-pulse
 python3.14 -m unittest discover -s tests
 python3.14 ../UniXNU/scripts/porting-record.py check --device .
 ```
+
+2026-11-07 15:36（中国标准时间），Heimdall 成功上传 BOOT `4ae3bcd1…` 并请求重启。
+详见 [打包记录](preparation.json)、[主机验证](host-validation.json)和 [上传回执](upload.json)。
+启动后三指按住两秒，采集 `GPU cx` 一行。CX 上电应答和恢复待实机读数。
