@@ -82,7 +82,7 @@ static GmuRate pulseGmuRate(IOMemoryMap &gmu, IOMemoryMap &cc, unsigned power) {
         if (!coldGmu(gmu) || result.active == UINT32_MAX) return result;
         if (power >= 9 && result.active == requested && branchRunning(read(cc, A650_CC_AHB_CLK)) &&
             branchRunning(read(cc, A650_CC_CXO_CLK)) && branchRunning(read(cc, A650_CC_CX_GMU_CLK))) {
-            result.smmu = pulseSmmuBus(*gcc, power >= 10, power == cbBarMode ? &gmu : nullptr);
+            result.smmu = pulseSmmuBus(*gcc, gmu, power);
             if (result.smmu.holdParents) {
                 result.state = "smmu-hold";
                 return result;

@@ -1401,6 +1401,7 @@ procedure = [
   "Read KGSL identity and frequency nodes, list GPU firmware files and calculate the GMU/SQE hashes without executing GPU commands.",
 ]
 findings = [
+  "v118 uses the v117 selector value as a single allowed CBAR residual. It takes two complete CB0 and route readbacks with CM3 in reset, no valid SMRs and no active translation before allowing parent release.",
   "v117 BOOTa9c4860d read CBAR 0x1f300 both before and after the rollback write. VA64 returned to zero. Post-restore guard bit 3 held the dependencies before the full snapshot comparison.",
   "v116 BOOT9ea0a924 audited five tables, 42 leaves and 2560 descriptors on the board. v117 qualifies CBAR Stage 1 readback and rollback with all streams unpublished, SCTLR.M clear and the GMU in reset.",
   "v116 builds and audits inactive 4 KiB GMU/HFI tables using the catalog-pinned ArmSmmu4K and XNU-owned wired backing. The CPU walks the encoded root for five A650 RAM windows. No GPU/SMMU MMIO occurs in mode 13.",
@@ -1432,7 +1433,7 @@ limits = [
   "No GMU bring-up, command submission, DMA/SMMU ownership or Metal rendering was tested under UniXNU.",
 ]
 next_action = [
-  "Qualify safe teardown when CBAR retains Stage 1, then verify the Stage 1 view and actual 64-bit TTBR access before installing an owned root. Before publishing a stream, qualify the global fault policy and SID5 versus masked 0x405 routing.",
+  "Capture v118 GPU cbar. If the two guarded readbacks and parent release succeed, verify actual 64-bit TTBR access in the Stage 1 view before installing an owned root. Before publishing a stream, qualify the global fault policy and SID5 versus masked 0x405 routing.",
 ]
 evidence = [
   { kind = "device", reference = "evidence/gpu/cbbar-v117/device-result.json", revision = "897b0faba3ef5ece91aa95da43443838ffdf6cd9", command = "BOOTa9c4860d and owner three-finger report screenshot", result = "CBAR remains 0x1f300 after rollback, VA64=1/0, guard=8. Dependencies held. Eight CPUs, RAM Data query success and 28 GOP copies and retirements." },
@@ -1740,6 +1741,7 @@ procedure = [
   "Read BuildManifest.plist from the local IPSW using Python zipfile and plistlib to identify its OS version, build and product types.",
 ]
 findings = [
+  "v118 starts from exact v117 BOOT, replacing the FAT kernel and changing the opt-in diagnostic mode to 15 while verifying the ADT, Data seed, trust cache and all bytes outside FAT.",
   "v117 validates exact v116 BOOT and switches the diagnostic kernel and mode in FAT with ADT, Data seed, trust cache and bytes outside FAT verified.",
   "v116 starts from exact v115 BOOT and switches the FAT kernel and diagnostic mode. The packer verifies the retained ADT, Data seed, trust cache and bytes outside FAT.",
   "v115 validates exact v114 BOOT and replaces the kernel and GPU mode in FAT. ADT, Data seed, trust cache and bytes outside FAT are preserved.",

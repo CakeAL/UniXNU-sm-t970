@@ -7,6 +7,7 @@ namespace t970_gpu {
 
 constexpr unsigned cbBarChanged = 1u << 3;
 constexpr unsigned cbBarMode = 14;
+constexpr unsigned cbBarReleaseMode = 15;
 constexpr uint32_t cbBarStage1 = 0x1f300;
 // Arm IHI 0062D.c: FSR[10:9] describes the translation table format.
 constexpr uint32_t cbFsrFormatMask = 0x600;
@@ -43,6 +44,7 @@ struct SmmuSnapshot {
     const char *barState = "skip";
     uint32_t barActive = 0, barRestored = 0;
     bool barRestoreRead = false;
+    unsigned restoreSamples = 0;
 };
 
 constexpr unsigned cbOffsets[] = {
@@ -125,7 +127,8 @@ static bool pulseCbBar(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &result
     return true;
 }
 
-static void pulseCbFormat(IOMemoryMap &smmu, SmmuSnapshot &result, IOMemoryMap *barGmu) {
+static void pulseCbFormat(IOMemoryMap &smmu, SmmuSnapshot &result, IOMemoryMap *barGmu,
+                          bool allowLatched) {
     result.format = "refuse";
     result.va64Before = readSmmu32(smmu, 0x1800);
     result.guard = readCbGuards(smmu);
@@ -159,21 +162,40 @@ static void pulseCbFormat(IOMemoryMap &smmu, SmmuSnapshot &result, IOMemoryMap *
     result.va64After = readSmmu32(smmu, 0x1800);
     result.restoreRead = true;
     result.format = "restore-hold";
-    result.restoreFlags = readCbGuards(smmu).flags();
-    if (readSmmu32(smmu, A650_SMMU_S2CR(0)) != result.firstS2cr) result.restoreFlags |= 1u << 7;
-    if (barGmu && (!sameRoutes(smmu, routes) || !coldGmu(*barGmu) ||
-                   readSmmu32(smmu, A650_SMMU_SCR0) != result.scr0)) result.restoreFlags |= 1u << 8;
-    if (result.va64After != result.va64Before || result.restoreFlags) return;
-    for (unsigned i = 0; i < 15; ++i) {
-        if (readSmmu32(smmu, cbOffsets[i]) != result.cb[i]) result.restoreDiff |= 1u << i;
+    // A stage-1 selector can persist without an installed root or a route.
+    // Accept precisely the observed selector in the dedicated release probe.
+    const bool latched = result.barRestoreRead && result.barRestored == cbBarStage1;
+    const bool releaseLatched = allowLatched && latched && result.barActive == cbBarStage1;
+    const uint32_t expectedBar = releaseLatched ? cbBarStage1 : result.cb[0];
+    const unsigned expectedFlags = releaseLatched ? cbBarChanged : 0;
+    const unsigned samples = allowLatched ? 2 : 1;
+    for (unsigned pass = 0; pass < samples; ++pass) {
+        if (pass) IODelay(1000);
+        const CbGuards restored = readCbGuards(smmu);
+        result.restoreFlags = restored.flags();
+        if (readSmmu32(smmu, A650_SMMU_S2CR(0)) != result.firstS2cr) result.restoreFlags |= 1u << 7;
+        if (barGmu && (!sameRoutes(smmu, routes) || !coldGmu(*barGmu) ||
+                       restored.scr0 != result.scr0 ||
+                       readSmmu32(smmu, A650_SMMU_ID2) != result.id2)) result.restoreFlags |= 1u << 8;
+        if (result.va64After != result.va64Before || result.restoreFlags != expectedFlags ||
+            (releaseLatched && restored.bar != expectedBar)) return;
+        for (unsigned i = 0; i < 15; ++i) {
+            const uint32_t expected = i == 0 ? expectedBar : result.cb[i];
+            if (readSmmu32(smmu, cbOffsets[i]) != expected) result.restoreDiff |= 1u << i;
+        }
+        if (result.restoreDiff) return;
+        ++result.restoreSamples;
     }
-    if (result.restoreDiff || (result.barRestoreRead && result.barRestored)) return;
+    if (latched && !releaseLatched) return;
     result.holdParents = false;
-    result.format = result.va64Active == 1 && result.guard.fsr == cbFsrAarch64 ? "ok" : "readback";
+    result.format = releaseLatched ? "inert" :
+        result.va64Active == 1 && result.guard.fsr == cbFsrAarch64 ? "ok" : "readback";
 }
 
-static void sampleSmmu(SmmuSnapshot &result, bool format, IOMemoryMap *barGmu) {
+static void sampleSmmu(SmmuSnapshot &result, IOMemoryMap &gmu, unsigned power) {
     using namespace t970_touch;
+    const bool format = power >= 10;
+    auto *barGmu = power >= cbBarMode ? &gmu : nullptr;
     auto smmu = mapMmio(A650_GPU_BASE_SMMU_GR0, 0x10000, format ? 0 : kIOMapReadOnly);
     if (!smmu || !smmu->getVirtualAddress()) {
         result.state = "map-fail";
@@ -208,12 +230,12 @@ static void sampleSmmu(SmmuSnapshot &result, bool format, IOMemoryMap *barGmu) {
     }
     result.contextRead = true;
     result.state = "read";
-    if (format) pulseCbFormat(*smmu, result, barGmu);
+    if (format) pulseCbFormat(*smmu, result, barGmu, power == cbBarReleaseMode);
 }
 
 // The T970 stock SMMU DT names MEMNOC, SNOC DVM and GPUCC AHB.
 // The caller already holds GPUCC AHB, CX and the GMU source.
-static SmmuSnapshot pulseSmmuBus(IOMemoryMap &gcc, bool format, IOMemoryMap *barGmu) {
+static SmmuSnapshot pulseSmmuBus(IOMemoryMap &gcc, IOMemoryMap &gmu, unsigned power) {
     using namespace t970_touch;
     constexpr unsigned gpu = A650_GPU_BASE_GCC_GPU - 0x100000;
     constexpr unsigned clocks[] = {gpu + A650_GCC_GPU_MEMNOC_GFX, gpu + A650_GCC_GPU_SNOC_DVM_GFX};
@@ -236,7 +258,7 @@ static SmmuSnapshot pulseSmmuBus(IOMemoryMap &gcc, bool format, IOMemoryMap *bar
         if (!branchRunning(value)) break;
         result.ready |= 1u << i;
     }
-    if (result.ready == 3) sampleSmmu(result, format, barGmu);
+    if (result.ready == 3) sampleSmmu(result, gmu, power);
     if (result.holdParents) return result;
     for (unsigned i = 2; i-- > 0;) {
         const unsigned bit = 1u << i;

@@ -286,7 +286,7 @@ static unsigned powerMode() {
 #ifdef T970_GPU_GMU_TABLES
     if (power == 13) return power;
 #endif
-    if ((power >= 1 && power <= 12) || power == cbBarMode) return power;
+    if ((power >= 1 && power <= 12) || power == cbBarMode || power == cbBarReleaseMode) return power;
 #endif
     return 0;
 }
