@@ -18,3 +18,10 @@ python3.14 evidence/gpu/power-v104/prepare.py --cb-restore
 python3.14 -m unittest discover -s tests
 python3.14 ../UniXNU/scripts/porting-record.py check --device .
 ```
+
+## 实测
+
+[刷写回执](upload.json)与[实机照片及读数](device-result.json)对应 BOOT
+`789e99a1b42f03b312586e5641e5d11da3b666a36f7a04d2e58245c1add98353`。
+置位和回读均通过，CB0 全部恢复，总线、RSC、XO 与 CX 随后释放。快照中八核
+在线，RAM Data 查询成功，GOP 路径完成五次拷贝和回收，侧键采样零错误。

@@ -1,0 +1,24 @@
+{
+  "device_revision": "0bc3ed847e3d7449593d3fb1c628af1076007e5a",
+  "unixnu_revision": "2c834e313d25482c78d38d703eff1f8d190f2597",
+  "boot_sha256": "789e99a1b42f03b312586e5641e5d11da3b666a36f7a04d2e58245c1add98353",
+  "tests": {
+    "command": "python3.14 -m unittest discover -s tests",
+    "ran": 73,
+    "skipped": 10,
+    "result": "OK"
+  },
+  "format_model": "Ten ASan/UBSan cases cover format, filtered write, fault and dependency hold, and exact restoration.",
+  "kernel_prelink": "PASS",
+  "fat_readback": "PASS",
+  "check_hardware_description": "PASS with synthetic identity",
+  "check_platform": "Stopped at historical framework revision guard",
+  "image_symbols": {
+    "reference": "https://github.com/kmu1757/UniXNU-y2q/blob/fc5d5da6ee5626219bc3b779f85e14d4c28cb878/scripts/check-image-symbols.py",
+    "command": "python3.14 .cache/y2q-reference-20261107/scripts/check-image-symbols.py out/data-bringup/gpu-cbrestore-v115/kernel.macho",
+    "checked_symbols": 69435,
+    "segments": 15,
+    "result": "PASS"
+  },
+  "porting_record": "PASS"
+}

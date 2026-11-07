@@ -83,8 +83,9 @@ TCS 和控制寄存器恢复。v111 实测 GMU 200 MHz 路径回读 `1/100602/1`
 保留了上游依赖。v114 采用 lmi 的显式 32 位 MMIO 读法，定位到唯一触发项是
 CB0 FSR `0x400`。Arm SMMUv2 将 FSR[10:9] 定义为 Format，实际故障位为零。
 v115 从故障守卫中排除 Format，并在回读时核对 VA64、原始 FSR 和完整 CB0 状态。
-确认回读后接入 ArmSmmu4K，按原厂 DT 的 SID5 / mask `0x400`
-建立 GMU 页表和 HFI 缓冲区。
+v115 实测 `va64=0/1/0 rb=1 guard=0/0 diff=0`，上游依赖也已恢复。
+接下来用 ArmSmmu4K 为 GMU 页表和 HFI 缓冲区建表。原厂 DT 的 SID5
+使用 mask `0x400`，发布前须验证实际流 ID 和匹配策略。
 锁定的 Sm8250Platform 冷启动序列会写入固定的 hidden 值，集成时需处理与实测路由的差异。
 见 [v109 实测](../evidence/gpu/rsc-init-v109/device-result.json)、
 [v110 实测](../evidence/gpu/arc-vote-v110/device-result.json)、
@@ -92,7 +93,7 @@ v115 从故障守卫中排除 Format，并在回读时核对 VA64、原始 FSR �
 [v112 实测](../evidence/gpu/smmu-v112/device-result.json)、
 [v113 实测](../evidence/gpu/cbfmt-v113/device-result.json)、
 [v114 实测](../evidence/gpu/cbguard-v114/device-result.json)、
-[v115 方案](../evidence/gpu/cbrestore-v115/README.md)、
+[v115 实测](../evidence/gpu/cbrestore-v115/device-result.json)、
 [lmi RSC 实现](https://github.com/Fsasdddd/lmi-uefi-touch-gpu/blob/0c9398400f937555918a53f1e9a97a90a3345257/tools/lmi-gpu-rsc-init.c)
 和 [SM8250 GMU 实现](https://github.com/FFT-infra/UniXNU-sm8250-common/blob/166235ec2480ff0992627b7aafa15c65ce6b4efa/kits/Sm8250Platform/A650Gmu.c)。
 

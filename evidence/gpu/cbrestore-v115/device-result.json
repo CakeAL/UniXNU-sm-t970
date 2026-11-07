@@ -1,0 +1,34 @@
+{
+  "boot_sha256": "789e99a1b42f03b312586e5641e5d11da3b666a36f7a04d2e58245c1add98353",
+  "photo": "screen-runtime.jpg",
+  "photo_sha256": "2c4d564bd0ddcf677a4ba5ad971f55cf09ed10f77005e9b19a43a7d75a932888",
+  "photo_time_local": "2026-11-07T21:07:40+08:00",
+  "lines": [
+    "GPU cbfmt ok/ok va64=0/1/0 rb=1 guard=0/0 diff=0 bus=3/3 rsc=ff/ff xo=7 cxr=1",
+    "CB guard id=4c017e06/20000005 f=0/400 bar/scr/ctl=0/270406/13cde30a smr=0"
+  ],
+  "va64_set_readback": 1,
+  "restore_attempted": true,
+  "restore_verified": true,
+  "parents_restored": true,
+  "boot": {
+    "launchd_main": true,
+    "cpus": 8,
+    "processes": 212,
+    "springboard_pid": 27,
+    "backboardd_pid": 57
+  },
+  "storage": {
+    "data_space_rc": 0,
+    "block_size": 4096,
+    "available_blocks": 63457
+  },
+  "display": {
+    "copies": 5,
+    "retired": 5
+  },
+  "input": {
+    "side_key_sample_errors": 0,
+    "side_key_hid": "1/1/0"
+  }
+}

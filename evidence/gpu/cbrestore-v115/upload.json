@@ -1,0 +1,12 @@
+{
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/gpu-cbrestore-v115/boot-partition.img",
+  "finished_at": "2026-11-07T21:03:20+08:00",
+  "boot_sha256": "789e99a1b42f03b312586e5641e5d11da3b666a36f7a04d2e58245c1add98353",
+  "partition": "BOOT",
+  "exit_code": 0,
+  "transfer_confirmed": true,
+  "reboot_requested": true,
+  "partition_readback": false,
+  "userdata_partition_uploaded": false,
+  "transfer_log_sha256": "3634cb6a721690ebec51de2aae82b631e02d349f10201c5a1708783765e0f6ac"
+}
