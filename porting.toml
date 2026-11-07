@@ -1080,6 +1080,7 @@ procedure = [
   "Collect DRM modes, panel type and brightness limits; read only display-selection tokens from /proc/cmdline and match the selected S6TUUM3 node in the live DT.",
 ]
 findings = [
+  "The v119 opt-in diagnostic archive adds the pinned ArmSmmu4KMmio object for the GPU TTBR width probe.",
   "The opt-in v116 build routes GPU mode 13 through the startup report and links the five pinned ArmSmmu4K objects in the diagnostic display archive.",
   "GPU report mode 8 replaces the ARC inventory with the GMU rate and restoration report in the terminal buffer.",
   "GPU report mode 7 replaces the ARC table text with the bounded TCS vote report in the existing startup buffer.",
@@ -1401,6 +1402,7 @@ procedure = [
   "Read KGSL identity and frequency nodes, list GPU firmware files and calculate the GMU/SQE hashes without executing GPU commands.",
 ]
 findings = [
+  "v118 BOOT240b2f38 confirmed two CB0 checks and parent release with only the known CBAR residual. v119 compares direct 64-bit TTBR reads with paired 32-bit reads, toggles and restores ASID bit 48 with translation off, then rechecks both roots and all routes.",
   "v118 uses the v117 selector value as a single allowed CBAR residual. It takes two complete CB0 and route readbacks with CM3 in reset, no valid SMRs and no active translation before allowing parent release.",
   "v117 BOOTa9c4860d read CBAR 0x1f300 both before and after the rollback write. VA64 returned to zero. Post-restore guard bit 3 held the dependencies before the full snapshot comparison.",
   "v116 BOOT9ea0a924 audited five tables, 42 leaves and 2560 descriptors on the board. v117 qualifies CBAR Stage 1 readback and rollback with all streams unpublished, SCTLR.M clear and the GMU in reset.",
@@ -1433,9 +1435,10 @@ limits = [
   "No GMU bring-up, command submission, DMA/SMMU ownership or Metal rendering was tested under UniXNU.",
 ]
 next_action = [
-  "Capture v118 GPU cbar. If the two guarded readbacks and parent release succeed, verify actual 64-bit TTBR access in the Stage 1 view before installing an owned root. Before publishing a stream, qualify the global fault policy and SID5 versus masked 0x405 routing.",
+  "Capture v119 GPU ttbr. If native width and rollback are confirmed, install an audited XNU root with CM3 held in reset and no published stream. Before publishing a stream, qualify the global fault policy and SID5 versus masked 0x405 routing.",
 ]
 evidence = [
+  { kind = "device", reference = "evidence/gpu/cbrelease-v118/device-result.json", revision = "6277209284adcd8f9683d19f171878bc9865c3b2", command = "BOOT240b2f38 and owner three-finger report screenshot", result = "CBAR 0x1f300 retained, VA64 restored, n=2, bus=3/3, rsc=ff/ff, xo=7, cxr=1. Eight CPUs, RAM Data query success and 34 GOP copies and retirements." },
   { kind = "host", reference = "evidence/gpu/cbrelease-v118/host-validation.json", revision = "6277209284adcd8f9683d19f171878bc9865c3b2", command = "python3.14 -m unittest discover -s tests and evidence/gpu/power-v104/prepare.py --cb-release", result = "Sanitized model, prelink, FAT readback, image symbols and separate DTS/ADT check passed." },
   { kind = "device", reference = "evidence/gpu/cbrelease-v118/upload.json", revision = "6277209284adcd8f9683d19f171878bc9865c3b2", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/gpu-cbrelease-v118/boot-partition.img", result = "BOOT240b2f38 transfer succeeded and requested reboot. CBAR release device result pending." },
   { kind = "device", reference = "evidence/gpu/cbbar-v117/device-result.json", revision = "897b0faba3ef5ece91aa95da43443838ffdf6cd9", command = "BOOTa9c4860d and owner three-finger report screenshot", result = "CBAR remains 0x1f300 after rollback, VA64=1/0, guard=8. Dependencies held. Eight CPUs, RAM Data query success and 28 GOP copies and retirements." },
@@ -1743,6 +1746,7 @@ procedure = [
   "Read BuildManifest.plist from the local IPSW using Python zipfile and plistlib to identify its OS version, build and product types.",
 ]
 findings = [
+  "v119 validates exact v118 BOOT and changes the kernel and GPU diagnostic mode in FAT. ADT, Data seed, trust cache and bytes outside FAT are verified.",
   "v118 starts from exact v117 BOOT, replacing the FAT kernel and changing the opt-in diagnostic mode to 15 while verifying the ADT, Data seed, trust cache and all bytes outside FAT.",
   "v117 validates exact v116 BOOT and switches the diagnostic kernel and mode in FAT with ADT, Data seed, trust cache and bytes outside FAT verified.",
   "v116 starts from exact v115 BOOT and switches the FAT kernel and diagnostic mode. The packer verifies the retained ADT, Data seed, trust cache and bytes outside FAT.",
@@ -2039,6 +2043,7 @@ procedure = [
   "Run python3 scripts/collect-adb-inventory.py --root --output evidence/<new-capture>; review per-command stderr, checksums, GPT CRC results and DT sanitization before updating this record.",
 ]
 findings = [
+  "v119 reports TTBR0 and TTBR1 native read, ASID write and rollback masks through the three-finger startup report.",
   "The v116 three-finger report includes a bounded GMU table-walk result with allocator, backing, build, bind, encode and audit failure labels.",
   "Mode 8 records inherited, active and restored RCG and DIV_GATE values. The GPLL0 calculation is shared with the existing read-only clock report.",
   "Mode 7 prints MX and CX separately, including command status, pending IRQ/control/slot state and the RSC/XO/CX restoration result.",

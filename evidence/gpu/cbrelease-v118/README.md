@@ -26,4 +26,7 @@ python3.14 -m unittest discover -s tests
 
 [镜像清单](preparation.json)与[刷写回执](upload.json)对应 BOOT
 `240b2f38742b2b181f4e6a97cc269e7c24b6b74c68fa50306785653caa9eeb6f`。
-Heimdall 确认上传成功并请求重启。实机读数待采集。
+Heimdall 确认上传成功并请求重启。
+
+[实机报告](device-result.json)显示 `latched/inert/ok`，两次完整快照均通过。
+总线、RSC/PDC、XO 与 CX 全部恢复。八核在线，Data 查询成功，GOP 完成 34 次拷贝和回收。

@@ -284,7 +284,7 @@ static unsigned powerMode() {
     unsigned power = 0;
     if (!PE_parse_boot_argn("t970-gpu-p", &power, sizeof(power))) return 0;
 #ifdef T970_GPU_GMU_TABLES
-    if (power == 13) return power;
+    if (power == 13 || power == cbTtbrMode) return power;
 #endif
     if ((power >= 1 && power <= 12) || power == cbBarMode || power == cbBarReleaseMode) return power;
 #endif

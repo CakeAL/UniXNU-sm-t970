@@ -10,7 +10,7 @@ import tomllib
 DEVICE = Path(__file__).resolve().parents[1]
 SMMU_REVISION = '8bb168ad058c28d5c04f179ba407875eacba7ef3'
 SMMU_UNITS = ('ArmSmmu4K', 'ArmSmmu4KContext', 'ArmSmmu4KProgram',
-              'ArmSmmu4KAudit', 'ArmSmmu4KTableMemory')
+              'ArmSmmu4KAudit', 'ArmSmmu4KTableMemory', 'ArmSmmu4KMmio')
 
 
 def build_smmu(compiler, repository, output, log):

@@ -1,0 +1,30 @@
+{
+  "boot_sha256": "240b2f38742b2b181f4e6a97cc269e7c24b6b74c68fa50306785653caa9eeb6f",
+  "source": "Owner screenshot attached to the Codex conversation",
+  "photo_time_local": "2026-11-07T22:19:19+08:00",
+  "line": "GPU cbar latched/inert/ok bar=1f300/1f300 rb=1 va=1/0 f=8 diff=0 bus=3/3 rsc=ff/ff xo=7 cxr=1 n=2",
+  "cbar_residual": "0x1f300",
+  "va64_after_restore": 0,
+  "snapshot_passes": 2,
+  "parent_dependencies_restored": true,
+  "boot": {
+    "launchd_main": true,
+    "cpus": 8,
+    "processes": 260,
+    "springboard_pid": 27,
+    "backboardd_pid": 57
+  },
+  "storage": {
+    "data_space_rc": 0,
+    "block_size": 4096,
+    "available_blocks": 44922
+  },
+  "display": {
+    "copies": 34,
+    "retired": 34
+  },
+  "input": {
+    "side_key_sample_errors": 0,
+    "side_key_hid": "1/1/0"
+  }
+}

@@ -2,12 +2,16 @@
 #pragma once
 #include "A650GmuPower.h"
 #include "../T970Touch/BusSnapshot.h"
+#ifdef T970_GPU_GMU_TABLES
+#include "ArmSmmu4KMmio.h"
+#endif
 
 namespace t970_gpu {
 
 constexpr unsigned cbBarChanged = 1u << 3;
 constexpr unsigned cbBarMode = 14;
 constexpr unsigned cbBarReleaseMode = 15;
+constexpr unsigned cbTtbrMode = 16;
 constexpr uint32_t cbBarStage1 = 0x1f300;
 // Arm IHI 0062D.c: FSR[10:9] describes the translation table format.
 constexpr uint32_t cbFsrFormatMask = 0x600;
@@ -45,6 +49,8 @@ struct SmmuSnapshot {
     uint32_t barActive = 0, barRestored = 0;
     bool barRestoreRead = false;
     unsigned restoreSamples = 0;
+    const char *ttbrState = "skip";
+    unsigned ttbrRead = 0, ttbrWrite = 0, ttbrRestore = 0;
 };
 
 constexpr unsigned cbOffsets[] = {
@@ -104,19 +110,77 @@ static bool barViewIdle(IOMemoryMap &smmu, IOMemoryMap &gmu, const SmmuSnapshot 
         sameRoutes(smmu, routes) && coldGmu(gmu);
 }
 
+#ifdef T970_GPU_GMU_TABLES
+static uint64_t readTtbrWords(IOMemoryMap &smmu, unsigned offset) {
+    const uint64_t low = readSmmu32(smmu, offset);
+    return low | (static_cast<uint64_t>(readSmmu32(smmu, offset + 4)) << 32);
+}
+
+static bool pulseTtbr(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &result,
+                      const uint32_t (&routes)[6]) {
+    ArmSmmu4KMmio mmio = {reinterpret_cast<volatile unsigned char *>(smmu.getVirtualAddress()), 0x10000};
+    ArmSmmu4KIo io = {};
+    result.ttbrState = "bind";
+    if (ArmSmmu4KBindMmio(&mmio, &io)) return true;
+    constexpr unsigned offsets[] = {0x8020, 0x8028};
+    constexpr uint64_t asidBit = UINT64_C(1) << 48;
+    uint64_t saved[2] = {};
+    result.ttbrState = "width";
+    for (unsigned i = 0; i < 2; ++i) {
+        const auto offset = offsets[i];
+        saved[i] = readTtbrWords(smmu, offset);
+        uint64_t wide = 0;
+        if (!io.read64(io.cookie, offset, &wide) && wide != UINT64_MAX &&
+            wide == saved[i] && readTtbrWords(smmu, offset) == saved[i]) result.ttbrRead |= 1u << i;
+    }
+    if (result.ttbrRead != 3) return true;
+    result.ttbrState = "hold";
+    for (unsigned i = 0; i < 2; ++i) {
+        const auto offset = offsets[i];
+        const auto before = readCbGuards(smmu);
+        if (before.bar != cbBarStage1 || !barViewIdle(smmu, gmu, result, routes, before) ||
+            readTtbrWords(smmu, offsets[0]) != saved[0] ||
+            readTtbrWords(smmu, offsets[1]) != saved[1]) return false;
+        // Toggle an ASID bit in the high word so an emulated low-word-only
+        // access cannot pass. The table base stays intact and M stays clear.
+        const uint64_t requested = saved[i] ^ asidBit;
+        if (io.write64(io.cookie, offset, requested) || io.barrier(io.cookie)) return false;
+        const auto active = readCbGuards(smmu);
+        if (active.bar != cbBarStage1 || !barViewIdle(smmu, gmu, result, routes, active)) return false;
+        uint64_t wide = 0;
+        if (!io.read64(io.cookie, offset, &wide) && wide == requested &&
+            readTtbrWords(smmu, offset) == requested) result.ttbrWrite |= 1u << i;
+        if (io.write64(io.cookie, offset, saved[i]) || io.barrier(io.cookie) ||
+            io.read64(io.cookie, offset, &wide) || wide != saved[i] ||
+            readTtbrWords(smmu, offsets[0]) != saved[0] ||
+            readTtbrWords(smmu, offsets[1]) != saved[1]) return false;
+        result.ttbrRestore |= 1u << i;
+    }
+    result.ttbrState = result.ttbrWrite == 3 ? "ok" : "width";
+    return true;
+}
+#endif
+
 static bool pulseCbBar(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &result,
-                       const uint32_t (&routes)[6]) {
+                       const uint32_t (&routes)[6], [[maybe_unused]] unsigned power) {
     result.barState = "pre";
     if (result.guard.bar || !barViewIdle(smmu, gmu, result, routes, result.guard))
         return false;
     // lmi mode 27 uses this stage-1/stage-2-bypass value with CM3 in reset.
-    // Leave SCTLR.M, stream routing and TTBRs untouched.
+    // Leave SCTLR.M and stream routing untouched.
     writeSmmu32(smmu, 0x1000, cbBarStage1);
     const CbGuards active = readCbGuards(smmu);
     result.barActive = active.bar;
     result.barState = "busy-hold";
     if ((active.bar && active.bar != cbBarStage1) ||
         !barViewIdle(smmu, gmu, result, routes, active)) return false;
+#ifdef T970_GPU_GMU_TABLES
+    if (power == cbTtbrMode && active.bar == cbBarStage1) {
+        if (!pulseTtbr(smmu, gmu, result, routes)) return false;
+        const auto after = readCbGuards(smmu);
+        if (after.bar != cbBarStage1 || !barViewIdle(smmu, gmu, result, routes, after)) return false;
+    }
+#endif
     if (active.bar) writeSmmu32(smmu, 0x1000, 0);
     const CbGuards restored = readCbGuards(smmu);
     result.barRestored = restored.bar;
@@ -128,7 +192,7 @@ static bool pulseCbBar(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &result
 }
 
 static void pulseCbFormat(IOMemoryMap &smmu, SmmuSnapshot &result, IOMemoryMap *barGmu,
-                          bool allowLatched) {
+                          unsigned power) {
     result.format = "refuse";
     result.va64Before = readSmmu32(smmu, 0x1800);
     result.guard = readCbGuards(smmu);
@@ -153,7 +217,7 @@ static void pulseCbFormat(IOMemoryMap &smmu, SmmuSnapshot &result, IOMemoryMap *
         (result.guard.flags() & ~cbBarChanged)) return;
     if (barGmu) {
         if (result.va64Active == 1 && result.guard.fsr == cbFsrAarch64 &&
-            !pulseCbBar(smmu, *barGmu, result, routes) && strcmp(result.barState, "pre")) return;
+            !pulseCbBar(smmu, *barGmu, result, routes, power) && strcmp(result.barState, "pre")) return;
         const CbGuards beforeRestore = readCbGuards(smmu);
         if ((beforeRestore.flags() & ~cbBarChanged) || beforeRestore.bar == UINT32_MAX ||
             beforeRestore.scr0 != result.scr0 || !sameRoutes(smmu, routes) || !coldGmu(*barGmu)) return;
@@ -164,6 +228,7 @@ static void pulseCbFormat(IOMemoryMap &smmu, SmmuSnapshot &result, IOMemoryMap *
     result.format = "restore-hold";
     // A stage-1 selector can persist without an installed root or a route.
     // Accept precisely the observed selector in the dedicated release probe.
+    const bool allowLatched = power >= cbBarReleaseMode;
     const bool latched = result.barRestoreRead && result.barRestored == cbBarStage1;
     const bool releaseLatched = allowLatched && latched && result.barActive == cbBarStage1;
     const uint32_t expectedBar = releaseLatched ? cbBarStage1 : result.cb[0];
@@ -230,7 +295,7 @@ static void sampleSmmu(SmmuSnapshot &result, IOMemoryMap &gmu, unsigned power) {
     }
     result.contextRead = true;
     result.state = "read";
-    if (format) pulseCbFormat(*smmu, result, barGmu, power == cbBarReleaseMode);
+    if (format) pulseCbFormat(*smmu, result, barGmu, power);
 }
 
 // The T970 stock SMMU DT names MEMNOC, SNOC DVM and GPUCC AHB.

@@ -45,8 +45,15 @@ def main():
     variants.add_argument('--gmu-tables', action='store_true', help='Pack v116 from the tested v115 BOOT')
     variants.add_argument('--cb-bar', action='store_true', help='Pack v117 from the tested v116 BOOT')
     variants.add_argument('--cb-release', action='store_true', help='Pack v118 from the tested v117 BOOT')
+    variants.add_argument('--ttbr-width', action='store_true', help='Pack v119 from the tested v118 BOOT')
     options = parser.parse_args()
-    if options.cb_release:
+    if options.ttbr_width:
+        baseline = 'gpu-cbrelease-v118'
+        base_sha = '240b2f38742b2b181f4e6a97cc269e7c24b6b74c68fa50306785653caa9eeb6f'
+        output = OUT / 'gpu-ttbrwidth-v119'
+        old, new = b't970-gpu-p=15', b't970-gpu-p=16'
+        markers = (b'GPU ttbr %s/%s/%s rd/wr/rb=', b'inert')
+    elif options.cb_release:
         baseline = 'gpu-cbbar-v117'
         base_sha = 'a9c4860d9fd50e264f00d75c65de75350aa487b9edfcc83249abf7f36974ee92'
         output = OUT / 'gpu-cbrelease-v118'
