@@ -335,7 +335,9 @@ extern "C" void native_t970_display_timing(char *out, unsigned length, int hold)
         used = strlen(out);
         t970_gpu::reportArc(out + used, static_cast<unsigned>(length - used));
         used = strlen(out);
-        t970_gpu::reportClock(out + used, static_cast<unsigned>(length - used));
+        unsigned gpuWrite = 0;
+        bool writeGate = PE_parse_boot_argn("t970-gpu-w", &gpuWrite, sizeof(gpuWrite)) && gpuWrite == 1;
+        t970_gpu::reportClock(out + used, static_cast<unsigned>(length - used), writeGate);
         return;
     }
     uint64_t publishNs = 0, firstNs = 0, lastNs = 0, blankNs = 0, darkNs = 0;
@@ -364,7 +366,9 @@ extern "C" void native_t970_display_timing(char *out, unsigned length, int hold)
     used = strlen(out);
     t970_gpu::reportArc(out + used, static_cast<unsigned>(length - used));
     used = strlen(out);
-    t970_gpu::reportClock(out + used, static_cast<unsigned>(length - used));
+    unsigned gpuWrite = 0;
+    bool writeGate = PE_parse_boot_argn("t970-gpu-w", &gpuWrite, sizeof(gpuWrite)) && gpuWrite == 1;
+    t970_gpu::reportClock(out + used, static_cast<unsigned>(length - used), writeGate);
 }
 
 extern "C" __attribute__((noreturn)) void native_legacy_backend_guard(unsigned slot, void *object, void *caller) {

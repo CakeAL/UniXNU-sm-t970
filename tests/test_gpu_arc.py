@@ -97,7 +97,16 @@ int main() {
         self.assertIn('GPU arc db=%x cx=%x lv=%u [%s] min=%u mx=%x lv=%u [%s] min=%u', header)
         self.assertNotIn('writeMasked', header)
         display = (ROOT / 'package/T970Display/DisplayRegistration.cpp').read_text()
-        self.assertGreaterEqual(display.count('reportArc('), 2)
+        self.assertGreaterEqual(display.count('t970_gpu::reportArc('), 2)
+        self.assertGreaterEqual(display.count('t970_gpu::reportClock('), 2)
+        self.assertIn('PE_parse_boot_argn("t970-gpu-w"', display)
+
+    def test_gpu_branch_gate_write_is_restored(self):
+        clock = (ROOT / 'package/T970Gpu/ClockSnapshot.h').read_text()
+        self.assertIn('mapMmio(0x100000, 0x80000, writeGate ? 0 : kIOMapReadOnly)', clock)
+        self.assertIn('writeMasked(*gcc, 0x52000, divGate, divGate);', clock)
+        self.assertIn('writeMasked(*gcc, 0x52000, divGate, branch & divGate);', clock)
+        self.assertIn('restore=%u', clock)
 
 
 if __name__ == '__main__':
