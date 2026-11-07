@@ -1,0 +1,12 @@
+{
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/gpu-smmu-v112/boot-partition.img",
+  "finished_at": "2026-11-07T18:09:59+08:00",
+  "boot_sha256": "f9df94f349d8bb6859fd6ee7626941de38be3e7333a422e3e0d49b7a0b3bd550",
+  "partition": "BOOT",
+  "exit_code": 0,
+  "transfer_confirmed": true,
+  "reboot_requested": true,
+  "partition_readback": false,
+  "userdata_partition_uploaded": false,
+  "transfer_log_sha256": "3634cb6a721690ebec51de2aae82b631e02d349f10201c5a1708783765e0f6ac"
+}

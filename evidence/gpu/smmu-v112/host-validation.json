@@ -1,0 +1,17 @@
+{
+  "device_revision": "87cfa4ecf042a75ec37b3d95c882be2441590d2e",
+  "unixnu_revision": "2c834e313d25482c78d38d703eff1f8d190f2597",
+  "boot_sha256": "f9df94f349d8bb6859fd6ee7626941de38be3e7333a422e3e0d49b7a0b3bd550",
+  "tests": {
+    "command": "python3.14 -m unittest discover -s tests",
+    "ran": 73,
+    "skipped": 10,
+    "result": "OK"
+  },
+  "smmu_model": "ASan/UBSan mock MMIO passed for exact geometry, read-only SMMU mapping, occupied stream refusal, changing CB0, stopped bus clock, and holding parents on bus restore failure.",
+  "kernel_prelink": "PASS",
+  "fat_readback": "PASS",
+  "check_hardware_description": "PASS with synthetic identity",
+  "check_platform": "Stopped at historical framework revision guard",
+  "porting_record": "PASS"
+}

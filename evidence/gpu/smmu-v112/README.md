@@ -23,3 +23,6 @@ python3.14 evidence/gpu/power-v104/prepare.py --smmu-read
 python3.14 -m unittest discover -s tests
 python3.14 ../UniXNU/scripts/porting-record.py check --device .
 ```
+
+2026-11-07 18:09（中国标准时间），Heimdall 成功上传 BOOT `f9df94f3…` 并请求重启。
+启动后三指按住两秒，采集 `GPU smmu` 和下一行 `CB0`。 [主机验证](host-validation.json) · [上传回执](upload.json)
