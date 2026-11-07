@@ -1,0 +1,104 @@
+{
+  "device_revision": "abe50fc005299c3dd908cbe6b61e39bade5e1ef7",
+  "unixnu_revision": "2c834e313d25482c78d38d703eff1f8d190f2597",
+  "boot_sha256": "9b6513f4350264f534e3157afe62260fa8d27fabf5fa060b8a77a5460f7a94e3",
+  "tests": {
+    "command": "python3.14 -m unittest discover -s tests",
+    "result": "See the v125/v126 host evidence; the v127 build only changes stack ownership"
+  },
+  "stack": {
+    "method": "llvm-objdump prologue frame sizes along the panicked call chain of the v126 and v127 kernels",
+    "v126_total_bytes": 12768,
+    "v127_total_bytes": 8288,
+    "released_bytes": 4480,
+    "frames": [
+      {
+        "function": "native_t970_display_timing",
+        "v126": 448,
+        "v127": 448
+      },
+      {
+        "function": "reportGpu",
+        "v126": 816,
+        "v127": 816
+      },
+      {
+        "function": "reportCxPulse",
+        "v126": 1840,
+        "v127": 1008
+      },
+      {
+        "function": "pulseXoClocks",
+        "v126": 1920,
+        "v127": 432
+      },
+      {
+        "function": "sampleRsc",
+        "v126": 80,
+        "v127": 80
+      },
+      {
+        "function": "pulseRscInit",
+        "v126": 1680,
+        "v127": 1152
+      },
+      {
+        "function": "pulseGmuRate",
+        "v126": 640,
+        "v127": 96
+      },
+      {
+        "function": "pulseSmmuBus",
+        "v126": 144,
+        "v127": 144
+      },
+      {
+        "function": "pulseCbFormat",
+        "v126": 192,
+        "v127": 192
+      },
+      {
+        "function": "pulseCbBar",
+        "v126": 368,
+        "v127": 368
+      },
+      {
+        "function": "pulseCbRoot",
+        "v126": 928,
+        "v127": 928
+      },
+      {
+        "function": "pulseCbActivation",
+        "v126": 512,
+        "v127": 608
+      },
+      {
+        "function": "pulseSid5",
+        "v126": 176,
+        "v127": 176
+      },
+      {
+        "function": "stageGmuFirmware",
+        "v126": 1376,
+        "v127": 192
+      },
+      {
+        "function": "A650GmuBuildRegions",
+        "v126": 1648,
+        "v127": 1648
+      }
+    ],
+    "runtime_report_thread_frame": 3408,
+    "remaining_margin_bytes": "about 4 KiB of the 16 KiB kernel stack after the report thread frame and thread entry"
+  },
+  "adreno_firmware": {
+    "revision": "20ad3d7aca14bd46aecab6335c780f5413fa054b",
+    "sm8250_revision": "166235ec2480ff0992627b7aafa15c65ce6b4efa",
+    "gmu_sha256": "df79fa8482fcc7587bb239b9c9e2b24bce4729893b990fe3f82b30da8175b01c"
+  },
+  "firmware_bytes": 41548,
+  "stock_hash_matched": true,
+  "kernel_prelink": "PASS",
+  "fat_readback": "PASS",
+  "gpu_boot_arg": "t970-gpu-p=23 (FAT config, 1 occurrence)"
+}
