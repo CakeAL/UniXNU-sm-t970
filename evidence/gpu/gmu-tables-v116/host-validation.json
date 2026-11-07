@@ -1,0 +1,54 @@
+{
+  "device_revision": "7b25360276fe9975094b871be7360309b10c5f18",
+  "unixnu_revision": "2c834e313d25482c78d38d703eff1f8d190f2597",
+  "boot_sha256": "9ea0a92498f038c87798a410ecade65a3592bbdd82d2914f98324f960fd26633",
+  "arm_smmu4k": {
+    "revision": "8bb168ad058c28d5c04f179ba407875eacba7ef3",
+    "objects": {
+      "ArmSmmu4K.o": "f5d9fbc6213b09e807c2466ccb43621bea0f3ddd9056851384cbdf266133308a",
+      "ArmSmmu4KContext.o": "a10f3d5f990fe48eac41975b51ebbd09c8662cea22f37e68aa54898a2aa9a62c",
+      "ArmSmmu4KProgram.o": "d78d979e3eba88e895280d2cb5e66194e2d072cbdcd6175f7f92de6b970649bb",
+      "ArmSmmu4KAudit.o": "63a16dec7e8d220edfd99cc3a8da0c57f1fbe5bb6245d12a707c0323bf958143",
+      "ArmSmmu4KTableMemory.o": "5c0dd8132ceeea96e5bac981f74f9e9f5990180bb1ba4f124bcd9ea0ef536f8c"
+    },
+    "probe_sha256": "ef60ecbbdb044b7a8a976553c3c5245fcc6cada2ad3213d6f038797cd4442f8f"
+  },
+  "tests": {
+    "command": "python3.14 -m unittest discover -s tests",
+    "ran": 73,
+    "skipped": 10,
+    "result": "OK"
+  },
+  "host_model": {
+    "result": "PASS with ASan and UBSan",
+    "table_pages": 5,
+    "leaf_pages": 42,
+    "descriptor_reads": 2560,
+    "tcr": "8080201c",
+    "checked": [
+      "zero report length",
+      "zeroed backing",
+      "short physical segment",
+      "36-bit physical overflow",
+      "misaligned CPU mapping",
+      "allocator failure",
+      "release on each allocated path"
+    ]
+  },
+  "kernel_prelink": "PASS",
+  "fat_readback": "PASS",
+  "image_symbol_check": {
+    "reference_revision": "fc5d5da6ee5626219bc3b779f85e14d4c28cb878",
+    "segments": 15,
+    "symbols_checked": 69461,
+    "result": "PASS"
+  },
+  "linked_symbols": [
+    "ArmSmmu4KBuild",
+    "ArmSmmu4KBindTableMemory",
+    "ArmSmmu4KEncodeContext",
+    "ArmSmmu4KAuditTables"
+  ],
+  "check_hardware_description": "PASS with synthetic identity",
+  "check_platform": "Stopped at historical framework revision guard"
+}

@@ -15,3 +15,12 @@ python3.14 evidence/display/hello-black-v64/build-kernel.py --cached-headers --s
 python3.14 evidence/gpu/power-v104/prepare.py --gmu-tables
 python3.14 -m unittest discover -s tests
 ```
+
+## 构建和刷写
+
+[主机验证](host-validation.json)记录了 ASan/UBSan 模型、预链接、FAT 回读、
+符号范围检查和独立 DTS/ADT 检查。完整平台检查停在历史框架版本校验。
+
+[镜像清单](preparation.json)与[刷写回执](upload.json)对应 BOOT
+`9ea0a92498f038c87798a410ecade65a3592bbdd82d2914f98324f960fd26633`。
+Heimdall 确认 BOOT 上传成功并请求重启。实机页表报告待采集。
