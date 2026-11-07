@@ -23,3 +23,19 @@ python3.14 -m unittest discover -s tests -v
 `GPU clk` 行的 `run`、`post`、`hz` 和 `branch`。这决定 GPUCC 200 MHz 的
 父时钟是否已运行、GPU 分支门控是否关闭；之后才设计 GPUCC/GDSC 的受控
 上电和 GMU 冷启动。
+
+## 实机结果
+
+14:52:38 照片确认：
+
+```
+GPU clk gpl0=d810003d/1f/4000/0 branch=1206d7f run=1 post=1 hz=600000000
+```
+
+- GPLL0 以 L=31、alpha=0x4000 运行在 600 MHz，MODE 的 bit31/bit0 与 running
+  位满足 lmi 的父时钟前置检查，post-div=1；
+- GPU 分支 `0x1206d7f` 的 DIV_GATE（bit16）当前为 0；
+- 电池仍 `charge=kicked`、44 样本零错误；电流符号继续在正负间跳，待单独核对。
+
+下一步（v103）只做受控写：把 GCC 0x52000 的 DIV_GATE 置 1，回读确认后恢复
+原值，验证这条 GPU 分支门控可写且不依赖电源轨。

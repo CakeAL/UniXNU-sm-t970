@@ -1,0 +1,36 @@
+{
+  "boot_sha256": "f99055795fa586f7d4ee6155503c7210b30c71aed4e5ff27acafb5dc0e3eec4c",
+  "photo": "screen-runtime.jpg",
+  "photo_sha256": "aab5787c2e7885910d406f92fe933ffb888235bef9b524b03c8e675a3f6ecce2",
+  "photo_time_local": "2026-11-07T14:52:38+08:00",
+  "desktop_reached": true,
+  "gpu_clock": {
+    "line": "GPU clk gpl0=d810003d/1f/4000/0 branch=1206d7f run=1 post=1 hz=600000000",
+    "gpll0_mode": "0xd810003d",
+    "gpll0_l": "0x1f",
+    "gpll0_alpha": "0x4000",
+    "gpll0_status": "0x0",
+    "gpu_branch_0x52000": "0x1206d7f",
+    "running": true,
+    "post_div": 1,
+    "hz": 600000000,
+    "decode": "L=31 and alpha=0x4000 give 19.2MHz*31 + (19.2MHz*0x4000>>16) = 595.2MHz + 4.8MHz = 600MHz. MODE bit31 and bit0 are set (0xd810003d & 0x80000001 == 0x80000001) and bit30 reports running, so the lmi-gpu-clock.c parent checks pass. The GPU branch 0x1206d7f has DIV_GATE (bit16) clear."
+  },
+  "battery": {
+    "line": "Bat present=1 soc100=6559 uV=3945625 uA=-528906 mC=28199 cap=5900/8922 chg=1:5f/e0/31 restore=1 done/none reg=0",
+    "state_of_charge_percent": 65.59,
+    "voltage_uv": 3945625,
+    "current_ua": -528906,
+    "remaining_mah": 5900,
+    "full_mah": 8922,
+    "note": "Negative current again at CHG_DTLS=1; the gauge sign remains inconsistent across samples."
+  },
+  "service": {
+    "line": "Battery svc=1 samples=44 errors=0 published=1 age_ms=451 charge=kicked",
+    "samples": 44,
+    "errors": 0,
+    "charge": "kicked"
+  },
+  "units_check": "16796*100/256=6559, 50504*78125/1000=3945625, -677*15625*5/100=-528906, 7219*1000/256=28199.",
+  "next": "v103 forces and restores the GPU-only divided gate (GCC 0x52000 bit16) with readback; if the bit sticks, the next step is the GPUCC/GDSC and RSC vote design."
+}
