@@ -20,3 +20,7 @@ python3.14 evidence/gpu/power-v104/prepare.py --rsc-read
 python3.14 -m unittest discover -s tests
 python3.14 ../UniXNU/scripts/porting-record.py check --device .
 ```
+
+2026-11-07 16:01（中国标准时间），Heimdall 成功上传 BOOT `25f846a6…` 并请求重启。
+详见 [打包记录](preparation.json)、[主机验证](host-validation.json)和 [上传回执](upload.json)。
+启动后三指按住两秒，采集 `GPU rsc` 和下一行 `RSC hidden`。

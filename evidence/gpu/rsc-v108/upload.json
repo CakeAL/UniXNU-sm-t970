@@ -1,0 +1,12 @@
+{
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/gpu-rsc-v108/boot-partition.img",
+  "finished_at": "2026-11-07T16:01:52+08:00",
+  "boot_sha256": "25f846a61e86269dc42d97ba863de8bf13ef983dd488e66e56060c29301067ec",
+  "partition": "BOOT",
+  "exit_code": 0,
+  "transfer_confirmed": true,
+  "reboot_requested": true,
+  "partition_readback": false,
+  "userdata_partition_uploaded": false,
+  "transfer_log_sha256": "3634cb6a721690ebec51de2aae82b631e02d349f10201c5a1708783765e0f6ac"
+}
