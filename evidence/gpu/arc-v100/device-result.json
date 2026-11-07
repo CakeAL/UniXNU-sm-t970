@@ -1,0 +1,42 @@
+{
+  "boot_sha256": "1e1b1936adebdc9f1fe1b4407ce54958aeebf7c85f4a7c03790db19d86852a2c",
+  "photo": "screen-runtime.jpg",
+  "photo_sha256": "71400200c9ed761e9e2876ecf7031964cb49cc0afb2247d8665bd735687b44d7",
+  "photo_time_local": "2026-11-07T14:33:00+08:00",
+  "desktop_reached": true,
+  "gpu_arc": {
+    "line": "GPU arc db=1 cx=30000 lv=9 min=2 mx=30010 lv=9 min=2",
+    "db_version": 1,
+    "cx": {
+      "address": "0x30000",
+      "levels": 9,
+      "min_svs_index": 2
+    },
+    "mx": {
+      "address": "0x30010",
+      "levels": 9,
+      "min_svs_index": 2
+    },
+    "interpretation": "Both SM8250 CX/MX level resources parse from the ARC cmd-db with nine voltage levels each and the same minimum-SVS index 2. Addresses are RPMh/ARC resource selectors, not memory addresses. The level codes themselves are not printed yet."
+  },
+  "keys_full_line": "Keys: v=50010000 pon=13 gpio=051 mask=0 power=0/0 up=0/0 down=0/0 stage=5 samples=16557 errors=0 hid=1/1/0",
+  "buffer_fix": "The complete Keys line and the GPU arc line both printed, so display_state[1280] fixed the 896-byte truncation.",
+  "battery": {
+    "line": "Bat present=1 soc100=6416 uV=3960312 uA=17968 mC=28199 cap=5770/8932 chg=1:5f/e0/31 restore=1 done/none reg=0",
+    "state_of_charge_percent": 64.16,
+    "voltage_uv": 3960312,
+    "current_ua": 17968,
+    "remaining_mah": 5770,
+    "full_mah": 8932,
+    "note": "The gauge current is positive while CHG_DTLS=1, unlike the negative v98 sample; the magnitude is small, so the sign/magnitude still needs a separate steady-state check."
+  },
+  "service": {
+    "line": "Battery svc=1 samples=56 errors=0 published=1 age_ms=1587 charge=kicked",
+    "samples": 56,
+    "errors": 0,
+    "charge": "kicked"
+  },
+  "ufs_time_line": "LS waits=1 addr=2030a0978 waiter=130 owner=741 U r=328613 f=0 ms=47448 us=144 b1=137 bn=307 n=8 h=19 ah=0",
+  "units_check": "16507*100/256=6416, 50692*78125/1000=3960312, 23*15625*5/100=17968, 7219*1000/256=28199.",
+  "next": "Print the nine level codes so they can be matched to the T970 GPU OPP/regulator domains before any GPUCC/GDSC access."
+}

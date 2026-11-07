@@ -18,3 +18,15 @@ python3.14 -m unittest discover -s tests -v
 三指报告应同时包含完整的 `Keys` 行和 `GPU arc db= cx= lv= min= mx= lv= min=`
 行。若 `GPU arc` 是 `refused`，把该行发来；若正常，下一步对照 T970 DT 的
 GPU OPP/电源域，然后做 GPUCC/GDSC 只读资格确认。
+
+## 实机结果
+
+14:33:00 照片确认缓冲修复生效：完整 `Keys` 行和
+`GPU arc db=1 cx=30000 lv=9 min=2 mx=30010 lv=9 min=2` 同时出现。
+
+- 解析器找到 CX/MX 两个资源，各有 9 个电压档，最低 SVS 档索引都是 2；
+  `0x30000/0x30010` 是 RPMh ARC 资源选择符，不是内存地址。
+- 行里还没有档位数值本身；下一步把 9 个 level 码打出来，再与 T970 DT 的
+  GPU OPP/电源域对照，之后才做 GPUCC/GDSC 资格确认。
+- 电池服务正常：64.16%、3960312 µV、+17968 µA（充电）、`charge=kicked`、
+  56 样本零错误；本次电流符号与 CHG_DTLS=1 一致，但幅度偏小，仍需单独核对。
