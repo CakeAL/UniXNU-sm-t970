@@ -1,0 +1,32 @@
+{
+  "boot_sha256": "a9c4860d9fd50e264f00d75c65de75350aa487b9edfcc83249abf7f36974ee92",
+  "source": "Owner screenshot attached to the Codex conversation",
+  "photo_time_local": "2026-11-07T22:09:30+08:00",
+  "line": "GPU cbar latched/restore-hold/smmu-hold bar=1f300/1f300 rb=1 va=1/0 f=8 diff=0 bus=3/0 rsc=ff/0 xo=0 cxr=0",
+  "cbar_after_set": "0x1f300",
+  "cbar_after_restore_attempt_before_va64_restore": "0x1f300",
+  "va64_after_restore": 0,
+  "post_restore_guard_mask": "0x8",
+  "post_restore_guard": "CBAR still nonzero after VA64 rollback",
+  "full_cb_snapshot_comparison_completed": false,
+  "parent_dependencies_held": true,
+  "boot": {
+    "launchd_main": true,
+    "cpus": 8,
+    "springboard_pid": 27,
+    "backboardd_pid": 57
+  },
+  "storage": {
+    "data_space_rc": 0,
+    "block_size": 4096,
+    "available_blocks": 47410
+  },
+  "display": {
+    "copies": 28,
+    "retired": 28
+  },
+  "input": {
+    "side_key_sample_errors": 0,
+    "side_key_hid": "1/1/0"
+  }
+}

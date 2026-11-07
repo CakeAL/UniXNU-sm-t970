@@ -1401,6 +1401,7 @@ procedure = [
   "Read KGSL identity and frequency nodes, list GPU firmware files and calculate the GMU/SQE hashes without executing GPU commands.",
 ]
 findings = [
+  "v117 BOOTa9c4860d read CBAR 0x1f300 both before and after the rollback write. VA64 returned to zero. Post-restore guard bit 3 held the dependencies before the full snapshot comparison.",
   "v116 BOOT9ea0a924 audited five tables, 42 leaves and 2560 descriptors on the board. v117 qualifies CBAR Stage 1 readback and rollback with all streams unpublished, SCTLR.M clear and the GMU in reset.",
   "v116 builds and audits inactive 4 KiB GMU/HFI tables using the catalog-pinned ArmSmmu4K and XNU-owned wired backing. The CPU walks the encoded root for five A650 RAM windows. No GPU/SMMU MMIO occurs in mode 13.",
   "v114 BOOTa3c7e5fc isolates the post-set guard to CB0 FSR=0x400, the AArch64 Format field. v115 masks Format in the fault predicate, requires VA64=1 with FSR=0x400 for active readback success, and compares the original raw FSR and all CB0 words on rollback.",
@@ -1431,9 +1432,10 @@ limits = [
   "No GMU bring-up, command submission, DMA/SMMU ownership or Metal rendering was tested under UniXNU.",
 ]
 next_action = [
-  "Capture v117 GPU cbar and confirm whether CBAR can be restored while CM3 remains in reset. Verify the Stage 1 view and actual 64-bit TTBR access before installing an owned root. Before publishing a stream, qualify the global fault policy and SID5 versus masked 0x405 routing.",
+  "Qualify safe teardown when CBAR retains Stage 1, then verify the Stage 1 view and actual 64-bit TTBR access before installing an owned root. Before publishing a stream, qualify the global fault policy and SID5 versus masked 0x405 routing.",
 ]
 evidence = [
+  { kind = "device", reference = "evidence/gpu/cbbar-v117/device-result.json", revision = "897b0faba3ef5ece91aa95da43443838ffdf6cd9", command = "BOOTa9c4860d and owner three-finger report screenshot", result = "CBAR remains 0x1f300 after rollback, VA64=1/0, guard=8. Dependencies held. Eight CPUs, RAM Data query success and 28 GOP copies and retirements." },
   { kind = "host", reference = "evidence/gpu/cbbar-v117/host-validation.json", revision = "897b0faba3ef5ece91aa95da43443838ffdf6cd9", command = "python3.14 -m unittest discover -s tests and evidence/gpu/power-v104/prepare.py --cb-bar", result = "Sanitized CBAR model, real W-register disassembly, prelink, FAT readback, image symbols and separate DTS/ADT check passed." },
   { kind = "device", reference = "evidence/gpu/cbbar-v117/upload.json", revision = "897b0faba3ef5ece91aa95da43443838ffdf6cd9", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/gpu-cbbar-v117/boot-partition.img", result = "BOOTa9c4860d transfer succeeded and requested reboot. CBAR device result pending." },
   { kind = "device", reference = "evidence/gpu/gmu-tables-v116/device-result.json", revision = "7b25360276fe9975094b871be7360309b10c5f18", command = "BOOT9ea0a924 and owner three-finger report screenshot", result = "table/leaf/read=5/42/2560, TCR=8080201c. Eight CPUs, Data space query success, 41 GOP copies and retirements, side-key sampling errors zero." },

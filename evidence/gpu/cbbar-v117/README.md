@@ -22,4 +22,11 @@ python3.14 -m unittest discover -s tests
 
 [镜像清单](preparation.json)与[刷写回执](upload.json)对应 BOOT
 `a9c4860d9fd50e264f00d75c65de75350aa487b9edfcc83249abf7f36974ee92`。
-Heimdall 确认上传成功并请求重启。实机 CBAR 读数待采集。
+Heimdall 确认上传成功并请求重启。
+
+## 实测
+
+[三指报告](device-result.json)读到 `bar=1f300/1f300 rb=1 va=1/0 f=8`。
+CBAR 写入成功，写回零后仍显示 Stage 1。VA64 已回到零，恢复守卫仍观察到 CBAR 非零。
+守卫提前返回，`diff=0` 是未执行全量比较时的默认值。总线、RSC、XO 和 CX 保持。
+同一快照中八核在线、Data 查询成功、GOP 完成 28 次拷贝和回收。

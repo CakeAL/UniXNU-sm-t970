@@ -86,8 +86,9 @@ v115 从故障守卫中排除 Format，并在回读时核对 VA64、原始 FSR �
 v115 实测 `va64=0/1/0 rb=1 guard=0/0 diff=0`，上游依赖也已恢复。
 v116 直接编译 UniXNU 目录固定的 ArmSmmu4K 源码，使用 XNU 分配的物理连续内存
 建立并走查 GMU/HFI 页表，实机确认 5 张表、42 个映射页和 2,560 个描述符。
-v117 在 CM3 保持复位和翻译关闭时验证 CBAR Stage 1 的写入及恢复，随后才验证
-TTBR 的 64 位访问和页表地址接入。原厂 DT 的 SID5
+v117 实测 CBAR 切换到 Stage 1 后保持 `0x1f300`，写回零未生效。
+VA64 已恢复为零，CBAR 守卫仍触发保留。下一步先验证 Stage 1 残留时的安全撤销边界，
+再验证 TTBR 的 64 位访问和页表地址接入。原厂 DT 的 SID5
 使用 mask `0x400`，发布前须验证实际流 ID 和匹配策略。
 锁定的 Sm8250Platform 冷启动序列会写入固定的 hidden 值，集成时需处理与实测路由的差异。
 见 [v109 实测](../evidence/gpu/rsc-init-v109/device-result.json)、
@@ -98,7 +99,7 @@ TTBR 的 64 位访问和页表地址接入。原厂 DT 的 SID5
 [v114 实测](../evidence/gpu/cbguard-v114/device-result.json)、
 [v115 实测](../evidence/gpu/cbrestore-v115/device-result.json)、
 [v116 页表实测](../evidence/gpu/gmu-tables-v116/device-result.json)、
-[v117 CBAR 探针](../evidence/gpu/cbbar-v117/README.md)、
+[v117 CBAR 实测](../evidence/gpu/cbbar-v117/device-result.json)、
 [lmi RSC 实现](https://github.com/Fsasdddd/lmi-uefi-touch-gpu/blob/0c9398400f937555918a53f1e9a97a90a3345257/tools/lmi-gpu-rsc-init.c)
 和 [SM8250 GMU 实现](https://github.com/FFT-infra/UniXNU-sm8250-common/blob/166235ec2480ff0992627b7aafa15c65ce6b4efa/kits/Sm8250Platform/A650Gmu.c)。
 
