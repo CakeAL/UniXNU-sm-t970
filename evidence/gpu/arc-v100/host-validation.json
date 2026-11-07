@@ -1,0 +1,22 @@
+{
+  "boot_sha256": "1e1b1936adebdc9f1fe1b4407ce54958aeebf7c85f4a7c03790db19d86852a2c",
+  "kernel_build_sha256": "45b84b3bcea295bf15f76055b046c189af4fbef58a57d50e7dd8cd04d4bfa7f6",
+  "tests": {
+    "command": "python3.14 -m unittest discover -s tests",
+    "ran": 71,
+    "skipped": 10,
+    "result": "OK"
+  },
+  "buffer": {
+    "declaration": "char display_state[1280]",
+    "source": "xnu-work bsd/kern/kern_exec.c line 8340",
+    "patch": "patches/xnu/t970-report-buffer.patch",
+    "applied_after": "t970-battery-power.patch"
+  },
+  "markers": [
+    "GPU arc db=",
+    "GPU arc: refused"
+  ],
+  "kernel_args": "unchanged (986 bytes)",
+  "runtime": "uploaded and reboot requested; GPU arc line pending"
+}
