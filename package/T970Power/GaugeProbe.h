@@ -106,8 +106,17 @@ static void applyChargerAction(GaugeSample &sample, const GaugeAction &action,
         bool preserved = !readbackOk || (readback & 0xfc) == (config.cnfg06 & 0xfc);
         if (!acked || !preserved) {
             ok = false;
-            sample.chargeResult = acked ? "kick-corrupt" : "kick-failed";
-            // Leave CHG_EN on: the unkicked watchdog stops charging by itself.
+            if (acked) {
+                // Preserved configuration bits changed: stop charging and let
+                // the next sample re-establish it from a clean read.
+                sample.chargeResult = "kick-corrupt";
+                uint8_t stop = static_cast<uint8_t>(config.cnfg09 & ~0x80u), restore = 0;
+                (void)writeChargerRegister(writer, 0xc0, stop, restore);
+            } else {
+                // Write NACK: leave CHG_EN on; the unkicked watchdog stops
+                // charging by itself and the next sample retries the kick.
+                sample.chargeResult = "kick-failed";
+            }
         } else {
             config.cnfg06 = readbackOk ? readback : config.cnfg06;
             sample.config[3] = config.cnfg06;
