@@ -1,0 +1,18 @@
+{
+  "boot_sha256": "f9df94f349d8bb6859fd6ee7626941de38be3e7333a422e3e0d49b7a0b3bd550",
+  "photo": "screen-runtime.jpg",
+  "photo_sha256": "880a6db424c6edec031e908c7c17b918e95320a75bca1c7ab81b3bbabf2ce8f9",
+  "photo_time_local": "2026-11-07T18:17:23+08:00",
+  "smmu": {
+    "line": "GPU smmu read/ok id=4c017e06/20000005/5511 scr/f=270406/0 sm=0/0/1f3aeaff bus=4221/1:3/3 rsc=ff/ff xo=7 cxr=1",
+    "context_banks": 5,
+    "context_page_bytes": 4096,
+    "nonzero_stream_matches": 0,
+    "cb0": {"cbar": "0x0", "cba2r": "0x0", "sctlr": "0x17cde30a", "actlr": "0x4003c064", "fsr": "0x0", "changed_reads": 0},
+    "cb0_translation_enabled": false
+  },
+  "boot": {"launchd_main": true, "cpus": 8, "processes": 262, "springboard_pid": 27, "backboardd_pid": 57},
+  "storage": {"data_space_rc": 0, "block_size": 4096, "available_blocks": 35189},
+  "display": {"copies": 52, "retired": 52},
+  "input": {"side_key_sample_errors": 0, "side_key_hid": "1/1/0"}
+}

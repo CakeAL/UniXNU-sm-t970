@@ -25,4 +25,6 @@ python3.14 ../UniXNU/scripts/porting-record.py check --device .
 ```
 
 2026-11-07 18:09（中国标准时间），Heimdall 成功上传 BOOT `f9df94f3…` 并请求重启。
-启动后三指按住两秒，采集 `GPU smmu` 和下一行 `CB0`。 [主机验证](host-validation.json) · [上传回执](upload.json)
+实测 ID0/ID1 与 lmi 一致，六个 SMR 全零，CB0 的 CBAR/CBA2R 为 0、SCTLR.M 为 0，
+全局和上下文故障状态为 0，三次 CB0 读数一致。S2CR0 和 CB0 其他寄存器保留非零值。
+同屏八核在线、52 次 GOP 复制和退役。 [实测记录](device-result.json) · [上传回执](upload.json)

@@ -46,7 +46,7 @@ static bool updateGmuRcg(IOMemoryMap &cc, uint32_t cfg, uint32_t &command) {
 }
 
 // lmi mode 26. The caller holds the verified ARC votes, CX and XO clocks.
-static GmuRate pulseGmuRate(IOMemoryMap &gmu, IOMemoryMap &cc, bool readSmmu) {
+static GmuRate pulseGmuRate(IOMemoryMap &gmu, IOMemoryMap &cc, unsigned power) {
     using namespace t970_touch;
     GmuRate result;
     result.state = "gcc-map";
@@ -84,11 +84,11 @@ static GmuRate pulseGmuRate(IOMemoryMap &gmu, IOMemoryMap &cc, bool readSmmu) {
         result.active = read(cc, A650_CC_GMU_RCGR + 4);
         result.state = "xo-hold";
         if (!coldGmu(gmu) || result.active == UINT32_MAX) return result;
-        if (readSmmu && result.active == requested && branchRunning(read(cc, A650_CC_AHB_CLK)) &&
+        if (power >= 9 && result.active == requested && branchRunning(read(cc, A650_CC_AHB_CLK)) &&
             branchRunning(read(cc, A650_CC_CXO_CLK)) && branchRunning(read(cc, A650_CC_CX_GMU_CLK))) {
-            result.smmu = pulseSmmuBus(*gcc);
+            result.smmu = pulseSmmuBus(*gcc, power == 10);
             if (result.smmu.holdParents) {
-                result.state = "bus-hold";
+                result.state = "smmu-hold";
                 return result;
             }
             if (!coldGmu(gmu)) return result;

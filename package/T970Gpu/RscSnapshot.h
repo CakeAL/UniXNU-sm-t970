@@ -127,7 +127,7 @@ static void pulseRscInit(IOMemoryMap &gmu, IOMemoryMap &cc, IOMemoryMap &rscc,
             return;
         }
         if (power >= 8 && result.votes.mx.ack && result.votes.cx.ack) {
-            result.rate = pulseGmuRate(gmu, cc, power == 9);
+            result.rate = pulseGmuRate(gmu, cc, power);
             if (result.rate.holdParents || !rscStillIdle(gmu, rscc, state)) {
                 result.state = "rate-hold";
                 return;
@@ -223,8 +223,16 @@ static void reportRscMode(char *out, unsigned length, const RscSnapshot &rsc, un
                           unsigned xoRestored, bool cxRestored) {
     if (power >= 8 && rsc.votes.mx.ack && rsc.votes.cx.ack && !rsc.votes.holdParents) {
         const GmuRate &rate = rsc.rate;
-        if (power == 9 && strcmp(rate.smmu.state, "skip")) {
+        if (power >= 9 && strcmp(rate.smmu.state, "skip")) {
             const SmmuSnapshot &s = rate.smmu;
+            if (power == 10 && strcmp(s.format, "skip")) {
+                snprintf(out, length,
+                    "\nGPU cbfmt %s/%s va64=%x/%x/%x ctl=%x fsr=%x chg=%u bus=%x/%x rsc=%x/%x xo=%x cxr=%u",
+                    s.format, rate.state, s.va64Before, s.va64Active, s.va64After,
+                    s.cb[2], s.cb[12], s.changed, s.ready, s.restored, rsc.programmed, rsc.restored,
+                    xoRestored, cxRestored ? 1u : 0u);
+                return;
+            }
             const int used = snprintf(out, length,
                 "\nGPU smmu %s/%s id=%x/%x/%x scr/f=%x/%x sm=%u/%u/%x bus=%x/%x:%x/%x rsc=%x/%x xo=%x cxr=%u",
                 s.state, rate.state, s.id0, s.id1, s.id2, s.scr0, s.gfsr,
