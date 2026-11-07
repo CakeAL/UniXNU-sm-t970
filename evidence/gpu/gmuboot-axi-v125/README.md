@@ -16,3 +16,9 @@ python3.14 evidence/display/hello-black-v64/build-kernel.py --cached-headers --s
 python3.14 evidence/gpu/power-v104/prepare.py --gmu-boot-axi
 python3.14 -m unittest discover -s tests
 ```
+
+[镜像清单](preparation.json)和[刷写回执](upload.json)对应 BOOT
+`1cb79accad1624cd468373e8fe3421beb1ce08e8a5f076ed2b908bf40b4e38b6`。
+Heimdall 确认上传并请求重启。首启结果待实机报告。
+[主机验证](host-validation.json)包括时钟与 GMU 首启模型、封包和独立 DTS/ADT 检查。
+完整平台检查停在历史框架版本校验。
