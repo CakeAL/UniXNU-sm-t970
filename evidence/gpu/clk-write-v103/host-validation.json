@@ -1,0 +1,21 @@
+{
+  "boot_sha256": "6b1240530b8b702f1ea1083d1f2adb94f2a9ec59203422932a75946399e6ec80",
+  "kernel_build_sha256": "52157ac620ae629e9c2cd95159c8300d464f59ee9a0b56766ce4679cfde705b7",
+  "tests": {
+    "command": "python3.14 -m unittest discover -s tests",
+    "ran": 73,
+    "skipped": 10,
+    "result": "OK"
+  },
+  "write_scope": "GCC 0x52000 bit16 only; original bit restored after a 10us delay",
+  "kernel_args": {
+    "bytes": 998,
+    "added": "t970-gpu-w=1",
+    "limit": 1000
+  },
+  "markers": [
+    "GPU clk gpl0=",
+    "div=%u back=%x restore=%u"
+  ],
+  "runtime": "uploaded and reboot requested; div/back/restore pending"
+}

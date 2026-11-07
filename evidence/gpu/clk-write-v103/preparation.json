@@ -1,0 +1,37 @@
+{
+  "base_boot_sha256": "f99055795fa586f7d4ee6155503c7210b30c71aed4e5ff27acafb5dc0e3eec4c",
+  "boot_sha256": "6b1240530b8b702f1ea1083d1f2adb94f2a9ec59203422932a75946399e6ec80",
+  "boot_bytes": 71303168,
+  "kernel_sha256": "359b77f5212da709a065b8c8d619661f170f31eee48682542169fb96e77c72a8",
+  "kernel_build_sha256": "52157ac620ae629e9c2cd95159c8300d464f59ee9a0b56766ce4679cfde705b7",
+  "adt_sha256": "ccf520425d90445a5415425f714ba12065daa4b6a70ce1e30b740437d6de85b6",
+  "dram_size": "0x200000000",
+  "data_seed_sha256": "9a0005a5c520412006589e068264b611c3484af123547d13103387a9fb7c0afa",
+  "config_sha256": "f66bda5b3c5d72cbae1f4972e1c3b4a16d9963e9fd9ca22aae23dc0e0cb81b1c",
+  "trust_cache_sha256": "7416ca4f8377146626bb284e2133c76bee6cb4e3ee0af5d648b186235a7323a7",
+  "unchanged_adt_seed_trust": true,
+  "unchanged_config": true,
+  "battery_service": true,
+  "charge_boot_arg": "t970-charge=1",
+  "gpu_arc_read_only": true,
+  "gpu_arc_block": "0x80860000+0x20000",
+  "gpu_arc_resources": [
+    "cx.lvl",
+    "mx.lvl"
+  ],
+  "report_buffer_bytes": 1280,
+  "report_buffer_fix": true,
+  "gpu_clock_read_only": true,
+  "gpu_branch_write": true,
+  "gpu_branch_write_restored": true,
+  "gpu_clock_registers": [
+    "GPLL0_MODE",
+    "GPLL0_L",
+    "GPLL0_ALPHA",
+    "GPLL0_USER",
+    "GPLL0_STATUS",
+    "GPU_BRANCH"
+  ],
+  "unchanged_header_firmware_dtb_tail": true,
+  "uploaded": false
+}
