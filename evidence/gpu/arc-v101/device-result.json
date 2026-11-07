@@ -1,0 +1,61 @@
+{
+  "boot_sha256": "12bf03ae172b38511c3d22ecab4acd2d5adbd13daaad07d8be31f6345fb45b88",
+  "photo": "screen-runtime.jpg",
+  "photo_sha256": "02ed70f0ed832201d2bcc2c6a30d75b92fe9390e491f9ab851076b25ea8cd298",
+  "photo_time_local": "2026-11-07T14:41:46+08:00",
+  "desktop_reached": true,
+  "gpu_arc": {
+    "line": "GPU arc db=1 cx=30000 lv=9 [0,16,64,128,192,256,320,384,416] min=2 mx=30010 lv=9 [0,16,128,192,224,256,320,384,416] min=2",
+    "db_version": 1,
+    "cx": {
+      "address": "0x30000",
+      "levels": [
+        0,
+        16,
+        64,
+        128,
+        192,
+        256,
+        320,
+        384,
+        416
+      ],
+      "min_svs_index": 2,
+      "min_svs_level": 64
+    },
+    "mx": {
+      "address": "0x30010",
+      "levels": [
+        0,
+        16,
+        128,
+        192,
+        224,
+        256,
+        320,
+        384,
+        416
+      ],
+      "min_svs_index": 2,
+      "min_svs_level": 128
+    },
+    "interpretation": "Nine RPMh voltage-corner codes per resource. CX and MX differ at index 2 (64 vs 128) and MX adds 224; the minimum-SVS index is 2 for both. These are corner selectors for ARC votes, not GPU clocks."
+  },
+  "battery": {
+    "line": "Bat present=1 soc100=6489 uV=3947968 uA=-277343 mC=28199 cap=5837/8920 chg=1:5f/e0/31 restore=1 done/none reg=0",
+    "state_of_charge_percent": 64.89,
+    "voltage_uv": 3947968,
+    "current_ua": -277343,
+    "remaining_mah": 5837,
+    "full_mah": 8920,
+    "note": "Current is negative again while CHG_DTLS=1 (v100 showed +17968uA); the gauge sign/magnitude remains inconsistent across samples."
+  },
+  "service": {
+    "line": "Battery svc=1 samples=49 errors=0 published=1 age_ms=1929 charge=kicked",
+    "samples": 49,
+    "errors": 0,
+    "charge": "kicked"
+  },
+  "units_check": "16611*100/256=6489, 50534*78125/1000=3947968, -355*15625*5/100=-277343, 7219*1000/256=28199.",
+  "next": "Map the nine codes to the T970 GPU power levels and CX/MX rail domains, then qualify GPUCC/GDSC before any GMU register access."
+}
