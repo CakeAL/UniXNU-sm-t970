@@ -1080,6 +1080,7 @@ procedure = [
   "Collect DRM modes, panel type and brightness limits; read only display-selection tokens from /proc/cmdline and match the selected S6TUUM3 node in the live DT.",
 ]
 findings = [
+  "The v123 diagnostic display archive links the pinned A650GmuRegions and AdrenoFirmware planner objects and embeds the hash-checked A650 image only when explicitly requested.",
   "The v119 opt-in diagnostic archive adds the pinned ArmSmmu4KMmio object for the GPU TTBR width probe.",
   "The opt-in v116 build routes GPU mode 13 through the startup report and links the five pinned ArmSmmu4K objects in the diagnostic display archive.",
   "GPU report mode 8 replaces the ARC inventory with the GMU rate and restoration report in the terminal buffer.",
@@ -1402,6 +1403,7 @@ procedure = [
   "Read KGSL identity and frequency nodes, list GPU firmware files and calculate the GMU/SQE hashes without executing GPU commands.",
 ]
 findings = [
+  "v122 BOOT1c7ea2fe confirmed SMR0 and S2CR0 publish and revoke for the stock GMU masked match with CM3 in reset. v123 validates the exact stock firmware hash and stages its seven payload blocks with the pinned A650GmuRegions and AdrenoFirmwarePlanGmu.",
   "v121 BOOTe99b0cf6 verified SCTLR a7/a6 and two local TLB synchronizations. v122 reads the inherited fault-on-unmatched policy and tests the stock GMU kernel masked match and S2CR rollback with CM3 in reset.",
   "v120 BOOTe6d8b426 verified installation and rollback of all six context registers, with a 42-leaf walk rooted in hardware TTBR0. v121 qualifies local TLB synchronization and SCTLR.M activation and withdrawal while all SMRs remain empty and CM3 remains in reset.",
   "v119 BOOT9e07061d verified real 64-bit reads, ASID writes and restores on TTBR0 and TTBR1. v120 installs and audits an XNU-owned root with SCTLR.M clear and no streams, and retains backing on uncertain rollback.",
@@ -1438,9 +1440,10 @@ limits = [
   "No GMU bring-up, command submission, DMA/SMMU ownership or Metal rendering was tested under UniXNU.",
 ]
 next_action = [
-  "Capture v122 GPU sid5. After masked stream publication and rollback pass, qualify the stock A650 firmware image, real GMU DMA and HFI startup using Sm8250Platform and AdrenoFirmware, then proceed to bounded CP submission.",
+  "Capture v123 GPU fw. After the firmware load and rollback pass, qualify GMU release and FW_INIT with the verified SID5 mapping, inherited RSC route and correct HFI layout before bounded CP submission.",
 ]
 evidence = [
+  { kind = "device", reference = "evidence/gpu/sid5-v122/device-result.json", revision = "d8288efb095608706f155af10c5210c48915e8fa", command = "BOOT1c7ea2fe and owner three-finger report screenshot", result = "SMR0 84000005 to 0, S2CR0 1c38eb00 to 1f3aeaff, SCR0 270406, both TLB syncs and all restores passed. Eight CPUs, RAM Data query success and 19 GOP copies and retirements." },
   { kind = "host", reference = "evidence/gpu/sid5-v122/host-validation.json", revision = "d8288efb095608706f155af10c5210c48915e8fa", command = "python3.14 -m unittest discover -s tests and evidence/gpu/power-v104/prepare.py --sid5", result = "Sanitized masked-route model, prelink, FAT readback, image symbols and separate DTS/ADT check passed." },
   { kind = "device", reference = "evidence/gpu/sid5-v122/upload.json", revision = "d8288efb095608706f155af10c5210c48915e8fa", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/gpu-sid5-v122/boot-partition.img", result = "BOOT1c7ea2fe transfer succeeded and requested reboot. Masked GMU route result pending." },
   { kind = "device", reference = "evidence/gpu/cbactivate-v121/device-result.json", revision = "29eb342996385a077d1f84a299352c5068580433", command = "BOOTe99b0cf6 and owner three-finger report screenshot", result = "tlb=3/2, SCTLR a7/a6, cfg/rb=3f/3f, backing and parents released. Eight CPUs, RAM Data query success and 15 GOP copies and retirements." },
@@ -1612,6 +1615,7 @@ procedure = [
   "Read selected power-supply attributes, available sleep states and thermal-zone names; do not write charging, regulator or suspend controls.",
 ]
 findings = [
+  "The optional v123 GMU firmware probe runs under the existing verified power and clock sequence and restores TCM retention before the normal dependency release.",
   "The v116 diagnostic archive keeps the existing power paths and adds a separate mode 13 software table walk that issues no GPU rail or clock votes.",
   "v104 keeps the established battery and charger arguments while sampling GPU power handoff through GCC and qualified GPUCC reads.",
   "v98 BOOT749b7419 fixes the false kick failure: WDTCLR is self-clearing, so bits1:0 read back zero after a successful kick. The action now verifies only the preserved CNFG_06 bits7:2; a write NACK leaves CHG_EN on (the unkicked watchdog stops charging by itself) and a preserved-bit change clears CHG_EN. On BOOT749b7419 the kick fix holds: charge=kicked, CNFG_09 stays 0xbb, CHG_DTLS=1 with CHG_OK set, and the charger reports charging over 47 samples with zero errors. The gauge current remains negative (-215625uA) while SOC/capacity/voltage drift upward, so the gauge current sign is not yet reconciled with the charger state and Amperage is not yet suitable for time estimates. The later v100 photo shows +17968uA with CHG_DTLS=1, but v101 is -277343uA at the same charger state, so the gauge current sign is not a reliable indicator yet and Amperage stays out of time estimates.",
@@ -1760,6 +1764,7 @@ procedure = [
   "Read BuildManifest.plist from the local IPSW using Python zipfile and plistlib to identify its OS version, build and product types.",
 ]
 findings = [
+  "v123 validates exact v122 BOOT and stages the opted-in kernel with a hash-matched A650 GMU firmware input. The packer verifies the retained ADT, Data seed, trust cache and bytes outside FAT.",
   "v122 validates exact v121 BOOT and changes the FAT kernel and diagnostic mode. ADT, Data seed, trust cache and bytes outside FAT are verified.",
   "v121 validates exact v120 BOOT and changes the FAT kernel and opt-in GPU mode. It verifies ADT, Data seed, trust cache and bytes outside FAT.",
   "v120 validates exact v119 BOOT and changes the FAT kernel and opt-in GPU mode. The packer verifies ADT, Data seed, trust cache and bytes outside FAT.",
@@ -2060,6 +2065,7 @@ procedure = [
   "Run python3 scripts/collect-adb-inventory.py --root --output evidence/<new-capture>; review per-command stderr, checksums, GPT CRC results and DT sanitization before updating this record.",
 ]
 findings = [
+  "The v123 startup report shows TCM and RAM bytes, readback and restoration mismatches, and the staged DTCM version.",
   "v119 reports TTBR0 and TTBR1 native read, ASID write and rollback masks through the three-finger startup report.",
   "The v116 three-finger report includes a bounded GMU table-walk result with allocator, backing, build, bind, encode and audit failure labels.",
   "Mode 8 records inherited, active and restored RCG and DIV_GATE values. The GPLL0 calculation is shared with the existing read-only clock report.",

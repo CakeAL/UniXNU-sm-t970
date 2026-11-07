@@ -27,4 +27,7 @@ FAT 回读、Mach-O 符号范围和独立 DTS/ADT 检查。完整平台检查停
 
 [镜像清单](preparation.json)与[刷写回执](upload.json)对应 BOOT
 `1c7ea2fe56a3f61945340c5e1879a8af781b5390106db882904a3812f497838d`。
-Heimdall 确认上传成功并请求重启。实机读数待采集。
+Heimdall 确认上传成功并请求重启。
+
+[实机报告](device-result.json)显示 `smr=84000005/0 s2=1c38eb00/1f3aeaff tlb=3 held=0`。
+上下文、路由、页表和上游依赖完成撤销。八核在线，Data 查询成功，GOP 完成 19 次拷贝和回收。

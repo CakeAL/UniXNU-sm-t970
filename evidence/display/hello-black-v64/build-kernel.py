@@ -35,6 +35,7 @@ def main():
     parser.add_argument('--keys', action='store_true', help='Link the opt-in T970 PMIC key observer')
     parser.add_argument('--gpu-soc', type=Path, help='Pinned SM8250 checkout for the GPU power snapshot')
     parser.add_argument('--arm-smmu4k', type=Path, help='ArmSmmu4K Git repository for the GMU table probe')
+    parser.add_argument('--gmu-firmware', type=Path, help='a650_gmu.bin matching the T970 firmware inventory')
     parser.add_argument('--refresh-hid', action='store_true', help='Recompile the audited HID wrapper with the setup baseline')
     parser.add_argument('--gop-fork', action='store_true',
                         help='Link the audited GopFramebuffer fork object (scanout and source cache options)')
@@ -46,6 +47,8 @@ def main():
         parser.error('--refresh-hid requires --setup-probe or --touch-hid')
     if args.arm_smmu4k and not args.gpu_soc:
         parser.error('--arm-smmu4k requires --gpu-soc')
+    if args.gmu_firmware and not args.arm_smmu4k:
+        parser.error('--gmu-firmware requires --arm-smmu4k')
     build = args.output.resolve()
     kernel = WORK / 'kernel/kernel.macho'
     if sha(kernel) != BASE_KERNEL_SHA or sha(LIVE / ARCHIVE) != BASE_ARCHIVE_SHA:
@@ -79,6 +82,8 @@ def main():
         registration_command.extend(['--gpu-soc', str(args.gpu_soc)])
     if args.arm_smmu4k:
         registration_command.extend(['--arm-smmu4k', str(args.arm_smmu4k)])
+    if args.gmu_firmware:
+        registration_command.extend(['--gmu-firmware', str(args.gmu_firmware)])
     subprocess.run(registration_command, check=True)
     replacement = registration / MEMBER
     source = DEVICE / 'package/T970Display/DisplayRegistration.cpp'
@@ -108,14 +113,17 @@ def main():
     if any(members.count(member) != 1 for member in replacements):
         raise ValueError('Expected unique archive members to replace')
     additions = {}
-    if args.arm_smmu4k:
-        smmu = json.loads((registration / 'report.json').read_text())['arm_smmu4k']
-        additions = {name: registration / 'ArmSmmu4K' / name for name in smmu['objects']}
-        if additions.keys() & set(members) or any(
-            sha(path) != smmu['objects'][name] for name, path in additions.items()
-        ):
-            raise ValueError('Unexpected ArmSmmu4K archive members')
-        report['arm_smmu4k'] = smmu
+    registration_report = json.loads((registration / 'report.json').read_text())
+    for key, kit in (('arm_smmu4k', 'ArmSmmu4K'), ('adreno_firmware', 'AdrenoFirmware')):
+        if key not in registration_report:
+            continue
+        component = registration_report[key]
+        for name, digest in component['objects'].items():
+            path = registration / kit / name
+            if name in members or name in additions or sha(path) != digest:
+                raise ValueError(f'Unexpected {kit} archive member {name}')
+            additions[name] = path
+        report[key] = component
     updated = replacements | additions
     ar('-r', archive, *(str(path) for path in updated.values()))
     after = ar('-t', archive).decode().splitlines()

@@ -6,6 +6,7 @@
 #include "ArmSmmu4KMmio.h"
 #include "GmuTables.h"
 #endif
+#include "GmuFirmware.h"
 
 class IOBufferMemoryDescriptor;
 
@@ -19,6 +20,7 @@ constexpr unsigned cbTtbrMode = 16;
 constexpr unsigned cbRootMode = 17;
 constexpr unsigned cbActivateMode = 18;
 constexpr unsigned cbSid5Mode = 19;
+constexpr unsigned cbFirmwareMode = 20;
 constexpr uint32_t cbBarStage1 = 0x1f300;
 // Arm IHI 0062D.c: FSR[10:9] describes the translation table format.
 constexpr uint32_t cbFsrFormatMask = 0x600;
@@ -66,6 +68,7 @@ struct SmmuSnapshot {
     uint32_t ctlOn = 0, ctlOff = 0;
     const char *sid5State = "skip";
     uint32_t sid5Smr = 0, sid5S2cr = 0, sid5SmrAfter = 0, sid5S2crAfter = 0;
+    GmuFirmwareProbe firmware;
 };
 
 constexpr unsigned cbOffsets[] = {
@@ -357,6 +360,9 @@ static bool pulseCbRoot(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &resul
     for (unsigned i = 0; i < fieldCount; ++i) {
         if (!readField(i, saved[i])) return true;
     }
+#ifdef T970_GPU_GMU_FIRMWARE
+    if (power == cbFirmwareMode && !stageGmuFirmware(gmu, tables, result.firmware)) return false;
+#endif
 
     // SM8250 cache lines are 64 bytes. Publish the backing at PoC before TTBR0.
     const auto start = reinterpret_cast<uintptr_t>(tables.tables);
@@ -396,7 +402,7 @@ static bool pulseCbRoot(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &resul
     const bool installed = result.rootInstalled == fullMask;
     const bool audited = installed && auditGmuTables(tables, observed[firstTtbr]);
     if (audited) result.rootLeaves = static_cast<unsigned>(tables.audit.leaf_pages);
-    if (audited && power >= cbActivateMode &&
+    if (audited && (power == cbActivateMode || power == cbSid5Mode) &&
         !pulseCbActivation(smmu, gmu, result, routes, tables.image, before.sctlr, power == cbSid5Mode))
         return false;
 

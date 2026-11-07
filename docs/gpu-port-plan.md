@@ -100,8 +100,9 @@ v117 实测 CBAR 切换到 Stage 1 后保持 `0x1f300`，写回零未生效。
 VA64 已恢复为零，CBAR 守卫仍触发保留。v118 实机确认 Stage 1 精确保持、其余状态
 连续两次匹配，随后释放了上游依赖。v119 实机确认两个 TTBR 的 64 位读、写和恢复。
 v120 实机确认翻译关闭时可以安装、走查并撤销 XNU 页表。v121 实机确认在 CM3 复位、无流时
-可以完成两次本地 TLB 同步和 CB0 启停。v122 按原厂 DT 的 SID5/mask `0x400` 验证
-SMR0 与 S2CR0 的发布及撤销，之后再验证 GMU 真实 DMA 和 HFI。
+可以完成两次本地 TLB 同步和 CB0 启停。v122 实机确认原厂 DT 的 SID5/mask `0x400`
+可发布至 CB0 并撤销。v123 用固定的 A650 固件验证 ITCM/DTCM 与 RAM 装载。
+CM3 启动阶段需保留 T970 的 RSC 路由，且核对 A650 的 HFI 队列布局。
 锁定的 Sm8250Platform 冷启动序列会写入固定的 hidden 值，集成时需处理与实测路由的差异。
 见 [v109 实测](../evidence/gpu/rsc-init-v109/device-result.json)、
 [v110 实测](../evidence/gpu/arc-vote-v110/device-result.json)、
@@ -116,7 +117,8 @@ SMR0 与 S2CR0 的发布及撤销，之后再验证 GMU 真实 DMA 和 HFI。
 [v119 TTBR 实测](../evidence/gpu/ttbrwidth-v119/device-result.json)、
 [v120 页表接入实测](../evidence/gpu/cbroot-v120/device-result.json)、
 [v121 启停实测](../evidence/gpu/cbactivate-v121/device-result.json)、
-[v122 SID5 探针](../evidence/gpu/sid5-v122/README.md)、
+[v122 SID5 实测](../evidence/gpu/sid5-v122/device-result.json)、
+[v123 固件装载探针](../evidence/gpu/gmufw-v123/README.md)、
 [lmi RSC 实现](https://github.com/Fsasdddd/lmi-uefi-touch-gpu/blob/0c9398400f937555918a53f1e9a97a90a3345257/tools/lmi-gpu-rsc-init.c)
 和 [SM8250 GMU 实现](https://github.com/FFT-infra/UniXNU-sm8250-common/blob/166235ec2480ff0992627b7aafa15c65ce6b4efa/kits/Sm8250Platform/A650Gmu.c)。
 

@@ -225,6 +225,15 @@ static void reportRscMode(char *out, unsigned length, const RscSnapshot &rsc, un
         const GmuRate &rate = rsc.rate;
         if (power >= 9 && strcmp(rate.smmu.state, "skip")) {
             const SmmuSnapshot &s = rate.smmu;
+            if (power == cbFirmwareMode) {
+                const auto &f = s.firmware;
+                snprintf(out, length,
+                    "\nGPU fw %s/%s/%s tcm/ram=%u/%u bad/rb=%u/%u ver=%x cfg=%x/%x bus=%x/%x rsc=%x/%x xo=%x cxr=%u",
+                    f.state, s.rootState, rate.state, f.tcmBytes, f.ramBytes, f.mismatches, f.restoreMismatches,
+                    f.version, s.rootInstalled, s.rootRestored, s.ready, s.restored, rsc.programmed, rsc.restored,
+                    xoRestored, cxRestored ? 1u : 0u);
+                return;
+            }
             if (power == cbSid5Mode) {
                 snprintf(out, length,
                     "\nGPU sid5 %s/%s/%s smr=%x/%x s2=%x/%x scr=%x tlb=%x held=%u bus=%x/%x rsc=%x/%x xo=%x cxr=%u n=%u",

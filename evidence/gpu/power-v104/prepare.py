@@ -49,8 +49,15 @@ def main():
     variants.add_argument('--cb-root', action='store_true', help='Pack v120 from the tested v119 BOOT')
     variants.add_argument('--cb-activate', action='store_true', help='Pack v121 from the tested v120 BOOT')
     variants.add_argument('--sid5', action='store_true', help='Pack v122 from the tested v121 BOOT')
+    variants.add_argument('--gmu-firmware', action='store_true', help='Pack v123 from the tested v122 BOOT')
     options = parser.parse_args()
-    if options.sid5:
+    if options.gmu_firmware:
+        baseline = 'gpu-sid5-v122'
+        base_sha = '1c7ea2fe56a3f61945340c5e1879a8af781b5390106db882904a3812f497838d'
+        output = OUT / 'gpu-gmufw-v123'
+        old, new = b't970-gpu-p=19', b't970-gpu-p=20'
+        markers = (b'GPU fw %s/%s/%s tcm/ram=', b'tcm-hold')
+    elif options.sid5:
         baseline = 'gpu-cbactivate-v121'
         base_sha = 'e99b0cf69823f9320f2196ef9d71580c00a2fc023c9a273ad99526c8d3b8447d'
         output = OUT / 'gpu-sid5-v122'
