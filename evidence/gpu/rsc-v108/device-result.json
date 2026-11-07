@@ -1,0 +1,34 @@
+{
+  "boot_sha256": "25f846a61e86269dc42d97ba863de8bf13ef983dd488e66e56060c29301067ec",
+  "photo": "screen-runtime.jpg",
+  "photo_sha256": "c920d2401d1503d4a570236b870e3d441fc9ed43c8549ba5c588b01ae40f0e1f",
+  "photo_time_local": "2026-11-07T16:08:23+08:00",
+  "image_binding": "v108 BOOT upload and matching RSC/PDC report in the owner screenshot",
+  "rsc": {
+    "status_line": "GPU rsc read cfg/st/busy=4000000a/0/0 g=0 irq=0/0 idle=3ff xo=7/7 cx=1/1",
+    "tables_line": "RSC hidden=82204514/0/82204510/0/82204520/0 route=1/0/4520/4510/4514 seq=0/0/0/0/0 pdc=0/100",
+    "idle_slots": 10,
+    "xo_and_cx_restored": true,
+    "cold_tables_match_lmi_mode24": true
+  },
+  "boot": {
+    "launchd_main": true,
+    "cpus": 8,
+    "processes": 256,
+    "springboard_pid": 27,
+    "backboardd_pid": 57
+  },
+  "storage": {
+    "data_space_rc": 0,
+    "block_size": 4096,
+    "available_blocks": 34463
+  },
+  "display": {
+    "copies": 37,
+    "retired": 37
+  },
+  "input": {
+    "side_key_sample_errors": 0,
+    "side_key_hid": "1/1/0"
+  }
+}

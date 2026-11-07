@@ -23,4 +23,6 @@ python3.14 ../UniXNU/scripts/porting-record.py check --device .
 
 2026-11-07 16:01（中国标准时间），Heimdall 成功上传 BOOT `25f846a6…` 并请求重启。
 详见 [打包记录](preparation.json)、[主机验证](host-validation.json)和 [上传回执](upload.json)。
-启动后三指按住两秒，采集 `GPU rsc` 和下一行 `RSC hidden`。
+机主截图显示 `cfg/st/busy=4000000a/0/0 g=0 irq=0/0 idle=3ff xo=7/7 cx=1/1`。
+hidden 命令、路由、空序列 SRAM 和 PDC `0/100` 都与 lmi mode 24 的写前条件一致。
+同屏八核在线、37 次 GOP 复制和退役。 [实测字段和截图哈希](device-result.json)

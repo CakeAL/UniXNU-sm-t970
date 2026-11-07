@@ -70,14 +70,15 @@ v106 实测 `rcg=80000000/1 br=1/1/4221 mask=7/7 cx=1/1`，AHB、CXO、CX GMU
 [v106 实测](../evidence/gpu/xo-v106/device-result.json)。
 
 v107 实测 GMU 可读，CM3 仍在 reset、FW_INIT=0，AO 从 `0x1440` 推进到
-`0x6b66`，XO 与 CX 恢复。v108 读取 RSC/PDC 冷态，核对 DRV0 配置、十个 TCS
-的空闲状态，以及继承的 hidden 命令、路由和序列值。
+`0x6b66`，XO 与 CX 恢复。v108 实测 DRV0 `4000000a`、十个 TCS 空闲，hidden
+命令、路由、空序列 SRAM 和 PDC `0/100` 均匹配 lmi mode 24 的冷态。
 见 [v107 实测](../evidence/gpu/gmu-v107/device-result.json)和
-[v108 方案](../evidence/gpu/rsc-v108/README.md)。
+[v108 实测](../evidence/gpu/rsc-v108/device-result.json)。
 
-RSC 对照需要先读本机的 DRV0 配置、TCS 空闲状态和 hidden 命令。lmi 的独立投票实验
-保留继承的 hidden 命令，锁定的 Sm8250Platform 冷启动序列则会写入固定值。以 T970
-实测决定后续初始化值，GMU/HFI 阶段复用共享实现。见
+v109 采用 lmi 的独立初始化顺序，保留继承的 hidden 命令，验证 SDE、五个 RSC SRAM 字
+与 PDC start/enable 的写入和恢复。通过后再用 GPU DRV0 TCS 验证 MX、CX 最低档位投票，
+然后接入 GMU 200 MHz 和固件/HFI。锁定的 Sm8250Platform 冷启动序列会写入固定的 hidden 值，
+集成时需处理与实测路由的差异。见 [v109 方案](../evidence/gpu/rsc-init-v109/README.md)、
 [lmi RSC 实现](https://github.com/Fsasdddd/lmi-uefi-touch-gpu/blob/0c9398400f937555918a53f1e9a97a90a3345257/tools/lmi-gpu-rsc-init.c)
 和 [SM8250 GMU 实现](https://github.com/FFT-infra/UniXNU-sm8250-common/blob/166235ec2480ff0992627b7aafa15c65ce6b4efa/kits/Sm8250Platform/A650Gmu.c)。
 

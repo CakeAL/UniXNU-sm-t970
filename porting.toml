@@ -1398,6 +1398,7 @@ procedure = [
   "Read KGSL identity and frequency nodes, list GPU firmware files and calculate the GMU/SQE hashes without executing GPU commands.",
 ]
 findings = [
+  "v108 BOOT25f846a6 confirms DRV0 config 4000000a, ten idle TCS slots, lmi-matching inherited hidden commands and route, zeroed sequence SRAM and PDC 0/100. v109 applies the lmi mode 24 SDE/SRAM/PDC subset under the exact cold-state guard and verifies reverse restoration.",
   "v107 BOOT5354324f shows GMU reset=1 fw=0 ao=1440/6b66 xo=7/7 cx=1/1. The AO counter advanced by 22310 while CM3 remained held. v108 adds a read-only GPU DRV0/TCS and PDC census under that clock and reset state, before any sequencer or vote programming.",
   "v106 BOOTd0a4c191 reports rcg=80000000/1 br=1/1/4221 mask=7/7 cx=1/1. The AHB, CXO and CX GMU branches ran on the inherited XO route, and all votes were restored. v107 rechecks CX and all three branches before a read-only GMU mapping, then samples CM3 reset, FW_INIT and the AO counter in that order.",
   "v105 BOOT4ae3bcd1 confirms the CX pulse: 222001/5ff4 -> f8222000/80001fe0 -> 222001/5ff4, ack=1 restore=1. v106 qualifies the inherited XO source and tests the AHB, CXO and CX GMU branch enables while CX is on. It restores branch votes in reverse order and retains parents when a child vote cannot be restored.",
@@ -1419,9 +1420,10 @@ limits = [
   "No GMU bring-up, command submission, DMA/SMMU ownership or Metal rendering was tested under UniXNU.",
 ]
 next_action = [
-  "Capture the v108 GPU rsc and RSC hidden lines. Compare DRV0, idle TCS, inherited hidden commands, RSC SRAM and PDC state against lmi before staging sequence/PDC initialization and ARC votes.",
+  "Capture the v109 GPU init line. With wr=ff restore=ff xo=7/7 cx=1/1, stage GPU DRV0 TCS votes for the T970 command-DB MX/CX levels while the verified sequence and PDC state are held.",
 ]
 evidence = [
+  { kind = "device", reference = "evidence/gpu/rsc-v108/device-result.json", revision = "e21ab3fe563c905362468a4616d68af2b079c91f", command = "BOOT25f846a6; owner three-finger report screenshot 2026-11-07T16:08:23+08:00", result = "DRV0=4000000a idle=3ff, lmi cold route/hidden and PDC values match, XO/CX restore; eight CPUs and 37 GOP copies and retirements." },
   { kind = "host", reference = "evidence/gpu/rsc-v108/host-validation.json", revision = "e21ab3fe563c905362468a4616d68af2b079c91f", command = "python3.14 -m unittest discover -s tests; evidence/gpu/power-v104/prepare.py --rsc-read", result = "73 tests ran, 10 skipped, OK. Sanitized RSC guard model, prelink, FAT readback and separate DTS/ADT check passed." },
   { kind = "device", reference = "evidence/gpu/rsc-v108/upload.json", revision = "e21ab3fe563c905362468a4616d68af2b079c91f", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/gpu-rsc-v108/boot-partition.img", result = "BOOT25f846a6 upload succeeded and requested reboot. DRV0/TCS and PDC cold-state values await the device report." },
   { kind = "device", reference = "evidence/gpu/gmu-v107/device-result.json", revision = "f0e0fdee576ca67bbd2068161d449d7fb73e739d", command = "BOOT5354324f; owner three-finger report screenshot 2026-11-07T15:56:33+08:00", result = "CM3 reset=1, FW_INIT=0, AO counter advances 22310 and XO/CX restore. Eight CPUs, Data query rc=0 and 29 GOP copies and retirements." },
@@ -1698,6 +1700,7 @@ procedure = [
   "Read BuildManifest.plist from the local IPSW using Python zipfile and plistlib to identify its OS version, build and product types.",
 ]
 findings = [
+  "v109 validates exact v108 BOOT and replaces the kernel and GPU diagnostic mode in FAT. The ADT, Data seed, trust cache and bytes outside FAT are preserved.",
   "The v108 packer validates exact v107 BOOT and replaces the kernel and t970-gpu-p value in FAT. ADT, Data seed, trust cache and bytes outside FAT are preserved.",
   "The v107 packer validates the tested v106 BOOT, then swaps only the kernel and GPU diagnostic mode in FAT. The ADT, Data seed, trust cache and bytes outside FAT are preserved.",
   "The v106 package validates exact v105 BOOT and changes the kernel plus t970-gpu-p=3 in FAT, preserving ADT, Data, trust cache and the bytes outside FAT.",

@@ -13,55 +13,141 @@ struct RscSnapshot {
     uint32_t hidden[6] = {}, route[5] = {}, seq[5] = {};
     uint32_t pdcStart = 0, pdcEnable = 0;
     bool tablesRead = false;
+    unsigned programmed = 0, restored = 0;
+    bool holdParents = false;
 };
 
-// The caller holds CX and all three XO clock branches with CM3 in reset.
-static RscSnapshot sampleRsc(IOMemoryMap &gmu) {
+static uint32_t gmuRscActivity(IOMemoryMap &gmu) {
     using namespace t970_touch;
-    RscSnapshot result;
     // RPMH_CTRL, RSCC_CONTROL_REQ and RSCC_CONTROL_ACK in the GMU window.
-    result.gmuBusy = read(gmu, 0x143a0) | read(gmu, 0x24c1c) | read(gmu, 0x24c20);
-    if (result.gmuBusy) {
-        result.state = "gmu-busy";
-        return result;
-    }
-    auto rscc = mapMmio(A650_GPU_BASE_RSCC, 0x10000, kIOMapReadOnly);
-    if (!rscc || !rscc->getVirtualAddress()) {
-        result.state = "rscc-map";
-        return result;
-    }
-    result.config = read(*rscc, 0xc);
-    result.status = read(*rscc, 0x10);
-    result.busy = read(*rscc, 0x404);
+    return read(gmu, 0x143a0) | read(gmu, 0x24c1c) | read(gmu, 0x24c20);
+}
+
+static bool readRscIdle(IOMemoryMap &rscc, RscSnapshot &result) {
+    using namespace t970_touch;
+    result.config = read(rscc, 0xc);
+    result.status = read(rscc, 0x10);
+    result.busy = read(rscc, 0x404);
     if (result.config != 0x4000000a) {
         result.state = "layout";
-        return result;
+        return false;
     }
 
     // lmi DRV0 has ten slots of eight commands. Inspect the same status,
     // control, wait and enable registers without reading or issuing commands.
-    result.irqEnable = read(*rscc, 0xd00);
-    result.irqStatus = read(*rscc, 0xd04);
+    result.irqEnable = read(rscc, 0xd00);
+    result.irqStatus = read(rscc, 0xd04);
+    result.idle = 0;
     for (unsigned slot = 0; slot < 10; ++slot) {
         const unsigned base = 0xd00 + slot * 0x2a0;
-        const uint32_t pending = read(*rscc, base + 0x10) |
-                                 read(*rscc, base + 0x14) | read(*rscc, base + 0x1c);
-        if (read(*rscc, base + 0x18) == 1 && !pending) result.idle |= 1u << slot;
+        const uint32_t pending = read(rscc, base + 0x10) |
+                                 read(rscc, base + 0x14) | read(rscc, base + 0x1c);
+        if (read(rscc, base + 0x18) == 1 && !pending) result.idle |= 1u << slot;
     }
     if ((result.status & 0x10000) || result.busy || result.irqStatus || result.idle != 0x3ff) {
         result.state = "busy";
-        return result;
+        return false;
     }
+    return true;
+}
+
+static void readRscTables(IOMemoryMap &rscc, RscSnapshot &result) {
+    using namespace t970_touch;
     constexpr unsigned routing[] = {0x2c, 0x400, 0x20, 0x24, 0x28};
-    for (unsigned i = 0; i < 6; ++i) result.hidden[i] = read(*rscc, 0x34 + i * 4);
+    for (unsigned i = 0; i < 6; ++i) result.hidden[i] = read(rscc, 0x34 + i * 4);
     for (unsigned i = 0; i < 5; ++i) {
-        result.route[i] = read(*rscc, routing[i]);
-        result.seq[i] = read(*rscc, 0x600 + i * 4);
+        result.route[i] = read(rscc, routing[i]);
+        result.seq[i] = read(rscc, 0x600 + i * 4);
     }
     result.tablesRead = true;
+}
 
+static bool rscCold(const RscSnapshot &state) {
+    constexpr uint32_t hidden[] = {0x82204514, 0, 0x82204510, 0, 0x82204520, 0};
+    constexpr uint32_t route[] = {1, 0, 0x4520, 0x4510, 0x4514};
+    constexpr uint32_t empty[5] = {};
+    return !state.status && !state.irqEnable && state.pdcStart == 0 && state.pdcEnable == 0x100 &&
+           !memcmp(state.hidden, hidden, sizeof(hidden)) && !memcmp(state.route, route, sizeof(route)) &&
+           !memcmp(state.seq, empty, sizeof(empty));
+}
+
+static bool rscStillIdle(IOMemoryMap &gmu, IOMemoryMap &rscc, RscSnapshot &state) {
+    using namespace t970_touch;
+    return read(gmu, 0x14000) == 1 && !read(gmu, 0x14070) && !gmuRscActivity(gmu) &&
+           readRscIdle(rscc, state) && !state.irqEnable;
+}
+
+static void pulseRscInit(IOMemoryMap &gmu, IOMemoryMap &rscc, IOMemoryMap &pdc, RscSnapshot &result) {
+    using namespace t970_touch;
+    RscSnapshot state;
+    if (!rscCold(result) || !rscStillIdle(gmu, rscc, state) || state.status) {
+        result.state = "refuse";
+        return;
+    }
+
+    // lmi mode 24, A650 pdc_in_aop. Preserve the inherited hidden commands.
+    const struct { IOMemoryMap &bank; unsigned offset; uint32_t before, requested; } writes[] = {
+        {rscc, 0x10, 0, 0x01000000},
+        {rscc, 0x600, 0, 0xeaaae5a0}, {rscc, 0x604, 0, 0xe1a1ebab}, {rscc, 0x608, 0, 0xa2e0a581},
+        {rscc, 0x60c, 0, 0xecac82e2}, {rscc, 0x610, 0, 0x0020edad},
+        {pdc, 0x4520, 0, 0}, {pdc, 0x4500, 0x100, 0x80000001},
+    };
+    unsigned attempted = 0;
+    for (const auto &op : writes) {
+        const unsigned bit = 1u << attempted++;
+        write(op.bank, op.offset, op.requested);
+        if (read(op.bank, op.offset) != op.requested) break;
+        result.programmed |= bit;
+    }
+
+    result.holdParents = true;
+    if (!rscStillIdle(gmu, rscc, state)) {
+        result.state = "busy-hold";
+        return;
+    }
+    for (unsigned i = attempted; i-- > 0;) {
+        const auto &op = writes[i];
+        write(op.bank, op.offset, op.before);
+        if (read(op.bank, op.offset) != op.before) {
+            result.state = "restore-hold";
+            return;
+        }
+        result.restored |= 1u << i;
+    }
+    if (!rscStillIdle(gmu, rscc, state)) {
+        result.state = "busy-hold";
+        return;
+    }
+    readRscTables(rscc, state);
+    state.pdcStart = read(pdc, 0x4520);
+    state.pdcEnable = read(pdc, 0x4500);
+    if (!rscCold(state)) {
+        result.state = "restore-hold";
+        return;
+    }
+    result.holdParents = false;
+    result.state = result.programmed == 0xff ? "ok" : "rollback";
+}
+
+// The caller holds CX and all three XO clock branches with CM3 in reset.
+static RscSnapshot sampleRsc(IOMemoryMap &gmu, bool init) {
+    using namespace t970_touch;
+    RscSnapshot result;
+    result.gmuBusy = gmuRscActivity(gmu);
+    if (result.gmuBusy) {
+        result.state = "gmu-busy";
+        return result;
+    }
+    const IOOptionBits options = init ? 0 : kIOMapReadOnly;
+    auto rscc = mapMmio(A650_GPU_BASE_RSCC, 0x10000, options);
+    if (!rscc || !rscc->getVirtualAddress()) {
+        result.state = "rscc-map";
+        return result;
+    }
+    if (!readRscIdle(*rscc, result)) return result;
+    readRscTables(*rscc, result);
     // T970 stock kgsl_gmu_pdc_cfg. The PDC sequencer is a separate resource.
-    auto pdc = mapMmio(0x0b290000, 0x10000, kIOMapReadOnly);
+    auto pdc = mapMmio(0x0b290000, 0x10000, options);
     if (!pdc || !pdc->getVirtualAddress()) {
         result.state = "pdc-map";
         return result;
@@ -69,7 +155,15 @@ static RscSnapshot sampleRsc(IOMemoryMap &gmu) {
     result.pdcStart = read(*pdc, 0x4520);
     result.pdcEnable = read(*pdc, 0x4500);
     result.state = "read";
+    if (init) pulseRscInit(gmu, *rscc, *pdc, result);
     return result;
+}
+
+static void reportRscInit(char *out, unsigned length, const RscSnapshot &rsc,
+                          unsigned xoRestored, bool cxRestored) {
+    snprintf(out, length,
+        "\nGPU init %s cfg=%x idle=%x wr=%x restore=%x xo=7/%x cx=1/%u",
+        rsc.state, rsc.config, rsc.idle, rsc.programmed, rsc.restored, xoRestored, cxRestored ? 1u : 0u);
 }
 
 static void reportRsc(char *out, unsigned length, const RscSnapshot &rsc, bool restored) {
