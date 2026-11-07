@@ -1,0 +1,71 @@
+{
+  "boot_sha256": "01e85687885b0a07d3f34442d132d89107e0203b976e95381a93df5358512d3b",
+  "photo": "screen-runtime.jpg",
+  "photo_sha256": "087948d4af7f822ee1d1f61645680a8398962ef7748d4cdf579ea67aca58ae1b",
+  "photo_time_local": "2026-11-07T13:32:48+08:00",
+  "desktop_reached": true,
+  "status_bar": {
+    "clock": "4:04 PM Wed Dec 31",
+    "right": "Not Charging",
+    "battery_glyph": true,
+    "interpretation": "SpringBoard shows the external-power battery glyph with the Not Charging label, which matches ExternalConnected=true and IsCharging=false from the new IOPMPowerSource. The percentage text is not shown; iPadOS shows the glyph unless the percentage setting is enabled."
+  },
+  "gauge": {
+    "line": "Gauge id=15/02 valid=7f raw=80/3cf0/c3f8/ff0f/1c33/890/dbb",
+    "id": "15/02",
+    "valid": "0x7f",
+    "raw": {
+      "status_00": "0x0080",
+      "repsoc_06": "0x3cf0",
+      "vcell_09": "0xc3f8",
+      "current_0a": "0xff0f",
+      "temp_08": "0x1c33",
+      "repcap_05": "0x0890",
+      "fullcap_10": "0x0dbb"
+    }
+  },
+  "battery": {
+    "line": "Bat present=1 soc100=6093 uV=3919375 uA=-188281 mC=28199 cap=5480/8787 chg=1:4f/e0/3b restore=1 done/none reg=0",
+    "present": 1,
+    "state_of_charge_percent": 60.93,
+    "voltage_uv": 3919375,
+    "current_ua": -188281,
+    "temperature_mc": 28199,
+    "remaining_mah": 5480,
+    "full_mah": 8787,
+    "capacity_ratio_percent": 62.36,
+    "current_direction": "discharging; the signed 0xff0f word is -241, and -241*15625*5/100 = -188281 uA"
+  },
+  "charger": {
+    "valid": 1,
+    "int_ok_b2": "0x4f",
+    "details_00_b3": "0xe0",
+    "details_01_b4": "0x3b",
+    "chgin_dtls": 3,
+    "chgin_ok": true,
+    "chg_dtls": 11,
+    "watchdog_expired": true,
+    "external_connected": true,
+    "charging": false,
+    "full": false,
+    "decode": "b2=0x4f keeps CHGIN_OK (b6) and clears CHG_OK (b4); b3=0xe0 selects CHGIN_DTLS=3 (valid input); b4=0x3b is CHG_DTLS=0xB, the vendor charger-watchdog-expired detail, so the source reports external power without charging."
+  },
+  "service": {
+    "line": "Battery svc=1 samples=48 errors=0 published=1 age_ms=1870",
+    "samples": 48,
+    "errors": 0,
+    "published": 1,
+    "age_ms": 1870,
+    "rate_check": "48 samples at the 5 s poll interval span about 240 s, matching the interval from the 13:28:24 reboot request to the 13:32:48 photo.",
+    "cached_report": "The Gauge/Bat lines come from the worker's last committed sample (age 1.87 s), not from a panic-time I2C transfer."
+  },
+  "units_check": "Every converted value recomputes from its raw word: 15600*100/256=6093, 50168*78125/1000=3919375, -241*15625*5/100=-188281, 7219*1000/256=28199, 2192*5/2=5480, 3515*5/2=8787.",
+  "writes": "None. v95 performs no PMIC, gauge or charger configuration write; only the GPIO borrow/restore of the read path is used.",
+  "interpretation": "The read-only IOPMPowerSource is published and consumed by the system: the status bar shows the external-power battery glyph with Not Charging, matching the decoded external=1/charging=0 state. Periodic refresh works with zero errors over 48 samples, and the terminal report shows the cached sample plus service counters. The battery is discharging at about 188 mA because the charger watchdog expired and charging is still stopped.",
+  "limits": [
+    "One observation. Plug/unplug transition latency and error recovery are not separately measured.",
+    "The status bar shows the glyph and Not Charging state, but no percentage text was visible in this configuration.",
+    "Charging remains off: the expired charger watchdog and charge-enable configuration have not been inspected or serviced.",
+    "No charger interrupt is wired; external state updates only on the 5 s poll."
+  ]
+}

@@ -30,13 +30,23 @@ python3.14 -m unittest discover -s tests -v
 - 电池对象与 PMGR 桥共用同一个 force-load 归档
   （`libShengPlatformPower.a`），因此现有链接依赖也会在电池对象变化时重链接。
 
+## 实机结果
+
+13:32:48 机主照片 `screen-runtime.jpg` 及 `device-result.json` 确认：
+
+- 桌面已进入。右上状态栏显示电池图标和 `Not Charging`，与
+  `external=1 / charging=0` 一致，说明 `IOPMPowerSource` 已被系统消费。
+- `Battery svc=1 samples=48 errors=0 published=1 age_ms=1870`：48 个 5 秒
+  样本约等于 13:28:24 重启到拍照的 4 分钟，期间无读取错误；Gauge/Bat 来自
+  worker 最后一次提交的样本（age 1.87 秒），不是 panic 路径的现场读取。
+- 读数：60.93%、3919375 µV、-188281 µA（放电约 188 mA）、28.2 °C、
+  5480/8787 mAh；所有换算值仍可由原始字重算。
+- charger `chg=1:4f/e0/3b`：CHGIN_DTLS=3 有效、`CHG_OK` 位为 0、
+  `CHG_DTLS=0xB` 是看门狗过期，所以插着 USB 仍显示未充电并在放电。
+
 ## 未验证与下一步
 
-本轮仍未写 PMIC/gauge/charger 配置：v94 看到的充电看门狗过期状态未处理，
-充电不会因此开始。未接 charger 中断，插拔状态最多延迟一个 5 秒周期。
-系统电池图标/百分比是否随 `IOPMPowerSource` 更新仍待机主观察；本目录
-`upload.json` 只记录 BOOT 传输成功，`host-validation.json` 只记录主机检查。
-
-实机步骤：正常重启进入桌面后三指按住取报告，确认 `Battery svc=1
-samples>0 errors=0 published=1` 与 Gauge/Bat 两行；再插拔 USB，观察
-`external`/充电图标是否在一个周期内变化。
+仍不写充电配置。下一步先只读 charger 的 CNFG_00/02/04/06/09，确认
+WDTEN、CHG_EN、充电电流、输入限流和浮充电压，再决定是否清除看门狗并
+恢复充电。未接 charger 中断，插拔状态最多延迟一个 5 秒周期；本次状态栏
+只显示图标和 `Not Charging`，没有百分比文字。
