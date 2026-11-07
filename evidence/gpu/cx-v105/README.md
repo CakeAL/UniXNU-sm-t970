@@ -22,4 +22,6 @@ python3.14 ../UniXNU/scripts/porting-record.py check --device .
 
 2026-11-07 15:36（中国标准时间），Heimdall 成功上传 BOOT `4ae3bcd1…` 并请求重启。
 详见 [打包记录](preparation.json)、[主机验证](host-validation.json)和 [上传回执](upload.json)。
-启动后三指按住两秒，采集 `GPU cx` 一行。CX 上电应答和恢复待实机读数。
+机主报告显示 `pre=222001/5ff4 on=f8222000/80001fe0 end=222001/5ff4 ack=1 restore=1`。
+CX 上电和恢复均得到确认。报告采于启动早期，八核和 SpringBoard 已出现，GOP 已发布，复制计数为 0。
+[实测字段和截图哈希](device-result.json)

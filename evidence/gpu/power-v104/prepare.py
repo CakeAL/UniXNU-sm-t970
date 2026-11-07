@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Pack the v104 GPU power snapshot or the v105 CX pulse from its exact baseline."""
+"""Pack a GPU power probe from its exact baseline BOOT."""
 import argparse
 import hashlib
 import json
@@ -30,9 +30,17 @@ def require(condition, message):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--cx-pulse', action='store_true', help='Pack v105 from the tested v104 BOOT')
+    variants = parser.add_mutually_exclusive_group()
+    variants.add_argument('--cx-pulse', action='store_true', help='Pack v105 from the tested v104 BOOT')
+    variants.add_argument('--xo-clocks', action='store_true', help='Pack v106 from the tested v105 BOOT')
     options = parser.parse_args()
-    if options.cx_pulse:
+    if options.xo_clocks:
+        baseline = 'gpu-cx-v105'
+        base_sha = '4ae3bcd1cbf11903cb24ad69cb607368dab1a3edcdd5575769686a8071bf90cb'
+        output = OUT / 'gpu-xo-v106'
+        old, new = b't970-gpu-p=2', b't970-gpu-p=3'
+        markers = (b'GPU xo rcg=', b'GPU xo hold rcg=')
+    elif options.cx_pulse:
         baseline = 'gpu-power-v104'
         base_sha = '031095d5baf37dae5f3ae7b89e4f1eaffd22683bea218efdf56ffe6e5434f902'
         output = OUT / 'gpu-cx-v105'

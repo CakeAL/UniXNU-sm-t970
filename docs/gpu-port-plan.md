@@ -40,7 +40,7 @@ CP 提交、GPU 内存映射和最小绘图；Metal/DPU 留到后续阶段。
 | 阶段 | 内容 | 设备证据 |
 | --- | --- | --- |
 | 0 | 资源/固件/候选源对照（v99 起） | 报告 `GPU arc` 行、DT/固件哈希 |
-| 1 | GPUCC/GDSC/供电/TSENS 资格确认 | v104 读到 GPUCC；v105 验证 CX 上电与恢复，后续验证 GMU 所需时钟与供电 |
+| 1 | GPUCC/GDSC/供电/TSENS 资格确认 | v104 读到 GPUCC，v105 确认 CX 上电和恢复，v106 验证 GMU 所需的 XO 分支 |
 | 2 | GMU 冷启动 + HFI 版本回读 | `FW_INIT`/HFI 响应 |
 | 3 | ZAP 认证 + secure mode 退出 | 认证结果 |
 | 4 | SMMU/GPU VA + CP ring/fence | GPU 内存写入回读 |
@@ -63,10 +63,12 @@ GX 的 `0x3d91508` 是 clamp 控制，GX GDSCR 位于 `0x3d9100c`。
 见 [v103 门控实测](../evidence/gpu/clk-write-v103/device-result.json)和
 [v104 GPUCC 实测](../evidence/gpu/power-v104/device-result.json)。
 
-v105 单独验证 CX 软件 vote，启动后由三指报告触发。若 CX 上电并恢复，下一步
-在独立实验中验证 CX 持有期间的 AHB、CXO 和 CX GMU 分支时钟，再进入 RSC/PDC
-与板级 CX/MX 投票。若 CX 未应答，先比较软件位回读和硬件状态，确认是否需要
-先补足板级投票。见 [v105 方案](../evidence/gpu/cx-v105/README.md)。
+v105 实测 CX 从 `222001/5ff4` 变为 `f8222000/80001fe0`，随后回到原状态，
+`ack=1 restore=1`。v106 在 CX 持有期间，按 AHB、CXO、CX GMU 顺序验证继承的
+XO 时钟路径，再逆序恢复分支和 CX。若三条分支均通过，再分开验证 GMU 寄存器访问
+与 RSC/PDC、板级 CX/MX 投票，之后才进入 GPLL0 分频 200 MHz 路径。
+见 [v105 实测](../evidence/gpu/cx-v105/device-result.json)和
+[v106 方案](../evidence/gpu/xo-v106/README.md)。
 
 ## 风险
 

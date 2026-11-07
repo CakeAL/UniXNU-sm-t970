@@ -1,0 +1,35 @@
+{
+  "boot_sha256": "4ae3bcd1cbf11903cb24ad69cb607368dab1a3edcdd5575769686a8071bf90cb",
+  "photo": "screen-runtime.jpg",
+  "photo_sha256": "208684470738b1e23cf16c8b0459f77b290e4ab23b9ef82b08a53e14ec44a3a9",
+  "photo_time_local": "2026-11-07T15:38:17+08:00",
+  "image_binding": "v105 BOOT upload and its GPU cx report in the owner screenshot",
+  "cx_pulse": {
+    "line": "GPU cx pre=222001/5ff4 on=f8222000/80001fe0 end=222001/5ff4 ack=1 restore=1",
+    "power_acknowledged": true,
+    "power_restored": true
+  },
+  "boot": {
+    "launchd_main": true,
+    "cpus": 8,
+    "secondary_cpus": 7,
+    "processes": 69,
+    "springboard_pid": 27,
+    "backboardd_pid": 0
+  },
+  "storage": {
+    "data_space_rc": 0,
+    "block_size": 4096,
+    "available_blocks": 130425
+  },
+  "display": {
+    "gop_published": true,
+    "copies": 0,
+    "retired": 0,
+    "sample_scope": "Early runtime report"
+  },
+  "input": {
+    "side_key_sample_errors": 0,
+    "side_key_hid": "1/1/0"
+  }
+}
