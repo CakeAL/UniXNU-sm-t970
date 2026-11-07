@@ -48,8 +48,15 @@ def main():
     variants.add_argument('--ttbr-width', action='store_true', help='Pack v119 from the tested v118 BOOT')
     variants.add_argument('--cb-root', action='store_true', help='Pack v120 from the tested v119 BOOT')
     variants.add_argument('--cb-activate', action='store_true', help='Pack v121 from the tested v120 BOOT')
+    variants.add_argument('--sid5', action='store_true', help='Pack v122 from the tested v121 BOOT')
     options = parser.parse_args()
-    if options.cb_activate:
+    if options.sid5:
+        baseline = 'gpu-cbactivate-v121'
+        base_sha = 'e99b0cf69823f9320f2196ef9d71580c00a2fc023c9a273ad99526c8d3b8447d'
+        output = OUT / 'gpu-sid5-v122'
+        old, new = b't970-gpu-p=18', b't970-gpu-p=19'
+        markers = (b'GPU sid5 %s/%s/%s smr=', b'GPU ctx %s/%s/%s tlb=')
+    elif options.cb_activate:
         baseline = 'gpu-cbroot-v120'
         base_sha = 'e6d8b426b79facd7ebe47b5a6e6100f377542befbf3fc718e9a91c8a3c6d21b6'
         output = OUT / 'gpu-cbactivate-v121'

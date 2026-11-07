@@ -27,4 +27,7 @@ FAT 回读、Mach-O 符号范围和独立 DTS/ADT 检查。完整平台检查停
 
 [镜像清单](preparation.json)与[刷写回执](upload.json)对应 BOOT
 `e99b0cf69823f9320f2196ef9d71580c00a2fc023c9a273ad99526c8d3b8447d`。
-Heimdall 确认上传成功并请求重启。实机读数待采集。
+Heimdall 确认上传成功并请求重启。
+
+[实机报告](device-result.json)显示 `tlb=3/2 ctl=a7/a6 cfg/rb=3f/3f held=0`。
+两次本地同步和翻译启停均通过，配置、页表与上游依赖均完成撤销。

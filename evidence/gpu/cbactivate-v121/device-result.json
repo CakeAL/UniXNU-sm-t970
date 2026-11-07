@@ -1,0 +1,35 @@
+{
+  "boot_sha256": "e99b0cf69823f9320f2196ef9d71580c00a2fc023c9a273ad99526c8d3b8447d",
+  "source": "Owner screenshot attached to the Codex conversation",
+  "photo_time_local": "2026-11-07T22:53:06+08:00",
+  "line": "GPU ctx ok/ok/ok tlb=3/2 ctl=a7/a6 cfg/rb=3f/3f held=0 bus=3/3 rsc=ff/ff xo=7 cxr=1 n=2",
+  "tlb_sync_mask": 3,
+  "tlb_status_reads": 2,
+  "sctlr_on": "0xa7",
+  "sctlr_off": "0xa6",
+  "installed_mask": "0x3f",
+  "rollback_mask": "0x3f",
+  "backing_retained": false,
+  "snapshot_passes": 2,
+  "parent_dependencies_restored": true,
+  "boot": {
+    "launchd_main": true,
+    "cpus": 8,
+    "processes": 241,
+    "springboard_pid": 27,
+    "backboardd_pid": 57
+  },
+  "storage": {
+    "data_space_rc": 0,
+    "block_size": 4096,
+    "available_blocks": 47043
+  },
+  "display": {
+    "copies": 15,
+    "retired": 15
+  },
+  "input": {
+    "side_key_sample_errors": 0,
+    "side_key_hid": "1/1/0"
+  }
+}

@@ -225,6 +225,14 @@ static void reportRscMode(char *out, unsigned length, const RscSnapshot &rsc, un
         const GmuRate &rate = rsc.rate;
         if (power >= 9 && strcmp(rate.smmu.state, "skip")) {
             const SmmuSnapshot &s = rate.smmu;
+            if (power == cbSid5Mode) {
+                snprintf(out, length,
+                    "\nGPU sid5 %s/%s/%s smr=%x/%x s2=%x/%x scr=%x tlb=%x held=%u bus=%x/%x rsc=%x/%x xo=%x cxr=%u n=%u",
+                    s.sid5State, s.activation, rate.state, s.sid5Smr, s.sid5SmrAfter, s.sid5S2cr, s.sid5S2crAfter,
+                    s.scr0, s.tlbSynced, s.rootHeld ? 1u : 0u, s.ready, s.restored, rsc.programmed, rsc.restored,
+                    xoRestored, cxRestored ? 1u : 0u, s.restoreSamples);
+                return;
+            }
             if (power == cbActivateMode) {
                 snprintf(out, length,
                     "\nGPU ctx %s/%s/%s tlb=%x/%u ctl=%x/%x cfg/rb=%x/%x held=%u bus=%x/%x rsc=%x/%x xo=%x cxr=%u n=%u",

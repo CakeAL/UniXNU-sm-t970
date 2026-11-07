@@ -18,6 +18,7 @@ constexpr unsigned cbBarReleaseMode = 15;
 constexpr unsigned cbTtbrMode = 16;
 constexpr unsigned cbRootMode = 17;
 constexpr unsigned cbActivateMode = 18;
+constexpr unsigned cbSid5Mode = 19;
 constexpr uint32_t cbBarStage1 = 0x1f300;
 // Arm IHI 0062D.c: FSR[10:9] describes the translation table format.
 constexpr uint32_t cbFsrFormatMask = 0x600;
@@ -63,6 +64,8 @@ struct SmmuSnapshot {
     const char *activation = "skip";
     unsigned tlbSynced = 0, tlbReads = 0;
     uint32_t ctlOn = 0, ctlOff = 0;
+    const char *sid5State = "skip";
+    uint32_t sid5Smr = 0, sid5S2cr = 0, sid5SmrAfter = 0, sid5S2crAfter = 0;
 };
 
 constexpr unsigned cbOffsets[] = {
@@ -173,9 +176,61 @@ static bool pulseTtbr(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &result,
     return true;
 }
 
+static bool pulseSid5(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &result,
+                      const uint32_t (&routes)[6], uint32_t sctlr) {
+    constexpr unsigned smr0 = A650_SMMU_SMR(0), s2cr0 = A650_SMMU_S2CR(0);
+    constexpr uint32_t globalPolicy = 0x40f, faultUnmatched = 0x406;
+    constexpr uint32_t routeType = 3u << 16, faultRoute = 2u << 16;
+    constexpr uint32_t sid5Match = (1u << 31) | (0x400u << 16) | 5u;
+    // The lmi A650 route writes this field subset, preserving the other
+    // firmware-owned bits. The stock GMU kernel match covers 5 and 0x405.
+    const uint32_t translated = (routes[0] & ~0x030303ffu) | 0x300u;
+    uint32_t expectedRoutes[6];
+    memcpy(expectedRoutes, routes, sizeof(expectedRoutes));
+    const auto matches = [&](uint32_t match, uint32_t route) {
+        auto current = readCbGuards(smmu);
+        if (current.bar != cbBarStage1 || current.sctlr != sctlr ||
+            readSmmu32(smmu, A650_SMMU_ID2) != result.id2 ||
+            current.smrs != (match ? 1u : 0u) || readSmmu32(smmu, smr0) != match)
+            return false;
+        current.smrs = 0;
+        expectedRoutes[0] = route;
+        return barViewIdle(smmu, gmu, result, expectedRoutes, current, true);
+    };
+    result.sid5State = "policy";
+    if ((result.scr0 & globalPolicy) != faultUnmatched || (routes[0] & routeType) != faultRoute)
+        return true;
+    result.sid5State = "guard";
+    if (!matches(0, routes[0])) return false;
+
+    writeSmmu32(smmu, s2cr0, translated);
+    result.sid5S2cr = readSmmu32(smmu, s2cr0);
+    const bool staged = result.sid5S2cr == translated && matches(0, translated);
+    bool published = false;
+    if (staged) {
+        writeSmmu32(smmu, smr0, sid5Match);
+        result.sid5Smr = readSmmu32(smmu, smr0);
+        published = result.sid5Smr == sid5Match && matches(sid5Match, translated);
+    }
+
+    result.sid5State = "detach";
+    if (readSmmu32(smmu, A650_SMMU_ID0) != result.id0 ||
+        readSmmu32(smmu, A650_SMMU_ID1) != result.id1 ||
+        readSmmu32(smmu, A650_SMMU_ID2) != result.id2) return false;
+    if (staged) writeSmmu32(smmu, smr0, 0);
+    result.sid5SmrAfter = readSmmu32(smmu, smr0);
+    // Restore the inherited FAULT route even if SMR withdrawal was filtered.
+    writeSmmu32(smmu, s2cr0, routes[0]);
+    result.sid5S2crAfter = readSmmu32(smmu, s2cr0);
+    if (result.sid5SmrAfter || result.sid5S2crAfter != routes[0] ||
+        !matches(0, routes[0])) return false;
+    result.sid5State = published ? "ok" : staged ? "smr" : "s2cr";
+    return true;
+}
+
 static bool pulseCbActivation(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &result,
                               const uint32_t (&routes)[6], const ArmSmmu4KContextImage &image,
-                              uint32_t original) {
+                              uint32_t original, bool publishSid5) {
     constexpr unsigned sctlr = 0x8000, tlbStatus = 0x87f4;
     constexpr uint32_t enable = 1, faultInterrupt = 1u << 6, policyMask = 0x1f7;
     const ArmSmmu4KIo tlbIo = {
@@ -235,12 +290,15 @@ static bool pulseCbActivation(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot 
     const bool activeClean = barViewIdle(smmu, gmu, result, routes, active, active.sctlr & enable) &&
         contextMatches();
     const bool activeMatch = activeClean && (active.sctlr & policyMask) == (requested & policyMask);
+    const bool routeWithdrawn = !publishSid5 || !activeMatch ||
+        (pulseSid5(smmu, gmu, result, routes, active.sctlr) && contextMatches());
+    if (publishSid5 && !stillOwnsView(readCbGuards(smmu))) return false;
     // Withdraw M even if the active readback failed, before considering
     // any restoration of the root and original control word.
     writeSmmu32(smmu, sctlr, requested & ~enable);
     const auto disabled = readCbGuards(smmu);
     result.ctlOff = disabled.sctlr;
-    if (!activeClean || !stillOwnsView(disabled) ||
+    if (!activeClean || !routeWithdrawn || !stillOwnsView(disabled) ||
         (disabled.sctlr & (enable | faultInterrupt)) || !barViewIdle(smmu, gmu, result, routes, disabled))
         return false;
     result.activation = "sync-off";
@@ -258,7 +316,7 @@ static bool pulseCbActivation(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot 
 }
 
 static bool pulseCbRoot(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &result,
-                        const uint32_t (&routes)[6], IOBufferMemoryDescriptor *&wiredRoot, bool activate) {
+                        const uint32_t (&routes)[6], IOBufferMemoryDescriptor *&wiredRoot, unsigned power) {
     GmuTables tables;
     if (!prepareGmuTables(tables, result.id0, result.id2)) {
         result.rootState = tables.stage;
@@ -338,7 +396,8 @@ static bool pulseCbRoot(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &resul
     const bool installed = result.rootInstalled == fullMask;
     const bool audited = installed && auditGmuTables(tables, observed[firstTtbr]);
     if (audited) result.rootLeaves = static_cast<unsigned>(tables.audit.leaf_pages);
-    if (audited && activate && !pulseCbActivation(smmu, gmu, result, routes, tables.image, before.sctlr))
+    if (audited && power >= cbActivateMode &&
+        !pulseCbActivation(smmu, gmu, result, routes, tables.image, before.sctlr, power == cbSid5Mode))
         return false;
 
     // TCR2/TCR precede restoring TTBRs because TCR2 controls ASID width.
@@ -375,8 +434,8 @@ static bool pulseCbBar(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &result
         const auto after = readCbGuards(smmu);
         if (after.bar != cbBarStage1 || !barViewIdle(smmu, gmu, result, routes, after)) return false;
     }
-    if ((power == cbRootMode || power == cbActivateMode) && active.bar == cbBarStage1 &&
-        !pulseCbRoot(smmu, gmu, result, routes, wiredRoot, power == cbActivateMode)) return false;
+    if (power >= cbRootMode && active.bar == cbBarStage1 &&
+        !pulseCbRoot(smmu, gmu, result, routes, wiredRoot, power)) return false;
 #endif
     if (active.bar) writeSmmu32(smmu, 0x1000, 0);
     const CbGuards restored = readCbGuards(smmu);
