@@ -1,0 +1,12 @@
+{
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/gpu-arc-v99/boot-partition.img",
+  "finished_at": "2026-11-07T06:18:13.486440+00:00",
+  "boot_sha256": "76dd4b3261348ea43aee1302760ac4178d5f84491e887331451aa2339b404174",
+  "partition": "BOOT",
+  "exit_code": 0,
+  "transfer_confirmed": true,
+  "reboot_requested": true,
+  "partition_readback": false,
+  "userdata_partition_uploaded": false,
+  "transfer_log_sha256": "3634cb6a721690ebec51de2aae82b631e02d349f10201c5a1708783765e0f6ac"
+}

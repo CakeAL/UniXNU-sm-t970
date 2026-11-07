@@ -1,0 +1,23 @@
+{
+  "boot_sha256": "76dd4b3261348ea43aee1302760ac4178d5f84491e887331451aa2339b404174",
+  "kernel_build_sha256": "ab329668cd27a11e9686f5d265177a0860a75179828ba563f31c766e6d9171a1",
+  "tests": {
+    "command": "python3.14 -m unittest discover -s tests",
+    "ran": 71,
+    "skipped": 10,
+    "result": "OK"
+  },
+  "test_gpu_arc": {
+    "ran": 2,
+    "result": "OK",
+    "covers": "synthetic cmd-db parse (cx/mx addresses, levels, min-SVS index), bad magic, duplicate id, non-increasing levels, misaligned address; report is read-only and called from both report branches"
+  },
+  "markers": [
+    "GPU arc db=",
+    "GPU arc: refused",
+    "Battery svc="
+  ],
+  "reads": "ARC cmd-db at 0x80860000 + 0x20000 only; no GPU/GMU window access, no RPMh request, no register write",
+  "kernel_args": "unchanged (986 bytes)",
+  "runtime": "uploaded and reboot requested; ARC line pending"
+}

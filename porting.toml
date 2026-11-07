@@ -330,6 +330,8 @@ evidence = [
   { kind = "device", reference = "evidence/adb-2026-11-01/identity.txt", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "The saved boot properties report flash.locked=0, orange verified-boot state and warranty_bit=1.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },
   { kind = "device", reference = "evidence/adb-2026-11-01/capture.json", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Parsed boot/recovery header fields identify Android boot header v2 and 4096-byte pages; collection commands are recorded.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },
   { kind = "device", reference = "evidence/adb-2026-11-01/live-device-tree.dts", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "The sanitized live DT declares PSCI 1.0 using SMC.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },
+  { kind = "host", reference = "evidence/gpu/arc-v99/host-validation.json", revision = "37ba28f2723eb94b992d1cd6f9f1c5d3a411a4d6", command = "python3.14 -m unittest discover -s tests; gpu/arc-v99/prepare.py", result = "71 tests ran, 10 skipped, OK (2 GPU ARC tests). BOOT76dd4b32 adds the read-only ARC parser and the GPU arc marker; ADT/seed/trust/config unchanged." },
+  { kind = "device", reference = "evidence/gpu/arc-v99/upload.json", revision = "37ba28f2723eb94b992d1cd6f9f1c5d3a411a4d6", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/gpu-arc-v99/boot-partition.img", result = "BOOT-only upload exited 0 and requested reboot; the GPU arc values remain unobserved." },
   { kind = "source", reference = "evidence/shared-support/uefi-candidate.json", result = "Pinned upstream Samsung/Kona/config directory inventory and r8q-versus-T970 differences." },
   { kind = "source", reference = "https://github.com/Project-Silicium/Mu-Silicium/blob/4bd8ae83bf37de41777f19e0777db70f59383a6d/Resources/Configs/r8q.toml", result = "Reference-board Android boot header v1; not adopted as T970 configuration." },
   { kind = "host", reference = "evidence/firmware-log-exporter/verification.json", command = "GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=submodule.active GIT_CONFIG_VALUE_0=__no_module_submodules__ PATH=/opt/homebrew/opt/llvm/bin:/opt/homebrew/opt/lld/bin:$PATH python3.14 ../UniXNU/unixnu build firmware -D . --uefi .cache/uefi-source/Mu-Silicium --edk2 .cache/uefi-source/Mu-Silicium/Mu_Basecore --local-module refer:edk2=.cache/uefi-source/Mu-Silicium/Mu_Basecore", revision = "a4112792c2b405d053c8fd215f452b111598b66e", result = "PASS: the DEBUG firmware builds and FVMAIN.Fv contains AdvancedLogDxe FFS 8D4E7F50-3A2C-4C9A-9E1B-50C4C8472D41 among 92 files, also listed by FVMAIN.inf. Tools/QR and log contents are untested; no payload image or device boot exists." },
@@ -1363,6 +1365,10 @@ status = "planned"
 components = []
 paths = [
   "evidence/adb-2026-11-01/gpu.txt",
+  "docs/gpu-port-plan.md",
+  "package/T970Gpu/**",
+  "evidence/gpu/**",
+  "tests/test_gpu_arc.py",
 ]
 inputs = [
   "KGSL reports Adreno650v3, seven power levels and a maximum clock of 670000000 Hz; the GPU DT chipid is 0x06050002.",
@@ -1377,6 +1383,8 @@ procedure = [
   "Read KGSL identity and frequency nodes, list GPU firmware files and calculate the GMU/SQE hashes without executing GPU commands.",
 ]
 findings = [
+  "The closest XNU references are the MIT T733 Adreno6xx driver (SM7325/A642L, same iPadOS 17.7.11 ABI family: NativeAdreno ABI v1, ring, submit, fences, BO/memory, scheduler, user client) and the MIT lmi-uefi-touch-gpu project (SM8250/A650, iOS 16.5: ARC/RPMh/clock, GMU/HFI, ZAP, CP, SMMU, tile/desktop). Adreno740 is SM8550-only and UniXNU-umi has no GPU backend. The port therefore reuses the A6xx ABI core and writes a new A650 backend from the lmi sequences and the T970 DT.",
+  "v99 adds a read-only SM8250 ARC resource parser (cx.lvl/mx.lvl at 0x80860000+0x20000, no RPMh request) and prints GPU arc in the terminal report; GPU/GMU windows are deliberately untouched until clock/power qualification.",
   "Disabled GPU/GMU overrides now preserve the stock named register windows and interrupts. Unverified shared iommus references are removed; no GPU DMA mapping is invented.",
   "Six A650 files include GMU/SQE and the split signed ZAP image.",
   "The measured GPU is A650, so A740 register sequences and firmware cannot be assumed compatible. Presence of a615_zap files alone does not establish which secure firmware the running driver loads.",
@@ -1390,7 +1398,7 @@ limits = [
   "No GMU bring-up, command submission, DMA/SMMU ownership or Metal rendering was tested under UniXNU.",
 ]
 next_action = [
-  "Compare the measured A650 resources and firmware hashes with the candidate SM8250 GMU implementation and document the loaded secure-firmware path.",
+  "Compare the v99 ARC levels with the T970 GPU OPP/regulator domains, then qualify GPUCC/GDSC read-only before touching the GPU/GMU windows; after that boot the a650_gmu.bin GMU with the lmi SID5 stage1 sequence.",
 ]
 evidence = [
   { kind = "source", reference = "evidence/device-inputs/firmware.json", result = "Six A650 files include GMU/SQE and the split signed ZAP image." },
