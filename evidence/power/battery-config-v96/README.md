@@ -36,3 +36,21 @@ WDTEN、CHG_EN、充电电流、输入限流和浮充电压的现值。本轮只
 实机步骤：正常重启进桌面后三指按住，发 `Charger cfg=` 行和
 Gauge/Bat/`Battery svc` 行。若报告没有这一行，说明配置读取失败，请一并
 发 `Bat` 行的 `stage/fault`。
+
+## 实机结果
+
+13:43:20 照片及 `device-result.json` 确认：
+
+- `Charger cfg=15/5e/13/ec/3b wdtEn=1 chgEn=0 ichg=1500mA iin=1500mA cv=13`。
+- `CNFG_00=0x15` 的 mode 已是 0x5（buck+charge），`CNFG_02` 为 1500 mA
+  充电电流，`CNFG_09` 为 1500 mA 输入限流，`CNFG_04=0x13` 按原厂反向映射
+  是 4350 mV；`CNFG_06` 的 CHGPROT=3，配置可写。
+- 关键原因是 **`CHG_EN=0`**（CNFG_09 bit7），不是只看门狗：即使看门狗过期，
+  充电主使能也是关的。WDTEN 仍为 1 且未喂狗。
+- `Battery svc=1 samples=44 errors=0 published=1 age_ms=2759`；电池静置
+  约 -2.3 mA（VBUS 供系统），61.25%、3932 mV、28.2 °C、5510/8710 mAh。
+  本次照片没有拍到状态栏。
+
+下一步：在温度/电压/CHGPROT 守卫下设置 CHG_EN，并按原厂每个采样周期
+kick 看门狗（CNFG_06 WDTCLR），回读校验；若 0xB 状态仍锁定，再做
+mode 0x4→延时→0x5 的充电重启。

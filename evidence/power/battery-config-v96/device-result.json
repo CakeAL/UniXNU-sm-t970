@@ -1,0 +1,66 @@
+{
+  "boot_sha256": "3ce997f23f30650f4ffec97edd0e76ce0d9a4ab35d8382a4454a79fb89f98c35",
+  "photo": "screen-runtime.jpg",
+  "photo_sha256": "4713194131b1164a532d40951d875f9863931d6063554e2cfee6d3fbad7c104f",
+  "photo_time_local": "2026-11-07T13:43:20+08:00",
+  "desktop_reached": true,
+  "status_bar_visible": false,
+  "gauge": {
+    "line": "Gauge id=15/02 valid=7f raw=80/3d41/c49e/fffd/1c33/89c/d9c",
+    "id": "15/02",
+    "valid": "0x7f",
+    "raw": {
+      "status_00": "0x0080",
+      "repsoc_06": "0x3d41",
+      "vcell_09": "0xc49e",
+      "current_0a": "0xfffd",
+      "temp_08": "0x1c33",
+      "repcap_05": "0x089c",
+      "fullcap_10": "0x0d9c"
+    }
+  },
+  "battery": {
+    "line": "Bat present=1 soc100=6125 uV=3932343 uA=-2343 mC=28199 cap=5510/8710 chg=1:cf/e0/3b restore=1 done/none reg=0",
+    "present": 1,
+    "state_of_charge_percent": 61.25,
+    "voltage_uv": 3932343,
+    "current_ua": -2343,
+    "temperature_mc": 28199,
+    "remaining_mah": 5510,
+    "full_mah": 8710,
+    "capacity_ratio_percent": 63.26
+  },
+  "charger_config": {
+    "line": "Charger cfg=15/5e/13/ec/3b wdtEn=1 chgEn=0 ichg=1500mA iin=1500mA cv=13",
+    "cnfg00_0xb7": "0x15",
+    "cnfg02_0xb9": "0x5e",
+    "cnfg04_0xbb": "0x13",
+    "cnfg06_0xbd": "0xec",
+    "cnfg09_0xc0": "0x3b",
+    "watchdog_enabled": true,
+    "charge_enabled": false,
+    "charge_current_ma": 1500,
+    "input_limit_ma": 1500,
+    "float_voltage_code": 19,
+    "float_voltage_mv": 4350,
+    "chgprot": 3,
+    "mode_bits_cnfg00": 5,
+    "decode": "C00 0x15 = WDTEN set and mode 0x5 (BUCK+CHG); C02 0x5e = CHG_CC 30*50mA and OTG_ILIM 1; C04 0x13 = code 19, vendor reverse mapping (19-4)*10+4200 = 4350mV; C06 0xec = CHGPROT 3 (unlocked), WDTCLR 0, LX_SLOPE 3; C09 0x3b = CHG_EN clear and CHGIN_LIM 59 -> (59+1)*25 = 1500mA."
+  },
+  "service": {
+    "line": "Battery svc=1 samples=44 errors=0 published=1 age_ms=2759",
+    "samples": 44,
+    "errors": 0,
+    "published": 1,
+    "age_ms": 2759,
+    "rate_check": "44 samples at 5 s span about 220 s, matching the 13:39 reboot request to the 13:43:20 photo."
+  },
+  "units_check": "15681*100/256=6125, 50334*78125/1000=3932343, -3*15625*5/100=-2343, 7219*1000/256=28199, 2204*5/2=5510, 3484*5/2=8710.",
+  "writes": "No charger register write in v96. The five configuration words are read-only and do not disturb the charger state.",
+  "interpretation": "The charger is in mode 0x5 (buck + charge) with a 1500mA charge current, 1500mA input limit and 4.35V float target, but CHG_EN (C09 bit7) is clear, so charging is disabled regardless of the expired watchdog. The watchdog itself is enabled and unkicked. The battery is essentially idle at -2.3mA because VBUS powers the system. To resume charging the next step must set CHG_EN and kick or disable the watchdog, not merely wait for the watchdog.",
+  "limits": [
+    "The status bar is not visible in this photo; the Not Charging state was already confirmed in v95.",
+    "No write has been attempted, so whether the latched 0xB state clears after CHG_EN is still unknown.",
+    "The 1500mA/4.35V values are the bootloader-programmed profile; they are read, not validated against the packs thermal limits."
+  ]
+}
