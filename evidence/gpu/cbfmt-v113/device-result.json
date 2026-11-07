@@ -1,0 +1,31 @@
+{
+  "boot_sha256": "cc2fb731540a3e3fdbe13c1e8d3c93aaea8690283b64b37a5272ecde1d02c0ad",
+  "photo": "screen-runtime.jpg",
+  "photo_sha256": "dc5e87b3672ab95ba411470b370ebf3c5f950c76cbee020bafbd3abb2d07989c",
+  "photo_time_local": "2026-11-07T18:58:19+08:00",
+  "line": "GPU cbfmt busy-hold/smmu-hold va64=0/1/0 ctl=17cde30a fsr=0 chg=0 bus=3/0 rsc=ff/0 xo=0 cxr=0",
+  "va64_set_readback": 1,
+  "restore_attempted": false,
+  "parents_held": true,
+  "cause": "A post-set idle predicate failed; v113 did not record which predicate.",
+  "boot": {
+    "launchd_main": true,
+    "cpus": 8,
+    "processes": 246,
+    "springboard_pid": 27,
+    "backboardd_pid": 57
+  },
+  "storage": {
+    "data_space_rc": 0,
+    "block_size": 4096,
+    "available_blocks": 43965
+  },
+  "display": {
+    "copies": 32,
+    "retired": 32
+  },
+  "input": {
+    "side_key_sample_errors": 0,
+    "side_key_hid": "1/1/0"
+  }
+}

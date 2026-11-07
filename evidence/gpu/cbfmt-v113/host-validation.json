@@ -1,0 +1,18 @@
+{
+  "device_revision": "95a2ad08b921b0388c0f8110b6b9b9a7c3eec3aa",
+  "unixnu_revision": "2c834e313d25482c78d38d703eff1f8d190f2597",
+  "boot_sha256": "cc2fb731540a3e3fdbe13c1e8d3c93aaea8690283b64b37a5272ecde1d02c0ad",
+  "tests": {
+    "command": "python3.14 -m unittest discover -s tests",
+    "ran": 73,
+    "skipped": 10,
+    "result": "OK"
+  },
+  "format_model": "ASan/UBSan mock MMIO passed for VA64 set/restore, disabled and active guards, filtered write and restoration holds.",
+  "instructions": "DisplayRegistration.o: set STR W9,[X8] at 0x9eec, restore STR W21,[X8] at 0x9f54, DSB SY follows both.",
+  "kernel_prelink": "PASS",
+  "fat_readback": "PASS",
+  "check_hardware_description": "PASS with synthetic identity",
+  "check_platform": "Stopped at historical framework revision guard",
+  "porting_record": "PASS"
+}

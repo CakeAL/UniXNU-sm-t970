@@ -16,3 +16,7 @@ python3.14 evidence/gpu/power-v104/prepare.py --cb-format
 python3.14 -m unittest discover -s tests
 python3.14 ../UniXNU/scripts/porting-record.py check --device .
 ```
+
+2026-11-07 18:53（中国标准时间），Heimdall 成功上传 BOOT `cc2fb731…` 并请求重启。
+机主截图确认 VA64 从 0 写到 1，随后触发 `busy-hold`。第三个 0 是恢复读数的默认值。
+同屏八核在线，GOP 完成 32 次复制和退役。 [实测记录](device-result.json) · [上传回执](upload.json)
