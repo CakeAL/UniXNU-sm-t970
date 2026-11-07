@@ -40,7 +40,7 @@ CP 提交、GPU 内存映射和最小绘图；Metal/DPU 留到后续阶段。
 | 阶段 | 内容 | 设备证据 |
 | --- | --- | --- |
 | 0 | 资源/固件/候选源对照（v99 起） | 报告 `GPU arc` 行、DT/固件哈希 |
-| 1 | GPUCC/GDSC/供电/TSENS 资格确认 | v104 读到 GPUCC，v105 确认 CX 上电和恢复，v106 验证 GMU 所需的 XO 分支 |
+| 1 | GPUCC/GDSC/供电/TSENS 资格确认 | v104 读到 GPUCC，v105 确认 CX 上电和恢复，v106 确认 XO 分支运行与恢复 |
 | 2 | GMU 冷启动 + HFI 版本回读 | `FW_INIT`/HFI 响应 |
 | 3 | ZAP 认证 + secure mode 退出 | 认证结果 |
 | 4 | SMMU/GPU VA + CP ring/fence | GPU 内存写入回读 |
@@ -63,12 +63,15 @@ GX 的 `0x3d91508` 是 clamp 控制，GX GDSCR 位于 `0x3d9100c`。
 见 [v103 门控实测](../evidence/gpu/clk-write-v103/device-result.json)和
 [v104 GPUCC 实测](../evidence/gpu/power-v104/device-result.json)。
 
-v105 实测 CX 从 `222001/5ff4` 变为 `f8222000/80001fe0`，随后回到原状态，
-`ack=1 restore=1`。v106 在 CX 持有期间，按 AHB、CXO、CX GMU 顺序验证继承的
-XO 时钟路径，再逆序恢复分支和 CX。若三条分支均通过，再分开验证 GMU 寄存器访问
-与 RSC/PDC、板级 CX/MX 投票，之后才进入 GPLL0 分频 200 MHz 路径。
-见 [v105 实测](../evidence/gpu/cx-v105/device-result.json)和
-[v106 方案](../evidence/gpu/xo-v106/README.md)。
+v105 实测 CX 从 `222001/5ff4` 变为 `f8222000/80001fe0`，随后回到原状态。
+v106 实测 `rcg=80000000/1 br=1/1/4221 mask=7/7 cx=1/1`，AHB、CXO、CX GMU
+三条分支在 CX 期间运行，原分支投票与 CX 均恢复。见
+[v105 实测](../evidence/gpu/cx-v105/device-result.json)和
+[v106 实测](../evidence/gpu/xo-v106/device-result.json)。
+
+v107 复用 lmi 的 GMU 只读路径，在三条时钟与 CX 均通过检查后读 CM3 reset、FW_INIT
+和 AO 计数器。通过后按 lmi 的 RSC/PDC 与 ARC 投票顺序核对 T970 板级输入，
+再用 SoC 的 A650 GMU/HFI 实现推进固件启动。见 [v107 方案](../evidence/gpu/gmu-v107/README.md)。
 
 ## 风险
 

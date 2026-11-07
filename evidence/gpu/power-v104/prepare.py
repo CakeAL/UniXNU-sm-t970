@@ -33,8 +33,15 @@ def main():
     variants = parser.add_mutually_exclusive_group()
     variants.add_argument('--cx-pulse', action='store_true', help='Pack v105 from the tested v104 BOOT')
     variants.add_argument('--xo-clocks', action='store_true', help='Pack v106 from the tested v105 BOOT')
+    variants.add_argument('--gmu-read', action='store_true', help='Pack v107 from the tested v106 BOOT')
     options = parser.parse_args()
-    if options.xo_clocks:
+    if options.gmu_read:
+        baseline = 'gpu-xo-v106'
+        base_sha = 'd0a4c1919b589ba1db6c147300a426e8745345f18043664b78d0722a76de4955'
+        output = OUT / 'gpu-gmu-v107'
+        old, new = b't970-gpu-p=3', b't970-gpu-p=4'
+        markers = (b'GPU gmu %s reset=', b'GPU xo hold rcg=')
+    elif options.xo_clocks:
         baseline = 'gpu-cx-v105'
         base_sha = '4ae3bcd1cbf11903cb24ad69cb607368dab1a3edcdd5575769686a8071bf90cb'
         output = OUT / 'gpu-xo-v106'

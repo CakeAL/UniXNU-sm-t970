@@ -1397,6 +1397,7 @@ procedure = [
   "Read KGSL identity and frequency nodes, list GPU firmware files and calculate the GMU/SQE hashes without executing GPU commands.",
 ]
 findings = [
+  "v106 BOOTd0a4c191 reports rcg=80000000/1 br=1/1/4221 mask=7/7 cx=1/1. The AHB, CXO and CX GMU branches ran on the inherited XO route, and all votes were restored. v107 rechecks CX and all three branches before a read-only GMU mapping, then samples CM3 reset, FW_INIT and the AO counter in that order.",
   "v105 BOOT4ae3bcd1 confirms the CX pulse: 222001/5ff4 -> f8222000/80001fe0 -> 222001/5ff4, ack=1 restore=1. v106 qualifies the inherited XO source and tests the AHB, CXO and CX GMU branch enables while CX is on. It restores branch votes in reverse order and retains parents when a child vote cannot be restored.",
   "v104 device report on BOOT031095d5 confirms GCC CFG AHB=1 and a readable GPUCC. CX and GX GDSCR=0x222001, CX HW=0x5ff4, and AHB/GMU/SMMU branches report CLK_OFF. v105 therefore exercises CX SW_COLLAPSE alone after guarding the cold software-controlled CX and GX states.",
   "v104 reads the inherited GCC CFG AHB, MEMNOC, DVM and DDRSS AXI branches. It reads the GPUCC CX/GX status and branch clocks only if CFG AHB is enabled and running. GX GDSCR is GPUCC +0x100c and +0x1508 controls the GX clamp.",
@@ -1416,9 +1417,10 @@ limits = [
   "No GMU bring-up, command submission, DMA/SMMU ownership or Metal rendering was tested under UniXNU.",
 ]
 next_action = [
-  "Capture the v106 GPU xo line. With mask=7/7 and cx=1/1, stage a separately guarded GMU register-access probe before programming RSC/PDC or qualifying board RPMh votes.",
+  "Capture the v107 GPU gmu line. With reset=1, fw=0, a moving AO counter, and restored clocks and CX, qualify the T970 RSC/PDC state and ARC vote route against the lmi and SM8250 reference implementations.",
 ]
 evidence = [
+  { kind = "device", reference = "evidence/gpu/xo-v106/device-result.json", revision = "df353f59626193710542485feb345cdd7e42cc88", command = "BOOTd0a4c191; owner three-finger report screenshot 2026-11-07T15:46:51+08:00", result = "rcg=80000000/1 br=1/1/4221 mask=7/7 cx=1/1. Eight CPUs, 44 GOP copies and retirements and Data query rc=0." },
   { kind = "host", reference = "evidence/gpu/xo-v106/host-validation.json", revision = "df353f59626193710542485feb345cdd7e42cc88", command = "python3.14 -m unittest discover -s tests; evidence/gpu/power-v104/prepare.py --xo-clocks", result = "73 tests ran, 10 skipped, OK. Sanitized branch model, prelink, FAT readback and separate DTS/ADT check passed." },
   { kind = "device", reference = "evidence/gpu/xo-v106/upload.json", revision = "df353f59626193710542485feb345cdd7e42cc88", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/gpu-xo-v106/boot-partition.img", result = "BOOTd0a4c191 upload succeeded and requested reboot. XO source, branch and CX restoration await the device report." },
   { kind = "device", reference = "evidence/gpu/cx-v105/device-result.json", revision = "83c6ed0220e9594355902ee610723dc643aa595c", command = "BOOT4ae3bcd1; owner three-finger report screenshot 2026-11-07T15:38:17+08:00", result = "CX status 222001/5ff4 -> f8222000/80001fe0 -> 222001/5ff4. ack=1 restore=1. Eight CPUs, Data query rc=0 and GOP published before first copy." },
@@ -1689,6 +1691,7 @@ procedure = [
   "Read BuildManifest.plist from the local IPSW using Python zipfile and plistlib to identify its OS version, build and product types.",
 ]
 findings = [
+  "The v107 packer validates the tested v106 BOOT, then swaps only the kernel and GPU diagnostic mode in FAT. The ADT, Data seed, trust cache and bytes outside FAT are preserved.",
   "The v106 package validates exact v105 BOOT and changes the kernel plus t970-gpu-p=3 in FAT, preserving ADT, Data, trust cache and the bytes outside FAT.",
   "The v105 packer validates exact v104 BOOT and swaps only the kernel and GPU mode in its FAT. ADT, Data seed, trust cache and bytes outside FAT are preserved.",
   "v104 replaces only the XNU kernel and GPU diagnostic argument in the verified v103 BOOT FAT. ADT, Data seed, trust cache and the bytes outside FAT are preserved.",

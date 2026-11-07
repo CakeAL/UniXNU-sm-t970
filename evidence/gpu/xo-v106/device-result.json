@@ -1,0 +1,37 @@
+{
+  "boot_sha256": "d0a4c1919b589ba1db6c147300a426e8745345f18043664b78d0722a76de4955",
+  "photo": "screen-runtime.jpg",
+  "photo_sha256": "1eea2d64d5825693f6fba7d4720b699f2ad9c03d233eb63023c6667c4f5ca511",
+  "photo_time_local": "2026-11-07T15:46:51+08:00",
+  "image_binding": "v106 BOOT upload and matching GPU xo line in the owner screenshot",
+  "xo": {
+    "line": "GPU xo rcg=80000000/1 br=1/1/4221 mask=7/7 cx=1/1",
+    "rcg_update_pending": false,
+    "rcg_xo_divider_one": true,
+    "all_branches_enabled_and_running": true,
+    "all_branch_votes_restored": true,
+    "cx_acknowledged_and_restored": true
+  },
+  "boot": {
+    "launchd_main": true,
+    "cpus": 8,
+    "secondary_cpus": 7,
+    "processes": 245,
+    "springboard_pid": 27,
+    "backboardd_pid": 57
+  },
+  "storage": {
+    "data_space_rc": 0,
+    "block_size": 4096,
+    "available_blocks": 44959
+  },
+  "display": {
+    "gop_published": true,
+    "copies": 44,
+    "retired": 44
+  },
+  "input": {
+    "side_key_sample_errors": 0,
+    "side_key_hid": "1/1/0"
+  }
+}
