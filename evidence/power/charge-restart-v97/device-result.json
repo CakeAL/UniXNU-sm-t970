@@ -1,0 +1,51 @@
+{
+  "boot_sha256": "96ff33b674e62c4ca18eeb3efed8955d718e22c70c7a4d9d20f5116063a5f979",
+  "photo": "screen-runtime.jpg",
+  "photo_sha256": "5679b91fb7f15e03618356089ed998a86e8f9762dacd4bd8b3c1512525b209be",
+  "photo_time_local": "2026-11-07T13:56:01+08:00",
+  "desktop_reached": true,
+  "status_bar_visible": false,
+  "gauge": {
+    "line": "Gauge id=15/02 valid=7f raw=80/3de0/c400/fead/1c33/8b2/de4",
+    "raw": {
+      "status": "0x0080",
+      "repsoc": "0x3de0",
+      "vcell": "0xc400",
+      "current": "0xfead",
+      "temp": "0x1c33",
+      "repcap": "0x08b2",
+      "fullcap": "0x0de4"
+    }
+  },
+  "battery": {
+    "line": "Bat present=1 soc100=6187 uV=3920000 uA=-264843 mC=28199 cap=5565/8890 chg=1:5f/e0/31 restore=1 done/none reg=0",
+    "state_of_charge_percent": 61.87,
+    "voltage_uv": 3920000,
+    "current_ua": -264843,
+    "temperature_mc": 28199,
+    "remaining_mah": 5565,
+    "full_mah": 8890
+  },
+  "charger": {
+    "line": "Charger cfg=15/5e/13/ec/bb wdtEn=1 chgEn=1 ichg=1500mA iin=1500mA cv=13",
+    "cnfg09": "0xbb",
+    "cnfg06": "0xec",
+    "charge_enabled": true,
+    "status_line": "chg=1:5f/e0/31",
+    "decode": "INT_OK 0x5f sets CHG_OK (b4) and CHGIN_OK (b6); DETAILS_01 low nibble 1 means charging, so the enable write did reach the charger. CNFG_06 still reads 0xec because WDTCLR is self-clearing: bits 1:0 read back zero after a kick, and the code compared the readback with 0xed, reported kick-failed and wrote CHG_EN back to 0 every cycle."
+  },
+  "service": {
+    "line": "Battery svc=1 samples=59 errors=0 published=1 age_ms=4182 charge=kick-failed",
+    "samples": 59,
+    "errors": 0,
+    "published": 1,
+    "age_ms": 4182
+  },
+  "units_check": "15840*100/256=6187, 50176*78125/1000=3920000, -339*15625*5/100=-264843, 7219*1000/256=28199, 2226*5/2=5565, 3556*5/2=8890.",
+  "interpretation": "CHG_EN was written and the charger reported charging, but the kick verification treated the self-clearing WDTCLR readback as a failure and restored CHG_EN each cycle, so charging flapped on for a moment every 5 s and the battery still discharged about 265 mA. This is a verification bug, not a charger refusal.",
+  "limits": [
+    "The status bar is covered by the panic text in this photo.",
+    "The -264 mA reading is an average over a flapping charge-enable cycle and does not establish the steady charge current.",
+    "No mode restart was attempted; the CHG_DTLS 0x1 shows the charger accepts CHG_EN."
+  ]
+}

@@ -37,3 +37,18 @@ python3.14 -m unittest discover -s tests -v
 三指报告的 `Battery svc` 行（`charge=` 值）、`Charger cfg` 行和 `Bat` 行；
 状态栏是否从 `Not Charging` 变为充电。若温度/电压守卫拒绝，会看到
 `charge=guard` 且寄存器不变。
+
+## 实机结果
+
+13:56:01 照片及 `device-result.json` 确认：
+
+- `Charger cfg=15/5e/13/ec/bb`：`CHG_EN` 已被写成 1，说明使能写成功；
+  `Bat` 的 `chg=1:5f/e0/31` 里 CHG_OK 置位、CHG_DTLS=1，charger 确实进入充电。
+- 但 `Battery svc` 行是 `charge=kick-failed`，`CNFG_06` 仍读回 `0xec`。
+  原因是 WDTCLR 位**写 1 后自清**，回读的 bit1:0 永远是 0；v97 拿整字节
+  `0xed` 比对，误判为失败，然后每周期把 `CHG_EN` 写回 0，充电被反复开关。
+- 电流仍是 -264843 µA（放电），与这种 5 秒一次的短暂使能一致。
+
+修复方向（v98）：喂狗只校验被保留的 bit7:2，不要求 WDTCLR 位回读为 1；
+喂狗失败也不撤销 CHG_EN（未喂的看门狗到期会自行停充）。enabled/kicked 的
+判别保持不变。
