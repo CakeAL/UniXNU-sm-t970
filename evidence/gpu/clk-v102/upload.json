@@ -1,0 +1,12 @@
+{
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/gpu-clk-v102/boot-partition.img",
+  "finished_at": "2026-11-07T06:48:17.908343+00:00",
+  "boot_sha256": "f99055795fa586f7d4ee6155503c7210b30c71aed4e5ff27acafb5dc0e3eec4c",
+  "partition": "BOOT",
+  "exit_code": 0,
+  "transfer_confirmed": true,
+  "reboot_requested": true,
+  "partition_readback": false,
+  "userdata_partition_uploaded": false,
+  "transfer_log_sha256": "3634cb6a721690ebec51de2aae82b631e02d349f10201c5a1708783765e0f6ac"
+}
