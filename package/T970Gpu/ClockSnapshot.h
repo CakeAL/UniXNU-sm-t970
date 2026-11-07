@@ -282,7 +282,7 @@ static void reportClock(char *out, unsigned length, bool writeGate, unsigned pow
 static unsigned powerMode() {
 #ifdef T970_GPU_POWER_SNAPSHOT
     unsigned power = 0;
-    if (PE_parse_boot_argn("t970-gpu-p", &power, sizeof(power)) && power >= 1 && power <= 10) return power;
+    if (PE_parse_boot_argn("t970-gpu-p", &power, sizeof(power)) && power >= 1 && power <= 11) return power;
 #endif
     return 0;
 }

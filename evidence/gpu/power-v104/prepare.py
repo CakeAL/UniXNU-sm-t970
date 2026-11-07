@@ -40,8 +40,15 @@ def main():
     variants.add_argument('--gmu-rate', action='store_true', help='Pack v111 from the tested v110 BOOT')
     variants.add_argument('--smmu-read', action='store_true', help='Pack v112 from the tested v111 BOOT')
     variants.add_argument('--cb-format', action='store_true', help='Pack v113 from the tested v112 BOOT')
+    variants.add_argument('--cb-guard', action='store_true', help='Pack v114 from the tested v113 BOOT')
     options = parser.parse_args()
-    if options.cb_format:
+    if options.cb_guard:
+        baseline = 'gpu-cbfmt-v113'
+        base_sha = 'cc2fb731540a3e3fdbe13c1e8d3c93aaea8690283b64b37a5272ecde1d02c0ad'
+        output = OUT / 'gpu-cbguard-v114'
+        old, new = b't970-gpu-p=10', b't970-gpu-p=11'
+        markers = (b'GPU cbfmt %s/%s va64=', b'CB guard id=', b'rb=%u guard=')
+    elif options.cb_format:
         baseline = 'gpu-smmu-v112'
         base_sha = 'f9df94f349d8bb6859fd6ee7626941de38be3e7333a422e3e0d49b7a0b3bd550'
         output = OUT / 'gpu-cbfmt-v113'

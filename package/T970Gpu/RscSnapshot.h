@@ -225,12 +225,15 @@ static void reportRscMode(char *out, unsigned length, const RscSnapshot &rsc, un
         const GmuRate &rate = rsc.rate;
         if (power >= 9 && strcmp(rate.smmu.state, "skip")) {
             const SmmuSnapshot &s = rate.smmu;
-            if (power == 10 && strcmp(s.format, "skip")) {
+            if (power >= 10 && strcmp(s.format, "skip")) {
                 snprintf(out, length,
-                    "\nGPU cbfmt %s/%s va64=%x/%x/%x ctl=%x fsr=%x chg=%u bus=%x/%x rsc=%x/%x xo=%x cxr=%u",
+                    "\nGPU cbfmt %s/%s va64=%x/%x/%x rb=%u guard=%x/%x diff=%x bus=%x/%x rsc=%x/%x xo=%x cxr=%u"
+                    "\nCB guard id=%x/%x f=%x/%x bar/scr/ctl=%x/%x/%x smr=%x",
                     s.format, rate.state, s.va64Before, s.va64Active, s.va64After,
-                    s.cb[2], s.cb[12], s.changed, s.ready, s.restored, rsc.programmed, rsc.restored,
-                    xoRestored, cxRestored ? 1u : 0u);
+                    s.restoreRead ? 1u : 0u, s.guard.flags(), s.restoreFlags, s.restoreDiff,
+                    s.ready, s.restored, rsc.programmed, rsc.restored, xoRestored, cxRestored ? 1u : 0u,
+                    s.guard.id0, s.guard.id1, s.guard.gfsr, s.guard.fsr, s.guard.bar, s.guard.scr0,
+                    s.guard.sctlr, s.guard.smrs);
                 return;
             }
             const int used = snprintf(out, length,
