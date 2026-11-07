@@ -28,4 +28,7 @@ python3.14 -m unittest discover -s tests
 
 [镜像清单](preparation.json)与[刷写回执](upload.json)对应 BOOT
 `5bce7bb8a8160c67b5c5f40a4400ed3df1e225bb6d02ff2b615077d847ffba28`。
-Heimdall 确认上传成功并请求重启。实机读数待采集。
+Heimdall 确认上传成功并请求重启。
+
+[实机报告](device-result.json)显示 `tcm/ram=18404/22888 bad/rb=0/0 ver=20010008`。
+CB0 和上游依赖均恢复。八核在线，Data 查询成功，GOP 完成 16 次拷贝和回收。

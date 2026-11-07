@@ -1403,6 +1403,7 @@ procedure = [
   "Read KGSL identity and frequency nodes, list GPU firmware files and calculate the GMU/SQE hashes without executing GPU commands.",
 ]
 findings = [
+  "v123 BOOT5bce7bb8 verified all 18404 TCM and 22888 RAM payload bytes, DTCM version 20010008, zero readback and restore mismatches, and full dependency restoration while CM3 remained in reset.",
   "v122 BOOT1c7ea2fe confirmed SMR0 and S2CR0 publish and revoke for the stock GMU masked match with CM3 in reset. v123 validates the exact stock firmware hash and stages its seven payload blocks with the pinned A650GmuRegions and AdrenoFirmwarePlanGmu.",
   "v121 BOOTe99b0cf6 verified SCTLR a7/a6 and two local TLB synchronizations. v122 reads the inherited fault-on-unmatched policy and tests the stock GMU kernel masked match and S2CR rollback with CM3 in reset.",
   "v120 BOOTe6d8b426 verified installation and rollback of all six context registers, with a 42-leaf walk rooted in hardware TTBR0. v121 qualifies local TLB synchronization and SCTLR.M activation and withdrawal while all SMRs remain empty and CM3 remains in reset.",
@@ -1440,9 +1441,10 @@ limits = [
   "No GMU bring-up, command submission, DMA/SMMU ownership or Metal rendering was tested under UniXNU.",
 ]
 next_action = [
-  "Capture v123 GPU fw. After the firmware load and rollback pass, qualify GMU release and FW_INIT with the verified SID5 mapping, inherited RSC route and correct HFI layout before bounded CP submission.",
+  "Qualify GMU release and FW_INIT with the device-tested firmware, verified SID5 mapping, inherited RSC route and correct HFI layout. Confirm an HFI response before bounded CP submission.",
 ]
 evidence = [
+  { kind = "device", reference = "evidence/gpu/gmufw-v123/device-result.json", revision = "23ef1ae8c0240cd038b0c7e339c783161d6cdecf", command = "BOOT5bce7bb8 and owner three-finger report screenshot", result = "TCM/RAM 18404/22888, bad/rb 0/0, version 20010008, CB0 and all dependencies restored. Eight CPUs, RAM Data query success and 16 GOP copies and retirements." },
   { kind = "host", reference = "evidence/gpu/gmufw-v123/host-validation.json", revision = "23ef1ae8c0240cd038b0c7e339c783161d6cdecf", command = "python3.14 -m unittest discover -s tests and evidence/gpu/power-v104/prepare.py --gmu-firmware", result = "Exact stock hash and packaged firmware verified. Sanitized staging model, prelink, FAT readback, image symbols and separate DTS/ADT check passed." },
   { kind = "device", reference = "evidence/gpu/gmufw-v123/upload.json", revision = "23ef1ae8c0240cd038b0c7e339c783161d6cdecf", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/gpu-gmufw-v123/boot-partition.img", result = "BOOT5bce7bb8 transfer succeeded and requested reboot. GMU staging device result pending." },
   { kind = "device", reference = "evidence/gpu/sid5-v122/device-result.json", revision = "d8288efb095608706f155af10c5210c48915e8fa", command = "BOOT1c7ea2fe and owner three-finger report screenshot", result = "SMR0 84000005 to 0, S2CR0 1c38eb00 to 1f3aeaff, SCR0 270406, both TLB syncs and all restores passed. Eight CPUs, RAM Data query success and 19 GOP copies and retirements." },

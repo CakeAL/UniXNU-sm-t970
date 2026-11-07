@@ -1,0 +1,35 @@
+{
+  "boot_sha256": "5bce7bb8a8160c67b5c5f40a4400ed3df1e225bb6d02ff2b615077d847ffba28",
+  "source": "Owner screenshot attached to the Codex conversation",
+  "photo_time_local": "2026-11-07T23:20:17+08:00",
+  "line": "GPU fw ok/ok/ok tcm/ram=18404/22888 bad/rb=0/0 ver=20010008 cfg=3f/3f bus=3/3 rsc=ff/ff xo=7 cxr=1",
+  "tcm_bytes": 18404,
+  "ram_bytes": 22888,
+  "readback_mismatches": 0,
+  "rollback_mismatches": 0,
+  "dtcm_version": "0x20010008",
+  "cm3_released": false,
+  "cb0_config_mask": "0x3f",
+  "cb0_rollback_mask": "0x3f",
+  "parent_dependencies_restored": true,
+  "boot": {
+    "launchd_main": true,
+    "cpus": 8,
+    "processes": 233,
+    "springboard_pid": 27,
+    "backboardd_pid": 57
+  },
+  "storage": {
+    "data_space_rc": 0,
+    "block_size": 4096,
+    "available_blocks": 47763
+  },
+  "display": {
+    "copies": 16,
+    "retired": 16
+  },
+  "input": {
+    "side_key_sample_errors": 0,
+    "side_key_hid": "1/1/0"
+  }
+}
