@@ -53,6 +53,9 @@ CP 提交、GPU 内存映射和最小绘图；Metal/DPU 留到后续阶段。
 触摸/RSC 路径已映射过该块），报告新增 `GPU arc db= cx= lv= min= mx= ...`。
 它验证 GPU 的 CX/MX 电压档资源路径，不请求 RPMh、不写寄存器。
 
+v99 首次上机时报告缓冲（896 字节）被前面的 display/UI/Data-space 文本占满，
+GPU arc 行没有写入；v100 把 `display_state` 扩到 1280 字节，保持探测与参数不变。
+
 下一步：把 ARC 读数与 T970 DT 的 OPP/电源域对照，再做 GPUCC/GDSC 的
 只读资格确认（先确认时钟/电源状态，再读 GPU 窗口），然后进入 GMU 启动。
 

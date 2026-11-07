@@ -29,3 +29,15 @@ GPU 已上电、GPUCC/GDSC 可用或 GMU 能启动。GPU/GMU 窗口的读取仍�
 三指报告的 `GPU arc` 行。若显示 `refused`，请把整行发来（含 cx/mx 的
 valid/地址），据此判断 cmd-db 布局差异；若正常，下一步对照 DT 的 OPP 和
 电源域，再做 GPUCC/GDSC 只读资格确认。
+
+## 实机结果与修复
+
+14:22:23 照片里没有出现 `GPU arc` 行，且 `Keys` 行在 `pon=1` 处被截断。原因不是
+解析失败，而是报告共享的 `display_state[896]` 已被前面的
+display/client/key-state/ui-spawn/ui-call/Data-space 文本占用；新增的
+Charger cfg 与 Battery svc 两行填满剩余空间后，Keys 被截断，追加在后面的
+GPU arc 行没有字节可写。探测代码和标记已链接进内核（`GPU arc db=` 标记存在）。
+
+修复（v100）：`t970-report-buffer.patch` 把 `display_state` 扩到 1280 字节，
+使完整 battery/keys/GPU 行都能放下；ARC 探测和启动参数不变。电池服务本身
+仍正常：63.36%、-386718 µA、`charge=kicked`、42 样本零错误。

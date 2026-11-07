@@ -1,0 +1,27 @@
+{
+  "boot_sha256": "76dd4b3261348ea43aee1302760ac4178d5f84491e887331451aa2339b404174",
+  "photo": "screen-runtime.jpg",
+  "photo_sha256": "8f7b5b933b7fe5e18c3ec4322e9a9224a2dc634f81d0b9445405e8d1e51814ed",
+  "photo_time_local": "2026-11-07T14:22:23+08:00",
+  "desktop_reached": true,
+  "gpu_arc_line_present": false,
+  "keys_line_complete": false,
+  "battery": {
+    "line": "Bat present=1 soc100=6336 uV=3933593 uA=-386718 mC=28199 cap=5700/8937 chg=1:5f/e0/31 restore=1 done/none reg=0",
+    "state_of_charge_percent": 63.36,
+    "voltage_uv": 3933593,
+    "current_ua": -386718,
+    "remaining_mah": 5700,
+    "full_mah": 8937
+  },
+  "service": {
+    "line": "Battery svc=1 samples=42 errors=0 published=1 age_ms=2263 charge=kicked",
+    "samples": 42,
+    "errors": 0,
+    "charge": "kicked"
+  },
+  "reason": "The terminal report uses a shared 896-byte display_state buffer filled by display/client/key-state/ui-spawn/ui-call/Data-space text before the battery lines. Adding Charger cfg and Battery svc filled the remaining space; the Keys line is visibly clipped at pon=1 and the GPU arc line appended after it had zero bytes. The probe code and marker are linked (marker present in the kernel), but the line cannot be printed in this buffer.",
+  "keys_observation": "Keys: v=50010000 pon=1 (clipped) - the previous report printed the full key line.",
+  "interpretation": "The ARC probe did not execute or did not fit; this photo cannot distinguish a parse failure from truncation, but the clipped Keys line shows the buffer was exhausted, so truncation is the established cause. The battery service kept running: 63.36%, -386718 uA, charge=kicked, 42 samples, zero errors.",
+  "fix": "v100 raises display_state to 1280 bytes in t970-report-buffer.patch so the full battery/keys/GPU lines fit; the ARC probe and boot arguments are unchanged."
+}
