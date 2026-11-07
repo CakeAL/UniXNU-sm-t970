@@ -16,3 +16,7 @@ python3.14 evidence/gpu/power-v104/prepare.py --gmu-rate
 python3.14 -m unittest discover -s tests
 python3.14 ../UniXNU/scripts/porting-record.py check --device .
 ```
+
+2026-11-07 17:37（中国标准时间），Heimdall 成功上传 BOOT `50deea9b…` 并请求重启。
+机主截图确认 `cfg=1/100602/1 cmd=0 gate=1206d7f/1216d7f/1206d7f rsc=ff/ff xo=7/7 cxr=1`。
+同屏八核在线，GOP 完成 48 次复制和退役。 [实测记录](device-result.json) · [上传回执](upload.json)

@@ -1,0 +1,17 @@
+{
+  "device_revision": "0aa54149fce5cf8100d270b8247357a1a5fb39d5",
+  "unixnu_revision": "2c834e313d25482c78d38d703eff1f8d190f2597",
+  "boot_sha256": "50deea9b872a75087923157b3696a96d80c7330e06fb037594c9d5a4e5c06888",
+  "tests": {
+    "command": "python3.14 -m unittest discover -s tests",
+    "ran": 73,
+    "skipped": 10,
+    "result": "OK"
+  },
+  "rate_model": "ASan/UBSan mock MMIO passed for the source guard, exact register order, gate refusal, stuck UPDATE, rollback and dependency retention.",
+  "kernel_prelink": "PASS",
+  "fat_readback": "PASS",
+  "check_hardware_description": "PASS with synthetic identity",
+  "check_platform": "Stopped at historical framework revision guard",
+  "porting_record": "PASS"
+}

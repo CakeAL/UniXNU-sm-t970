@@ -1,0 +1,12 @@
+{
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/gpu-gmu-rate-v111/boot-partition.img",
+  "finished_at": "2026-11-07T17:37:40+08:00",
+  "boot_sha256": "50deea9b872a75087923157b3696a96d80c7330e06fb037594c9d5a4e5c06888",
+  "partition": "BOOT",
+  "exit_code": 0,
+  "transfer_confirmed": true,
+  "reboot_requested": true,
+  "partition_readback": false,
+  "userdata_partition_uploaded": false,
+  "transfer_log_sha256": "3634cb6a721690ebec51de2aae82b631e02d349f10201c5a1708783765e0f6ac"
+}

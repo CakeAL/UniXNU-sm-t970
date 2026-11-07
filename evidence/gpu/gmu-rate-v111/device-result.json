@@ -1,0 +1,30 @@
+{
+  "boot_sha256": "50deea9b872a75087923157b3696a96d80c7330e06fb037594c9d5a4e5c06888",
+  "photo": "screen-runtime.jpg",
+  "photo_sha256": "4c06bddb2f908c57e8308f224fd35f62cf0da2780d431e556eeb4e0301df1afe",
+  "photo_time_local": "2026-11-07T17:42:02+08:00",
+  "line": "GPU rate ok/ok hz=600000000 cfg=1/100602/1 cmd=0 gate=1206d7f/1216d7f/1206d7f rsc=ff/ff xo=7/7 cxr=1",
+  "rate_configured_hz": 200000000,
+  "frequency_measured": false,
+  "clock_and_rsc_restored": true,
+  "boot": {
+    "launchd_main": true,
+    "cpus": 8,
+    "processes": 241,
+    "springboard_pid": 27,
+    "backboardd_pid": 57
+  },
+  "storage": {
+    "data_space_rc": 0,
+    "block_size": 4096,
+    "available_blocks": 43160
+  },
+  "display": {
+    "copies": 48,
+    "retired": 48
+  },
+  "input": {
+    "side_key_sample_errors": 0,
+    "side_key_hid": "1/1/0"
+  }
+}
