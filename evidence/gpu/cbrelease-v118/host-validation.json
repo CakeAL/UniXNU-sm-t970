@@ -1,0 +1,21 @@
+{
+  "device_revision": "6277209284adcd8f9683d19f171878bc9865c3b2",
+  "unixnu_revision": "2c834e313d25482c78d38d703eff1f8d190f2597",
+  "boot_sha256": "240b2f38742b2b181f4e6a97cc269e7c24b6b74c68fa50306785653caa9eeb6f",
+  "tests": {
+    "command": "python3.14 -m unittest discover -s tests",
+    "ran": 73,
+    "skipped": 10,
+    "result": "OK"
+  },
+  "guard_model": "ASan and UBSan passed for exact Stage 1 latch, delayed TTBR drift, unexpected CBAR, ordinary restore, filtered write, faults, route and CM3 drift, and legacy modes.",
+  "kernel_prelink": "PASS",
+  "fat_readback": "PASS",
+  "image_symbol_check": {
+    "segments": 15,
+    "symbols_checked": 69464,
+    "result": "PASS"
+  },
+  "check_hardware_description": "PASS with synthetic identity",
+  "check_platform": "Stopped at historical framework revision guard"
+}
