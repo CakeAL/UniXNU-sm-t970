@@ -19,4 +19,6 @@ python3.14 ../UniXNU/scripts/porting-record.py check --device .
 
 2026-11-07 15:52（中国标准时间），Heimdall 成功上传 BOOT `5354324f…` 并请求重启。
 详见 [打包记录](preparation.json)、[主机验证](host-validation.json)和 [上传回执](upload.json)。
-启动后三指按住两秒，采集 `GPU gmu` 一行。
+机主截图显示 `reset=1 fw=0 ao=1440/6b66 xo=7/7 cx=1/1`。CM3 仍在 reset，
+AO 计数推进 22,310，且 XO 与 CX 均恢复。同屏八核运行，GOP 完成 29 次复制和退役。
+[实测字段和截图哈希](device-result.json)

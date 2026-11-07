@@ -34,8 +34,15 @@ def main():
     variants.add_argument('--cx-pulse', action='store_true', help='Pack v105 from the tested v104 BOOT')
     variants.add_argument('--xo-clocks', action='store_true', help='Pack v106 from the tested v105 BOOT')
     variants.add_argument('--gmu-read', action='store_true', help='Pack v107 from the tested v106 BOOT')
+    variants.add_argument('--rsc-read', action='store_true', help='Pack v108 from the tested v107 BOOT')
     options = parser.parse_args()
-    if options.gmu_read:
+    if options.rsc_read:
+        baseline = 'gpu-gmu-v107'
+        base_sha = '5354324ff1c4b61f86be0a188fece6f8e980cd7d362ae31731071a0b365fba9b'
+        output = OUT / 'gpu-rsc-v108'
+        old, new = b't970-gpu-p=4', b't970-gpu-p=5'
+        markers = (b'GPU rsc %s cfg/st/busy=', b'RSC hidden=')
+    elif options.gmu_read:
         baseline = 'gpu-xo-v106'
         base_sha = 'd0a4c1919b589ba1db6c147300a426e8745345f18043664b78d0722a76de4955'
         output = OUT / 'gpu-gmu-v107'

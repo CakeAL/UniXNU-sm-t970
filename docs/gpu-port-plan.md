@@ -69,9 +69,11 @@ v106 实测 `rcg=80000000/1 br=1/1/4221 mask=7/7 cx=1/1`，AHB、CXO、CX GMU
 [v105 实测](../evidence/gpu/cx-v105/device-result.json)和
 [v106 实测](../evidence/gpu/xo-v106/device-result.json)。
 
-v107 复用 lmi 的 GMU 只读路径，在三条时钟与 CX 均通过检查后读 CM3 reset、FW_INIT
-和 AO 计数器。通过后按 lmi 的 RSC/PDC 与 ARC 投票顺序核对 T970 板级输入，
-再用 SoC 的 A650 GMU/HFI 实现推进固件启动。见 [v107 方案](../evidence/gpu/gmu-v107/README.md)。
+v107 实测 GMU 可读，CM3 仍在 reset、FW_INIT=0，AO 从 `0x1440` 推进到
+`0x6b66`，XO 与 CX 恢复。v108 读取 RSC/PDC 冷态，核对 DRV0 配置、十个 TCS
+的空闲状态，以及继承的 hidden 命令、路由和序列值。
+见 [v107 实测](../evidence/gpu/gmu-v107/device-result.json)和
+[v108 方案](../evidence/gpu/rsc-v108/README.md)。
 
 RSC 对照需要先读本机的 DRV0 配置、TCS 空闲状态和 hidden 命令。lmi 的独立投票实验
 保留继承的 hidden 命令，锁定的 Sm8250Platform 冷启动序列则会写入固定值。以 T970

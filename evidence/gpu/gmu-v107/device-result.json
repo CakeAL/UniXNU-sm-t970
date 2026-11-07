@@ -1,0 +1,36 @@
+{
+  "boot_sha256": "5354324ff1c4b61f86be0a188fece6f8e980cd7d362ae31731071a0b365fba9b",
+  "photo": "screen-runtime.jpg",
+  "photo_sha256": "1ce7a4f798863dfa0c3efdccda73329cc3b8dfed9ea1e268dceee843e1e0e4fe",
+  "photo_time_local": "2026-11-07T15:56:33+08:00",
+  "image_binding": "v107 BOOT upload and matching GPU gmu line in the owner screenshot",
+  "gmu": {
+    "line": "GPU gmu read reset=1 fw=0 ao=1440/6b66 xo=7/7 cx=1/1",
+    "cm3_reset_asserted": true,
+    "fw_init_result": 0,
+    "ao_counter_delta": 22310,
+    "xo_and_cx_restored": true
+  },
+  "boot": {
+    "launchd_main": true,
+    "cpus": 8,
+    "secondary_cpus": 7,
+    "processes": 240,
+    "springboard_pid": 27,
+    "backboardd_pid": 57
+  },
+  "storage": {
+    "data_space_rc": 0,
+    "block_size": 4096,
+    "available_blocks": 47276
+  },
+  "display": {
+    "gop_published": true,
+    "copies": 29,
+    "retired": 29
+  },
+  "input": {
+    "side_key_sample_errors": 0,
+    "side_key_hid": "1/1/0"
+  }
+}

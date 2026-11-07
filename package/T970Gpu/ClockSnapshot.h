@@ -6,6 +6,7 @@
 #include "../T970Touch/BusSnapshot.h"
 #ifdef T970_GPU_POWER_SNAPSHOT
 #include "A650GmuPower.h"
+#include "RscSnapshot.h"
 #endif
 
 namespace t970_gpu {
@@ -77,9 +78,10 @@ struct GmuSnapshot {
     uint32_t fwInit = 0;
     uint32_t counterBefore = 0;
     uint32_t counterAfter = 0;
+    RscSnapshot rsc;
 };
 
-static GmuSnapshot sampleGmu(IOMemoryMap &cc, const unsigned (&branches)[3]) {
+static GmuSnapshot sampleGmu(IOMemoryMap &cc, const unsigned (&branches)[3], bool readRsc) {
     using namespace t970_touch;
     GmuSnapshot result;
     if (!sampleCx(cc).on()) return result;
@@ -106,6 +108,7 @@ static GmuSnapshot sampleGmu(IOMemoryMap &cc, const unsigned (&branches)[3]) {
     IODelay(1000);
     result.counterAfter = read(*gmu, 0x14220);
     result.state = "read";
+    if (readRsc && result.counterBefore != result.counterAfter) result.rsc = sampleRsc(*gmu);
     return result;
 }
 
@@ -118,7 +121,7 @@ struct XoResult {
     GmuSnapshot gmu;
 };
 
-static XoResult pulseXoClocks(IOMemoryMap &cc, bool readGmu) {
+static XoResult pulseXoClocks(IOMemoryMap &cc, unsigned power) {
     using namespace t970_touch;
     constexpr unsigned offsets[] = {A650_CC_AHB_CLK, A650_CC_CXO_CLK, A650_CC_CX_GMU_CLK};
     constexpr uint32_t enable = A650_CBCR_ENABLE;
@@ -151,7 +154,7 @@ static XoResult pulseXoClocks(IOMemoryMap &cc, bool readGmu) {
         if (value == UINT32_MAX || !(value & enable) || (i && !A650GpuClockIsOn(value))) break;
         result.ready |= bit;
     }
-    if (readGmu && result.ready == 7) result.gmu = sampleGmu(cc, offsets);
+    if (power >= 4 && result.ready == 7) result.gmu = sampleGmu(cc, offsets, power == 5);
     for (unsigned i = 3; i-- > 0;) {
         const unsigned bit = 1u << i;
         if (!(visited & bit)) continue;
@@ -202,7 +205,7 @@ static void reportCxPulse(char *out, unsigned length, IOMemoryMap &gcc, unsigned
     const CxState during = waitCx(*cc, true);
     const bool clocks = power >= 3 && during.on();
     XoResult xo{};
-    if (clocks) xo = pulseXoClocks(*cc, power == 4);
+    if (clocks) xo = pulseXoClocks(*cc, power);
     if (!xo.canReleaseCx) {
         snprintf(out, length, "\nGPU xo hold rcg=%x/%x br=%x/%x/%x mask=%x/%x cx=1/0",
                  xo.cmd, xo.cfg, xo.active[0], xo.active[1], xo.active[2], xo.ready, xo.restored);
@@ -212,7 +215,11 @@ static void reportCxPulse(char *out, unsigned length, IOMemoryMap &gcc, unsigned
     write(*cc, A650_CC_CX_GDSCR, (current == UINT32_MAX ? before.sw : current) | collapse);
     const CxState after = waitCx(*cc, false);
     const bool restored = after.off() && (after.sw & collapse);
-    if (power == 4 && xo.ready == 7) {
+    if (power == 5 && xo.ready == 7 && xo.gmu.counterBefore != xo.gmu.counterAfter) {
+        reportRsc(out, length, xo.gmu.rsc, restored);
+        return;
+    }
+    if (power >= 4 && xo.ready == 7) {
         const GmuSnapshot &gmu = xo.gmu;
         snprintf(out, length, "\nGPU gmu %s reset=%x fw=%x ao=%x/%x xo=%x/%x cx=1/%u",
                  gmu.state, gmu.reset, gmu.fwInit, gmu.counterBefore, gmu.counterAfter,
@@ -231,21 +238,16 @@ static void reportCxPulse(char *out, unsigned length, IOMemoryMap &gcc, unsigned
 }
 #endif
 
-static void reportClock(char *out, unsigned length, bool writeGate = false) {
+static void reportClock(char *out, unsigned length, bool writeGate, unsigned power) {
     using namespace t970_touch;
-#ifdef T970_GPU_POWER_SNAPSHOT
-    unsigned power = 0;
-    const bool powerSnapshot = PE_parse_boot_argn("t970-gpu-p", &power, sizeof(power)) &&
-                               power >= 1 && power <= 4;
-    if (powerSnapshot) writeGate = false;
-#endif
+    if (power) writeGate = false;
     auto gcc = mapMmio(0x100000, 0x80000, writeGate ? 0 : kIOMapReadOnly);
     if (!gcc || !gcc->getVirtualAddress()) {
         snprintf(out, length, "\nGPU clk: mapping failed");
         return;
     }
 #ifdef T970_GPU_POWER_SNAPSHOT
-    if (powerSnapshot) {
+    if (power) {
         if (power == 1) reportPower(out, length, *gcc);
         else reportCxPulse(out, length, *gcc, power);
         return;
@@ -273,6 +275,14 @@ static void reportClock(char *out, unsigned length, bool writeGate = false) {
     bool restored = (after & divGate) == (branch & divGate);
     snprintf(out + used, length - used, " div=%u back=%x restore=%u",
              set ? 1u : 0u, during, restored ? 1u : 0u);
+}
+
+static unsigned powerMode() {
+#ifdef T970_GPU_POWER_SNAPSHOT
+    unsigned power = 0;
+    if (PE_parse_boot_argn("t970-gpu-p", &power, sizeof(power)) && power >= 1 && power <= 5) return power;
+#endif
+    return 0;
 }
 
 } // namespace t970_gpu

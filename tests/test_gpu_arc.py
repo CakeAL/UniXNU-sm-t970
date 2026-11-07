@@ -97,8 +97,9 @@ int main() {
         self.assertIn('GPU arc db=%x cx=%x lv=%u [%s] min=%u mx=%x lv=%u [%s] min=%u', header)
         self.assertNotIn('writeMasked', header)
         display = (ROOT / 'package/T970Display/DisplayRegistration.cpp').read_text()
-        self.assertGreaterEqual(display.count('t970_gpu::reportArc('), 2)
-        self.assertGreaterEqual(display.count('t970_gpu::reportClock('), 2)
+        self.assertEqual(display.count('reportGpu(out + used,'), 2)
+        self.assertIn('if (mode != 5) t970_gpu::reportArc(out, length);', display)
+        self.assertIn('t970_gpu::reportClock(', display)
         self.assertIn('PE_parse_boot_argn("t970-gpu-w"', display)
 
     def test_gpu_branch_gate_write_is_restored(self):

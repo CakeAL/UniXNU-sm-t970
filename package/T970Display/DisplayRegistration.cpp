@@ -320,11 +320,19 @@ extern "C" bool native_legacy_prepare_scanout(void) {
     return true;
 }
 
+static void reportGpu(char *out, unsigned length) {
+    const unsigned mode = t970_gpu::powerMode();
+    if (mode != 5) t970_gpu::reportArc(out, length);
+    const size_t used = strlen(out);
+    unsigned gpuWrite = 0;
+    const bool writeGate = PE_parse_boot_argn("t970-gpu-w", &gpuWrite, sizeof(gpuWrite)) && gpuWrite == 1;
+    t970_gpu::reportClock(out + used, static_cast<unsigned>(length - used), writeGate, mode);
+}
+
 extern "C" void native_t970_display_timing(char *out, unsigned length, int hold) {
     unsigned peripheral = 0;
     if (PE_parse_boot_argn("t970-battery-ro", &peripheral, sizeof(peripheral))) {
-        // The caller's display buffer is 896 bytes, shared with startup diagnostics.
-        // Prioritize current peripheral evidence instead of appending it after old Setup counters.
+        // Prioritize peripheral evidence in the shared startup diagnostics buffer.
         if (!out || !length) return;
         out[0] = 0;
         t970MemoryHandoff(out, length);
@@ -333,11 +341,7 @@ extern "C" void native_t970_display_timing(char *out, unsigned length, int hold)
         used = strlen(out);
         if (native_t970_key_state) native_t970_key_state(out + used, static_cast<unsigned>(length - used));
         used = strlen(out);
-        t970_gpu::reportArc(out + used, static_cast<unsigned>(length - used));
-        used = strlen(out);
-        unsigned gpuWrite = 0;
-        bool writeGate = PE_parse_boot_argn("t970-gpu-w", &gpuWrite, sizeof(gpuWrite)) && gpuWrite == 1;
-        t970_gpu::reportClock(out + used, static_cast<unsigned>(length - used), writeGate);
+        reportGpu(out + used, static_cast<unsigned>(length - used));
         return;
     }
     uint64_t publishNs = 0, firstNs = 0, lastNs = 0, blankNs = 0, darkNs = 0;
@@ -364,11 +368,7 @@ extern "C" void native_t970_display_timing(char *out, unsigned length, int hold)
     used = strlen(out);
     t970MemoryHandoff(out + used, length - used);
     used = strlen(out);
-    t970_gpu::reportArc(out + used, static_cast<unsigned>(length - used));
-    used = strlen(out);
-    unsigned gpuWrite = 0;
-    bool writeGate = PE_parse_boot_argn("t970-gpu-w", &gpuWrite, sizeof(gpuWrite)) && gpuWrite == 1;
-    t970_gpu::reportClock(out + used, static_cast<unsigned>(length - used), writeGate);
+    reportGpu(out + used, static_cast<unsigned>(length - used));
 }
 
 extern "C" __attribute__((noreturn)) void native_legacy_backend_guard(unsigned slot, void *object, void *caller) {
