@@ -105,6 +105,8 @@ v120 实机确认翻译关闭时可以安装、走查并撤销 XNU 页表。v121
 TCM 恢复无差异，版本字为 `0x20010008`。
 v124 复用 T970 的 RSC 路由和 v122 的 SID5，把四队列 HFI 布局随固件发布，
 随后释放 CM3 并检查 FW_INIT 和 HFI 就绪。加载后保留 DMA 内存和依赖至重启。
+v124 实机在 DDR AXI 时钟关闭时返回。v125 在该范围请求 DDR AXI 时钟，
+回读 ENABLE 与 CLK_OFF 后再进入 GMU 首启。
 CM3 启动阶段需保留 T970 的 RSC 路由，且核对 A650 的 HFI 队列布局。
 锁定的 Sm8250Platform 冷启动序列会写入固定的 hidden 值，集成时需处理与实测路由的差异。
 见 [v109 实测](../evidence/gpu/rsc-init-v109/device-result.json)、
@@ -123,6 +125,7 @@ CM3 启动阶段需保留 T970 的 RSC 路由，且核对 A650 的 HFI 队列布
 [v122 SID5 实测](../evidence/gpu/sid5-v122/device-result.json)、
 [v123 固件装载实测](../evidence/gpu/gmufw-v123/device-result.json)、
 [v124 首启探针](../evidence/gpu/gmuboot-v124/README.md)、
+[v125 DDR AXI 探针](../evidence/gpu/gmuboot-axi-v125/README.md)、
 [lmi RSC 实现](https://github.com/Fsasdddd/lmi-uefi-touch-gpu/blob/0c9398400f937555918a53f1e9a97a90a3345257/tools/lmi-gpu-rsc-init.c)
 和 [SM8250 GMU 实现](https://github.com/FFT-infra/UniXNU-sm8250-common/blob/166235ec2480ff0992627b7aafa15c65ce6b4efa/kits/Sm8250Platform/A650Gmu.c)。
 

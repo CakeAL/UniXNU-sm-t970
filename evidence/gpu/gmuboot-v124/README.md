@@ -17,6 +17,8 @@ RSC 路由和 200 MHz GMU 时钟，用 XNU 自有页表为 SID5 提供 GMU RAM�
 `0x400` 是 AArch64 Format 位。`at` 记录发生回读异常的 GMU 配置寄存器偏移。
 本轮验收到 HFI 队列就绪。后续用 `FW_VER` 的应答验证收发队列。
 
+以下构建命令对应 v124 源码版本 `932e7a2`。
+
 ```sh
 python3.14 evidence/display/hello-black-v64/build-kernel.py --cached-headers --setup-probe --gop-fork --keys --refresh-hid --gpu-soc .cache/git-sources/sm8250-166235ec2480 --arm-smmu4k ../UniXNU/kits/ArmSmmu4K --gmu-firmware .cache/firmware/gpu-candidates/linux-firmware-20260221-a650_gmu.bin --output out/data-bringup/gpu-gmuboot-v124-build
 python3.14 evidence/gpu/power-v104/prepare.py --gmu-boot

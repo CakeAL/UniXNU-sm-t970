@@ -22,7 +22,8 @@ constexpr unsigned cbRootMode = 17;
 constexpr unsigned cbActivateMode = 18;
 constexpr unsigned cbSid5Mode = 19;
 constexpr unsigned cbFirmwareMode = 20;
-constexpr unsigned cbBootMode = 21;
+constexpr unsigned cbBootMode = 22;
+constexpr unsigned ddrAxiIndex = 2;
 constexpr uint32_t cbBarStage1 = 0x1f300;
 // Arm IHI 0062D.c: FSR[10:9] describes the translation table format.
 constexpr uint32_t cbFsrFormatMask = 0x600;
@@ -48,7 +49,7 @@ struct SmmuSnapshot {
     uint32_t firstS2cr = 0;
     uint32_t cb[15] = {};
     bool contextRead = false;
-    uint32_t clock[2] = {};
+    uint32_t clock[3] = {};
     unsigned ready = 0, restored = 0;
     bool holdParents = false;
     const char *format = "skip";
@@ -72,7 +73,7 @@ struct SmmuSnapshot {
     uint32_t sid5Smr = 0, sid5S2cr = 0, sid5SmrAfter = 0, sid5S2crAfter = 0;
     GmuFirmwareProbe firmware;
     GmuBootProbe boot;
-    uint32_t ddrAxi = 0;
+    uint32_t ddrAxiBefore = 0, ddrAxiAfter = 0;
 };
 
 constexpr unsigned cbOffsets[] = {
@@ -604,21 +605,20 @@ static void sampleSmmu(SmmuSnapshot &result, IOMemoryMap &gmu, unsigned power) {
 static SmmuSnapshot pulseSmmuBus(IOMemoryMap &gcc, IOMemoryMap &gmu, unsigned power) {
     using namespace t970_touch;
     constexpr unsigned gpu = A650_GPU_BASE_GCC_GPU - 0x100000;
-    constexpr unsigned clocks[] = {gpu + A650_GCC_GPU_MEMNOC_GFX, gpu + A650_GCC_GPU_SNOC_DVM_GFX};
+    constexpr unsigned clocks[] = {gpu + A650_GCC_GPU_MEMNOC_GFX, gpu + A650_GCC_GPU_SNOC_DVM_GFX,
+                                   gpu + A650_GCC_DDRSS_GPU_AXI};
     constexpr uint32_t enable = A650_CBCR_ENABLE;
+    const unsigned count = power == cbBootMode ? 3 : 2;
     SmmuSnapshot result;
-    if (power == cbBootMode) {
-        result.ddrAxi = read(gcc, gpu + A650_GCC_DDRSS_GPU_AXI);
-        if (result.ddrAxi == UINT32_MAX || !A650GpuClockIsOn(result.ddrAxi)) {
-            result.state = "axi";
-            return result;
-        }
-    }
     result.state = "clock";
-    uint32_t before[2] = {};
+    uint32_t before[3] = {};
     unsigned visited = 0;
-    for (unsigned i = 0; i < 2; ++i) {
+    for (unsigned i = 0; i < count; ++i) {
         before[i] = read(gcc, clocks[i]);
+        if (i == ddrAxiIndex) {
+            result.state = "axi";
+            result.ddrAxiBefore = before[i];
+        }
         if (before[i] == UINT32_MAX) break;
         visited |= 1u << i;
         if (!branchRunning(before[i])) write(gcc, clocks[i], before[i] | enable);
@@ -631,18 +631,18 @@ static SmmuSnapshot pulseSmmuBus(IOMemoryMap &gcc, IOMemoryMap &gmu, unsigned po
         if (!branchRunning(value)) break;
         result.ready |= 1u << i;
     }
-    if (result.ready == 3) sampleSmmu(result, gmu, power);
+    if (result.ready == (1u << count) - 1) sampleSmmu(result, gmu, power);
     if (result.holdParents) return result;
-    for (unsigned i = 2; i-- > 0;) {
+    for (unsigned i = count; i-- > 0;) {
         const unsigned bit = 1u << i;
         if (!(visited & bit)) continue;
         uint32_t value = read(gcc, clocks[i]);
-        if (value == UINT32_MAX) break;
-        if (!(before[i] & enable) && (value & enable)) {
+        if (value != UINT32_MAX && !(before[i] & enable) && (value & enable)) {
             write(gcc, clocks[i], value & ~enable);
             IODelay(10);
             value = read(gcc, clocks[i]);
         }
+        if (i == ddrAxiIndex) result.ddrAxiAfter = value;
         if (value == UINT32_MAX || ((value ^ before[i]) & enable)) break;
         result.restored |= bit;
     }
