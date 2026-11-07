@@ -1,0 +1,12 @@
+{
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/gpu-cbroot-v120/boot-partition.img",
+  "finished_at": "2026-11-07T22:37:19+08:00",
+  "boot_sha256": "e6d8b426b79facd7ebe47b5a6e6100f377542befbf3fc718e9a91c8a3c6d21b6",
+  "partition": "BOOT",
+  "exit_code": 0,
+  "transfer_confirmed": true,
+  "reboot_requested": true,
+  "partition_readback": false,
+  "userdata_partition_uploaded": false,
+  "transfer_log_sha256": "3634cb6a721690ebec51de2aae82b631e02d349f10201c5a1708783765e0f6ac"
+}
