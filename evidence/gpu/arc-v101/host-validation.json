@@ -1,0 +1,16 @@
+{
+  "boot_sha256": "12bf03ae172b38511c3d22ecab4acd2d5adbd13daaad07d8be31f6345fb45b88",
+  "kernel_build_sha256": "655020cdce562638be824b2051993f9b65a11d53b8fbc21e22b78bc84ae06dae",
+  "tests": {
+    "command": "python3.14 -m unittest discover -s tests",
+    "ran": 71,
+    "skipped": 10,
+    "result": "OK"
+  },
+  "level_codes": "ArcResource stores up to 16 levels; formatArcLevels prints the list; test asserts 0,16,32,48",
+  "markers": [
+    "GPU arc db=%x cx=%x lv=%u [%s] min=%u"
+  ],
+  "kernel_args": "unchanged (986 bytes)",
+  "runtime": "uploaded and reboot requested; level lists pending"
+}
