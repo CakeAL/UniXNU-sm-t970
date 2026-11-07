@@ -1,0 +1,21 @@
+{
+  "boot_sha256": "749b7419d42801fd27b22193343824a17ff6b3c96fea3347545a5ad0f7f25f1c",
+  "kernel_build_sha256": "5e79f66aefb14fd7b4a60dab4a783c3e612b08e5e7d1911330deba9fc9ea360e",
+  "tests": {
+    "command": "python3.14 -m unittest discover -s tests",
+    "ran": 69,
+    "skipped": 10,
+    "result": "OK"
+  },
+  "test_gauge_probe": "self-clearing WDTCLR model (0xed write reads 0xec), continuous kicked path, guard refusal and guard-disabled path with transaction counts 18/16/14/16",
+  "kernel_markers": [
+    "T970 battery: charger action result=",
+    "kick-corrupt",
+    "Charger cfg=",
+    "Battery svc="
+  ],
+  "kick_verification": "only CNFG_06 bits7:2 must match; WDTCLR bits1:0 are allowed to read back zero",
+  "kick_failure_policy": "write NACK leaves CHG_EN on (watchdog expires); preserved-bit change clears CHG_EN",
+  "kernel_args": "unchanged (986 bytes, t970-charge=1 present)",
+  "runtime": "uploaded and reboot requested; steady-charge result pending"
+}
