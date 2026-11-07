@@ -12,7 +12,7 @@ T733 参考项目的提交与实机范围已核查，见
 | --- | --- | --- | --- |
 | 内存 | Loader 的连续 owned window；v87 托管范围覆盖补丁已撤下 | v88 桌面，3713.86 MiB 管理页，8 核 | 导出实际 EFI 内存图和分配区间，设计多区间管理，压力验证 |
 | 侧键 | PM8150 PON + PM8150L SPMI GPIO，v89/v90 观察器已链接 | v91 三键HID、97报告/0错误；锁屏及再次点亮正常；音量键响应 | 音频路由可用后验证音量值与实际声音；继续电池／内存，分别验证音量和锁屏／唤醒 |
-| 电池 | MAX77705，QUP0 I²C，GPIO28/29；FG 0x36、charger 0x69、PMIC 0x66 | v94 实机读数有效；v95 服务已确认：48 样本/0 错误，状态栏显示电池与 `Not Charging`；v96 只读 charger 配置快照已刷，待回报 | 按配置恢复充电，再接充电中断 |
+| 电池 | MAX77705，QUP0 I²C，GPIO28/29；FG 0x36、charger 0x69、PMIC 0x66 | v94 实机读数有效；v95 服务已确认：48 样本/0 错误，状态栏显示电池与 `Not Charging`；v96 配置快照确认 `chgEn=0`；v97 受守卫的 CHG_EN/喂狗已刷，待回报 | 确认 `charge=` 与 `CHG_DTLS`，再接充电中断与亮度 |
 | 亮度 | S6TUUM3 AMSA24VU01，DSI command mode，范围 1–355 | GOP 图像已验证，亮度未验证 | 读取 DSI 交接状态；按面板 normal gamma mode 2 命令与映射表实现调节 |
 | Wi-Fi | QCA6390 PCI 17cb:1101，subsystem 17cb:0108，PCIe0 | Android 设备 ID；XNU 尚未训练链路 | SM8250 PCIe0 供电、PHY、复位、BAR、MSI／DMA；然后接 ath11k/MHI/QMI 与 21H461 网络 ABI |
 
@@ -55,6 +55,12 @@ charger 中断留给后续。
 v96 `BOOT3ce997f2` 已加入这五个配置字的只读采样，报告新增
 `Charger cfg=.. wdtEn= chgEn= ichg= iin= cv=` 行；仍不写 charger 寄存器。
 实机值待回报，之后按原厂顺序处理看门狗和充电重启。
+
+v97 `BOOT96ff33b6` 在 `t970-charge=1` 下把 CHG_EN 从 0 置 1、按原厂方式写
+WDTCLR 喂狗，并在温度 0–45 °C、电压 3.0–4.35 V、电池在位和 CHGPROT 解锁的
+守卫下执行；每次写入回读校验，守卫失败或喂狗失败会撤销 CHG_EN。充电电流、
+输入限流和 4.35 V 浮充值仍是引导阶段的原厂配置，本轮不改。报告在
+`Battery svc` 行末给出 `charge=` 结果；实机充电状态待回报。
 
 v93 实测 SE0 `fw=0x303`（I²C 协议 3）、`status=0`、GPIO28/29 配置 `7/7`。
 临时解除 slave AHB HWCG 后可读引擎，随后恢复。详见

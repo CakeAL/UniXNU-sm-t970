@@ -1,0 +1,12 @@
+{
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/charge-restart-v97/boot-partition.img",
+  "finished_at": "2026-11-07T05:50:30.878601+00:00",
+  "boot_sha256": "96ff33b674e62c4ca18eeb3efed8955d718e22c70c7a4d9d20f5116063a5f979",
+  "partition": "BOOT",
+  "exit_code": 0,
+  "transfer_confirmed": true,
+  "reboot_requested": true,
+  "partition_readback": false,
+  "userdata_partition_uploaded": false,
+  "transfer_log_sha256": "3634cb6a721690ebec51de2aae82b631e02d349f10201c5a1708783765e0f6ac"
+}

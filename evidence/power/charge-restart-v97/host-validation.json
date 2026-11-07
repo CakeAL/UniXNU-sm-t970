@@ -1,0 +1,27 @@
+{
+  "boot_sha256": "96ff33b674e62c4ca18eeb3efed8955d718e22c70c7a4d9d20f5116063a5f979",
+  "kernel_build_sha256": "5b16b624d93b10992e217aff952410db150d0a17e969583c99230aff9a708043",
+  "tests": {
+    "command": "python3.14 -m unittest discover -s tests",
+    "ran": 69,
+    "skipped": 10,
+    "result": "OK"
+  },
+  "test_gauge_probe": "ASan/UBSan model now also covers CHG_EN 0x3b->0xbb, watchdog kick 0xec->0xed, guard refusal at 64 C (no write) and the 14-read transaction count",
+  "test_battery_service": "5 tests cover the charger decode, guarded action wiring and cached report",
+  "kernel_args_bytes": 986,
+  "kernel_args_added": "t970-charge=1",
+  "markers": [
+    "T970 battery: charger action result=",
+    "Charger cfg=",
+    "Battery svc="
+  ],
+  "guard": "present + 0..45 C + 3.0..4.35 V + CHGPROT 3",
+  "writes": [
+    "CNFG_09 |= 0x80 when CHG_EN is clear",
+    "CNFG_06 WDTCLR=1 kick",
+    "CHG_EN cleared on guard failure or failed kick"
+  ],
+  "readback": "every write is read back; a mismatch is reported and the enable byte restored",
+  "runtime": "uploaded and reboot requested; charge result pending"
+}
