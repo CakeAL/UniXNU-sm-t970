@@ -27,6 +27,8 @@ void thread_terminate_self(void);
 namespace {
 
 using t970_power::GaugeSample;
+using t970_power::t970_charger_config;
+using t970_power::t970_charger_config_decode;
 using t970_power::t970_charger_decode;
 using t970_power::t970_charger_state;
 
@@ -141,6 +143,19 @@ public:
             setBoolean("FullyCharged", charger.full);
             setNumber("T970ChargerDetail", charger.chgDtls);
         }
+        t970_charger_config config = t970_charger_config_decode(sample.config, sample.configValid);
+        if (config.valid) {
+            // Read-only snapshot for the next charger decision; nothing here writes it back.
+            setNumber("T970ChargerConfig00", config.cnfg00);
+            setNumber("T970ChargerConfig02", config.cnfg02);
+            setNumber("T970ChargerConfig04", config.cnfg04);
+            setNumber("T970ChargerConfig06", config.cnfg06);
+            setNumber("T970ChargerConfig09", config.cnfg09);
+            setNumber("T970ChargeCurrentMilliamp", config.chargeCurrentMa);
+            setNumber("T970InputCurrentLimitMilliamp", config.inputCurrentMa);
+            setBoolean("T970ChargerWatchdogEnabled", config.watchdogEnabled);
+            setBoolean("T970ChargeEnabled", config.chargeEnabled);
+        }
 
         if (!gaugeComplete || !charger.valid) {
             const OSSymbol *error = OSSymbol::withCString("MAX77705ReadIncomplete");
@@ -207,6 +222,13 @@ void batteryWorker(void *, wait_result_t) {
                    unsigned(charger.watchdogExpired),
                    __atomic_load_n(&state.published, __ATOMIC_ACQUIRE),
                    unsigned(sample.restored), sample.stage, sample.fault);
+            if (sample.configValid) {
+                t970_charger_config config = t970_charger_config_decode(sample.config, true);
+                printf("T970 battery: charger cfg %02x/%02x/%02x/%02x/%02x wdtEn=%u chgEn=%u ichg=%umA iin=%umA cv=%02x\n",
+                       config.cnfg00, config.cnfg02, config.cnfg04, config.cnfg06, config.cnfg09,
+                       unsigned(config.watchdogEnabled), unsigned(config.chargeEnabled),
+                       config.chargeCurrentMa, config.inputCurrentMa, config.floatVoltageCode);
+            }
         }
         lastComplete = complete;
         lastExternal = charger.external;

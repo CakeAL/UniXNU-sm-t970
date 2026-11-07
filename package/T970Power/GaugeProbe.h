@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: BSD-2-Clause-Patent
 #pragma once
 #include "../T970Touch/BusSnapshot.h"
+#include "Max77705Charger.h"
 #include "Max77705Measurements.h"
 
 namespace t970_power {
@@ -13,10 +14,12 @@ struct GaugeSample {
     uint32_t pinConfig[2] = {};
     uint8_t id[2] = {};
     uint8_t charger[3] = {};
+    uint8_t config[5] = {};
     uint16_t raw[7] = {};
     t970_battery_measurements values = {};
     bool identified = false;
     bool chargerValid = false;
+    bool configValid = false;
     bool restored = false;
     const char *stage = "lines-low";
     const char *fault = "none";
@@ -85,6 +88,19 @@ static bool readGaugeSample(GaugeSample &sample) {
                 if (!sample.chargerValid) {
                     sample.stage = "charger-read";
                     sample.fault = charge.fault;
+                } else {
+                    // Read-only configuration snapshot: CNFG_00/02/04/06/09.
+                    const uint8_t configRegisters[] = {0xb7, 0xb9, 0xbb, 0xbd, 0xc0};
+                    ProbeBus config(*pins, T970_CHARGER_ADDRESS);
+                    sample.configValid = true;
+                    for (unsigned i = 0; i < sizeof(configRegisters); ++i) {
+                        if (!config.transfer(&configRegisters[i], 1, &sample.config[i], 1)) {
+                            sample.configValid = false;
+                            sample.stage = "charger-config";
+                            sample.fault = config.fault;
+                            break;
+                        }
+                    }
                 }
             }
         }
@@ -121,6 +137,16 @@ static void formatGaugeSample(const GaugeSample &sample, char *out, unsigned len
         sample.values.remaining_mah, sample.values.full_mah, sample.chargerValid,
         sample.charger[0], sample.charger[1], sample.charger[2],
         sample.restored, sample.stage, sample.fault, sample.failedRegister);
+    size_t used = strlen(out);
+    if (used < length && sample.chargerValid) {
+        t970_power::t970_charger_config config = t970_power::t970_charger_config_decode(sample.config, sample.configValid);
+        snprintf(out + used, length - used,
+            "\nCharger cfg=%02x/%02x/%02x/%02x/%02x wdtEn=%u chgEn=%u ichg=%umA iin=%umA cv=%02x%s",
+            sample.config[0], sample.config[1], sample.config[2], sample.config[3], sample.config[4],
+            unsigned(config.watchdogEnabled), unsigned(config.chargeEnabled),
+            config.chargeCurrentMa, config.inputCurrentMa, config.floatVoltageCode,
+            config.valid ? "" : " partial");
+    }
 }
 
 static void reportGauge(char *out, unsigned length) {

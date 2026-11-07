@@ -40,6 +40,17 @@ int main() {
     uint8_t none[3] = {0xff, 0xff, 0xff};
     auto n = t970_charger_decode(none, false);
     assert(!n.valid && !n.external && !n.charging && !n.full && !n.watchdogExpired);
+    /* Configuration snapshot: WDTEN set, CHG_EN set, CHG_CC 40*50mA, CHGIN_LIM 7 -> 200mA. */
+    uint8_t cfg[5] = {0x10, 0x28, 0x1c, 0x00, 0x87};
+    auto cc = t970_charger_config_decode(cfg, true);
+    assert(cc.valid && cc.watchdogEnabled && cc.chargeEnabled);
+    assert(cc.chargeCurrentMa == 2000 && cc.inputCurrentMa == 200 && cc.floatVoltageCode == 0x1c);
+    assert(cc.cnfg00 == 0x10 && cc.cnfg02 == 0x28 && cc.cnfg09 == 0x87);
+    uint8_t zero[5] = {0x00, 0x00, 0x00, 0x00, 0x00};
+    auto z = t970_charger_config_decode(zero, true);
+    assert(!z.watchdogEnabled && !z.chargeEnabled && z.chargeCurrentMa == 0 && z.inputCurrentMa == 0);
+    auto bad = t970_charger_config_decode(cfg, false);
+    assert(!bad.valid);
 }
 '''
         with tempfile.TemporaryDirectory() as tmp:
@@ -67,6 +78,7 @@ class ServiceWiring(unittest.TestCase):
                 't970_charger_decode(sample.charger, sample.chargerValid)',
                 'IOSleep(kPollMilliseconds)',
                 'Battery svc=1 samples=%u errors=%u published=%u age_ms=%llu',
+                'T970ChargerConfig00', 'T970ChargeEnabled', 'T970ChargerWatchdogEnabled',
                 'OSMetaClass::preModLoad(g_kernel_kmod_info.name)',
                 'OSMetaClass::postModLoad(handle)'):
             self.assertIn(needle, source)
@@ -83,6 +95,14 @@ class ServiceWiring(unittest.TestCase):
         self.assertIn('T970Power/BatteryService.cpp', builder)
         self.assertIn('BatteryService.late.o', builder)
         self.assertIn('BatteryService.late.o', (ROOT / 'scripts/check-data-payload.py').read_text())
+
+    def test_config_snapshot_is_read_only(self):
+        gauge = (ROOT / 'package/T970Power/GaugeProbe.h').read_text()
+        for needle in ('0xb7', '0xb9', '0xbb', '0xbd', '0xc0',
+                       'Charger cfg=%02x/%02x/%02x/%02x/%02x wdtEn=%u chgEn=%u ichg=%umA iin=%umA cv=%02x'):
+            self.assertIn(needle, gauge)
+        # The header may only read the configuration registers; no write helper is used there.
+        self.assertNotIn('writeReg', gauge)
 
     def test_cached_report_does_not_touch_the_bus(self):
         bus = (ROOT / 'package/T970Power/BusSnapshot.h').read_text()

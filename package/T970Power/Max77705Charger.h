@@ -37,4 +37,40 @@ static inline t970_charger_state t970_charger_decode(const uint8_t raw[3], bool 
     return state;
 }
 
+// Charger configuration snapshot (read-only). Register meanings follow the
+// pinned vendor header: CNFG_00 bit4 WDTEN, CNFG_02 bits5:0 CHG_CC in 50 mA
+// steps, CNFG_04 bits5:0 float-voltage code, CNFG_09 bit7 CHG_EN and bits6:0
+// CHGIN_LIM in 25 mA steps (code = mA/25 - 1, zero disables the limit).
+struct t970_charger_config {
+    bool valid;
+    uint8_t cnfg00;
+    uint8_t cnfg02;
+    uint8_t cnfg04;
+    uint8_t cnfg06;
+    uint8_t cnfg09;
+    bool watchdogEnabled;
+    bool chargeEnabled;
+    unsigned chargeCurrentMa;
+    unsigned inputCurrentMa;
+    unsigned floatVoltageCode;
+};
+
+static inline t970_charger_config t970_charger_config_decode(const uint8_t raw[5], bool valid) {
+    t970_charger_config cfg = {};
+    cfg.valid = valid;
+    if (!valid) return cfg;
+    cfg.cnfg00 = raw[0];
+    cfg.cnfg02 = raw[1];
+    cfg.cnfg04 = raw[2];
+    cfg.cnfg06 = raw[3];
+    cfg.cnfg09 = raw[4];
+    cfg.watchdogEnabled = ((cfg.cnfg00 >> 4) & 1u) != 0;
+    cfg.chargeEnabled = ((cfg.cnfg09 >> 7) & 1u) != 0;
+    cfg.chargeCurrentMa = (cfg.cnfg02 & 0x3fu) * 50u;
+    const unsigned inputCode = cfg.cnfg09 & 0x7fu;
+    cfg.inputCurrentMa = inputCode ? (inputCode + 1u) * 25u : 0;
+    cfg.floatVoltageCode = cfg.cnfg04 & 0x3fu;
+    return cfg;
+}
+
 } // namespace t970_power

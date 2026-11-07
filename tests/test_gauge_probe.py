@@ -16,6 +16,7 @@ class GaugeProbe(unittest.TestCase):
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
+#include "package/T970Power/Max77705Charger.h"
 #include "package/T970Power/Max77705Measurements.h"
 struct IOMemoryMap { uint32_t cfg[2]={7,7}, io[2]={3,3}; };
 static IOMemoryMap pins;
@@ -46,7 +47,13 @@ public:
         assert(pins.cfg[0]==3 && pins.cfg[1]==3 && pins.io[0]==1 && pins.io[1]==1);
         ++transfers;
         if(address==0x66) { assert(*command==0 && size==2);data[0]=unknown?0:0x15;data[1]=2;return true; }
-        if(address==0x69) { assert(*command==0xb2 && size==3);data[0]=0x40;data[1]=0x60;data[2]=3;return true; }
+        if(address==0x69) {
+            if(size==3) { assert(*command==0xb2);data[0]=0x40;data[1]=0x60;data[2]=3;return true; }
+            assert(size==1);
+            static const uint8_t cfg[5]={0x10,0x28,0x1c,0x00,0x87};
+            unsigned ix=*command==0xb7?0:*command==0xb9?1:*command==0xbb?2:*command==0xbd?3:4;
+            assert(ix<5);data[0]=cfg[ix];return true;
+        }
         assert(address==0x36 && size==2);
         if(nack){fault="nack";return false;}
         uint16_t value;
@@ -72,7 +79,7 @@ int main() {
     assert(strstr(text,"id=15/02 valid=7f"));
     assert(strstr(text,"soc100=10000 uV=4250000 uA=-400000 mC=25500 cap=10090/10090"));
     assert(strstr(text,"chg=1:40/60/03 restore=1 done/none"));
-    assert(transfers==9 && pins.cfg[0]==7 && pins.cfg[1]==7 && pins.io[0]==3 && pins.io[1]==3);
+    assert(transfers==14 && pins.cfg[0]==7 && pins.cfg[1]==7 && pins.io[0]==3 && pins.io[1]==3);
     nack=true;transfers=0;
     reportGauge(text,sizeof text);
     assert(strstr(text,"valid=0") && strstr(text,"restore=1 gauge-read/nack"));
