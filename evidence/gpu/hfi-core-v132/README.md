@@ -17,3 +17,10 @@ python3.14 evidence/display/hello-black-v64/build-kernel.py --cached-headers --s
 python3.14 evidence/gpu/power-v104/prepare.py --gmu-hfi-core
 python3.14 -m unittest discover -s tests
 ```
+
+[镜像清单](preparation.json)、[刷写回执](upload.json)及[实机报告](device-result.json)
+对应 BOOT `3fdb8e6dc324e9b2d724c73cc1010ca1821e7bffe8d88cba72f82371fd372015`。
+实测带宽表回显 `210303/30a003/0`、核心启动回显 `31030e/40020e/0`，
+两次中断均清零，`pf=0`。八核在线，Data 查询成功，GOP 拷贝和回收各 38 次。
+[主机验证](host-validation.json)记录队列、栈帧、封包和独立 DTS/ADT 检查。
+完整平台检查停在历史框架版本校验。

@@ -1404,6 +1404,7 @@ procedure = [
   "Read KGSL identity and frequency nodes, list GPU firmware files and calculate the GMU/SQE hashes without executing GPU commands.",
 ]
 findings = [
+  "v132 BOOT3fdb8e6d verified BW_TBL ACK 210303/30a003/0 and CORE_FW_START ACK 31030e/40020e/0 on the T970. Command cursors reached 224 and 228, both response IRQs cleared, and no SMMU faults were recorded.",
   "v132 mode 28 submits one legacy off-only DDR bandwidth table using four validated live BCM addresses. An accepted bandwidth reply gates CORE_FW_START. Both commands have bounded polls and leave dependencies held.",
   "v131 BOOT08365a3a verified PERF_TBL ACK 110304/203b04/0 on the T970 with command cursors 64/64, message cursors 4/8, IRQ 1/0 and zero recorded faults.",
   "v131 mode 27 uses the v130 FW_VER gate, T970's captured GPU OPPs and live gfx/cx/mx cmd-db selectors to submit one legacy PERF_TBL. It validates the exact reply echo, result and IRQ clear before considering the table accepted.",
@@ -1459,9 +1460,12 @@ limits = [
   "The diagnostic SID5 mapping and FW_VER validate GMU HFI DMA. GX, ZAP authentication, CP submission and fences, rendering and Metal remain unverified on the T970.",
 ]
 next_action = [
-  "Verify v132 BW_TBL and CORE_FW_START on hardware before qualifying GX, ZAP and bounded CP submission in an owned GPU mapping.",
+  "Qualify HFI START, the lowest GX DCVS vote and the GX OOB handshake. Follow with ZAP and bounded CP submission in an owned GPU mapping.",
 ]
 evidence = [
+  { kind = "device", reference = "evidence/gpu/hfi-core-v132/device-result.json", revision = "7fc32bee0188cf6142ee109a4eb1eac2fa03b499", command = "BOOT3fdb8e6d and owner three-finger report screenshot", result = "BW_TBL and CORE_FW_START accepted, both IRQs cleared, zero recorded faults. Eight CPUs, Data query success and 38 GOP copies and retirements." },
+  { kind = "host", reference = "evidence/gpu/hfi-core-v132/host-validation.json", revision = "7fc32bee0188cf6142ee109a4eb1eac2fa03b499", command = "python3.14 -m unittest discover -s tests and evidence/gpu/power-v104/prepare.py --gmu-hfi-core", result = "ASan/UBSan verified the off-only BW table, BCM refusal, gated CORE exchange and failure paths. FAT readback, firmware hash, image symbols and independent DTS/ADT passed." },
+  { kind = "device", reference = "evidence/gpu/hfi-core-v132/upload.json", revision = "7fc32bee0188cf6142ee109a4eb1eac2fa03b499", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/gpu-hfi-core-v132/boot-partition.img", result = "BOOT3fdb8e6d transfer succeeded and requested reboot." },
   { kind = "host", reference = "evidence/gpu/hfi-perf-v131/host-validation.json", revision = "b82e85ddf38c6ccc05e868a8bbd86e64e9491f55", command = "python3.14 -m unittest discover -s tests and evidence/gpu/power-v104/prepare.py --gmu-hfi-perf", result = "ASan/UBSan model validated ARC selection, the 59-word packet and ordered FW_VER then PERF_TBL with cursor, ACK and failure cases. FAT readback, firmware hash, image symbols and independent DTS/ADT passed." },
   { kind = "device", reference = "evidence/gpu/hfi-perf-v131/device-result.json", revision = "b82e85ddf38c6ccc05e868a8bbd86e64e9491f55", command = "BOOT08365a3a and owner three-finger report screenshot", result = "FW_VER and PERF_TBL accepted. PERF ACK 110304/203b04/0, cmd 64/64, msg 4/8, IRQ 1/0. Eight CPUs, Data query success and 27 GOP copies and retirements." },
   { kind = "device", reference = "evidence/gpu/hfi-perf-v131/upload.json", revision = "b82e85ddf38c6ccc05e868a8bbd86e64e9491f55", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/gpu-hfi-perf-v131/boot-partition.img", result = "BOOT08365a3a transfer succeeded and requested reboot." },
