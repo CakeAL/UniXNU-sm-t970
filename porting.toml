@@ -1404,6 +1404,7 @@ procedure = [
   "Read KGSL identity and frequency nodes, list GPU firmware files and calculate the GMU/SQE hashes without executing GPU commands.",
 ]
 findings = [
+  "v130 BOOTda034981 verified bidirectional GMU HFI DMA on device. FW_VER ACK 10401/100201/0/20010008 matched the request with result 0, command cursors 4/4, and the response IRQ cleared from 1 to 0. No recorded SMMU faults.",
   "v130 mode 26 sends one legacy A650 FW_VER after verified cold start. It checks empty queues and pinned versions, publishes the payload before the cursor and doorbell, and validates and consumes a single matching reply. The live route and backing remain held.",
   "v129 BOOT866a0644 confirmed SID5 S2CR0 1038eb00, FW_INIT 100, HFI status/version 1/20000001 and CM3 reset 0. The captured fault count and global fault status were zero; CB0 FSR 400 was the AArch64 format field.",
   "v129 clears S2CR0 INSTCFG[27:26] in the SID5 translation entry to use the incoming instruction attribute, verifies full S2CR readback before publishing SMR0, and begins with the original XN scratch, log and HFI leaves.",
@@ -1452,14 +1453,15 @@ completion = [
   "GMU boots, bounded GPU submissions and fences complete, memory mappings remain valid, and a known rendered image reaches a Metal client and display.",
 ]
 limits = [
-  "No GMU bring-up, command submission, DMA/SMMU ownership or Metal rendering was tested under UniXNU.",
+  "The diagnostic SID5 mapping and FW_VER validate GMU HFI DMA. GX, ZAP authentication, CP submission and fences, rendering and Metal remain unverified on the T970.",
 ]
 next_action = [
-  "Read the v130 mode 26 FW_VER report. Confirm the reply echo, firmware version and IRQ clear before sending performance or core start messages.",
+  "Verify legacy HFI performance and bandwidth table replies and CORE_FW_START with T970 inputs. Then qualify GX, ZAP and bounded CP submission with an owned GPU mapping.",
 ]
 evidence = [
   { kind = "host", reference = "evidence/gpu/hfi-version-v130/host-validation.json", revision = "9eac521eec7ffabdbef96aa2b05d63d4e689f57c", command = "python3.14 -m unittest discover -s tests and evidence/gpu/power-v104/prepare.py --gmu-hfi-version", result = "ASan/UBSan dual-view HFI model passed publication, ACK and failure paths. Firmware hash, FAT readback, image symbols and independent DTS/ADT passed." },
-  { kind = "device", reference = "evidence/gpu/hfi-version-v130/upload.json", revision = "9eac521eec7ffabdbef96aa2b05d63d4e689f57c", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/gpu-hfi-version-v130/boot-partition.img", result = "BOOTda034981 transfer succeeded and requested reboot. FW_VER device result pending." },
+  { kind = "device", reference = "evidence/gpu/hfi-version-v130/device-result.json", revision = "9eac521eec7ffabdbef96aa2b05d63d4e689f57c", command = "BOOTda034981 and owner three-finger report screenshot", result = "FW_VER ok, cmd 4/4, msg 0/4 before consumption, IRQ 1/0 and ACK 10401/100201/0/20010008. No recorded faults; eight CPUs, Data query success and 24 GOP copies and retirements." },
+  { kind = "device", reference = "evidence/gpu/hfi-version-v130/upload.json", revision = "9eac521eec7ffabdbef96aa2b05d63d4e689f57c", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/gpu-hfi-version-v130/boot-partition.img", result = "BOOTda034981 transfer succeeded and requested reboot." },
   { kind = "host", reference = "evidence/gpu/gmuboot-inst-v129/host-validation.json", revision = "0258acda12ec9b033f106d11810685fd988ab573", command = "python3.14 -m unittest discover -s tests and evidence/gpu/power-v104/prepare.py --gmu-boot-default-inst", result = "ASan/UBSan mock verifies mode 25 S2CR0 1038eb00, preserved legacy policy, refusal on filtered write and hold on failed restore. FAT readback, firmware hash, image symbols and independent DTS/ADT passed." },
   { kind = "device", reference = "evidence/gpu/gmuboot-inst-v129/device-result.json", revision = "0258acda12ec9b033f106d11810685fd988ab573", command = "BOOT866a0644 and owner three-finger report screenshot", result = "FW_INIT 100, HFI ready 1/version 20000001, CM3 out of reset, S2CR0 1038eb00, no recorded faults. Eight CPUs, Data query success, 32 GOP copies and retirements." },
   { kind = "device", reference = "evidence/gpu/gmuboot-inst-v129/upload.json", revision = "0258acda12ec9b033f106d11810685fd988ab573", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/gpu-gmuboot-inst-v129/boot-partition.img", result = "BOOT866a0644 transfer succeeded and requested reboot." },

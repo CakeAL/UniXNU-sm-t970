@@ -22,6 +22,9 @@ python3.14 -m unittest discover -s tests
 
 [镜像清单](preparation.json)和[刷写回执](upload.json)对应 BOOT
 `da0349810f6e3f64181c273502a3c6b31db78b3d6e2740b1ff97f67c2a7180a7`。
-Heimdall 确认上传并请求重启，FW_VER 等待实机报告。
+Heimdall 确认上传并请求重启。[实机报告](device-result.json)确认
+`cmd=4/4 msg=0/4 irq=1/0 ack=10401/100201/0/20010008`。固件读取了
+命令并写回匹配应答，中断已清除，`pf=0`。八核在线，Data 查询成功，
+GOP 完成 24 次拷贝和回收。
 [主机验证](host-validation.json)记录了缓存与队列模型、栈帧、封包和独立
 DTS/ADT 检查。完整平台检查停在历史框架版本校验。

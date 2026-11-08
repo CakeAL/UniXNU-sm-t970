@@ -1,0 +1,25 @@
+{
+  "boot_sha256": "da0349810f6e3f64181c273502a3c6b31db78b3d6e2740b1ff97f67c2a7180a7",
+  "source": "Owner screenshot attached to the Codex conversation",
+  "photo_time_local": "2026-11-08T12:33:44+08:00",
+  "photo_sha256": "fc5e4d2f1c688fd120b978717fba02e2739dcfb03de36ea07fe8d1f9bced8a37",
+  "lines": [
+    "GPU boot ready/smmu-hold fw=100 hfi=1/20000001 rst=0 at=0 f=0/400 irq=0/1 held=1 axi=80100000/100001/0 pf=0 s2=1038eb00",
+    "GPU fwver ok cmd=4/4 msg=0/4 irq=1/0 ack=10401/100201/0/20010008"
+  ],
+  "hfi_exchange": {
+    "command": "FW_VER",
+    "command_read_write": [4, 4],
+    "message_read_write_before_consumption": [0, 4],
+    "interrupt_before_after_clear": [1, 0],
+    "reply_header": "0x10401",
+    "request_echo": "0x100201",
+    "firmware_result": 0,
+    "firmware_version": "0x20010008"
+  },
+  "smmu": { "s2cr0": "0x1038eb00", "global_fault_status": 0, "context_fault_status": "0x400", "permission_faults": 0 },
+  "dependencies_retained": true,
+  "boot": { "three_finger_report": true, "cpus": 8, "processes": 243, "springboard_pid": 27, "backboardd_pid": 57 },
+  "storage": { "data_space_rc": 0, "block_size": 4096, "available_blocks": 46373 },
+  "display": { "copies": 24, "retired": 24 }
+}

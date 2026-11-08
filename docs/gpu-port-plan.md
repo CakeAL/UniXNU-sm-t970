@@ -39,7 +39,7 @@ CP 提交、GPU 内存映射和最小绘图；Metal/DPU 留到后续阶段。
 
 按 [GPU 与 Metal 适配](https://unixnu.com/zh/porting/gpu)的验收项记录。
 T970 已确定 A650 与 21H461，原厂 GMU、SQE 和 ZAP 已记录来源与哈希。
-电源和时钟的前置实测已完成，GMU 固件启动与 HFI 应答待验收。
+电源和时钟的前置实测已完成，v129 验证 GMU 启动，v130 验证 HFI 应答。
 GMU 启动依赖 SMMU，因此先做指南第 3 步开头的上下文和流验证，再完成第 2 步的 GMU/HFI 验收。
 当前探针使用 ArmSmmu4K 建表、走查及同步。原厂 GMU kernel 使用掩码匹配，
 板级探针依原厂设备树和 lmi 处理 SMR/S2CR。后续在固件/HFI 和命令提交路径分别接入
@@ -51,7 +51,7 @@ AdrenoFirmware 与 AdrenoPM4，再验收 ring、fence、已知图像和 iPadOS M
 | --- | --- | --- |
 | 0 | 资源/固件/候选源对照（v99 起） | 报告 `GPU arc` 行、DT/固件哈希 |
 | 1 | GPUCC/GDSC/供电/TSENS 资格确认 | v104 读到 GPUCC，v105 确认 CX 上电和恢复，v106 确认 XO 分支运行与恢复 |
-| 2 | GMU 冷启动 + HFI 版本回读 | `FW_INIT`/HFI 响应 |
+| 2 | GMU 冷启动 + HFI 版本回读 | [v130 实测通过](../evidence/gpu/hfi-version-v130/device-result.json) |
 | 3 | ZAP 认证 + secure mode 退出 | 认证结果 |
 | 4 | SMMU/GPU VA + CP ring/fence | GPU 内存写入回读 |
 | 5 | tile/GL 探针 | 已知像素精确匹配 |
@@ -127,8 +127,9 @@ INSTCFG 设为 3，覆盖了匹配流的读请求属性。v129 在发布 SID5 �
 INSTCFG 设为 0，使用请求原有的属性，再以原始 XN 页表验证 GMU 首启。
 见 [Arm SMMUv2 §3.4、§9.6](https://documentation-service.arm.com/static/5f900d34f86e16515cdc08fb)。
 v129 实机确认 `s2=1038eb00 fw=100 hfi=1/20000001 rst=0 pf=0`。
-v130 以同样的启动路径在队列就绪后发送一条 `FW_VER`，以应答回显、
-返回码及固件版本验证双向 DMA。
+v130 实机确认 `FW_VER` 应答 `10401/100201/0/20010008`、
+命令游标 `4/4`、中断由 `1` 清为 `0`，验证 GMU 与主机之间的双向 DMA。
+下一步验证性能表、带宽表和 `CORE_FW_START`，再进入 GX、ZAP 和 CP。
 CM3 启动阶段需保留 T970 的 RSC 路由，且核对 A650 的 HFI 队列布局。
 锁定的 Sm8250Platform 冷启动序列会写入固定的 hidden 值，集成时需处理与实测路由的差异。
 见 [v109 实测](../evidence/gpu/rsc-init-v109/device-result.json)、
