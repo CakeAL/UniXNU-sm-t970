@@ -19,3 +19,9 @@ python3.14 evidence/display/hello-black-v64/build-kernel.py --cached-headers --s
 python3.14 evidence/gpu/power-v104/prepare.py --gmu-hfi-perf
 python3.14 -m unittest discover -s tests
 ```
+
+[镜像清单](preparation.json)和[刷写回执](upload.json)对应 BOOT
+`08365a3ad111027ea7cadb0027200b7424f3769fd80d24537ed01c692344b20a`。
+Heimdall 确认上传并请求重启。PERF_TBL 等待实机报告。
+[主机验证](host-validation.json)记录了队列及性能表模型、栈帧、封包和
+独立 DTS/ADT 检查。完整平台检查停在历史框架版本校验。

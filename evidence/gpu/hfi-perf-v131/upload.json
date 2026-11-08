@@ -1,0 +1,12 @@
+{
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/gpu-hfi-perf-v131/boot-partition.img",
+  "finished_at": "2026-11-08T13:08:25+08:00",
+  "boot_sha256": "08365a3ad111027ea7cadb0027200b7424f3769fd80d24537ed01c692344b20a",
+  "partition": "BOOT",
+  "exit_code": 0,
+  "transfer_confirmed": true,
+  "reboot_requested": true,
+  "partition_readback": false,
+  "userdata_partition_uploaded": false,
+  "transfer_log_sha256": "3634cb6a721690ebec51de2aae82b631e02d349f10201c5a1708783765e0f6ac"
+}
