@@ -24,8 +24,9 @@ constexpr unsigned cbSid5Mode = 19;
 constexpr unsigned cbFirmwareMode = 20;
 constexpr unsigned cbBootMode = 22;
 constexpr unsigned cbBootRepairMode = 23;
+constexpr unsigned cbBootScratchExecMode = 24;
 static constexpr bool isBootMode(unsigned power) {
-    return power == cbBootMode || power == cbBootRepairMode;
+    return power == cbBootMode || power == cbBootRepairMode || power == cbBootScratchExecMode;
 }
 constexpr unsigned ddrAxiIndex = 2;
 constexpr uint32_t cbBarStage1 = 0x1f300;
@@ -247,7 +248,7 @@ static bool pulseSid5(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &result,
             if (safe) {
                 result.boot.state = "route";
                 if (matches(sid5Match, translated))
-                    startGmuBoot(gmu, smmu, *bootTables, result.boot, power == cbBootRepairMode,
+                    startGmuBoot(gmu, smmu, *bootTables, result.boot, power != cbBootMode,
                                  [&] { return matches(sid5Match, translated, false); });
             }
             return false;
@@ -361,7 +362,7 @@ static bool pulseCbActivation(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot 
 static bool pulseCbRoot(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &result,
                         const uint32_t (&routes)[6], IOBufferMemoryDescriptor *&wiredRoot, unsigned power) {
     GmuTables tables;
-    if (!prepareGmuTables(tables, result.id0, result.id2)) {
+    if (!prepareGmuTables(tables, result.id0, result.id2, power == cbBootScratchExecMode)) {
         result.rootState = tables.stage;
         return true;
     }

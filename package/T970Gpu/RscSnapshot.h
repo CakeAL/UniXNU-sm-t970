@@ -232,10 +232,10 @@ static void reportRscMode(char *out, unsigned length, const RscSnapshot &rsc, un
                     if (strcmp(s.sid5State, "skip")) stage = s.sid5State;
                 }
                 int used = snprintf(out, length,
-                    "\nGPU boot %s/%s fw=%x hfi=%x/%x rst=%x at=%x f=%x/%x irq=%x/%x held=%u axi=%x/%x/%x",
+                    "\nGPU boot %s/%s fw=%x hfi=%x/%x rst=%x at=%x f=%x/%x irq=%x/%x held=%u axi=%x/%x/%x pf=%u",
                     stage, rate.state, b.fwInit, b.hfiStatus, b.hfiVersion, b.reset, b.offset,
                     b.globalFault, b.contextFault, b.aoStatus, b.gmuStatus, s.rootHeld ? 1u : 0u,
-                    s.ddrAxiBefore, s.clock[ddrAxiIndex], s.ddrAxiAfter);
+                    s.ddrAxiBefore, s.clock[ddrAxiIndex], s.ddrAxiAfter, b.faultEvents);
                 // Fault forensics: the first observation keeps the stalled
                 // transaction's syndrome and the leaf word before/after the
                 // one-attribute repair. Later reports reuse the same snapshot.
@@ -243,9 +243,10 @@ static void reportRscMode(char *out, unsigned length, const RscSnapshot &rsc, un
                                      i < b.faultEvents && i < 2; ++i) {
                     const GmuFault &f = b.fault[i];
                     const int wrote = snprintf(out + used, length - used,
-                        "\nGPU pf%u fsr=%x far=%x/%x syn=%x sid=%x pte=%x/%x fix=%c%c rs=%u",
+                        "\nGPU pf%u fsr=%x far=%x/%x syn=%x sid=%x pte=%llx/%llx fix=%c%c rs=%u",
                         i + 1, f.fsr, static_cast<unsigned>(f.far & 0xffffffffu),
-                        static_cast<unsigned>(f.far >> 32), f.fsynr, f.sid, f.pteBefore, f.pteAfter,
+                        static_cast<unsigned>(f.far >> 32), f.fsynr, f.sid,
+                        static_cast<unsigned long long>(f.pteBefore), static_cast<unsigned long long>(f.pteAfter),
                         f.access, f.privilege, f.resumed ? 1u : 0u);
                     if (wrote < 0 || static_cast<unsigned>(wrote) >= length - used) break;
                     used += wrote;

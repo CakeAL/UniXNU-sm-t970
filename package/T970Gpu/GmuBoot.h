@@ -8,8 +8,8 @@ namespace t970_gpu {
 // read while the offending transaction is still stalled, so the reported
 // values describe the first access the GMU issued after CM3 release.
 struct GmuFault {
-    uint32_t fsr = 0, fsynr = 0, sid = 0, pteBefore = 0, pteAfter = 0;
-    uint64_t far = 0;
+    uint32_t fsr = 0, fsynr = 0, sid = 0;
+    uint64_t far = 0, pteBefore = 0, pteAfter = 0;
     unsigned polls = 0;
     char access = '-', privilege = '-';
     bool resumed = false;
@@ -242,8 +242,8 @@ static void startGmuBoot(IOMemoryMap &gmu, IOMemoryMap &smmu, GmuTables &tables,
         *leaf = after;
         __asm__ volatile("dc cvac, %0" :: "r"(leaf) : "memory");
         __asm__ volatile("dsb sy" ::: "memory");
-        f.pteBefore = static_cast<uint32_t>(before);
-        f.pteAfter = static_cast<uint32_t>(after);
+        f.pteBefore = before;
+        f.pteAfter = after;
         f.access = (f.fsynr & (1u << 6)) ? 'x' : (f.fsynr & (1u << 4)) ? 'w' : 'r';
         f.privilege = (f.fsynr & (1u << 5)) ? 'p' : 'u';
         // Drop every cached translation of this owned ASID, clear the stalled

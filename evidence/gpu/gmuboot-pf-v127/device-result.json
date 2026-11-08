@@ -1,0 +1,32 @@
+{
+  "boot_sha256": "9b6513f4350264f534e3157afe62260fa8d27fabf5fa060b8a77a5460f7a94e3",
+  "source": "Owner screenshot attached to the Codex conversation",
+  "photo_time_local": "2026-11-08T11:25:50+08:00",
+  "photo_sha256": "f44d9f9fd18f226d1d4047e69d8189d6eebc1bf5ec7b17b92cb7ba2b521e2bd3",
+  "lines": [
+    "GPU boot fw/smmu-hold fw=0 hfi=0/0 rst=1 at=0 f=0/40000408 irq=0/0 held=1 axi=80100000/100001/0",
+    "GPU pf1 fsr=40000408 far=153e00/0 syn=20063 sid=5 pte=c847fe03/c847fe03 fix=xp rs=1",
+    "GPU pf2 fsr=40000408 far=154600/0 syn=20063 sid=5 pte=c8480e03/c8480e03 fix=xp rs=1"
+  ],
+  "faults_visible": [
+    { "far": "0x153e00", "page": "0x153000", "fsynr0": "0x20063", "sid": 5, "access": "privileged instruction fetch", "retry_written": true },
+    { "far": "0x154600", "page": "0x154000", "fsynr0": "0x20063", "sid": 5, "access": "privileged instruction fetch", "retry_written": true }
+  ],
+  "pte_report": "Only bits 31:0 were printed. XN bits 54:53 are outside the displayed word.",
+  "cm3": {
+    "release_written": true,
+    "fw_init": 0,
+    "hfi_status": 0,
+    "reset_after_failure": 1
+  },
+  "dependencies_retained": true,
+  "boot": {
+    "three_finger_report": true,
+    "cpus": 8,
+    "processes": 266,
+    "springboard_pid": 27,
+    "backboardd_pid": 57
+  },
+  "storage": { "data_space_rc": 0, "block_size": 4096, "available_blocks": 27698 },
+  "display": { "copies": 84, "retired": 84 }
+}

@@ -1388,6 +1388,7 @@ paths = [
   "package/T970Gpu/**",
   "evidence/gpu/**",
   "tests/test_gpu_arc.py",
+  "tests/test_gpu_boot_fault.py",
 ]
 inputs = [
   "KGSL reports Adreno650v3, seven power levels and a maximum clock of 670000000 Hz; the GPU DT chipid is 0x06050002.",
@@ -1403,6 +1404,8 @@ procedure = [
   "Read KGSL identity and frequency nodes, list GPU firmware files and calculate the GMU/SQE hashes without executing GPU commands.",
 ]
 findings = [
+  "v128 gives the owned 19-page GMU scratch window execute permission before publishing SID5. Mode 24 changes only XN on these initial leaf descriptors and reports full 64-bit repair words and the captured fault count.",
+  "v127 BOOT9b6513f4 produced the report without the v126 stack panic. Two displayed stalled SID5 privileged instruction fetches at 0x153e00 and 0x154600 belong to the same scratch window. The probe wrote retries and FW_INIT remained zero.",
   "v127 keeps mode 23 but compresses the report thread stack: the snapshot functions now fill caller-owned objects and the firmware planner arrays live in BSS. The measured frame sum along the panicked chain drops from 12,768 to 8,288 bytes, leaving about 4 KiB of the 16 KiB kernel stack.",
   "v126 BOOT986ddf4b panicked in the runtime report thread before the three-finger report: invalid kernel stack pointer (probable overflow), ESR 96000047, FAR in the stack guard page, with the faulting chain ending in A650GmuBuildRegions. The 12.8 KiB probe chain plus the 3.4 KiB report thread frame exceeded the 16 KiB kernel stack, and no GMU or SMMU data was produced.",
   "v126 keeps the first post-release FSR/FAR/FSYNR0/SID and the offending 4 KiB leaf word. It widens only the attribute the syndrome names (AF, AP[2], AP[1] per PNU, XN per IND), invalidates the owned ASID, clears the stalled fault and retries. Translation, external and page-table-walk faults, non-leaf words and pages outside the audited ranges are never patched.",
@@ -1448,11 +1451,12 @@ limits = [
   "No GMU bring-up, command submission, DMA/SMMU ownership or Metal rendering was tested under UniXNU.",
 ]
 next_action = [
-  "Read the v127 mode 23 three-finger report: the GPU pf line should name the rejected access direction and privilege, the repaired leaf word and rs, and the boot line shows whether FW_INIT reaches 0x100 before any HFI or FW_VER exchange.",
+  "Read the v128 mode 24 three-finger report for FW_INIT and HFI ready or a new GPU pf syndrome. Start a separate FW_VER exchange only after readiness.",
 ]
 evidence = [
+  { kind = "device", reference = "evidence/gpu/gmuboot-pf-v127/device-result.json", revision = "abe50fc005299c3dd908cbe6b61e39bade5e1ef7", command = "BOOT9b6513f4 and owner three-finger report screenshot", result = "Report recovered from v126 stack overflow. CB0 stalled PF with SID5 privileged instruction fetches at 0x153e00 and 0x154600. FW_INIT 0, CM3 reset restored. Eight CPUs, Data query succeeded and 84 GOP copies and retirements." },
   { kind = "host", reference = "evidence/gpu/gmuboot-pf-v127/host-validation.json", revision = "abe50fc005299c3dd908cbe6b61e39bade5e1ef7", command = "frame-size analysis with xcrun llvm-objdump plus evidence/gpu/power-v104/prepare.py --gmu-boot-pf-fix", result = "The panicked chain drops from 12,768 to 8,288 bytes across the same 15 functions. Frozen firmware, prelink and FAT readback passed." },
-  { kind = "device", reference = "evidence/gpu/gmuboot-pf-v127/upload.json", revision = "abe50fc005299c3dd908cbe6b61e39bade5e1ef7", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/gpu-gmuboot-pf-v127/boot-partition.img", result = "BOOT9b6513f4 transfer succeeded and requested reboot. The mode 23 fault report is pending." },
+  { kind = "device", reference = "evidence/gpu/gmuboot-pf-v127/upload.json", revision = "abe50fc005299c3dd908cbe6b61e39bade5e1ef7", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/gpu-gmuboot-pf-v127/boot-partition.img", result = "BOOT9b6513f4 transfer succeeded and requested reboot." },
   { kind = "device", reference = "evidence/gpu/gmuboot-pf-v126/device-result.json", revision = "b531bbd7c7b1d3d60bb6e29c4a77338b04941542", command = "BOOT986ddf4b and owner screenshot", result = "Panic before the report: invalid kernel stack pointer (probable overflow) in the report thread, symbolicated to the GPU probe chain through A650GmuBuildRegions. No GMU/SMMU data." },
   { kind = "host", reference = "evidence/gpu/gmuboot-pf-v126/host-validation.json", revision = "b531bbd7c7b1d3d60bb6e29c4a77338b04941542", command = "python3.14 -m unittest discover -s tests, evidence/gpu/power-v104/prepare.py --gmu-boot-pf and scripts/check-hardware-description.py", result = "76 tests ran, 10 skipped, OK. ASan/UBSan FSR classification, bounded leaf walk and one-attribute repair model passed. Frozen firmware, ADT and boot arg 23 verified; the platform checker stops at the historical framework guard." },
   { kind = "device", reference = "evidence/gpu/gmuboot-pf-v126/upload.json", revision = "b531bbd7c7b1d3d60bb6e29c4a77338b04941542", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/gpu-gmuboot-pf-v126/boot-partition.img", result = "BOOT986ddf4b transfer succeeded and requested reboot. The mode 23 fault report is pending." },
@@ -1786,6 +1790,7 @@ procedure = [
   "Read BuildManifest.plist from the local IPSW using Python zipfile and plistlib to identify its OS version, build and product types.",
 ]
 findings = [
+  "v128 starts from exact v127 BOOT and selects opt-in mode 24. The packer verifies the retained ADT, Data seed, trust cache and bytes outside FAT.",
   "v127 starts from the same exact v125 BOOT, keeps opt-in mode 23 and only changes the kernel stack ownership. The packer verifies the retained ADT, Data seed, trust cache and bytes outside FAT.",
   "v126 uses exact v125 BOOT and selects opt-in mode 23 with the same hash-matched A650 GMU firmware. The packer verifies the retained ADT, Data seed, trust cache and bytes outside FAT.",
   "v125 uses exact v124 BOOT and selects opt-in mode 22 with the same hash-matched A650 GMU firmware. The packer verifies the retained ADT, Data seed, trust cache and bytes outside FAT.",

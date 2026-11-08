@@ -111,10 +111,10 @@ int main() {
     def test_report_and_mode_wiring(self):
         report = (ROOT / 'package/T970Gpu/RscSnapshot.h').read_text()
         self.assertIn('if (isBootMode(power)) {', report)
-        self.assertIn('"\\nGPU pf%u fsr=%x far=%x/%x syn=%x sid=%x pte=%x/%x fix=%c%c rs=%u"', report)
+        self.assertIn('"\\nGPU pf%u fsr=%x far=%x/%x syn=%x sid=%x pte=%llx/%llx fix=%c%c rs=%u"', report)
         smmu = (ROOT / 'package/T970Gpu/SmmuSnapshot.h').read_text()
         self.assertIn('constexpr unsigned cbBootRepairMode = 23;', smmu)
-        self.assertIn('startGmuBoot(gmu, smmu, *bootTables, result.boot, power == cbBootRepairMode,', smmu)
+        self.assertIn('startGmuBoot(gmu, smmu, *bootTables, result.boot, power != cbBootMode,', smmu)
         clock = (ROOT / 'package/T970Gpu/ClockSnapshot.h').read_text()
         self.assertIn('static char firstReport[512];', clock)
         self.assertIn('if (power == cbFirmwareMode || isBootMode(power)) return power;', clock)

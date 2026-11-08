@@ -40,7 +40,7 @@ static bool auditGmuTables(GmuTables &gmu, uint64_t ttbr0) {
     return !gmu.status;
 }
 
-static bool prepareGmuTables(GmuTables &gmu, uint32_t id0, uint32_t id2) {
+static bool prepareGmuTables(GmuTables &gmu, uint32_t id0, uint32_t id2, bool executeScratch = false) {
     constexpr unsigned addressBits = 36;
     constexpr unsigned rw = ArmSmmu4KRead | ArmSmmu4KWrite | ArmSmmu4KPrivileged;
     // Kernel-owned wired backing. Its retain must outlive any installed root.
@@ -62,7 +62,8 @@ static bool prepareGmuTables(GmuTables &gmu, uint32_t id0, uint32_t id2) {
     const uint64_t payload = physical + GmuTables::poolPages * GmuTables::pageBytes;
     const ArmSmmu4KRange ranges[] = {
         {0x00004000, payload,           0x08000, ArmSmmu4KRead | ArmSmmu4KExecute | ArmSmmu4KPrivileged, 0, 2},
-        {0x00144000, payload + 0x08000, 0x13000, rw, 0, 2},
+        // T970 SID5 issued privileged fetches in this window at CM3 startup.
+        {0x00144000, payload + 0x08000, 0x13000, executeScratch ? rw | ArmSmmu4KExecute : rw, 0, 2},
         {0x00157000, payload + 0x1b000, 0x09000, rw, 0, 2},
         {0x60000000, payload + 0x24000, 0x01000, rw, 0, 2},
         {0x60001000, payload + 0x25000, 0x05000, rw, 0, 2},

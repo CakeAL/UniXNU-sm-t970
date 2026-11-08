@@ -27,3 +27,8 @@ python3.14 -m unittest discover -s tests
 `9b6513f4350264f534e3157afe62260fa8d27fabf5fa060b8a77a5460f7a94e3`，
 由 v125 BOOT `1cb79acc` 加模式 23 内核生成。Heimdall 确认上传并请求重启。
 开机后三指报告应出现 `GPU boot` 行，随后是最多两行 `GPU pf` 故障记录。
+
+[实机报告](device-result.json)成功出图，并记录 SID5 在 `0x153e00`
+和 `0x154600` 发出的特权取指请求。两次都写入了重试，FW_INIT 仍为零。
+页表字段只显示低 32 位，XN 在高位。两页均在 `0x144000–0x156fff` 的
+GMU 临时 RAM 内。
