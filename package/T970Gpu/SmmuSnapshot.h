@@ -36,8 +36,9 @@ constexpr unsigned cbBootHfiGxMode = 29;
 constexpr unsigned cbBootCpReadMode = 30;
 constexpr unsigned cbBootCb1FormatMode = 31;
 constexpr unsigned cbBootCb1RootMode = 32;
+constexpr unsigned cbBootCb1ActivateMode = 33;
 static constexpr bool isBootMode(unsigned power) {
-    return power >= cbBootMode && power <= cbBootCb1RootMode;
+    return power >= cbBootMode && power <= cbBootCb1ActivateMode;
 }
 constexpr unsigned ddrAxiIndex = 2;
 constexpr uint32_t cbBarStage1 = 0x1f300;
@@ -71,6 +72,9 @@ struct GpuCpSnapshot {
     unsigned sqeBytes = 0, rootFields = 0, leaves = 0;
     uint64_t liveRoot = 0;
     bool rootHeld = false;
+    const char *activation = "skip";
+    unsigned tlbSynced = 0, tlbReads = 0;
+    uint32_t ctlOn = 0, ctlOff = 0, fsrOn = 0, fsrOff = 0;
 };
 
 struct SmmuSnapshot {
@@ -177,6 +181,26 @@ static uint64_t readTtbrWords(IOMemoryMap &smmu, unsigned offset) {
     return low | (static_cast<uint64_t>(readSmmu32(smmu, offset + 4)) << 32);
 }
 
+static ArmSmmu4KIo contextTlbIo(IOMemoryMap &smmu) {
+    return {
+        &smmu, 0x10000,
+        [](void *cookie, size_t offset, uint32_t *value) {
+            *value = readSmmu32(*static_cast<IOMemoryMap *>(cookie), static_cast<unsigned>(offset));
+            return 0;
+        },
+        nullptr,
+        [](void *cookie, size_t offset, uint32_t value) {
+            writeSmmu32(*static_cast<IOMemoryMap *>(cookie), static_cast<unsigned>(offset), value);
+            return 0;
+        },
+        nullptr,
+        [](void *) {
+            __asm__ volatile("dsb sy" ::: "memory");
+            return 0;
+        },
+    };
+}
+
 static bool pulseTtbr(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &result,
                       const uint32_t (&routes)[6]) {
     ArmSmmu4KMmio mmio = {reinterpret_cast<volatile unsigned char *>(smmu.getVirtualAddress()), 0x10000};
@@ -224,7 +248,57 @@ static bool pulseTtbr(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &result,
 #ifdef T970_GPU_GMU_FIRMWARE
 #ifdef T970_GPU_SQE_FIRMWARE
 template <typename Live>
-static void installCb1Root(IOMemoryMap &smmu, GpuCpSnapshot &result, Live live) {
+static void pulseCpContext(IOMemoryMap &smmu, GpuCpSnapshot &result,
+                           const ArmSmmu4KContextImage &image, Live live) {
+    constexpr unsigned ctl = 0x9000, fsr = 0x9058, tlbStatus = 0x97f4;
+    constexpr uint32_t enable = 1, faultInterrupt = 1u << 6, policyMask = 0x1f7;
+    const auto io = contextTlbIo(smmu);
+    const auto ownsBank = [&] {
+        return readSmmu32(smmu, A650_SMMU_ID0) == 0x4c017e06 &&
+            readSmmu32(smmu, A650_SMMU_ID1) == 0x20000005 &&
+            readSmmu32(smmu, 0x1804) == image.cba2r &&
+            readSmmu32(smmu, 0x1004) == image.cbar &&
+            readTtbrWords(smmu, 0x9020) == image.ttbr0;
+    };
+    const auto inactive = [&] {
+        return live() && ownsBank() && readSmmu32(smmu, fsr) == cbFsrAarch64 &&
+            !(readSmmu32(smmu, ctl) & enable);
+    };
+    const auto sync = [&](unsigned bit) {
+        ArmSmmu4KProgramResult syncResult = {};
+        const auto status = ArmSmmu4KSyncContextTlb(&io, ctl, static_cast<unsigned>(image.ttbr0 >> 48),
+                                                   0, 1000, &syncResult);
+        result.tlbReads += syncResult.poll_reads;
+        if (status || !syncResult.tlb_synchronized) return false;
+        result.tlbSynced |= bit;
+        return true;
+    };
+    result.activation = "sync-on";
+    if (!inactive() || (readSmmu32(smmu, tlbStatus) & 1) || !sync(1) || !inactive()) return;
+
+    const uint32_t requested = image.sctlr & ~faultInterrupt;
+    writeSmmu32(smmu, ctl, requested);
+    result.ctlOn = readSmmu32(smmu, ctl);
+    result.fsrOn = readSmmu32(smmu, fsr);
+    result.activation = "disable";
+    if (!ownsBank()) return;
+    // Withdraw M even if the active readback or fault status differs.
+    writeSmmu32(smmu, ctl, requested & ~enable);
+    result.ctlOff = readSmmu32(smmu, ctl);
+    result.fsrOff = readSmmu32(smmu, fsr);
+    if ((result.ctlOff & (enable | faultInterrupt)) || !ownsBank()) return;
+
+    result.activation = "sync-off";
+    if (!sync(2)) return;
+    result.activation = "readback";
+    if (!inactive() || result.fsrOn != cbFsrAarch64 || result.fsrOff != cbFsrAarch64 ||
+        ((result.ctlOn ^ requested) & policyMask) ||
+        ((result.ctlOff ^ (requested & ~enable)) & policyMask)) return;
+    result.activation = "ok";
+}
+
+template <typename Live>
+static void installCb1Root(IOMemoryMap &smmu, GpuCpSnapshot &result, Live live, bool activate) {
     constexpr unsigned va64 = 0x1804, bar = 0x1004, ctl = 0x9000, fsr = 0x9058;
     const auto view = [&](uint32_t expectedVa, uint32_t expectedBar, uint32_t expectedFsr) {
         return live() && readSmmu32(smmu, va64) == expectedVa &&
@@ -291,6 +365,7 @@ static void installCb1Root(IOMemoryMap &smmu, GpuCpSnapshot &result, Live live) 
     if (!auditGmuTables(tables, result.liveRoot)) return;
     result.leaves = static_cast<unsigned>(tables.audit.leaf_pages);
     result.rootState = "ok";
+    if (activate) pulseCpContext(smmu, result, tables.image, live);
 }
 #endif
 
@@ -374,7 +449,7 @@ static void samplePoweredCp(IOMemoryMap &smmu, IOMemoryMap &gmu, GpuCpSnapshot &
     result.state = "idle";
     if (power == cbBootCb1FormatMode) pulseCb1Format(smmu, result, live);
 #ifdef T970_GPU_SQE_FIRMWARE
-    if (power == cbBootCb1RootMode) installCb1Root(smmu, result, live);
+    if (power >= cbBootCb1RootMode) installCb1Root(smmu, result, live, power == cbBootCb1ActivateMode);
 #endif
 }
 #endif
@@ -472,23 +547,7 @@ static bool pulseCbActivation(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot 
                               uint32_t original, bool publishSid5, GmuTables *bootTables, unsigned power) {
     constexpr unsigned sctlr = 0x8000, tlbStatus = 0x87f4;
     constexpr uint32_t enable = 1, faultInterrupt = 1u << 6, policyMask = 0x1f7;
-    const ArmSmmu4KIo tlbIo = {
-        &smmu, 0x10000,
-        [](void *cookie, size_t offset, uint32_t *value) {
-            *value = readSmmu32(*static_cast<IOMemoryMap *>(cookie), static_cast<unsigned>(offset));
-            return 0;
-        },
-        nullptr,
-        [](void *cookie, size_t offset, uint32_t value) {
-            writeSmmu32(*static_cast<IOMemoryMap *>(cookie), static_cast<unsigned>(offset), value);
-            return 0;
-        },
-        nullptr,
-        [](void *) {
-            __asm__ volatile("dsb sy" ::: "memory");
-            return 0;
-        },
-    };
+    const auto tlbIo = contextTlbIo(smmu);
     const auto sync = [&](unsigned bit) {
         ArmSmmu4KProgramResult syncResult = {};
         const auto status = ArmSmmu4KSyncContextTlb(&tlbIo, sctlr, static_cast<unsigned>(image.ttbr0 >> 48),

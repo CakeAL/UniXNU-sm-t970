@@ -1,0 +1,38 @@
+Heimdall v1.4.2
+
+Copyright (c) 2010-2017 Benjamin Dobell, Glass Echidna
+http://www.glassechidna.com.au/
+
+This software is provided free of charge. Copying and redistribution is
+encouraged.
+
+If you appreciate this software and you would like to support future
+development please consider donating:
+http://www.glassechidna.com.au/donate/
+
+Initialising connection...
+Detecting device...
+Claiming interface...
+Setting up interface...
+
+Initialising protocol...
+Protocol initialisation successful.
+
+Beginning session...
+
+Some devices may take up to 2 minutes to respond.
+Please be patient!
+
+Session begun.
+
+Downloading device's PIT file...
+PIT file download successful.
+
+Uploading BOOT
+0%\b\b1%\b\b2%\b\b4%\b\b5%\b\b7%\b\b8%\b\b10%\b\b\b11%\b\b\b13%\b\b\b14%\b\b\b16%\b\b\b17%\b\b\b19%\b\b\b20%\b\b\b22%\b\b\b23%\b\b\b25%\b\b\b26%\b\b\b27%\b\b\b29%\b\b\b30%\b\b\b32%\b\b\b33%\b\b\b35%\b\b\b36%\b\b\b38%\b\b\b39%\b\b\b41%\b\b\b42%\b\b\b44%\b\b\b45%\b\b\b47%\b\b\b48%\b\b\b50%\b\b\b51%\b\b\b52%\b\b\b54%\b\b\b55%\b\b\b57%\b\b\b58%\b\b\b60%\b\b\b61%\b\b\b63%\b\b\b64%\b\b\b66%\b\b\b67%\b\b\b69%\b\b\b70%\b\b\b72%\b\b\b73%\b\b\b75%\b\b\b76%\b\b\b77%\b\b\b79%\b\b\b80%\b\b\b82%\b\b\b83%\b\b\b85%\b\b\b86%\b\b\b88%\b\b\b89%\b\b\b91%\b\b\b92%\b\b\b94%\b\b\b95%\b\b\b97%\b\b\b98%\b\b\b100%
+BOOT upload successful
+
+Ending session...
+Rebooting device...
+Releasing device interface...
+

@@ -265,7 +265,12 @@ static void reportRscMode(char *out, unsigned length, const RscSnapshot &rsc, un
                         cp.rp, cp.wp, cp.sqe, cp.fault, cp.cpIrq);
                     if (wrote < 0 || static_cast<unsigned>(wrote) >= length - used) return;
                     used += wrote;
-                    if (power == cbBootCb1RootMode && !strcmp(cp.state, "idle")) {
+                    if (power == cbBootCb1ActivateMode && !strcmp(cp.state, "idle")) {
+                        wrote = snprintf(out + used, length - used,
+                            "\nGPU cb1ctx %s/%s tlb=%x/%u ctl=%x/%x f=%x/%x leaf=%u held=%u",
+                            cp.rootState, cp.activation, cp.tlbSynced, cp.tlbReads, cp.ctlOn,
+                            cp.ctlOff, cp.fsrOn, cp.fsrOff, cp.leaves, cp.rootHeld ? 1u : 0u);
+                    } else if (power == cbBootCb1RootMode && !strcmp(cp.state, "idle")) {
                         wrote = snprintf(out + used, length - used,
                             "\nGPU cb1root %s cfg=%x leaf=%u sqe=%u ttbr=%llx held=%u",
                             cp.rootState, cp.rootFields, cp.leaves, cp.sqeBytes,

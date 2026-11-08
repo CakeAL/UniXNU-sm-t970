@@ -1,0 +1,12 @@
+{
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/gpu-cb1-activate-v137/boot-partition.img",
+  "finished_at": "2026-11-08T19:37:12+08:00",
+  "boot_sha256": "f697aa74ba25972dde443854f12e06d974b4ff860598c47f5c76ab0408e01792",
+  "partition": "BOOT",
+  "exit_code": 0,
+  "transfer_confirmed": true,
+  "reboot_requested": true,
+  "partition_readback": false,
+  "userdata_partition_uploaded": false,
+  "transfer_log_sha256": "b18848a1638966f47621d2af87c7f3ad95b7aa899b1451f3475ab1a3ca0eebf9"
+}

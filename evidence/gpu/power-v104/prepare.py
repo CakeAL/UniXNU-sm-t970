@@ -63,8 +63,15 @@ def main():
     variants.add_argument('--gpu-cp-read', action='store_true', help='Pack v134 from the tested v133 BOOT')
     variants.add_argument('--gpu-cb1-format', action='store_true', help='Pack v135 from the tested v134 BOOT')
     variants.add_argument('--gpu-cb1-root', action='store_true', help='Pack v136 from the tested v135 BOOT')
+    variants.add_argument('--gpu-cb1-activate', action='store_true', help='Pack v137 from the tested v136 BOOT')
     options = parser.parse_args()
-    if options.gpu_cb1_root:
+    if options.gpu_cb1_activate:
+        baseline = 'gpu-cb1-root-v136'
+        base_sha = '109ee7ebbede2a3411cad5eb1ef0f08e4a17f7f67f55faaac1dc7ce4f6507c49'
+        output = OUT / 'gpu-cb1-activate-v137'
+        old, new = b't970-gpu-p=32', b't970-gpu-p=33'
+        markers = (b'GPU cp %s rbbm=', b'GPU cb1ctx %s/%s tlb=')
+    elif options.gpu_cb1_root:
         baseline = 'gpu-cb1-format-v135'
         base_sha = '72eb23cb5df12da59851e773065af3a02c59836d94efa8d2ceaef566bbc88f23'
         output = OUT / 'gpu-cb1-root-v136'

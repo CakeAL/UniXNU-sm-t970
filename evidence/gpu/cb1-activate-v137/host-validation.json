@@ -1,0 +1,58 @@
+{
+  "unixnu_revision": "2c834e313d25482c78d38d703eff1f8d190f2597",
+  "boot_sha256": "f697aa74ba25972dde443854f12e06d974b4ff860598c47f5c76ab0408e01792",
+  "tests": {
+    "command": "python3.14 -m unittest discover -s tests",
+    "ran": 76,
+    "skipped": 10,
+    "result": "OK"
+  },
+  "model": {
+    "tooling": "ASan/UBSan, extracted pulseCpContext and pinned ArmSmmu4K",
+    "result": "PASS",
+    "cases": [
+      "Exact CB1 writes and ASID 2, no stream writes",
+      "SID5 guard blocks entry",
+      "Sync-on timeout before enable",
+      "Sync-off timeout after disable",
+      "Disable after active fault",
+      "Disable after SID5 drift",
+      "Filtered disable readback",
+      "No further writes when ownership changes"
+    ]
+  },
+  "stack": {
+    "method": "Same-symbol SP decreases from llvm-objdump",
+    "deltas_from_v136_bytes": {
+      "reportCxPulse": 32,
+      "pulseRscInit": 32,
+      "installCb1Root": 0
+    },
+    "pulseCpContext_bytes": 336
+  },
+  "arm_smmu4k": {
+    "revision": "8bb168ad058c28d5c04f179ba407875eacba7ef3",
+    "objects": {
+      "ArmSmmu4K.o": "f5d9fbc6213b09e807c2466ccb43621bea0f3ddd9056851384cbdf266133308a",
+      "ArmSmmu4KContext.o": "a10f3d5f990fe48eac41975b51ebbd09c8662cea22f37e68aa54898a2aa9a62c",
+      "ArmSmmu4KProgram.o": "d78d979e3eba88e895280d2cb5e66194e2d072cbdcd6175f7f92de6b970649bb",
+      "ArmSmmu4KAudit.o": "63a16dec7e8d220edfd99cc3a8da0c57f1fbe5bb6245d12a707c0323bf958143",
+      "ArmSmmu4KTableMemory.o": "5c0dd8132ceeea96e5bac981f74f9e9f5990180bb1ba4f124bcd9ea0ef536f8c",
+      "ArmSmmu4KMmio.o": "4e054ae09b922ca77eccd2b573c6310a2dfb131ebbb188c24978d7fd4bc52c9f"
+    },
+    "probe_sha256": "a77b06fc171467224c154b600472641d16928afe7bce37e5754851b2b0fedede"
+  },
+  "kernel_prelink": "PASS",
+  "fat_readback": "PASS",
+  "exact_payload_copies_in_kernel_and_boot": {
+    "gmu": 1,
+    "sqe": 1
+  },
+  "image_symbols": {
+    "segments": 18,
+    "section_symbols_checked": 69238,
+    "result": "PASS"
+  },
+  "check_hardware_description": "PASS with synthetic identity",
+  "check_platform": "Stopped at historical framework revision guard"
+}
