@@ -142,6 +142,9 @@ v134 在 GX 上电后读取 CP ring、SQE 和候选 CB1，建立提交前基线�
 v135 只对 CB1 做一次 VA64 切换与恢复，并保持 SID5 有效。
 v135 实测 `va=0/1/0 fsr=400 diff=0`。v136 用独立的 XNU 自有 backing
 建立 GPU ring、SQE 和回读页，在 CB1 翻译关闭时安装并走查 TTBR0。
+[v136 实测](../evidence/gpu/cb1-root-v136/device-result.json)确认六个字段、
+17 个页和 SQE 31628 字节，CP 仍空闲。下一轮先检查 SID5 保持、CB1 ASID 失效和
+TLB 同步，再单独验收 CB1 启停和 GPU stream 路由。
 Samsung SM8250 vendor 镜像中的 SQE 与 T970 原厂清单的 31,632 字节及
 SHA-256 完全匹配，已保存到本地忽略目录。ZAP 分片仍需获取并核验。
 [固定 SQE 来源](https://github.com/TheMuppets/proprietary_vendor_samsung_sm8250-common/blob/b9558414f2c55b1c307f663f785f400d67450385/proprietary/vendor/firmware/a650_sqe.fw)。

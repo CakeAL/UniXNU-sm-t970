@@ -10,7 +10,10 @@ CB1 VA64，随后将 CBAR 切到 Stage 1。用 ArmSmmu4K 生成单独的 ASID 2
 探针写入并核对六个上下文字段，再用硬件 TTBR0 走查 17 个叶子。
 CB1 翻译维持关闭，S2CR/SMR 不变。开始写 TTBR 后 backing 保留至重启。
 
-预期 `GPU cb1root ok cfg=3f leaf=17 sqe=31628 ... held=1`。
+[实机截图记录](device-result.json)显示
+`GPU cb1root ok cfg=3f leaf=17 sqe=31628 ttbr=20000cdfa8000 held=1`。
+CB1 六个字段通过回读，17 个页表叶通过走查。SQE 已放进映射的内存，
+CP 仍空闲，CB1 翻译和 GPU stream 留待下一轮验证。
 
 ```sh
 python3.14 evidence/display/hello-black-v64/build-kernel.py --cached-headers --setup-probe --gop-fork --keys --refresh-hid --gpu-soc .cache/git-sources/sm8250-166235ec2480 --arm-smmu4k ../UniXNU/kits/ArmSmmu4K --gmu-firmware .cache/firmware/gpu-candidates/linux-firmware-20260221-a650_gmu.bin --sqe-firmware .cache/firmware/gpu-candidates/samsung-common-a650_sqe.fw --output out/data-bringup/gpu-cb1-root-v136-build
@@ -20,6 +23,6 @@ python3.14 -m unittest discover -s tests
 
 [镜像清单](preparation.json)和[刷写回执](upload.json)对应 BOOT
 `109ee7ebbede2a3411cad5eb1ef0f08e4a17f7f67f55faaac1dc7ce4f6507c49`。
-Heimdall 确认上传并请求重启，等待 CB1 实机报告。
+Heimdall 确认上传并请求重启。18:49:21 的诊断截图与模式 32 的输出匹配。
 [主机验证](host-validation.json)记录 17 个叶、SQE 字节、故障保留、封包和
 独立 DTS/ADT 检查。完整平台检查停在历史框架版本校验。

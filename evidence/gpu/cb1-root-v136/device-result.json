@@ -1,0 +1,36 @@
+{
+  "boot_sha256": "109ee7ebbede2a3411cad5eb1ef0f08e4a17f7f67f55faaac1dc7ce4f6507c49",
+  "source": "Owner screenshot attached to the Codex conversation, matched to the mode 32 BOOT upload",
+  "photo_time_local": "2026-11-08T18:49:21+08:00",
+  "photo_sha256": "1957fb3b6fe460b956537fd312ead51bcd5cf04398d8589454bc767458088a62",
+  "lines": [
+    "GPU boot ready/smmu-hold fw=100 hfi=1/20000001 rst=0 at=0 f=0/400 irq=0/0 held=1 axi=80100000/100001/0 pf=0 s2=1038eb00",
+    "GPU cp idle rbbm=1 irq=0 rb=0/0 ptr=0/0 sqe=0 err=0/0",
+    "GPU cb1root ok cfg=3f leaf=17 sqe=31628 ttbr=20000cdfa8000 held=1"
+  ],
+  "cb1": {
+    "verified_field_mask": "0x3f",
+    "audited_leaf_pages": 17,
+    "staged_sqe_bytes": 31628,
+    "ttbr0": "0x20000cdfa8000",
+    "asid": 2,
+    "translation_enabled": false,
+    "stream_published": false,
+    "backing_retained": true
+  },
+  "boot": {
+    "cpus": 8,
+    "processes": 271,
+    "springboard_pid": 27,
+    "backboardd_pid": 57
+  },
+  "storage": {
+    "data_space_rc": 0,
+    "block_size": 4096,
+    "available_blocks": 21369
+  },
+  "display": {
+    "copies": 205,
+    "retired": 205
+  }
+}
