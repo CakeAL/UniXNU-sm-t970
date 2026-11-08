@@ -11,8 +11,8 @@ MX 选择器按主轨实际选中的 corner 计算。ACD 字段使用诊断哨�
 `0x203b04`、返回码为零且应答中断可清除才判定通过。探针保留 live
 SID5、DMA backing 和电源到重启，本轮验收到性能表。
 
-预期 `GPU perf ok cmd=64/64 msg=4/8 irq=1/0 ack=10301/203b04/0`。
-ACK 首字的低 8 位保留为原始固件值。
+预期 `GPU perf ok cmd=64/64 msg=4/8 irq=1/0`，并回显 `203b04/0`。
+ACK 首字保留固件原值。
 
 ```sh
 python3.14 evidence/display/hello-black-v64/build-kernel.py --cached-headers --setup-probe --gop-fork --keys --refresh-hid --gpu-soc .cache/git-sources/sm8250-166235ec2480 --arm-smmu4k ../UniXNU/kits/ArmSmmu4K --gmu-firmware .cache/firmware/gpu-candidates/linux-firmware-20260221-a650_gmu.bin --output out/data-bringup/gpu-hfi-perf-v131-build
@@ -22,6 +22,8 @@ python3.14 -m unittest discover -s tests
 
 [镜像清单](preparation.json)和[刷写回执](upload.json)对应 BOOT
 `08365a3ad111027ea7cadb0027200b7424f3769fd80d24537ed01c692344b20a`。
-Heimdall 确认上传并请求重启。PERF_TBL 等待实机报告。
+Heimdall 确认上传并请求重启。[实机报告](device-result.json)回读
+`cmd=64/64 msg=4/8 irq=1/0 ack=110304/203b04/0`，HFI 性能表通过，
+SMMU 故障计数为零。八核在线，Data 查询成功，GOP 完成 27 次拷贝和回收。
 [主机验证](host-validation.json)记录了队列及性能表模型、栈帧、封包和
 独立 DTS/ADT 检查。完整平台检查停在历史框架版本校验。

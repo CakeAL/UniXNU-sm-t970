@@ -236,7 +236,8 @@ static void reportRscMode(char *out, unsigned length, const RscSnapshot &rsc, un
                     stage, rate.state, b.fwInit, b.hfiStatus, b.hfiVersion, b.reset, b.offset,
                     b.globalFault, b.contextFault, b.aoStatus, b.gmuStatus, s.rootHeld ? 1u : 0u,
                     s.ddrAxiBefore, s.clock[ddrAxiIndex], s.ddrAxiAfter, b.faultEvents, s.sid5S2cr);
-                if (power >= cbBootHfiVersionMode && used > 0 && static_cast<unsigned>(used) < length) {
+                const bool reportCore = power == cbBootHfiCoreMode && !strcmp(b.hfiPerf.state, "ok");
+                if (!reportCore && power >= cbBootHfiVersionMode && used > 0 && static_cast<unsigned>(used) < length) {
                     const auto &hfi = b.hfiExchange;
                     const int wrote = snprintf(out + used, length - used,
                         "\nGPU fwver %s cmd=%u/%u msg=%u/%u irq=%x/%x ack=%x/%x/%x/%x",
@@ -245,12 +246,25 @@ static void reportRscMode(char *out, unsigned length, const RscSnapshot &rsc, un
                     if (wrote < 0 || static_cast<unsigned>(wrote) >= length - used) return;
                     used += wrote;
                 }
-                if (power == cbBootHfiPerfMode && used > 0 && static_cast<unsigned>(used) < length) {
+                if (!reportCore && power >= cbBootHfiPerfMode && used > 0 && static_cast<unsigned>(used) < length) {
                     const auto &perf = b.hfiPerf;
                     const int wrote = snprintf(out + used, length - used,
                         "\nGPU perf %s cmd=%u/%u msg=%u/%u irq=%x/%x ack=%x/%x/%x",
                         perf.state, perf.cmdRead, perf.cmdWrite, perf.msgRead, perf.msgWrite,
                         perf.irq, perf.irqAfter, perf.reply[0], perf.reply[1], perf.reply[2]);
+                    if (wrote < 0 || static_cast<unsigned>(wrote) >= length - used) return;
+                    used += wrote;
+                }
+                if (reportCore && used > 0 && static_cast<unsigned>(used) < length) {
+                    const auto &bw = b.hfiCore.bandwidth;
+                    const auto &core = b.hfiCore.start;
+                    const int wrote = snprintf(out + used, length - used,
+                        "\nGPU bw %s cmd=%u/%u msg=%u/%u irq=%x/%x ack=%x/%x/%x"
+                        "\nGPU core %s cmd=%u/%u msg=%u/%u irq=%x/%x ack=%x/%x/%x",
+                        bw.state, bw.cmdRead, bw.cmdWrite, bw.msgRead, bw.msgWrite, bw.irq, bw.irqAfter,
+                        bw.reply[0], bw.reply[1], bw.reply[2],
+                        core.state, core.cmdRead, core.cmdWrite, core.msgRead, core.msgWrite, core.irq, core.irqAfter,
+                        core.reply[0], core.reply[1], core.reply[2]);
                     if (wrote < 0 || static_cast<unsigned>(wrote) >= length - used) return;
                     used += wrote;
                 }
