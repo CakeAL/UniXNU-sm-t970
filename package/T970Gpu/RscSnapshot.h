@@ -236,7 +236,8 @@ static void reportRscMode(char *out, unsigned length, const RscSnapshot &rsc, un
                     stage, rate.state, b.fwInit, b.hfiStatus, b.hfiVersion, b.reset, b.offset,
                     b.globalFault, b.contextFault, b.aoStatus, b.gmuStatus, s.rootHeld ? 1u : 0u,
                     s.ddrAxiBefore, s.clock[ddrAxiIndex], s.ddrAxiAfter, b.faultEvents, s.sid5S2cr);
-                const bool reportCore = power == cbBootHfiCoreMode && !strcmp(b.hfiPerf.state, "ok");
+                const bool reportCore = power >= cbBootHfiCoreMode && !strcmp(b.hfiPerf.state, "ok");
+                const bool reportGx = power == cbBootHfiGxMode && !strcmp(b.hfiCore.start.state, "ok");
                 if (!reportCore && power >= cbBootHfiVersionMode && used > 0 && static_cast<unsigned>(used) < length) {
                     const auto &hfi = b.hfiExchange;
                     const int wrote = snprintf(out + used, length - used,
@@ -255,7 +256,15 @@ static void reportRscMode(char *out, unsigned length, const RscSnapshot &rsc, un
                     if (wrote < 0 || static_cast<unsigned>(wrote) >= length - used) return;
                     used += wrote;
                 }
-                if (reportCore && used > 0 && static_cast<unsigned>(used) < length) {
+                if (reportGx && used > 0 && static_cast<unsigned>(used) < length) {
+                    const auto &gx = b.hfiGx;
+                    const int wrote = snprintf(out + used, length - used,
+                        "\nGPU gx %s/%s/%s echo=%x/%x rc=%x/%x oob=%x/%x pwr=%x/%x fence=%x",
+                        gx.start.state, gx.dcvs.state, gx.state, gx.start.reply[1], gx.dcvs.reply[1],
+                        gx.start.reply[2], gx.dcvs.reply[2], gx.ack, gx.irqAfter, gx.before, gx.after, gx.fence);
+                    if (wrote < 0 || static_cast<unsigned>(wrote) >= length - used) return;
+                    used += wrote;
+                } else if (reportCore && used > 0 && static_cast<unsigned>(used) < length) {
                     const auto &bw = b.hfiCore.bandwidth;
                     const auto &core = b.hfiCore.start;
                     const int wrote = snprintf(out + used, length - used,

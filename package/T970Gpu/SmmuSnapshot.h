@@ -29,8 +29,9 @@ constexpr unsigned cbBootDefaultInstMode = 25;
 constexpr unsigned cbBootHfiVersionMode = 26;
 constexpr unsigned cbBootHfiPerfMode = 27;
 constexpr unsigned cbBootHfiCoreMode = 28;
+constexpr unsigned cbBootHfiGxMode = 29;
 static constexpr bool isBootMode(unsigned power) {
-    return power >= cbBootMode && power <= cbBootHfiCoreMode;
+    return power >= cbBootMode && power <= cbBootHfiGxMode;
 }
 constexpr unsigned ddrAxiIndex = 2;
 constexpr uint32_t cbBarStage1 = 0x1f300;
@@ -256,7 +257,8 @@ static bool pulseSid5(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &result,
             if (safe) {
                 result.boot.state = "route";
                 if (matches(sid5Match, translated)) {
-                    const auto hfiMode = power == cbBootHfiCoreMode ? GmuHfiProbeMode::Core :
+                    const auto hfiMode = power == cbBootHfiGxMode ? GmuHfiProbeMode::Gx :
+                        power == cbBootHfiCoreMode ? GmuHfiProbeMode::Core :
                         power == cbBootHfiPerfMode ? GmuHfiProbeMode::Performance :
                         power == cbBootHfiVersionMode ? GmuHfiProbeMode::Version : GmuHfiProbeMode::None;
                     startGmuBoot(gmu, smmu, *bootTables, result.boot, power != cbBootMode,

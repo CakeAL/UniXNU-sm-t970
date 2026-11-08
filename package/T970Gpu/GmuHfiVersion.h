@@ -4,7 +4,7 @@
 
 namespace t970_gpu {
 
-enum class GmuHfiProbeMode { None, Version, Performance, Core };
+enum class GmuHfiProbeMode { None, Version, Performance, Core, Gx };
 
 struct GmuHfiProbe {
     const char *state = "skip";

@@ -1404,6 +1404,7 @@ procedure = [
   "Read KGSL identity and frequency nodes, list GPU firmware files and calculate the GMU/SQE hashes without executing GPU commands.",
 ]
 findings = [
+  "v133 mode 29 gates HFI START and lowest active DCVS on CORE_FW_START, then requests GX OOB with bit 30. It accepts an exact bit 31 reply and clear, GX power/clock-off bits clear and a clear AHB fence. The request and dependencies stay held through reboot.",
   "v132 BOOT3fdb8e6d verified BW_TBL ACK 210303/30a003/0 and CORE_FW_START ACK 31030e/40020e/0 on the T970. Command cursors reached 224 and 228, both response IRQs cleared, and no SMMU faults were recorded.",
   "v132 mode 28 submits one legacy off-only DDR bandwidth table using four validated live BCM addresses. An accepted bandwidth reply gates CORE_FW_START. Both commands have bounded polls and leave dependencies held.",
   "v131 BOOT08365a3a verified PERF_TBL ACK 110304/203b04/0 on the T970 with command cursors 64/64, message cursors 4/8, IRQ 1/0 and zero recorded faults.",
@@ -1460,7 +1461,7 @@ limits = [
   "The diagnostic SID5 mapping and FW_VER validate GMU HFI DMA. GX, ZAP authentication, CP submission and fences, rendering and Metal remain unverified on the T970.",
 ]
 next_action = [
-  "Qualify HFI START, the lowest GX DCVS vote and the GX OOB handshake. Follow with ZAP and bounded CP submission in an owned GPU mapping.",
+  "Verify the v133 START, DCVS and GX OOB device report. Follow with ZAP and bounded CP submission in an owned GPU mapping.",
 ]
 evidence = [
   { kind = "device", reference = "evidence/gpu/hfi-core-v132/device-result.json", revision = "7fc32bee0188cf6142ee109a4eb1eac2fa03b499", command = "BOOT3fdb8e6d and owner three-finger report screenshot", result = "BW_TBL and CORE_FW_START accepted, both IRQs cleared, zero recorded faults. Eight CPUs, Data query success and 38 GOP copies and retirements." },
@@ -1814,6 +1815,7 @@ procedure = [
   "Read BuildManifest.plist from the local IPSW using Python zipfile and plistlib to identify its OS version, build and product types.",
 ]
 findings = [
+  "v133 starts from exact v132 BOOT and selects opt-in mode 29. The packer verifies the retained ADT, Data seed, trust cache and bytes outside FAT.",
   "v132 starts from exact v131 BOOT and selects opt-in mode 28. The packer verifies the retained ADT, Data seed, trust cache and bytes outside FAT.",
   "v131 starts from exact v130 BOOT and selects opt-in mode 27. The packer verifies the retained ADT, Data seed, trust cache and bytes outside FAT.",
   "v130 starts from exact v129 BOOT and selects opt-in mode 26. The packer verifies the retained ADT, Data seed, trust cache and bytes outside FAT.",
@@ -2125,6 +2127,7 @@ procedure = [
 ]
 findings = [
   "The v126 startup report appends up to two GPU pf lines with FSR, FAR, FSYNR0, CBFRSYNRA, the leaf word before and after repair and whether the transaction was retried. v128 prints both full 64-bit leaf words and the number of faults captured. v129 adds the S2CR0 readback before stream publication. v130 through v132 report FW_VER, PERF_TBL, BW_TBL and CORE_FW_START with cursors, interrupt readback and raw ACK words.",
+  "v133 reports START and DCVS echoes, OOB acknowledgement and clear, GX power status and AHB fence status.",
   "The v123 startup report shows TCM and RAM bytes, readback and restoration mismatches, and the staged DTCM version.",
   "v119 reports TTBR0 and TTBR1 native read, ASID write and rollback masks through the three-finger startup report.",
   "The v116 three-finger report includes a bounded GMU table-walk result with allocator, backing, build, bind, encode and audit failure labels.",

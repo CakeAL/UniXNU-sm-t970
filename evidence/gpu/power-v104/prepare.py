@@ -59,8 +59,15 @@ def main():
     variants.add_argument('--gmu-hfi-version', action='store_true', help='Pack v130 from the tested v129 BOOT')
     variants.add_argument('--gmu-hfi-perf', action='store_true', help='Pack v131 from the tested v130 BOOT')
     variants.add_argument('--gmu-hfi-core', action='store_true', help='Pack v132 from the tested v131 BOOT')
+    variants.add_argument('--gmu-hfi-gx', action='store_true', help='Pack v133 from the tested v132 BOOT')
     options = parser.parse_args()
-    if options.gmu_hfi_core:
+    if options.gmu_hfi_gx:
+        baseline = 'gpu-hfi-core-v132'
+        base_sha = '3fdb8e6dc324e9b2d724c73cc1010ca1821e7bffe8d88cba72f82371fd372015'
+        output = OUT / 'gpu-hfi-gx-v133'
+        old, new = b't970-gpu-p=28', b't970-gpu-p=29'
+        markers = (b'GPU gx %s/%s/%s echo=', b'GPU core %s cmd=')
+    elif options.gmu_hfi_core:
         baseline = 'gpu-hfi-perf-v131'
         base_sha = '08365a3ad111027ea7cadb0027200b7424f3769fd80d24537ed01c692344b20a'
         output = OUT / 'gpu-hfi-core-v132'

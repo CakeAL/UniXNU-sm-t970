@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 #pragma once
 #include <stdint.h>
-#include "GmuHfiCore.h"
+#include "GmuHfiGx.h"
 
 namespace t970_gpu {
 
@@ -28,6 +28,7 @@ struct GmuBootProbe {
     unsigned faultEvents = 0;
     GmuHfiProbe hfiExchange, hfiPerf;
     GmuHfiCoreProbe hfiCore;
+    GmuHfiGxProbe hfiGx;
 };
 
 }
@@ -286,8 +287,10 @@ static void startGmuBoot(IOMemoryMap &gmu, IOMemoryMap &smmu, GmuTables &tables,
                         probeGmuHfiVersion(gmu, tables, result.hfiExchange, hfiHealthy);
                         if (hfiMode >= GmuHfiProbeMode::Performance && !strcmp(result.hfiExchange.state, "ok"))
                             probeGmuHfiPerf(gmu, tables, result.hfiPerf, hfiHealthy);
-                        if (hfiMode == GmuHfiProbeMode::Core && !strcmp(result.hfiPerf.state, "ok"))
+                        if (hfiMode >= GmuHfiProbeMode::Core && !strcmp(result.hfiPerf.state, "ok"))
                             probeGmuHfiCore(gmu, tables, result.hfiCore, hfiHealthy);
+                        if (hfiMode == GmuHfiProbeMode::Gx && !strcmp(result.hfiCore.start.state, "ok"))
+                            probeGmuHfiGx(gmu, tables, result.hfiGx, hfiHealthy);
                     }
                     return;
                 }
