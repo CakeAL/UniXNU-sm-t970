@@ -26,8 +26,9 @@ constexpr unsigned cbBootMode = 22;
 constexpr unsigned cbBootRepairMode = 23;
 constexpr unsigned cbBootScratchExecMode = 24;
 constexpr unsigned cbBootDefaultInstMode = 25;
+constexpr unsigned cbBootHfiVersionMode = 26;
 static constexpr bool isBootMode(unsigned power) {
-    return power >= cbBootMode && power <= cbBootDefaultInstMode;
+    return power >= cbBootMode && power <= cbBootHfiVersionMode;
 }
 constexpr unsigned ddrAxiIndex = 2;
 constexpr uint32_t cbBarStage1 = 0x1f300;
@@ -207,7 +208,7 @@ static bool pulseSid5(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &result,
     // The inherited FAULT entry forces every read to Instruction. For the
     // live default-attribute probe, preserve the originating IND sideband.
     constexpr uint32_t instCfg = 3u << 26;
-    const uint32_t routeMask = 0x030303ffu | (power == cbBootDefaultInstMode ? instCfg : 0);
+    const uint32_t routeMask = 0x030303ffu | (power >= cbBootDefaultInstMode ? instCfg : 0);
     const uint32_t translated = (routes[0] & ~routeMask) | 0x300u;
     uint32_t expectedRoutes[6];
     memcpy(expectedRoutes, routes, sizeof(expectedRoutes));
@@ -254,6 +255,7 @@ static bool pulseSid5(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &result,
                 result.boot.state = "route";
                 if (matches(sid5Match, translated))
                     startGmuBoot(gmu, smmu, *bootTables, result.boot, power != cbBootMode,
+                                 power == cbBootHfiVersionMode,
                                  [&] { return matches(sid5Match, translated, false); });
             }
             return false;

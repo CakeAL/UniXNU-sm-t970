@@ -19,6 +19,8 @@ python3.14 -m unittest discover -s tests
 
 [镜像清单](preparation.json)和[刷写回执](upload.json)对应 BOOT
 `866a0644d8bbba90ce7dd2caa08d78e479b36713f59bb802b59fe0650b7cb2e3`。
-Heimdall 确认上传并请求重启，等待实机报告。
+Heimdall 确认上传并请求重启。[实机报告](device-result.json)回读
+`s2=1038eb00 fw=100 hfi=1/20000001 rst=0 pf=0`，GMU 已运行，
+HFI 队列已就绪。八核在线，Data 查询成功，GOP 完成 32 次拷贝和回收。
 [主机验证](host-validation.json)包括路由回读与撤销模型、封包和独立
 DTS/ADT 检查。完整平台检查停在历史框架版本校验。

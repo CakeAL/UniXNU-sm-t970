@@ -126,6 +126,9 @@ v128 实机仍在 HFI 队列和电源日志起始页报告 IND。继承的 S2CR0
 INSTCFG 设为 3，覆盖了匹配流的读请求属性。v129 在发布 SID5 时将
 INSTCFG 设为 0，使用请求原有的属性，再以原始 XN 页表验证 GMU 首启。
 见 [Arm SMMUv2 §3.4、§9.6](https://documentation-service.arm.com/static/5f900d34f86e16515cdc08fb)。
+v129 实机确认 `s2=1038eb00 fw=100 hfi=1/20000001 rst=0 pf=0`。
+v130 以同样的启动路径在队列就绪后发送一条 `FW_VER`，以应答回显、
+返回码及固件版本验证双向 DMA。
 CM3 启动阶段需保留 T970 的 RSC 路由，且核对 A650 的 HFI 队列布局。
 锁定的 Sm8250Platform 冷启动序列会写入固定的 hidden 值，集成时需处理与实测路由的差异。
 见 [v109 实测](../evidence/gpu/rsc-init-v109/device-result.json)、

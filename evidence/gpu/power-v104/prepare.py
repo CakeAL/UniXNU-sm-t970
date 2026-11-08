@@ -56,8 +56,15 @@ def main():
     variants.add_argument('--gmu-boot-pf-fix', action='store_true', help='Pack v127 from the tested v125 BOOT')
     variants.add_argument('--gmu-boot-scratch-exec', action='store_true', help='Pack v128 from the tested v127 BOOT')
     variants.add_argument('--gmu-boot-default-inst', action='store_true', help='Pack v129 from the tested v128 BOOT')
+    variants.add_argument('--gmu-hfi-version', action='store_true', help='Pack v130 from the tested v129 BOOT')
     options = parser.parse_args()
-    if options.gmu_boot_default_inst:
+    if options.gmu_hfi_version:
+        baseline = 'gpu-gmuboot-inst-v129'
+        base_sha = '866a0644d8bbba90ce7dd2caa08d78e479b36713f59bb802b59fe0650b7cb2e3'
+        output = OUT / 'gpu-hfi-version-v130'
+        old, new = b't970-gpu-p=25', b't970-gpu-p=26'
+        markers = (b'GPU boot %s/%s fw=', b'GPU fwver %s cmd=')
+    elif options.gmu_boot_default_inst:
         baseline = 'gpu-gmuboot-exec-v128'
         base_sha = '8ee0c6edbbdf3a6a6c419cef22be74c82b846b7caaacf01e9a704dca076e9c88'
         output = OUT / 'gpu-gmuboot-inst-v129'

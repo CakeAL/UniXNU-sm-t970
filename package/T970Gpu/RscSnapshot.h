@@ -236,6 +236,15 @@ static void reportRscMode(char *out, unsigned length, const RscSnapshot &rsc, un
                     stage, rate.state, b.fwInit, b.hfiStatus, b.hfiVersion, b.reset, b.offset,
                     b.globalFault, b.contextFault, b.aoStatus, b.gmuStatus, s.rootHeld ? 1u : 0u,
                     s.ddrAxiBefore, s.clock[ddrAxiIndex], s.ddrAxiAfter, b.faultEvents, s.sid5S2cr);
+                if (power == cbBootHfiVersionMode && used > 0 && static_cast<unsigned>(used) < length) {
+                    const auto &hfi = b.hfiExchange;
+                    const int wrote = snprintf(out + used, length - used,
+                        "\nGPU fwver %s cmd=%u/%u msg=%u/%u irq=%x/%x ack=%x/%x/%x/%x",
+                        hfi.state, hfi.cmdRead, hfi.cmdWrite, hfi.msgRead, hfi.msgWrite,
+                        hfi.irq, hfi.irqAfter, hfi.reply[0], hfi.reply[1], hfi.reply[2], hfi.reply[3]);
+                    if (wrote < 0 || static_cast<unsigned>(wrote) >= length - used) return;
+                    used += wrote;
+                }
                 // Fault forensics: the first observation keeps the stalled
                 // transaction's syndrome and the leaf word before/after the
                 // one-attribute repair. Later reports reuse the same snapshot.

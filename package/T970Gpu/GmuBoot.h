@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 #pragma once
 #include <stdint.h>
+#include "GmuHfiVersion.h"
 
 namespace t970_gpu {
 
@@ -25,6 +26,7 @@ struct GmuBootProbe {
     static constexpr unsigned maxFaults = 3;
     GmuFault fault[maxFaults] = {};
     unsigned faultEvents = 0;
+    GmuHfiVersionProbe hfiExchange;
 };
 
 }
@@ -96,26 +98,20 @@ static uint64_t gmuRepairDescriptor(uint64_t pte, uint32_t fsynr) {
 static bool prepareGmuBootHfi(GmuTables &tables) {
     // Vendor A650 layout from lmi mode 28: four headers and four rings in
     // five 4 KiB pages. This probe only publishes the cold queue table.
-    constexpr uint32_t iova = 0x60001000;
-    constexpr unsigned bytes = 5 * 4096;
-    for (const auto &range : tables.ranges) {
-        if (range.iova != iova || range.bytes != bytes) continue;
-        auto *shared = reinterpret_cast<uint32_t *>(reinterpret_cast<uint8_t *>(tables.tables) +
-            (range.physical - tables.config.table_physical));
-        bzero(shared, bytes);
-        const uint32_t table[] = {0, 54, 6, 12, 4, 4};
-        memcpy(shared, table, sizeof(table));
-        constexpr unsigned priorities[] = {10, 10, 40, 20};
-        for (unsigned i = 0; i < 4; ++i) {
-            auto *queue = shared + 6 + i * 12;
-            queue[0] = i < 3;
-            queue[1] = iova + 256 + i * 4096;
-            queue[2] = i | (priorities[i] << 8);
-            queue[3] = 1024;
-        }
-        return true;
+    auto *shared = gmuHfiMemory(tables);
+    if (!shared) return false;
+    bzero(shared, gmuHfiBytes);
+    const uint32_t table[] = {0, 54, 6, 12, 4, 4};
+    memcpy(shared, table, sizeof(table));
+    constexpr unsigned priorities[] = {10, 10, 40, 20};
+    for (unsigned i = 0; i < 4; ++i) {
+        auto *queue = shared + 6 + i * 12;
+        queue[0] = i < 3;
+        queue[1] = gmuHfiIova + 256 + i * 4096;
+        queue[2] = i | (priorities[i] << 8);
+        queue[3] = 1024;
     }
-    return false;
+    return true;
 }
 
 // Board first-boot probe using the lmi A650 boot values with the T970 RSC
@@ -128,7 +124,7 @@ static bool prepareGmuBootHfi(GmuTables &tables) {
 // translation, a page-table walk fault or a page outside the audited ranges.
 template <typename CheckRoute>
 static void startGmuBoot(IOMemoryMap &gmu, IOMemoryMap &smmu, GmuTables &tables,
-                         GmuBootProbe &result, bool repair, CheckRoute checkRoute) {
+                         GmuBootProbe &result, bool repair, bool exchange, CheckRoute checkRoute) {
     using t970_touch::read;
     using t970_touch::write;
     constexpr unsigned reset = 0x14000, fwInit = 0x14070;
@@ -165,7 +161,7 @@ static void startGmuBoot(IOMemoryMap &gmu, IOMemoryMap &smmu, GmuTables &tables,
 
     const struct { unsigned offset; uint32_t value; } settings[] = {
         {0x14004, 2},          // CM3_BOOT_CONFIG
-        {0x14614, 0x60001000}, // HFI_QTBL_ADDR
+        {0x14614, gmuHfiIova}, // HFI_QTBL_ADDR
         {0x14610, 1},          // HFI_QTBL_INFO
         {0x24c44, 0x80a008a0}, // AHB_FENCE_RANGE_0
         {0x14608, 0x06050200}, // HFI_SFR_ADDR
@@ -280,6 +276,13 @@ static void startGmuBoot(IOMemoryMap &gmu, IOMemoryMap &smmu, GmuTables &tables,
                 result.reset = read(gmu, reset);
                 if (!result.reset) {
                     result.state = "ready";
+                    if (exchange) {
+                        probeGmuHfiVersion(gmu, tables, result.hfiExchange, [&] {
+                            return healthy() && !read(gmu, reset) &&
+                                (read(gmu, fwInit) & 0x1ff) == 0x100 && read(gmu, hfiStatus) == 1 &&
+                                read(gmu, hfiVersion) == 0x20000001;
+                        });
+                    }
                     return;
                 }
             }
