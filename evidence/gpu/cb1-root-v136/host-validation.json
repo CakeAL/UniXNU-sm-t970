@@ -1,0 +1,51 @@
+{
+  "device_revision": "9e56be0ea5b4a3d5005e0e9c1f7af85152df3fd3",
+  "unixnu_revision": "2c834e313d25482c78d38d703eff1f8d190f2597",
+  "boot_sha256": "109ee7ebbede2a3411cad5eb1ef0f08e4a17f7f67f55faaac1dc7ce4f6507c49",
+  "tests": {
+    "command": "python3.14 -m unittest discover -s tests",
+    "ran": 76,
+    "skipped": 10,
+    "result": "OK"
+  },
+  "model": "ASan/UBSan with pinned ArmSmmu4K and mock MMIO: 17 leaves, SQE payload/readback, disabled CB1 writes, exact TTBR readback and software audit, CBAR refusal, failed write/retention and corrupted table audit.",
+  "stack": {
+    "method": "Same-symbol SP decreases from llvm-objdump",
+    "common_deltas_bytes": {
+      "reportCxPulse": 48,
+      "pulseRscInit": 48
+    },
+    "new_frames_bytes": {
+      "installCb1Root": 640,
+      "prepareCpTables": "inlined"
+    }
+  },
+  "adreno_firmware": {
+    "revision": "20ad3d7aca14bd46aecab6335c780f5413fa054b",
+    "sm8250_revision": "166235ec2480ff0992627b7aafa15c65ce6b4efa",
+    "gmu_sha256": "df79fa8482fcc7587bb239b9c9e2b24bce4729893b990fe3f82b30da8175b01c",
+    "objects": {
+      "AdrenoFirmware.o": "514534a2afd38bf3f09e58471ed0901fbc24f20a7057099f5d4818b68cf1b029",
+      "A650GmuRegions.o": "c05512936d859c8a2ddbf1d066d5147ad9f9632ff243db871675650d328dc8a5"
+    },
+    "probe_sha256": "48dbd111d7fc5cd044d26a1ac35b281b3b81535278fb260d97e13a0733dc7027",
+    "sqe_sha256": "b4c27420fd6a5c6b511b254cc0fad8cdd40eea38ceb3418f895a1084f4460487"
+  },
+  "gmu_bytes": 41548,
+  "sqe_file_bytes": 31632,
+  "sqe_payload_bytes": 31628,
+  "exact_payload_copies_in_kernel_and_boot": {
+    "gmu": 1,
+    "sqe": 1
+  },
+  "bad_sqe_rejected": true,
+  "kernel_prelink": "PASS",
+  "fat_readback": "PASS",
+  "image_symbol_check": {
+    "segments": 15,
+    "symbols_checked": 69533,
+    "result": "PASS"
+  },
+  "check_hardware_description": "PASS with synthetic identity",
+  "check_platform": "Stopped at historical framework revision guard"
+}

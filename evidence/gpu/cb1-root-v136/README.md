@@ -17,3 +17,9 @@ python3.14 evidence/display/hello-black-v64/build-kernel.py --cached-headers --s
 python3.14 evidence/gpu/power-v104/prepare.py --gpu-cb1-root
 python3.14 -m unittest discover -s tests
 ```
+
+[镜像清单](preparation.json)和[刷写回执](upload.json)对应 BOOT
+`109ee7ebbede2a3411cad5eb1ef0f08e4a17f7f67f55faaac1dc7ce4f6507c49`。
+Heimdall 确认上传并请求重启，等待 CB1 实机报告。
+[主机验证](host-validation.json)记录 17 个叶、SQE 字节、故障保留、封包和
+独立 DTS/ADT 检查。完整平台检查停在历史框架版本校验。

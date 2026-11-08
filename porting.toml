@@ -1081,6 +1081,7 @@ procedure = [
 ]
 findings = [
   "The v123 diagnostic display archive links the pinned A650GmuRegions and AdrenoFirmware planner objects and embeds the hash-checked A650 image only when explicitly requested.",
+  "The v136 diagnostic display archive accepts a separate opt-in SQE input, validates its exact stock size and SHA-256, and exposes the CB1 root mode only in kernels built with that input.",
   "The v119 opt-in diagnostic archive adds the pinned ArmSmmu4KMmio object for the GPU TTBR width probe.",
   "The opt-in v116 build routes GPU mode 13 through the startup report and links the five pinned ArmSmmu4K objects in the diagnostic display archive.",
   "GPU report mode 8 replaces the ARC inventory with the GMU rate and restoration report in the terminal buffer.",
@@ -1470,6 +1471,8 @@ next_action = [
   "Verify the v136 disabled CB1 root on hardware, then qualify CB1 activation and the GPU stream. Obtain signed T970 ZAP inputs and qualify PAS before normal GPU submissions.",
 ]
 evidence = [
+  { kind = "host", reference = "evidence/gpu/cb1-root-v136/host-validation.json", revision = "9e56be0ea5b4a3d5005e0e9c1f7af85152df3fd3", command = "python3.14 -m unittest discover -s tests and evidence/gpu/power-v104/prepare.py --gpu-cb1-root", result = "ASan/UBSan verified 17 leaves, stock SQE placement, disabled CB1 field writes and failure retention. GMU/SQE payload, FAT readback, symbols and independent DTS/ADT passed." },
+  { kind = "device", reference = "evidence/gpu/cb1-root-v136/upload.json", revision = "9e56be0ea5b4a3d5005e0e9c1f7af85152df3fd3", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/gpu-cb1-root-v136/boot-partition.img", result = "BOOT109ee7eb transfer succeeded and requested reboot. Disabled CB1 root result pending." },
   { kind = "device", reference = "evidence/gpu/cb1-format-v135/device-result.json", revision = "d14feb4a24a7500ac82d53a82e4eb68d5beedaab", command = "BOOT72eb23cb and owner three-finger report screenshot", result = "CB1 VA64 0/1/0, FSR 400 in AArch64 view, all 15 inherited words restored, live SID5. Eight CPUs, Data query success and 47 GOP copies and retirements." },
   { kind = "host", reference = "evidence/gpu/cb1-format-v135/host-validation.json", revision = "d14feb4a24a7500ac82d53a82e4eb68d5beedaab", command = "python3.14 -m unittest discover -s tests and evidence/gpu/power-v104/prepare.py --gpu-cb1-format", result = "ASan/UBSan CB1 selector model, FAT readback, firmware hash, image symbols and independent DTS/ADT passed." },
   { kind = "device", reference = "evidence/gpu/cb1-format-v135/upload.json", revision = "d14feb4a24a7500ac82d53a82e4eb68d5beedaab", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/gpu-cb1-format-v135/boot-partition.img", result = "BOOT72eb23cb transfer succeeded and requested reboot." },
@@ -1683,6 +1686,7 @@ procedure = [
 ]
 findings = [
   "The optional v123 GMU firmware probe runs under the existing verified power and clock sequence and restores TCM retention before the normal dependency release.",
+  "The v136 SQE build option stages a disabled GPU context after the existing qualified GX power sequence.",
   "The v116 diagnostic archive keeps the existing power paths and adds a separate mode 13 software table walk that issues no GPU rail or clock votes.",
   "v104 keeps the established battery and charger arguments while sampling GPU power handoff through GCC and qualified GPUCC reads.",
   "v98 BOOT749b7419 fixes the false kick failure: WDTCLR is self-clearing, so bits1:0 read back zero after a successful kick. The action now verifies only the preserved CNFG_06 bits7:2; a write NACK leaves CHG_EN on (the unkicked watchdog stops charging by itself) and a preserved-bit change clears CHG_EN. On BOOT749b7419 the kick fix holds: charge=kicked, CNFG_09 stays 0xbb, CHG_DTLS=1 with CHG_OK set, and the charger reports charging over 47 samples with zero errors. The gauge current remains negative (-215625uA) while SOC/capacity/voltage drift upward, so the gauge current sign is not yet reconciled with the charger state and Amperage is not yet suitable for time estimates. The later v100 photo shows +17968uA with CHG_DTLS=1, but v101 is -277343uA at the same charger state, so the gauge current sign is not a reliable indicator yet and Amperage stays out of time estimates.",
@@ -2147,6 +2151,7 @@ procedure = [
 findings = [
   "The v126 startup report appends up to two GPU pf lines with FSR, FAR, FSYNR0, CBFRSYNRA, the leaf word before and after repair and whether the transaction was retried. v128 prints both full 64-bit leaf words and the number of faults captured. v129 adds the S2CR0 readback before stream publication. v130 through v132 report FW_VER, PERF_TBL, BW_TBL and CORE_FW_START with cursors, interrupt readback and raw ACK words.",
   "v133 reports START and DCVS echoes, OOB acknowledgement and clear, GX power status and AHB fence status.",
+  "v136 reports disabled CB1 root fields, leaf count, SQE byte count and whether the allocation was retained.",
   "The v123 startup report shows TCM and RAM bytes, readback and restoration mismatches, and the staged DTCM version.",
   "v119 reports TTBR0 and TTBR1 native read, ASID write and rollback masks through the three-finger startup report.",
   "The v116 three-finger report includes a bounded GMU table-walk result with allocator, backing, build, bind, encode and audit failure labels.",
