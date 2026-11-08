@@ -4,7 +4,9 @@
 
 namespace t970_gpu {
 
-struct GmuHfiVersionProbe {
+enum class GmuHfiProbeMode { None, Version, Performance };
+
+struct GmuHfiProbe {
     const char *state = "skip";
     uint32_t cmdRead = 0, cmdWrite = 0, msgRead = 0, msgWrite = 0, irq = 0, irqAfter = 0;
     uint32_t reply[4] = {};
@@ -38,17 +40,30 @@ static void syncGmuHfi(uintptr_t address, unsigned bytes, unsigned line, bool pu
     __asm__ volatile("dsb sy" ::: "memory");
 }
 
-// One legacy A650 FW_VER exchange using the four-queue layout and wire
-// format qualified by lmi mode 29. The caller holds the route through reboot.
+struct GmuHfiRequest {
+    const uint32_t *packet;
+    unsigned words, cmdStart, msgStart;
+    uint32_t expectedVersion = 0;
+};
+
+// Bounded, non-wrapping transfer on the legacy four-queue A650 transport.
+// The caller holds the route through reboot and stops after any failed exchange.
 template <typename Healthy>
-static void probeGmuHfiVersion(IOMemoryMap &gmu, GmuTables &tables, GmuHfiVersionProbe &result, Healthy healthy) {
+static void exchangeGmuHfi(IOMemoryMap &gmu, GmuTables &tables, const GmuHfiRequest &request,
+                          GmuHfiProbe &result, Healthy healthy) {
     using t970_touch::read;
     using t970_touch::write;
     constexpr unsigned irqClear = 0x14644, irqInfo = 0x14648, doorbell = 0x14650;
     constexpr unsigned command = 256, response = command + 4096;
     constexpr unsigned cmdRead = 16, cmdWrite = 17, msgRead = 28, msgWrite = 29;
-    constexpr uint32_t request[] = {0x00100201, 0x20000000, 0xfafafafa, 0xfafafafa};
-    constexpr unsigned words = sizeof(request) / sizeof(request[0]);
+    constexpr unsigned ringWords = 1024, replyStride = 4;
+    const unsigned replyWords = request.expectedVersion ? 4 : 3;
+    result.state = "packet";
+    if (!request.words || request.words > 255 || (request.cmdStart & 3) || (request.msgStart & 3) ||
+        ((request.packet[0] >> 8) & 0xff) != request.words) return;
+    const unsigned span = (request.words + 3) & ~3u;
+    if (request.cmdStart >= ringWords - span || request.msgStart >= ringWords - replyStride) return;
+    const unsigned cmdEnd = request.cmdStart + span, msgEnd = request.msgStart + replyStride;
     result.state = "health";
     if (!healthy()) return;
     result.state = "versions";
@@ -79,14 +94,17 @@ static void probeGmuHfiVersion(IOMemoryMap &gmu, GmuTables &tables, GmuHfiVersio
     };
     result.state = "busy";
     sample();
-    if (result.irq || result.cmdRead || result.cmdWrite || result.msgRead || result.msgWrite) return;
+    if (result.irq || result.cmdRead != request.cmdStart || result.cmdWrite != request.cmdStart ||
+        result.msgRead != request.msgStart || result.msgWrite != request.msgStart) return;
 
     // Publish payload first and its producer cursor last. CMD and MSG
     // indices can share a line, so clean that line only before the request
     // and once after firmware has consumed it and posted the complete reply.
-    for (unsigned i = 0; i < words; ++i) shared[command / 4 + i] = request[i];
-    syncGmuHfi(base + command, sizeof(request), line, true);
-    shared[cmdWrite] = words;
+    const unsigned cmdOffset = command + request.cmdStart * 4;
+    for (unsigned i = 0; i < span; ++i)
+        shared[cmdOffset / 4 + i] = i < request.words ? request.packet[i] : 0xfafafafa;
+    syncGmuHfi(base + cmdOffset, span * 4, line, true);
+    shared[cmdWrite] = cmdEnd;
     syncGmuHfi(base + cmdWrite * 4, 4, line, true);
     write(gmu, doorbell, 1);
 
@@ -97,18 +115,21 @@ static void probeGmuHfiVersion(IOMemoryMap &gmu, GmuTables &tables, GmuHfiVersio
             result.state = "health";
             return;
         }
-        if (result.irq & ~1u || result.cmdRead > words || result.cmdWrite != words ||
-            result.msgRead || result.msgWrite > words) {
+        if (result.irq & ~1u || result.cmdRead < request.cmdStart || result.cmdRead > cmdEnd ||
+            result.cmdWrite != cmdEnd || result.msgRead != request.msgStart ||
+            result.msgWrite < request.msgStart || result.msgWrite > msgEnd) {
             result.state = "cursor";
             return;
         }
-        if (result.cmdRead == words && result.msgWrite == words && result.irq == 1) {
+        if (result.cmdRead == cmdEnd && result.msgWrite == msgEnd && result.irq == 1) {
             result.state = "reply";
-            syncGmuHfi(base + response, sizeof(result.reply), line, false);
-            for (unsigned j = 0; j < words; ++j) result.reply[j] = shared[response / 4 + j];
-            if ((result.reply[0] & 0xfff00u) != 0x10400 || result.reply[1] != request[0] ||
-                result.reply[2] || result.reply[3] != 0x20010008) return;
-            shared[msgRead] = words;
+            const unsigned msgOffset = response + request.msgStart * 4;
+            syncGmuHfi(base + msgOffset, replyWords * 4, line, false);
+            for (unsigned j = 0; j < replyWords; ++j) result.reply[j] = shared[msgOffset / 4 + j];
+            if ((result.reply[0] & 0xfff00u) != (0x10000 | (replyWords << 8)) ||
+                result.reply[1] != request.packet[0] || result.reply[2] ||
+                (request.expectedVersion && result.reply[3] != request.expectedVersion)) return;
+            shared[msgRead] = msgEnd;
             syncGmuHfi(base + msgRead * 4, 4, line, true);
             write(gmu, irqClear, 1);
             result.state = "irq";
@@ -118,6 +139,12 @@ static void probeGmuHfiVersion(IOMemoryMap &gmu, GmuTables &tables, GmuHfiVersio
         }
         IODelay(100);
     }
+}
+
+template <typename Healthy>
+static void probeGmuHfiVersion(IOMemoryMap &gmu, GmuTables &tables, GmuHfiProbe &result, Healthy healthy) {
+    constexpr uint32_t request[] = {0x00100201, 0x20000000};
+    exchangeGmuHfi(gmu, tables, {request, 2, 0, 0, 0x20010008}, result, healthy);
 }
 
 }

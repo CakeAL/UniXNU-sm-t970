@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 #pragma once
 #include <stdint.h>
-#include "GmuHfiVersion.h"
+#include "GmuHfiPerf.h"
 
 namespace t970_gpu {
 
@@ -26,7 +26,7 @@ struct GmuBootProbe {
     static constexpr unsigned maxFaults = 3;
     GmuFault fault[maxFaults] = {};
     unsigned faultEvents = 0;
-    GmuHfiVersionProbe hfiExchange;
+    GmuHfiProbe hfiExchange, hfiPerf;
 };
 
 }
@@ -124,7 +124,7 @@ static bool prepareGmuBootHfi(GmuTables &tables) {
 // translation, a page-table walk fault or a page outside the audited ranges.
 template <typename CheckRoute>
 static void startGmuBoot(IOMemoryMap &gmu, IOMemoryMap &smmu, GmuTables &tables,
-                         GmuBootProbe &result, bool repair, bool exchange, CheckRoute checkRoute) {
+                         GmuBootProbe &result, bool repair, GmuHfiProbeMode hfiMode, CheckRoute checkRoute) {
     using t970_touch::read;
     using t970_touch::write;
     constexpr unsigned reset = 0x14000, fwInit = 0x14070;
@@ -276,12 +276,15 @@ static void startGmuBoot(IOMemoryMap &gmu, IOMemoryMap &smmu, GmuTables &tables,
                 result.reset = read(gmu, reset);
                 if (!result.reset) {
                     result.state = "ready";
-                    if (exchange) {
-                        probeGmuHfiVersion(gmu, tables, result.hfiExchange, [&] {
+                    if (hfiMode != GmuHfiProbeMode::None) {
+                        const auto hfiHealthy = [&] {
                             return healthy() && !read(gmu, reset) &&
                                 (read(gmu, fwInit) & 0x1ff) == 0x100 && read(gmu, hfiStatus) == 1 &&
                                 read(gmu, hfiVersion) == 0x20000001;
-                        });
+                        };
+                        probeGmuHfiVersion(gmu, tables, result.hfiExchange, hfiHealthy);
+                        if (hfiMode == GmuHfiProbeMode::Performance && !strcmp(result.hfiExchange.state, "ok"))
+                            probeGmuHfiPerf(gmu, tables, result.hfiPerf, hfiHealthy);
                     }
                     return;
                 }

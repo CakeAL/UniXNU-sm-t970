@@ -130,6 +130,8 @@ v129 实机确认 `s2=1038eb00 fw=100 hfi=1/20000001 rst=0 pf=0`。
 v130 实机确认 `FW_VER` 应答 `10401/100201/0/20010008`、
 命令游标 `4/4`、中断由 `1` 清为 `0`，验证 GMU 与主机之间的双向 DMA。
 下一步验证性能表、带宽表和 `CORE_FW_START`，再进入 GX、ZAP 和 CP。
+v131 复用实测通过的 `FW_VER` 传输，按本机原厂 OPP 和 live ARC cmd-db
+构建并发送一张 legacy `PERF_TBL`，单独验收性能表应答。
 CM3 启动阶段需保留 T970 的 RSC 路由，且核对 A650 的 HFI 队列布局。
 锁定的 Sm8250Platform 冷启动序列会写入固定的 hidden 值，集成时需处理与实测路由的差异。
 见 [v109 实测](../evidence/gpu/rsc-init-v109/device-result.json)、

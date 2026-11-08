@@ -236,12 +236,21 @@ static void reportRscMode(char *out, unsigned length, const RscSnapshot &rsc, un
                     stage, rate.state, b.fwInit, b.hfiStatus, b.hfiVersion, b.reset, b.offset,
                     b.globalFault, b.contextFault, b.aoStatus, b.gmuStatus, s.rootHeld ? 1u : 0u,
                     s.ddrAxiBefore, s.clock[ddrAxiIndex], s.ddrAxiAfter, b.faultEvents, s.sid5S2cr);
-                if (power == cbBootHfiVersionMode && used > 0 && static_cast<unsigned>(used) < length) {
+                if (power >= cbBootHfiVersionMode && used > 0 && static_cast<unsigned>(used) < length) {
                     const auto &hfi = b.hfiExchange;
                     const int wrote = snprintf(out + used, length - used,
                         "\nGPU fwver %s cmd=%u/%u msg=%u/%u irq=%x/%x ack=%x/%x/%x/%x",
                         hfi.state, hfi.cmdRead, hfi.cmdWrite, hfi.msgRead, hfi.msgWrite,
                         hfi.irq, hfi.irqAfter, hfi.reply[0], hfi.reply[1], hfi.reply[2], hfi.reply[3]);
+                    if (wrote < 0 || static_cast<unsigned>(wrote) >= length - used) return;
+                    used += wrote;
+                }
+                if (power == cbBootHfiPerfMode && used > 0 && static_cast<unsigned>(used) < length) {
+                    const auto &perf = b.hfiPerf;
+                    const int wrote = snprintf(out + used, length - used,
+                        "\nGPU perf %s cmd=%u/%u msg=%u/%u irq=%x/%x ack=%x/%x/%x",
+                        perf.state, perf.cmdRead, perf.cmdWrite, perf.msgRead, perf.msgWrite,
+                        perf.irq, perf.irqAfter, perf.reply[0], perf.reply[1], perf.reply[2]);
                     if (wrote < 0 || static_cast<unsigned>(wrote) >= length - used) return;
                     used += wrote;
                 }
