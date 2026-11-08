@@ -16,3 +16,12 @@ python3.14 evidence/display/hello-black-v64/build-kernel.py --cached-headers --s
 python3.14 evidence/gpu/power-v104/prepare.py --gmu-boot-scratch-exec
 python3.14 -m unittest discover -s tests
 ```
+
+[镜像清单](preparation.json)和[刷写回执](upload.json)对应 BOOT
+`8ee0c6edbbdf3a6a6c419cef22be74c82b846b7caaacf01e9a704dca076e9c88`。
+Heimdall 确认上传并请求重启。[实机报告](device-result.json)显示捕获了三次
+故障，前两次落在 HFI 队列和电源日志的起始页，PTE 的 XN 位在写入重试前已清除。
+此前路由保留的 `INSTCFG=3` 会把读请求标记为取指，因此日志的 IND 位
+反映的是 SMMU 路由处理后的属性。
+[主机验证](host-validation.json)记录了页表差异、探测链栈帧、封包和独立
+DTS/ADT 检查。完整平台检查停在历史框架版本校验。

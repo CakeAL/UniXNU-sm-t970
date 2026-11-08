@@ -1454,6 +1454,9 @@ next_action = [
   "Read the v128 mode 24 three-finger report for FW_INIT and HFI ready or a new GPU pf syndrome. Start a separate FW_VER exchange only after readiness.",
 ]
 evidence = [
+  { kind = "host", reference = "evidence/gpu/gmuboot-exec-v128/host-validation.json", revision = "81afc9698ab669bc7ec789e36c4ba00d5736100c", command = "python3.14 -m unittest discover -s tests and evidence/gpu/power-v104/prepare.py --gmu-boot-scratch-exec", result = "ASan/UBSan table comparison confirmed 19 XN-only leaf deltas. Known startup chain increases by 32 bytes versus v127. FAT readback, firmware hash, image symbols and independent DTS/ADT passed." },
+  { kind = "device", reference = "evidence/gpu/gmuboot-exec-v128/device-result.json", revision = "81afc9698ab669bc7ec789e36c4ba00d5736100c", command = "BOOT8ee0c6ed and owner three-finger report screenshot", result = "Three faults captured. Two shown were SID5 instruction-marked reads at the HFI and power-log base IOVAs, with XN cleared before retry. FW_INIT stayed 0. Eight CPUs, Data query succeeded, 45 GOP copies and retirements." },
+  { kind = "device", reference = "evidence/gpu/gmuboot-exec-v128/upload.json", revision = "81afc9698ab669bc7ec789e36c4ba00d5736100c", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/gpu-gmuboot-exec-v128/boot-partition.img", result = "BOOT8ee0c6ed transfer succeeded and requested reboot." },
   { kind = "device", reference = "evidence/gpu/gmuboot-pf-v127/device-result.json", revision = "abe50fc005299c3dd908cbe6b61e39bade5e1ef7", command = "BOOT9b6513f4 and owner three-finger report screenshot", result = "Report recovered from v126 stack overflow. CB0 stalled PF with SID5 privileged instruction fetches at 0x153e00 and 0x154600. FW_INIT 0, CM3 reset restored. Eight CPUs, Data query succeeded and 84 GOP copies and retirements." },
   { kind = "host", reference = "evidence/gpu/gmuboot-pf-v127/host-validation.json", revision = "abe50fc005299c3dd908cbe6b61e39bade5e1ef7", command = "frame-size analysis with xcrun llvm-objdump plus evidence/gpu/power-v104/prepare.py --gmu-boot-pf-fix", result = "The panicked chain drops from 12,768 to 8,288 bytes across the same 15 functions. Frozen firmware, prelink and FAT readback passed." },
   { kind = "device", reference = "evidence/gpu/gmuboot-pf-v127/upload.json", revision = "abe50fc005299c3dd908cbe6b61e39bade5e1ef7", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/gpu-gmuboot-pf-v127/boot-partition.img", result = "BOOT9b6513f4 transfer succeeded and requested reboot." },
@@ -2096,7 +2099,7 @@ procedure = [
   "Run python3 scripts/collect-adb-inventory.py --root --output evidence/<new-capture>; review per-command stderr, checksums, GPT CRC results and DT sanitization before updating this record.",
 ]
 findings = [
-  "The v126 startup report appends up to two GPU pf lines with the FSR, FAR, FSYNR0, CBFRSYNRA, the leaf word before and after the one-attribute repair and whether the transaction was retried.",
+  "The v126 startup report appends up to two GPU pf lines with FSR, FAR, FSYNR0, CBFRSYNRA, the leaf word before and after repair and whether the transaction was retried. v128 prints both full 64-bit leaf words and the number of faults captured.",
   "The v123 startup report shows TCM and RAM bytes, readback and restoration mismatches, and the staged DTCM version.",
   "v119 reports TTBR0 and TTBR1 native read, ASID write and rollback masks through the three-finger startup report.",
   "The v116 three-finger report includes a bounded GMU table-walk result with allocator, backing, build, bind, encode and audit failure labels.",

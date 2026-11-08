@@ -1,0 +1,22 @@
+{
+  "boot_sha256": "8ee0c6edbbdf3a6a6c419cef22be74c82b846b7caaacf01e9a704dca076e9c88",
+  "source": "Owner screenshot attached to the Codex conversation",
+  "photo_time_local": "2026-11-08T11:46:53+08:00",
+  "photo_sha256": "1a786664fbb470ce7415b6c64226fb5428fbff3eff8ae0e126126b284881eb28",
+  "lines": [
+    "GPU boot fw/smmu-hold fw=0 hfi=0/0 rst=1 at=0 f=0/40000408 irq=0/0 held=1 axi=80100000/100001/0 pf=3",
+    "GPU pf1 fsr=40000408 far=60001000/0 syn=20063 sid=5 pte=600000ceb21e03/ceb21e03 fix=xp rs=1",
+    "GPU pf2 fsr=40000408 far=60000000/0 syn=20063 sid=5 pte=600000ceb20e03/ceb20e03 fix=xp rs=1"
+  ],
+  "faults_captured": 3,
+  "faults_visible": [
+    { "far": "0x60001000", "region": "HFI queue", "fsynr0": "0x20063", "sid": 5, "xn_bits_cleared": true, "retry_written": true },
+    { "far": "0x60000000", "region": "power log", "fsynr0": "0x20063", "sid": 5, "xn_bits_cleared": true, "retry_written": true }
+  ],
+  "route_interpretation": "The installed S2CR0 policy retained INSTCFG[27:26]=3. SMMUv2 classifies reads on this route as instruction fetches and records IND after that override. The observed IND does not establish that the GMU originated instruction fetches to these data buffers.",
+  "cm3": { "release_written": true, "fw_init": 0, "hfi_status": 0, "reset_after_failure": 1 },
+  "dependencies_retained": true,
+  "boot": { "three_finger_report": true, "cpus": 8, "processes": 250, "springboard_pid": 27, "backboardd_pid": 57 },
+  "storage": { "data_space_rc": 0, "block_size": 4096, "available_blocks": 43874 },
+  "display": { "copies": 45, "retired": 45 }
+}
