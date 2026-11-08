@@ -30,8 +30,9 @@ constexpr unsigned cbBootHfiVersionMode = 26;
 constexpr unsigned cbBootHfiPerfMode = 27;
 constexpr unsigned cbBootHfiCoreMode = 28;
 constexpr unsigned cbBootHfiGxMode = 29;
+constexpr unsigned cbBootCpReadMode = 30;
 static constexpr bool isBootMode(unsigned power) {
-    return power >= cbBootMode && power <= cbBootHfiGxMode;
+    return power >= cbBootMode && power <= cbBootCpReadMode;
 }
 constexpr unsigned ddrAxiIndex = 2;
 constexpr uint32_t cbBarStage1 = 0x1f300;
@@ -50,6 +51,14 @@ struct CbGuards {
                (scr0 & (1u << 3) ? 16u : 0u) | (sctlr & 1u ? cbTranslationEnabled : 0u) |
                (smrs ? 64u : 0u);
     }
+};
+
+struct GpuCpSnapshot {
+    const char *state = "skip";
+    uint32_t rbbm = 0, irq = 0, rbCntl = 0, rp = 0, wp = 0, sqe = 0, fault = 0, cpIrq = 0;
+    uint64_t rbBase = 0;
+    uint32_t cbFormat = 0, cbBar = 0, cbCtl = 0, cbFsr = 0, cbTcr = 0, slot = 0;
+    uint64_t cbTtbr0 = 0;
 };
 
 struct SmmuSnapshot {
@@ -83,6 +92,7 @@ struct SmmuSnapshot {
     uint32_t sid5Smr = 0, sid5S2cr = 0, sid5SmrAfter = 0, sid5S2crAfter = 0;
     GmuFirmwareProbe firmware;
     GmuBootProbe boot;
+    GpuCpSnapshot cp;
     uint32_t ddrAxiBefore = 0, ddrAxiAfter = 0;
 };
 
@@ -199,6 +209,53 @@ static bool pulseTtbr(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &result,
     return true;
 }
 
+#ifdef T970_GPU_GMU_FIRMWARE
+template <typename CheckRoute>
+static void samplePoweredCp(IOMemoryMap &smmu, IOMemoryMap &gmu, GpuCpSnapshot &result, CheckRoute checkRoute) {
+    using namespace t970_touch;
+    const auto live = [&] {
+        return checkRoute() && !(read(gmu, 0x14340) & 0xc0) && !read(gmu, 0x14648) &&
+            !(read(gmu, 0x24c14) & 0x29) && !read(gmu, 0x24c4c);
+    };
+    result.state = "guard";
+    if (!live()) return;
+    result.state = "map";
+    auto gpu = mapMmio(A650_GPU_BASE_GPU, 0x40000);
+    if (!gpu || !gpu->getVirtualAddress()) return;
+
+    result.state = "read";
+    if (!live()) return;
+    result.rbbm = read(*gpu, 4 * 0x210);
+    if (result.rbbm == UINT32_MAX) return;
+    result.irq = read(*gpu, 4 * 0x201);
+    result.rbBase = read(*gpu, 4 * 0x800) | (static_cast<uint64_t>(read(*gpu, 4 * 0x801)) << 32);
+    result.rbCntl = read(*gpu, 4 * 0x802);
+    result.rp = read(*gpu, 4 * 0x806);
+    result.wp = read(*gpu, 4 * 0x807);
+    result.sqe = read(*gpu, 4 * 0x808);
+    result.fault = read(*gpu, 4 * 0x821);
+    result.cpIrq = read(*gpu, 4 * 0x823);
+    result.cbFormat = readSmmu32(smmu, 0x1804);
+    result.cbBar = readSmmu32(smmu, 0x1004);
+    result.cbCtl = readSmmu32(smmu, 0x9000);
+    result.cbFsr = readSmmu32(smmu, 0x9058);
+    result.cbTcr = readSmmu32(smmu, 0x9030);
+    result.cbTtbr0 = readTtbrWords(smmu, 0x9020);
+    result.slot = readSmmu32(smmu, A650_SMMU_S2CR(1));
+
+    result.state = "busy";
+    if ((result.rbbm & ~1u) || result.irq || result.rp || result.wp || result.sqe || result.fault ||
+        result.cpIrq || result.cbFormat || result.cbBar || (result.cbCtl & 1) ||
+        result.cbFsr || (result.slot & (3u << 16)) != (2u << 16)) return;
+    result.state = "drift";
+    if (!live() || result.rp != read(*gpu, 4 * 0x806) || result.wp != read(*gpu, 4 * 0x807) ||
+        result.sqe != read(*gpu, 4 * 0x808) || result.fault != read(*gpu, 4 * 0x821) ||
+        result.cpIrq != read(*gpu, 4 * 0x823) || result.cbCtl != readSmmu32(smmu, 0x9000) ||
+        result.cbFsr != readSmmu32(smmu, 0x9058)) return;
+    result.state = "idle";
+}
+#endif
+
 static bool pulseSid5(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &result,
                       const uint32_t (&routes)[6], uint32_t sctlr,
                       [[maybe_unused]] GmuTables *bootTables, [[maybe_unused]] unsigned power) {
@@ -257,13 +314,14 @@ static bool pulseSid5(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &result,
             if (safe) {
                 result.boot.state = "route";
                 if (matches(sid5Match, translated)) {
-                    const auto hfiMode = power == cbBootHfiGxMode ? GmuHfiProbeMode::Gx :
+                    const auto hfiMode = power >= cbBootHfiGxMode ? GmuHfiProbeMode::Gx :
                         power == cbBootHfiCoreMode ? GmuHfiProbeMode::Core :
                         power == cbBootHfiPerfMode ? GmuHfiProbeMode::Performance :
                         power == cbBootHfiVersionMode ? GmuHfiProbeMode::Version : GmuHfiProbeMode::None;
-                    startGmuBoot(gmu, smmu, *bootTables, result.boot, power != cbBootMode,
-                                 hfiMode,
-                                 [&] { return matches(sid5Match, translated, false); });
+                    const auto liveRoute = [&] { return matches(sid5Match, translated, false); };
+                    startGmuBoot(gmu, smmu, *bootTables, result.boot, power != cbBootMode, hfiMode, liveRoute);
+                    if (power == cbBootCpReadMode && !strcmp(result.boot.hfiGx.state, "ok"))
+                        samplePoweredCp(smmu, gmu, result.cp, liveRoute);
                 }
             }
             return false;

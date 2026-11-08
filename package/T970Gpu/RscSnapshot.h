@@ -237,7 +237,8 @@ static void reportRscMode(char *out, unsigned length, const RscSnapshot &rsc, un
                     b.globalFault, b.contextFault, b.aoStatus, b.gmuStatus, s.rootHeld ? 1u : 0u,
                     s.ddrAxiBefore, s.clock[ddrAxiIndex], s.ddrAxiAfter, b.faultEvents, s.sid5S2cr);
                 const bool reportCore = power >= cbBootHfiCoreMode && !strcmp(b.hfiPerf.state, "ok");
-                const bool reportGx = power == cbBootHfiGxMode && !strcmp(b.hfiCore.start.state, "ok");
+                const bool reportGx = power >= cbBootHfiGxMode && !strcmp(b.hfiCore.start.state, "ok");
+                const bool reportCp = power == cbBootCpReadMode && !strcmp(b.hfiGx.state, "ok");
                 if (!reportCore && power >= cbBootHfiVersionMode && used > 0 && static_cast<unsigned>(used) < length) {
                     const auto &hfi = b.hfiExchange;
                     const int wrote = snprintf(out + used, length - used,
@@ -256,7 +257,17 @@ static void reportRscMode(char *out, unsigned length, const RscSnapshot &rsc, un
                     if (wrote < 0 || static_cast<unsigned>(wrote) >= length - used) return;
                     used += wrote;
                 }
-                if (reportGx && used > 0 && static_cast<unsigned>(used) < length) {
+                if (reportCp && used > 0 && static_cast<unsigned>(used) < length) {
+                    const auto &cp = s.cp;
+                    const int wrote = snprintf(out + used, length - used,
+                        "\nGPU cp %s rbbm=%x irq=%x rb=%llx/%x ptr=%x/%x sqe=%x err=%x/%x"
+                        "\nGPU cb1 va=%x bar=%x ctl=%x fsr=%x tcr=%x ttbr=%llx s2=%x",
+                        cp.state, cp.rbbm, cp.irq, static_cast<unsigned long long>(cp.rbBase), cp.rbCntl,
+                        cp.rp, cp.wp, cp.sqe, cp.fault, cp.cpIrq, cp.cbFormat, cp.cbBar, cp.cbCtl,
+                        cp.cbFsr, cp.cbTcr, static_cast<unsigned long long>(cp.cbTtbr0), cp.slot);
+                    if (wrote < 0 || static_cast<unsigned>(wrote) >= length - used) return;
+                    used += wrote;
+                } else if (reportGx && used > 0 && static_cast<unsigned>(used) < length) {
                     const auto &gx = b.hfiGx;
                     const int wrote = snprintf(out + used, length - used,
                         "\nGPU gx %s/%s/%s echo=%x/%x rc=%x/%x oob=%x/%x pwr=%x/%x fence=%x",

@@ -1,0 +1,18 @@
+{
+  "base_boot_sha256": "3fdb8e6dc324e9b2d724c73cc1010ca1821e7bffe8d88cba72f82371fd372015",
+  "boot_sha256": "f6537ceddde66d65b67fdc74d5efac5df468ac2a1459750da0cdc62180d5a793",
+  "boot_bytes": 71303168,
+  "kernel_build_sha256": "5ee9bcbb9a0bbba406ab2cf6b881938c71edc3923f964235a1e92369f31b3389",
+  "kernel_sha256": "57ade21bb104dd275e57fdd190b7b97c61967d1e2702462a0ab9361a90e04b4c",
+  "config_sha256": "3e384fbeb988bd6482c72905072a86bf6da9bafbdd4c59bd6edce8a78dd8c3b6",
+  "xnu_args_bytes": 999,
+  "gpu_boot_arg": "t970-gpu-p=29",
+  "unchanged_fat_inputs": {
+    "Payloads/kernel.macho.adt": "ccf520425d90445a5415425f714ba12065daa4b6a70ce1e30b740437d6de85b6",
+    "Payloads/scratch-data.img": "9a0005a5c520412006589e068264b611c3484af123547d13103387a9fb7c0afa",
+    "Payloads/kernel.macho.trustcache": "7416ca4f8377146626bb284e2133c76bee6cb4e3ee0af5d648b186235a7323a7"
+  },
+  "unchanged_header_firmware_dtb_tail": true,
+  "gpu_soc_revision": "166235ec2480ff0992627b7aafa15c65ce6b4efa",
+  "gpu_soc_header_sha256": "1ca7e0162a82c07fbae5184cbdff67144f7ec306c1dc4494150e296c21a4e3ca"
+}

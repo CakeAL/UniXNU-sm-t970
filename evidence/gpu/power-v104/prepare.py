@@ -60,8 +60,15 @@ def main():
     variants.add_argument('--gmu-hfi-perf', action='store_true', help='Pack v131 from the tested v130 BOOT')
     variants.add_argument('--gmu-hfi-core', action='store_true', help='Pack v132 from the tested v131 BOOT')
     variants.add_argument('--gmu-hfi-gx', action='store_true', help='Pack v133 from the tested v132 BOOT')
+    variants.add_argument('--gpu-cp-read', action='store_true', help='Pack v134 from the tested v133 BOOT')
     options = parser.parse_args()
-    if options.gmu_hfi_gx:
+    if options.gpu_cp_read:
+        baseline = 'gpu-hfi-gx-v133'
+        base_sha = 'f6537ceddde66d65b67fdc74d5efac5df468ac2a1459750da0cdc62180d5a793'
+        output = OUT / 'gpu-cp-read-v134'
+        old, new = b't970-gpu-p=29', b't970-gpu-p=30'
+        markers = (b'GPU cp %s rbbm=', b'GPU cb1 va=')
+    elif options.gmu_hfi_gx:
         baseline = 'gpu-hfi-core-v132'
         base_sha = '3fdb8e6dc324e9b2d724c73cc1010ca1821e7bffe8d88cba72f82371fd372015'
         output = OUT / 'gpu-hfi-gx-v133'

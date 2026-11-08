@@ -16,3 +16,10 @@ python3.14 evidence/display/hello-black-v64/build-kernel.py --cached-headers --s
 python3.14 evidence/gpu/power-v104/prepare.py --gmu-hfi-gx
 python3.14 -m unittest discover -s tests
 ```
+
+[镜像清单](preparation.json)、[刷写回执](upload.json)和[实机报告](device-result.json)
+对应 BOOT `f6537ceddde66d65b67fdc74d5efac5df468ac2a1459750da0cdc62180d5a793`。
+实机确认 `echo=50010a/60041e rc=0/0 oob=80000000/0 pwr=c0/0 fence=0`，
+`pf=0`。八核在线，Data 查询成功，GOP 拷贝和回收各 20 次。
+[主机验证](host-validation.json)包括 GX 模型、栈帧、封包和独立 DTS/ADT。
+完整平台检查停在历史框架版本校验。

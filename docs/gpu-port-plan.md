@@ -136,6 +136,8 @@ v131 实测回显 `203b04`、返回码 0，命令游标到 `64/64`，中断已�
 v132 在此基础上验证 off 档 `BW_TBL` 和 `CORE_FW_START`。
 v132 实机收到两条返回码为零的应答，两次中断均清除。`pf=0`。
 v133 继续验收 `START`、305 MHz DCVS 和 GX OOB 请求。
+v133 实测三项均通过，GX 电源与时钟关断位由 `0xc0` 清至 `0`。
+v134 在 GX 上电后读取 CP ring、SQE 和候选 CB1，建立提交前基线。
 CM3 启动阶段需保留 T970 的 RSC 路由，且核对 A650 的 HFI 队列布局。
 锁定的 Sm8250Platform 冷启动序列会写入固定的 hidden 值，集成时需处理与实测路由的差异。
 见 [v109 实测](../evidence/gpu/rsc-init-v109/device-result.json)、
