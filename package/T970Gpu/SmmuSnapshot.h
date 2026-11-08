@@ -25,8 +25,9 @@ constexpr unsigned cbFirmwareMode = 20;
 constexpr unsigned cbBootMode = 22;
 constexpr unsigned cbBootRepairMode = 23;
 constexpr unsigned cbBootScratchExecMode = 24;
+constexpr unsigned cbBootDefaultInstMode = 25;
 static constexpr bool isBootMode(unsigned power) {
-    return power == cbBootMode || power == cbBootRepairMode || power == cbBootScratchExecMode;
+    return power >= cbBootMode && power <= cbBootDefaultInstMode;
 }
 constexpr unsigned ddrAxiIndex = 2;
 constexpr uint32_t cbBarStage1 = 0x1f300;
@@ -203,7 +204,11 @@ static bool pulseSid5(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &result,
     constexpr uint32_t sid5Match = (1u << 31) | (0x400u << 16) | 5u;
     // The lmi A650 route writes this field subset, preserving the other
     // firmware-owned bits. The stock GMU kernel match covers 5 and 0x405.
-    const uint32_t translated = (routes[0] & ~0x030303ffu) | 0x300u;
+    // The inherited FAULT entry forces every read to Instruction. For the
+    // live default-attribute probe, preserve the originating IND sideband.
+    constexpr uint32_t instCfg = 3u << 26;
+    const uint32_t routeMask = 0x030303ffu | (power == cbBootDefaultInstMode ? instCfg : 0);
+    const uint32_t translated = (routes[0] & ~routeMask) | 0x300u;
     uint32_t expectedRoutes[6];
     memcpy(expectedRoutes, routes, sizeof(expectedRoutes));
     const auto matches = [&](uint32_t match, uint32_t route, bool requireCold = true) {

@@ -1404,6 +1404,8 @@ procedure = [
   "Read KGSL identity and frequency nodes, list GPU firmware files and calculate the GMU/SQE hashes without executing GPU commands.",
 ]
 findings = [
+  "v129 clears S2CR0 INSTCFG[27:26] in the SID5 translation entry to use the incoming instruction attribute, verifies full S2CR readback before publishing SMR0, and begins with the original XN scratch, log and HFI leaves.",
+  "v128 BOOT8ee0c6ed captured instruction-marked reads at HFI and power-log base IOVAs. The inherited S2CR0 translation retained INSTCFG=3, which overrides IND on matching reads before permission checks and syndrome reporting.",
   "v128 gives the owned 19-page GMU scratch window execute permission before publishing SID5. Mode 24 changes only XN on these initial leaf descriptors and reports full 64-bit repair words and the captured fault count.",
   "v127 BOOT9b6513f4 produced the report without the v126 stack panic. Two displayed stalled SID5 privileged instruction fetches at 0x153e00 and 0x154600 belong to the same scratch window. The probe wrote retries and FW_INIT remained zero.",
   "v127 keeps mode 23 but compresses the report thread stack: the snapshot functions now fill caller-owned objects and the firmware planner arrays live in BSS. The measured frame sum along the panicked chain drops from 12,768 to 8,288 bytes, leaving about 4 KiB of the 16 KiB kernel stack.",
@@ -1451,7 +1453,7 @@ limits = [
   "No GMU bring-up, command submission, DMA/SMMU ownership or Metal rendering was tested under UniXNU.",
 ]
 next_action = [
-  "Read the v128 mode 24 three-finger report for FW_INIT and HFI ready or a new GPU pf syndrome. Start a separate FW_VER exchange only after readiness.",
+  "Read the v129 mode 25 three-finger report for S2CR0 1038eb00, FW_INIT and HFI ready or a new GPU pf syndrome. Start a separate FW_VER exchange only after readiness.",
 ]
 evidence = [
   { kind = "host", reference = "evidence/gpu/gmuboot-exec-v128/host-validation.json", revision = "81afc9698ab669bc7ec789e36c4ba00d5736100c", command = "python3.14 -m unittest discover -s tests and evidence/gpu/power-v104/prepare.py --gmu-boot-scratch-exec", result = "ASan/UBSan table comparison confirmed 19 XN-only leaf deltas. Known startup chain increases by 32 bytes versus v127. FAT readback, firmware hash, image symbols and independent DTS/ADT passed." },
@@ -1793,6 +1795,7 @@ procedure = [
   "Read BuildManifest.plist from the local IPSW using Python zipfile and plistlib to identify its OS version, build and product types.",
 ]
 findings = [
+  "v129 starts from exact v128 BOOT and selects opt-in mode 25. The packer verifies the retained ADT, Data seed, trust cache and bytes outside FAT.",
   "v128 starts from exact v127 BOOT and selects opt-in mode 24. The packer verifies the retained ADT, Data seed, trust cache and bytes outside FAT.",
   "v127 starts from the same exact v125 BOOT, keeps opt-in mode 23 and only changes the kernel stack ownership. The packer verifies the retained ADT, Data seed, trust cache and bytes outside FAT.",
   "v126 uses exact v125 BOOT and selects opt-in mode 23 with the same hash-matched A650 GMU firmware. The packer verifies the retained ADT, Data seed, trust cache and bytes outside FAT.",
@@ -2099,7 +2102,7 @@ procedure = [
   "Run python3 scripts/collect-adb-inventory.py --root --output evidence/<new-capture>; review per-command stderr, checksums, GPT CRC results and DT sanitization before updating this record.",
 ]
 findings = [
-  "The v126 startup report appends up to two GPU pf lines with FSR, FAR, FSYNR0, CBFRSYNRA, the leaf word before and after repair and whether the transaction was retried. v128 prints both full 64-bit leaf words and the number of faults captured.",
+  "The v126 startup report appends up to two GPU pf lines with FSR, FAR, FSYNR0, CBFRSYNRA, the leaf word before and after repair and whether the transaction was retried. v128 prints both full 64-bit leaf words and the number of faults captured. v129 adds the S2CR0 readback before stream publication.",
   "The v123 startup report shows TCM and RAM bytes, readback and restoration mismatches, and the staged DTCM version.",
   "v119 reports TTBR0 and TTBR1 native read, ASID write and rollback masks through the three-finger startup report.",
   "The v116 three-finger report includes a bounded GMU table-walk result with allocator, backing, build, bind, encode and audit failure labels.",

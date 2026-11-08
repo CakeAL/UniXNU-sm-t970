@@ -122,6 +122,10 @@ BSS，链上帧和降到约 8.3 KiB 后再取首启报告。
 v127 实机报告成功，SID5 特权取指在 `0x153e00`、`0x154600` 触发
 权限故障，FW_INIT 仍为零。v128 在发布页表前给两页所在的 19 页 GMU
 临时 RAM 段加入执行权限，并记录完整的 64 位叶描述符。
+v128 实机仍在 HFI 队列和电源日志起始页报告 IND。继承的 S2CR0 将
+INSTCFG 设为 3，覆盖了匹配流的读请求属性。v129 在发布 SID5 时将
+INSTCFG 设为 0，使用请求原有的属性，再以原始 XN 页表验证 GMU 首启。
+见 [Arm SMMUv2 §3.4、§9.6](https://documentation-service.arm.com/static/5f900d34f86e16515cdc08fb)。
 CM3 启动阶段需保留 T970 的 RSC 路由，且核对 A650 的 HFI 队列布局。
 锁定的 Sm8250Platform 冷启动序列会写入固定的 hidden 值，集成时需处理与实测路由的差异。
 见 [v109 实测](../evidence/gpu/rsc-init-v109/device-result.json)、
