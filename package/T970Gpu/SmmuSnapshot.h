@@ -6,6 +6,9 @@
 #include "ArmSmmu4KMmio.h"
 #include "GmuTables.h"
 #endif
+#ifdef T970_GPU_SQE_FIRMWARE
+#include "CpTables.h"
+#endif
 #include "GmuFirmware.h"
 #include "GmuBoot.h"
 
@@ -32,8 +35,9 @@ constexpr unsigned cbBootHfiCoreMode = 28;
 constexpr unsigned cbBootHfiGxMode = 29;
 constexpr unsigned cbBootCpReadMode = 30;
 constexpr unsigned cbBootCb1FormatMode = 31;
+constexpr unsigned cbBootCb1RootMode = 32;
 static constexpr bool isBootMode(unsigned power) {
-    return power >= cbBootMode && power <= cbBootCb1FormatMode;
+    return power >= cbBootMode && power <= cbBootCb1RootMode;
 }
 constexpr unsigned ddrAxiIndex = 2;
 constexpr uint32_t cbBarStage1 = 0x1f300;
@@ -63,6 +67,10 @@ struct GpuCpSnapshot {
     const char *formatState = "skip";
     uint32_t vaDuring = 0, vaAfter = 0, barDuring = 0, fsrDuring = 0, ctlDuring = 0;
     unsigned formatDiff = 0;
+    const char *rootState = "skip";
+    unsigned sqeBytes = 0, rootFields = 0, leaves = 0;
+    uint64_t liveRoot = 0;
+    bool rootHeld = false;
 };
 
 struct SmmuSnapshot {
@@ -214,6 +222,78 @@ static bool pulseTtbr(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &result,
 }
 
 #ifdef T970_GPU_GMU_FIRMWARE
+#ifdef T970_GPU_SQE_FIRMWARE
+template <typename Live>
+static void installCb1Root(IOMemoryMap &smmu, GpuCpSnapshot &result, Live live) {
+    constexpr unsigned va64 = 0x1804, bar = 0x1004, ctl = 0x9000, fsr = 0x9058;
+    const auto view = [&](uint32_t expectedVa, uint32_t expectedBar, uint32_t expectedFsr) {
+        return live() && readSmmu32(smmu, va64) == expectedVa &&
+            readSmmu32(smmu, bar) == expectedBar && readSmmu32(smmu, fsr) == expectedFsr &&
+            !(readSmmu32(smmu, ctl) & 1);
+    };
+    result.rootState = "guard";
+    if (!view(0, 0, 0)) return;
+    CpTables tables;
+    if (!prepareCpTables(tables, readSmmu32(smmu, A650_SMMU_ID0), readSmmu32(smmu, A650_SMMU_ID2),
+                         result.sqeBytes)) {
+        result.rootState = tables.stage;
+        return;
+    }
+    ArmSmmu4KMmio mmio = {reinterpret_cast<volatile unsigned char *>(smmu.getVirtualAddress()), 0x10000};
+    ArmSmmu4KIo io = {};
+    result.rootState = "bind";
+    if (ArmSmmu4KBindMmio(&mmio, &io)) return;
+    publishGmuTables(tables);
+    if (!view(0, 0, 0)) return;
+    result.rootState = "format";
+    writeSmmu32(smmu, va64, tables.image.cba2r);
+    if (!view(1, 0, cbFsrAarch64)) return;
+    result.rootState = "bar";
+    writeSmmu32(smmu, bar, tables.image.cbar);
+    const auto ready = [&] { return view(1, tables.image.cbar, cbFsrAarch64); };
+    if (!ready()) return;
+
+    constexpr unsigned fields[] = {0x9010, 0x9030, 0x9038, 0x903c, 0x9020, 0x9028};
+    constexpr unsigned firstTtbr = 4, count = sizeof(fields) / sizeof(fields[0]);
+    const uint64_t expected[] = {tables.image.tcr2, tables.image.tcr, tables.image.mair0,
+                                 tables.image.mair1, tables.image.ttbr0, tables.image.ttbr1};
+    const auto matches = [&](unsigned i) {
+        if (i >= firstTtbr) {
+            uint64_t word = 0;
+            if (io.read64(io.cookie, fields[i], &word) || readTtbrWords(smmu, fields[i]) != word) return false;
+            if (i == firstTtbr) result.liveRoot = word;
+            return word == expected[i];
+        }
+        const uint64_t word = readSmmu32(smmu, fields[i]);
+        const uint64_t addedTbi = i == 0 ? word & ~expected[i] & 0x60 : 0;
+        return !((word ^ expected[i]) & ~addedTbi);
+    };
+    result.rootState = "hold";
+    for (unsigned i = 0; i < count; ++i) {
+        if (!ready()) return;
+        if (i == firstTtbr) {
+            // Once TTBR programming starts, retain the wired backing even
+            // if subsequent writes or readbacks fail.
+            tables.memory.detach();
+            result.rootHeld = true;
+        }
+        if (i >= firstTtbr) {
+            if (io.write64(io.cookie, fields[i], expected[i]) || io.barrier(io.cookie)) return;
+        } else {
+            writeSmmu32(smmu, fields[i], static_cast<uint32_t>(expected[i]));
+        }
+        if (!matches(i)) return;
+        result.rootFields |= 1u << i;
+    }
+    for (unsigned i = 0; i < count; ++i) if (!matches(i)) return;
+    if (!ready()) return;
+    result.rootState = "audit";
+    if (!auditGmuTables(tables, result.liveRoot)) return;
+    result.leaves = static_cast<unsigned>(tables.audit.leaf_pages);
+    result.rootState = "ok";
+}
+#endif
+
 template <typename Live>
 static void pulseCb1Format(IOMemoryMap &smmu, GpuCpSnapshot &result, Live live) {
     constexpr unsigned va64 = 0x1804, bar = 0x1004, ctl = 0x9000, fsr = 0x9058;
@@ -250,7 +330,7 @@ static void pulseCb1Format(IOMemoryMap &smmu, GpuCpSnapshot &result, Live live) 
 
 template <typename CheckRoute>
 static void samplePoweredCp(IOMemoryMap &smmu, IOMemoryMap &gmu, GpuCpSnapshot &result,
-                            bool format, CheckRoute checkRoute) {
+                            unsigned power, CheckRoute checkRoute) {
     using namespace t970_touch;
     const auto live = [&] {
         return checkRoute() && !(read(gmu, 0x14340) & 0xc0) && !read(gmu, 0x14648) &&
@@ -292,7 +372,10 @@ static void samplePoweredCp(IOMemoryMap &smmu, IOMemoryMap &gmu, GpuCpSnapshot &
         result.cpIrq != read(*gpu, 4 * 0x823) || result.cbCtl != readSmmu32(smmu, 0x9000) ||
         result.cbFsr != readSmmu32(smmu, 0x9058)) return;
     result.state = "idle";
-    if (format) pulseCb1Format(smmu, result, live);
+    if (power == cbBootCb1FormatMode) pulseCb1Format(smmu, result, live);
+#ifdef T970_GPU_SQE_FIRMWARE
+    if (power == cbBootCb1RootMode) installCb1Root(smmu, result, live);
+#endif
 }
 #endif
 
@@ -361,7 +444,7 @@ static bool pulseSid5(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &result,
                     const auto liveRoute = [&] { return matches(sid5Match, translated, false); };
                     startGmuBoot(gmu, smmu, *bootTables, result.boot, power != cbBootMode, hfiMode, liveRoute);
                     if (power >= cbBootCpReadMode && !strcmp(result.boot.hfiGx.state, "ok"))
-                        samplePoweredCp(smmu, gmu, result.cp, power == cbBootCb1FormatMode, liveRoute);
+                        samplePoweredCp(smmu, gmu, result.cp, power, liveRoute);
                 }
             }
             return false;

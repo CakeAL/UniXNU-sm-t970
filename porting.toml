@@ -1404,6 +1404,8 @@ procedure = [
   "Read KGSL identity and frequency nodes, list GPU firmware files and calculate the GMU/SQE hashes without executing GPU commands.",
 ]
 findings = [
+  "v136 mode 32 builds a separate 17-leaf ASID 2 GPU context with the exact stock SQE payload, installs the disabled CB1 root and audits the hardware TTBR0. The SID5 route remains live and no CB1 stream is published.",
+  "v135 BOOT72eb23cb verified CB1 VA64 0/1/0 and FSR 400 with no differences across 15 restored words and live SID5.",
   "v135 mode 31 qualifies the unused CB1 CBA2R.VA64 toggle while GX and the SID5 route stay live. It restores VA64 and compares 15 inherited CB1 words before declaring the format verified.",
   "v134 BOOT54cc16fa recorded idle powered CP with ring cursors, SQE and fault fields zero. CB1 had CBA2R, CBAR, SCTLR.M and FSR clear and its candidate S2CR1 was FAULT.",
   "v134 mode 30 records read-only powered CP/RBBM and candidate CB1 baselines under the live SID5 and GX guards. It rechecks the route and key idle values after the snapshot.",
@@ -1465,9 +1467,12 @@ limits = [
   "The diagnostic SID5 mapping and FW_VER validate GMU HFI DMA, and v133 verifies GX power and clocks. ZAP authentication, CP submission and fences, rendering and Metal remain unverified on the T970.",
 ]
 next_action = [
-  "Verify v135 CB1 format and rollback on hardware. Use the stock-hash-matched SQE, obtain the signed T970 ZAP inputs, and qualify the GPU mapping and PAS calls before bounded CP submission.",
+  "Verify the v136 disabled CB1 root on hardware, then qualify CB1 activation and the GPU stream. Obtain signed T970 ZAP inputs and qualify PAS before normal GPU submissions.",
 ]
 evidence = [
+  { kind = "device", reference = "evidence/gpu/cb1-format-v135/device-result.json", revision = "d14feb4a24a7500ac82d53a82e4eb68d5beedaab", command = "BOOT72eb23cb and owner three-finger report screenshot", result = "CB1 VA64 0/1/0, FSR 400 in AArch64 view, all 15 inherited words restored, live SID5. Eight CPUs, Data query success and 47 GOP copies and retirements." },
+  { kind = "host", reference = "evidence/gpu/cb1-format-v135/host-validation.json", revision = "d14feb4a24a7500ac82d53a82e4eb68d5beedaab", command = "python3.14 -m unittest discover -s tests and evidence/gpu/power-v104/prepare.py --gpu-cb1-format", result = "ASan/UBSan CB1 selector model, FAT readback, firmware hash, image symbols and independent DTS/ADT passed." },
+  { kind = "device", reference = "evidence/gpu/cb1-format-v135/upload.json", revision = "d14feb4a24a7500ac82d53a82e4eb68d5beedaab", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/gpu-cb1-format-v135/boot-partition.img", result = "BOOT72eb23cb transfer succeeded and requested reboot." },
   { kind = "source", reference = "https://github.com/TheMuppets/proprietary_vendor_samsung_sm8250-common/blob/b9558414f2c55b1c307f663f785f400d67450385/proprietary/vendor/firmware/a650_sqe.fw", result = "Pinned Samsung SM8250 SQE is 31632 bytes with SHA256 b4c27420fd6a5c6b511b254cc0fad8cdd40eea38ceb3418f895a1084f4460487, exactly matching the T970 stock inventory. Saved in ignored local storage." },
   { kind = "device", reference = "evidence/gpu/cp-read-v134/device-result.json", revision = "aee6d8c96a86adb3af8ab8dfc8d192ce0edfe02b", command = "BOOT54cc16fa and owner three-finger report screenshot", result = "Powered CP idle, ring cursors/SQE/errors zero, CB1 disabled and candidate slot FAULT. Eight CPUs, Data query success; the early report had zero GOP copies." },
   { kind = "host", reference = "evidence/gpu/cp-read-v134/host-validation.json", revision = "aee6d8c96a86adb3af8ab8dfc8d192ce0edfe02b", command = "python3.14 -m unittest discover -s tests and evidence/gpu/power-v104/prepare.py --gpu-cp-read", result = "ASan/UBSan CP/CB1 MMIO model, FAT readback, firmware hash, image symbols and separate DTS/ADT passed." },
@@ -1826,6 +1831,7 @@ procedure = [
   "Read BuildManifest.plist from the local IPSW using Python zipfile and plistlib to identify its OS version, build and product types.",
 ]
 findings = [
+  "v136 starts from exact v135 BOOT and selects opt-in mode 32 with the stock-hash-checked SQE input. The packer verifies the retained ADT, Data seed, trust cache and bytes outside FAT.",
   "v135 starts from exact v134 BOOT and selects opt-in mode 31. The packer verifies the retained ADT, Data seed, trust cache and bytes outside FAT.",
   "v134 starts from exact v133 BOOT and selects opt-in mode 30. The packer verifies the retained ADT, Data seed, trust cache and bytes outside FAT.",
   "v133 starts from exact v132 BOOT and selects opt-in mode 29. The packer verifies the retained ADT, Data seed, trust cache and bytes outside FAT.",

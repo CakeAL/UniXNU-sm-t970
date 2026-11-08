@@ -302,6 +302,9 @@ static unsigned powerMode() {
     if (power == 13 || (power >= cbTtbrMode && power <= cbSid5Mode)) return power;
 #endif
 #ifdef T970_GPU_GMU_FIRMWARE
+#ifndef T970_GPU_SQE_FIRMWARE
+    if (power == cbBootCb1RootMode) return 0;
+#endif
     if (power == cbFirmwareMode || isBootMode(power)) return power;
 #endif
     if ((power >= 1 && power <= 12) || power == cbBarMode || power == cbBarReleaseMode) return power;

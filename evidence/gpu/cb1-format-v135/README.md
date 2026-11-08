@@ -14,3 +14,10 @@ python3.14 evidence/display/hello-black-v64/build-kernel.py --cached-headers --s
 python3.14 evidence/gpu/power-v104/prepare.py --gpu-cb1-format
 python3.14 -m unittest discover -s tests
 ```
+
+[刷写回执](upload.json)和[实机报告](device-result.json)对应 BOOT
+`72eb23cb5df12da59851e773065af3a02c59836d94efa8d2ceaef566bbc88f23`。
+实测 `va=0/1/0 bar=0 ctl=1abfa500 fsr=400 diff=0`，CB1 恢复，
+SID5 保持有效。八核在线，Data 查询成功，GOP 拷贝和回收各 47 次。
+[主机验证](host-validation.json)记录模型、封包、栈帧和独立 DTS/ADT。
+完整平台检查停在历史框架版本校验。

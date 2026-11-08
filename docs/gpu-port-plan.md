@@ -140,6 +140,8 @@ v133 实测三项均通过，GX 电源与时钟关断位由 `0xc0` 清至 `0`。
 v134 在 GX 上电后读取 CP ring、SQE 和候选 CB1，建立提交前基线。
 实机读到 `GPU cp idle`，CB1 翻译关闭，S2CR1 仍为 FAULT。
 v135 只对 CB1 做一次 VA64 切换与恢复，并保持 SID5 有效。
+v135 实测 `va=0/1/0 fsr=400 diff=0`。v136 用独立的 XNU 自有 backing
+建立 GPU ring、SQE 和回读页，在 CB1 翻译关闭时安装并走查 TTBR0。
 Samsung SM8250 vendor 镜像中的 SQE 与 T970 原厂清单的 31,632 字节及
 SHA-256 完全匹配，已保存到本地忽略目录。ZAP 分片仍需获取并核验。
 [固定 SQE 来源](https://github.com/TheMuppets/proprietary_vendor_samsung_sm8250-common/blob/b9558414f2c55b1c307f663f785f400d67450385/proprietary/vendor/firmware/a650_sqe.fw)。

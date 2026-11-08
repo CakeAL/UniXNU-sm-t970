@@ -36,6 +36,7 @@ def main():
     parser.add_argument('--gpu-soc', type=Path, help='Pinned SM8250 checkout for the GPU power snapshot')
     parser.add_argument('--arm-smmu4k', type=Path, help='ArmSmmu4K Git repository for the GMU table probe')
     parser.add_argument('--gmu-firmware', type=Path, help='a650_gmu.bin matching the T970 firmware inventory')
+    parser.add_argument('--sqe-firmware', type=Path, help='a650_sqe.fw matching the T970 firmware inventory')
     parser.add_argument('--refresh-hid', action='store_true', help='Recompile the audited HID wrapper with the setup baseline')
     parser.add_argument('--gop-fork', action='store_true',
                         help='Link the audited GopFramebuffer fork object (scanout and source cache options)')
@@ -49,6 +50,8 @@ def main():
         parser.error('--arm-smmu4k requires --gpu-soc')
     if args.gmu_firmware and not args.arm_smmu4k:
         parser.error('--gmu-firmware requires --arm-smmu4k')
+    if args.sqe_firmware and not args.gmu_firmware:
+        parser.error('--sqe-firmware requires --gmu-firmware')
     build = args.output.resolve()
     kernel = WORK / 'kernel/kernel.macho'
     if sha(kernel) != BASE_KERNEL_SHA or sha(LIVE / ARCHIVE) != BASE_ARCHIVE_SHA:
@@ -84,6 +87,8 @@ def main():
         registration_command.extend(['--arm-smmu4k', str(args.arm_smmu4k)])
     if args.gmu_firmware:
         registration_command.extend(['--gmu-firmware', str(args.gmu_firmware)])
+    if args.sqe_firmware:
+        registration_command.extend(['--sqe-firmware', str(args.sqe_firmware)])
     subprocess.run(registration_command, check=True)
     replacement = registration / MEMBER
     source = DEVICE / 'package/T970Display/DisplayRegistration.cpp'

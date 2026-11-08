@@ -14,6 +14,7 @@ SMMU_UNITS = ('ArmSmmu4K', 'ArmSmmu4KContext', 'ArmSmmu4KProgram',
 FIRMWARE_REVISION = '20ad3d7aca14bd46aecab6335c780f5413fa054b'
 FIRMWARE_UNITS = ('AdrenoFirmware', 'A650GmuRegions')
 GMU_SHA256 = 'df79fa8482fcc7587bb239b9c9e2b24bce4729893b990fe3f82b30da8175b01c'
+SQE_SHA256 = 'b4c27420fd6a5c6b511b254cc0fad8cdd40eea38ceb3418f895a1084f4460487'
 
 
 def stage_units(kit, repository, revision, units, prefix=''):
@@ -44,6 +45,7 @@ def main():
     p.add_argument('--gpu-soc', type=Path, help='Pinned SM8250 checkout for the GPU power snapshot')
     p.add_argument('--arm-smmu4k', type=Path, help='ArmSmmu4K Git repository for the GMU table probe')
     p.add_argument('--gmu-firmware', type=Path, help='a650_gmu.bin matching the T970 firmware inventory')
+    p.add_argument('--sqe-firmware', type=Path, help='a650_sqe.fw matching the T970 firmware inventory')
     p.add_argument('--approved', type=Path,
                    default=DEVICE / 'evidence/display/abi21h461/object-check.json')
     a = p.parse_args()
@@ -51,10 +53,16 @@ def main():
         p.error('--arm-smmu4k requires --gpu-soc')
     if a.gmu_firmware and not a.arm_smmu4k:
         p.error('--gmu-firmware requires --arm-smmu4k')
+    if a.sqe_firmware and not a.gmu_firmware:
+        p.error('--sqe-firmware requires --gmu-firmware')
     if a.gmu_firmware:
         firmware = a.gmu_firmware.read_bytes()
         if len(firmware) != 41548 or hashlib.sha256(firmware).hexdigest() != GMU_SHA256:
             raise ValueError('a650_gmu.bin does not match the stock T970 firmware pin')
+    if a.sqe_firmware:
+        sqe = a.sqe_firmware.read_bytes()
+        if len(sqe) != 31632 or hashlib.sha256(sqe).hexdigest() != SQE_SHA256:
+            raise ValueError('a650_sqe.fw does not match the stock T970 firmware pin')
     approved = json.loads(a.approved.read_text())
     if hashlib.sha256(a.gop_object.read_bytes()).hexdigest() != approved['object_sha256']:
         raise ValueError('Use the previously audited cf3b429 GOP object')
@@ -118,6 +126,12 @@ def main():
             (fw_kit / 'T970A650Firmware.h').write_text(
                 'static const uint8_t t970GmuFirmware[] = {\n' + '\n'.join(rows) + '\n};\n')
             command.extend(['-DT970_GPU_GMU_FIRMWARE=1', '-I', str(fw_kit)])
+            if a.sqe_firmware:
+                rows = ['    ' + ', '.join(f'0x{byte:02x}' for byte in sqe[i:i + 16]) + ','
+                        for i in range(0, len(sqe), 16)]
+                (fw_kit / 'T970A650Sqe.h').write_text(
+                    'static const uint8_t t970SqeFirmware[] = {\n' + '\n'.join(rows) + '\n};\n')
+                command.append('-DT970_GPU_SQE_FIRMWARE=1')
         (out / 'command.json').write_text(json.dumps(command, indent=2)+'\n')
         subprocess.run(command, cwd=r['directory'], stdout=log, stderr=subprocess.STDOUT, check=True)
     undefined = set(subprocess.check_output(['xcrun', 'nm', '-u', str(a.gop_object)], text=True).split())
@@ -150,6 +164,8 @@ def main():
             'objects': {unit + '.o': sha(fw_kit / (unit + '.o')) for unit in FIRMWARE_UNITS},
             'probe_sha256': sha(DEVICE / 'package/T970Gpu/GmuFirmware.h'),
         }
+    if a.sqe_firmware:
+        report['adreno_firmware']['sqe_sha256'] = SQE_SHA256
     (out / 'report.json').write_text(json.dumps(report, indent=2)+'\n')
     print('PASS: board callbacks compiled; nine native_legacy original-family aliases remain')
 
