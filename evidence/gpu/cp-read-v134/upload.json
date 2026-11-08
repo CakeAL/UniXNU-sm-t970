@@ -1,0 +1,12 @@
+{
+  "command": ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/gpu-cp-read-v134/boot-partition.img",
+  "finished_at": "2026-11-08T15:32:23+08:00",
+  "boot_sha256": "54cc16fa928448adb68a0bda3ffc3731d5b5b9dd92adeace5a7cdb9067174167",
+  "partition": "BOOT",
+  "exit_code": 0,
+  "transfer_confirmed": true,
+  "reboot_requested": true,
+  "partition_readback": false,
+  "userdata_partition_uploaded": false,
+  "transfer_log_sha256": "3634cb6a721690ebec51de2aae82b631e02d349f10201c5a1708783765e0f6ac"
+}

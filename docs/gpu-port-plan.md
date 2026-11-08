@@ -138,6 +138,11 @@ v132 实机收到两条返回码为零的应答，两次中断均清除。`pf=0`
 v133 继续验收 `START`、305 MHz DCVS 和 GX OOB 请求。
 v133 实测三项均通过，GX 电源与时钟关断位由 `0xc0` 清至 `0`。
 v134 在 GX 上电后读取 CP ring、SQE 和候选 CB1，建立提交前基线。
+实机读到 `GPU cp idle`，CB1 翻译关闭，S2CR1 仍为 FAULT。
+v135 只对 CB1 做一次 VA64 切换与恢复，并保持 SID5 有效。
+Samsung SM8250 vendor 镜像中的 SQE 与 T970 原厂清单的 31,632 字节及
+SHA-256 完全匹配，已保存到本地忽略目录。ZAP 分片仍需获取并核验。
+[固定 SQE 来源](https://github.com/TheMuppets/proprietary_vendor_samsung_sm8250-common/blob/b9558414f2c55b1c307f663f785f400d67450385/proprietary/vendor/firmware/a650_sqe.fw)。
 CM3 启动阶段需保留 T970 的 RSC 路由，且核对 A650 的 HFI 队列布局。
 锁定的 Sm8250Platform 冷启动序列会写入固定的 hidden 值，集成时需处理与实测路由的差异。
 见 [v109 实测](../evidence/gpu/rsc-init-v109/device-result.json)、

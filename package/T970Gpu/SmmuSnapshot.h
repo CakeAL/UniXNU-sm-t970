@@ -31,8 +31,9 @@ constexpr unsigned cbBootHfiPerfMode = 27;
 constexpr unsigned cbBootHfiCoreMode = 28;
 constexpr unsigned cbBootHfiGxMode = 29;
 constexpr unsigned cbBootCpReadMode = 30;
+constexpr unsigned cbBootCb1FormatMode = 31;
 static constexpr bool isBootMode(unsigned power) {
-    return power >= cbBootMode && power <= cbBootCpReadMode;
+    return power >= cbBootMode && power <= cbBootCb1FormatMode;
 }
 constexpr unsigned ddrAxiIndex = 2;
 constexpr uint32_t cbBarStage1 = 0x1f300;
@@ -59,6 +60,9 @@ struct GpuCpSnapshot {
     uint64_t rbBase = 0;
     uint32_t cbFormat = 0, cbBar = 0, cbCtl = 0, cbFsr = 0, cbTcr = 0, slot = 0;
     uint64_t cbTtbr0 = 0;
+    const char *formatState = "skip";
+    uint32_t vaDuring = 0, vaAfter = 0, barDuring = 0, fsrDuring = 0, ctlDuring = 0;
+    unsigned formatDiff = 0;
 };
 
 struct SmmuSnapshot {
@@ -210,8 +214,43 @@ static bool pulseTtbr(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &result,
 }
 
 #ifdef T970_GPU_GMU_FIRMWARE
+template <typename Live>
+static void pulseCb1Format(IOMemoryMap &smmu, GpuCpSnapshot &result, Live live) {
+    constexpr unsigned va64 = 0x1804, bar = 0x1004, ctl = 0x9000, fsr = 0x9058;
+    constexpr unsigned fields[] = {bar, ctl, 0x9010, 0x9020, 0x9024, 0x9028, 0x902c, 0x9030,
+                                   0x9034, 0x9038, 0x903c, fsr, 0x9060, 0x9064, 0x9068};
+    uint32_t saved[sizeof(fields) / sizeof(fields[0])];
+    result.formatState = "pre";
+    if (!live() || readSmmu32(smmu, va64)) return;
+    for (unsigned i = 0; i < sizeof(saved) / sizeof(saved[0]); ++i) {
+        saved[i] = readSmmu32(smmu, fields[i]);
+        if (saved[i] == UINT32_MAX) return;
+    }
+    if (saved[0] || (saved[1] & 1) || readSmmu32(smmu, fsr) || !live()) return;
+
+    writeSmmu32(smmu, va64, 1);
+    result.vaDuring = readSmmu32(smmu, va64);
+    result.barDuring = readSmmu32(smmu, bar);
+    result.fsrDuring = readSmmu32(smmu, fsr);
+    result.ctlDuring = readSmmu32(smmu, ctl);
+    const bool active = result.vaDuring == 1 && result.fsrDuring == cbFsrAarch64 &&
+        !(result.ctlDuring & 1) && !result.barDuring;
+
+    result.formatState = "hold";
+    if (!live() || result.vaDuring == UINT32_MAX) return;
+    // Every non-GMU stream remains unpublished, even if the alternate CB1
+    // view differed. Restore the original selector before comparing the view.
+    writeSmmu32(smmu, va64, 0);
+    result.vaAfter = readSmmu32(smmu, va64);
+    for (unsigned i = 0; i < sizeof(saved) / sizeof(saved[0]); ++i)
+        if (readSmmu32(smmu, fields[i]) != saved[i]) result.formatDiff |= 1u << i;
+    if (!live() || result.vaAfter || result.formatDiff) return;
+    result.formatState = active ? "ok" : result.vaDuring ? "view" : "filtered";
+}
+
 template <typename CheckRoute>
-static void samplePoweredCp(IOMemoryMap &smmu, IOMemoryMap &gmu, GpuCpSnapshot &result, CheckRoute checkRoute) {
+static void samplePoweredCp(IOMemoryMap &smmu, IOMemoryMap &gmu, GpuCpSnapshot &result,
+                            bool format, CheckRoute checkRoute) {
     using namespace t970_touch;
     const auto live = [&] {
         return checkRoute() && !(read(gmu, 0x14340) & 0xc0) && !read(gmu, 0x14648) &&
@@ -253,6 +292,7 @@ static void samplePoweredCp(IOMemoryMap &smmu, IOMemoryMap &gmu, GpuCpSnapshot &
         result.cpIrq != read(*gpu, 4 * 0x823) || result.cbCtl != readSmmu32(smmu, 0x9000) ||
         result.cbFsr != readSmmu32(smmu, 0x9058)) return;
     result.state = "idle";
+    if (format) pulseCb1Format(smmu, result, live);
 }
 #endif
 
@@ -320,8 +360,8 @@ static bool pulseSid5(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &result,
                         power == cbBootHfiVersionMode ? GmuHfiProbeMode::Version : GmuHfiProbeMode::None;
                     const auto liveRoute = [&] { return matches(sid5Match, translated, false); };
                     startGmuBoot(gmu, smmu, *bootTables, result.boot, power != cbBootMode, hfiMode, liveRoute);
-                    if (power == cbBootCpReadMode && !strcmp(result.boot.hfiGx.state, "ok"))
-                        samplePoweredCp(smmu, gmu, result.cp, liveRoute);
+                    if (power >= cbBootCpReadMode && !strcmp(result.boot.hfiGx.state, "ok"))
+                        samplePoweredCp(smmu, gmu, result.cp, power == cbBootCb1FormatMode, liveRoute);
                 }
             }
             return false;

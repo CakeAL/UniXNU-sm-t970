@@ -16,3 +16,11 @@ python3.14 evidence/display/hello-black-v64/build-kernel.py --cached-headers --s
 python3.14 evidence/gpu/power-v104/prepare.py --gpu-cp-read
 python3.14 -m unittest discover -s tests
 ```
+
+[刷写回执](upload.json)、[镜像清单](preparation.json)及[实机报告](device-result.json)
+对应 BOOT `54cc16fa928448adb68a0bda3ffc3731d5b5b9dd92adeace5a7cdb9067174167`。
+实机读到 `GPU cp idle rbbm=1 irq=0 rb=0/0 ptr=0/0 sqe=0 err=0/0`，
+CB1 的 VA64、CBAR、SCTLR.M 和 FSR 均为零。该截图采于启动早期，
+Data 查询成功，GOP 拷贝计数为零。
+[主机验证](host-validation.json)记录模型、栈帧、封包及独立 DTS/ADT。
+完整平台检查停在历史框架版本校验。
