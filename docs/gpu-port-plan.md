@@ -12,6 +12,7 @@ CP 提交、GPU 内存映射和最小绘图；Metal/DPU 留到后续阶段。
 | [lmi-uefi-touch-gpu](https://github.com/Fsasdddd/lmi-uefi-touch-gpu)（MIT） | SM8250 / A650，iOS 16.5 | SM8250 ARC/RPMh/时钟、GMU 冷启动与 HFI、ZAP/SCM、CP、SMMU/context、tile/desktop；与本机同 SoC/GPU | 内核基线是 HackiOS 16.5，不是 UniXNU 17.7.11；板级数值是 lmi |
 | [UniXNU Adreno740](https://github.com/UniXNU/Adreno740) | SM8550 / A740 | NativeAdreno 当前组件结构、构建/发布方式 | A740 寄存器、固件、Metal 插件均不适用 |
 | [UniXNU-umi](https://github.com/reAAAq/UniXNU-umi) | SM8250，iPadOS 17.7.11 | 同 SoC + 同 OS profile 的板级/ABI 经验 | GPU 未实现（纯 CPU 呈现） |
+| [UniXNU-pipa](https://github.com/xVanTuring/UniXNU-pipa/blob/cdb3d62771e31d48d832853ee0c90964346d78da/package/GpuProbe.cpp) | SM8250 / A650 | 已实测 GMU/HFI、CP marker、ZAP/PAS、IRQ 和 Metal 设备发布。可参考 `NativeAdrenoGpuContextBringupRoutes`、`NativeAdrenoCpInit` 和 `NativeAdrenoPublish` 的接线顺序 | pipa 用 CB1 跑 GMU、CB0 跑 CP。T970 已用 CB0 跑 GMU，CB1 用于 CP 探针，slot 和 bank 按本机验收 |
 
 ## 复用划分
 
@@ -144,8 +145,18 @@ v135 实测 `va=0/1/0 fsr=400 diff=0`。v136 用独立的 XNU 自有 backing
 建立 GPU ring、SQE 和回读页，在 CB1 翻译关闭时安装并走查 TTBR0。
 [v136 实测](../evidence/gpu/cb1-root-v136/device-result.json)确认六个字段、
 17 个页和 SQE 31628 字节，CP 仍空闲。
-v137 在 SID5 保持时对 CB1 做一次启停，前后各用 ASID 2 失效并同步。
-通过后再单独验收 GPU stream 路由。
+v137 在 SID5 保持时对 CB1 做一次启停，前后各用 ASID 2 失效并同步。双系统 Recovery 已实测通过，下一步验收 GPU stream 路由。
+
+### 双系统上的 CB1 验收与后续提交
+
+旧 v137 的 BOOT 镜像面向分区拆分前的布局。双系统候选启用已在持久化 Recovery 内核中的同一探针，通过 `RECOVERY` 启动并保留 `unixnu` 根卷和 Data。构建、上传与设备结果见 [双系统 CB1 记录](../evidence/gpu/dual-cb1-20261111/README.md)。
+
+原厂 T970 DT 的 `gfx3d_user` 与 pipa 同为 `<0 0x401>`，匹配 SID `0/1/0x400/0x401`。T970 的 secure 路由 `<2 0x400>` 和 GMU 路由另有归属。v134 的 S2CR1 为 `0x3a56f9ff`，TYPE 为 FAULT。通用 `ArmSmmu4KCheckFaultedStreams` 要求扣除 EXIDVALID 后整字等于 `0x20000`，因此直接调用会拒绝这个槽。下一步先读取并核对所有候选槽，按已有 SID5 探针的字段和回读规则验证 T970 的路由，再进行有界的 `CP_ME_INIT` 和 GPU 向自有 scratch 页写标记。标记、ring 游标、SMMU/CP fault 一起记录。T733 的 [A642L 驱动](https://github.com/RigoLigoRLC/unixnu-adreno6xx/tree/86e0f1bd9afb3471b82ceac11fc062426af674a2)提供同一 iPadOS 代际的 NativeAdreno BO、提交、fence 和 Turnip 离屏像素验证，可用来对照这层的验收。正常用户态提交还需核验 T970 自己的 ZAP 和 IRQ。
+
+Metal 层参考 [pipa 的 A650 archive 配方](https://github.com/xVanTuring/UniXNU-pipa/blob/cdb3d62771e31d48d832853ee0c90964346d78da/scripts/build-adreno650.py)与 [AdrenoMetal](https://unixnu.com/drivers/adreno-metal)。前端通过 Metal 私有插件入口注册设备，`metal2vulkan` 和 Turnip 经 Darwin KMD 向 NativeAdreno 提交。21H461 的真实缓存已通过静态发现接口审计，确认 `IOAcceleratorES`、`MetalPluginName`、`MetalPluginClassName` 和 IOGPU open type。前端已交叉编译为 arm64 iOS 17.0 对象。仍需依次验证原生 user client、离屏 Metal 像素回读和 DPU 呈现。
+
+T970 原厂 `pil_gpu_mem` 节点名带 `8681a000`，但实机 `reg` 是 `0x9031a000 + 0x2000`。ZAP 的分片要与本机清单逐个对照，认证与运行地址按 T970 的 `reg` 和已拥有的内存范围验收。
+
 Samsung SM8250 vendor 镜像中的 SQE 与 T970 原厂清单的 31,632 字节及
 SHA-256 完全匹配，已保存到本地忽略目录。ZAP 分片仍需获取并核验。
 [固定 SQE 来源](https://github.com/TheMuppets/proprietary_vendor_samsung_sm8250-common/blob/b9558414f2c55b1c307f663f785f400d67450385/proprietary/vendor/firmware/a650_sqe.fw)。

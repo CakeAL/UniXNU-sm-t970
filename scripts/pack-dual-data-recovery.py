@@ -17,11 +17,14 @@ def require(condition, message):
         raise SystemExit(message)
 
 
-def pack(base, kernel, mode):
+def pack(base, kernel, mode, *, gpu_cb1=False):
     require(hashlib.sha256(base).hexdigest() == BASE_SHA, "Expected the verified dual-system RECOVERY")
     require(all(marker in kernel for marker in (
         b"T970 Data probe:", b"T970 Data persistence not active", b"store header is foreign")),
         "Kernel lacks the guarded T970 persistence path")
+    if gpu_cb1:
+        require(mode == 2, "The GPU probe uses the verified persistent Data configuration")
+        require(b"GPU cb1ctx %s/%s tlb=" in kernel, "Kernel lacks the T970 CB1 activation probe")
 
     shim_size, ramdisk_size, second_size, page, version = (
         struct.unpack_from("<I", base, offset)[0] for offset in (8, 16, 24, 36, 40))
@@ -51,6 +54,10 @@ def pack(base, kernel, mode):
         if mode == 1:
             require(config.count("t970-data-space=1") == 1, "Expected the baseline Data report argument")
             config = config.replace("t970-data-space=1", "t970-data-probe=1")
+        if gpu_cb1:
+            require("t970-gpu-p=" not in config and config.count("t970-data-space=1") == 1,
+                    "Unexpected baseline GPU arguments")
+            config = config.replace("t970-data-space=1", "t970-gpu-p=33")
         entries = [entry for entry in tomllib.loads(config)["entry"] if entry["type"] == "xnu"]
         require(len(entries) == 1, "Expected one XNU entry")
         command_line = entries[0]["args"]
@@ -83,9 +90,10 @@ def main():
     parser.add_argument("--base", type=Path, required=True)
     parser.add_argument("--kernel", type=Path, required=True, help="prelinked kernel with the panic screen")
     parser.add_argument("--mode", type=int, choices=(1, 2), required=True, help="1 probes read-only, 2 persists Data")
+    parser.add_argument("--gpu-cb1", action="store_true", help="enable the opt-in CB1 activation probe in mode 2")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
-    recovery = pack(args.base.read_bytes(), args.kernel.read_bytes(), args.mode)
+    recovery = pack(args.base.read_bytes(), args.kernel.read_bytes(), args.mode, gpu_cb1=args.gpu_cb1)
     with args.output.open("xb") as output:
         output.write(recovery)
     print(f"RECOVERY mode={args.mode} sha256={hashlib.sha256(recovery).hexdigest()} {args.output}")

@@ -1,0 +1,60 @@
+{
+  "cache_uuid": "590d839a82d230f1a17d0cc053420f73",
+  "local_symbols_uuid": "a1a859a2479c31998a34f4afbd808cf5",
+  "images": [
+    {
+      "name": "/System/Library/Frameworks/Metal.framework/Metal",
+      "va": 6570868736,
+      "uuid": "5e7ceec3fdea3f9a97d8a710986b45d4"
+    },
+    {
+      "name": "/System/Library/Frameworks/IOKit.framework/Versions/A/IOKit",
+      "va": 6710521856,
+      "uuid": "4a07bc8a85a9336a947b99deb15f2ab1"
+    },
+    {
+      "name": "/System/Library/PrivateFrameworks/IOGPU.framework/IOGPU",
+      "va": 8534511616,
+      "uuid": "e4f223029bc23f4eb7a24fea8694fa4b"
+    },
+    {
+      "name": "/System/Library/Extensions/AGXMetalA10.bundle/AGXMetalA10",
+      "va": 9068736512,
+      "uuid": "1bdbd16f9e6f382b93bd57cd5de0d3f3"
+    }
+  ],
+  "service_match": "IOAcceleratorES",
+  "plugin_properties": [
+    "MetalPluginName",
+    "/System/Library/Extensions",
+    ".bundle",
+    "MetalPluginClassName"
+  ],
+  "plugin_info_sha256": "2a99488747ed0a8dc09c9bb4e245d68b75eebf5e187e170d1e2e109534e88d33",
+  "original_principal_class": "AGXPrincipalDevice",
+  "functions": {
+    "register": {
+      "va": "0x187aa48e8",
+      "inspected_bytes": 240,
+      "sha256": "02a29e5265b7db64994ba65794d870941c7ece691866dbc9624aec385ef1c0d4"
+    },
+    "plugin": {
+      "va": "0x187aa49d8",
+      "inspected_bytes": 304,
+      "sha256": "00ceded7dad8257ed253ee66242fb0a99f67feec83f2135dc9ba529f0a56d787"
+    },
+    "iogpu_open": {
+      "va": "0x1fcb2f8c8",
+      "inspected_bytes": 120,
+      "sha256": "0ebb3eaaeeb265ed036ebde3be3e495e10c1b990fe23e7981dfb2d6659437f4c"
+    }
+  },
+  "iogpu_base_open_type": 1,
+  "iogpu_api_shift": 16,
+  "native_metal_plugin_required": true,
+  "static_only": true,
+  "runtime_device_created": false,
+  "original_instructions_modified": false,
+  "original_principal_class_runtime_acceptance_qualified": false,
+  "adreno_metal_qualified": false
+}

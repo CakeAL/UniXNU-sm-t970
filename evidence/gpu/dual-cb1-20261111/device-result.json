@@ -1,0 +1,18 @@
+{
+  "recovery_sha256": "3413470c351a19e728e8d050dfe47055b826af1f2f9e5e691b312b8343e7f674",
+  "photo_time_local": "2026-11-11T15:22:31+08:00",
+  "photo_sha256": "e94e23c5387dcc9145dc68cd30434e3f595a16a1cc97686cc0d742ed3f9d5be0",
+  "lines": [
+    "GPU boot ready/smmu-hold fw=100 hfi=1/20000001 rst=0 at=0 f=0/400 irq=0/0 held=1 axi=80100000/100001/0 pf=0 s2=1038eb00",
+    "GPU cp idle rbbm=1 irq=0 rb=0/0 ptr=0/0 sqe=0 err=0/0",
+    "GPU cb1ctx ok/ok tlb=3/2 ctl=a7/a6 f=400/400 leaf=17 held=1"
+  ],
+  "cpus": 8,
+  "springboard_pid": 27,
+  "backboardd_pid": 57,
+  "cpu_framebuffer_copies": 143,
+  "asid2_sync_before_after": true,
+  "cb1_translation_disabled_after_probe": true,
+  "gpu_streams_published": false,
+  "cp_submitted": false
+}
