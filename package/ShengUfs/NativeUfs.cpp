@@ -1369,14 +1369,11 @@ static bool hostBringUpHandoff (const char **why)
 // live in a fixed userdata region after the root image (which ends at LBA 5260288) and the kernel
 // links only the owner public-key anchor: vr_open authenticates each envelope before its entry is
 // added, so no window can publish against bytes the owner did not sign.
-// The kernel addresses LUN 0 with disk-absolute LBAs (the root layout's userdataFirst is 2969600),
-// while the recovery channel wrote partition-relative offsets 5505024 and 5516624, so the carrier is
-// read at the sum. Getting this wrong reads an unrelated block and fails the header format check.
+// The recovery writer uses partition-relative LBAs. Add the validated GPT start to address LUN 0.
 extern "C" void native_verified_policy_count_set (uint64_t);
 static uint64_t gCarrierCountSeen, gCarrierTable0Seen, gCarrierBytes1Seen;
-constexpr uint64_t kOwnerPolicyPartitionLba = 2969600ULL;
-constexpr uint64_t kOwnerPolicyLbaOS = kOwnerPolicyPartitionLba + 5505024ULL;
-constexpr uint64_t kOwnerPolicyLbaSystemOS = kOwnerPolicyPartitionLba + 5516624ULL;
+constexpr uint64_t kOwnerPolicyLbaOS = 5505024ULL;
+constexpr uint64_t kOwnerPolicyLbaSystemOS = 5516624ULL;
 constexpr uint64_t kOwnerPolicyHeaderBytes = 160, kOwnerPolicySignatureBytes = 384;
 // Boot-lifetime ownership stays with the carrier. Block devices borrow only exact registered
 // allocations; their readonly vr_view and private readonly key still authenticate every read.
@@ -1405,9 +1402,13 @@ static bool ownerCarrierAllocation (const uint8_t *manifest, uint64_t length, vm
 }
 
 
-static bool readOwnerEnvelope (uint64_t lba, uint64_t expectedImageBytes, const char **why,
+static bool readOwnerEnvelope (uint64_t lba, uint64_t lastLba, uint64_t expectedImageBytes, const char **why,
                                uint8_t **outBytes, uint64_t *outLength)
 {
+  if (lba > lastLba) {
+    *why = "policy header outside root partition";
+    return false;
+  }
   uint8_t header[4096];
   if (hostRead4k (0, lba, 1, header) != kIOReturnSuccess) {
     *why = "policy header read";
@@ -1430,12 +1431,16 @@ static bool readOwnerEnvelope (uint64_t lba, uint64_t expectedImageBytes, const 
     *why = "policy header format";
     return false;
   }
-  if (imageBytes != expectedImageBytes) {
+  if (imageBytes != expectedImageBytes || blocks != (expectedImageBytes + 4095) / 4096) {
     *why = "policy capacity";
     return false;
   }
   const uint64_t length = kOwnerPolicyHeaderBytes + kOwnerPolicySignatureBytes + blocks * 32;
   const uint64_t totalBlocks = (length + 4095) / 4096;
+  if (totalBlocks - 1 > lastLba - lba) {
+    *why = "policy envelope outside root partition";
+    return false;
+  }
   vm_size_t allocation = round_page (static_cast<vm_size_t> (length));
   if (allocation < length) {
     *why = "policy length";
@@ -1463,7 +1468,7 @@ static bool readOwnerEnvelope (uint64_t lba, uint64_t expectedImageBytes, const 
 
 // Fills the linked policy table from the two signed envelopes. Both must authenticate before any
 // entry is added, so a single bad envelope leaves publication fail-closed.
-static bool installOwnerPolicyCarrier (const char **why)
+static bool installOwnerPolicyCarrier (uint64_t firstLba, uint64_t lastLba, const char **why)
 {
   static const struct { uint64_t lba, imageBytes; } envelope[2] = {
     { kOwnerPolicyLbaOS, 6077580800ULL },
@@ -1475,7 +1480,8 @@ static bool installOwnerPolicyCarrier (const char **why)
   for (unsigned index = 0; index < 2; ++index) {
     uint8_t *bytes = nullptr;
     uint64_t length = 0;
-    if (!readOwnerEnvelope (envelope[index].lba, envelope[index].imageBytes, why, &bytes, &length)) {
+    if (!readOwnerEnvelope (firstLba + envelope[index].lba, lastLba,
+                            envelope[index].imageBytes, why, &bytes, &length)) {
       return false;
     }
     struct vr_view view = {};
@@ -1521,11 +1527,12 @@ static uint32_t be32w (const uint8_t *at)
 }
 
 // ---- Persistent Data store window (sheng-data-persist) ----------------------------------------------------------
-// The only part of this driver that ever writes. The consumer (NativeRamBlock's overlay) asks for a window of the given
-// size at the END of the userdata partition. Mode 1 (boot argument sheng-data-persist=1) only reads: it proves the window and
-// lets the consumer inspect its header. Mode 2 additionally opens the write window. A window is refused unless it lies inside
-// the partition, clear of the flashed root image plus a 4 MiB guard, and is at most a quarter of the partition.
+// NativeRamBlock stores changed pages in a fixed window within the dual-system unixnu partition.
+// Mode 1 probes the window and mode 2 enables writes.
+extern "C" unsigned native_ufs_store_gpt_check (void);
+extern "C" uint8_t native_ram_block_seed_sha256[32] __attribute__((weak_import));
 namespace {
+#include "T970DataWindow.h"
 struct StoreGeometry {
   bool valid;
   uint64_t first, last, imageBytes, entriesLba;
@@ -1571,22 +1578,30 @@ extern "C" unsigned native_ufs_store_mode (void) { return storeMode (); }
 // Returns 1 and the first absolute 4096-byte LBA of the window, 0 on refusal (reason in *why, may be null).
 extern "C" int native_ufs_store_open (uint64_t blocks, uint64_t *firstLba, const char **why)
 {
+  const unsigned mode = storeMode ();
+  uint32_t unixnu = 0, reset = 0;
+  PE_parse_boot_argn ("t970-ufs-unixnu", &unixnu, sizeof (unixnu));
+  PE_parse_boot_argn ("sheng-data-reset", &reset, sizeof (reset));
   const char *reason = "";
+  uint64_t first = 0;
+  int headerState = -1;
   int ok = 0;
-  if (!storeMode ()) reason = "off";
+  if (!mode) reason = "off";
   else if (!gStoreGeometry.valid || !gHost.ready) reason = "no root layout";
   else if (gStoreRegionBlocks) reason = "already open";
+  else if (!(first = t970DataFirst (unixnu, reset, gStoreGeometry.first, gStoreGeometry.last,
+                                  gStoreGeometry.imageBytes, blocks, reserveBlocks ()))) {
+    reason = "requires the reviewed unixnu layout and 512 MiB seed";
+  } else if (native_ufs_store_gpt_check ()) reason = "GPT changed or unreadable";
   else {
-    uint64_t partition = gStoreGeometry.last - gStoreGeometry.first + 1;
-    uint64_t imageBlocks = (gStoreGeometry.imageBytes + 4095) / 4096;
-    const uint64_t reserve = reserveBlocks ();
-    if (!blocks || reserve >= partition || blocks > partition - reserve) reason = "size";
-    else if (partition - blocks - reserve < imageBlocks + 1024) reason = "overlaps the root image";
+    uint8_t header[4096];
+    if (!native_ram_block_seed_sha256 || hostRead4k (0, first, 1, header) != kIOReturnSuccess) {
+      reason = "seed identity or store header unavailable";
+    }
     else {
-      // The reserve at the end of the partition belongs to the diagnostic log (its last 32 MiB, with the export region below them);
-      // the store ends just below it.
-      uint64_t first = gStoreGeometry.last + 1 - reserve - blocks;
-      if (storeMode () == 2 && !hostStoreOpen (first, blocks)) reason = "window refused";
+      headerState = t970DataHeaderState (header, native_ram_block_seed_sha256);
+      if (headerState < 0) reason = "store header is foreign, damaged or for another seed";
+      else if (mode == 2 && !hostStoreOpen (first, blocks)) reason = "window refused";
       else {
         gStoreRegionFirst = first;
         gStoreRegionBlocks = blocks;
@@ -1595,6 +1610,10 @@ extern "C" int native_ufs_store_open (uint64_t blocks, uint64_t *firstLba, const
       }
     }
   }
+  uint32_t probe = 0;
+  if (mode == 1 && PE_parse_boot_argn ("t970-data-probe", &probe, sizeof (probe)) && probe == 1)
+    panic ("T970 Data probe: ok=%d header=%d\nLBA=%llu blocks=%llu\n%s", ok, headerState, first, blocks, reason);
+  if (mode == 2 && !ok) panic ("T970 Data: %s", reason);
   if (why) *why = reason;
   return ok;
 }
@@ -3485,17 +3504,18 @@ bool NativeUfs::start (IOService *provider)
              gRootDiagnostic.smr, gRootDiagnostic.s2cr, gRootDiagnostic.gfsr,
              gRootDiagnostic.fsr, gRootDiagnostic.dma, kDmaBytes);
     }
+    RootLayout *layout = static_cast<RootLayout *> (IOMalloc (sizeof (RootLayout)));
+    if (!layout) panic ("T970 UFS publish: no layout buffer");
+    if (!findRootLayout (layout, &why)) panic ("T970 UFS publish: layout: %s", why);
+    const uint64_t first = layout->userdataFirst, last = layout->userdataLast;
     const char *policyWhy = "";
-    if (!installOwnerPolicyCarrier (&policyWhy)) {
+    if (!installOwnerPolicyCarrier (first, last, &policyWhy)) {
       panic ("T970 UFS publish: owner policy carrier: %s\n"
              "stage=%s policies=%llu verify=%08x\ndma=%llx lbaOS=%llx lbaSystemOS=%llx",
              policyWhy, gRootDiagnostic.stage, gRootDiagnostic.policyCount,
              gRootDiagnostic.verify, gRootDiagnostic.dma,
-             static_cast<uint64_t> (kOwnerPolicyLbaOS), static_cast<uint64_t> (kOwnerPolicyLbaSystemOS));
+             first + kOwnerPolicyLbaOS, first + kOwnerPolicyLbaSystemOS);
     }
-    RootLayout *layout = static_cast<RootLayout *> (IOMalloc (sizeof (RootLayout)));
-    if (!layout) panic ("T970 UFS publish: no layout buffer");
-    if (!findRootLayout (layout, &why)) panic ("T970 UFS publish: layout: %s", why);
     static char windows[4][32];
     uint64_t offset[4] = { 0, 0, 0, 0 }, bytes[4] = { 0, 0, 0, 0 };
     for (unsigned i = 0; i < 4; ++i) windows[i][0] = 0;
@@ -3504,7 +3524,6 @@ bool NativeUfs::start (IOService *provider)
       offset[i] = layout->window[i].offset;
       bytes[i] = layout->window[i].size;
     }
-    const uint64_t first = layout->userdataFirst, last = layout->userdataLast;
     const uint64_t imageBytes = layout->imageBytes;
     const uint32_t manifest = layout->manifestStatus, magic0 = layout->magic0, magic1 = layout->magic1;
     const unsigned count = layout->windows;

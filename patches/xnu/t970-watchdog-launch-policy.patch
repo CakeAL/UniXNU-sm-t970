@@ -93,10 +93,17 @@
  static int
  native_owner_data_prepare(proc_t p, user_addr_t scratch)
  {
-@@ -8214,6 +8296,12 @@
+@@ -8214,6 +8296,19 @@
  #if defined(XNU_OWNER_DATA_MOUNT) && XNU_OWNER_DATA_MOUNT
  	int data_error = native_owner_data_prepare(p, (user_addr_t)scratch_addr);
  	if (data_error) panic("offline scratch Data mount failed: %d", data_error);
++	extern unsigned native_ufs_store_mode(void);
++	extern volatile uint32_t native_data_persist_state, native_data_persist_gpt_after;
++	if (native_ufs_store_mode() == 2 &&
++	    ((native_data_persist_state != 2 && native_data_persist_state != 3) ||
++	     native_data_persist_gpt_after != 0))
++		panic("T970 Data persistence not active: state=%u GPT=%u",
++		    native_data_persist_state, native_data_persist_gpt_after);
 +	unsigned int disable_watchdog = 0;
 +	if (PE_parse_boot_argn("t970-disable-watchdogd", &disable_watchdog, sizeof(disable_watchdog)) && disable_watchdog == 1) {
 +		native_t970_watchdog_policy_status = native_t970_watchdog_policy_prepare(p, (user_addr_t)scratch_addr);

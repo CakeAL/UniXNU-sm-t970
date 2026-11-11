@@ -87,10 +87,17 @@ static bool rootEntryUsed (const uint8_t *entry)
   return used != 0;
 }
 
-// Find the partition named "userdata" in LUN 0's primary GPT (4096-byte sectors), then read the
-// manifest at its first block. Read-only. Returns false only if the GPT itself is unusable.
+// Find the selected root partition in LUN 0's primary GPT, then read its first block.
 static bool findRootLayout (RootLayout *layout, const char **why)
 {
+  uint32_t unixnu = 0;
+  PE_parse_boot_argn ("t970-ufs-unixnu", &unixnu, sizeof (unixnu));
+  if (unixnu > 1) {
+    *why = "t970-ufs-unixnu must be 0 or 1";
+    return false;
+  }
+  const char *wanted = unixnu ? "unixnu" : "userdata";
+  const size_t nameBytes = strlen (wanted) + 1;
   gRootDiagnostic.stage = "GPT header";
   bzero (layout, sizeof (*layout));
   if (hostRead4k (0, 1, 1, gScratch) != kIOReturnSuccess) {
@@ -136,7 +143,6 @@ static bool findRootLayout (RootLayout *layout, const char **why)
     *why = "GPT entries CRC";
     return false;
   }
-  static const char wanted[] = "userdata";
   bool found = false;
   for (uint32_t index = 0; index < count; index++) {
     const uint8_t *entry = gScratch + index * 128;
@@ -154,7 +160,7 @@ static bool findRootLayout (RootLayout *layout, const char **why)
       }
     }
     bool match = true;
-    for (unsigned c = 0; c < sizeof (wanted); c++) {
+    for (size_t c = 0; c < nameBytes; c++) {
       if (entry[56 + 2 * c] != static_cast<uint8_t> (wanted[c]) || entry[57 + 2 * c] != 0) {
         match = false;
         break;
@@ -162,7 +168,7 @@ static bool findRootLayout (RootLayout *layout, const char **why)
     }
     if (match) {
       if (found) {
-        *why = "duplicate userdata partition";
+        *why = "duplicate root partition";
         return false;
       }
       layout->userdataFirst = le64 (entry + 32);
@@ -174,7 +180,7 @@ static bool findRootLayout (RootLayout *layout, const char **why)
     }
   }
   if (!found || layout->userdataLast < layout->userdataFirst) {
-    *why = "no userdata partition";
+    *why = unixnu ? "no unixnu partition" : "no userdata partition";
     return false;
   }
   gRootDiagnostic.first = layout->userdataFirst;
@@ -182,7 +188,7 @@ static bool findRootLayout (RootLayout *layout, const char **why)
   gRootDiagnostic.stage = "root manifest";
   // First block of the partition: manifest if the root image was flashed, ext4 otherwise.
   if (hostRead4k (0, layout->userdataFirst, 1, gScratch) != kIOReturnSuccess) {
-    *why = "userdata first block read";
+    *why = "root partition first block read";
     return false;
   }
   layout->magic0 = le32 (gScratch);

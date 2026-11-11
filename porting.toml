@@ -715,6 +715,9 @@ id = "storage"
 status = "implemented"
 components = ["ShengUfs", "VirtioMmioBlock", "RamBlock", "VerifiedRoot"]
 paths = [
+  "evidence/storage/dual-system-20261108/**",
+  "docs/dual-data-performance.md",
+  "scripts/pack-dual-data-recovery.py",
   "evidence/display/springboard-dim-v68/**",
   "evidence/display/owned-window-2g-v62/**",
   "patches/xnu/t970-data-space-report.patch",
@@ -807,12 +810,17 @@ inputs = [
   "boot=sda22 (71303168 bytes), recovery=sda23 (86888448 bytes), dtbo=sda21 (10485760 bytes), super=sda28 (9961472000 bytes), userdata=sda36 (243668070400 bytes).",
 ]
 configuration = [
-  "The Android by-name mapping and GPT provide measured partition inputs; no UniXNU root volume or writable Data region has been allocated.",
+  "The measured Android by-name mapping and GPT are the board inputs. The dual-system installation uses a dedicated unixnu partition for iPadOS root and Data.",
 ]
 procedure = [
   "Read block sysfs and by-name links; read each LUN's primary GPT header and entry array and validate their CRC32 values without writing any block device.",
 ]
 findings = [
+  "On 2026-11-08 TWRP shrank the fresh MinsOS F2FS and verified both GPTs after a recovery restart. Android userdata keeps LBA 2969600 through 37292799. The new 96 GiB unixnu partition occupies LBA 37292800 through 62458623. Unrelated GPT entries, including factory duplicate GUIDs, were preserved.",
+  "The explicit t970-ufs-unixnu=1 selector resolves the unixnu GPT entry and confines verified-root carrier reads to that range. The host test with the captured GPT verifies the selector, the legacy userdata path and failure when unixnu is absent. The iPadOS Data seed remains RAM-backed.",
+  "The exact iPadOS root image and both corrected owner policy carriers were written to unixnu only. Each written range was read back in full and matched the expected SHA-256.",
+  "The dual-system Data implementation reuses the 512 MiB RamBlock seed and admits only the measured unixnu geometry. The overlay at LBA 62065403 through 62196479 is validated before opening for writes.",
+  "The 2026-11-11 owner photo for read-only Recovery fba0a116ff37e5640c83e9e1bd63bdf0644eb2ba8a32f6c00f8b7fc6a4412c87 shows ok=1, header=0, LBA 62065403 and 131077 blocks. The scoped writable Recovery 33efcec0915129321995cd4de57a3223f7fd41e36c8f73205f07fa97e7aeaeba was then uploaded to RECOVERY only with Heimdall exit 0. The owner reports the changed setting persisted across a hardware restart and about four minutes to the home screen on each boot. The iPadOS software shutdown stalled at the spinner. The owner subsequently confirmed One UI booted normally.",
   "The matched v68 display comparison runs disposable RAM Data from copies of the existing 512 MiB seed. Both retain the Data UUID and disable the persistent backend to avoid reinitializing the existing UFS store. A direct v67 comparison therefore mixes Data history and policy.",
   "The v62 owner report shows Data mounted with 15402 free 4 KiB blocks (about 60.2 MiB) and 1115551 verified UFS blocks. There is no ENOSPC measurement. Data contents change across boots.",
   "The verified 512 MiB APFS seed reports 534294528 free bytes when attached read-only on the host, before any device writes. This is not runtime free space. BOOTe0a2d858 adds an opt-in bounded worker that checks the actual RAM Data device and requests APFS block counts, while preserving display counters in the 125-second terminal report. Host helper, BSD compile, kernel/prelink and packing checks pass; owner photo after successful BOOT upload shows rc0/phase1/support1d0 and 78135 available blocks of 4096 bytes (320040960 bytes). At the target125 snapshot the mounted RAM Data APFS has free capacity. See evidence/storage/data-space-v31.",
@@ -883,11 +891,13 @@ completion = [
   "UFS reads return correct capacity, GPT and known blocks under XNU; the chosen root mounts and writes persist only inside the allocated Data region.",
 ]
 limits = [
-  "Root image and corrected carrier writes were explicitly authorized, completed and readback-verified in their respective receipts. Readonly root and SystemOS preparation reached before-init-exec; writable Data, persistence and sustained XNU storage operation remain unverified.",
+  "Root image and corrected carrier writes were readback-verified in their respective receipts. The current dual-system Data test verifies a changed setting across one hardware restart. Normal shutdown and sustained writable storage under load remain unverified.",
   "Current corrected runtime carriers authenticate the published OS/SystemOS windows; prior empty-policy publication reports are historical. Latest repeat has bootloader-only output, without a usable exec-return observation.",
 ]
-next_action = ["Track persistent Data separately from the v31 RAM Data result. Reopen the capacity hypothesis if a write operation reports ENOSPC or a later sample shows exhaustion."]
+next_action = ["Diagnose the iPadOS shutdown stall and qualify sustained Data writes. Reopen the capacity hypothesis if a write reports ENOSPC or a later sample shows exhaustion."]
 evidence = [
+  { kind = "device", reference = "docs/dual-data-performance.md", revision = "5c37b6e5f54ebbd9f59c78ef17315e68de4e2dd0", command = ".cache/heimdall/build/bin/heimdall flash --RECOVERY out/dual-system/data-persistence-20261111/recovery-persistent.img --no-reboot", result = "Working-tree build 33efcec0. Owner confirmed an iPadOS setting persisted across a hardware restart and One UI booted normally. The iPadOS shutdown spinner stalled." },
+  { kind = "device", reference = "evidence/storage/dual-system-20261108/README.md", revision = "404572cfc431f0b259cd190a99ad5b2c881a074a", command = "scripts/dual_sys/partition.py apply --preserve-duplicate-guids --size-gib 96, then verify in restarted TWRP", result = "Both GPTs, kernel partition ranges and mounted F2FS size match the applied plan." },
   { kind = "host", reference = "evidence/display/springboard-dim-v68/preparation.json", revision = "2e16664c9230a3788e028fb5f90f777e24671be2", command = "python3.14 evidence/display/springboard-dim-v68/prepare.py --output out/data-bringup/springboard-dim-v68", result = "The final FAT verification confirms matching kernel, ADT, trust cache and configuration. The same-size Data seeds retain the volume UUID and differ only by the three intended SpringBoard keys and APFS edit metadata." },
   { kind = "device", reference = "evidence/storage/data-space-v31/device-result.json", revision = "657a9404016124564be3af25531daad80c286448", command = "Owner photo after BOOTe0a2d858 upload, target125 terminal report", result = "Writable RAM Data APFS capacity returned all requested fields, 320040960 bytes available. Open7/swap2/copy2/retire2/vsync0; home screen unverified." },
   { kind = "host", reference = "evidence/storage/data-space-survey/initial-seed.json", revision = "657a9404016124564be3af25531daad80c286448", command = "python3.14 scripts/check-data-seed-space.py --seed <raw-seed> --expected-sha256 <reviewed-hash> --output <report>", result = "Verified initial 512 MiB seed, attached it read-only, measured 534294528 bytes free, and detached. No runtime Data capacity is implied." },
@@ -1080,6 +1090,7 @@ procedure = [
   "Collect DRM modes, panel type and brightness limits; read only display-selection tokens from /proc/cmdline and match the selected S6TUUM3 node in the live DT.",
 ]
 findings = [
+  "The v84 trace measured 42.531 ms for its last CPU framebuffer copy and 49.297 ms maximum. This timer covers copying a completed frame to scanout and the memory barrier. The v62 trace separately measured 93.587 seconds from display publication to its first copy.",
   "The v123 diagnostic display archive links the pinned A650GmuRegions and AdrenoFirmware planner objects and embeds the hash-checked A650 image only when explicitly requested.",
   "The v136 diagnostic display archive accepts a separate opt-in SQE input, validates its exact stock size and SHA-256, and exposes the CB1 root mode only in kernels built with that input.",
   "The v119 opt-in diagnostic archive adds the pinned ArmSmmu4KMmio object for the GPU TTBR width probe.",
@@ -1091,6 +1102,7 @@ findings = [
   "v93 prioritizes peripheral diagnostics within the existing 896-byte display report to avoid clipping Memory/Battery lines. The v91 owner confirms power-key lock/relight; hardware panel power-off and brightness are still separate unverified functions. The long magenta-to-logo interval has no phase timestamps yet, so memory size, I/O or probe delays are not established causes.",
   "The active S6TUUM3_AMSA24VU01 panel uses DSI command-mode brightness. The stock normal gamma-mode2 function writes DBV low byte then upper3 bits and changes smoothing state; the UI range1..355 is not a raw linear DBV range. No brightness command has yet been sent by XNU.",
   "v84 boots to the iPadOS home screen. The Data seed marks Setup done, so Setup.app never launches (exec 0/0/0), and SpringBoard PID 27 draws the status bar and icons with 277 swaps, 276 CPU copies at 42531/49297 us and zero rejections. The frame copy stays at about 43 ms. The owner reports that apps open and display correctly, but launching takes some time; no app-side frame, copy or memory sample exists yet. Brightness control and sustained animation remain unobserved.",
+  "The owner reports slow Settings loads and visible corruption in Settings and Today View on iPadOS Recovery 33efcec0. This image uses a software refresh timer and CPU copies into the active scanout buffer. Panel tearing and corruption already present in the submitted frame require different observations. No image of the reported symptom has been collected.",
   "v84 follows the framework skip-setup guide: the v83 kernel and arguments stay, only the packed Data seed changes so com.apple.purplebuddy marks Setup done and com.apple.migration records 21H461, with auto-dim disabled. BOOT215edec4 was uploaded with a requested reboot; the SpringBoard result is pending.",
   "v83 links a GopFramebuffer fork off cf3b429: t970-fb-wc=1 maps the scanout write-combined and t970-fb-cached=1 maps the source copyback with a flush_dcache64 before the read, both off by default. Host tests, object audit (22 globals unchanged, only _flush_dcache64 added), prelink and FAT readback pass; BOOTb739e1ca was uploaded with a requested reboot. On the transfer page the copy fell from 326897/331681 us to 46419/69991 us, about 422 MB/s; 1157 copies in 485 s give about 2.4 frames per second, and the copy now takes only 11% of the 0.42 s frame. Setup still holds four waiting threads, accountsd and akd stay idle, the page still does not advance, and the LaunchServices lock shows two waiters with owner 0x11c5 unsampled.",
   "v82 keeps the v81 arguments and replaces the timed report with a manual one: the HID delivery loop requests a single report after exactly three contacts stay active for two seconds, and that request then samples Setup, SpringBoard, backboardd, lsd, accountsd and akd with up to six Setup threads. The owner triggered it on the transfer page. Setup had four threads: two in CFRunLoop, one waiting for a dispatch_mach reply and one idle workqueue thread; accountsd and akd were idle in CFRunLoop, so the spinner is not an account-service block. The report kept 548 full-frame copies of 19.6 MB at about 327 ms each while only 366x176 changed, so the fixed copy cost dominates interaction. Setup also reports exec=2/394/0 exit=1/273/9 reason=10/0x5bc1ea44, so the language-change restart killed Setup and relaunched it as PID 394.",
@@ -1747,6 +1759,7 @@ components = [
   "XnuPrelink",
 ]
 paths = [
+  "evidence/storage/dual-system-20261108/**",
   "evidence/display/display-continuous-v25/**",
   "evidence/display/key-state-v10/**",
   "evidence/display/memory768-v11/**",
@@ -1837,6 +1850,7 @@ procedure = [
   "Read BuildManifest.plist from the local IPSW using Python zipfile and plistlib to identify its OS version, build and product types.",
 ]
 findings = [
+  "The dual-system iPadOS Android-header-v2 image embeds the same-device stock DTBO as recovery_dtbo and selects unixnu through its XNU payload. The full RECOVERY partition readback matches 5c9355fa, with the MinsOS BOOT and external DTBO preserved. The owner confirmed that the iPadOS UI appeared after rebooting into recovery.",
   "v136 starts from exact v135 BOOT and selects opt-in mode 32 with the stock-hash-checked SQE input. The packer verifies the retained ADT, Data seed, trust cache and bytes outside FAT.",
   "v137 starts from exact v136 BOOT and selects opt-in mode 33 for the CB1 activation pulse, with the same packed firmware and FAT input checks.",
   "v135 starts from exact v134 BOOT and selects opt-in mode 31. The packer verifies the retained ADT, Data seed, trust cache and bytes outside FAT.",
