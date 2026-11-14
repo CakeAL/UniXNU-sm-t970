@@ -1,0 +1,23 @@
+{
+  "image": "out/dual-system/port-all-v4-20261114/recovery-port-all-v4.img",
+  "bytes": 75011618,
+  "sha256": "811fa5b5c45576ff5d08f82f8e7a128ca737bddede4b956bd05e9b32f1ea8fe5",
+  "partition": "RECOVERY",
+  "bytes_header_ramdisk_size": 68976640,
+  "kernel_embedded_addon": "NGPUADD2",
+  "boot_args_added": [
+    "gpu-addon=1",
+    "fb-gpu=1"
+  ],
+  "patches": [
+    "t970-gpu-addon-embedded.patch"
+  ],
+  "sources": [
+    "package/T970GpuAddon/T970GpuAddon.S",
+    "package/T970GpuAddon/gpu.addon"
+  ],
+  "previous": "out/dual-system/port-all-v3-20261114/recovery-port-all-v3.img",
+  "previous_sha256": "19466bb4cb9531455f91ced8f5b9833deab85c204f1af6172998e13b366b98fe",
+  "flashed_at": "2026-11-14T21:31:02",
+  "note": "addon embedded in the kernel image; the FAT was grown from 58,720,256 to 68,976,640 bytes and DTBO shifted to 72,130,560"
+}
