@@ -1,0 +1,12 @@
+{
+  "base_recovery_sha256": "cbbf85d79a71670b0058f47839c48c2fc493428a1fae14bdd45b2056624be4f4",
+  "image": "out/dual-system/wholesale-inputs-20261115/mmu-probe/after-arm-vm-init/recovery.img",
+  "sha256": "7c48c58aad5ee3fecc7189e7e25f0187b6d49602999db819ffae6c38e1efe40b",
+  "kernel_readback_sha256": "94e0ec225c9dc7ab175850c7e57fd67f8536092a90e4b0d263d1edb6140244b5",
+  "checkpoint": "first return from arm_vm_init in arm_init",
+  "reset_seconds": 12,
+  "partition": "RECOVERY",
+  "upload": "RECOVERY upload successful",
+  "heimdall_exit": 0,
+  "device_boot": "awaiting observation"
+}

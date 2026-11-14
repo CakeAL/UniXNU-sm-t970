@@ -9,5 +9,5 @@
   "partition": "RECOVERY",
   "heimdall_exit": 0,
   "uploaded_at": "2026-11-15T02:10:58+08:00",
-  "device_boot": "awaiting observation"
+  "device_boot": "Owner observed an automatic reset approximately 6 seconds after the magenta bar, consistent with reaching the post-MMU reset checkpoint."
 }
