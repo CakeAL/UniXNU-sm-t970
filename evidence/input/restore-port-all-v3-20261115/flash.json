@@ -1,0 +1,7 @@
+{
+  "image": "out/dual-system/port-all-v3-20261114/recovery-port-all-v3.img",
+  "sha256": "19466bb4cb9531455f91ced8f5b9833deab85c204f1af6172998e13b366b98fe",
+  "reason": "boot-report v2 rebooted after the green bar; restored the last image that reaches the home screen",
+  "result": "RECOVERY upload successful",
+  "timestamp": "2026-11-15T00:03:14.518140+08:00"
+}
