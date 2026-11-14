@@ -1,0 +1,12 @@
+{
+  "base_recovery_sha256": "cbbf85d79a71670b0058f47839c48c2fc493428a1fae14bdd45b2056624be4f4",
+  "image": "out/dual-system/wholesale-inputs-20261115/mmu-probe/after-create-console/recovery.img",
+  "sha256": "b3cb8c5490a42ebd294683e8d9f2ccdf9b172751590fa0964634319fffc3a8b4",
+  "kernel_readback_sha256": "88936b55b1a9bd7c0fdb33f6d166d67ab90cd1c928bf1f3a0e30b8ceca207831",
+  "checkpoint": "first return from PE_create_console in arm_init",
+  "reset_seconds": 16,
+  "partition": "RECOVERY",
+  "upload": "RECOVERY upload successful",
+  "heimdall_exit": 0,
+  "device_boot": "awaiting observation"
+}
