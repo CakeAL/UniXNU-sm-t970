@@ -265,7 +265,7 @@ static void reportRscMode(char *out, unsigned length, const RscSnapshot &rsc, un
                         cp.rp, cp.wp, cp.sqe, cp.fault, cp.cpIrq);
                     if (wrote < 0 || static_cast<unsigned>(wrote) >= length - used) return;
                     used += wrote;
-                    if (power == cbBootCb1ActivateMode && !strcmp(cp.state, "idle")) {
+                    if (power >= cbBootCb1ActivateMode && !strcmp(cp.state, "idle")) {
                         wrote = snprintf(out + used, length - used,
                             "\nGPU cb1ctx %s/%s tlb=%x/%u ctl=%x/%x f=%x/%x leaf=%u held=%u",
                             cp.rootState, cp.activation, cp.tlbSynced, cp.tlbReads, cp.ctlOn,
@@ -288,6 +288,14 @@ static void reportRscMode(char *out, unsigned length, const RscSnapshot &rsc, un
                     }
                     if (wrote < 0 || static_cast<unsigned>(wrote) >= length - used) return;
                     used += wrote;
+                    if (power == cbBootStreamReadMode && used > 0 && static_cast<unsigned>(used) < length) {
+                        wrote = snprintf(out + used, length - used,
+                            "\nGPU streams %s free=%x gmu=%x s2=%x/%x/%x/%x/%x",
+                            cp.streams, cp.freeStreams, cp.gmuMatch, cp.streamRoute[0], cp.streamRoute[1],
+                            cp.streamRoute[2], cp.streamRoute[3], cp.streamRoute[4]);
+                        if (wrote < 0 || static_cast<unsigned>(wrote) >= length - used) return;
+                        used += wrote;
+                    }
                 } else if (reportGx && used > 0 && static_cast<unsigned>(used) < length) {
                     const auto &gx = b.hfiGx;
                     const int wrote = snprintf(out + used, length - used,

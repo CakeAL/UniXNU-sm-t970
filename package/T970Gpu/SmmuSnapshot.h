@@ -37,8 +37,9 @@ constexpr unsigned cbBootCpReadMode = 30;
 constexpr unsigned cbBootCb1FormatMode = 31;
 constexpr unsigned cbBootCb1RootMode = 32;
 constexpr unsigned cbBootCb1ActivateMode = 33;
+constexpr unsigned cbBootStreamReadMode = 34;
 static constexpr bool isBootMode(unsigned power) {
-    return power >= cbBootMode && power <= cbBootCb1ActivateMode;
+    return power >= cbBootMode && power <= cbBootStreamReadMode;
 }
 constexpr unsigned ddrAxiIndex = 2;
 constexpr uint32_t cbBarStage1 = 0x1f300;
@@ -75,6 +76,9 @@ struct GpuCpSnapshot {
     const char *activation = "skip";
     unsigned tlbSynced = 0, tlbReads = 0;
     uint32_t ctlOn = 0, ctlOff = 0, fsrOn = 0, fsrOff = 0;
+    const char *streams = "skip";
+    uint32_t gmuMatch = 0, streamRoute[5] = {};
+    unsigned freeStreams = 0;
 };
 
 struct SmmuSnapshot {
@@ -247,6 +251,27 @@ static bool pulseTtbr(IOMemoryMap &smmu, IOMemoryMap &gmu, SmmuSnapshot &result,
 
 #ifdef T970_GPU_GMU_FIRMWARE
 #ifdef T970_GPU_SQE_FIRMWARE
+template <typename Live>
+static void sampleCpStreams(IOMemoryMap &smmu, GpuCpSnapshot &result, Live live) {
+    constexpr uint32_t routeType = 3u << 16, faultRoute = 2u << 16;
+    result.streams = "guard";
+    if (strcmp(result.activation, "ok") || !live()) return;
+    result.gmuMatch = readSmmu32(smmu, A650_SMMU_SMR(0));
+    for (unsigned slot = 1; slot < 6; ++slot) {
+        const uint32_t match = readSmmu32(smmu, A650_SMMU_SMR(slot));
+        const uint32_t route = readSmmu32(smmu, A650_SMMU_S2CR(slot));
+        result.streamRoute[slot - 1] = route;
+        if (!match && (route & routeType) == faultRoute) result.freeStreams |= 1u << slot;
+    }
+    result.streams = "drift";
+    for (unsigned slot = 1; slot < 6; ++slot) {
+        if (readSmmu32(smmu, A650_SMMU_SMR(slot)) ||
+            readSmmu32(smmu, A650_SMMU_S2CR(slot)) != result.streamRoute[slot - 1]) return;
+    }
+    if (!live()) return;
+    result.streams = result.freeStreams ? "ok" : "no-slot";
+}
+
 template <typename Live>
 static void pulseCpContext(IOMemoryMap &smmu, GpuCpSnapshot &result,
                            const ArmSmmu4KContextImage &image, Live live) {
@@ -449,7 +474,8 @@ static void samplePoweredCp(IOMemoryMap &smmu, IOMemoryMap &gmu, GpuCpSnapshot &
     result.state = "idle";
     if (power == cbBootCb1FormatMode) pulseCb1Format(smmu, result, live);
 #ifdef T970_GPU_SQE_FIRMWARE
-    if (power >= cbBootCb1RootMode) installCb1Root(smmu, result, live, power == cbBootCb1ActivateMode);
+    if (power >= cbBootCb1RootMode) installCb1Root(smmu, result, live, power >= cbBootCb1ActivateMode);
+    if (power == cbBootStreamReadMode) sampleCpStreams(smmu, result, live);
 #endif
 }
 #endif

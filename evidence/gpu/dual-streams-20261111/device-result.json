@@ -1,0 +1,13 @@
+{
+  "recovery_sha256": "05e003312a45ab0b0e5745c6a53797776d4a784abd2271ac9be0777fb310a6e9",
+  "photo_time_local": "2026-11-14T15:44:33+08:00",
+  "photo_sha256": "a1000cfefdbe3800509effb04db28b448d00996dd807db47e4f06624d90de0c4",
+  "lines": [
+    "GPU cp idle rbbm=1 irq=0 rb=0/0 ptr=0/0 sqe=0 err=0/0",
+    "GPU cb1ctx ok/ok tlb=3/2 ctl=a7/a6 f=400/400 leaf=17 held=1",
+    "GPU streams ok free=3e gmu=84000005 s2=3a76e9ff/33b2cbff/1f2a63ff/177ee8ff/231acbff"
+  ],
+  "candidate_slots": [1, 2, 3, 4, 5],
+  "gpu_streams_published": false,
+  "cp_submitted": false
+}
