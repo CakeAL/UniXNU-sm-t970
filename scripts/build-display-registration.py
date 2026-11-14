@@ -196,7 +196,7 @@ def main():
         (out / 'command.json').write_text(json.dumps(command, indent=2)+'\n')
         subprocess.run(command, cwd=r['directory'], stdout=log, stderr=subprocess.STDOUT, check=True)
         if a.haptics:
-            for relative in ('package/T970Power/Rpmh.cpp', 'reference/gts7xlwifi/package/T970Haptics.cpp'):
+            for relative in ('package/T970Power/Rpmh.cpp', 'package/T970Haptics/T970Haptics.cpp'):
                 peripheral = DEVICE / relative
                 args = command.copy()
                 args[args.index(str(source))] = str(peripheral)

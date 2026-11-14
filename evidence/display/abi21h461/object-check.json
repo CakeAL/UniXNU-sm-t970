@@ -4,7 +4,7 @@
   "header_generator_reference": "UniXNU/UniXNU-sheng@516a780473a2ac59c8b438e132bb60204dda9e22/scripts/build-gop-legacy-display.py",
   "header_generator_sha256": "d938f29c8f6fa198b1119663d46b077f8352336bff7730e56b05226f30235982",
   "generated_header_sha256": "8465dbcff188e88e66fdbe9a5e24b102c093b06d17f879f7a55fa3d1c58f8016",
-  "object_sha256": "54e56f545f2fccecd9a6161bc1d841b978543acbc56dfae97642d0a25761859a",
+  "object_sha256": "fddde0bf6715907f518b1dd26fae2523f0b21eea79c09a5efd2b591258d7ed71",
   "compile_exit_code": 0,
   "actual_compiled_virtual_entries": 358,
   "actual_owned_slots": [
@@ -37,5 +37,8 @@
   "linked": false,
   "registration_callbacks_implemented": false,
   "hardware_result_pending": true,
-  "object_path": "/Users/cakeal/vsc/UniXNU/out/t970-data-bringup/display-object-cf3b429/NativeLegacyDisplay.o"
+  "object_path": "/Users/cakeal/vsc/UniXNU/out/t970-data-bringup/display-object-cf3b429/NativeLegacyDisplay.o",
+  "superseded_object_sha256": "54e56f545f2fccecd9a6161bc1d841b978543acbc56dfae97642d0a25761859a",
+  "object_provenance": "rebuilt from GopFramebuffer cf3b42979a9c44219e7bb149543e6fc3388b58ed with the recorded XNU compile recipe and the audited OriginalLegacyFramebufferABI.h; the previous object 54e56f54... is no longer reproducible byte-for-byte on the current toolchain",
+  "object_rebuild_command": "python3.14 scripts/build-t970-gop-object.py (recipe IOPlatformExpert.cpo.json)"
 }

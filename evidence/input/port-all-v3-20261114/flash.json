@@ -1,0 +1,18 @@
+{
+  "image": "out/dual-system/port-all-v3-20261114/recovery-port-all-v3.img",
+  "bytes": 86888448,
+  "sha256": "19466bb4cb9531455f91ced8f5b9833deab85c204f1af6172998e13b366b98fe",
+  "partition": "RECOVERY",
+  "result": "RECOVERY upload successful",
+  "mode": 2,
+  "options": [
+    "--pen",
+    "--haptics",
+    "--shutdown"
+  ],
+  "kernel_macho_sha256": "8c50792631e596e39b488e3f076611a993dc5f8311f6a7a58252f1805d47206d",
+  "rollback": "out/dual-system/all-in-one-20261114/recovery-all-in-one.img",
+  "rollback_sha256": "34434b0b227d520dbf32c30edf9176a8a4cabe391632bad6d1468f6f601df9a0",
+  "flashed_at": "2026-11-14T21:18:10",
+  "notes": "peripheral drivers compiled from in-repo sources; ShengFirmware is a fail-closed link stub; USB stack not enabled in this candidate"
+}
