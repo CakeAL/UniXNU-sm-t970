@@ -15,7 +15,6 @@ from pathlib import Path
 import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
-TREE = Path('/Users/cakeal/vsc/UniXNU/out/t970-dual-system/sm-t970/ipados-17.7.11-21H461/sm-t970_data/tree')
 
 
 def require(value, message):
@@ -27,8 +26,8 @@ OUT = ROOT / 'build/boot-progress'
 OUT.mkdir(parents=True, exist_ok=True)
 # The device package is linked into the tree as kits/<kit> (see scripts/unixnu/tree.py), so locate it the way
 # build-platform-power.py does instead of assuming a fixed directory name.
-sources = [ROOT / 'package/T970Board/BootProgress.c']
-require(sources[0].is_file(), 'package/T970Board/BootProgress.c is missing')
+sources = sorted(ROOT.glob('kits/*/BootProgress.c'))
+require(len(sources) == 1, 'Expected one device package with BootProgress.c')
 PACKAGE = sources[0].parent
 
 
@@ -39,7 +38,8 @@ def font_dir():
     that checkout as UNIXNU_UEFI; without it, find the sibling checkout by walking up from the tree, whose depth
     depends on the layout (out/<board>/tree/ before the migration, out/<device>/<os_profile>/<config>/tree/ after).
     """
-    candidates = [os.environ.get('UNIXNU_UEFI'), str(ROOT / '.cache/uefi-source/Mu-Silicium')]
+    candidates = [os.environ.get('UNIXNU_UEFI')]
+    candidates += [str(parent / 'uefi-umi') for parent in ROOT.parents]
     for candidate in candidates:
         if not candidate:
             continue
@@ -49,7 +49,7 @@ def font_dir():
     raise SystemExit('BootProgressDisplay.h includes Font.h from the Mu-Silicium checkout; run with UNIXNU_UEFI set')
 
 
-record = json.loads((TREE / 'build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/osfmk/DEVELOPMENT/startup.o.json').read_text().strip().rstrip(','))
+record = json.loads((ROOT / 'build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/osfmk/DEVELOPMENT/startup.o.json').read_text().strip().rstrip(','))
 source = PACKAGE / 'BootProgress.c'
 # Compile from a private copy on local disk. Reading straight off the virtiofs mount makes
 # clang-24 abort with `MemoryBuffer::init: Buffer is not null terminated` when the shared
@@ -94,7 +94,7 @@ while i < len(args):
         command.append(arg)
     i += 1
 command += ['-DXNU_BOOT_PROGRESS=1', '-mgeneral-regs-only', '-Wall', '-Wextra', '-Werror',
-            '-I', str(TREE / '.cache/xnu-work/osfmk'), '-I', str(PACKAGE), '-I', str(font_dir())]
+            '-I', str(ROOT / '.cache/xnu-work/osfmk'), '-I', str(PACKAGE), '-I', str(font_dir())]
 subprocess.run(command, cwd=record['directory'], check=True, timeout=90)
 (OUT / 'compile-command.json').write_text(json.dumps(command, indent=2) + '\n')
 fault_source = PACKAGE / 'BootFaultProbe.c'
@@ -103,7 +103,7 @@ fault_command = [str(fault_source) if arg == str(source) else str(fault_obj) if 
 subprocess.run(fault_command, cwd=record['directory'], check=True, timeout=90)
 policy_source = PACKAGE / 'BootWatchdogPolicy.c'
 policy_obj = OUT / 'BootWatchdogPolicy.o'
-policy_record = json.loads((TREE / 'build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/bsd/DEVELOPMENT/kern_exec.o.json').read_text().strip().rstrip(','))
+policy_record = json.loads((ROOT / 'build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/bsd/DEVELOPMENT/kern_exec.o.json').read_text().strip().rstrip(','))
 policy_command = []
 policy_args = policy_record['arguments']
 j = 0

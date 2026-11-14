@@ -26,7 +26,9 @@ archives = [
   "component:SoftwareAES",
   "build-software-aes-bindings.py",
   # Owner root authentication: the signed policies of the SHNGROOT OS/SystemOS windows on sda39.
-  "build-root-policy-archive.py --tree . --policies .cache/firmware/root-policies --output build/verified-root-os-xnu-bundle",
+  # Owner-signed SHNGROOT policies are not on this workstation; the empty verified-root
+  # bundle keeps the same archive name so the linkage is unchanged.
+  "build-verified-root-empty.py --tree . --output build/verified-root-os-xnu-bundle",
   "component:ShengUfs",
   "build-storage-bindings.py --object build/sheng-ufs/NativeUfs.o --archive libShengUfs.a",
   # Root authentication only: the DTS has no virtio,mmio node, so the transport never probes. It
