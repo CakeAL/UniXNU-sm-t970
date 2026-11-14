@@ -15,7 +15,7 @@ legacy_display = os.environ.get('XNU_NATIVE_LEGACY_DISPLAY', '0')
 # BootProgressStubs.c carries the zero-valued definitions of the diagnostics BootProgress.c and
 # BootLog.c reference as weak_import. It is in the same archive because both files answer the same
 # question at the link: which names the kernel needs that no selected component defines.
-sources = [ROOT / 'kits/gts7xlwifi/LinkStubs.c', ROOT / 'kits/gts7xlwifi/BootProgressStubs.c']
+sources = [ROOT / 'kits/sm-t970/LinkStubs.c', ROOT / 'kits/sm-t970/BootProgressStubs.c']
 objects = []
 for source in sources:
     obj = out / (source.stem + '.o')
