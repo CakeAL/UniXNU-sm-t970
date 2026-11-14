@@ -1,0 +1,9 @@
+{
+  "base_recovery_sha256": "cbbf85d79a71670b0058f47839c48c2fc493428a1fae14bdd45b2056624be4f4",
+  "image": "out/dual-system/wholesale-inputs-20261115/mmu-probe/recovery-post-mmu.img",
+  "sha256": "1ec7168701b27211e3bfbf21a13fcb38d783b9e8d51ef4536f6f75150604cd7d",
+  "kernel_readback_sha256": "28802a9ff9caffe7ea28450980d9dbc6aed99c14311bae470823e779002d3ad5",
+  "reset_seconds": 6,
+  "panic_screen": false,
+  "upload": "pending"
+}

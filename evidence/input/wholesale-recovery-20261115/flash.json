@@ -9,5 +9,5 @@
   "upload": "RECOVERY upload successful",
   "heimdall_exit": 0,
   "uploaded_at": "2026-11-15T01:57:06+08:00",
-  "device_boot": "awaiting observation"
+  "device_boot": "Owner reports the magenta bar remained for five minutes; no desktop or panic text reported."
 }
