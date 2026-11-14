@@ -6,3 +6,6 @@
 /.cache/
 __pycache__/
 *.pyc
+
+# 同型号上游副本放在仓库之外，见 docs/gts7xlwifi-import.md
+/reference/

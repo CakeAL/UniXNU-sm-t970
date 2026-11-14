@@ -9,6 +9,11 @@
 #include <pexpert/pexpert.h>
 #include "TouchHid.h"
 
+#if defined(T970_PERIPHERAL_RPMH)
+extern "C" void t970_rpmh_lock();
+extern "C" void t970_rpmh_unlock();
+#endif
+
 #if defined(T970_TOUCH_HID)
 extern "C" void thread_terminate_self(void);
 extern "C" void native_t970_touch_down();
@@ -620,6 +625,9 @@ static void reportPoweredIdentity(char *out, size_t length, Scan scan) {
     }
 
     uint32_t avdd[3] = {}, dvdd[3] = {};
+#if defined(T970_PERIPHERAL_RPMH)
+    t970_rpmh_lock();
+#endif
     bool interrupts = ml_set_interrupts_enabled(false);
     const char *a = voteTouchRail(*rsc, analog, 3300, avdd);
     ml_set_interrupts_enabled(interrupts);
@@ -630,6 +638,9 @@ static void reportPoweredIdentity(char *out, size_t length, Scan scan) {
         d = voteTouchRail(*rsc, digital, 1800, dvdd);
         ml_set_interrupts_enabled(interrupts);
     }
+#if defined(T970_PERIPHERAL_RPMH)
+    t970_rpmh_unlock();
+#endif
     int written = snprintf(out, length, "\nTouch PWR A=%s:%x/%x/%x D=%s:%x/%x/%x",
                            a, avdd[0], avdd[1], avdd[2], d, dvdd[0], dvdd[1], dvdd[2]);
     // Leave the verified stock voltage/enable votes in place until reset.

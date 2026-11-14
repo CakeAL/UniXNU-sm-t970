@@ -23,7 +23,7 @@ GPU_PROBES = {
 }
 
 
-def pack(base, kernel, mode, *, gpu_probe=None):
+def pack(base, kernel, mode, *, gpu_probe=None, shutdown=False, pen=False, haptics=False, usb=False):
     require(hashlib.sha256(base).hexdigest() == BASE_SHA, "Expected the verified dual-system RECOVERY")
     require(all(marker in kernel for marker in (
         b"T970 Data probe:", b"T970 Data persistence not active", b"store header is foreign")),
@@ -32,6 +32,21 @@ def pack(base, kernel, mode, *, gpu_probe=None):
         require(mode == 2, "The GPU probe uses the verified persistent Data configuration")
         require(gpu_probe in GPU_PROBES and GPU_PROBES[gpu_probe] in kernel,
                 "Kernel lacks the selected T970 GPU probe")
+    if shutdown:
+        require(mode == 2 and gpu_probe is None, "Shutdown verification requires standalone persistent mode")
+        require(b"T970PlatformPower: shutdown failsafe armed" in kernel,
+                "Kernel lacks the T970 shutdown failsafe")
+    if pen:
+        require(mode == 2 and gpu_probe is None, "S Pen requires standalone persistent mode")
+        require(b"T970 pen: original IOHIDEventDriver attached" in kernel,
+                "Kernel lacks the T970 Pencil HID service")
+    if haptics:
+        require(mode == 2 and gpu_probe is None, "Haptics requires standalone persistent mode")
+        require(b"t970-haptics" in kernel, "Kernel lacks the T970 haptics service")
+    if usb:
+        require(mode == 2 and gpu_probe is None, "USB requires standalone persistent mode")
+        require(b"T970 USB: MUIC route=" in kernel and b"com.apple.driver.AppleUSBDeviceMux" in kernel,
+                "Kernel lacks the shared MUIC route or Apple USB device stack")
 
     shim_size, ramdisk_size, second_size, page, version = (
         struct.unpack_from("<I", base, offset)[0] for offset in (8, 16, 24, 36, 40))
@@ -65,6 +80,22 @@ def pack(base, kernel, mode, *, gpu_probe=None):
             require("t970-gpu-p=" not in config and config.count("t970-data-space=1") == 1,
                     "Unexpected baseline GPU arguments")
             config = config.replace("t970-data-space=1", f"t970-gpu-p={gpu_probe}")
+        if shutdown:
+            require(config.count("t970-data-space=1") == 1 and "t970-shutdown-wait=" not in config,
+                    "Unexpected baseline shutdown arguments")
+            config = config.replace("t970-data-space=1", "t970-shutdown-wait=10")
+        if pen:
+            require("t970-pen=" not in config and config.count("t970-setup-report-touch=1") == 1,
+                    "Expected the verified HID boot arguments")
+            config = config.replace("t970-setup-report-touch=1", "t970-pen=14359")
+        if haptics:
+            require("t970-haptics=" not in config and config.count("t970-memory-report=1") == 1,
+                    "Expected the verified diagnostics arguments")
+            config = config.replace("t970-memory-report=1", "t970-haptics=3")
+        if usb:
+            require("t970-usb=" not in config and config.count("t970-ui-stack=10") == 1,
+                    "Expected the verified diagnostics arguments")
+            config = config.replace("t970-ui-stack=10", "t970-usb=37")
         entries = [entry for entry in tomllib.loads(config)["entry"] if entry["type"] == "xnu"]
         require(len(entries) == 1, "Expected one XNU entry")
         command_line = entries[0]["args"]
@@ -102,9 +133,14 @@ def main():
                      help="enable the CB1 activation probe in mode 2")
     gpu.add_argument("--gpu-streams", dest="gpu_probe", action="store_const", const=34,
                      help="enable the GPU stream slot survey in mode 2")
+    parser.add_argument("--shutdown", action="store_true", help="enable the post-unmount shutdown failsafe in mode 2")
+    parser.add_argument("--pen", action="store_true", help="enable the independent Pencil HID in mode 2")
+    parser.add_argument("--haptics", action="store_true", help="enable haptics and one boot pulse in mode 2")
+    parser.add_argument("--usb", action="store_true", help="enable DWC3 high-speed device mode in mode 2")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
-    recovery = pack(args.base.read_bytes(), args.kernel.read_bytes(), args.mode, gpu_probe=args.gpu_probe)
+    recovery = pack(args.base.read_bytes(), args.kernel.read_bytes(), args.mode,
+                    gpu_probe=args.gpu_probe, shutdown=args.shutdown, pen=args.pen, haptics=args.haptics, usb=args.usb)
     with args.output.open("xb") as output:
         output.write(recovery)
     print(f"RECOVERY mode={args.mode} sha256={hashlib.sha256(recovery).hexdigest()} {args.output}")

@@ -10,6 +10,7 @@ import sys
 
 DEVICE = Path(__file__).resolve().parents[1]
 SOURCE = DEVICE / 'package/T970Touch/TouchHid.cpp'
+PEN_SOURCE = DEVICE / 'reference/gts7xlwifi/package/T970Pen.cpp'
 V75 = DEVICE / 'out/data-bringup/touch-events-v75-build/kernel.macho'
 SLIDE = -0x1000000
 HID = 'com.apple.iokit.IOHIDFamily'
@@ -93,6 +94,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--registration', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--reference-kernel', type=Path, default=V75,
+                        help='Reference 21H461 prelink with the original HID kext')
     parser.add_argument('--verify', type=Path, help='Verify bindings against the newly linked kernel')
     args = parser.parse_args()
     out = args.output.resolve()
@@ -116,7 +119,10 @@ def main():
     recipe = tree / 'build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/iokit/DEVELOPMENT/IOPlatformExpert.cpo.json'
     cwd = json.loads(recipe.read_text().strip().rstrip(','))['directory']
     subprocess.run(command, cwd=cwd, check=True)
-    bindings = object_bindings(obj, checked_hid(V75, prelink), prelink)
+    command[command.index(str(SOURCE))] = str(PEN_SOURCE)
+    command[command.index('-o') + 1] = str(out / 'T970Pen.o')
+    subprocess.run([*command, '-Wno-deprecated-volatile'], cwd=cwd, check=True)
+    bindings = object_bindings(obj, checked_hid(args.reference_kernel, prelink), prelink)
     assembly = out / 'touch-hid-bindings.S'
     assembly.write_text(''.join(f'.globl {name}\n.set {name}, {address:#x}\n'
                                 for name, address in sorted(bindings.items())))

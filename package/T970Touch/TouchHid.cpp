@@ -19,6 +19,8 @@ extern "C" {
 extern kern_return_t OSKextLoadKextWithIdentifier(const char *);
 void t970_touch_hid_static_init(void) __asm__("__GLOBAL__sub_I_TouchHid.cpp");
 extern kmod_info_t g_kernel_kmod_info;
+void native_pen_set_sink(void (*sink)(void *, uint64_t), void *context);
+void t970_pen_start(void);
 }
 
 // Each Finger collection owns one FTS ID. Its bits are Tip, Confidence and Untouch.
@@ -50,6 +52,18 @@ static const uint8_t buttonDescriptor[] = {
     0x75,0x04,0x95,0x01,0x81,0x03,0xc0
 };
 
+// Keyboard-first Pencil service, adapted from gts7xlwifi's verified 21H461 HID path.
+static const uint8_t penDescriptor[] = {
+    0x05,0x0d,0x09,0x20,0xa1,0x01,0x85,0x07,
+    0x09,0x20,0xa1,0x00,
+    0x09,0x42,0x09,0x44,0x09,0x3c,0x09,0x45,0x09,0x32,0x15,0x00,0x25,0x01,0x75,0x01,0x95,0x05,0x81,0x02,
+    0x95,0x03,0x81,0x03,
+    0x05,0x01,0x09,0x30,0x09,0x31,0x15,0x00,0x26,0xff,0x7f,0x75,0x10,0x95,0x02,0x81,0x02,
+    0x05,0x0d,0x09,0x30,0x16,0x01,0xf0,0x26,0xff,0x0f,0x75,0x10,0x95,0x01,0x81,0x02,
+    0x09,0x3d,0x09,0x3e,0x15,0xc1,0x25,0x3f,0x35,0xc1,0x45,0x3f,0x65,0x14,0x55,0x00,0x75,0x08,0x95,0x02,0x81,0x02,
+    0x65,0x00,0x35,0x00,0x45,0x00,0xc0,0xc0
+};
+
 namespace {
 
 // Original IOHIDEventDriver dispatch slots and fields match NativeHidInput's 21H461 ABI.
@@ -58,6 +72,8 @@ enum : uint32_t {
     kX = 0xb0000, kY = 0xb0001, kFromEdge = 0x800
 };
 static uintptr_t originalDispatch;
+static uintptr_t originalPenDispatch;
+static constexpr int32_t penForce = 1000;
 static unsigned dispatchCount;
 static unsigned digitizerCount;
 static bool edgeContact[256];
@@ -101,6 +117,45 @@ static R eventCall(void *object, unsigned slot, A... args)
 {
     uintptr_t *table = *reinterpret_cast<uintptr_t **>(object);
     return reinterpret_cast<R (*)(void *, A...)>(table[slot])(object, args...);
+}
+
+static void scalePenPressure(OSObject *event)
+{
+    constexpr uint32_t transducerType = 0xb0004, pressure = 0xb000a;
+    if (eventCall<uint32_t, IOOptionBits>(event, 18, 0) != kDigitizer ||
+        eventCall<int32_t, uint32_t, IOOptionBits>(event, 23, transducerType, 0) != 0) {
+        return;
+    }
+    int32_t force = eventCall<int32_t, uint32_t, IOOptionBits>(event, 25, pressure, 0);
+    if (force > 0) {
+        if (force > 65536) force = 65536;
+        eventCall<void, uint32_t, int32_t, IOOptionBits>(event, 26, pressure, force * penForce, 0);
+    }
+}
+
+static void dispatchPen(IOService *service, OSObject *event, IOOptionBits options)
+{
+    if (event && eventCall<uint32_t, IOOptionBits>(event, 18, 0) == kDigitizer) {
+        auto *children = *reinterpret_cast<OSArray **>(reinterpret_cast<uint8_t *>(event) + 24);
+        if (children && OSDynamicCast(OSArray, children)) {
+            for (unsigned i = 0; i < children->getCount(); ++i) {
+                OSObject *child = children->getObject(i);
+                if (child && child->metaCast("IOHIDEvent")) scalePenPressure(child);
+            }
+        } else if (!children) {
+            scalePenPressure(event);
+        }
+    }
+    reinterpret_cast<void (*)(IOService *, OSObject *, IOOptionBits)>(originalPenDispatch)(service, event, options);
+}
+
+static void stampPen(IORegistryEntry *entry)
+{
+    entry->setProperty("Built-In", kOSBooleanTrue);
+    entry->setProperty("DisplayIntegrated", kOSBooleanTrue);
+    entry->setProperty("PrimaryUsagePage", 0x0dULL, 32);
+    entry->setProperty("PrimaryUsage", 0x20ULL, 32);
+    entry->setProperty("AccurateMaxDigitizerPressureValue", (unsigned long long)penForce, 32);
 }
 
 static bool markEdge(OSObject *event)
@@ -208,6 +263,7 @@ class T970TouchHid : public IOHIDDevice {
     unsigned transform = 5;
     struct T970TouchFrame previous = {};
     bool buttonsOnly = false;
+    bool penOnly = false;
 
     bool bindEvents()
     {
@@ -228,11 +284,23 @@ class T970TouchHid : public IOHIDDevice {
             return false;
         }
         memcpy(copy, *reinterpret_cast<uintptr_t **>(driver), 256 * sizeof(uintptr_t));
-        originalDispatch = copy[198];
-        copy[198] = reinterpret_cast<uintptr_t>(&dispatch);
+        if (penOnly) {
+            auto *interface = driver->getParentEntry(gIOServicePlane);
+            if (interface) stampPen(interface);
+            stampPen(driver);
+            originalPenDispatch = copy[198];
+            copy[198] = reinterpret_cast<uintptr_t>(&dispatchPen);
+        } else {
+            originalDispatch = copy[198];
+            copy[198] = reinterpret_cast<uintptr_t>(&dispatch);
+        }
         __asm__ volatile("dmb ish" ::: "memory");
         *reinterpret_cast<uintptr_t **>(driver) = copy;
         ready = true;
+        if (penOnly) {
+            printf("T970 pen: original IOHIDEventDriver attached with pressure scale %d\n", penForce);
+            return true;
+        }
         OSDictionary *digitizer = OSDynamicCast(OSDictionary, driver->getProperty("Digitizer"));
         bool collectionDispatch = digitizer &&
             digitizer->getObject("collectionDispatch") == kOSBooleanTrue;
@@ -329,6 +397,41 @@ class T970TouchHid : public IOHIDDevice {
 
 public:
     void setButtonsOnly() { buttonsOnly = true; }
+    void setPenOnly() { penOnly = true; }
+
+    static void notifyPen(void *context, uint64_t packet)
+    {
+        auto *self = static_cast<T970TouchHid *>(context);
+        self->loop->runAction(deliverPen, self, reinterpret_cast<void *>(uintptr_t(packet)));
+    }
+
+    static IOReturn deliverPen(OSObject *owner, void *input, void *, void *, void *)
+    {
+        auto *self = OSDynamicCast(T970TouchHid, owner);
+        if (!self || !self->penOnly || !self->bindEvents()) return kIOReturnNotReady;
+        uint64_t packet = reinterpret_cast<uintptr_t>(input);
+        bool tip = (packet >> 56) & 1, barrel = (packet >> 57) & 1;
+        bool range = (packet >> 58) & 1, eraser = (packet >> 59) & 1;
+        uint16_t x = packet & 0x7fff, y = (packet >> 15) & 0x7fff;
+        uint16_t pressure = (packet >> 30) & 0xfff;
+        auto tilt = [](uint64_t axis) -> uint8_t {
+            return (axis & 0x40) ? (axis & 0x7f) | 0x80 : axis & 0x7f;
+        };
+        uint8_t report[] = {
+            7, uint8_t((tip && !eraser) | (barrel << 1) | ((eraser && range) << 2) |
+                ((tip && eraser) << 3) | (range << 4)),
+            uint8_t(x), uint8_t(x >> 8), uint8_t(y), uint8_t(y >> 8),
+            uint8_t(pressure), uint8_t(pressure >> 8), tilt(packet >> 42), tilt(packet >> 49)
+        };
+        auto *buffer = IOBufferMemoryDescriptor::withBytes(report, sizeof(report), kIODirectionNone);
+        IOReturn result = buffer ? self->handleReport(buffer, 0, 0) : kIOReturnNoMemory;
+        OSSafeReleaseNULL(buffer);
+        ++self->reports;
+        if (self->reports == 1 || result != kIOReturnSuccess) {
+            printf("T970 pen: HID report=%u result=%x\n", self->reports, result);
+        }
+        return result;
+    }
 
     static IOReturn deliverButtons(OSObject *owner, void *input, void *, void *, void *)
     {
@@ -355,11 +458,12 @@ public:
 
     OSString *newTransportString() const override
     {
-        return OSString::withCString(buttonsOnly ? "SPMI" : "I2C");
+        return OSString::withCString(penOnly ? "Virtual" : buttonsOnly ? "SPMI" : "I2C");
     }
 
     OSString *newProductString() const override
     {
+        if (penOnly) return OSString::withCString("Samsung SM-T970 S Pen");
         return OSString::withCString(buttonsOnly ? "Samsung SM-T970 Side Buttons" : "Samsung SM-T970 FTS Touchscreen");
     }
 
@@ -368,8 +472,15 @@ public:
         if (!out) {
             return kIOReturnBadArgument;
         }
-        *out = IOBufferMemoryDescriptor::withBytes(buttonsOnly ? buttonDescriptor : descriptor,
-            buttonsOnly ? sizeof(buttonDescriptor) : sizeof(descriptor), kIODirectionNone);
+        if (penOnly) {
+            uint8_t combined[sizeof(buttonDescriptor) + sizeof(penDescriptor)];
+            memcpy(combined, buttonDescriptor, sizeof(buttonDescriptor));
+            memcpy(combined + sizeof(buttonDescriptor), penDescriptor, sizeof(penDescriptor));
+            *out = IOBufferMemoryDescriptor::withBytes(combined, sizeof(combined), kIODirectionNone);
+        } else {
+            *out = IOBufferMemoryDescriptor::withBytes(buttonsOnly ? buttonDescriptor : descriptor,
+                buttonsOnly ? sizeof(buttonDescriptor) : sizeof(descriptor), kIODirectionNone);
+        }
         return *out ? kIOReturnSuccess : kIOReturnNoMemory;
     }
 
@@ -379,16 +490,19 @@ public:
         if (!loop) {
             return false;
         }
-        PE_parse_boot_argn("t970-touch-transform", &transform, sizeof(transform));
-        transform &= 7;
-        edgeX = 48 * 65536 / ((transform & 1) ? 2800 : 1752);
-        edgeY = 48 * 65536 / ((transform & 1) ? 1752 : 2800);
+        if (!penOnly && !buttonsOnly) {
+            PE_parse_boot_argn("t970-touch-transform", &transform, sizeof(transform));
+            transform &= 7;
+            edgeX = 48 * 65536 / ((transform & 1) ? 2800 : 1752);
+            edgeY = 48 * 65536 / ((transform & 1) ? 1752 : 2800);
+        }
         setProperty("HIDDefaultBehavior", true);
         setProperty("Built-In", true);
         if (!buttonsOnly) {
             setProperty("DisplayIntegrated", true);
             setProperty("DigitizerCollectionDispatch", kOSBooleanTrue);
         }
+        if (penOnly) setProperty("AccurateMaxDigitizerPressureValue", (unsigned long long)penForce, 32);
         if (!IOHIDDevice::start(provider)) {
             return false;
         }
@@ -484,6 +598,21 @@ bool t970_touch_hid_start()
                 OSSafeReleaseNULL(keys);
             }
             printf("T970 keys: consumer HID service=%u\n", keysRunning);
+        }
+        unsigned pen = 0;
+        if (PE_parse_boot_argn("t970-pen", &pen, sizeof(pen)) && (pen & 7) == 7) {
+            auto *stylus = new T970TouchHid;
+            bool initialized = stylus && stylus->init();
+            if (initialized) stylus->setPenOnly();
+            bool attachedPen = initialized && stylus->attach(resource);
+            if (attachedPen && stylus->start(resource)) {
+                native_pen_set_sink(T970TouchHid::notifyPen, stylus);
+                t970_pen_start();
+            } else {
+                if (attachedPen) stylus->detach(resource);
+                OSSafeReleaseNULL(stylus);
+                printf("T970 pen: Pencil HID service failed to start\n");
+            }
         }
     }
     resource->release();

@@ -22,6 +22,7 @@ extern kmod_info_t g_kernel_kmod_info;
 void t970_battery_static_init(void) __asm__("__GLOBAL__sub_I_BatteryService.cpp");
 // The exported thread.h omits this declaration, as T970Touch also records.
 void thread_terminate_self(void);
+volatile int32_t t970_muic[8];
 }
 
 namespace {
@@ -208,11 +209,19 @@ void batteryWorker(void *, wait_result_t) {
     bool lastComplete = false, lastExternal = false, lastCharging = false, lastFull = false;
     uint32_t lastPercent = 0xffffffffu;
     unsigned count = 0;
+    unsigned usb = 0;
+    PE_parse_boot_argn("t970-usb", &usb, sizeof(usb));
     for (;;) {
         GaugeSample sample;
         GaugeAction action;
         action.enableCharging = chargeArmed;
-        bool complete = t970_power::readGaugeSample(sample, chargeArmed ? &action : nullptr);
+        action.routeUsb = (usb & 1) && __atomic_load_n(&t970_muic[0], __ATOMIC_ACQUIRE) == 0;
+        bool complete = t970_power::readGaugeSample(sample, &action);
+        if (action.routeUsb && sample.restored && sample.usbRoute) {
+            t970_muic[6] = int32_t(sample.usbCc) << 8;
+            __atomic_store_n(&t970_muic[0], sample.usbRoute, __ATOMIC_RELEASE);
+            printf("T970 USB: MUIC route=%d cc=%02x\n", sample.usbRoute, sample.usbCc);
+        }
         t970_charger_state charger = t970_charger_decode(sample.charger, sample.chargerValid);
         publishState(sample, complete);
         battery->acceptSample(sample, charger);

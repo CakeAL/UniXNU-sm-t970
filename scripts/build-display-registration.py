@@ -36,12 +36,63 @@ def compile_units(compiler, kit, units, log):
     (kit / 'commands.json').write_text(json.dumps(commands, indent=2) + '\n')
 
 
+def compile_dsp(tree, out, cpp_command, cpp_source, cpp_directory, log):
+    package = DEVICE / 'package/T970Dsp'
+    build = tree / 'build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837'
+    record = json.loads((build / 'osfmk/DEVELOPMENT/startup.o.json').read_text().strip().rstrip(','))
+    c_names = ('QcomMdt', 'QcomSmem', 'QcomSmp2p', 'QcomGlink', 'QcomQmp', 'QcomRpmh', 'T970Apr', 'T970Ssc')
+    cpp_names = ('T970Adsp', 'T970Audio', 'T970AudioService', 'T970Sensors')
+    for name in c_names:
+        command = []
+        arguments = iter(record['arguments'])
+        for value in arguments:
+            if value == record['file']:
+                command.append(str(package / (name + '.c')))
+            elif value == '-o':
+                next(arguments)
+                command.extend(('-o', str(out / (name + '.o'))))
+            elif value in ('-MF', '-MT', '-MJ'):
+                next(arguments)
+            elif value == '-Xclang':
+                setting = next(arguments)
+                if not setting.startswith('-W'):
+                    command.extend((value, setting))
+            elif value not in ('-MD', '-MP') and not value.startswith('-W'):
+                command.append(value)
+        subprocess.run([*command, '-mgeneral-regs-only', '-I', str(tree / '.cache/xnu-work/osfmk')],
+                       cwd=record['directory'], stdout=log, stderr=subprocess.STDOUT, check=True)
+    for name in cpp_names:
+        command = cpp_command.copy()
+        command[command.index(str(cpp_source))] = str(package / (name + '.cpp'))
+        command[command.index('-o') + 1] = str(out / (name + '.o'))
+        subprocess.run([*command, '-Wno-deprecated-volatile', '-Wno-deprecated-anon-enum-enum-conversion',
+                        '-Wno-missing-field-initializers', '-Wno-sign-compare'],
+                       cwd=cpp_directory, stdout=log, stderr=subprocess.STDOUT, check=True)
+    llvm = Path(subprocess.check_output(['brew', '--prefix', 'llvm'], text=True).strip()) / 'bin'
+    subprocess.run([str(llvm / 'llvm-objcopy'), '--remove-section=__DATA,__mod_init_func',
+                    '--globalize-symbol=__GLOBAL__sub_I_T970AudioService.cpp',
+                    str(out / 'T970AudioService.o'), str(out / 'T970AudioService.late.o')], check=True)
+    sdk = Path(subprocess.check_output(['xcrun', '--sdk', 'iphoneos', 'clang', '--print-resource-dir'],
+                                       text=True).strip())
+    runtime = out / 'compiler-rt-arm64.a'
+    subprocess.run(['xcrun', 'lipo', '-thin', 'arm64', sdk / 'lib/darwin/libclang_rt.cc_kext_ios.a',
+                    '-output', runtime], check=True)
+    helpers = ('udivti3.c.o', 'udivmodti4.c.o')
+    subprocess.run([llvm / 'llvm-ar', 'x', runtime, *helpers], cwd=out, check=True)
+    return [*(name + '.o' for name in c_names),
+            *(name + ('.late.o' if name == 'T970AudioService' else '.o') for name in cpp_names), *helpers]
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--tree', type=Path, required=True)
     p.add_argument('--gop-object', type=Path, required=True)
     p.add_argument('--output', type=Path, required=True)
     p.add_argument('--touch-hid', action='store_true')
+    p.add_argument('--haptics', action='store_true', help='build the shared RPMh adapter and late haptics object')
+    p.add_argument('--usb-device', action='store_true', help='wire a separately built QcomDwc3 archive into startup')
+    p.add_argument('--wireless', action='store_true', help='wire separately built wireless archives into startup')
+    p.add_argument('--dsp', action='store_true', help='wire separately built audio and sensor archives into startup')
     p.add_argument('--gpu-soc', type=Path, help='Pinned SM8250 checkout for the GPU power snapshot')
     p.add_argument('--arm-smmu4k', type=Path, help='ArmSmmu4K Git repository for the GMU table probe')
     p.add_argument('--gmu-firmware', type=Path, help='a650_gmu.bin matching the T970 firmware inventory')
@@ -51,6 +102,8 @@ def main():
     a = p.parse_args()
     if a.arm_smmu4k and not a.gpu_soc:
         p.error('--arm-smmu4k requires --gpu-soc')
+    if (a.usb_device or a.wireless or a.dsp) and not a.haptics:
+        p.error('--usb-device, --wireless and --dsp require the shared RPMh adapter from --haptics')
     if a.gmu_firmware and not a.arm_smmu4k:
         p.error('--gmu-firmware requires --arm-smmu4k')
     if a.sqe_firmware and not a.gmu_firmware:
@@ -105,6 +158,14 @@ def main():
                     '-I', str(tree / '.cache/xnu-work/osfmk')])
     if a.touch_hid:
         command.append('-DT970_TOUCH_HID=1')
+    if a.haptics:
+        command.append('-DT970_PERIPHERAL_RPMH=1')
+    if a.usb_device:
+        command.append('-DT970_USB_DEVICE=1')
+    if a.wireless:
+        command.append('-DT970_WIRELESS=1')
+    if a.dsp:
+        command.append('-DT970_DSP=1')
     if a.gpu_soc:
         command.extend(['-DT970_GPU_POWER_SNAPSHOT=1', '-I', str(gpu_kit)])
     with (out / 'compile.log').open('w') as log:
@@ -134,6 +195,20 @@ def main():
                 command.append('-DT970_GPU_SQE_FIRMWARE=1')
         (out / 'command.json').write_text(json.dumps(command, indent=2)+'\n')
         subprocess.run(command, cwd=r['directory'], stdout=log, stderr=subprocess.STDOUT, check=True)
+        if a.haptics:
+            for relative in ('package/T970Power/Rpmh.cpp', 'reference/gts7xlwifi/package/T970Haptics.cpp'):
+                peripheral = DEVICE / relative
+                args = command.copy()
+                args[args.index(str(source))] = str(peripheral)
+                args[args.index('-o') + 1] = str(out / peripheral.with_suffix('.o').name)
+                subprocess.run([*args, '-Wno-deprecated-volatile'], cwd=r['directory'],
+                               stdout=log, stderr=subprocess.STDOUT, check=True)
+            llvm = subprocess.check_output(['brew', '--prefix', 'llvm'], text=True).strip()
+            subprocess.run([str(Path(llvm) / 'bin/llvm-objcopy'), '--remove-section=__DATA,__mod_init_func',
+                            '--globalize-symbol=__GLOBAL__sub_I_T970Haptics.cpp',
+                            str(out / 'T970Haptics.o'), str(out / 'T970Haptics.late.o')], check=True)
+        if a.dsp:
+            dsp_objects = compile_dsp(tree, out, command, source, r['directory'], log)
     undefined = set(subprocess.check_output(['xcrun', 'nm', '-u', str(a.gop_object)], text=True).split())
     defined = {line.split()[-1] for line in subprocess.check_output(
         ['xcrun', 'nm', '-gU', str(obj)], text=True).splitlines() if line.split()}
@@ -149,6 +224,10 @@ def main():
                   gop_object_sha256=sha(a.gop_object), board_callbacks_resolved=sorted(hooks & defined),
                   pending_original_aliases=sorted(missing), compiled=True, linked=False,
                   runtime_display_verified=False)
+    if a.haptics:
+        report['haptics_objects'] = {name: sha(out / name) for name in ('Rpmh.o', 'T970Haptics.late.o')}
+    if a.dsp:
+        report['dsp_objects'] = {name: sha(out / name) for name in dsp_objects}
     if a.gpu_soc:
         report['gpu_soc_revision'] = pin
         report['gpu_soc_header_sha256'] = sha(gpu_header)

@@ -1,0 +1,23 @@
+{
+  "action": "clear Android bootloader control block in MISC to restore normal Boot path",
+  "device": "SM-T970 / gts7xlwifi",
+  "reason": "The RECOVERY partition holds a UniXNU iPadOS image, so the boot-recovery command written by adb reboot recovery on 2026-11-08 was never consumed or cleared; every boot was routed to RECOVERY instead of BOOT (MinsOS/One UI).",
+  "image": "out/dual-system/clear-bcb/misc-clean.img",
+  "image_sha256": "64c814d07a23c8274521bc650e11895cffd3d036831429c4e22748ba79db579c",
+  "image_bytes": 1048576,
+  "image_source": "out/dual-system/pre-minsos-20261108/misc.img (BCB region zero, unchanged in the MISC partition)",
+  "pit_partition": "MISC",
+  "pit_partition_size": "256 blocks x 4096 = 1048576 bytes",
+  "command": ".cache/heimdall/build/bin/heimdall flash --MISC out/dual-system/clear-bcb/misc-clean.img --no-reboot",
+  "heimdall": "v1.4.2",
+  "upload_reported": "MISC upload successful",
+  "session_end_confirmed": false,
+  "heimdall_exit": 1,
+  "partition_readback": false,
+  "partitions_touched": ["MISC"],
+  "boot_partition": "unchanged (MinsOS boot.img, 52170768 bytes, sha256 5e206cde1b38078fa858f219cffc5ad19f92cbca545cbb0c882068d13c595805)",
+  "recovery_partition": "unchanged (UniXNU dual-system GPU streams mode 34 image)",
+  "notes": "Heimdall 1.4.2 reports the session-end confirmation failure after a successful upload on this device; it also occurred on 2026-11-08 and does not change the upload result. Device observation of the next normal boot pending.",
+  "flash_log_sha256": "e067af3a535d0d82f5157789008d626fe7587636b4db5c7064f5614886fe1e5a",
+  "device_observed": null
+}

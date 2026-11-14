@@ -40,3 +40,5 @@ t970-battery-power.patch
 t970-report-buffer.patch
 # v87 failed on device: only EFI-owned memory may enter the managed range.
 # t970-8g-managed-range.patch is retained as historical evidence, not applied.
+
+t970-shutdown-failsafe.patch

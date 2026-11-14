@@ -28,6 +28,8 @@ struct GaugeSample {
     bool writeApplied = false;
     const char *chargeResult = "none";
     uint8_t chargeReadback06 = 0;
+    int usbRoute = 0;
+    uint8_t usbCc = 0;
 };
 
 // Optional charger action for one read session. The read re-checks the guards
@@ -35,7 +37,38 @@ struct GaugeSample {
 struct GaugeAction {
     bool enableCharging = false;
     bool disableCharging = false;
+    bool routeUsb = false;
 };
+
+static int routeMuicToUsb(t970_touch::ProbeBus &bus, uint8_t &cc)
+{
+    // MAX77705 CONTROL1 opcodes as used by the same-model USB port.
+    auto opcode = [&bus](uint8_t op, bool set, uint8_t &value) {
+        uint8_t request[] = {0x21, op, value};
+        uint8_t end[] = {0x41, 0};
+        if (!bus.transfer(request, set ? 3 : 2) || !bus.transfer(end, 2)) return false;
+        const uint8_t response = 0x51;
+        for (unsigned attempt = 0; attempt < 10; ++attempt) {
+            uint8_t reply[2] = {};
+            IOSleep(10);
+            if (!bus.transfer(&response, 1, reply, sizeof(reply))) return false;
+            if (reply[0] == op) {
+                value = reply[1];
+                return true;
+            }
+        }
+        return false;
+    };
+    uint8_t ccRegister = 0x0a;
+    (void)bus.transfer(&ccRegister, 1, &cc, 1);
+    uint8_t value = 0;
+    (void)opcode(0x07, false, value);
+    if (!opcode(0x05, false, value)) return -3;
+    if (value == 0x09) return 3;
+    value = 0x09;
+    if (!opcode(0x06, true, value)) return -4;
+    return opcode(0x05, false, value) && value == 0x09 ? 2 : -5;
+}
 
 static bool writeChargerRegister(t970_touch::ProbeBus &bus, uint8_t reg, uint8_t value,
                                  uint8_t &readback) {
@@ -204,6 +237,10 @@ static bool readGaugeSample(GaugeSample &sample, const GaugeAction *action = nul
                         applyChargerAction(sample, *action, *pins);
                     }
                 }
+            }
+            if (action && action->routeUsb) {
+                t970_touch::ProbeBus muic(*pins, 0x25);
+                sample.usbRoute = routeMuicToUsb(muic, sample.usbCc);
             }
         }
     }

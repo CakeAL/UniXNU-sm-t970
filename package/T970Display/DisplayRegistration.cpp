@@ -32,6 +32,21 @@ extern "C" void t970_keystore_start(void);
 extern "C" void native_t970_keystore_state(char *, unsigned);
 extern "C" void native_t970_key_start(void) __attribute__((weak_import));
 extern "C" void native_t970_key_state(char *, unsigned) __attribute__((weak_import));
+#if defined(T970_PERIPHERAL_RPMH)
+extern "C" void t970_haptics_start();
+#endif
+#if defined(T970_USB_DEVICE)
+extern "C" void t970_usb_start();
+#endif
+#if defined(T970_WIRELESS)
+extern "C" void t970_wifi_start();
+extern "C" void t970_bluetooth_start();
+#endif
+#if defined(T970_DSP)
+extern "C" void t970_audio_start();
+extern "C" void t970_adsp_start();
+extern "C" void t970_sensors_start();
+#endif
 
 static IOService *pendingDisplay;
 static IOService *activeDisplay;
@@ -241,6 +256,21 @@ extern "C" void native_legacy_display_late_probe(void) {
         IOLog("T970 display: CPU framebuffer service ready 2800x1752 stride=%lu\n", video.v_rowBytes);
 #if defined(T970_TOUCH_HID)
         t970_touch::startHid();
+#endif
+#if defined(T970_PERIPHERAL_RPMH)
+        t970_haptics_start();
+#endif
+#if defined(T970_USB_DEVICE)
+        t970_usb_start();
+#endif
+#if defined(T970_WIRELESS)
+        t970_wifi_start();
+        t970_bluetooth_start();
+#endif
+#if defined(T970_DSP)
+        t970_audio_start();
+        t970_adsp_start();
+        t970_sensors_start();
 #endif
         return;
     }

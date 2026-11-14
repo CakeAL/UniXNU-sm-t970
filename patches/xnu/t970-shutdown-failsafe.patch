@@ -1,0 +1,32 @@
+--- a/bsd/kern/kern_shutdown.c
++++ b/bsd/kern/kern_shutdown.c
+@@ -85,6 +85,14 @@
+ static int  sd_closelog(vfs_context_t);
+ static void sd_log(vfs_context_t, const char *, ...);
+ static void proc_shutdown(int only_non_dext);
++extern void t970_shutdown_failsafe(int howto) __attribute__((weak_import));
++static int
++t970_shutdown_check_mount(mount_t mount, void *context)
++{
++	if (vfs_isrdonly(mount)) return VFS_RETURNED;
++	*(bool *)context = true;
++	return VFS_RETURNED_DONE;
++}
+ static void zprint_panic_info(void);
+ extern void halt_log_enter(const char * what, const void * pc, uint64_t time);
+ 
+@@ -274,6 +282,14 @@
+ 		}
+ 
+ 		IOSystemShutdownNotification(howto, kIOSystemShutdownNotificationTerminateDEXTs);
++
++		/* The non-system unmount pass can time out. Arm only when no
++		 * writable mount remains, so the iPadOS Data overlay is quiesced. */
++		if (t970_shutdown_failsafe) {
++			bool writable = false;
++			vfs_iterate(0, t970_shutdown_check_mount, &writable);
++			if (!writable) t970_shutdown_failsafe(howto);
++		}
+ 
+ 		startTime = mach_absolute_time();
+ 		proc_shutdown(FALSE);

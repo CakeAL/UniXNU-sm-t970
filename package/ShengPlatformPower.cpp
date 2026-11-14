@@ -8,6 +8,8 @@
 #include <libkern/c++/OSSymbol.h>
 #include <mach/kmod.h>
 #include <pexpert/pexpert.h>
+#include <kern/thread_call.h>
+#include <kern/clock.h>
 
 extern "C" {
 extern kmod_info_t g_kernel_kmod_info;
@@ -20,6 +22,69 @@ void sheng_original_pmgr_nub_write(IOService *, uint64_t);
 // read-after,own-before,own-after,nub-before,nub-after,attached,registered,mode.
 volatile uint64_t sheng_pmgr_observation[16];
 __attribute__((noinline)) void sheng_pmgr_checkpoint(void) { __asm__ volatile("" ::: "memory"); }
+}
+
+// gts7xlwifi periph15: shutdown and restart, as SM-T733's ShengPlatformPower (46l "正常关机"). periph14 stopped after launchd's
+// DOMAIN_DEACTIVATE: nothing answered PE_halt_restart. launchd and the kernel have synced and unmounted the volumes by then (APFS
+// barriers reach the UFS driver's cache flush), so this only asks the secure monitor: PSCI SYSTEM_OFF (0x84000008) for a halt,
+// SYSTEM_RESET (0x84000009) for a restart or a panic restart. A return means the monitor refused; the kernel's own loop then holds.
+extern "C" int (*PE_halt_restart)(unsigned int);
+extern "C" volatile uint64_t t970_halt_restart_seen[2];
+volatile uint64_t t970_halt_restart_seen[2];
+// gts7xlwifi: the speaker amplifiers mute and power down first (T970Audio.cpp), or the speakers pop as the supply drops. Not on a panic.
+extern "C" __attribute__((weak)) void t970_audio_quiesce(void) {}
+static int t970_halt_restart(unsigned type)
+{
+  uint64_t function;
+  switch (type) {
+    case kPEHaltCPU:
+    case kPEUPSDelayHaltCPU:
+      function = 0x84000008;
+      break;
+    case kPERestartCPU:
+    case kPEPanicRestartCPU:
+      function = 0x84000009;
+      break;
+    default:
+      return 0;
+  }
+  t970_halt_restart_seen[0] = type;
+  if (type != kPEPanicRestartCPU) t970_audio_quiesce();
+  register uint64_t x0 __asm__("x0") = function;
+  register uint64_t x1 __asm__("x1") = 0;
+  register uint64_t x2 __asm__("x2") = 0;
+  register uint64_t x3 __asm__("x3") = 0;
+  __asm__ volatile("dsb sy\n\tsmc #0" : "+r"(x0), "+r"(x1), "+r"(x2), "+r"(x3) : : "memory");
+  t970_halt_restart_seen[1] = x0;
+  return -1;
+}
+
+// gts7xlwifi: shutdown failsafe (patches/xnu/t970-shutdown-failsafe.patch). The kernel calls this after the writable volumes are
+// unmounted and IOServicePH::systemHalt; periph15 then waited for minutes in vfs_unmountall(system) on the sealed OS volume and the
+// screen stayed on. Nothing writable is mounted at that point, so after the configured delay the PSCI call is made from here.
+// t970_halt_restart_seen[0] gets 0x100 | type when the failsafe made the call; t970-shutdown-wait=SECS changes the delay (0 = off).
+static constexpr int kRbHalt = 0x08, kRbPanic = 0x800;
+static thread_call_t t970_failsafe_call;
+static void t970_failsafe_fire(thread_call_param_t howto, thread_call_param_t)
+{
+  const unsigned type = (static_cast<int>(reinterpret_cast<uintptr_t>(howto)) & kRbHalt) ? kPEHaltCPU : kPERestartCPU;
+  IOLog("T970PlatformPower: shutdown stalled after unmount, PSCI %s\n", type == kPEHaltCPU ? "off" : "reset");
+  t970_halt_restart_seen[1] = 0;
+  t970_halt_restart(type);
+  t970_halt_restart_seen[0] = 0x100 | type;
+}
+extern "C" void t970_shutdown_failsafe(int howto)
+{
+  unsigned seconds = 0;
+  PE_parse_boot_argn("t970-shutdown-wait", &seconds, sizeof(seconds));
+  if (!seconds || (howto & kRbPanic) || t970_failsafe_call || PE_halt_restart != t970_halt_restart) return;
+  t970_failsafe_call = thread_call_allocate_with_options(t970_failsafe_fire, reinterpret_cast<thread_call_param_t>(static_cast<uintptr_t>(howto)),
+                                                         THREAD_CALL_PRIORITY_KERNEL_HIGH, 0);
+  if (!t970_failsafe_call) return;
+  uint64_t deadline = 0;
+  clock_interval_to_deadline(seconds, kSecondScale, &deadline);
+  thread_call_enter_delayed(t970_failsafe_call, deadline);
+  IOLog("T970PlatformPower: shutdown failsafe armed, %u s\n", seconds);
 }
 
 __attribute__((noreturn)) static void unavailable(unsigned slot)
@@ -124,6 +189,9 @@ extern "C" void sheng_pmgr_run(void)
       }
       provider->registerService(kIOServiceSynchronous);
       nub->registerService(kIOServiceSynchronous);
+      unsigned shutdownWait = 0;
+      if (PE_parse_boot_argn("t970-shutdown-wait", &shutdownWait, sizeof(shutdownWait)) && shutdownWait)
+        PE_halt_restart = t970_halt_restart;
       sheng_pmgr_observation[0] = 5;
       sheng_pmgr_observation[13] = nub->getProvider() == provider && provider->getProvider() == platform;
       sheng_pmgr_observation[14] = (nub->getState() & provider->getState()) & kIOServiceRegisteredState;

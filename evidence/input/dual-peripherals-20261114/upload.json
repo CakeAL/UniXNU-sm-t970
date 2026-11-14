@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-11-14T19:56:44+08:00",
+  "revision": "1a74b0df6e9770aa4c852fe439856d6c51502b35",
+  "image": "out/dual-system/usb-20261114/recovery-usb.img",
+  "bytes": 86888448,
+  "sha256": "c5e1456ad05ed1093158b1cde04bf886967db9f844bad9ab71e4bac0cc4237b3",
+  "target": "RECOVERY",
+  "pit": {
+    "id": 23,
+    "start": 122131,
+    "blocks": 21213,
+    "logical_block_bytes": 4096,
+    "sha256": "c93b77232ff926d01a18ea890ea419bbc150d20453b3552021d1114ca37e73b3"
+  },
+  "command": ".cache/heimdall/build/bin/heimdall flash --RECOVERY out/dual-system/usb-20261114/recovery-usb.img --no-reboot",
+  "result": "RECOVERY upload successful",
+  "exit_code": 0,
+  "partition_readback": false,
+  "host_log": "out/dual-system/usb-20261114/flash-recovery-fresh.log",
+  "host_log_sha256": "494b1ad8b8e791d7ace23b484e57a4cb4a9ee977b61cafd0b47f5e1e13272ac0",
+  "rollback_image": "out/dual-system/gpu-streams-20261111/recovery-gpu-streams.img",
+  "rollback_sha256": "05e003312a45ab0b0e5745c6a53797776d4a784abd2271ac9be0777fb310a6e9"
+}

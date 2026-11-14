@@ -45,7 +45,7 @@ class ProbeBus {
 public:
     const char *fault="none";
     ProbeBus(IOMemoryMap &,uint8_t a):address(a){}
-    bool transfer(const uint8_t *command,unsigned count,uint8_t *data,unsigned size) {
+    bool transfer(const uint8_t *command,unsigned count,uint8_t *data=nullptr,unsigned size=0) {
         assert(count==1 || count==2);
         assert(pins.cfg[0]==3 && pins.cfg[1]==3 && pins.io[0]==1 && pins.io[1]==1);
         ++transfers;
@@ -68,6 +68,7 @@ public:
 };
 }
 static void IODelay(unsigned us){assert(us==100);}
+static void IOSleep(unsigned ms){assert(ms==10);}
 '''
         cases = r'''
 int main() {
