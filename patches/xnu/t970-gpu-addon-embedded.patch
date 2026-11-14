@@ -6,8 +6,8 @@
  extern int native_ram_block_gpu_addon(const uint8_t **, uint64_t *) __attribute__((weak_import));
 +/* gts7xlwifi: the board's DarwinBoot hands no GpuAddon over, so the kernel image carries the addon
 + * (package/T970GpuAddon.S, the bytes of scripts/make-gpu-addon.py's output) and is used when the loader gave none. */
-+extern const uint8_t t970_gpu_addon_data[] __attribute__((weak));
-+extern const uint64_t t970_gpu_addon_size __attribute__((weak));
++extern const uint8_t t970_gpu_addon_data[] __attribute__((weak_import));
++extern const uint64_t t970_gpu_addon_size __attribute__((weak_import));
  #include <libkern/zlib.h>
  /* zlib's state, from kalloc with its size in front (the default allocator of the kernel's zlib is not meant for this). */
  static voidpf
