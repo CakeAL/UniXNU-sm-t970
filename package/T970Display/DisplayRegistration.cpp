@@ -185,6 +185,8 @@ extern "C" void native_legacy_display_probe(void) {
     IOLog("T970 display: initialized original Legacy, waiting for IOBSD\n");
 }
 
+extern "C" void t970_touch_bridge_start(void);
+
 extern "C" void native_legacy_display_late_probe(void) {
     IOService *display = pendingDisplay;
     if (!display) {
@@ -254,6 +256,7 @@ extern "C" void native_legacy_display_late_probe(void) {
         activeProvider = provider;
         OSSafeReleaseNULL(treeParent);
         IOLog("T970 display: CPU framebuffer service ready 2800x1752 stride=%lu\n", video.v_rowBytes);
+        t970_touch_bridge_start();
 #if defined(T970_TOUCH_HID)
         t970_touch::startHid();
 #endif
