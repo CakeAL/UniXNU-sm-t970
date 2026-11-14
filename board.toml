@@ -49,7 +49,9 @@ archives = [
   "build-gop-legacy-display.py",
   # The A650 kernel GPU driver (drivers/Adreno650, FFT-infra/Adreno650 bdee54c as UniXNU-alioth) with the kits it needs and the
   # board probe (package/GpuProbe.cpp, pipa-gpu=<n>) and this tablet's firmware (package/GpuFirmwareA650.c).
-  "build-adreno650.py",
+  # GPU archive needs a650_zap.mdt/.b0N, which this tablet's vendor image does not ship;
+  # it stays the M5 item of docs/board-package-migration.md.
+  # "build-adreno650.py",
   # The CDC-ACM debug console over the DWC3 the bootloader leaves in DEVICE mode (drivers/QcomXnuUsbDebug).
   "build-qcom-usb-debug.py",
   # Apple's own USB device stack on the DWC3 (drivers/QcomDwc3 SM8250 port + package/T970UsbProbe.cpp, t970-usb=<bits>), bound to
