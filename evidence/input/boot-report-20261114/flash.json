@@ -1,0 +1,13 @@
+{
+  "image": "out/dual-system/boot-report-20261114/recovery-boot-report.img",
+  "bytes": 86888448,
+  "sha256": "c8d7f989ac43ce4d58acfa09e7b9737bd553974d628522f05b8aea9837c16eb3",
+  "kernel_sha256": "0f37267c7af40344cbd312c2e517b39248575ae79d235e36527e72407cdb32de",
+  "partitions": [
+    "RECOVERY"
+  ],
+  "result": "RECOVERY upload successful",
+  "rollback": "out/dual-system/port-all-v3-20261114/recovery-port-all-v3.img",
+  "change": "BootProgress/BootLog/BootDiagExport/BootFaultProbe/BootReset/BootWatchdogPolicy plus weak stubs linked; kernel boot_progress hooks and exported header in place",
+  "timestamp": "2026-11-14T23:58:25.226136+08:00"
+}
