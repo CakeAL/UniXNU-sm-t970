@@ -1,0 +1,22 @@
+{
+  "candidate": "out/dual-system/touch-core-20261114/recovery-touch.img",
+  "image_sha256": "0ef080acad197353074b754dc3ca631daf65a702a2a2b73c3f5d5f05a43a489d",
+  "image_size": 86888448,
+  "kernel_sha256": "7dba4695e2dc9c7d8135f2362e132f55ed979f04f6e3fd0be121e5f8c9aadabf",
+  "kernel_size": 52727808,
+  "target": "RECOVERY",
+  "result": "RECOVERY upload successful",
+  "exit": 0,
+  "features": [
+    "touchcore",
+    "touchbridge",
+    "haptics",
+    "pen",
+    "usb",
+    "shutdown",
+    "datapersist",
+    "metal-addon(pending)"
+  ],
+  "flash_log": "out/dual-system/touch-core-20261114/flash.log",
+  "recorded": "2026-11-14T22:48:47+08:00"
+}
