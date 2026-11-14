@@ -1,0 +1,13 @@
+{
+  "image": "out/dual-system/touch-late-20261114/recovery-touch-late.img",
+  "bytes": 86888448,
+  "sha256": "2b15baf2ba3970c738bf259cf8edd5bd6b08172483f6356bf0eab714b818c25b",
+  "kernel_sha256": "5c4d394f75e3512535dbad70e9e91af3c75fa53002512efe60b17593e1c9e771",
+  "partitions": [
+    "RECOVERY"
+  ],
+  "result": "RECOVERY upload successful",
+  "rollback": "out/dual-system/port-all-v3-20261114/recovery-port-all-v3.img",
+  "change": "touch start restored after display readiness; FTS core starts before the HID publisher inside the bridge",
+  "timestamp": "2026-11-14T23:38:25.257424+08:00"
+}
