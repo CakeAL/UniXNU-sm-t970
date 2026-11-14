@@ -1259,7 +1259,7 @@ static unsigned storeMode (void)
   static int cached = -1;
   if (cached < 0) {
     uint32_t value = 0;
-    if (!PE_parse_boot_argn ("data-persist", &value, sizeof (value)) || value > 2) value = 0;
+    if (!PE_parse_boot_argn ("sheng-data-persist", &value, sizeof (value)) || value > 2) value = 0;
     cached = static_cast<int> (value);
   }
   return static_cast<unsigned> (cached);
@@ -1273,25 +1273,171 @@ extern "C" int native_ufs_dpu_window_build (uintptr_t smmu) { return dpuWindowBu
 extern "C" uintptr_t native_ufs_smmu_base (void) { return gHost.smmu; }
 extern "C" unsigned native_ufs_store_mode (void) { return storeMode (); }
 
-// Returns 1 and the first absolute 4096-byte LBA of the window, 0 on refusal (reason in *why, may be null).
+#if defined(NATIVE_VERIFIED_BLOCK) && NATIVE_VERIFIED_BLOCK
+// Owner policy carrier. The two windows need 47,481,664 + 25,805,344 bytes of signed block hashes,
+// against an 86,888,448-byte RECOVERY partition, so the envelopes cannot be linked into the kernel. They
+// live in a fixed unixnu region after the root image (which ends at LBA 5260288) and the kernel
+// links only the owner public-key anchor: vr_open authenticates each envelope before its entry is
+// added, so no window can publish against bytes the owner did not sign.
+// The recovery writer uses partition-relative LBAs. Add the validated GPT start to address LUN 0.
+extern "C" void native_verified_policy_count_set (uint64_t);
+static uint64_t gCarrierCountSeen, gCarrierTable0Seen, gCarrierBytes1Seen;
+constexpr uint64_t kOwnerPolicyLbaOS = 5505024ULL;
+constexpr uint64_t kOwnerPolicyLbaSystemOS = 5516624ULL;
+constexpr uint64_t kOwnerPolicyHeaderBytes = 160, kOwnerPolicySignatureBytes = 384;
+// Boot-lifetime ownership stays with the carrier. Block devices borrow only exact registered
+// allocations; their readonly vr_view and private readonly key still authenticate every read.
+struct OwnerCarrierStorage {
+  const uint8_t *manifest = nullptr;
+  uint64_t length = 0;
+  vm_size_t allocation = 0;
+};
+static OwnerCarrierStorage gOwnerCarrierStorage[2];
+extern "C" {
+volatile uint64_t native_ufs_policy_pinned_bytes = 0;
+volatile uint64_t native_ufs_policy_borrowed_bytes = 0;
+volatile uint64_t native_ufs_policy_copied_bytes = 0;
+}
+static bool readOwnerEnvelope (uint64_t lba, uint64_t lastLba, uint64_t expectedImageBytes, const char **why,
+                               uint8_t **outBytes, uint64_t *outLength)
+{
+  if (lba > lastLba) {
+    *why = "policy header outside root partition";
+    return false;
+  }
+  uint8_t header[4096];
+  if (hostRead4k (0, lba, 1, header) != kIOReturnSuccess) {
+    *why = "policy header read";
+    return false;
+  }
+  uint32_t headerBytes = 0, blockBytes = 0;
+  uint64_t imageBytes = 0, blocks = 0;
+  memcpy (&headerBytes, header + 12, 4);
+  memcpy (&blockBytes, header + 16, 4);
+  memcpy (&imageBytes, header + 24, 8);
+  memcpy (&blocks, header + 32, 8);
+  if (memcmp (header, "VROOT01\0", 8) || headerBytes != kOwnerPolicyHeaderBytes ||
+      blockBytes != 4096 || !blocks || blocks > 0x400000) {
+    memcpy (&gRootDiagnostic.magic0, header, 4);
+    memcpy (&gRootDiagnostic.magic1, header + 4, 4);
+    gRootDiagnostic.cap = headerBytes;
+    gRootDiagnostic.version = blockBytes;
+    gRootDiagnostic.windowBytes = imageBytes;
+    gRootDiagnostic.policyCount = blocks;
+    *why = "policy header format";
+    return false;
+  }
+  if (imageBytes != expectedImageBytes || blocks != (expectedImageBytes + 4095) / 4096) {
+    *why = "policy capacity";
+    return false;
+  }
+  const uint64_t length = kOwnerPolicyHeaderBytes + kOwnerPolicySignatureBytes + blocks * 32;
+  const uint64_t totalBlocks = (length + 4095) / 4096;
+  if (totalBlocks - 1 > lastLba - lba) {
+    *why = "policy envelope outside root partition";
+    return false;
+  }
+  vm_size_t allocation = round_page (static_cast<vm_size_t> (length));
+  if (allocation < length) {
+    *why = "policy length";
+    return false;
+  }
+  vm_offset_t address = 0;
+  if (kmem_alloc (kernel_map, &address, allocation, static_cast<kma_flags_t> (KMA_KOBJECT | KMA_DATA),
+                  VM_KERN_MEMORY_SECURITY) != KERN_SUCCESS || !address) {
+    *why = "policy allocation";
+    return false;
+  }
+  uint8_t *bytes = reinterpret_cast<uint8_t *> (address);
+  for (uint64_t at = 0; at < totalBlocks;) {
+    const uint32_t chunk = static_cast<uint32_t> (totalBlocks - at > 32 ? 32 : totalBlocks - at);
+    if (hostRead4k (0, lba + at, chunk, bytes + at * 4096) != kIOReturnSuccess) {
+      *why = "policy read";
+      return false;
+    }
+    at += chunk;
+  }
+  *outBytes = bytes;
+  *outLength = length;
+  return true;
+}
+
+// Fills the linked policy table from the two signed envelopes. Both must authenticate before any
+// entry is added, so a single bad envelope leaves publication fail-closed.
+static bool installOwnerPolicyCarrier (uint64_t firstLba, uint64_t lastLba, const char **why)
+{
+  static const struct { uint64_t lba, imageBytes; } envelope[2] = {
+    { kOwnerPolicyLbaOS, 6077580800ULL },
+    { kOwnerPolicyLbaSystemOS, 3303014400ULL },
+  };
+  NativeVerifiedBlockPolicy *table =
+    const_cast<NativeVerifiedBlockPolicy *> (verified_root_policies);
+  uint64_t *count = const_cast<uint64_t *> (&verified_root_policy_count);  // addressed for read-back only
+  for (unsigned index = 0; index < 2; ++index) {
+    uint8_t *bytes = nullptr;
+    uint64_t length = 0;
+    if (!readOwnerEnvelope (firstLba + envelope[index].lba, lastLba,
+                            envelope[index].imageBytes, why, &bytes, &length)) {
+      return false;
+    }
+    struct vr_view view = {};
+    const int status = vr_open (bytes, length, verified_root_key, 1, &vr_xnu_crypto, &view);
+    gRootDiagnostic.verify = static_cast<uint32_t> (status);
+    if (status != VR_OK || view.image_bytes != envelope[index].imageBytes ||
+        kOwnerPolicyHeaderBytes + kOwnerPolicySignatureBytes + view.block_count * 32 != length) {
+      *why = "policy signature";
+      return false;
+    }
+    gOwnerCarrierStorage[index] = { bytes, length, round_page (static_cast<vm_size_t> (length)) };
+    native_ufs_policy_pinned_bytes += gOwnerCarrierStorage[index].allocation;
+    table[index].manifest = bytes;
+    table[index].manifestBytes = length;
+    // A store through a const object is undefined behaviour and clang drops it, which is why the
+    // count stayed zero while the pointers stuck. The setter lives in assembly so the write is
+    // opaque to the optimiser.
+    native_verified_policy_count_set (index + 1);
+  }
+  // Read the symbols back: a write that the verifier cannot see would otherwise look identical to
+  // a carrier that never ran, and the publication stop prints these values.
+  gCarrierCountSeen = *reinterpret_cast<volatile uint64_t *> (count);
+  gCarrierTable0Seen = reinterpret_cast<uint64_t> (table[0].manifest);
+  gCarrierBytes1Seen = table[1].manifestBytes;
+  gRootDiagnostic.policyCount = 2;
+  return true;
+}
+#endif
+
+#include "T970DataWindow.h"
+extern "C" uint8_t native_ram_block_seed_sha256[32] __attribute__((weak_import));
+extern "C" unsigned native_ufs_store_gpt_check (void);
+
+// Returns 1 and the first absolute 4096-byte LBA of the window, 0 on refusal.
 extern "C" int native_ufs_store_open (uint64_t blocks, uint64_t *firstLba, const char **why)
 {
+  const unsigned mode = storeMode ();
+  uint32_t reset = 0, legacyReset = 0;
+  PE_parse_boot_argn ("sheng-data-reset", &reset, sizeof (reset));
+  PE_parse_boot_argn ("data-reset", &legacyReset, sizeof (legacyReset));
   const char *reason = "";
+  uint64_t first = 0;
+  int headerState = -1;
   int ok = 0;
-  if (!storeMode ()) reason = "off";
+  if (!mode) reason = "off";
   else if (!gStoreGeometry.valid || !gHost.ready) reason = "no root layout";
   else if (gStoreRegionBlocks) reason = "already open";
+  else if (!(first = t970DataFirst (1, reset | legacyReset, gStoreGeometry.first, gStoreGeometry.last,
+                                  gStoreGeometry.imageBytes, blocks, reserveBlocks ()))) {
+    reason = "requires the reviewed unixnu layout and 512 MiB seed";
+  } else if (native_ufs_store_gpt_check ()) reason = "GPT changed or unreadable";
   else {
-    uint64_t partition = gStoreGeometry.last - gStoreGeometry.first + 1;
-    uint64_t imageBlocks = (gStoreGeometry.imageBytes + 4095) / 4096;
-    const uint64_t reserve = reserveBlocks ();
-    if (!blocks || reserve >= partition || blocks > partition - reserve) reason = "size";
-    else if (partition - blocks - reserve < imageBlocks + 1024) reason = "overlaps the root image";
+    uint8_t header[4096];
+    if (!native_ram_block_seed_sha256 || hostRead4k (0, first, 1, header) != kIOReturnSuccess) {
+      reason = "seed identity or store header unavailable";
+    }
     else {
-      // The reserve at the end of the partition belongs to the diagnostic log (its last 32 MiB, with the export region below them);
-      // the store ends just below it.
-      uint64_t first = gStoreGeometry.last + 1 - reserve - blocks;
-      if (storeMode () == 2 && !hostStoreOpen (first, blocks)) reason = "window refused";
+      headerState = t970DataHeaderState (header, native_ram_block_seed_sha256);
+      if (headerState < 0) reason = "store header is foreign, damaged or for another seed";
+      else if (mode == 2 && !hostStoreOpen (first, blocks)) reason = "window refused";
       else {
         gStoreRegionFirst = first;
         gStoreRegionBlocks = blocks;
@@ -1300,6 +1446,10 @@ extern "C" int native_ufs_store_open (uint64_t blocks, uint64_t *firstLba, const
       }
     }
   }
+  uint32_t probe = 0;
+  if (mode == 1 && PE_parse_boot_argn ("t970-data-probe", &probe, sizeof (probe)) && probe == 1)
+    panic ("T970 Data probe: ok=%d header=%d\nLBA=%llu blocks=%llu\n%s", ok, headerState, first, blocks, reason);
+  if (mode == 2 && !ok) panic ("T970 Data: %s", reason);
   if (why) *why = reason;
   return ok;
 }
@@ -1767,113 +1917,6 @@ static bool ufsHasAncestor (IORegistryEntry *entry, const IORegistryEntry *ances
 // diskX after that. Override the final BSD name only after this media is
 // reachable from our exact whole-userdata block device.
 // ---- gts7xlwifi: persistent Data container after the SHNGROOT image ----------------------------------------------
-// The partition holds the SHNGROOT root image (manifest, OS, SystemOS) and, from the image's end to the partition's end,
-// one original Apple APFS container whose Data volume is mounted read-write as /private/var. The container is published
-// through the whole-userdata block class on the single root route, so every access is confined to that range by
-// hostInRoot() and writes need ufsrw=1. Nothing here touches the image windows or any other partition.
-static NativeUfsWholeUserdataBlock *gT970DataDevice;
-
-static bool t970PublishData (IOService *owner, const RootLayout *layout)
-{
-  uint32_t enabled = 0, rw = 0;
-  if (!PE_parse_boot_argn ("t970-ufs-data", &enabled, sizeof (enabled)) || enabled != 1) return true;
-  PE_parse_boot_argn ("ufsrw", &rw, sizeof (rw));
-  if (!layout->imageBytes || (layout->imageBytes & 4095)) {
-    IOLog ("NativeUfs: t970 Data refused: image bytes %llx\n", layout->imageBytes);
-    return false;
-  }
-  const uint64_t first = layout->userdataFirst + layout->imageBytes / 4096, last = layout->userdataLast;
-  if (first > last) {
-    IOLog ("NativeUfs: t970 Data refused: no room after the image (first=%llx last=%llx)\n", first, last);
-    return false;
-  }
-  uint8_t *block = static_cast<uint8_t *> (IOMalloc (4096));
-  if (!block) return false;
-  const IOReturn read = hostRead4k (0, first, 1, block);
-  const bool container = read == kIOReturnSuccess && !memcmp (block + 32, "NXSB", 4);
-  IOFree (block, 4096);
-  if (!container) {
-    IOLog ("NativeUfs: t970 Data refused: no APFS container at %llx (read %x)\n", first, read);
-    return false;
-  }
-  const uint64_t blocks = last - first + 1;
-  uint64_t capacity = 0;
-  alioth::whole_userdata_root::Geometry geometry = {};
-  if (!alioth::whole_userdata_root::CheckedMultiply (blocks, alioth::whole_userdata_root::kMediaBlockBytes, &capacity) ||
-      alioth::whole_userdata_root::ProjectGeometry (first, last, capacity, &geometry) !=
-        alioth::whole_userdata_root::Status::Ok) {
-    IOLog ("NativeUfs: t970 Data geometry rejected first=%llx last=%llx\n", first, last);
-    return false;
-  }
-  NativeUfsWholeUserdataBlock *device = OSTypeAlloc (NativeUfsWholeUserdataBlock);
-  if (!device || !device->init (static_cast<OSDictionary *> (nullptr)) || !device->configure (geometry, rw == 1)) {
-    if (device) device->release ();
-    return false;
-  }
-  if (!device->attach (owner)) {
-    device->release ();
-    return false;
-  }
-  if (!device->start (owner)) {
-    device->detach (owner);
-    device->release ();
-    return false;
-  }
-  gT970DataDevice = device;
-  IOLog ("NativeUfs: t970 Data published first=%llx last=%llx blocks=%llu writable=%u\n",
-         first, last, blocks, rw == 1 ? 1U : 0U);
-  return true;
-}
-
-// The Data volume's BSD device, for the kernel's owner Data mount: the one IOMedia whose UUID is the given volume
-// UUID and whose provider chain reaches the published Data container. Waits for APFS to publish it.
-extern "C" int t970_ufs_data_volume (const char *uuid, dev_t *device, char *path, size_t size, uint64_t *bytes)
-{
-  if (!uuid || strlen (uuid) != 36 || !device || !path || size < 8 || !bytes || !gT970DataDevice) return ENXIO;
-  *device = NODEV;
-  path[0] = 0;
-  *bytes = 0;
-  OSDictionary *matching = IOService::serviceMatching ("IOMedia");
-  OSDictionary *properties = OSDictionary::withCapacity (1);
-  OSString *wanted = OSString::withCString (uuid);
-  bool ready = matching && properties && wanted && properties->setObject ("UUID", wanted) &&
-               matching->setObject ("IOPropertyMatch", properties);
-  OSSafeReleaseNULL (wanted);
-  OSSafeReleaseNULL (properties);
-  if (!ready) {
-    OSSafeReleaseNULL (matching);
-    return ENOMEM;
-  }
-  matching->retain ();
-  IOService *first = IOService::waitForMatchingService (matching, 30ULL * NSEC_PER_SEC);
-  OSSafeReleaseNULL (first);
-  OSIterator *iterator = IOService::getMatchingServices (matching);
-  matching->release ();
-  matching->release ();
-  if (!iterator) return ENOENT;
-  unsigned matches = 0;
-  int result = ENOENT;
-  while (IOMedia *media = ufsMediaCast (iterator->getNextObject ())) {
-    if (++matches != 1) { result = EEXIST; break; }
-    OSString *name = OSDynamicCast (OSString, media->getProperty (kIOBSDNameKey));
-    OSNumber *major = OSDynamicCast (OSNumber, media->getProperty (kIOBSDMajorKey));
-    OSNumber *minor = OSDynamicCast (OSNumber, media->getProperty (kIOBSDMinorKey));
-    if (!ufsHasAncestor (media, gT970DataDevice) || !name || !major || !minor || !name->getLength () ||
-        name->getLength () + 6 >= size || major->unsigned64BitValue () > 255 || minor->unsigned64BitValue () > 0xffffff) {
-      result = EPERM;
-      continue;
-    }
-    *device = static_cast<dev_t> (makedev (major->unsigned32BitValue (), minor->unsigned32BitValue ()));
-    snprintf (path, size, "/dev/%s", name->getCStringNoCopy ());
-    *bytes = gT970DataDevice->mediaBlockCount () * alioth::whole_userdata_root::kMediaBlockBytes;
-    result = 0;
-  }
-  iterator->release ();
-  if (matches != 1) result = matches ? EEXIST : ENOENT;
-  IOLog ("NativeUfs: t970 Data volume %s -> %s (%d, %u matches)\n", uuid, path, result, matches);
-  return result;
-}
-
 static void renameWholeUserdataThread (void *, wait_result_t)
 {
   NativeUfsWholeUserdataBlock *device = gWholeUserdataDevice;
@@ -2102,16 +2145,17 @@ bool NativeUfsBlock::configureVerification ()
 {
   gRootDiagnostic.stage = "policy selection";
   gRootDiagnostic.windowBytes = bytes;
-  gRootDiagnostic.policyCount = verified_root_policy_count;
+  const uint64_t policyCount = *reinterpret_cast<const volatile uint64_t *> (&verified_root_policy_count);
+  gRootDiagnostic.policyCount = policyCount;
   gRootDiagnostic.verify = 0xffffffff;
   // Select the one policy whose signed image size equals this window; two matches are refused.
   const uint8_t *manifest = nullptr;
   uint64_t manifestBytes = 0;
-  if (!verified_root_policy_count || verified_root_policy_count > 16) {
+  if (!policyCount || policyCount > 16) {
     gRootDiagnostic.stage = "policy count invalid";
     return false;
   }
-  for (uint64_t index = 0; index < verified_root_policy_count; ++index) {
+  for (uint64_t index = 0; index < policyCount; ++index) {
     const NativeVerifiedBlockPolicy &policy = verified_root_policies[index];
     if (!policy.manifest || policy.manifestBytes < VR_HEADER_BYTES + VR_SIGNATURE_BYTES) {
       gRootDiagnostic.stage = "policy envelope invalid";
@@ -2332,11 +2376,11 @@ bool NativeUfs::startWholeUserdataRoot (IOService *provider)
 {
   uint32_t writableArg = 0;
   PE_parse_boot_argn ("ufsrw", &writableArg, sizeof (writableArg));
-  if (writableArg > 1) {
-    rootDiagnosticFailure ("ufsrw must be 0 or 1");
+  if (writableArg != 0) {
+    rootDiagnosticFailure ("unixnu root is read-only");
     return false;
   }
-  const bool writable = writableArg == 1;
+  const bool writable = false;
 
   const char *why = "";
   native_ufs_root_step = 1;
@@ -2938,6 +2982,13 @@ bool NativeUfs::startRoot (IOService *provider)
     IOFree (layout, sizeof (RootLayout));
     return false;
   }
+#if defined(NATIVE_VERIFIED_BLOCK) && NATIVE_VERIFIED_BLOCK
+  if (!installOwnerPolicyCarrier (layout->userdataFirst, layout->userdataLast, &why)) {
+    rootDiagnosticFailure (why);
+    IOFree (layout, sizeof (RootLayout));
+    return false;
+  }
+#endif
   gStoreGeometry = { true, layout->userdataFirst, layout->userdataLast, layout->imageBytes, layout->gptEntriesLba,
                      layout->gptHeaderCrc, layout->gptEntriesCrc, layout->gptEntryCount, layout->logFirst, layout->logLast };
   const char *names[4] = {};
@@ -3007,10 +3058,6 @@ bool NativeUfs::startRoot (IOService *provider)
     void discard (unsigned index) { discardPendingWindow (index); }
   } operations = { this, layout };
   UfsRootPublicationResult result = ufsPrepareRootWindows (operations, layout->windows);
-  // gts7xlwifi: the Data container after the image, once the image windows are committed.
-  if (result.phase == UfsRootPhase::Complete && !t970PublishData (this, layout)) {
-    rootDiagnosticFailure ("t970 Data container publication failed");
-  }
   IOFree (layout, sizeof (RootLayout));
   if (result.phase != UfsRootPhase::Complete) {
     gPending = 0;

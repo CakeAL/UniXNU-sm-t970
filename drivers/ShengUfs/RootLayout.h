@@ -4,14 +4,14 @@
 // ---- LUN 0 GPT and the root-image manifest -------------------------------------------------
 struct RootWindow {
   char name[32];
-  uint64_t offset;   // bytes from the start of the userdata partition
+  uint64_t offset;   // bytes from the start of the unixnu partition
   uint64_t size;     // bytes
   uint8_t sha256[32];
 };
 
 struct RootLayout {
   uint64_t userdataFirst, userdataLast;   // 4096-byte LBAs on LUN 0
-  uint64_t logFirst, logLast;             // gts7xlwifi: the old Windows recovery partition "winre" (sda40), the diagnostic log's home; 0/0 if absent
+  uint64_t logFirst, logLast;             // reserved for the reference log API; this board leaves both zero
   uint32_t lbaBytes;                      // Logical block size reported by the device
   uint8_t typeGuid[16];                   // GPT partition type GUID, on-disk byte order
   uint8_t uniqueGuid[16];                 // GPT partition unique GUID, on-disk byte order
@@ -137,9 +137,7 @@ static bool findRootLayout (RootLayout *layout, const char **why)
     *why = "GPT entries CRC";
     return false;
   }
-  // gts7xlwifi: the iPadOS root image and Data live in the former Windows partition (sda39);
-  // Android userdata is never opened.
-  static const char wanted[] = "windows";
+  static const char wanted[] = "unixnu";
   bool found = false;
   for (uint32_t index = 0; index < count; index++) {
     const uint8_t *entry = gScratch + index * 128;
@@ -163,23 +161,9 @@ static bool findRootLayout (RootLayout *layout, const char **why)
         break;
       }
     }
-    // gts7xlwifi: the diagnostic log goes to "winre" (the old Windows recovery partition), never to Android partitions and
-    // never into the Data container, which fills sda39 to within 1 MiB of its end.
-    static const char logWanted[] = "winre";
-    bool logMatch = true;
-    for (unsigned c = 0; c < sizeof (logWanted); c++) {
-      if (entry[56 + 2 * c] != static_cast<uint8_t> (logWanted[c]) || entry[57 + 2 * c] != 0) {
-        logMatch = false;
-        break;
-      }
-    }
-    if (logMatch) {
-      layout->logFirst = entryFirst;
-      layout->logLast = entryLast;
-    }
     if (match) {
       if (found) {
-        *why = "duplicate userdata partition";
+        *why = "duplicate unixnu partition";
         return false;
       }
       layout->userdataFirst = le64 (entry + 32);
@@ -190,8 +174,8 @@ static bool findRootLayout (RootLayout *layout, const char **why)
       found = true;
     }
   }
-  if (!found || layout->userdataLast < layout->userdataFirst) {
-    *why = "no userdata partition";
+  if (!found || layout->userdataFirst != 37292800 || layout->userdataLast != 62458623) {
+    *why = "no unixnu partition";
     return false;
   }
   gRootDiagnostic.first = layout->userdataFirst;
@@ -199,7 +183,7 @@ static bool findRootLayout (RootLayout *layout, const char **why)
   gRootDiagnostic.stage = "root manifest";
   // First block of the partition: manifest if the root image was flashed, ext4 otherwise.
   if (hostRead4k (0, layout->userdataFirst, 1, gScratch) != kIOReturnSuccess) {
-    *why = "userdata first block read";
+    *why = "unixnu first block read";
     return false;
   }
   layout->magic0 = le32 (gScratch);

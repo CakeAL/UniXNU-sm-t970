@@ -222,3 +222,24 @@ Substituted with `build-verified-root-empty.py --tree . --output build/verified-
 - Do not claim a feature works from a host build; only from a device observation with the image
   hash attached.
 - Keep `main` bootable; do the wholesale work on `gts7xlwifi-wholesale`.
+
+## 9. Whole-board follow-up
+
+The reference's tested system is its `main7` configuration, with the separate
+host patch set and firmware inputs. The published board defaults alone do not
+enable everything listed in its README. The previous flashed Recovery predates
+this whole-board build.
+
+Use `gts7xlwifi_defconfig` for the wholesale branch. It selects the reference
+display and late touch path and the reference DTS with eight CPUs. The host
+DT-to-ADT cluster-ID change comes from the reference's UniXNU patch 0002. The
+profile uses the existing 512 MiB packed Data seed and exact `unixnu` GPT range.
+The board package reads the two already provisioned owner policies from the
+existing carrier; it does not use the upstream Windows partitions or their log
+region. Apple sources missing from a freshly cloned work tree were restored
+from the local pinned source cache and checked against Git blob IDs.
+
+Build checkpoint: standard `unixnu build kernel` now passes the initial
+compilation stage and enters the archive build. A successful bootstrap stops
+at the expected unresolved archive symbols. GPU remains gated on the device's
+signed `a650_zap` input. The wholesale change has no device observation yet.

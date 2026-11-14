@@ -64,14 +64,17 @@ def module_dir():
 MODULE = module_dir()
 LINUX = MODULE / 'deps/linux'
 ATH11K = LINUX / 'drivers/net/wireless/ath/ath11k'
-require((ATH11K / 'pci.c').is_file(), f'{ATH11K}/pci.c missing: the module checkout has no ath11k (tools/fetch-sources.sh)')
 OUT.mkdir(parents=True, exist_ok=True)
 RAW.mkdir(exist_ok=True)
 (OUT / 'build-report.json').unlink(missing_ok=True)
 (OUT / 'compile-errors.txt').unlink(missing_ok=True)
 
 # The module's own generated trees (pinned headers, mac80211/cfg80211/crypto copies, MHI and QMI with their OS patches).
-run(['bash', MODULE / 'tools/fetch-sources.sh'], stdout=subprocess.DEVNULL)
+fetch = ['bash', MODULE / 'tools/fetch-sources.sh']
+if not (ATH11K / 'pci.c').is_file() or subprocess.run(
+        [*fetch, '--check'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode:
+    run(fetch, stdout=subprocess.DEVNULL)
+require((ATH11K / 'pci.c').is_file(), f'{ATH11K}/pci.c missing after fetching locked sources')
 run(['bash', MODULE / 'tools/prepare.sh'], stdout=subprocess.DEVNULL)
 
 

@@ -1,23 +1,19 @@
 #!/usr/bin/env python3
-"""Link-time VerifiedRoot with a deliberately empty policy table.
-
-Follows the nx769j approach: the real VerifiedRoot crypto is compiled in, but
-verified_root_policy_count is zero so configureVerification returns before it
-reads the key or calls vr_open. Root verification is disabled by policy data,
-not approximated by stubs, and the 47 MiB signed hash table is not linked.
-"""
+"""Link the owner public anchor and the table filled by ShengUfs at boot."""
+import argparse
 import importlib.util
 import json
 import subprocess
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
-FW = ROOT.parent / 'UniXNU'
-if not (FW / 'kits/VerifiedRoot').is_dir():
-    FW = next(p for p in ROOT.parents if (p / 'kits/VerifiedRoot').is_dir())
-if not (ROOT / 'build/xnu').is_dir():
-    ROOT = sorted(FW.glob('out/*/*/*/tree'))[-1]
-out = ROOT / 'build/verified-root-empty'
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--tree', type=Path, default=Path('.'))
+parser.add_argument('--output', type=Path, default=Path('build/verified-root-empty'))
+args = parser.parse_args()
+ROOT = args.tree.resolve()
+FW = next(p for p in (ROOT, *ROOT.parents) if (p / 'kits/VerifiedRoot').is_dir()
+          and (p / 'build/verified-root-host/keys/owner-public.pem').is_file())
+out = args.output.resolve()
 out.mkdir(parents=True, exist_ok=True)
 recipe = ROOT / 'build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/bsd/DEVELOPMENT/bsd_init.o.json'
 record = json.loads(recipe.read_text().strip().rstrip(','))
@@ -40,14 +36,14 @@ for source in (FW / 'kits/VerifiedRoot/src/verified_root.c', FW / 'kits/Verified
         elif arg not in ('-MD', '-MP'):
             command.append(arg)
         i += 1
-    command += ['-I' + str(FW / 'kits/VerifiedRoot/include'), '-Werror']
+    command += ['-I' + str(FW / 'kits/VerifiedRoot/include'), '-Werror', '-Wno-missing-include-dirs']
     result = subprocess.run(command, cwd=record['directory'], capture_output=True, text=True)
     (out / (source.stem + '.log')).write_text(result.stdout + result.stderr)
     if result.returncode:
         raise SystemExit(result.stderr[-3000:])
     objects.append(obj)
-# The policy table starts empty and is filled at boot from the signed envelopes in userdata (see
-# scripts/build-owner-root-manifests.py): 73,287,008 bytes of block hashes cannot fit the BOOT
+# The policy table starts empty and is filled at boot from the signed envelopes on unixnu (see
+# scripts/build-owner-root-manifests.py): 73,287,008 bytes of block hashes cannot fit the RECOVERY
 # partition, so the kernel links only the owner public-key anchor and authenticates each envelope
 # with vr_open. The table and its count therefore live in .data, not .text.
 spec = importlib.util.spec_from_file_location('verified_manifest', FW / 'kits/VerifiedRoot/tools/manifest.py')

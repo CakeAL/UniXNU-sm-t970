@@ -12,6 +12,7 @@ summary = "SM-T970/iPadOS21H461 reaches SpringBoard desktop and opens apps. v88 
 id = "configuration"
 status = "host-verified"
 components = [
+  "AppleKeyStoreState",
   "ArmDTPlatform",
 ]
 paths = [
@@ -61,6 +62,7 @@ paths = [
   ".gitignore",
   "log.txt",
   "evidence/adb-2026-11-01/identity.txt",
+  "scripts/build-xnu-4k-baseline.sh",
   "board.toml",
   "feeds.toml",
   "configs/**",
@@ -98,6 +100,7 @@ procedure = [
   "Run python3.14 ../UniXNU-sm-t970/scripts/check-platform.py --unixnu . to compare DT/ADT bindings with the captured hardware.",
 ]
 findings = [
+  "The wholesale build selects the same-model gts7xlwifi_defconfig and reference board DTS. Signed Adreno firmware is required to re-enable the A650 archive. The full board image has not been verified on this tablet.",
   "The same-board 88b34f9 source and configuration are retained as reference inputs. The working SM-T970 board definition stays selected for dual-system images.",
   "v91 device feedback confirms power-key lock and relight, with Consumer HID events for volume but no working volume change. v92/v93 qualify the MAX77705 bus; v94 is BOOT-only uploaded with gated read-only gauge sampling. The T733 reference audit adds future USB CDC/ECM/LLDB, persistent Data, shutdown, MSC and thermal/DVFS goals without importing its board wiring; GPU remains deferred.",
   "Current maintainer scope: full usable 8 GB, Wi-Fi, brightness, side buttons and battery; GPU deferred. docs/peripherals.md separates hardware inputs, host-only implementations and device validation. v88 reached desktop with3713.86MiB; v90 verified all3 raw keys; v91 Consumer HID uploaded, OS behavior pending; v92 battery/memory observers prepared.",
@@ -362,6 +365,7 @@ components = [
   "ArmCpu",
 ]
 paths = [
+  "dts/gts7xlwifi.dts",
   "patches/xnu/t970-edge-smp-parallelism.patch",
   "scripts/check-smp-parallelism.py",
   "evidence/display/edge-smp-v21/**",
@@ -413,6 +417,7 @@ procedure = [
   "Collect /proc/cpuinfo, online/present CPU lists, cpufreq policies, /proc/interrupts and the live DT using the inventory script.",
 ]
 findings = [
+  "The wholesale board DTS reuses the reference E/P cluster assignments and eight affinities, paired with the reference DT-to-ADT cluster ID export. The menu requests load-based EPSS mode 4; runtime scheduling remains to be checked.",
   "BOOT5385b6ce owner photo03:00:42 shows three pending queues drained, MG done134, BB161, SB75->78, display open6/fail0/swap0. No constrained head means Q cap zero is absent data, not a measured cached limit. v22 reuses exact v21 kernel with existing stack mode1 to locate current BB/SB main waits; host image checks pass, hardware stack result pending.",
   "v21 BCM2837 EDGE width fallback uses registered SMP CPU/cluster counts only when E/P counts are both zero. Previous BOOT705d4160 has all eight ADT CPU cluster-type absent (SMP), cached constrained cap0 and callback progress. Actual prepared-function ASan/UBSan tests cover SMP1/8, E/P precedence and non-BCM guard; kernel/prelink/FAT checks pass. BOOT5385b6ce hardware result pending; this is not validated heterogeneous scheduling or desktop. See evidence/display/edge-smp-v21.",
   "UI-job-v8 kernel049897a9/BOOT1939b59d adds PID1 namei basename lookup counts and latest matching open error for BB/SB plists using existing kernel path copies only. Actual helper ASan tests cover filters/relative paths/errors/ring/bounds. Job lookup is not parsed/imported job proof; path/return association is best effort. Same eight-core60-second display diagnostics and policy. Hardware outcome pending; see evidence/display/ui-job-v8.",
@@ -717,6 +722,9 @@ id = "storage"
 status = "implemented"
 components = ["ShengUfs", "VirtioMmioBlock", "RamBlock", "VerifiedRoot"]
 paths = [
+  "drivers/ShengUfs/**",
+  "scripts/build-verified-root-empty.py",
+  "patches/xnu/series",
   "evidence/storage/dual-system-20261108/**",
   "docs/dual-data-performance.md",
   "scripts/pack-dual-data-recovery.py",
@@ -818,6 +826,7 @@ procedure = [
   "Read block sysfs and by-name links; read each LUN's primary GPT header and entry array and validate their CRC32 values without writing any block device.",
 ]
 findings = [
+  "The wholesale ShengUfs build requires the exact unixnu GPT range, loads the two authenticated root envelopes from the existing carrier, and reuses the protected 512 MiB RamBlock Data store. Direct reference APFS Data publication was removed from the wholesale driver.",
   "On 2026-11-08 TWRP shrank the fresh MinsOS F2FS and verified both GPTs after a recovery restart. Android userdata keeps LBA 2969600 through 37292799. The new 96 GiB unixnu partition occupies LBA 37292800 through 62458623. Unrelated GPT entries, including factory duplicate GUIDs, were preserved.",
   "The explicit t970-ufs-unixnu=1 selector resolves the unixnu GPT entry and confines verified-root carrier reads to that range. The host test with the captured GPT verifies the selector, the legacy userdata path and failure when unixnu is absent. The iPadOS Data seed remains RAM-backed.",
   "The exact iPadOS root image and both corrected owner policy carriers were written to unixnu only. Each written range was read back in full and matched the expected SHA-256.",
@@ -994,7 +1003,7 @@ evidence = [
 [[area]]
 id = "display"
 status = "implemented"
-components = []
+components = ["GopFramebuffer"]
 paths = [
   "evidence/display/setup-skip-v84/**",
   "evidence/display/setup-fb-cache-v83/**",
@@ -1299,7 +1308,7 @@ evidence = [
 [[area]]
 id = "input"
 status = "implemented"
-components = []
+components = ["ShengHidInput", "ShengNovatekTouch", "QcomGeniSpi"]
 paths = [
   "reference/gts7xlwifi/package/T970Pen.cpp",
   "evidence/input/dual-peripherals-20261114/**",
@@ -1614,6 +1623,7 @@ id = "network"
 status = "planned"
 components = []
 paths = [
+  "scripts/build-t970-wifi.py",
   "reference/gts7xlwifi/package/T970Wifi*.cpp",
   "reference/gts7xlwifi/package/T970Bluetooth.cpp",
   "evidence/adb-2026-11-01/network.txt",
@@ -1630,6 +1640,7 @@ procedure = [
   "Read PCI IDs, driver links, wlan0's device path and firmware directory names; do not collect SSIDs, MAC addresses or network traffic.",
 ]
 findings = [
+  "The standard QCA6390 archive recipe validates and reuses existing pinned sources before deciding to fetch. The archive passed in the first build using the legacy defconfig; the wholesale link and on-device Wi-Fi are pending.",
   "The QCA6390 Wi-Fi archive builds 110 Linux and 2 board objects against the pinned imported sources. Seven MinsOS vendor Wi-Fi files match the reference input list. Both MinsOS Bluetooth files differ from the historical Android capture. Signed wpa_supplicant, BlueTool and the donor 21H461 bluetoothd are staged in a common addon. Service mounting, keychain integration and runtime remain pending.",
   "The Wi-Fi worker and Bluetooth UART.SK transport link into the 21H461 kernel and prelink with the original HID checks intact. The USB route stays with the battery worker, and neither radio is enabled in the host-only Recovery candidate.",
   "The captured endpoint is QCA6390 PCI17cb:1101/subsystem17cb:0108 behind PCIe0. The maintained Ath12kWifi catalog component targets a different radio generation and is not directly applicable. T970 needs ath11k/MHI/QMI, board PCIe power/PHY/MSI/DMA and the selected21H461 network ABI; no XNU link or scan is claimed.",
@@ -1727,6 +1738,7 @@ procedure = [
   "Read selected power-supply attributes, available sleep states and thermal-zone names; do not write charging, regulator or suspend controls.",
 ]
 findings = [
+  "The wholesale profile selects the reference battery worker from the display late archive and requests t970-battery=1. The older BOOT battery fixtures remain historical evidence.",
   "The imported PSCI shutdown path is opt-in via t970-shutdown-wait. The deferred fallback checks the mount list after the non-system unmount pass and arms only if no writable volume remains. The standalone and Pencil kernels linked and passed Recovery readback. Actual power-off and a subsequent persistent Data boot remain unobserved.",
   "The DRV2 command adapter shares its lock with the touch rail sequence. The combined candidate links the opt-in T970Haptics service and its boot pulse on PM8150L LDO7. Motor and rail status remain unobserved on this tablet.",
   "The opt-in DWC3 build routes the MAX77705 MUIC from the existing battery worker, after PMIC identification. It publishes the route only after SE0 restoration, before the USB worker touches DWC3.",
@@ -1881,6 +1893,7 @@ procedure = [
   "Read BuildManifest.plist from the local IPSW using Python zipfile and plistlib to identify its OS version, build and product types.",
 ]
 findings = [
+  "The wholesale Recovery profile drops the reference direct Data mount patch and sets the embedded FAT budget to 72 MiB. The original persistent seed and recovery-only partition bound are required for packaging.",
   "Host readback of the standalone shutdown Recovery 755c53f3, shutdown/Pencil Recovery 5aeca0c4 and haptics combination 7c378fab confirms the same firmware, DTBO, firmware DTB, partition tail, ADT, trust cache and Data seed as persistent mode 2. All three candidates await a device boot.",
   "The combined USB Recovery c5e1456a passed independent host readback against the haptics candidate. The patched Heimdall uploaded RECOVERY only after checking the device PIT. Upload acknowledgement is recorded separately from device boot and readback.",
   "The dual-system iPadOS Android-header-v2 image embeds the same-device stock DTBO as recovery_dtbo and selects unixnu through its XNU payload. The full RECOVERY partition readback matches 5c9355fa, with the MinsOS BOOT and external DTBO preserved. The owner confirmed that the iPadOS UI appeared after rebooting into recovery.",
@@ -2200,6 +2213,7 @@ procedure = [
   "Run python3 scripts/collect-adb-inventory.py --root --output evidence/<new-capture>; review per-command stderr, checksums, GPT CRC results and DT sanitization before updating this record.",
 ]
 findings = [
+  "The wholesale Wi-Fi build checks the pinned source checkout before fetching again; standard launch diagnostics have no on-device result for this build.",
   "The QcomDwc3 archive has 102 AppleUSBXDCI bindings verified against the local 21H461 prelink with AppleUSBXDCI and AppleUSBDeviceMux roots, and links into Recovery c5e1456a. Finder enumeration remains unobserved on this tablet.",
   "The Metal addon is an independent host artifact (SHA-256 fb32130db66e4a3dfcb0bdb4d030aa6381159e70945837b6a685a84484104ca4); it was not added to the current Recovery. SPIR-V smoke shader validation and strict code signatures passed.",
   "The v126 startup report appends up to two GPU pf lines with FSR, FAR, FSYNR0, CBFRSYNRA, the leaf word before and after repair and whether the transaction was retried. v128 prints both full 64-bit leaf words and the number of faults captured. v129 adds the S2CR0 readback before stream publication. v130 through v132 report FW_VER, PERF_TBL, BW_TBL and CORE_FW_START with cursors, interrupt readback and raw ACK words.",

@@ -1,0 +1,64 @@
+# Kernel configuration: CONFIG_XNU_<NAME> becomes XNU_<NAME> for the kernel build script.
+# y and n are 1 and 0, a quoted string or a number is passed through, {tree} is the build tree.
+CONFIG_XNU_SOURCE_CORECRYPTO14=y
+CONFIG_XNU_SOURCE_PTHREAD=y
+CONFIG_XNU_ARM_DT_PLATFORM=y
+CONFIG_XNU_ARMCPU=y
+# SM8250 (kona) implements ARMv8.1 PAN: copyin/copyout must manage it at the exception entry
+# (same as UniXNU-alioth).
+CONFIG_XNU_NATIVE_PAN=y
+CONFIG_XNU_CRYPTO_BOOTSTRAP="prelinked"
+# Without this, check_for_panic_log() maps the BCM2837 header's PLATFORM_PANIC_LOG_PADDR
+# 0x3c0fc000, unmapped device space on SM8250, and PE_create_console() hangs the boot CPU.
+# Measured here 2026-10-30: a stage-4 reset before PE_create_console fired, after it did not.
+# With the flag, native-dt-panic-region.patch reads /pram from the ADT; there is none, so the
+# function returns without mapping anything (same as UniXNU-alioth).
+CONFIG_XNU_DT_PANIC_REGION=y
+# The A650 kernel GPU driver and its board probe (scripts/build-adreno650.py), as UniXNU-alioth.
+# CONFIG_XNU_NATIVE_ADRENO is not set
+# On-screen boot stages, kernel log rows and panic text (UniXNU-alioth's package/BootProgress.c,
+# 520581af). The OS profile's zzz-boot-progress.patch calls into it under this switch, and
+# build-xnu-4k-baseline.sh builds and force-loads build/boot-progress/libBootProgress.a.
+# BootLog.c and BootReset.c inside it act only on log= / autoreset=, which this board
+# does not pass: nothing is written to UFS or IMEM.
+# build-xnu-4k-baseline.sh accepts it only together with NATIVE_UFS, OWNER_ROOT_AUDIT,
+# NATIVE_VIRTIO_BLOCK and SOURCE_CORECRYPTO14: it turns on with the storage components.
+CONFIG_XNU_BOOT_PROGRESS=y
+CONFIG_XNU_BUILD_ARCHIVES=y
+# BootProgressStubs.c and LinkStubs.c: zero definitions of the weak diagnostics BootProgress.c
+# references for components this board does not select yet.
+# libT970Wifi.a (scripts/build-t970-wifi.py): the Wi-Fi stack, force-loaded because only weak imports of T970WifiProbe.cpp refer
+# to it; its strong definitions take the place of BootProgressStubs.c's weak zero rows (native_wifi_text, nw_wifi_stats).
+# libQcomDwc3.a (scripts/build-qcom-dwc3.py): Apple's USB device stack on the DWC3 (t970-usb), force-loaded for the same reason.
+CONFIG_XNU_EXTRA_LD_ARCHIVES="{tree}/build/link-stubs/libLinkStubs.a -Wl,-force_load,{tree}/build/t970-wifi/libT970Wifi.a -Wl,-force_load,{tree}/build/qcom-dwc3/libQcomDwc3.a -Wl,-force_load,{tree}/build/ram-block/libRamBlock.a"
+# AMFI's ConfigurationSettings panics "AMFI: No PMGR?" without an ApplePMGR provider (measured
+# here 2026-10-31, panic screen). ShengPlatformPower (UniXNU-alioth/sheng package, MIT) publishes the
+# original PMGR nub with every power operation refused: no clock, rail or reset is touched.
+# sheng-platform-power.patch calls sheng_pmgr_run() from bsd_init; pmgr=2 selects publication.
+CONFIG_XNU_SHENG_PMGR=y
+# Storage and owner root (same chain as UniXNU-alioth): ShengUfs publishes the SHNGROOT OS and
+# SystemOS windows of unixnu, VerifiedRoot authenticates every root read against the signed
+# policies, and the owner path mounts SystemOS over / and boots launchd from it.
+CONFIG_XNU_NATIVE_UFS=y
+CONFIG_XNU_VERIFIED_ROOT_PROBE=y
+CONFIG_XNU_OWNER_ROOT_AUDIT=y
+CONFIG_XNU_OWNER_ROOT_TRUST=y
+CONFIG_XNU_NATIVE_VIRTIO_BLOCK=y
+CONFIG_XNU_VERIFIED_ROOT_ARCHIVE="{tree}/build/verified-root-os-xnu-bundle/libVerifiedRootProbe.a"
+CONFIG_XNU_NATIVE_VIRTIO_BLOCK_ARCHIVE="{tree}/build/virtio-mmio-block-verified-bundle/libVirtioMmioBlock.a"
+CONFIG_XNU_OWNER_CACHE_MOUNT=y
+CONFIG_XNU_OWNER_CACHE_STARTUP=y
+CONFIG_XNU_OWNER_BOOT_MANIFEST=y
+CONFIG_XNU_OWNER_UNION_SYSTEMOS=y
+# Reuse the existing packed 512 MiB Data seed and its overlay on unixnu.
+CONFIG_XNU_SOURCE_STORAGE=y
+CONFIG_XNU_NATIVE_RAM_BLOCK=y
+CONFIG_XNU_OWNER_DATA_MOUNT=y
+CONFIG_XNU_OWNER_DATA_VOLUME_UUID="C25160D3-B586-4C11-9D3A-42CB2741227C"
+# The GOP framebuffer path (GopFramebuffer + package/LegacyDisplayProbe.cpp): bsd_init.c calls
+# native_legacy_display_late_probe() on this switch and build-xnu-4k-baseline.sh force-loads
+# build/native-legacy-display/libNativeLegacyDisplay.late.a. Same as UniXNU-alioth.
+CONFIG_XNU_NATIVE_LEGACY_DISPLAY=y
+
+# The QcomXnuUsbDebug CDC-ACM console (scripts/build-qcom-usb-debug.py, patches/xnu/t970-qcom-usb-debug-*.patch).
+CONFIG_XNU_QCOM_USB_DEBUG=y

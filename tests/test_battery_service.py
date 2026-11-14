@@ -88,15 +88,13 @@ class ServiceWiring(unittest.TestCase):
         self.assertIn('kPollMilliseconds = 5000', source)
 
     def test_boot_hook_and_archive_members(self):
-        patch = (ROOT / 'patches/xnu/t970-battery-power.patch').read_text()
-        self.assertIn('extern void t970_battery_start(void);', patch)
-        self.assertIn('t970_battery_start();', patch)
-        series = (ROOT / 'patches/xnu/series').read_text().splitlines()
-        self.assertEqual(series.count('t970-battery-power.patch'), 1)
-        builder = (ROOT / 'scripts/build-platform-power.py').read_text()
-        self.assertIn('T970Power/BatteryService.cpp', builder)
-        self.assertIn('BatteryService.late.o', builder)
-        self.assertIn('BatteryService.late.o', (ROOT / 'scripts/check-data-payload.py').read_text())
+        display = (ROOT / 'package/LegacyDisplayProbe.cpp').read_text()
+        self.assertIn('if (&t970_battery_start) t970_battery_start();', display)
+        builder = (ROOT / 'scripts/build-gop-legacy-display.py').read_text()
+        self.assertIn("'T970Battery'", builder)
+        self.assertIn('T970Battery.late.o', builder)
+        self.assertIn('service_objects', builder.split('archive = OUT /', 1)[1])
+        self.assertIn('"t970-battery=1"', (ROOT / 'board.toml').read_text())
 
     def test_guarded_charge_action(self):
         gauge = (ROOT / 'package/T970Power/GaugeProbe.h').read_text()

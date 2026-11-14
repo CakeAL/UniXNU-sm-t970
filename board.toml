@@ -11,7 +11,7 @@ description = "Samsung Galaxy Tab S7+ Wi-Fi (SM-T970, gts7xlwifi): iPadOS deskto
 kit = "sm-t970"
 
 [components]
-include = ["ArmDTPlatform", "ArmCpu", "SoftwareAES", "ShengUfs", "VirtioMmioBlock", "GopFramebuffer", "AppleKeyStoreState", "ShengHidInput", "XnuPrelink", "DarwinBoot"]
+include = ["ArmDTPlatform", "ArmCpu", "SoftwareAES", "ShengUfs", "RamBlock", "VirtioMmioBlock", "GopFramebuffer", "AppleKeyStoreState", "ShengHidInput", "XnuPrelink", "DarwinBoot"]
 
 [kernel]
 defconfig = "gts7xlwifi_defconfig"
@@ -25,12 +25,13 @@ archives = [
   "component:ArmCpu",
   "component:SoftwareAES",
   "build-software-aes-bindings.py",
-  # Owner root authentication: the signed policies of the SHNGROOT OS/SystemOS windows on sda39.
-  # Owner-signed SHNGROOT policies are not on this workstation; the empty verified-root
-  # bundle keeps the same archive name so the linkage is unchanged.
+  # Owner root authentication: the signed policies of the SHNGROOT OS/SystemOS windows on unixnu.
+  # Link the public anchor; ShengUfs loads and verifies the existing disk-resident policies.
   "build-verified-root-empty.py --tree . --output build/verified-root-os-xnu-bundle",
   "component:ShengUfs",
   "build-storage-bindings.py --object build/sheng-ufs/NativeUfs.o --archive libShengUfs.a",
+  "component:RamBlock",
+  "build-storage-bindings.py --object build/ram-block/NativeRamBlock.o --archive libRamBlock.a --provided-by build/sheng-ufs/bindings.json",
   # Root authentication only: the DTS has no virtio,mmio node, so the transport never probes. It
   # provides native_verified_block_root_authorized(), which reaches ShengUfs through the weak
   # native_ufs_block_authenticates(). The kernel links the multi-policy bundle.
@@ -73,7 +74,7 @@ archives = [
 roots = ["com.apple.AppleFSCompression.AppleFSCompressionTypeZlib", "com.apple.driver.AppleARMPlatform", "com.apple.driver.AppleARMWatchdogTimer", "com.apple.driver.AppleAudioClockLibs", "com.apple.driver.AppleEffaceableStorage", "com.apple.driver.AppleIISController", "com.apple.driver.AppleM2ScalerCSCDriver", "com.apple.driver.AppleMobileFileIntegrity", "com.apple.driver.ApplePMGR", "com.apple.driver.IODARTFamily", "com.apple.filesystems.apfs", "com.apple.iokit.CoreAnalyticsFamily", "com.apple.iokit.IOAVFamily", "com.apple.iokit.IOAudio2Family", "com.apple.iokit.IOCECFamily", "com.apple.iokit.IOCryptoAcceleratorFamily", "com.apple.iokit.IOGPUFamily", "com.apple.iokit.IOHDCPFamily", "com.apple.iokit.IOMobileGraphicsFamily", "com.apple.iokit.IOReportFamily", "com.apple.iokit.IOSlowAdaptiveClockingFamily", "com.apple.iokit.IOStorageFamily", "com.apple.iokit.IOSurface", "com.apple.kec.Libm", "com.apple.kec.corecrypto", "com.apple.kext.AppleMatch", "com.apple.kext.CoreTrust", "com.apple.security.AppleImage4", "com.apple.security.sandbox", "com.apple.iokit.IOHIDFamily", "com.apple.iokit.IOHIDEventDriver", "com.apple.driver.AppleUSBXDCI", "com.apple.driver.AppleUSBDeviceMux"]
 
 [device_tree]
-source = "device:dts/sm-t970.dts"
+source = "device:dts/gts7xlwifi.dts"
 include_dirs = ["soc:dts"]
 
 [ipsw]
@@ -119,9 +120,8 @@ TOUCH_FULL_INPUT_ENABLE = "0"
 POWER_OBSERVE_ENABLE = "0"
 
 [payload]
-# Files go to the existing ESP (sda37, 536870912 bytes), not a new FAT; the
-# volume label is not recorded yet, so it is not guessed here.
-size_mib = 512
+# FAT embedded in the dedicated Recovery image.
+size_mib = 72
 loader = "firmware"
 title = "UniXNU"
 # Full span from 0x80000000 to the end of the last bank (0x280000000).
@@ -152,12 +152,9 @@ kernel_args = ["kt_fixed_zones=120", "smp=1",
   "boot-progress=3",
   # Publish the original PMGR nub (ShengPlatformPower mode 2), as alioth.
   "pmgr=2",
-  # ShengUfs: SHNGROOT root on sda39. SM8250 routes the UFS host through SMMU streams 0x0e0 and
-  # 0x4e0 (SoC routing, as alioth; the Samsung DT binds no SMMU to ufshc, so the driver only
-  # validates the existing bypass contexts read-only before reusing them).
+  # Only the measured unixnu partition contains the existing root and Data overlay.
   "native-ufs-root=1", "native-ufs-stream=0xe0", "native-ufs-stream2=0x4e0",
-  # The APFS Data container after the root image, read-write, mounted at /private/var.
-  "t970-ufs-data=1", "ufsrw=1",
+  "sheng-data-persist=2",
   # The kernel manages DRAM from the owned window up to here (patches/xnu/t970-dram-extend.patch):
   # 768 MiB left ~1 MiB free once launchd ran and jetsam kept killing daemons (v14, 2026-10-31).
   "t970-dram-end=0x280000000",
@@ -175,21 +172,17 @@ kernel_args = ["kt_fixed_zones=120", "smp=1",
   "disable-watchdogd=1",
   # Key store stand-in, HID publisher, key events and the PON/PM8150L buttons (ButtonProbe.cpp).
   "aks=1", "offline-hid-input=1", "offline-key-events=1", "alioth-bt=1",
-  # Persistent log (package/BootLog.c) every 2 s into the last 288 MiB of winre (sda40, the old Windows
-  # recovery partition), read back from TWRP with deploy/.../read-boot-log.py. ShengUfs refuses it elsewhere.
-  "log=1",
-  # Speed without a GPU: vote the highest non-turbo level in all three EPSS domains (package/CpuFreqProbe.cpp; the live
-  # FDT has qcom,cpufreq-hw-epss at 0x18591000/2000/3000 like alioth), and write-combine the GOP scanout.
-  "cpufreq=3", "cpufreq-cap=2000", "qcom-usb-debug=1", "qcom-usb-ctl=1", "t970-fb-wc=1", "t970-fb-src-wb=1",
+  # Reference load-based EPSS DVFS and GOP cache policy.
+  "cpufreq=4", "cpufreq-cap=2000", "qcom-usb-debug=1", "qcom-usb-ctl=1", "t970-fb-wc=1", "t970-fb-src-wb=1",
   # Touch: package/T970FtsTouch.cpp (STM fts1ba90a, GPIO I2C on GPIO 12/13, RPMh L13/L14) feeding ShengHidInput.
   # t970-touch-xform: 1 swap axes (default), 2 mirror x, 4 mirror y.
-  "pipa-gpu=12", "pipa-turnip-debug=noubwc,nocb", "gpu-addon=1", "fb-gpu=1", "native-touch=1", "touch-hid=1", "t970-touch-xform=5",
+  "native-touch=1", "touch-hid=1", "t970-touch-xform=5",
   # next2: direct scanout (the display fetches the compositor's surface: NativeUfs DpuWindow.h + NativeLegacyDisplay's T970 pipe
   # discovery; it declines itself and keeps the GPU copy when the window or the pipes are not as expected, [direct] row), and the
   # wallpaper freeze (AdrenoMetal: a Poster process's first big frame is kept, its later command buffers are held back).
   # Room: keepsyms, pipa-gpu-pool (BOs are pageable system memory now, the pool default is 0), offline-legacy-verdict (an early
   # bring-up panic) and staged-apps=1 (the copy finished in v91; t970-migrate-once.patch installs them) left the line.
-  "dpu-scanout=2", "wallpaper-freeze=1"]
+  "memory-outside=1", "memory-outside-floor=0xd0000000", "t970-battery=1"]
 # Brightness (package/BacklightProbe.cpp, the S6TUUM3 panel over DSI0 and DSI1) is on without an argument: the command line
 # is at its 1000-byte limit. t970-bl=0 turns it off.
 # Text fixups (kernel native-text-fixup.patch, applied to a signed page before it first runs, re-applied on page-in): this array
@@ -215,6 +208,8 @@ text_fixups = [
 ]
 
 [payload.adt]
+packed_data_ramdisk = true
+persistent_data = true
 # /chosen/chip-id is the Qualcomm SoC ID: live FDT qcom,msm-id <356 0x20001>, 356 = 0x164.
 chip_id = "0x164"
 # 768 MiB. The tablet's UEFI (firmware-t970 Upstream/gts7xlwifi/Memory/PlatformMemoryMap.c,
