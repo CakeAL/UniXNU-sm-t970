@@ -5,5 +5,9 @@
   "kernel_readback_sha256": "28802a9ff9caffe7ea28450980d9dbc6aed99c14311bae470823e779002d3ad5",
   "reset_seconds": 6,
   "panic_screen": false,
-  "upload": "pending"
+  "upload": "RECOVERY upload successful",
+  "partition": "RECOVERY",
+  "heimdall_exit": 0,
+  "uploaded_at": "2026-11-15T02:10:58+08:00",
+  "device_boot": "awaiting observation"
 }
