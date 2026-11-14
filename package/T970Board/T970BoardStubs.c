@@ -97,3 +97,10 @@ __attribute__((weak)) volatile unsigned long native_touch_hid_reports[8];
 __attribute__((weak)) volatile unsigned long native_ufs_log_read[8];
 __attribute__((weak)) volatile unsigned long native_ufs_log_read_bytes[8];
 __attribute__((weak)) volatile unsigned long qcom_usb_debug_write[8];
+__attribute__((weak)) void boot_progress_exit_fault(int a, unsigned b, char *c, unsigned long d) { (void)a; (void)b; (void)c; (void)d; }
+__attribute__((weak)) void boot_progress_exit_reason(int a, unsigned b, char *c, unsigned long d) { (void)a; (void)b; (void)c; (void)d; }
+__attribute__((weak)) int boot_reset_probe(char *a, unsigned b) { (void)a; (void)b; return 0; }
+__attribute__((weak)) int boot_reset_bootloader(char *a, unsigned b) { (void)a; (void)b; return 0; }
+__attribute__((weak)) int boot_reset_mark_bootloader(char *a, unsigned b) { (void)a; (void)b; return 0; }
+__attribute__((weak)) int boot_reset_watchdog(unsigned c, char *a, unsigned b) { (void)c; (void)a; (void)b; return 0; }
+__attribute__((weak)) volatile unsigned long t970_motion_log_status[8];

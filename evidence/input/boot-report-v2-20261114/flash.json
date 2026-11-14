@@ -1,0 +1,13 @@
+{
+  "image": "out/dual-system/boot-report-v2-20261114/recovery-boot-report-v2.img",
+  "bytes": 86888448,
+  "sha256": "633652458498fb34345ef7ab0ba9897edc48f03a407025296c40e1c11eacdf0d",
+  "kernel_sha256": "9913aaacfda9761e17f5ad6172017216d751bba29d7f26d188046bce9193281a",
+  "partitions": [
+    "RECOVERY"
+  ],
+  "result": "RECOVERY upload successful",
+  "rollback": "out/dual-system/port-all-v3-20261114/recovery-port-all-v3.img",
+  "change": "BootProgress + BootLog + BootDiagExport only; fault/reset/watchdog probes dropped after the first link rebooted",
+  "timestamp": "2026-11-15T00:01:10.462523+08:00"
+}
