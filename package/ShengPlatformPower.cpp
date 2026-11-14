@@ -9,7 +9,6 @@
 #include <mach/kmod.h>
 #include <pexpert/pexpert.h>
 #include <kern/thread_call.h>
-#include <kern/clock.h>
 
 extern "C" {
 extern kmod_info_t g_kernel_kmod_info;
@@ -32,7 +31,7 @@ extern "C" int (*PE_halt_restart)(unsigned int);
 extern "C" volatile uint64_t t970_halt_restart_seen[2];
 volatile uint64_t t970_halt_restart_seen[2];
 // gts7xlwifi: the speaker amplifiers mute and power down first (T970Audio.cpp), or the speakers pop as the supply drops. Not on a panic.
-extern "C" __attribute__((weak)) void t970_audio_quiesce(void) {}
+extern "C" void t970_audio_quiesce(void) __attribute__((weak_import));
 static int t970_halt_restart(unsigned type)
 {
   uint64_t function;
@@ -49,7 +48,7 @@ static int t970_halt_restart(unsigned type)
       return 0;
   }
   t970_halt_restart_seen[0] = type;
-  if (type != kPEPanicRestartCPU) t970_audio_quiesce();
+  if (type != kPEPanicRestartCPU && t970_audio_quiesce) t970_audio_quiesce();
   register uint64_t x0 __asm__("x0") = function;
   register uint64_t x1 __asm__("x1") = 0;
   register uint64_t x2 __asm__("x2") = 0;
@@ -61,9 +60,10 @@ static int t970_halt_restart(unsigned type)
 
 // gts7xlwifi: shutdown failsafe (patches/xnu/t970-shutdown-failsafe.patch). The kernel calls this after the writable volumes are
 // unmounted and IOServicePH::systemHalt; periph15 then waited for minutes in vfs_unmountall(system) on the sealed OS volume and the
-// screen stayed on. Nothing writable is mounted at that point, so after the configured delay the PSCI call is made from here.
+// screen stayed on. Nothing writable is mounted at that point, so after kT970FailsafeSeconds the PSCI call is made from here.
 // t970_halt_restart_seen[0] gets 0x100 | type when the failsafe made the call; t970-shutdown-wait=SECS changes the delay (0 = off).
 static constexpr int kRbHalt = 0x08, kRbPanic = 0x800;
+static constexpr unsigned kT970FailsafeSeconds = 10;
 static thread_call_t t970_failsafe_call;
 static void t970_failsafe_fire(thread_call_param_t howto, thread_call_param_t)
 {
@@ -75,7 +75,7 @@ static void t970_failsafe_fire(thread_call_param_t howto, thread_call_param_t)
 }
 extern "C" void t970_shutdown_failsafe(int howto)
 {
-  unsigned seconds = 0;
+  unsigned seconds = kT970FailsafeSeconds;
   PE_parse_boot_argn("t970-shutdown-wait", &seconds, sizeof(seconds));
   if (!seconds || (howto & kRbPanic) || t970_failsafe_call || PE_halt_restart != t970_halt_restart) return;
   t970_failsafe_call = thread_call_allocate_with_options(t970_failsafe_fire, reinterpret_cast<thread_call_param_t>(static_cast<uintptr_t>(howto)),
@@ -129,10 +129,10 @@ static const OSMetaClass *lookup(const char *text)
   return meta;
 }
 
-extern "C" void sheng_pmgr_run(void)
+static void sheng_pmgr_publish(void)
 {
   unsigned mode = 0;
-  if (!PE_parse_boot_argn("sheng-pmgr", &mode, sizeof(mode)) || !mode) return;
+  if (!PE_parse_boot_argn("pmgr", &mode, sizeof(mode)) || !mode) return;
   sheng_pmgr_observation[15] = mode;
   sheng_pmgr_observation[1] = static_cast<uint32_t>(kIOReturnError);
   if (mode > 3 || sheng_pmgr_observation[0]) { sheng_pmgr_checkpoint(); return; }
@@ -189,9 +189,7 @@ extern "C" void sheng_pmgr_run(void)
       }
       provider->registerService(kIOServiceSynchronous);
       nub->registerService(kIOServiceSynchronous);
-      unsigned shutdownWait = 0;
-      if (PE_parse_boot_argn("t970-shutdown-wait", &shutdownWait, sizeof(shutdownWait)) && shutdownWait)
-        PE_halt_restart = t970_halt_restart;
+      PE_halt_restart = t970_halt_restart;
       sheng_pmgr_observation[0] = 5;
       sheng_pmgr_observation[13] = nub->getProvider() == provider && provider->getProvider() == platform;
       sheng_pmgr_observation[14] = (nub->getState() & provider->getState()) & kIOServiceRegisteredState;
@@ -224,4 +222,18 @@ extern "C" void sheng_pmgr_run(void)
       sheng_pmgr_observation[11] != sheng_pmgr_observation[12]) sheng_pmgr_observation[1] = static_cast<uint32_t>(kIOReturnError);
   sheng_pmgr_observation[0] = 4;
   sheng_pmgr_checkpoint();
+}
+
+// gts7xlwifi: every refusal above returns silently, and the unchanged AMFI then panics with the
+// uninformative "No PMGR?". In publication mode, name the stage and status on the panic screen instead
+// (observation[0]: 1 kext/class checks, 2 init, 3 nub bound, 4 released, 5 published).
+extern "C" void sheng_pmgr_run(void)
+{
+  sheng_pmgr_publish();
+  unsigned mode = 0;
+  if (PE_parse_boot_argn("pmgr", &mode, sizeof(mode)) && mode == 2 && sheng_pmgr_observation[0] != 5)
+    panic("ShengPlatformPower: not published stage=%llu status=%llx parent=%llx own=%llx nub=%llx bound=%llx read=%llx/%llx state=%llx/%llx",
+          sheng_pmgr_observation[0], sheng_pmgr_observation[1], sheng_pmgr_observation[2], sheng_pmgr_observation[3],
+          sheng_pmgr_observation[5], sheng_pmgr_observation[6], sheng_pmgr_observation[7], sheng_pmgr_observation[8],
+          sheng_pmgr_observation[13], sheng_pmgr_observation[14]);
 }
