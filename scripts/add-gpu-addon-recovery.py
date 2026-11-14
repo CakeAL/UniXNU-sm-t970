@@ -16,7 +16,9 @@ def node_entry(blob: bytes, offset: int) -> tuple[int, int]:
 
 def find_node(blob: bytes, path: str) -> tuple[int, int]:
     """Return (properties_begin, child_begin) for a path like '/chosen/memory-map'."""
-    def walk(offset: int, prefix: str) -> tuple[int, int] | None:
+    hit: list[tuple[int, int]] = []
+
+    def walk(offset: int, prefix: str) -> int:
         count, children = node_entry(blob, offset)
         cursor = offset + 8
         props = {}
@@ -29,14 +31,15 @@ def find_node(blob: bytes, path: str) -> tuple[int, int]:
         name = blob[begin:begin + length].rstrip(b"\0").decode()
         here = "/" if not prefix else prefix.rstrip("/") + "/" + name
         if here == path:
-            return (offset, cursor)
+            hit.append((offset, cursor))
+            return cursor
         for _ in range(children):
-            cursor = walk(cursor, here)[1]
-        return (offset, cursor)
-    found = walk(0, "")
-    if found is None:
+            cursor = walk(cursor, here)
+        return cursor
+    walk(0, "")
+    if not hit:
         raise SystemExit(f"ADT has no {path}")
-    return found
+    return hit[0]
 
 
 def add_property(blob: bytes, path: str, key: str, value: bytes) -> bytes:

@@ -1,12 +1,18 @@
 {
   "image": "out/dual-system/gpu-addon-20261114/recovery-gpu-addon.img",
   "bytes": 76060194,
-  "sha256": "b0877df66d9903e47341491e965d17061f0a5a061a58f6d591ff06015b83c1bc",
+  "sha256": "23e014090049fc04ab3295c38a77f62e928b6dac244f92bcb4bc8bfa76509501",
   "base": "out/dual-system/port-all-v3-20261114/recovery-port-all-v3.img",
-  "change": "FAT carries Payloads/kernel.macho.gpuaddon; ADT /chosen/memory-map gained a 16-byte GpuAddon property; args += gpu-addon=1 fb-gpu=1",
-  "kernel_sha256": "unchanged from v3 (kernel.macho 52,744,192 B)",
+  "adt_edit": "+52 B record GpuAddon(size 16, all zero) at /chosen/memory-map, property count 3->4; rest byte-identical",
+  "fAT_added": "Payloads/kernel.macho.gpuaddon 13,647,616 B NGPUADD2",
+  "kernel": "unchanged 52,744,192 B",
+  "args_added": [
+    "gpu-addon=1",
+    "fb-gpu=1"
+  ],
   "upload": "RECOVERY upload successful",
   "exit": 0,
   "rollback": "out/dual-system/port-all-v3-20261114/recovery-port-all-v3.img",
-  "at": "2026-11-14T21:50:36"
+  "note": "previous attempt inserted the record at offset 0 (walker early-return dropped), corrupting the ADT",
+  "at": "2026-11-14T21:56:24"
 }
