@@ -10,7 +10,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 # The module is not in UniXNU's component catalog, so the tree has no drivers/QcomXnuUsbDebug of its own: link the device
 # repository's copy (the tree links its package as kits/gts7xlwifi), which build-xnu-4k-baseline.sh's include path also names.
-DEVICE = Path(os.path.realpath(ROOT / 'kits/gts7xlwifi')).parent
+DEVICE = Path(os.environ.get('T970_DEVICE_DIR') or os.path.realpath(ROOT / 'kits/gts7xlwifi')).parent
 module = ROOT / 'drivers/QcomXnuUsbDebug'
 if not module.exists():
     module.symlink_to(DEVICE / 'drivers/QcomXnuUsbDebug')
