@@ -23,7 +23,7 @@ GPU_PROBES = {
 }
 
 
-def pack(base, kernel, mode, *, gpu_probe=None, shutdown=False, pen=False, haptics=False, usb=False):
+def pack(base, kernel, mode, *, gpu_probe=None, shutdown=False, pen=False, haptics=False, usb=False, gpu_addon=False):
     require(hashlib.sha256(base).hexdigest() == BASE_SHA, "Expected the verified dual-system RECOVERY")
     require(all(marker in kernel for marker in (
         b"T970 Data probe:", b"T970 Data persistence not active", b"store header is foreign")),
@@ -99,6 +99,9 @@ def pack(base, kernel, mode, *, gpu_probe=None, shutdown=False, pen=False, hapti
         entries = [entry for entry in tomllib.loads(config)["entry"] if entry["type"] == "xnu"]
         require(len(entries) == 1, "Expected one XNU entry")
         command_line = entries[0]["args"]
+        if gpu_addon and "gpu-addon=1" not in command_line.split():
+            command_line = command_line.rstrip() + " gpu-addon=1 fb-gpu=1"
+            config = config.replace(entries[0]["args"], command_line)
         require(len(command_line.encode()) <= 1000 and "t970-ufs-unixnu=1" in command_line.split(),
                 "Invalid XNU arguments")
         require(not any(arg.startswith(("sheng-data-reset", "sheng-log=", "ufsrw="))
@@ -137,10 +140,11 @@ def main():
     parser.add_argument("--pen", action="store_true", help="enable the independent Pencil HID in mode 2")
     parser.add_argument("--haptics", action="store_true", help="enable haptics and one boot pulse in mode 2")
     parser.add_argument("--usb", action="store_true", help="enable DWC3 high-speed device mode in mode 2")
+    parser.add_argument("--gpu-addon", action="store_true", help="use the addon embedded in the kernel image (mode 2)")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     recovery = pack(args.base.read_bytes(), args.kernel.read_bytes(), args.mode,
-                    gpu_probe=args.gpu_probe, shutdown=args.shutdown, pen=args.pen, haptics=args.haptics, usb=args.usb)
+                    gpu_probe=args.gpu_probe, shutdown=args.shutdown, pen=args.pen, haptics=args.haptics, usb=args.usb, gpu_addon=args.gpu_addon)
     with args.output.open("xb") as output:
         output.write(recovery)
     print(f"RECOVERY mode={args.mode} sha256={hashlib.sha256(recovery).hexdigest()} {args.output}")
