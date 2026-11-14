@@ -1,0 +1,13 @@
+{
+  "candidate": "out/dual-system/touch-core-20261114/recovery-touch-fixed.img",
+  "image_sha256": "b77dce17ad9ab0520eda85e829232590ca13bf19e024e473b5cf7ea9242996b3",
+  "image_size": 86888448,
+  "kernel_sha256": "8d3a6599653971cb1c7b09a42cf4fc786e1a39791b8d6848496095fc350b120b",
+  "kernel_size": 52768768,
+  "target": "RECOVERY",
+  "result": "RECOVERY upload successful",
+  "exit": 0,
+  "note": "NOS_ARM_ASM/NOS_ARM_PMAP and refreshed EXPORT_HDRS restore the AMP scheduler 8-core path; previous image hung at the green bar",
+  "flash_log": "out/dual-system/touch-core-20261114/flash-fixed.log",
+  "recorded": "2026-11-14T23:08:45+08:00"
+}
