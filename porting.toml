@@ -16,6 +16,8 @@ components = [
   "ArmDTPlatform",
 ]
 paths = [
+  "package/BootProgressStubs.c",
+  "package/LinkStubs.c",
   "reference/gts7xlwifi/**","docs/t733-feature-audit-20261107.md",
   "docs/peripherals.md",
   "docs/buttons.md",
@@ -100,6 +102,7 @@ procedure = [
   "Run python3.14 ../UniXNU-sm-t970/scripts/check-platform.py --unixnu . to compare DT/ADT bindings with the captured hardware.",
 ]
 findings = [
+  "The first Recovery uses the existing firmware memory allocation and links the CPU display mode with optional GPU diagnostics resolved.",
   "The wholesale build selects the same-model gts7xlwifi_defconfig and reference board DTS. Signed Adreno firmware is required to re-enable the A650 archive. The full board image has not been verified on this tablet.",
   "The same-board 88b34f9 source and configuration are retained as reference inputs. The working SM-T970 board definition stays selected for dual-system images.",
   "v91 device feedback confirms power-key lock and relight, with Consumer HID events for volume but no working volume change. v92/v93 qualify the MAX77705 bus; v94 is BOOT-only uploaded with gated read-only gauge sampling. The T733 reference audit adds future USB CDC/ECM/LLDB, persistent Data, shutdown, MSC and thermal/DVFS goals without importing its board wiring; GPU remains deferred.",
@@ -627,6 +630,7 @@ procedure = [
   "Capture root-readable /proc/iomem and the live DT, then compare physical memory and reserved-memory reg values.",
 ]
 findings = [
+  "The first wholesale Recovery keeps the qualified 3840 MiB firmware allocation. The reference 6.7 GiB path requires the matching firmware memory-hole export and remains pending.",
   "v93 BOOTbb5bd9d0 photo reports actual arm64 boot_args physBase=0xc007c000, memSize=memSizeActual=0xf0000000 and topOfKernelData=0xc43b8000; managed pages=0xe81d9. This disproves an assumed high-bank-only allocation but does not provide the full EFI map or authorize reclaiming ADT reservations. v94 retains exactly the same ADT and memory request.",
   "Added opt-in t970-memory-report=1 to report the actual64-bit arm64 boot_args physBase/memSize/memSizeActual/topOfKernelData. This is observation only; it does not expand the managed range. Runtime allocation-base evidence is pending on the next report image.",
   "v88 BOOT0c94056e changed only the actual DarwinBoot owned-window request to 3840 MiB on the pre-v87 kernel. Owner desktop confirmation and three-finger photo show 0xe81dc managed 4 KiB pages (3713.859375 MiB), main1, cpu8/sec7. The unsafe t970-8g-managed-range patch was removed from the active series; full 8 GB, physical allocation base/map, carveout integrity and pressure testing remain unverified.",
@@ -826,6 +830,7 @@ procedure = [
   "Read block sysfs and by-name links; read each LUN's primary GPT header and entry array and validate their CRC32 values without writing any block device.",
 ]
 findings = [
+  "The board RamBlock direct path binds to the same guarded synchronous store writes as the regular path.",
   "The wholesale ShengUfs build requires the exact unixnu GPT range, loads the two authenticated root envelopes from the existing carrier, and reuses the protected 512 MiB RamBlock Data store. Direct reference APFS Data publication was removed from the wholesale driver.",
   "On 2026-11-08 TWRP shrank the fresh MinsOS F2FS and verified both GPTs after a recovery restart. Android userdata keeps LBA 2969600 through 37292799. The new 96 GiB unixnu partition occupies LBA 37292800 through 62458623. Unrelated GPT entries, including factory duplicate GUIDs, were preserved.",
   "The explicit t970-ufs-unixnu=1 selector resolves the unixnu GPT entry and confines verified-root carrier reads to that range. The host test with the captured GPT verifies the selector, the legacy userdata path and failure when unixnu is absent. The iPadOS Data seed remains RAM-backed.",
@@ -1005,6 +1010,7 @@ id = "display"
 status = "implemented"
 components = ["GopFramebuffer"]
 paths = [
+  "scripts/build-gop-legacy-display.py",
   "evidence/display/setup-skip-v84/**",
   "evidence/display/setup-fb-cache-v83/**",
   "evidence/display/gop-fb-cache/**",
@@ -1103,6 +1109,7 @@ procedure = [
   "Collect DRM modes, panel type and brightness limits; read only display-selection tokens from /proc/cmdline and match the selected S6TUUM3 node in the live DT.",
 ]
 findings = [
+  "The reference GOP and HID archive has passed its 21H461 ABI audit and compiles through the standard build.",
   "The v84 trace measured 42.531 ms for its last CPU framebuffer copy and 49.297 ms maximum. This timer covers copying a completed frame to scanout and the memory barrier. The v62 trace separately measured 93.587 seconds from display publication to its first copy.",
   "The v123 diagnostic display archive links the pinned A650GmuRegions and AdrenoFirmware planner objects and embeds the hash-checked A650 image only when explicitly requested.",
   "The v136 diagnostic display archive accepts a separate opt-in SQE input, validates its exact stock size and SHA-256, and exposes the CB1 root mode only in kernels built with that input.",
@@ -1738,7 +1745,8 @@ procedure = [
   "Read selected power-supply attributes, available sleep states and thermal-zone names; do not write charging, regulator or suspend controls.",
 ]
 findings = [
-  "The wholesale profile selects the reference battery worker from the display late archive and requests t970-battery=1. The older BOOT battery fixtures remain historical evidence.",
+  "The reference late display hook selects the existing T970Power battery service and its tested bus implementation; the reference snapshot does not define the SE0 helpers its own battery source imports.",
+  "The wholesale profile requests t970-battery=1 through the reference late display hook.",
   "The imported PSCI shutdown path is opt-in via t970-shutdown-wait. The deferred fallback checks the mount list after the non-system unmount pass and arms only if no writable volume remains. The standalone and Pencil kernels linked and passed Recovery readback. Actual power-off and a subsequent persistent Data boot remain unobserved.",
   "The DRV2 command adapter shares its lock with the touch rail sequence. The combined candidate links the opt-in T970Haptics service and its boot pulse on PM8150L LDO7. Motor and rail status remain unobserved on this tablet.",
   "The opt-in DWC3 build routes the MAX77705 MUIC from the existing battery worker, after PMIC identification. It publishes the route only after SE0 restoration, before the USB worker touches DWC3.",
@@ -1802,6 +1810,7 @@ components = [
   "XnuPrelink",
 ]
 paths = [
+  "scripts/pack-wholesale-recovery.py",
   "evidence/storage/dual-system-20261108/**",
   "evidence/display/display-continuous-v25/**",
   "evidence/display/key-state-v10/**",
@@ -1893,6 +1902,7 @@ procedure = [
   "Read BuildManifest.plist from the local IPSW using Python zipfile and plistlib to identify its OS version, build and product types.",
 ]
 findings = [
+  "A standard UniXNU FAT payload can be packed inside the exact tested Recovery outer wrapper. The packer verifies the persistent seed, trust cache, partition size and approved storage and memory arguments before writing a local candidate.",
   "The wholesale Recovery profile drops the reference direct Data mount patch and sets the embedded FAT budget to 72 MiB. The original persistent seed and recovery-only partition bound are required for packaging.",
   "Host readback of the standalone shutdown Recovery 755c53f3, shutdown/Pencil Recovery 5aeca0c4 and haptics combination 7c378fab confirms the same firmware, DTBO, firmware DTB, partition tail, ADT, trust cache and Data seed as persistent mode 2. All three candidates await a device boot.",
   "The combined USB Recovery c5e1456a passed independent host readback against the haptics candidate. The patched Heimdall uploaded RECOVERY only after checking the device PIT. Upload acknowledgement is recorded separately from device boot and readback.",
@@ -2213,6 +2223,7 @@ procedure = [
   "Run python3 scripts/collect-adb-inventory.py --root --output evidence/<new-capture>; review per-command stderr, checksums, GPT CRC results and DT sanitization before updating this record.",
 ]
 findings = [
+  "Optional GPU trace and USB diagnostic references are satisfied by inactive definitions during the CPU-display build.",
   "The wholesale Wi-Fi build checks the pinned source checkout before fetching again; standard launch diagnostics have no on-device result for this build.",
   "The QcomDwc3 archive has 102 AppleUSBXDCI bindings verified against the local 21H461 prelink with AppleUSBXDCI and AppleUSBDeviceMux roots, and links into Recovery c5e1456a. Finder enumeration remains unobserved on this tablet.",
   "The Metal addon is an independent host artifact (SHA-256 fb32130db66e4a3dfcb0bdb4d030aa6381159e70945837b6a685a84484104ca4); it was not added to the current Recovery. SPIR-V smoke shader validation and strict code signatures passed.",

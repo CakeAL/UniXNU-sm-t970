@@ -154,10 +154,7 @@ kernel_args = ["kt_fixed_zones=120", "smp=1",
   "pmgr=2",
   # Only the measured unixnu partition contains the existing root and Data overlay.
   "native-ufs-root=1", "native-ufs-stream=0xe0", "native-ufs-stream2=0x4e0",
-  "sheng-data-persist=2",
-  # The kernel manages DRAM from the owned window up to here (patches/xnu/t970-dram-extend.patch):
-  # 768 MiB left ~1 MiB free once launchd ran and jetsam kept killing daemons (v14, 2026-10-31).
-  "t970-dram-end=0x280000000",
+  "sheng-data-persist=2", "data-fua=1",
   # Display, as UniXNU-alioth: load the original mobile graphics family and drive the prelinked
   # IOMobileFramebufferLegacy from the GOP framebuffer (offline-component-load-probes.patch).
   # offline-legacy-pm: backboardd only presents after it turns display power on (sirius). Its PM registration in
@@ -182,7 +179,7 @@ kernel_args = ["kt_fixed_zones=120", "smp=1",
   # wallpaper freeze (AdrenoMetal: a Poster process's first big frame is kept, its later command buffers are held back).
   # Room: keepsyms, pipa-gpu-pool (BOs are pageable system memory now, the pool default is 0), offline-legacy-verdict (an early
   # bring-up panic) and staged-apps=1 (the copy finished in v91; t970-migrate-once.patch installs them) left the line.
-  "memory-outside=1", "memory-outside-floor=0xd0000000", "t970-battery=1"]
+  "t970-battery=1"]
 # Brightness (package/BacklightProbe.cpp, the S6TUUM3 panel over DSI0 and DSI1) is on without an argument: the command line
 # is at its 1000-byte limit. t970-bl=0 turns it off.
 # Text fixups (kernel native-text-fixup.patch, applied to a signed page before it first runs, re-applied on page-in): this array
@@ -212,17 +209,9 @@ packed_data_ramdisk = true
 persistent_data = true
 # /chosen/chip-id is the Qualcomm SoC ID: live FDT qcom,msm-id <356 0x20001>, 356 = 0x164.
 chip_id = "0x164"
-# 768 MiB. The tablet's UEFI (firmware-t970 Upstream/gts7xlwifi/Memory/PlatformMemoryMap.c,
-# MEMORY_ENABLE=1) exposes only two conventional runs: DXE Heap 0xC0000000+0xDFC0000 and
-# "High RAM UNVALIDATED" 0x200000000+0x40000000; the rest of DRAM is reserved. DarwinBoot's
-# window must fit in the 1 GiB run next to the firmware's own allocations there: 4 GiB and
-# 1.5 GiB returned "Out of Resources" (2026-10-30); 512 MiB was placed at 0x20007C000 and
-# stopped after "exiting boot services" with nothing drawn.
-# 640 MiB from 2026-10-31: firmware-t970 opens 0xD0000000..0xFFC00000 as conventional memory (PlatformMemoryMap.c),
-# and DarwinBoot's first fit puts the window there, leaving room below 4 GiB for UEFI's own allocations. The kernel
-# then manages up to t970-dram-end and skips /chosen/t970-dram-holes (patches/xnu/t970-dram-holes.patch). If the
-# window does not fit, DarwinBoot falls back to the 1 GiB high run and the kernel stops at 2 GiB as before.
-owned_memory_size = "0x28000000"
+# Use the qualified owned allocation with the existing Recovery firmware.
+# The reference's high-memory extension requires its matching UEFI hole export.
+owned_memory_size = "0xf0000000"
 # The OS volume of the SHNGROOT image on sda39 (owner policy 04769D26, same image as alioth).
 root_match_volume_uuid = "04769D26-2CA0-4825-B443-E2E5F88300F2"
 # Passed only through --unique-chip-id / UNIXNU_UNIQUE_CHIP_ID from the ignored local.toml.

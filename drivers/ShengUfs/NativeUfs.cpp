@@ -1482,6 +1482,12 @@ extern "C" int native_ufs_store_write (uint64_t rel, uint32_t blocks, const void
   return 1;
 }
 
+// RamBlock's direct path can use the same synchronous write contract.
+extern "C" int native_ufs_store_write_cached (uint64_t rel, uint32_t blocks, const void *src)
+{
+  return native_ufs_store_write (rel, blocks, src);
+}
+
 extern "C" int native_ufs_store_sync (void)
 {
   return storeMode () == 2 && gStoreRegionBlocks && hostSyncCache () == kIOReturnSuccess;

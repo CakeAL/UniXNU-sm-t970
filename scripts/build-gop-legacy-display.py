@@ -484,8 +484,9 @@ run(cpufreq_command, cwd=record['directory'])
 # attempt did: the link then failed on every native_legacy_* symbol the hooks define.
 service_objects = []
 # gts7xlwifi adds its STM fts1ba90a touch core (package/T970FtsTouch.cpp), which defines touchProbeStart().
-for service_name in ('BacklightProbe', 'ButtonProbe', 'T970FtsTouch', 'T970WifiProbe', 'T970Battery', 'T970Haptics', 'T970Camera', 'T970CameraService', 'T970Adsp', 'T970Audio', 'T970AudioService', 'T970Sensors', 'T970Pen'):
-    _service = sorted(ROOT.glob('kits/*/' + service_name + '.cpp'))
+for service_name in ('BacklightProbe', 'ButtonProbe', 'T970FtsTouch', 'T970WifiProbe', 'BatteryService', 'T970Haptics', 'T970Camera', 'T970CameraService', 'T970Adsp', 'T970Audio', 'T970AudioService', 'T970Sensors', 'T970Pen'):
+    relative = 'T970Power/BatteryService.cpp' if service_name == 'BatteryService' else service_name + '.cpp'
+    _service = sorted(ROOT.glob('kits/*/' + relative))
     require(_service, service_name + '.cpp missing: no kits/*/' + service_name + '.cpp')
     service_source = _service[0]
     service_obj = OUT / (service_name + '.o')
@@ -508,14 +509,16 @@ for service_name in ('BacklightProbe', 'ButtonProbe', 'T970FtsTouch', 'T970WifiP
                         '-Wno-c99-designator', '-Wno-reorder-init-list',
                         '-Wno-deprecated-enum-enum-conversion', '-Wno-missing-designated-field-initializers',
                         '-I', str(record['directory']), '-I', str(ROOT / '.cache/xnu-work/osfmk'), '-I', str(OUT)]
+    if service_name == 'BatteryService':
+        service_command.append('-Wno-unused-function')  # Shared headers also expose standalone diagnostics.
     service_command += service_suppressions
     run(service_command, cwd=record['directory'])
-    if service_name == 'T970Battery':
+    if service_name == 'BatteryService':
         # An IOPMPowerSource subclass: its metaclass registers when the service's worker runs the initialiser between
         # preModLoad and postModLoad, as the key store class above, not from the kernel's __mod_init_func.
-        battery_late = OUT / 'T970Battery.late.o'
+        battery_late = OUT / 'BatteryService.late.o'
         run([shutil.which('llvm-objcopy'), '--remove-section=__DATA,__mod_init_func',
-             '--globalize-symbol=__GLOBAL__sub_I_T970Battery.cpp', service_obj, battery_late])
+             '--globalize-symbol=__GLOBAL__sub_I_BatteryService.cpp', service_obj, battery_late])
         service_obj = battery_late
     if service_name == 'T970Haptics':
         # The vibration motor service (an IOService subclass): registered from its worker between preModLoad and postModLoad,

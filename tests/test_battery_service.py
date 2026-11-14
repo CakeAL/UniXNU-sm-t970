@@ -91,8 +91,8 @@ class ServiceWiring(unittest.TestCase):
         display = (ROOT / 'package/LegacyDisplayProbe.cpp').read_text()
         self.assertIn('if (&t970_battery_start) t970_battery_start();', display)
         builder = (ROOT / 'scripts/build-gop-legacy-display.py').read_text()
-        self.assertIn("'T970Battery'", builder)
-        self.assertIn('T970Battery.late.o', builder)
+        self.assertIn('T970Power/BatteryService.cpp', builder)
+        self.assertIn('BatteryService.late.o', builder)
         self.assertIn('service_objects', builder.split('archive = OUT /', 1)[1])
         self.assertIn('"t970-battery=1"', (ROOT / 'board.toml').read_text())
 

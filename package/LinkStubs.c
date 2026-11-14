@@ -139,3 +139,15 @@ __attribute__((weak)) unsigned int native_pmap_user_mappings(unsigned int page, 
 	return 0;
 }
 __attribute__((weak)) volatile uint32_t native_adreno_bad_physical[4];
+
+
+// Optional GPU entry points used by display and boot-report code in CPU mode.
+#include <stdbool.h>
+__attribute__((weak)) const void *native_adreno_global_lock(void) { return 0; }
+__attribute__((weak)) bool native_adreno_fences(uint32_t *submitted, uint32_t *retired) { return false; }
+__attribute__((weak)) bool native_adreno_fences_detail(uint32_t *submitted, uint32_t *retired, uint32_t *detail) { return false; }
+__attribute__((weak)) int native_gpu_trace_enabled(void) { return 0; }
+__attribute__((weak)) void native_gpu_trace_record(uint32_t event, uint32_t pid, const uint64_t *values, uint32_t count) {}
+
+// iPadOS 17 has no helper for releasing UEFI payload memory from the static map.
+__attribute__((weak)) bool ml_static_mfree_prepare(uintptr_t address, uintptr_t size) { return false; }

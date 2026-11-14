@@ -342,3 +342,23 @@ __attribute__((weak)) void qcom_usb_debug_get_status(void *status)
 // gts7xlwifi direct scanout rows (BootLog.c [direct]); the real ones live in GopFramebuffer and ShengUfs.
 __attribute__((weak)) uint32_t native_t970_direct[11];
 __attribute__((weak)) uint32_t native_t970_swapfmt[5];
+
+// Optional GPU and USB counters in the Recovery boot report.
+__attribute__((weak)) volatile uint32_t native_adreno_map_ring_count;
+__attribute__((weak)) volatile uint32_t native_adreno_unmap_ring_count;
+__attribute__((weak)) volatile uint32_t native_gpu_step;
+__attribute__((weak)) volatile uint32_t native_t970_wc_reassert;
+__attribute__((weak)) volatile uint32_t native_adreno_close_step[8];
+__attribute__((weak)) volatile uint32_t native_adreno_cp_aperture[4];
+__attribute__((weak)) volatile uint32_t native_adreno_cp_image[22];
+__attribute__((weak)) volatile uint32_t native_adreno_map_ring[256][4];
+__attribute__((weak)) volatile uint32_t native_adreno_table_pages[4];
+__attribute__((weak)) volatile uint32_t native_adreno_table_switches[8];
+__attribute__((weak)) volatile uint32_t native_adreno_unmap_ring[256][4];
+__attribute__((weak)) volatile uint32_t native_adreno_vm_fail[7];
+__attribute__((weak)) volatile uint32_t native_t970_ttbr[12];
+__attribute__((weak)) volatile uint32_t native_t970_wc_attr[3];
+__attribute__((weak)) volatile uint32_t t970_qud_faults[16];
+__attribute__((weak)) volatile int32_t t970_qud_retry[8];
+
+__attribute__((weak)) volatile int32_t t970_battery[28];
