@@ -1,0 +1,13 @@
+{
+  "image": "out/dual-system/touch-early-20261114/recovery-touch-early.img",
+  "bytes": 86888448,
+  "sha256": "5a4c62a6e2371e6b7c9f5ab569613712f23fbaaf4293b8e3796aa7d5e3f13cf1",
+  "kernel_sha256": "23117742be369a1c2ecce805d63d52446963ac97c8d10e9eae622b21c71cef42",
+  "partitions": [
+    "RECOVERY"
+  ],
+  "result": "RECOVERY upload successful",
+  "rollback": "out/dual-system/port-all-v3-20261114/recovery-port-all-v3.img",
+  "change": "touch core started at the top of the late display probe, before the IOSurface/framebuffer gates; HID publisher now optional",
+  "timestamp": "2026-11-14T23:31:40.495084+08:00"
+}

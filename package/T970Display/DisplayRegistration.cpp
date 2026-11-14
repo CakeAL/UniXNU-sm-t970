@@ -188,6 +188,9 @@ extern "C" void native_legacy_display_probe(void) {
 extern "C" void t970_touch_bridge_start(void);
 
 extern "C" void native_legacy_display_late_probe(void) {
+    // Start touch before the display path can bail: the controller needs no framebuffer, and a
+    // refused IOSurface load must not take the input device down with it.
+    t970_touch_bridge_start();
     IOService *display = pendingDisplay;
     if (!display) {
         return;
@@ -256,7 +259,6 @@ extern "C" void native_legacy_display_late_probe(void) {
         activeProvider = provider;
         OSSafeReleaseNULL(treeParent);
         IOLog("T970 display: CPU framebuffer service ready 2800x1752 stride=%lu\n", video.v_rowBytes);
-        t970_touch_bridge_start();
 #if defined(T970_TOUCH_HID)
         t970_touch::startHid();
 #endif

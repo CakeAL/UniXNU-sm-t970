@@ -64,12 +64,13 @@ extern "C" void t970_touch_bridge_start(void)
     if (!PE_parse_boot_argn("t970-touch-hid", &enabled, sizeof(enabled)) || enabled != 1) {
         return;
     }
-    if (!t970_touch_hid_start()) {
-        IOLog("T970 touch: HID publisher start refused\n");
-        return;
-    }
+    // The controller is independent of the display and of the HID publisher: start it first so a
+    // refused IOHIDFamily load cannot keep the touch core from running, then attach the sink.
     native_touch_set_sink(forward, nullptr);
     if (!touchProbeStart()) {
         IOLog("T970 touch: FTS core refused to start\n");
+    }
+    if (!t970_touch_hid_start()) {
+        IOLog("T970 touch: HID publisher start refused\n");
     }
 }
