@@ -51,3 +51,25 @@ python3.14 -m unittest discover -s tests
 `scripts/build-display-registration.py --dsp` 构建 ADSP、SLPI、APR 和音频服务对象及 Xcode 的两个 128 位除法 helper。初始化首先登记音频服务，然后启动 ADSP 和 SLPI，关机复用真实的音频停止回调。预链接和 HID 检查通过，镜像 `out/dual-system/dsp-20261114/recovery-dsp-disabled.img` 的 SHA-256 是 `d9aa10ced26d64bc5a5e6ca856ac24da41f75a8fa9555879a44ace8cbe9b83a6`。扬声器、麦克风和 SLPI 保持关闭，待签名固件及用户态接入完成后实测。
 
 Metal 构建在参考 UniXNU `62be7bc` 上运行。AdrenoMetal 为 `83b667824cb88c89473480cdf0c2c7276cd3ffc8`，metal2vulkan 为 `555b13d57e09bff70996a88cff64f1275256d5cf`，Mesa 为 `85fda3b36405bcaea8bffc64aa4f2651dc90770d`。先应用参考目录内的 Mesa patch series，再应用同型号 host patches 0002 和 0003 中的 BO 延迟回收修复。参考 0003 同时处理 iOS 17 Turnip 的 classic dyld binding。插件、Turnip 和探针分别通过严格签名检查，测试着色器通过 SPIR-V 校验。独立 Metal addon 位于 `out/dual-system/firmware-inputs-20261114/addon-metal.bin`，SHA-256 为 `fb32130db66e4a3dfcb0bdb4d030aa6381159e70945837b6a685a84484104ca4`。此处尚未移入参考的显示像素格式修复，也没有实机帧率、花屏或启动耗时数据。
+
+## 触控接线与内核重建阻塞（2026-11-14 夜）
+
+从同型号仓库取回 STM fts1ba90a 触控核心后，本仓库自己的 HID 发布器已经可用：
+`package/T970Touch/TouchHid.cpp` 导出 `t970_touch_hid_start()` 与
+`t970_touch_hid_frame(const T970TouchFrame&)`，`T970FtsTouch.cpp` 导出
+`touchProbeStart()`、`native_touch_set_sink()` 与 `native_touch_*` 序列锁。
+`package/T970Touch/TouchBridge.cpp` 把两者接起来（晚探测里由
+`t970_touch_bridge_start()` 启动，带 `t970-touch-hid=1` 开关），
+`scripts/build-touch-core.py` 用树内内核 C++ 编译记录产出
+`T970FtsTouch.o`、`TouchBridge.o` 与带外设宏的 `DisplayRegistration.o`。
+
+阻塞点不在驱动，而在整树内核重建：`.cache/xnu-work` 被重置后，
+当前 Xcode 27.2 SDK 不再提供 xnu 需要的 `usr/local/libexec/availability.pl`、
+`usr/local/include/kernel` 私有头与 `CodeSignature/Entitlements.h`，
+主机上也没有可回退的 iPhoneOS 26.x SDK，因此全量重编在
+`make_symbol_aliasing.sh`、`libkern/os/log.c`、`bsd/net/necp_client.c` 处失败。
+旧的 887 个对象文件仍在 `build/xnu/ios-obj`，但补丁源已重写，无法安全复用。
+
+结论：触控源码与接线已在本仓库完成并提交；要让平板真正拿到触控，
+需要先用 26.x SDK（或补回上述 SDK 文件）重建一次内核，再走
+`relink → prelink → pack-dual-data-recovery.py → Heimdall` 刷 RECOVERY。
