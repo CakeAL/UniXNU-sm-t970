@@ -243,3 +243,14 @@ Build checkpoint: standard `unixnu build kernel` now passes the initial
 compilation stage and enters the archive build. A successful bootstrap stops
 at the expected unresolved archive symbols. GPU remains gated on the device's
 signed `a650_zap` input. The wholesale change has no device observation yet.
+
+The whole-board kernel linked and prelinked at SHA-256 `246bc7f4…`. The
+72 MiB payload was rebuilt with a dedicated local build config to exclude old
+single-core and verbose arguments. The final image is `recovery-wholesale.img`
+(SHA-256 `cbbf85d79a71670b0058f47839c48c2fc493428a1fae14bdd45b2056624be4f4`).
+The original Recovery firmware, DTBO, DTB, Data seed and trust cache match on
+readback. Heimdall uploaded only RECOVERY, exit 0. This first image uses the
+existing 3840 MiB firmware allocation and CPU display. The matching GPU
+firmware and the reference UEFI memory-map handoff are still required for the
+GPU and 6.7 GiB configuration. See the upload receipt in
+`evidence/input/wholesale-recovery-20261115/flash.json`.

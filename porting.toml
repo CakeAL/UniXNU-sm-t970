@@ -1810,6 +1810,7 @@ components = [
   "XnuPrelink",
 ]
 paths = [
+  "evidence/input/wholesale-recovery-20261115/**",
   "scripts/pack-wholesale-recovery.py",
   "evidence/storage/dual-system-20261108/**",
   "evidence/display/display-continuous-v25/**",
@@ -1902,6 +1903,7 @@ procedure = [
   "Read BuildManifest.plist from the local IPSW using Python zipfile and plistlib to identify its OS version, build and product types.",
 ]
 findings = [
+  "The wholesale Recovery cbbf85d7 passes FAT and outer firmware/DTBO/DTB readback and uploads to RECOVERY with Heimdall exit 0. Device boot and touch observation are pending.",
   "A standard UniXNU FAT payload can be packed inside the exact tested Recovery outer wrapper. The packer verifies the persistent seed, trust cache, partition size and approved storage and memory arguments before writing a local candidate.",
   "The wholesale Recovery profile drops the reference direct Data mount patch and sets the embedded FAT budget to 72 MiB. The original persistent seed and recovery-only partition bound are required for packaging.",
   "Host readback of the standalone shutdown Recovery 755c53f3, shutdown/Pencil Recovery 5aeca0c4 and haptics combination 7c378fab confirms the same firmware, DTBO, firmware DTB, partition tail, ADT, trust cache and Data seed as persistent mode 2. All three candidates await a device boot.",
