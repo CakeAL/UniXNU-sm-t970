@@ -1,0 +1,12 @@
+{
+  "hypothesis": "the embedded 13.6 MB addon blob breaks early boot; the patch and relink are fine",
+  "kernel_patch": "t970-gpu-addon-embedded.patch (weak symbols)",
+  "addon": "zero-size stub (__DATA,__const: quad 0)",
+  "image": "out/dual-system/experiment-a-20261114/recovery-experiment-a.img",
+  "bytes": 64755234,
+  "sha256": "da862c783b46dec4ec060a2eef9e63eafd462823087814f3965b1c770e3563c2",
+  "kernel_macho_sha256": "2847dce8c336d9487c3a1db188e285a41b9966de492915b398adcefc41eee10a",
+  "previous": "out/dual-system/port-all-v4-20261114/recovery-port-all-v4.img",
+  "result": "RECOVERY upload successful",
+  "flashed_at": "2026-11-14T21:38:25"
+}
