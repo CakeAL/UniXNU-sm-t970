@@ -13,6 +13,7 @@
 #include "TouchHid.h"
 #include <IOKit/IOLib.h>
 #include <pexpert/pexpert.h>
+#include <kern/thread.h>
 
 bool touchProbeStart();
 
@@ -20,6 +21,10 @@ extern "C" {
 void native_touch_set_sink(void (*sink)(void *), void *context);
 extern volatile uint32_t native_touch_seq, native_touch_count;
 extern volatile int native_touch_xs[12], native_touch_ys[12], native_touch_ids[12];
+extern volatile uint32_t native_touch_fail_step;
+extern volatile int native_touch_stage_result;
+extern volatile unsigned native_touch_stage_value, native_touch_stage_total;
+extern char native_touch_stage_name[32];
 }
 
 namespace {
@@ -58,19 +63,38 @@ void forward(void *)
 
 }  // namespace
 
+namespace {
+volatile unsigned diagHidRefused;
+
+void diagWatchdog(void *, wait_result_t)
+{
+    IOSleep(12000);
+    panic("T970 touch: step=%u last=%s value=%x rc=%d hid=%u frames=%u",
+          (unsigned)native_touch_fail_step, native_touch_stage_name,
+          (unsigned)native_touch_stage_value, (int)native_touch_stage_result,
+          (unsigned)diagHidRefused, (unsigned)native_touch_count);
+}
+}  // namespace
+
 extern "C" void t970_touch_bridge_start(void)
 {
+    thread_t diag = nullptr;
+    if (kernel_thread_start(diagWatchdog, nullptr, &diag) == KERN_SUCCESS) {
+        thread_deallocate(diag);
+    }
     unsigned enabled = 0;
     if (!PE_parse_boot_argn("t970-touch-hid", &enabled, sizeof(enabled)) || enabled != 1) {
         return;
     }
-    // The controller is independent of the display and of the HID publisher: start it first so a
-    // refused IOHIDFamily load cannot keep the touch core from running, then attach the sink.
+    // Keep the booting order: the HID publisher is loaded first, exactly as in the image that
+    // reaches the home screen, but a refusal no longer stops the digitizer from starting.
+    const bool hid = t970_touch_hid_start();
+    if (!hid) {
+        diagHidRefused = 1;
+        IOLog("T970 touch: HID publisher start refused\n");
+    }
     native_touch_set_sink(forward, nullptr);
     if (!touchProbeStart()) {
         IOLog("T970 touch: FTS core refused to start\n");
-    }
-    if (!t970_touch_hid_start()) {
-        IOLog("T970 touch: HID publisher start refused\n");
     }
 }
