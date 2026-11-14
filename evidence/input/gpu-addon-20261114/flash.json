@@ -1,0 +1,12 @@
+{
+  "image": "out/dual-system/gpu-addon-20261114/recovery-gpu-addon.img",
+  "bytes": 76060194,
+  "sha256": "b0877df66d9903e47341491e965d17061f0a5a061a58f6d591ff06015b83c1bc",
+  "base": "out/dual-system/port-all-v3-20261114/recovery-port-all-v3.img",
+  "change": "FAT carries Payloads/kernel.macho.gpuaddon; ADT /chosen/memory-map gained a 16-byte GpuAddon property; args += gpu-addon=1 fb-gpu=1",
+  "kernel_sha256": "unchanged from v3 (kernel.macho 52,744,192 B)",
+  "upload": "RECOVERY upload successful",
+  "exit": 0,
+  "rollback": "out/dual-system/port-all-v3-20261114/recovery-port-all-v3.img",
+  "at": "2026-11-14T21:50:36"
+}
