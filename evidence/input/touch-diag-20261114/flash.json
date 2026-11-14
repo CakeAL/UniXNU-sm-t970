@@ -1,0 +1,15 @@
+{
+  "image": "out/dual-system/touch-diag-20261114/recovery-touch-diag.img",
+  "bytes": 86888448,
+  "sha256": "05a2196d633881042d3fb98308e8bb8066fd4ec214de8a6c3c99145ecbcbb11b",
+  "kernel": {
+    "source": "out/dual-system/touch-core-20261114/kernel.raw",
+    "prelinked_sha256": "43e0bbc49f79ec301cd67ca9d2285dba762263af1dcac042b46abbe3ab7c4947"
+  },
+  "partitions": [
+    "RECOVERY"
+  ],
+  "result": "upload completed; session closed",
+  "note": "touch stage lines now printed to the boot console",
+  "timestamp": "2026-11-14T23:25:46.806898+08:00"
+}

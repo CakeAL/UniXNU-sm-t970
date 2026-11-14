@@ -215,6 +215,7 @@ void stage(const char *name,unsigned value,int result){
     touchFlush();
     IOLog("T970 touch: %s value=%x result=%d nacks=%u bus=%u stretch=%u t=%ums\n",name,value,result,gNacks,gBusErrors,
           gStretchTimeouts,msSince(gEpoch));
+    printf("T970 touch: %s value=%x result=%d nacks=%u t=%ums\n",name,value,result,gNacks,msSince(gEpoch));
 }
 bool readEvent(uint8_t cmd,uint8_t *out,unsigned n){return i2cWriteRead(&cmd,1,out,n);}
 // fts_wait_for_ready: a status event of type INFORMATION (2) with status id READY (0).
