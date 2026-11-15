@@ -1,0 +1,39 @@
+--- a/bsd/kern/kern_exec.c
++++ b/bsd/kern/kern_exec.c
+@@ -1188,8 +1188,9 @@
+  *		to activate the image.
+  */
+ static int
+-exec_mach_imgact(struct image_params *imgp)
++	exec_mach_imgact(struct image_params *imgp)
+ {
++	{ extern void boot_progress_stage(const char *); boot_progress_stage("PID1 exec_mach_imgact enter"); }
+ 	struct mach_header *mach_header = (struct mach_header *)imgp->ip_vdata;
+ 	proc_t                  p = vfs_context_proc(imgp->ip_vfs_context);
+ 	int                     error = 0;
+@@ -1345,7 +1346,8 @@
+ 	 * Actually load the image file we previously decided to load.
+ 	 */
+ 	boot_progress_process_stage(proc_getpid(p),p->p_name,"exec load_machfile enter");
+-	lret = load_machfile(imgp, mach_header, thread, &map, &load_result);
++	lret = load_machfile(imgp, mach_header, thread, &map, &load_result);	{ extern void boot_progress_stage(const char *); boot_progress_stage("PID1 load_machfile returned"); }
++
+ 	boot_progress_process_stage(proc_getpid(p),p->p_name,"exec load_machfile returned");
+ 	if (lret != LOAD_SUCCESS) {
+ 		error = load_return_to_errno(lret);
+@@ -8213,6 +8215,7 @@
+ 	 * image on the former Windows partition (t970-ufs-data=1, writable with ufsrw=1). Not a RAM seed:
+ 	 * base and the seed digest stay zero, size is the container's bytes. */
+ 	extern int t970_ufs_data_volume(const char *, dev_t *, char *, size_t, uint64_t *);
++	{ extern void boot_progress_stage(const char *); boot_progress_stage("PID1 volume lookup call"); }
+ 	if (t970_ufs_data_volume("4F1C34B9-BBE3-4803-92AC-1503AEF26540", &device, device_path,
+ 	    sizeof(device_path), &size)) { error = ENOENT; goto done; }
+ 	if (device == NODEV || !size || (size & 4095)) goto done;
+@@ -8407,6 +8410,7 @@
+ #endif
+ #if defined(XNU_OWNER_DATA_MOUNT) && XNU_OWNER_DATA_MOUNT
+ 	boot_progress_stage("Data mount enter");
++	{ extern void boot_progress_stage(const char *); boot_progress_stage("PID1 data volume enter"); }
+ 	int data_error = native_owner_data_prepare(p, (user_addr_t)scratch_addr);
+ 	boot_progress_stage("Data mount returned");
+ 	if (data_error) panic("offline scratch Data mount failed: %d", data_error);
