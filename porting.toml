@@ -726,11 +726,14 @@ id = "storage"
 status = "implemented"
 components = ["ShengUfs", "VirtioMmioBlock", "RamBlock", "VerifiedRoot"]
 paths = [
+  "evidence/storage/large-data-y-20261115/**",
+  "evidence/storage/large-data-x-20261115/**",
   "evidence/storage/large-data-w-20261115/**",
   "evidence/storage/large-data-v-20261115/**",
   "evidence/storage/large-data-u-20261115/**",
   "drivers/ShengUfs/T970LargeData.h",
   "tests/t970_large_data.cpp",
+  "tests/test_t970_large_hash.py",
   "tests/test_t970_large_store.py",
   "evidence/storage/overlay-capacity-20261115/**",
   "scripts/check-t970-large-data-plan.py",
@@ -858,7 +861,9 @@ procedure = [
   "Read block sysfs and by-name links; read each LUN's primary GPT header and entry array and validate their CRC32 values without writing any block device.",
 ]
 findings = [
-  "Recovery bb822b000ec0d2df69d7ef08c2ce7a7a75d6307ebb28ba0d15e07230a62ac8b7 adds internal attachStore stage diagnostics. Kernel build, FAT readback and RECOVERY upload passed; runtime result pending.",
+  "Source review found that the old direct Data superblock SHA-256 literal in u/v/w/x was transcribed incorrectly after byte 16; the verified device header therefore cannot pass the initial conversion guard. The literal was corrected, and a new host test checks it against both the independent known digest and the local gzip backup when available. Recovery 3c96d2fee176fb59abc635440e0e1ed17baaf41aef397cd412376345b6a677b1 contains the correction, and independent FAT/kernel byte inspection and the second RECOVERY upload passed; device boot is pending.",
+  "Recovery c8996f3be73e14346f5be02f291a4fee0b60be7f3da9b011137ad9a948db757e adds read-only progress markers inside native_ufs_store_open after w stopped inside that call. Host provider checks, kernel build, FAT readback and RECOVERY upload passed; runtime result pending.",
+  "Recovery bb822b000ec0d2df69d7ef08c2ce7a7a75d6307ebb28ba0d15e07230a62ac8b7 adds internal attachStore stage diagnostics. Kernel build, FAT readback and RECOVERY upload passed. At 543 seconds the first GPT check reports unchanged and attachStore waits inside native_ufs_store_open, before its return.",
   "Recovery e776a5af422be4748eb9938159038398c227a15e9dfed1140b74afbe4806286f adds read-only RamBlock selection and I/O counters to diagnose the u Data wait. Kernel build, symbol audit, FAT readback and RECOVERY upload passed. At 44 seconds the device reports one matching volume, select stage 4 (entering attachStore), 300 seed reads and persistence state 0; the internal wait is not yet located.",
   "Recovery 8a428368652ab838f30c0cbd9ddf5ead9e2ce27566d290894cd4124a401ed794 carries a 73 GiB reference seed and guarded one-time conversion for the backed-up direct Data container. Provider identity and range checks, interruption simulation, existing RamBlock persistence tests, kernel build and independent Recovery FAT readback passed; Heimdall reported RECOVERY upload successful. At 25 and 145 seconds the owner screen reports RAMDISK capacity 74752 MiB and PID1 data volume enter with one process; successful store initialization and Data mount remain unverified.",
   "The reference seed was expanded with seed-data-grow.py to a 73 GiB APFS container (packed SHA-256 ca1543d1986cb1de5dd8ef6a3f01f48609e2a65a18bbf3f88f04b2d189031dcf). Host-only geometry validation places a candidate seeded overlay at LBAs 42816256..61953352, clear of policy envelopes, the old overlay and the reserve. This is a proposed layout, not an implemented or installed store. TWRP read-only superblock SHA-256 f1d880ae3bb4ad6b874c44dda3a1782724622c144ad56be0d24385108db94d0f matches the prior large Data backup. Safe one-time conversion, power-loss behavior and device boot are unresolved.",

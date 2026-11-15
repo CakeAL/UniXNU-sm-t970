@@ -1500,11 +1500,27 @@ static bool t970ApfsSeed (uint64_t first, uint64_t blocks, bool writable)
 // only for the specifically reviewed former direct container; once its header
 // is committed, later boots resume instead of resetting any user data.
 static bool gT970LargeNeedsInit = false;
+extern "C" { volatile uint32_t native_t970_store_open_stage = 0; }
 extern "C" int native_ufs_store_needs_init (void) { return gT970LargeNeedsInit ? 1 : 0; }
+static unsigned t970StoreTraceGpt (void)
+{
+  native_t970_store_open_stage = 3;
+  unsigned value = native_ufs_store_gpt_check ();
+  native_t970_store_open_stage = 4;
+  return value;
+}
+static IOReturn t970StoreTraceRead (uint64_t first, uint8_t *header)
+{
+  native_t970_store_open_stage = 5;
+  IOReturn status = hostRead4k (0, first, 1, header);
+  native_t970_store_open_stage = 6;
+  return status;
+}
 
 // Returns 1 and the first absolute 4096-byte LBA of the window, 0 on refusal.
 extern "C" int native_ufs_store_open (uint64_t blocks, uint64_t *firstLba, const char **why)
 {
+  native_t970_store_open_stage = 1;
   t970ApfsProbe ();
   const unsigned mode = storeMode ();
   uint32_t reset = 0, legacyReset = 0;
@@ -1519,6 +1535,7 @@ extern "C" int native_ufs_store_open (uint64_t blocks, uint64_t *firstLba, const
   PE_parse_boot_argn ("t970-ufs-data", &direct, sizeof (direct));
   PE_parse_boot_argn ("t970-large-init", &init, sizeof (init));
   gT970LargeNeedsInit = false;
+  native_t970_store_open_stage = 2;
   if (!mode) reason = "off";
   else if (!gStoreGeometry.valid || !gHost.ready) reason = "no root layout";
   else if (gStoreRegionBlocks) reason = "already open";
@@ -1529,14 +1546,16 @@ extern "C" int native_ufs_store_open (uint64_t blocks, uint64_t *firstLba, const
                           : t970DataFirst (1, reset | legacyReset, gStoreGeometry.first, gStoreGeometry.last,
                                           gStoreGeometry.imageBytes, blocks, reserveBlocks ()))) {
     reason = "unreviewed Data geometry or seed";
-  } else if (native_ufs_store_gpt_check ()) reason = "GPT changed or unreadable";
+  } else if (t970StoreTraceGpt ()) reason = "GPT changed or unreadable";
   else {
     uint8_t header[4096];
-    if (hostRead4k (0, first, 1, header) != kIOReturnSuccess) reason = "store header unavailable";
+    if (t970StoreTraceRead (first, header) != kIOReturnSuccess) reason = "store header unavailable";
     else {
       if (large) {
+        native_t970_store_open_stage = 7;
         uint8_t digest[32]; SHA256_CTX context;
         SHA256_Init (&context); SHA256_Update (&context, header, sizeof (header)); SHA256_Final (digest, &context);
+        native_t970_store_open_stage = 8;
         headerState = t970LargeHeaderState (header, digest);
         if (headerState == 1 && (init != 1 || mode != 2)) headerState = -1;
       } else headerState = t970DataHeaderState (header, native_ram_block_seed_sha256);
@@ -1551,11 +1570,13 @@ extern "C" int native_ufs_store_open (uint64_t blocks, uint64_t *firstLba, const
       }
     }
   }
+  native_t970_store_open_stage = 9;
   uint32_t probe = 0;
   if (mode == 1 && PE_parse_boot_argn ("t970-data-probe", &probe, sizeof (probe)) && probe == 1)
     panic ("T970 Data probe: ok=%d header=%d\nLBA=%llu blocks=%llu\n%s", ok, headerState, first, blocks, reason);
   if (mode == 2 && !ok) panic ("T970 Data: %s", reason);
   if (why) *why = reason;
+  native_t970_store_open_stage = 10;
   return ok;
 }
 

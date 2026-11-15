@@ -27,5 +27,27 @@
   "hardware_tested": false,
   "note": "Enables the boot page only; no flash or reboot performed",
   "partition": "RECOVERY",
-  "build_command": "python3.14 scripts/build-boot-progress-page.py --mode 2 --large-data-seed --data-ramdisk out/dual-system/overlay-inspection-20261115/reference-fresh-73g.dbr --kernel-arg build-tag=large-data-w --kernel-arg t970-large-data=1 --kernel-arg t970-large-init=1 --kernel-arg native-ufs-stream2=0x4e0 --drop-kernel-arg panic_on_crash_disabled --kernel /Users/cakeal/vsc/UniXNU/out/sm-t970/ipados-17.7.11-21H461/gts7xlwifi/kernel/kernel.macho --output out/dual-system/wholesale-inputs-20261115/boot-progress-page/page-large-data-w"
+  "build_command": "python3.14 scripts/build-boot-progress-page.py --mode 2 --large-data-seed --data-ramdisk out/dual-system/overlay-inspection-20261115/reference-fresh-73g.dbr --kernel-arg build-tag=large-data-w --kernel-arg t970-large-data=1 --kernel-arg t970-large-init=1 --kernel-arg native-ufs-stream2=0x4e0 --drop-kernel-arg panic_on_crash_disabled --kernel /Users/cakeal/vsc/UniXNU/out/sm-t970/ipados-17.7.11-21H461/gts7xlwifi/kernel/kernel.macho --output out/dual-system/wholesale-inputs-20261115/boot-progress-page/page-large-data-w",
+  "observation": {
+    "source": "owner screen 2026-11-15 22:32 Asia/Shanghai",
+    "time_seconds": 543,
+    "selection_stage": 4,
+    "attach_stage": 4,
+    "gpt_status": 0,
+    "matching_volumes": 1,
+    "ramdisk_reads": 300,
+    "ramdisk_writes": 0,
+    "ramdisk_failures": 0,
+    "persistence_state": 0,
+    "persistence_header": 9,
+    "owner_stage": 0,
+    "owner_status": -1,
+    "interpretation": "First GPT check returned unchanged. attachStore has not returned from native_ufs_store_open; the inner operation remains unknown.",
+    "later_source_finding": "The compiled old APFS header SHA-256 literal was incorrectly transcribed after the first 16 bytes. The verified device header cannot match it, so the provider rejects initialization; panic handling still needs a device trace to explain the live display."
+  },
+  "upload": {
+    "status": "success",
+    "partition": "RECOVERY",
+    "log": "evidence/storage/large-data-w-20261115/upload.log"
+  }
 }

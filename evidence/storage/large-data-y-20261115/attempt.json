@@ -1,0 +1,13 @@
+{
+  "recovery_sha256": "3c96d2fee176fb59abc635440e0e1ed17baaf41aef397cd412376345b6a677b1",
+  "first_attempt": "USB disconnected during handshake; no RECOVERY upload success",
+  "fix": "Correct 32-byte reviewed superblock SHA-256, with independent comparison against gzip backup and embedded kernel bytes",
+  "hardware_result": "boot observation pending",
+  "second_attempt": "RECOVERY upload successful",
+  "sources_sha256": {
+    "drivers/ShengUfs/T970LargeData.h": "da43f22dbf96da47a99b5e06e1f5f96826ab6d76ef1139e56e4ea64d53a9929b",
+    "drivers/ShengUfs/NativeUfs.cpp": "86461dd41d976b0f7234e6558f27375079a465cc222d494d7ce92ed898af02ff",
+    "package/BootProgress.c": "330a3b6e6f4e81b944c1b16a2a0025f9ecdffb46a5603a294968385fd8c3a6c3",
+    "tests/test_t970_large_hash.py": "5872f666ff9f79d9eaf34b3a88238f583745b994eeeb5bb5badef86d6c1d3ab1"
+  }
+}

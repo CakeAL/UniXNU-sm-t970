@@ -148,6 +148,7 @@ extern volatile uint64_t native_ram_block_writes __attribute__((weak_import));
 extern volatile uint64_t native_ram_block_failures __attribute__((weak_import));
 extern volatile uint32_t native_ram_block_select_stage __attribute__((weak_import));
 extern volatile uint32_t native_ram_block_attach_stage __attribute__((weak_import));
+extern volatile uint32_t native_t970_store_open_stage __attribute__((weak_import));
 extern volatile uint32_t native_data_persist_gpt __attribute__((weak_import));
 extern volatile uint32_t native_ram_block_select_matches __attribute__((weak_import));
 extern volatile uint32_t native_data_persist_state __attribute__((weak_import));
@@ -903,9 +904,10 @@ static void draw(unsigned now) {
     max_mem>>20,vm_page_free_count,vm_page_active_count,vm_page_inactive_count,
     vm_page_wire_count,vm_page_speculative_count);line(35,b,0xffffff00);
   if(&native_ram_block_sparse){
-    snprintf(b,sizeof(b),"RAM MiB=%llu sel=%u att=%u match=%u IO=%llu/%llu/%llu store=%u/%u gpt=%u owner=%d/%d",
+    snprintf(b,sizeof(b),"RAM MiB=%llu sel=%u att=%u open=%u match=%u IO=%llu/%llu/%llu store=%u/%u gpt=%u owner=%d/%d",
       native_ram_block_bytes>>20,&native_ram_block_select_stage?native_ram_block_select_stage:999,
       &native_ram_block_attach_stage?native_ram_block_attach_stage:999,
+      &native_t970_store_open_stage?native_t970_store_open_stage:999,
       &native_ram_block_select_matches?native_ram_block_select_matches:999,
       &native_ram_block_reads?native_ram_block_reads:0,&native_ram_block_writes?native_ram_block_writes:0,
       &native_ram_block_failures?native_ram_block_failures:0,&native_data_persist_state?native_data_persist_state:999,

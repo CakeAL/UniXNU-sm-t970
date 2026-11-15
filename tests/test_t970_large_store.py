@@ -26,6 +26,8 @@ struct { bool ready=true; } gHost;
 uint64_t gStoreRegionFirst=0,gStoreRegionBlocks=0; bool gT970LargeNeedsInit=false;
 unsigned mode=2, large=1, direct=0, init=1, reset=0, gpt=0, opens=0;
 unsigned storeMode(){return mode;} uint64_t reserveBlocks(){return 262144;}
+uint32_t native_t970_store_open_stage=0;
+unsigned t970StoreTraceGpt(); int t970StoreTraceRead(uint64_t,uint8_t *);
 void t970ApfsProbe(){} unsigned native_ufs_store_gpt_check(){return gpt;}
 uint64_t t970DataFirst(unsigned,unsigned,uint64_t,uint64_t,uint64_t,uint64_t,uint64_t){return 0;}
 int t970DataHeaderState(const uint8_t *,const uint8_t *){return -1;}
@@ -35,6 +37,8 @@ bool PE_parse_boot_argn(const char *n,uint32_t *v,size_t){
 const int kIOReturnSuccess=0;
 int hostRead4k(int,uint64_t l,int n,void *d){assert(l==kT970LargeFirst && n==1);memcpy(d,block,4096);return 0;}
 bool hostStoreOpen(uint64_t l,uint64_t n){assert(l==kT970LargeFirst && n==kT970LargeBlocks); ++opens;return true;}
+unsigned t970StoreTraceGpt(){return native_ufs_store_gpt_check();}
+int t970StoreTraceRead(uint64_t first,uint8_t *p){return hostRead4k(0,first,1,p);}
 struct SHA256_CTX{}; void SHA256_Init(SHA256_CTX *){} void SHA256_Update(SHA256_CTX *,const void *,size_t){} void SHA256_Final(uint8_t *p,SHA256_CTX *){memcpy(p,digest,32);}
 void panic(const char *,...){}
 '''

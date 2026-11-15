@@ -22,6 +22,13 @@ int main() {
   auto first = [](uint64_t blocks, const uint8_t *seed, unsigned enabled=1, unsigned reset=0, unsigned direct=0, uint64_t part=37292800) {
     return t970LargeDataFirst(enabled,reset,direct,part,62458623,9382658048ULL,blocks,262144,seed);
   };
+  // Compare the compiled literal to an independently transcribed digest of the
+  // actual device superblock, not to the same constant used by the classifier.
+  const uint8_t reviewedHeaderHash[32] = {
+    0xf1,0xd8,0x80,0xae,0x3b,0xb4,0xad,0x6b,0x87,0x4c,0x44,0xdd,0xa3,0xa1,0x78,0x27,
+    0x24,0x62,0x2c,0x14,0x4a,0xd5,0x6b,0xe0,0xd2,0x43,0x85,0x10,0x8d,0xb9,0x4d,0x0f
+  };
+  assert(!memcmp(kT970DirectHeaderHash, reviewedHeaderHash, sizeof(reviewedHeaderHash)));
   assert(kT970LargeBitmapBlocks == 584 && kT970LargeBlocks == 19137097);
   assert(first(kT970LargeBlocks,kT970LargeSeed) == kT970LargeFirst);
   assert(!first(kT970LargeBlocks+1,kT970LargeSeed));

@@ -1,0 +1,15 @@
+{
+  "sources_sha256": {
+    "drivers/ShengUfs/NativeUfs.cpp": "86461dd41d976b0f7234e6558f27375079a465cc222d494d7ce92ed898af02ff",
+    "package/BootProgress.c": "330a3b6e6f4e81b944c1b16a2a0025f9ecdffb46a5603a294968385fd8c3a6c3",
+    "tests/test_t970_large_store.py": "d3f46e102940ccc8a6d21a567abca3c50f8ef3f4addbe2025f86675e68eed4a6"
+  },
+  "image_sha256": "c8996f3be73e14346f5be02f291a4fee0b60be7f3da9b011137ad9a948db757e",
+  "checks": [
+    "provider host test passed",
+    "kernel build passed",
+    "Recovery FAT seed and boot arguments independently verified",
+    "RECOVERY upload successful"
+  ],
+  "device_boot": "pending"
+}

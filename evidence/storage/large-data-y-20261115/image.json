@@ -1,0 +1,31 @@
+{
+  "device_revision": "e66cb546ed9bb6cf82227e66d680a13072271ba3",
+  "framework_revision": "945ad8db0641060f6566422d168684c3e9182d53",
+  "instruments": {
+    "boot_progress_mode": 2,
+    "stage_bars": true,
+    "panic_screen": true,
+    "kernel_args_override": [
+      "boot-progress=2",
+      "build-tag=large-data-y",
+      "t970-large-data=1",
+      "t970-large-init=1",
+      "native-ufs-stream2=0x4e0"
+    ],
+    "kernel_args_dropped": [
+      "panic_on_crash_disabled=1"
+    ]
+  },
+  "board_sha256": "601c27c34ead065e43b9bf075413ffa77e7046ea23d5e2357c5f52b3bbdf4e23",
+  "source_kernel_sha256": "b5a05593bb707f50e380b19a4d2560dab0c23d51fdc776e451dff31b4e0558f5",
+  "embedded_data_ramdisk_sha256": "ca1543d1986cb1de5dd8ef6a3f01f48609e2a65a18bbf3f88f04b2d189031dcf",
+  "base_recovery_sha256": "33efcec0915129321995cd4de57a3223f7fd41e36c8f73205f07fa97e7aeaeba",
+  "firmware_config_dtb_sha256": "86c14aa305a6cf5db46665f4095d28aadcb1ea5ce9d213cd711641a07504ed1d",
+  "image_sha256": "3c96d2fee176fb59abc635440e0e1ed17baaf41aef397cd412376345b6a677b1",
+  "image_bytes": 86888448,
+  "recovery_partition_bytes": 86888448,
+  "hardware_tested": false,
+  "note": "Enables the boot page only; no flash or reboot performed",
+  "partition": "RECOVERY",
+  "build_command": "python3.14 scripts/build-boot-progress-page.py --mode 2 --large-data-seed --data-ramdisk out/dual-system/overlay-inspection-20261115/reference-fresh-73g.dbr --kernel-arg build-tag=large-data-y --kernel-arg t970-large-data=1 --kernel-arg t970-large-init=1 --kernel-arg native-ufs-stream2=0x4e0 --drop-kernel-arg panic_on_crash_disabled --kernel /Users/cakeal/vsc/UniXNU/out/sm-t970/ipados-17.7.11-21H461/gts7xlwifi/kernel/kernel.macho --output out/dual-system/wholesale-inputs-20261115/boot-progress-page/page-large-data-y"
+}
