@@ -461,6 +461,60 @@ extern volatile uint32_t armcpu_timer_short[8] __attribute__((weak_import));
 extern int nprocs;
 extern volatile int native_owner_root_accepted;
 
+/* T970_PID1_BEGIN: where process 1 is when nothing else has started.
+ * The wholesale kernel reaches load_init_program and then nprocs stays 1: launchd runs, but it
+ * never spawns a daemon and no display client ever asks for a scanout. This walks the task queue
+ * and prints pid 1's threads -- id, state (TH_WAIT/TH_RUN/TH_UNINT), wait event, continuation and
+ * the user PC/LR of the saved user state. All values are unslid: symbolicate them against the
+ * unstripped kernel. Read-only: one try-lock, no thread suspension, no user memory. t970-pid1=1. */
+#include <kern/task.h>
+#include <mach/arm/thread_status.h>
+struct proc;
+extern int proc_pid(struct proc *);
+extern char *proc_name_address(struct proc *);
+extern lck_mtx_t tasks_threads_lock;
+extern queue_head_t tasks;
+static void line(unsigned row, const char *text, uint32_t color);
+
+static void pid1_dump(unsigned now) {
+  unsigned opt = 0;
+  if (!PE_parse_boot_argn("t970-pid1", &opt, sizeof(opt)) || opt != 1) return;
+  char rows[8][BP_COLS];
+  unsigned n = 0;
+  snprintf(rows[n], BP_COLS, "PID1 nprocs=%d t=%us: only process 1 exists, nothing was spawned", nprocs, now); ++n;
+  if (lck_mtx_try_lock(&tasks_threads_lock)) {
+    task_t task;
+    queue_iterate(&tasks, task, task_t, tasks) {
+      struct proc *p = get_bsdtask_info(task);
+      if (!p || proc_pid(p) != 1) continue;
+      task_lock(task);
+      snprintf(rows[n], BP_COLS, "pid1 %s suspend=%d threads=%d", proc_name_address(p), task->suspend_count, task->thread_count);
+      if (n < 7) ++n;
+      thread_t thread;
+      queue_iterate(&task->threads, thread, thread_t, task_threads) {
+        if (n >= 7) break;
+        uint64_t upc = 0, ulr = 0;
+        if (thread->machine.upcb) {
+          upc = get_saved_state_pc(thread->machine.upcb);
+          ulr = get_saved_state_lr(thread->machine.upcb);
+        }
+        snprintf(rows[n], BP_COLS, "T%llx s%x w%llx c%llx u%llx/%llx",
+            (unsigned long long)thread->thread_id, thread->state,
+            (unsigned long long)VM_KERNEL_UNSLIDE(thread->wait_event),
+            (unsigned long long)VM_KERNEL_UNSLIDE(thread->continuation),
+            (unsigned long long)upc, (unsigned long long)ulr);
+        ++n;
+      }
+      task_unlock(task);
+    }
+    lck_mtx_unlock(&tasks_threads_lock);
+  } else {
+    snprintf(rows[n], BP_COLS, "PID1 tasks_threads_lock busy"); ++n;
+  }
+  for (unsigned i = 0; i < n; ++i) line(24 + i, rows[i], 0xffaaffff);
+}
+/* T970_PID1_END */
+
 extern volatile uint32_t native_legacy_stage __attribute__((weak_import));
 extern volatile uint32_t native_legacy_pm_stage __attribute__((weak_import));
 extern volatile uint32_t native_legacy_pm_calls __attribute__((weak_import));
@@ -835,6 +889,7 @@ static void draw(unsigned now) {
     }
     if(col && row<48) { b[col]=0;line(row,b,0xffaaaaaa); }
   }
+  pid1_dump(now);
   __asm__ volatile("dsb sy" ::: "memory");
   last_draw=now;
 }
