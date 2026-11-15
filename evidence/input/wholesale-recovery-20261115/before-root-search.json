@@ -1,0 +1,10 @@
+{
+  "base_recovery_sha256": "cbbf85d79a71670b0058f47839c48c2fc493428a1fae14bdd45b2056624be4f4",
+  "image": "out/dual-system/wholesale-inputs-20261115/mmu-probe/before-root-search/recovery.img",
+  "sha256": "a43a36bd29cc5d29b61214011e059daddfb511154f671db50dd86f1f20e53e60",
+  "kernel_readback_sha256": "139363487530ae08c426b95ebb62d716a87e0692fccfb4b049afc9937b31ea9d",
+  "checkpoint": "first return from inittodr in bsd_init, before the root search via setconf",
+  "reset_seconds": 28,
+  "partition": "RECOVERY",
+  "upload": "pending"
+}

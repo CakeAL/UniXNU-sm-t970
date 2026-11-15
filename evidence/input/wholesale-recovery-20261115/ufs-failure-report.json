@@ -6,5 +6,5 @@
   "partition": "RECOVERY",
   "upload": "RECOVERY upload successful",
   "heimdall_exit": 0,
-  "device_boot": "awaiting observation"
+  "device_boot": "Owner observed only the magenta bar after two minutes; no UFS diagnostic text appeared."
 }
