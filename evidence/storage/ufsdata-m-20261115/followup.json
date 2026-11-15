@@ -1,0 +1,11 @@
+{
+  "image_sha256": "f654aa9fea6dd1f15b01d3e05be702a5ed85f5aa96724b06fb4fba6c952c4fa3",
+  "source": "owner-provided screen 2026-11-15 20:27 Asia/Shanghai",
+  "time_seconds": 181,
+  "last_stage": "policy: disabled.plist written",
+  "last_stage_timestamp_seconds": 4,
+  "pid1_process_count": 1,
+  "ufs_requests": 909,
+  "ufs_failures": 0,
+  "interpretation": "Last recorded stage and UFS request count unchanged since 21-second image; no forward progress observed. Stage did not distinguish earlier policy error from success."
+}

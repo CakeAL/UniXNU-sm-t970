@@ -115,6 +115,7 @@ static int t970_motion_debug_log(proc_t p, uint64_t scratch) {
 int sheng_boot_watchdog_policy(void *process, uint64_t scratch) {
  proc_t p=process;
  int enabled=0,error=0,fd=-1;int32_t result=0;
+ const char *failed_step="none";
  // The page's stage ring shows how far this ran: the boot thread was last recorded at "Data mount
  // returned" and never reached the next kern_exec stage, so the steps below are instrumented.
  int skip=0;
@@ -161,40 +162,52 @@ int sheng_boot_watchdog_policy(void *process, uint64_t scratch) {
  strlcat(policy,policy_tail,sizeof(policy));
  const char *directory="/private/var/db/com.apple.xpc.launchd";
  const char *path="/private/var/db/com.apple.xpc.launchd/disabled.plist";
+ failed_step="directory copyout";
  if((error=copyout(directory,scratch,strlen(directory)+1)))goto done;
  struct mkdir_args md={.path=scratch,.mode=0755};
+ failed_step="mkdir launchd";
  error=mkdir(p,&md,&result);
  if(error && error!=EEXIST)goto done;
+ failed_step="path copyout";
  if((error=copyout(path,scratch,strlen(path)+1)))goto done;
  // With persistent Data the previous boot's file is there: this policy is rewritten in place on every boot (it must follow the
  // boot arguments). Symlinks are still refused (O_NOFOLLOW) and the fstat check below insists on a root-owned regular file.
  struct open_args op={.path=scratch,.flags=O_WRONLY|O_CREAT|O_TRUNC|O_NOFOLLOW,.mode=0644};
+ failed_step="open plist";
  if((error=open(p,&op,&result)))goto done;
  fd=result;
  // The scratch page keeps the cache-mount environment slots at +0x400, so the policy (the lite list makes it longer than 0x200 bytes) goes
  // out in pieces through the 0x200 bytes at +0x200.
  for(size_t sent=0,total=strlen(policy);sent<total;) {
   size_t piece=total-sent<0x1f0?total-sent:0x1f0;
+  failed_step="data copyout";
   if((error=copyout(policy+sent,scratch+0x200,piece)))goto done;
   struct write_args wr={.fd=fd,.cbuf=scratch+0x200,.nbyte=piece};
   user_ssize_t written=0;
+  failed_step="write plist";
   if((error=write(p,&wr,&written)))goto done;
   if(written!=(user_ssize_t)piece){error=EIO;goto done;}
   sent+=piece;
  }
  struct fchown_args owner={.fd=fd,.uid=0,.gid=0};
+ failed_step="fchown";
  if((error=fchown(p,&owner,&result)))goto done;
  struct fchmod_args mode={.fd=fd,.mode=0644};
+ failed_step="fchmod";
  if((error=fchmod(p,&mode,&result)))goto done;
  struct fsync_args sync={.fd=fd};
+ failed_step="fsync";
  if((error=fsync(p,&sync,&result)))goto done;
  // Preserve the cache-mount environment slots at +0x400, +0x500, +0x600.
  struct fstat64_args sa={.fd=fd,.ub=scratch+0x800};struct stat64 st={0};
+ failed_step="stat or copyin";
  if((error=sys_fstat64(p,&sa,&result)) || (error=copyin(sa.ub,&st,sizeof(st))))goto done;
+ failed_step="stat validation";
  if(st.st_uid!=0 || st.st_gid!=0 || !S_ISREG(st.st_mode) || (st.st_mode&0777)!=0644 || st.st_size!=(off_t)(strlen(policy)))error=EINVAL;
  done:
- if(fd>=0){struct close_args cl={.fd=fd};int e=sys_close(p,&cl,&result);if(!error)error=e;}
- policy_stage(error ? "policy: disabled.plist error" : "policy: disabled.plist written");
+ if(fd>=0){struct close_args cl={.fd=fd};int e=sys_close(p,&cl,&result);if(!error && e){failed_step="close plist";error=e;}}
+ if(error) { char detail[96]; snprintf(detail,sizeof(detail),"policy: %s error=%d",failed_step,error); policy_stage(detail); }
+ else policy_stage("policy: disabled.plist written");
  // A real empty migration marker selects the qualified modern override loader.
  if(!error) {
   const char *marker="/private/var/db/com.apple.xpc.launchd/disabled.migrated";

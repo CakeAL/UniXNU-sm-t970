@@ -1,0 +1,80 @@
+{
+  "device_revision": "5529404f78d6a20f7b752db096c3b26deae6bb7a",
+  "framework_revision": "0e9e1e8182b18a6b78df983808ec296b7f30dc20",
+  "instruments": {
+    "boot_progress_mode": 2,
+    "stage_bars": true,
+    "panic_screen": true,
+    "kernel_args_override": [
+      "boot-progress=2",
+      "build-tag=ufsdata-n",
+      "t970-ufs-data=1",
+      "ufsrw=1",
+      "t970-pid1=1",
+      "native-ufs-stream2=0x4e0",
+      "sheng-data-persist=0"
+    ],
+    "kernel_args_dropped": [
+      "sheng-data-persist=2",
+      "panic_on_crash_disabled=1"
+    ]
+  },
+  "board_sha256": "601c27c34ead065e43b9bf075413ffa77e7046ea23d5e2357c5f52b3bbdf4e23",
+  "source_kernel_sha256": "d74a102c165cd6f49f8259f3c36f5a07fdc800696809bda2a33ff09e3ff88479",
+  "base_recovery_sha256": "33efcec0915129321995cd4de57a3223f7fd41e36c8f73205f07fa97e7aeaeba",
+  "firmware_config_dtb_sha256": "86c14aa305a6cf5db46665f4095d28aadcb1ea5ce9d213cd711641a07504ed1d",
+  "image_sha256": "c5ea44cbf554c677b4a1e8669bf2985230b1dce116fb8c34046055af86151048",
+  "image_bytes": 86888448,
+  "recovery_partition_bytes": 86888448,
+  "hardware_tested": false,
+  "note": "Enables the boot page only; no flash or reboot performed",
+  "partition": "RECOVERY",
+  "build_command": "python3.14 scripts/build-boot-progress-page.py --mode 2 --kernel-arg build-tag=ufsdata-n --kernel-arg t970-ufs-data=1 --kernel-arg ufsrw=1 --kernel-arg t970-pid1=1 --kernel-arg native-ufs-stream2=0x4e0 --kernel-arg sheng-data-persist=0 --drop-kernel-arg sheng-data-persist --drop-kernel-arg panic_on_crash_disabled --kernel /Users/cakeal/vsc/UniXNU/out/sm-t970/ipados-17.7.11-21H461/gts7xlwifi/kernel/kernel.macho --output out/dual-system/wholesale-inputs-20261115/boot-progress-page/page-ufs-data-n",
+  "validation": {
+    "previous_device_image": "f654aa9fea6dd1f15b01d3e05be702a5ed85f5aa96724b06fb4fba6c952c4fa3",
+    "seed_initialization": "disabled, existing Data required",
+    "boot_argument_tests": "tests/test_wholesale_boot_args.py passed",
+    "policy_diagnostics": "reports error or traces marker copyout/open/close and return"
+  },
+  "upload": {
+    "status": "success",
+    "partition": "RECOVERY",
+    "result": "RECOVERY upload successful",
+    "log": "evidence/storage/ufsdata-n-20261115/upload.log",
+    "partition_readback": "not performed",
+    "device_boot": "observed"
+  },
+  "observation": {
+    "source": "owner-provided screen 2026-11-15 20:30 Asia/Shanghai",
+    "time_seconds": 35,
+    "last_stage": "policy: returning error",
+    "prior_stage": "policy: disabled.plist error",
+    "pid1_process_count": 1,
+    "ufs_failures": 0,
+    "interpretation": "Data remounted after reboot without the seed flag; policy failed before marker creation. The specific operation and errno were not displayed; file contents and persistence are not verified."
+  },
+  "prior_seed_readonly_comparison": {
+    "source_sha256": "4591566eccd77f0f9d13a1338ecaf3c73ce86cd04aeea732d91db6b2e100ca3a",
+    "directories_present": [
+      "db",
+      "db/com.apple.xpc.launchd",
+      "mobile",
+      "mobile/Library",
+      "tmp",
+      "preferences",
+      "run",
+      "root",
+      "log"
+    ],
+    "note": "Read-only host comparisons: the old seed has the required directory skeleton, the newly formatted seed lacks it. Exact failing operation and errno are not yet observed.",
+    "new_seed_directories_missing": [
+      "db",
+      "mobile",
+      "tmp",
+      "preferences",
+      "run",
+      "root",
+      "log"
+    ]
+  }
+}
