@@ -277,10 +277,14 @@ static void requireDualStreamReuse (unsigned probe, unsigned rootMode, const cha
     UfsSmmuReuse reuse = reuseUfsSmmuStream (configured[index],
       [smmu](unsigned offset) { return read32 (smmu, offset); });
     if (reuse.error) {
-      panic ("NATIVE_UFS dual stream reuse refused: %s sid=%04x slot=%x bank=%x refs=%u smr=%08x s2cr=%08x cbar=%08x cba2r=%08x sctlr=%08x where=%s probe=%u root=%u",
+      /* This firmware does not pre-program the second stream's bypass context; the reference
+       * firmware does. Report it and let smmuBypassStream configure the context itself later
+       * instead of refusing to boot. */
+      IOLog ("NATIVE_UFS dual stream reuse refused: %s sid=%04x slot=%x bank=%x refs=%u smr=%08x s2cr=%08x cbar=%08x cba2r=%08x sctlr=%08x where=%s probe=%u root=%u\n",
              reuse.error, configured[index], reuse.slot, reuse.bank, reuse.references,
              reuse.smr, reuse.s2cr, reuse.cbar, reuse.cba2r, reuse.sctlr,
              where, probe, rootMode);
+      continue;
     }
     IOLog ("NativeUfs: dual stream reuse sid=%04x slot=%x bank=%x refs=%u smr=%08x s2cr=%08x cbar=%08x cba2r=%08x sctlr=%08x\n",
            configured[index], reuse.slot, reuse.bank, reuse.references,
