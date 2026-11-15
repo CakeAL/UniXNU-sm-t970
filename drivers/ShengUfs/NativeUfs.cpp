@@ -1414,6 +1414,7 @@ static bool installOwnerPolicyCarrier (uint64_t firstLba, uint64_t lastLba, cons
 #include "T970DataWindow.h"
 #include "T970ApfsSeed.h"
 #include "T970DataExtent.h"
+#include "T970SeedState.h"
 extern "C" uint8_t native_ram_block_seed_sha256[32] __attribute__((weak_import));
 extern "C" unsigned native_ufs_store_gpt_check (void);
 
@@ -1451,34 +1452,48 @@ static void t970ApfsProbe (void)
       gStoreGeometry.first, gStoreGeometry.last, gStoreGeometry.imageBytes, report);
 }
 
-// t970-apfs-seed=1: write the 33 metadata blocks of an empty APFS container into the space after the
-// root image. Every write stays inside [userdataFirst + imageBytes/4096, userdataLast].
-static bool t970ApfsSeed (uint64_t first)
+// Initialize only the reviewed blank Data extent. The root write window is
+// opened temporarily, after every seed block has passed a read-only preflight.
+// Block zero is written last so an interrupted seed cannot look like a
+// completed container. Matching earlier writes may be resumed on the next boot.
+static bool t970ApfsSeed (uint64_t first, uint64_t blocks, bool writable)
 {
-  uint32_t enabled = 0;
-  if (!PE_parse_boot_argn ("t970-apfs-seed", &enabled, sizeof (enabled)) || enabled != 1) return true;
   uint8_t *block = static_cast<uint8_t *> (IOMalloc (4096));
   if (!block) return false;
-  if (hostRead4k (0, first, 1, block) == kIOReturnSuccess && !memcmp (block + 32, "NXSB", 4)) {
-    IOLog ("[t970 apfs] seed: container already present at %llu\n", first);
-    IOFree (block, 4096);
-    return true;
+  IOReturn status = hostRead4k (0, first, 1, block);
+  if (status != kIOReturnSuccess) { IOFree (block, 4096); return false; }
+  if (!memcmp (block + 32, "NXSB", 4)) { IOFree (block, 4096); return true; }
+  uint32_t enabled = 0;
+  if (!writable || !PE_parse_boot_argn ("t970-apfs-seed", &enabled, sizeof (enabled)) || enabled != 1) {
+    IOFree (block, 4096); return false;
   }
-  unsigned written = 0;
   for (unsigned i = 0; i < kT970ApfsSeedBlocks; ++i) {
-    memcpy (block, kT970ApfsSeedData + i * 4096, 4096);
-    if (hostWrite4k (0, first + kT970ApfsSeedIndex[i], 1, block, true) != kIOReturnSuccess) break;
-    ++written;
+    if (kT970ApfsSeedIndex[i] >= blocks ||
+        hostRead4k (0, first + kT970ApfsSeedIndex[i], 1, block) != kIOReturnSuccess ||
+        t970SeedBlockState (block, kT970ApfsSeedData + i * 4096, 4096) == T970SeedBlockState::Foreign) {
+      IOLog ("[t970 apfs] seed preflight refused block %u\n", i);
+      IOFree (block, 4096); return false;
+    }
   }
-  memset (block, 0, 4096);
-  const IOReturn check = hostRead4k (0, first, 1, block);
-  const bool ok = written == kT970ApfsSeedBlocks && check == kIOReturnSuccess && !memcmp (block + 32, "NXSB", 4);
-  IOLog ("[t970 apfs] seed: first=%llu blocks=%u written=%u read=%x ok=%d\n",
-         first, kT970ApfsSeedBlocks, written, check, ok);
+  if (!hostRootOpen (first, blocks, true)) { IOFree (block, 4096); return false; }
+  bool ok = true;
+  for (unsigned n = 0; n < kT970ApfsSeedBlocks; ++n) {
+    // The superblock is the commit marker; all other metadata comes first.
+    const unsigned i = (n + 1) % kT970ApfsSeedBlocks;
+    const uint8_t *expected = kT970ApfsSeedData + i * 4096;
+    if (hostRead4k (0, first + kT970ApfsSeedIndex[i], 1, block) != kIOReturnSuccess ||
+        t970SeedBlockState (block, expected, 4096) == T970SeedBlockState::Foreign) { ok = false; break; }
+    if (t970SeedBlockState (block, expected, 4096) == T970SeedBlockState::Zero &&
+        hostRootWrite4k (0, first + kT970ApfsSeedIndex[i], 1, expected, true) != kIOReturnSuccess) { ok = false; break; }
+    if (hostRead4k (0, first + kT970ApfsSeedIndex[i], 1, block) != kIOReturnSuccess ||
+        t970SeedBlockState (block, expected, 4096) != T970SeedBlockState::Identical) { ok = false; break; }
+  }
+  if (ok && hostRootSync () != kIOReturnSuccess) ok = false;
+  hostRootClose ();
   IOFree (block, 4096);
+  IOLog ("[t970 apfs] seed: first=%llu blocks=%llu ok=%d\n", first, blocks, ok);
   return ok;
 }
-
 
 // Returns 1 and the first absolute 4096-byte LBA of the window, 0 on refusal.
 extern "C" int native_ufs_store_open (uint64_t blocks, uint64_t *firstLba, const char **why)
@@ -1989,7 +2004,7 @@ static bool ufsHasAncestor (IORegistryEntry *entry, const IORegistryEntry *ances
   return found;
 }
 
-// t970-ufs-data=1: publish the APFS container after the root image as a whole-userdata block device,
+// t970-ufs-data=1: publish the APFS container in the reviewed free extent as a block device,
 // so APFS can mount its Data volume and the kernel owner Data mount uses it instead of a RAM seed.
 static NativeUfsWholeUserdataBlock *gT970DataDevice;
 
@@ -2002,7 +2017,9 @@ static bool t970PublishData (IOService *owner, const RootLayout *layout)
     IOLog ("NativeUfs: t970 Data refused: image bytes %llx\n", layout->imageBytes);
     return false;
   }
-  const uint64_t first = layout->userdataFirst + layout->imageBytes / 4096, last = layout->userdataLast;
+  // The policy carriers and the existing SHNGDATA overlay must remain intact.
+  if (layout->imageBytes != 9382658048ULL) return false;
+  const uint64_t first = 42816256ULL, last = 62065402ULL;
   if (first > last) {
     IOLog ("NativeUfs: t970 Data refused: no room after the image (first=%llx last=%llx)\n", first, last);
     return false;
@@ -2011,7 +2028,7 @@ static bool t970PublishData (IOService *owner, const RootLayout *layout)
     IOLog ("NativeUfs: t970 Data refused: overlaps a protected range or leaves unixnu\n");
     return false;
   }
-  if (!t970ApfsSeed (first)) return false;
+  if (!t970ApfsSeed (first, last - first + 1, rw == 1)) return false;
   uint8_t *block = static_cast<uint8_t *> (IOMalloc (4096));
   if (!block) return false;
   const IOReturn read = hostRead4k (0, first, 1, block);

@@ -25,6 +25,22 @@ def fat_read(path, name):
     return subprocess.check_output(["mcopy", "-i", path, "::/EFI/UniXNU/" + name, "-"])
 
 
+def safe_command_line(command_line):
+    words = command_line.split()
+    keys = [word.split("=", 1)[0] for word in words]
+    if len(command_line.encode()) > 1000 or len(keys) != len(set(keys)):
+        return False
+    flags = set(words)
+    if not {"data-fua=1", "native-ufs-root=1"} <= flags:
+        return False
+    if any(key in {"log", "sheng-log", "data-reset", "sheng-data-reset", "t970-dram-end", "memory-outside"} for key in keys):
+        return False
+    # The old RAM overlay and the new UFS container must never be active at once.
+    if "t970-ufs-data=1" in flags:
+        return "sheng-data-persist=0" in flags
+    return "t970-ufs-data" not in keys and "sheng-data-persist=2" in flags
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--base", type=Path, required=True)
@@ -54,13 +70,7 @@ def main():
     boot_entries = [entry for entry in config["entry"] if entry["type"] == "xnu"]
     require(len(boot_entries) == 1, "Expected one XNU boot entry")
     command_line = boot_entries[0]["args"]
-    words = set(command_line.split())
-    require(len(command_line.encode()) <= 1000 and {"sheng-data-persist=2", "data-fua=1", "native-ufs-root=1"} <= words and
-            # ufsrw and t970-ufs-data are the reviewed UFS Data container switches: they publish the
-            # APFS container inside the reserved 96 GiB and never widen the write window.
-            not any(word.split("=", 1)[0] in {"log", "sheng-log", "data-reset",
-                                             "sheng-data-reset", "t970-dram-end", "memory-outside"}
-                    for word in words), "Unsafe storage or memory switch")
+    require(safe_command_line(command_line), "Unsafe storage or memory switch")
 
     dtbo = base[old_dtbo_at:old_dtbo_at + dtbo_size]
     dtb = base[dtb_at:dtb_at + dtb_size]

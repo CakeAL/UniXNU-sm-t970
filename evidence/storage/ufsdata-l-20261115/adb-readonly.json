@@ -60,6 +60,10 @@
     "bytes": 78844506112,
     "volume_uuid": "42888767-E4D4-467C-9FB6-A20A2645B6CC",
     "nonzero_blocks": 32,
-    "note": "Host-generated image only; seed installation and device mounting not implemented or tested."
+    "note": "Prepared and host-tested only; no device write or mount yet.",
+    "fsck_apfs_readonly": "passed on macOS; iPadOS 17 compatibility remains unverified",
+    "kernel_sha256": "d9386e605415b6ae76c912d38f3e11cffcb51ea58c0b880a7df843fe53293885",
+    "kernel_build": "passed including prelink",
+    "seed_init_host_test": "actual routine fault-injected; zero, matching, foreign, interruption and superblock-last cases passed"
   }
 }

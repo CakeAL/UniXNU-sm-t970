@@ -726,6 +726,12 @@ id = "storage"
 status = "implemented"
 components = ["ShengUfs", "VirtioMmioBlock", "RamBlock", "VerifiedRoot"]
 paths = [
+  "scripts/pack-wholesale-recovery.py",
+  "tests/test_wholesale_boot_args.py",
+  "drivers/ShengUfs/T970SeedState.h",
+  "scripts/generate-t970-data-seed.py",
+  "tests/test_t970_seed_init.py",
+  "tests/t970_seed_state.cpp",
   "drivers/ShengUfs/T970DataExtent.h",
   "tests/t970_data_extent.cpp",
   "patches/xnu/t970-data-provider-select.patch",
@@ -834,6 +840,8 @@ procedure = [
   "Read block sysfs and by-name links; read each LUN's primary GPT header and entry array and validate their CRC32 values without writing any block device.",
 ]
 findings = [
+  "The new host APFS seed passes macOS read-only fsck; compatibility with iPadOS 17 is unverified. Its opt-in initialization and prelink build pass host checks. The Recovery packer rejects simultaneous RAM overlay and UFS Data selection; device initialization, mount and persistence remain unverified.",
+  "The opt-in Data publisher now targets the scanned blank extent 42816256..62065402, with a seed sized for that extent. Initialization preflights seed blocks, refuses foreign contents, opens a bounded temporary write window and writes the superblock last; interrupted matching writes may resume. Host fault-injection and build results are tracked separately; no device write or mount has occurred.",
   "A host-only sparse APFS candidate was generated at the exact 78844506112-byte tentative extent size, with volume UUID 42888767-E4D4-467C-9FB6-A20A2645B6CC and 32 nonzero 4 KiB blocks. It is not integrated or device-tested; initialization and recovery semantics must be implemented before use.",
   "The current t970ApfsSeed runs before the Data device opens its root write window; hostWrite4k requires an already-open window. A future initialization path must first establish and bound the correct write window, and preserve existing metadata on partial or repeated initialization.",
   "ADB read-only also found the SHNGDATA header at absolute 4 KiB LBA 62065403. Preserve this existing overlay. A tentative non-overlapping APFS extent at 42816256..62065402 was fully scanned read-only against zero (78844506112 bytes, cmp exit 0). A new seed and device validation remain necessary; revalidate before initialization.",

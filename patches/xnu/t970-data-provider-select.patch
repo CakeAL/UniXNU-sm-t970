@@ -9,7 +9,7 @@
 +	if (use_ufs_data == 1) {
 +		extern int t970_ufs_data_volume(const char *, dev_t *, char *, size_t, uint64_t *);
 +		boot_progress_stage("PID1 volume lookup call");
-+		if (t970_ufs_data_volume("4F1C34B9-BBE3-4803-92AC-1503AEF26540", &device, device_path,
++		if (t970_ufs_data_volume("42888767-E4D4-467C-9FB6-A20A2645B6CC", &device, device_path,
 +		    sizeof(device_path), &size)) { error = ENOENT; goto done; }
 +		if (device == NODEV || !size || (size & 4095)) goto done;
 +	} else {
