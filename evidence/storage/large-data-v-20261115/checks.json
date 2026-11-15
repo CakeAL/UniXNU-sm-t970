@@ -1,0 +1,13 @@
+{
+  "ramblock_commit": "2f55c2f",
+  "framework_commit": "754380f",
+  "board_boot_progress_sha256": "1b36d95ffc62ea094e201a1523758e230ceafa7c58f349d2fa50c6870efc051f",
+  "source_kernel_sha256": "c1a2512f97cee3b4812bc2bbc8fbcb4366a3e008775ae705eaa00d5a75eb542d",
+  "image_sha256": "e776a5af422be4748eb9938159038398c227a15e9dfed1140b74afbe4806286f",
+  "checks": [
+    "kernel build and symbol audit passed",
+    "Recovery FAT seed and boot arguments independently verified",
+    "RECOVERY upload successful"
+  ],
+  "device_boot": "pending"
+}

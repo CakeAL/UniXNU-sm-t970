@@ -143,6 +143,17 @@ extern volatile uint32_t native_ram_block_sparse __attribute__((weak_import));
 extern void qcom_usb_debug_get_status(void *) __attribute__((weak_import));
 extern size_t qcom_usb_debug_write(const void *, size_t) __attribute__((weak_import));
 extern volatile uint64_t native_ram_block_bytes,native_ram_block_resident_bytes __attribute__((weak_import));
+extern volatile uint64_t native_ram_block_reads __attribute__((weak_import));
+extern volatile uint64_t native_ram_block_writes __attribute__((weak_import));
+extern volatile uint64_t native_ram_block_failures __attribute__((weak_import));
+extern volatile uint32_t native_ram_block_select_stage __attribute__((weak_import));
+extern volatile uint32_t native_ram_block_attach_stage __attribute__((weak_import));
+extern volatile uint32_t native_data_persist_gpt __attribute__((weak_import));
+extern volatile uint32_t native_ram_block_select_matches __attribute__((weak_import));
+extern volatile uint32_t native_data_persist_state __attribute__((weak_import));
+extern volatile uint32_t native_data_persist_header __attribute__((weak_import));
+extern volatile int native_owner_data_stage __attribute__((weak_import));
+extern volatile int native_owner_data_status __attribute__((weak_import));
 extern unsigned int vm_page_free_min,vm_page_free_reserved,vm_page_free_target;
 extern void boot_progress_exit_fault(int,unsigned,char *,unsigned long) __attribute__((weak_import));
 extern void boot_progress_exit_reason(int,unsigned,char *,unsigned long) __attribute__((weak_import));
@@ -892,9 +903,15 @@ static void draw(unsigned now) {
     max_mem>>20,vm_page_free_count,vm_page_active_count,vm_page_inactive_count,
     vm_page_wire_count,vm_page_speculative_count);line(35,b,0xffffff00);
   if(&native_ram_block_sparse){
-    snprintf(b,sizeof(b),"RAMDISK sparse=%u capacityMiB=%llu residentKiB=%llu; free min/reserved/target=%u/%u/%u",
-      native_ram_block_sparse,native_ram_block_bytes>>20,native_ram_block_resident_bytes>>10,
-      vm_page_free_min,vm_page_free_reserved,vm_page_free_target);line(36,b,0xffffff00);
+    snprintf(b,sizeof(b),"RAM MiB=%llu sel=%u att=%u match=%u IO=%llu/%llu/%llu store=%u/%u gpt=%u owner=%d/%d",
+      native_ram_block_bytes>>20,&native_ram_block_select_stage?native_ram_block_select_stage:999,
+      &native_ram_block_attach_stage?native_ram_block_attach_stage:999,
+      &native_ram_block_select_matches?native_ram_block_select_matches:999,
+      &native_ram_block_reads?native_ram_block_reads:0,&native_ram_block_writes?native_ram_block_writes:0,
+      &native_ram_block_failures?native_ram_block_failures:0,&native_data_persist_state?native_data_persist_state:999,
+      &native_data_persist_header?native_data_persist_header:999,&native_data_persist_gpt?native_data_persist_gpt:999,
+      &native_owner_data_stage?native_owner_data_stage:-9,
+      &native_owner_data_status?native_owner_data_status:-9);line(36,b,0xffffff00);
   }
   if (visible->frozen) {
     // Capture without touching the controller, including when an interrupted

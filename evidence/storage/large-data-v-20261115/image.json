@@ -1,0 +1,52 @@
+{
+  "device_revision": "fe235caead9dd731709fb92701be57fb2f1bc628",
+  "framework_revision": "fcba93a4cf88be28c2cca0d1c6802adf30e273de",
+  "instruments": {
+    "boot_progress_mode": 2,
+    "stage_bars": true,
+    "panic_screen": true,
+    "kernel_args_override": [
+      "boot-progress=2",
+      "build-tag=large-data-v",
+      "t970-large-data=1",
+      "t970-large-init=1",
+      "native-ufs-stream2=0x4e0"
+    ],
+    "kernel_args_dropped": [
+      "panic_on_crash_disabled=1"
+    ]
+  },
+  "board_sha256": "601c27c34ead065e43b9bf075413ffa77e7046ea23d5e2357c5f52b3bbdf4e23",
+  "source_kernel_sha256": "c1a2512f97cee3b4812bc2bbc8fbcb4366a3e008775ae705eaa00d5a75eb542d",
+  "embedded_data_ramdisk_sha256": "ca1543d1986cb1de5dd8ef6a3f01f48609e2a65a18bbf3f88f04b2d189031dcf",
+  "base_recovery_sha256": "33efcec0915129321995cd4de57a3223f7fd41e36c8f73205f07fa97e7aeaeba",
+  "firmware_config_dtb_sha256": "86c14aa305a6cf5db46665f4095d28aadcb1ea5ce9d213cd711641a07504ed1d",
+  "image_sha256": "e776a5af422be4748eb9938159038398c227a15e9dfed1140b74afbe4806286f",
+  "image_bytes": 86888448,
+  "recovery_partition_bytes": 86888448,
+  "hardware_tested": false,
+  "note": "Enables the boot page only; no flash or reboot performed",
+  "partition": "RECOVERY",
+  "build_command": "python3.14 scripts/build-boot-progress-page.py --mode 2 --large-data-seed --data-ramdisk out/dual-system/overlay-inspection-20261115/reference-fresh-73g.dbr --kernel-arg build-tag=large-data-v --kernel-arg t970-large-data=1 --kernel-arg t970-large-init=1 --kernel-arg native-ufs-stream2=0x4e0 --drop-kernel-arg panic_on_crash_disabled --kernel /Users/cakeal/vsc/UniXNU/out/sm-t970/ipados-17.7.11-21H461/gts7xlwifi/kernel/kernel.macho --output out/dual-system/wholesale-inputs-20261115/boot-progress-page/page-large-data-v",
+  "observation": {
+    "source": "owner screen 2026-11-15 22:19 Asia/Shanghai",
+    "time_seconds": 44,
+    "stage": "PID1 data volume enter",
+    "ramdisk_capacity_mib": 74752,
+    "selection_stage": 4,
+    "matching_volumes": 1,
+    "ramdisk_reads": 300,
+    "ramdisk_writes": 0,
+    "ramdisk_failures": 0,
+    "persistence_state": 0,
+    "persistence_header": 9,
+    "owner_stage": 0,
+    "owner_status": -1,
+    "interpretation": "Volume was found and attachStore was entered but had not returned. Specific wait within attachStore remains unknown."
+  },
+  "upload": {
+    "status": "success",
+    "partition": "RECOVERY",
+    "log": "evidence/storage/large-data-v-20261115/upload.log"
+  }
+}

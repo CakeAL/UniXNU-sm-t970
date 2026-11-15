@@ -43,5 +43,15 @@
     "status": "success",
     "partition": "RECOVERY",
     "log": "evidence/storage/large-data-u-20261115/upload.log"
+  },
+  "observation_145s": {
+    "source": "owner screen 2026-11-15 22:13 Asia/Shanghai",
+    "time_seconds": 145,
+    "stage": "PID1 data volume enter",
+    "ramdisk_capacity_mib": 74752,
+    "ufs_requests": 304,
+    "ufs_failures": 0,
+    "processes": 1,
+    "interpretation": "The diagnostic display is alive but Data discovery or mount has not progressed; no successful persistent store is shown."
   }
 }

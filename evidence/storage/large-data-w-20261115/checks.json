@@ -1,0 +1,16 @@
+{
+  "ramblock_commit": "55fe4ca",
+  "framework_commit": "945ad8d",
+  "board_boot_progress_sha256": "601092c4bd7d0f334809fc50a3020be9493a059f21b4e7bb5e18d8537b2ea38f",
+  "image_sha256": "bb822b000ec0d2df69d7ef08c2ce7a7a75d6307ebb28ba0d15e07230a62ac8b7",
+  "checks": [
+    "kernel build passed",
+    "Recovery FAT seed and boot arguments independently verified",
+    "RECOVERY upload successful"
+  ],
+  "device_boot": "pending",
+  "platform_check": {
+    "command": "python3.14 scripts/check-platform.py --unixnu ../UniXNU",
+    "result": "Not completed: existing review requires an older framework revision; no DT/ADT conclusion."
+  }
+}
