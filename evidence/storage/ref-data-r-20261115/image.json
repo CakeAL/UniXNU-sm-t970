@@ -1,0 +1,52 @@
+{
+  "device_revision": "cdedcc62aa73f4a665281c4b39e01094503944bb",
+  "framework_revision": "0e9e1e8182b18a6b78df983808ec296b7f30dc20",
+  "instruments": {
+    "boot_progress_mode": 2,
+    "stage_bars": true,
+    "panic_screen": true,
+    "kernel_args_override": [
+      "boot-progress=2",
+      "build-tag=ref-data-r",
+      "native-ufs-stream2=0x4e0"
+    ],
+    "kernel_args_dropped": [
+      "panic_on_crash_disabled=1"
+    ]
+  },
+  "board_sha256": "601c27c34ead065e43b9bf075413ffa77e7046ea23d5e2357c5f52b3bbdf4e23",
+  "source_kernel_sha256": "2b850551d349635045f923b947a00fe1330acce5ea35ca2aec776bd47bf5644f",
+  "base_recovery_sha256": "33efcec0915129321995cd4de57a3223f7fd41e36c8f73205f07fa97e7aeaeba",
+  "firmware_config_dtb_sha256": "86c14aa305a6cf5db46665f4095d28aadcb1ea5ce9d213cd711641a07504ed1d",
+  "image_sha256": "d9b19ec26bf1bd84e337ad78f3a63ad67d65c84dd780e169e42f4954767d4208",
+  "image_bytes": 86888448,
+  "recovery_partition_bytes": 86888448,
+  "hardware_tested": false,
+  "note": "Enables the boot page only; no flash or reboot performed",
+  "partition": "RECOVERY",
+  "build_command": "python3.14 scripts/build-boot-progress-page.py --mode 2 --kernel-arg build-tag=ref-data-r --kernel-arg native-ufs-stream2=0x4e0 --drop-kernel-arg panic_on_crash_disabled --kernel out/dual-system/wholesale-inputs-20261115/boot-progress-page/page-ufs-data-q/kernel-source.macho --output out/dual-system/wholesale-inputs-20261115/boot-progress-page/page-ref-data-r",
+  "validation": {
+    "basis": "existing 512 MiB OwnerData seed and existing SHNGDATA overlay; no repartition or reinitialization",
+    "kernel_source": "same kernel as observed ufsdata-q",
+    "t970_ufs_data": "not enabled; NativeRamBlock fallback selected",
+    "hardware_result": "pending"
+  },
+  "upload": {
+    "status": "success",
+    "partition": "RECOVERY",
+    "result": "RECOVERY upload successful",
+    "log": "evidence/storage/ref-data-r-20261115/upload.log",
+    "partition_readback": "not performed",
+    "device_boot": "observed"
+  },
+  "observation": {
+    "source": "owner screen 2026-11-15 21:11 Asia/Shanghai",
+    "time_seconds": 176,
+    "last_stage": "Data mount returned",
+    "processes": 1,
+    "ramdisk_capacity_mib": 0,
+    "ufs_requests": 304,
+    "ufs_failures": 0,
+    "interpretation": "The old-seed fallback did not reach the next policy stage. The built KernelConfigTables lacks NativeRamBlock personality even though NativeRamBlock is linked; this prevents normal IOKit matching. Whether this is the sole blocker remains to be tested."
+  }
+}

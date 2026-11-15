@@ -209,8 +209,18 @@ if [ "$NATIVE_RAM_BLOCK" != 0 ] && [ "$NATIVE_RAM_BLOCK" != 1 ]; then
   echo 'XNU_NATIVE_RAM_BLOCK must be 0 or 1' >&2
   exit 1
 fi
-# With source storage the RAM disk is part of the source storage archive, which also starts it.
-if [ "$NATIVE_RAM_BLOCK" = 1 ] && [ "${XNU_SOURCE_STORAGE:-0}" != 1 ]; then
+# Source storage normally starts the RAM disk itself. Some boards use that
+# configuration with a separately linked RAM disk and need its IOKit match.
+RAM_BLOCK_PERSONALITY=${XNU_RAM_BLOCK_PERSONALITY:-0}
+if [ "$RAM_BLOCK_PERSONALITY" != 0 ] && [ "$RAM_BLOCK_PERSONALITY" != 1 ]; then
+  echo 'XNU_RAM_BLOCK_PERSONALITY must be 0 or 1' >&2
+  exit 1
+fi
+if [ "$RAM_BLOCK_PERSONALITY" = 1 ] && [ "$NATIVE_RAM_BLOCK" != 1 ]; then
+  echo 'XNU_RAM_BLOCK_PERSONALITY requires XNU_NATIVE_RAM_BLOCK' >&2
+  exit 1
+fi
+if [ "$NATIVE_RAM_BLOCK" = 1 ] && { [ "${XNU_SOURCE_STORAGE:-0}" != 1 ] || [ "$RAM_BLOCK_PERSONALITY" = 1 ]; }; then
   if [ "${XNU_NATIVE_AES:-0}" != 1 ]; then
     echo 'NativeRamBlock requires the qualified original storage/AES prelink closure' >&2
     exit 1
@@ -227,6 +237,16 @@ if [ "$NATIVE_VIRTIO_CONSOLE" != 0 ] && [ "$NATIVE_VIRTIO_CONSOLE" != 1 ]; then
 fi
 if [ "$NATIVE_VIRTIO_CONSOLE" = 1 ]; then
   PERSONALITY_CFLAGS="$PERSONALITY_CFLAGS -DXNU_NATIVE_VIRTIO_CONSOLE=1"
+fi
+# Make does not track changed per-object flags. Rebuild the personality table
+# and relink whenever its actual flags change, even when archives are unchanged.
+PERSONALITY_DIR=$ROOT/build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837
+PERSONALITY_STAMP=$PERSONALITY_DIR/.board-personality-flags
+mkdir -p "$PERSONALITY_DIR"
+if [ "$(cat "$PERSONALITY_STAMP" 2>/dev/null || true)" != "$PERSONALITY_CFLAGS" ]; then
+  rm -f "$PERSONALITY_DIR/iokit/DEVELOPMENT/KernelConfigTables.cpo" \
+        "$PERSONALITY_DIR/mach.development.bcm2837.unstripped"
+  printf '%s\n' "$PERSONALITY_CFLAGS" > "$PERSONALITY_STAMP"
 fi
 EXTRA_MAKE_ARGS+=("KernelConfigTables.cpo_CFLAGS_ADD=$PERSONALITY_CFLAGS")
 TRUST_CACHE_MODE=${XNU_TRUST_CACHE_RUNTIME:-0}

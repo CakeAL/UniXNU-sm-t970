@@ -1,0 +1,27 @@
+{
+  "reference_revision": "88b34f97100a01aab4ea6b86dc9c748b2114c382",
+  "minsos_zip": "MinsOS_v1.2.3_20261024_gts7xlwifi.zip",
+  "zip_review": "ZIP includes vendor but no apnhlos image",
+  "matches_reference": [
+    "a650_gmu.bin",
+    "a650_sqe.fw",
+    "amss20.bin",
+    "m3.bin",
+    "bdwlan.elf",
+    "bdwlan.e05",
+    "bdwlan.elf1",
+    "bdwlan.elf2",
+    "regdb.bin"
+  ],
+  "metal_addon": "out/dual-system/firmware-inputs-20261114/addon-metal.bin",
+  "metal_addon_sha256": "fb32130db66e4a3dfcb0bdb4d030aa6381159e70945837b6a685a84484104ca4",
+  "limitations": "Reference GPU addon and stock-device A650 archive built on host; runtime and ADSP compatibility are not yet verified.",
+  "not_found_locally_before_device_read": [
+    "a650_zap.mdt",
+    "a650_zap.b00",
+    "a650_zap.b01",
+    "a650_zap.b02",
+    "adsp.mbn"
+  ],
+  "device_read_result": "All 4 ZAP and all 22 ADSP fragments subsequently read from this tablet; each matches this tablet stock inventory. See evidence/firmware/device-firmware-20261115/report.json."
+}

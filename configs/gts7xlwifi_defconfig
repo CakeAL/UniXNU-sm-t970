@@ -53,6 +53,8 @@ CONFIG_XNU_OWNER_UNION_SYSTEMOS=y
 # Reuse the existing packed 512 MiB Data seed and its overlay on unixnu.
 CONFIG_XNU_SOURCE_STORAGE=y
 CONFIG_XNU_NATIVE_RAM_BLOCK=y
+# The wholesale board links RamBlock separately from source storage.
+CONFIG_XNU_RAM_BLOCK_PERSONALITY=y
 CONFIG_XNU_OWNER_DATA_MOUNT=y
 CONFIG_XNU_OWNER_DATA_VOLUME_UUID="C25160D3-B586-4C11-9D3A-42CB2741227C"
 # The GOP framebuffer path (GopFramebuffer + package/LegacyDisplayProbe.cpp): bsd_init.c calls

@@ -726,6 +726,8 @@ id = "storage"
 status = "implemented"
 components = ["ShengUfs", "VirtioMmioBlock", "RamBlock", "VerifiedRoot"]
 paths = [
+  "evidence/storage/data-backup-20261115/**",
+  "evidence/storage/ref-data-r-20261115/**",
   "evidence/storage/ufsdata-p-20261115/**",
   "tests/test_boot_policy_parent.py",
   "evidence/storage/ufsdata-o-20261115/**",
@@ -845,6 +847,10 @@ procedure = [
   "Read block sysfs and by-name links; read each LUN's primary GPT header and entry array and validate their CRC32 values without writing any block device.",
 ]
 findings = [
+  "The wholesale defconfig now explicitly requests the separately linked RamBlock personality even with XNU_SOURCE_STORAGE. The build script tracks personality flags to invalidate KernelConfigTables and relink on changes. Kernel 30066a33bff5d11dd49bc2f5c6847c12df203c3e893f6d644dd5ea8bcae56e5c builds successfully and contains the NativeRamBlock match; the previous kernel does not. Runtime matching and persistent Data are pending.",
+  "Recovery d9b19ec26bf1bd84e337ad78f3a63ad67d65c84dd780e169e42f4954767d4208 stays at Data mount returned with one process and RAMDISK capacity zero at 176 seconds. Its compiled IOKit personality table omits NativeRamBlock despite the archive being linked, because XNU_SOURCE_STORAGE suppresses that table entry. Explicit matching requires host and device validation.",
+  "The new Data extent was backed up read-only over ADB: all 78844506112 bytes were streamed, gzip CRC verified and raw SHA-256 e745b6144c2ea1311604605addbab3f9c79fa03260608d8d4e62a414fa1794c0 recorded. The compressed backup stays in ignored local storage; no device writes were made.",
+  "Prepared Recovery d9b19ec26bf1bd84e337ad78f3a63ad67d65c84dd780e169e42f4954767d4208 with the existing 512 MiB OwnerData seed and preserved SHNGDATA overlay, using the kernel from q; direct UFS Data and reseeding are off. Heimdall reported RECOVERY upload successful; device boot and Data outcome remain pending.",
   "Recovery fb9f98b3e7c4884cda679cc6165c7101c883df38a805a7947c29f771a4787c8d at 197 seconds shows launchd spawned processes, 19 recorded exits, auearlyboot exit 1 and tzinit exit 2; only two processes remain and display ownership has not transferred. The diagnostic stack abort did not recur. The cause of the job exits and persistence of user files remain unverified.",
   "Recovery c23efc935f56cccff9d58973c7f18d91bcedcc4e1dd373e31669e183ab888eac creates the missing Data db parent for the launchd policy; host tests and kernel build passed. RECOVERY upload succeeded; runtime result remains pending.",
   "Recovery e24b0ee471a5db37decc170c4027fe7ba2ff4ef2eeb6d8c1f73a007cfd26cc05 reports policy mkdir launchd error=2 (ENOENT). The fresh Data seed lacks its db parent, unlike the prior seed. Boot policy now creates /private/var/db if absent before creating its launchd child; device validation is pending.",
@@ -1454,6 +1460,7 @@ id = "gpu"
 status = "planned"
 components = []
 paths = [
+  "evidence/firmware/device-firmware-20261115/**",
   "package/T970Adreno650/**",
   "scripts/build-t970-adreno650.py",
   "scripts/gen-t970-adreno650-firmware.py",
@@ -1478,6 +1485,7 @@ procedure = [
   "Read KGSL identity and frequency nodes, list GPU firmware files and calculate the GMU/SQE hashes without executing GPU commands.",
 ]
 findings = [
+  "Device ADB read-only extracted the four ZAP inputs; hashes match the previously inventoried stock T970 signed pair. The generated ELF matches the reference generator. The reference A650 build archived 32 objects and the staged accelerator after correcting the AdrenoMetal include path; host symbol audit passed, but no GPU image has been linked or device-tested.",
   "The same-model Adreno650 driver, HFI/SMMU/PM4 sources and 21H461 accelerator bindings compile in 34 host objects. Pinned metal2vulkan and Turnip with the reference BO retirement patch built for arm64 iOS 17, and the plugin, Turnip library and daemon passed strict signature verification. ZAP, full kernel link, display integration and GPU runtime remain pending.",
   "v137 mode 33 uses the audited CB1 root from the v136 procedure, synchronizes ASID 2 before and after a brief CB1 translation pulse, and checks that the live GMU SID5 route and unpublished GPU streams remain in the expected state.",
   "The dual-system v137 Recovery 3413470c reuses the exact persistent Data kernel, ADT, trust cache and seed. Heimdall uploaded RECOVERY only. Owner photo confirms CB1 ASID 2 sync on and off, ctl a7/a6, FSR 400/400, 17 retained leaves, live SID5 and idle CP.",
@@ -1711,6 +1719,7 @@ id = "audio"
 status = "planned"
 components = []
 paths = [
+  "evidence/firmware/device-firmware-20261115/**",
   "reference/gts7xlwifi/hal/**",
   "reference/gts7xlwifi/package/T970Sensors.cpp",
   "evidence/adb-2026-11-01/audio.txt",
@@ -1727,6 +1736,7 @@ procedure = [
   "Collect ALSA card/PCM lists, bound amplifier links and firmware file names, then inspect the sound and ADSP DT nodes.",
 ]
 findings = [
+  "Device ADB read-only extracted all 22 ADSP fragments, each matching this T970 stock inventory. The reassembled ADSP image differs from the reference tablet image; audio and firmware authentication remain untested.",
   "The audio, ADSP and SLPI startup paths link and prelink in 21H461. The iOS 17 audio HAL passes strict local code-signature verification. Three CS35L40 files extracted offline from MinsOS match the captured board inventory. Recovery d9aa10ce leaves DSPs disabled while signed ADSP/SLPI firmware and service mounting are pending.",
   "27 ADSP/amp firmware and service-description files are hashed; loaded DSP routes are not inferred.",
   "The bound amplifier driver is cs35l41 while available DSP firmware filenames use cs35l40; file names alone do not prove the loaded amplifier firmware or route.",

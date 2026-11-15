@@ -1,0 +1,14 @@
+{
+  "source": "/dev/block/sda37",
+  "absolute_4k_lba": [
+    42816256,
+    62065402
+  ],
+  "bytes": 78844506112,
+  "raw_sha256": "e745b6144c2ea1311604605addbab3f9c79fa03260608d8d4e62a414fa1794c0",
+  "gzip_sha256": "f3a9b1b6495e008ab7e8847d196a4b7d057825f4e88fdd0fa9903ec4cce47332",
+  "compressed_bytes": 344062030,
+  "gzip_crc_verified": true,
+  "adb_exit": 0,
+  "device_writes": false
+}

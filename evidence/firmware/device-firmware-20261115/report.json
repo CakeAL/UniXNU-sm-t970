@@ -1,0 +1,175 @@
+{
+  "serial": "R52N71CDBNM",
+  "source": "/vendor/firmware_mnt/image",
+  "mount": "read-only",
+  "device_writes": false,
+  "files": [
+    {
+      "name": "a650_zap.mdt",
+      "bytes": 6860,
+      "sha256": "56ed13adffa9af0bd8a39eefe025318312b734c3741badf1adc8f5a91ae0bb02",
+      "device_hash_match": true
+    },
+    {
+      "name": "a650_zap.b00",
+      "bytes": 148,
+      "sha256": "ec9b9d5a67456384809624b14a00d15d36297e5f2e75728504cd872bc95e0947",
+      "device_hash_match": true
+    },
+    {
+      "name": "a650_zap.b01",
+      "bytes": 6712,
+      "sha256": "83cd3f4e3886a5e509173a22c0de0009a7c73f956e636c7d792ca7feac49a68b",
+      "device_hash_match": true
+    },
+    {
+      "name": "a650_zap.b02",
+      "bytes": 1676,
+      "sha256": "a415e5452fa8f597670a6e51010e97bfabca7d20fbce8044caed64d9d5873113",
+      "device_hash_match": true
+    },
+    {
+      "name": "adsp.mdt",
+      "bytes": 8380,
+      "sha256": "a9a5c00004f887147fbde5fec6e4b40f5e5d0481074d459fc8ff64fea8cce08a",
+      "device_hash_match": true
+    },
+    {
+      "name": "adsp.b00",
+      "bytes": 756,
+      "sha256": "9cd20853ea09c4b3fd9259a523bf50a8a8a5ad419840007a21b85d9c2617c39e",
+      "device_hash_match": true
+    },
+    {
+      "name": "adsp.b01",
+      "bytes": 7624,
+      "sha256": "e3a339f0ae9b8e0d6f58117a487d4e3c9b05834c1cc689f87d4abf91c1dc5bec",
+      "device_hash_match": true
+    },
+    {
+      "name": "adsp.b02",
+      "bytes": 82552,
+      "sha256": "f10e949463f54e041eaf5ab955641cd1f011c5103240b3f8f8124b4abc667aa6",
+      "device_hash_match": true
+    },
+    {
+      "name": "adsp.b03",
+      "bytes": 358784,
+      "sha256": "1f760ce5ff08372d0927e87632162bab630093a7a31a1a415179aea4f85d03d9",
+      "device_hash_match": true
+    },
+    {
+      "name": "adsp.b04",
+      "bytes": 1961452,
+      "sha256": "bfc5a6c78eeab83c1e3e8dee9978ac9bec8c339ebff64c293085b4ef79bba522",
+      "device_hash_match": true
+    },
+    {
+      "name": "adsp.b05",
+      "bytes": 2487860,
+      "sha256": "f34686f80cab110deea79fa809713da7d7a3a7388177fe83e6b841899cc3fe1b",
+      "device_hash_match": true
+    },
+    {
+      "name": "adsp.b06",
+      "bytes": 38640,
+      "sha256": "6330322efc9e7ceb48f9c2c75db0e38f6f546f04f11a96b2da4695ad0ca8277b",
+      "device_hash_match": true
+    },
+    {
+      "name": "adsp.b07",
+      "bytes": 28972,
+      "sha256": "cb9fbd8220da1b64e22959f62518782be53251140bcd30ae469e33ad1de2951d",
+      "device_hash_match": true
+    },
+    {
+      "name": "adsp.b08",
+      "bytes": 126736,
+      "sha256": "9ab5abde33109089eeb1bf8ee44233e0a0d5a546e5a2f32c9ec1d02a861736c3",
+      "device_hash_match": true
+    },
+    {
+      "name": "adsp.b09",
+      "bytes": 64424,
+      "sha256": "60b01a8e5a478c79cc31f8c5548c59260d7a40b2296cbd33615279ec6159dae0",
+      "device_hash_match": true
+    },
+    {
+      "name": "adsp.b10",
+      "bytes": 610304,
+      "sha256": "eeead0a774ac358d78b3b3b66a62af9aba8f40e3226bc66a05f86569eb3ec69c",
+      "device_hash_match": true
+    },
+    {
+      "name": "adsp.b11",
+      "bytes": 11984892,
+      "sha256": "3b48362e239929a2396dd3d18e6865cac0d18178e0afb94e41e5fbe9e9fe2519",
+      "device_hash_match": true
+    },
+    {
+      "name": "adsp.b12",
+      "bytes": 1589280,
+      "sha256": "2c0824dfd0443a5c928e5c5a469e0bb598847da247656bd3292a77cf1bd49a00",
+      "device_hash_match": true
+    },
+    {
+      "name": "adsp.b13",
+      "bytes": 20480,
+      "sha256": "cc61635da46b2c9974335ea37e0b5fd660a5c8a42a89b271fa7ec2ac4b8b26f6",
+      "device_hash_match": true
+    },
+    {
+      "name": "adsp.b14",
+      "bytes": 2464,
+      "sha256": "01c4b3e9a729b06d0262df06b0054fc89463d20a7f041faa6c35ae14e408bcb9",
+      "device_hash_match": true
+    },
+    {
+      "name": "adsp.b15",
+      "bytes": 4416,
+      "sha256": "91937540ab206d861f60932ef419337e69a32205e76216d63a75a0b42db1e6ca",
+      "device_hash_match": true
+    },
+    {
+      "name": "adsp.b16",
+      "bytes": 305864,
+      "sha256": "06b510cf18094d197f5a656cd55dec814731d827cbca955c5cf30e6811591fdf",
+      "device_hash_match": true
+    },
+    {
+      "name": "adsp.b17",
+      "bytes": 1367348,
+      "sha256": "41cf2040f89ba1f28c6ea3c0003661ca1ae2ef87bb76c10283f3c778def5acce",
+      "device_hash_match": true
+    },
+    {
+      "name": "adsp.b18",
+      "bytes": 488496,
+      "sha256": "227637d4ffc6a75cca205827f1305a588480cdfab5a80c3228c5429bd33e5b79",
+      "device_hash_match": true
+    },
+    {
+      "name": "adsp.b19",
+      "bytes": 2326392,
+      "sha256": "341491e5dfa3fdd66179e5013ca12e32a027fe5be1542e9c8142afbe65139694",
+      "device_hash_match": true
+    },
+    {
+      "name": "adsp.b20",
+      "bytes": 132,
+      "sha256": "c071d27cbba524bcf015318ece5cfe33f6a94d1348125969d89cd4189baecda8",
+      "device_hash_match": true
+    }
+  ],
+  "validation": {
+    "device_inventory": "all 4 ZAP and all 22 ADSP inputs match proprietary-files.txt for this T970",
+    "reference_zap": "MDT and b01 differ from reference; match this device recorded signed pair",
+    "zap_elf_sha256": "91643550c98ec095d6bf519459bcbc1ec689a66bc516341b8ca376f4df0e0f55",
+    "zap_assembly": "matches reference generator byte-for-byte",
+    "adsp_mbn_sha256": "20674ab2df75ebaafc803516c2521d753c28eacde1be7af460fcf71e746f3328",
+    "adsp_reference_sha256": "7c613e3fa196ef87c9389f61578dbb6e2c110ff69057adf8733109b5682c1f6f",
+    "gpu_archive_sha256": "1143a41efdc515172df61a4d14e9da604c6b9444df7b1ff4003da3c2f4ffe05b",
+    "gpu_archive_result": "32 A650 objects, accelerator and bindings; build and symbol audit pass; not linked to a test image",
+    "device_runtime": "not tested"
+  }
+}

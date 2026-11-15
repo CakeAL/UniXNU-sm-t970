@@ -138,7 +138,7 @@ while i < len(cxx_recipe['arguments']):
     elif not value.startswith('-W') and value not in ('-MD', '-MP'):
         command.append(value)
     i += 1
-command += ['-I', str(Path('.cache/xnu-work/osfmk')), '-I', str(CORE_DRIVERS / 'Adreno740'), '-Wall', '-Wextra', '-Werror', '-Wno-unused-parameter',
+command += ['-I', str(Path('.cache/xnu-work/osfmk')), '-I', str(CORE_DRIVERS / 'AdrenoMetal'), '-Wall', '-Wextra', '-Werror', '-Wno-unused-parameter',
             '-Wno-unnecessary-virtual-specifier', '-Wno-c99-designator', '-Wno-reorder-init-list',
             '-Wno-deprecated-enum-enum-conversion', '-Wno-overloaded-virtual']
 result = subprocess.run(command, cwd=cxx_recipe['directory'], capture_output=True, text=True)
