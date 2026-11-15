@@ -1,0 +1,10 @@
+{
+  "base_recovery_sha256": "cbbf85d79a71670b0058f47839c48c2fc493428a1fae14bdd45b2056624be4f4",
+  "image": "out/dual-system/wholesale-inputs-20261115/ufs-failure-report/recovery.img",
+  "sha256": "118a157f02444dfac6e3de86ef40aba265c686d710b914d81f1a012562c79313",
+  "only_payload_change": "Appended native-ufs-diagnostics=1 to the XNU boot line; kernel, ADT, trust cache and seed verified byte-for-byte.",
+  "partition": "RECOVERY",
+  "upload": "RECOVERY upload successful",
+  "heimdall_exit": 0,
+  "device_boot": "awaiting observation"
+}

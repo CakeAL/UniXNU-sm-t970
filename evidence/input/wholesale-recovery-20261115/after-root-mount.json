@@ -8,5 +8,5 @@
   "partition": "RECOVERY",
   "upload": "RECOVERY upload successful",
   "heimdall_exit": 0,
-  "device_boot": "awaiting observation"
+  "device_boot": "Owner observed no reset for over two minutes. The root-mount return checkpoint was not demonstrated in that interval."
 }
