@@ -1,38 +1,37 @@
 {
-  "image": "out/dual-system/wholesale-inputs-20261115/boot-progress-page/page-mode2-e/boot.img",
-  "sha256": "e69538469e529c8d440e7e1ee91995af6d92bdcd923075ed07c26e642dfb0122",
-  "bytes": 86888448,
-  "base_recovery_sha256": "33efcec0915129321995cd4de57a3223f7fd41e36c8f73205f07fa97e7aeaeba",
-  "source_kernel_sha256": "246bc7f48a1d30b8a67c45c69cda7c0b8ae720e878bc0f02171bd01b9054320e",
-  "source_kernel": "out (framework) sm-t970/ipados-17.7.11-21H461/gts7xlwifi/kernel/kernel.macho, 54636544 bytes",
-  "packed_kernel_sha256": "e271aa1859316571875d0c359ff768f625664a924874094f1c9d4a8b713481be",
-  "packed_kernel_bytes": 54636544,
-  "device_revision": "54d120db35924ca11eeebfddce643636075d77d7",
-  "framework_revision": "0e9e1e8182b18a6b78df983808ec296b7f30dc20",
-  "instrument": "BootProgress page bound to the frame buffer (boot-progress=2), stage bars and panic screen still present",
-  "hooks_verified_in_kernel": [
-    "_arm_init: bl _boot_progress_init, bl _boot_progress_stage (x2)",
-    "_vcputc_options: bl _boot_progress_active, b _boot_progress_putc",
-    "_PE_init_kprintf: bl _boot_progress_active"
+ "image": "out/dual-system/wholesale-inputs-20261115/boot-progress-page/page-mode2-e/boot.img",
+ "sha256": "e69538469e529c8d440e7e1ee91995af6d92bdcd923075ed07c26e642dfb0122",
+ "bytes": 86888448,
+ "base_recovery_sha256": "33efcec0915129321995cd4de57a3223f7fd41e36c8f73205f07fa97e7aeaeba",
+ "source_kernel_sha256": "246bc7f48a1d30b8a67c45c69cda7c0b8ae720e878bc0f02171bd01b9054320e",
+ "source_kernel": "out (framework) sm-t970/ipados-17.7.11-21H461/gts7xlwifi/kernel/kernel.macho, 54636544 bytes",
+ "packed_kernel_sha256": "e271aa1859316571875d0c359ff768f625664a924874094f1c9d4a8b713481be",
+ "packed_kernel_bytes": 54636544,
+ "device_revision": "54d120db35924ca11eeebfddce643636075d77d7",
+ "framework_revision": "0e9e1e8182b18a6b78df983808ec296b7f30dc20",
+ "instrument": "BootProgress page bound to the frame buffer (boot-progress=2), stage bars and panic screen still present",
+ "hooks_verified_in_kernel": [
+  "_arm_init: bl _boot_progress_init, bl _boot_progress_stage (x2)",
+  "_vcputc_options: bl _boot_progress_active, b _boot_progress_putc",
+  "_PE_init_kprintf: bl _boot_progress_active"
+ ],
+ "change": "only boot-progress=2; every other board argument and the whole board.toml are unchanged",
+ "partition": "RECOVERY",
+ "upload": "RECOVERY upload successful",
+ "heimdall_log": "out/dual-system/wholesale-inputs-20261115/boot-progress-page/page-mode2-e/heimdall-flash.log",
+ "device_boot": "panicked with the boot page visible",
+ "supersedes": "50ca0cd99f080a38c2f56b5e3af3b81d1d9196e9d50873ba7ce71df84f270c14 (wrong kernel: old sm-t970 product kernel without BootProgress hooks)",
+ "question": "does the panel show the boot page text rows, and which row + which armcpu step is the last",
+ "observation": {
+  "time": "2026-11-15 15:59:40 +08:00",
+  "screen": "UniXNU boot diagnostics page bound and drawing; header \"UniXNU boot diagnostics - live XNU - native 4K - no automatic reboot\"",
+  "rows": [
+   "time=3s idle=0s IRQ=0 monitor=1 lost=0 root=0 proc=0 free=897392",
+   "UFS requests=0 verified4K=0 failures=0 integrity=0 published=0 | probe=0 match=0 root=0 -",
+   "TCR=22a51a25la TTBR0=c5c74000 TTBR1=c5c75000 SCTLR=3454593d",
+   "NATIVE_UFS dual stream reuse refused: UFS stream has no match sid=00e0 slot=ffffffff bank=0 refs=0 smr=00000000 s2cr=00000000 cbar=00000000 cba2r=00000000 sctlr=00000000 where=start probe=0 root=1 @NativeUfs.cpp:283"
   ],
-  "change": "only boot-progress=2; every other board argument and the whole board.toml are unchanged",
-  "partition": "RECOVERY",
-  "upload": "RECOVERY upload successful",
-  "heimdall_log": "out/dual-system/wholesale-inputs-20261115/boot-progress-page/page-mode2-e/heimdall-flash.log",
-  "device_boot": "panicked with the boot page visible",
-  "supersedes": "50ca0cd99f080a38c2f56b5e3af3b81d1d9196e9d50873ba7ce71df84f270c14 (wrong kernel: old sm-t970 product kernel without BootProgress hooks)",
-  "question": "does the panel show the boot page text rows, and which row + which armcpu step is the last",
-  "observation": {
-    "time": "2026-11-15 15:59:40 +08:00",
-    "screenshot": "evidence/input/wholesale-recovery-20261115/boot-diagnostics-panic-151559.jpg",
-    "screen": "UniXNU boot diagnostics page bound and drawing; header \"UniXNU boot diagnostics - live XNU - native 4K - no automatic reboot\"",
-    "rows": [
-      "time=3s idle=0s IRQ=0 monitor=1 lost=0 root=0 proc=0 free=897392",
-      "UFS requests=0 verified4K=0 failures=0 integrity=0 published=0 | probe=0 match=0 root=0 -",
-      "TCR=22a51a25la TTBR0=c5c74000 TTBR1=c5c75000 SCTLR=3454593d",
-      "NATIVE_UFS dual stream reuse refused: UFS stream has no match sid=00e0 slot=ffffffff bank=0 refs=0 smr=00000000 s2cr=00000000 cbar=00000000 cba2r=00000000 sctlr=00000000 where=start probe=0 root=1 @NativeUfs.cpp:283"
-    ],
-    "reading": "the kernel panicked in requireDualStreamReuse at NativeUfs.cpp:283 during start: the SMMU has no SMR entry matching sid 0xe0, so the dual-stream reuse guard fired. requireDualStreamReuse returns early unless native-ufs-stream2 is set, so the guard ran only because this board carries the reference pair 0xe0/0x4e0. The single-stream path does not panic on the same state: smmuBypassStream falls back to planUfsSmmu/configureUfsSmmu and programs the bypass context itself.",
-    "health": "the boot page instrument works: hooks bound the frame buffer, console output and the panic text are on the panel"
-  }
+  "reading": "the kernel panicked in requireDualStreamReuse at NativeUfs.cpp:283 during start: the SMMU has no SMR entry matching sid 0xe0, so the dual-stream reuse guard fired. requireDualStreamReuse returns early unless native-ufs-stream2 is set, so the guard ran only because this board carries the reference pair 0xe0/0x4e0. The single-stream path does not panic on the same state: smmuBypassStream falls back to planUfsSmmu/configureUfsSmmu and programs the bypass context itself.",
+  "health": "the boot page instrument works: hooks bound the frame buffer, console output and the panic text are on the panel"
+ }
 }
