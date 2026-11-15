@@ -8,5 +8,5 @@
   "partition": "RECOVERY",
   "upload": "RECOVERY upload successful",
   "heimdall_exit": 0,
-  "device_boot": "awaiting observation"
+  "device_boot": "Owner observed a quick automatic reset after magenta, confirming that the CPU count was not yet published when ml_wait_max_cpus reached its sleep call."
 }

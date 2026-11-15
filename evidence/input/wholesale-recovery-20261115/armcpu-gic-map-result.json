@@ -1,0 +1,13 @@
+{
+  "base_recovery_sha256": "9985d1824b746c3cb9a0a7df10eb41f7d457e80f20df28b47cade42591ba8f92",
+  "image": "out/dual-system/wholesale-inputs-20261115/mmu-probe/armcpu-gic-map-result/recovery.img",
+  "sha256": "ef5109f1d5f837f9e995b9d49fa0a1b571060ceaffe951a0e51fc514d51fbaf3",
+  "kernel_readback_sha256": "3c28eaefabf10573f415fd2bf503356a3a098bdeefbed75e5445d92549e3c538",
+  "checkpoint": "boot CPU ArmCpu::start return from ArmCpu::mapGic",
+  "reset_seconds": {
+    "false": 12,
+    "true": 24
+  },
+  "partition": "RECOVERY",
+  "upload": "pending"
+}
