@@ -8,5 +8,5 @@
   "partition": "RECOVERY",
   "upload": "RECOVERY upload successful",
   "heimdall_exit": 0,
-  "device_boot": "awaiting observation"
+  "device_boot": "Owner observed automatic reset approximately 20 seconds after magenta, confirming PE_lockdown_iokit returned."
 }
