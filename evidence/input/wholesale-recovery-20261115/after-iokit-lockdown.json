@@ -1,0 +1,12 @@
+{
+  "base_recovery_sha256": "cbbf85d79a71670b0058f47839c48c2fc493428a1fae14bdd45b2056624be4f4",
+  "image": "out/dual-system/wholesale-inputs-20261115/mmu-probe/after-iokit-lockdown/recovery.img",
+  "sha256": "7cae5956b0c4188c8aa6cd06e1d130e1350bf0595642172a2d6dbc0e0a3f0cf2",
+  "kernel_readback_sha256": "d3abb7576b1373131fd443942d9224ef7be5f6cbdb980b791eb01b528eca0eb6",
+  "checkpoint": "first return from PE_lockdown_iokit in kernel_bootstrap_thread",
+  "reset_seconds": 20,
+  "partition": "RECOVERY",
+  "upload": "RECOVERY upload successful",
+  "heimdall_exit": 0,
+  "device_boot": "awaiting observation"
+}

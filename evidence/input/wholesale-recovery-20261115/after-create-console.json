@@ -8,5 +8,5 @@
   "partition": "RECOVERY",
   "upload": "RECOVERY upload successful",
   "heimdall_exit": 0,
-  "device_boot": "awaiting observation"
+  "device_boot": "Owner observed an automatic reset approximately 16 seconds after magenta, confirming that PE_create_console returned."
 }
