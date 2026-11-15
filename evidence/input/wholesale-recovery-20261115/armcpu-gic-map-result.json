@@ -11,5 +11,5 @@
   "partition": "RECOVERY",
   "upload": "RECOVERY upload successful",
   "heimdall_exit": 0,
-  "device_boot": "Owner selected the combined answer for magenta beyond one minute or another outcome. Neither timed return (12 or 24 seconds) was reported; exact screen outcome unconfirmed."
+  "device_boot": "Owner confirmed the screen remained at magenta for over one minute, with neither timed reset observed."
 }
