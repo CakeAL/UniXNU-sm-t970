@@ -1,0 +1,10 @@
+{
+  "base_recovery_sha256": "9985d1824b746c3cb9a0a7df10eb41f7d457e80f20df28b47cade42591ba8f92",
+  "image": "out/dual-system/wholesale-inputs-20261115/mmu-probe/platform-publish/recovery.img",
+  "sha256": "86277f9e67a5c8ff07c9a34f2318ebe03156aa046c93dd0c086ce1f805f60a78",
+  "only_payload_change": "Appended platform-stage=5; original kernel, ADT, trust cache and seed match on readback.",
+  "checkpoint": "immediately after ArmDTPlatform registers its service",
+  "reset_seconds": 0,
+  "partition": "RECOVERY",
+  "upload": "pending"
+}
