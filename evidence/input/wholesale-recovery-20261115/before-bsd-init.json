@@ -1,0 +1,12 @@
+{
+  "base_recovery_sha256": "cbbf85d79a71670b0058f47839c48c2fc493428a1fae14bdd45b2056624be4f4",
+  "image": "out/dual-system/wholesale-inputs-20261115/mmu-probe/before-bsd-init/recovery.img",
+  "sha256": "a680a8d10b9573245a716872dde89490fd8b81c7781eea2bd67dc0d356180643",
+  "kernel_readback_sha256": "890d52cadd721067920ff94b69364667f7d53a759c08807816f1b004e8f884df",
+  "checkpoint": "immediately before the first call to bsd_init from kernel_bootstrap_thread",
+  "reset_seconds": 0,
+  "partition": "RECOVERY",
+  "upload": "RECOVERY upload successful",
+  "heimdall_exit": 0,
+  "device_boot": "awaiting observation"
+}
