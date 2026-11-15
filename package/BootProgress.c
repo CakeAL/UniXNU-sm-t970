@@ -514,6 +514,22 @@ static void pid1_dump(unsigned now) {
         ++n;
         if (n < 7) { snprintf(rows[n], BP_COLS, "  user pc=%llx lr=%llx", (unsigned long long)upc, (unsigned long long)ulr); ++n; }
         if (n < 7) { snprintf(rows[n], BP_COLS, "  kern pc=%llx lr=%llx", (unsigned long long)kpc, (unsigned long long)klr); ++n; }
+        /* A blocked thread keeps no saved PC in kpcb: machine_switch_context leaves its caller
+         * frame on the kernel stack, so the return addresses below are the call chain. */
+        {
+          uintptr_t top = (uintptr_t)thread->machine.kstackptr;
+          int shown = 0;
+          rows[n][0] = 0;
+          if (n < 7) snprintf(rows[n], BP_COLS, "  kst=%llx bt=", (unsigned long long)top);
+          for (int i = 1; i <= 96 && shown < 4 && n < 7; ++i) {
+            uintptr_t v = ((const uintptr_t *)top)[-i];
+            if (v < 0xfffffff007004000ULL || v > 0xfffffff030000000ULL) continue;
+            size_t len = strlen(rows[n]);
+            snprintf(rows[n] + len, BP_COLS - len, " %llx", (unsigned long long)v);
+            ++shown;
+          }
+          ++n;
+        }
       }
       task_unlock(task);
     }
