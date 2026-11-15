@@ -498,17 +498,22 @@ static void pid1_dump(unsigned now) {
       thread_t thread;
       queue_iterate(&task->threads, thread, thread_t, task_threads) {
         if (n >= 7) break;
-        uint64_t upc = 0, ulr = 0;
+        uint64_t upc = 0, ulr = 0, kpc = 0, klr = 0;
         if (thread->machine.upcb) {
           upc = get_saved_state_pc(thread->machine.upcb);
           ulr = get_saved_state_lr(thread->machine.upcb);
         }
-        snprintf(rows[n], BP_COLS, "T%llx s%x w%llx c%llx u%llx/%llx",
-            (unsigned long long)thread->thread_id, thread->state,
+        if (thread->machine.kpcb) {
+          kpc = get_saved_state_pc(thread->machine.kpcb);
+          klr = get_saved_state_lr(thread->machine.kpcb);
+        }
+        snprintf(rows[n], BP_COLS, "T%llx st=%x why=%x w%llx c%llx",
+            (unsigned long long)thread->thread_id, thread->state, thread->reason,
             (unsigned long long)VM_KERNEL_UNSLIDE(thread->wait_event),
-            (unsigned long long)VM_KERNEL_UNSLIDE(thread->continuation),
-            (unsigned long long)upc, (unsigned long long)ulr);
+            (unsigned long long)VM_KERNEL_UNSLIDE(thread->continuation));
         ++n;
+        if (n < 7) { snprintf(rows[n], BP_COLS, "  user pc=%llx lr=%llx", (unsigned long long)upc, (unsigned long long)ulr); ++n; }
+        if (n < 7) { snprintf(rows[n], BP_COLS, "  kern pc=%llx lr=%llx", (unsigned long long)kpc, (unsigned long long)klr); ++n; }
       }
       task_unlock(task);
     }

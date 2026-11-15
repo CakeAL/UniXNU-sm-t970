@@ -9,6 +9,10 @@
 #include <sys/stat.h>
 #include <pexpert/pexpert.h>
 
+// BootProgress is linked into the same kernel; the stage ring is the only console that works
+// before bsd_init returns.
+extern void boot_progress_stage(const char *text) __attribute__((weak_import));
+static void policy_stage(const char *text) { if (&boot_progress_stage) boot_progress_stage(text); }
 static const char policy_head[] =
  "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
  "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n"
@@ -111,7 +115,16 @@ static int t970_motion_debug_log(proc_t p, uint64_t scratch) {
 int sheng_boot_watchdog_policy(void *process, uint64_t scratch) {
  proc_t p=process;
  int enabled=0,error=0,fd=-1;int32_t result=0;
+ // The page's stage ring shows how far this ran: the boot thread was last recorded at "Data mount
+ // returned" and never reached the next kern_exec stage, so the steps below are instrumented.
+ int skip=0;
+ if(PE_parse_boot_argn("t970-skip-boot-policy",&skip,sizeof(skip)) && skip==1) {
+  policy_stage("boot policy skipped by boot argument");
+  return 0;
+ }
+ policy_stage("policy: motion debug log enter");
  t970_motion_log_status = t970_motion_debug_log(p, scratch);
+ policy_stage("policy: motion debug log returned");
  PE_parse_boot_argn("disable-watchdogd",&enabled,sizeof(enabled));
  if(!PE_parse_boot_argn("disable-jobs",jobs,sizeof(jobs)))jobs[0]=0;jobs[sizeof(jobs)-1]=0;
  int lite=0;PE_parse_boot_argn("lite",&lite,sizeof(lite));if(lite!=1)lite=0;
@@ -121,6 +134,7 @@ int sheng_boot_watchdog_policy(void *process, uint64_t scratch) {
  PE_parse_boot_argn("setup",&setup,sizeof(setup));
  PE_parse_boot_argn("data-reset",&reset,sizeof(reset));   // 2 = erase Data and show the Hello page; 1 = erase Data, Setup stays skipped
  if(reset==2)setup=1;
+ policy_stage("policy: setup reset enter");
  if(setup==1 && (error=sheng_boot_setup_reset(p,scratch))) {
   sheng_watchdog_policy_status=error;
   printf("sheng setup flags reset failed: %d\n",error);
@@ -180,6 +194,7 @@ int sheng_boot_watchdog_policy(void *process, uint64_t scratch) {
  if(st.st_uid!=0 || st.st_gid!=0 || !S_ISREG(st.st_mode) || (st.st_mode&0777)!=0644 || st.st_size!=(off_t)(strlen(policy)))error=EINVAL;
  done:
  if(fd>=0){struct close_args cl={.fd=fd};int e=sys_close(p,&cl,&result);if(!error)error=e;}
+ policy_stage("policy: disabled.plist written");
  // A real empty migration marker selects the qualified modern override loader.
  if(!error) {
   const char *marker="/private/var/db/com.apple.xpc.launchd/disabled.migrated";
