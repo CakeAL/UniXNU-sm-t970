@@ -479,6 +479,11 @@ static void line(unsigned row, const char *text, uint32_t color);
 static void pid1_dump(unsigned now) {
   unsigned opt = 0;
   if (!PE_parse_boot_argn("t970-pid1", &opt, sizeof(opt)) || opt != 1) return;
+  // This page also draws from kernel_bootstrap_thread, before bsd_init has created a single
+  // process: the task queue and its lock are still zero, so a walk there dereferences a NULL
+  // head. Wait until task_init has run (a process exists and the head points somewhere).
+  if (now < 3 || nprocs < 1) return;
+  if (!tasks.next || (void *)tasks.next == (void *)&tasks) return;
   char rows[8][BP_COLS];
   unsigned n = 0;
   snprintf(rows[n], BP_COLS, "PID1 nprocs=%d t=%us: only process 1 exists, nothing was spawned", nprocs, now); ++n;

@@ -1,10 +1,22 @@
 {
- "image": "out/dual-system/wholesale-inputs-20261115/boot-progress-page/page-mode2-pid1-a/boot.img",
- "sha256": "55eedc11ca3854e8318376a9aa238514505368fff3d8cfcf1b5ccb7ea8f61057",
- "source_kernel_sha256": "76d8eb7e67ac8cdbe28cd60c46d7e50c8f4ee79f5d0febe169585ddf1cb615e9",
- "device_revision": "20bb823",
- "change": "kernel rebuilt with package/BootProgress.c pid1_dump (t970-pid1=1): page rows 24..31 print pid 1's threads (id, state, wait event, continuation, user PC/LR, all unslid). Board arguments minus native-ufs-stream2=0x4e0; boot-progress=2 kept so the page owns the panel.",
- "purpose": "The wholesale kernel reaches load_init_program and then nprocs stays 1 for 219 s: launchd runs but spawns nothing and no display client asks for a scanout. The dump names the syscall wait launchd sits in instead of guessing.",
- "upload": "flashed by scripts/flash-recovery-when-detected.sh once Download Mode appeared",
- "observation": "awaiting the on-screen page"
+ "note": "pid 1 thread dump on the boot page: first attempt stopped the kernel before the page bound",
+ "broken": {
+  "image": "out/dual-system/wholesale-inputs-20261115/boot-progress-page/page-mode2-pid1-a/boot.img",
+  "sha256": "55eedc11ca3854e8318376a9aa238514505368fff3d8cfcf1b5ccb7ea8f61057",
+  "source_kernel_sha256": "76d8eb7e67ac8cdbe28cd60c46d7e50c8f4ee79f5d0febe169585ddf1cb615e9",
+  "observation": "device shows only the magenta pre-MMU stage band; page never bound, no panic text",
+  "cause": "pid1_dump ran from the page's draw(), which also draws from kernel_bootstrap_thread before bsd_init: osfmk/kern/processor.c:119 'queue_head_t tasks' is BSS and only queue_init'd by task_init, so queue_iterate dereferenced a NULL head"
+ },
+ "guarded": {
+  "image": "out/dual-system/wholesale-inputs-20261115/boot-progress-page/page-mode2-pid1-b/boot.img",
+  "sha256": "7b30ccdca15ad3cdd54d7e2e2062d71ac82020248f1a0900580d47b3f330d221",
+  "source_kernel_sha256": "fe4fdced98f7a2043b45ed7391381f2986162b660a9606910769ffaa520f60d7",
+  "change": "dump only runs when now>=3, nprocs>=1 and the task queue head is non-NULL and not self"
+ },
+ "control": {
+  "image": "out/dual-system/wholesale-inputs-20261115/boot-progress-page/page-mode2-pid1-control/boot.img",
+  "sha256": "74985b9854aa1bf74f7d385065b2e750c5bd374deff4bef6ba68f54c0d006321",
+  "source_kernel_sha256": "fe4fdced98f7a2043b45ed7391381f2986162b660a9606910769ffaa520f60d7",
+  "change": "same kernel and board arguments without t970-pid1=1: separates 'the dump faults' from 'the rebuilt kernel changed'"
+ }
 }
