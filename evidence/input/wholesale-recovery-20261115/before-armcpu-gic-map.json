@@ -1,0 +1,12 @@
+{
+  "base_recovery_sha256": "9985d1824b746c3cb9a0a7df10eb41f7d457e80f20df28b47cade42591ba8f92",
+  "image": "out/dual-system/wholesale-inputs-20261115/mmu-probe/before-armcpu-gic-map/recovery.img",
+  "sha256": "ba861dc19895b629558bc4009fc27a668e25ae146eba5fca3dc281ec408f4684",
+  "kernel_readback_sha256": "aca9077562551c4354df34d19c0d527aecca875a6b71499b33fa351b57caf03d",
+  "checkpoint": "immediately before the boot CPU ArmCpu::start call to ArmCpu::mapGic",
+  "reset_seconds": 0,
+  "partition": "RECOVERY",
+  "upload": "RECOVERY upload successful",
+  "heimdall_exit": 0,
+  "device_boot": "awaiting observation"
+}

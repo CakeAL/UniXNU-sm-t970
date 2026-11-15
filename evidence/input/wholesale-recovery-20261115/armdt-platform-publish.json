@@ -8,5 +8,5 @@
   "partition": "RECOVERY",
   "upload": "RECOVERY upload successful",
   "heimdall_exit": 0,
-  "device_boot": "awaiting observation"
+  "device_boot": "Owner observed a quick automatic reset, consistent with the platform-stage=5 checkpoint after ArmDTPlatform service publication."
 }
