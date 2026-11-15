@@ -1414,6 +1414,7 @@ static bool installOwnerPolicyCarrier (uint64_t firstLba, uint64_t lastLba, cons
 #include "T970DataWindow.h"
 #include "T970ApfsSeed.h"
 #include "T970DataExtent.h"
+#include "T970LargeData.h"
 #include "T970SeedState.h"
 extern "C" uint8_t native_ram_block_seed_sha256[32] __attribute__((weak_import));
 extern "C" unsigned native_ufs_store_gpt_check (void);
@@ -1495,6 +1496,12 @@ static bool t970ApfsSeed (uint64_t first, uint64_t blocks, bool writable)
   return ok;
 }
 
+// The RamBlock component asks once after this store is opened. This is true
+// only for the specifically reviewed former direct container; once its header
+// is committed, later boots resume instead of resetting any user data.
+static bool gT970LargeNeedsInit = false;
+extern "C" int native_ufs_store_needs_init (void) { return gT970LargeNeedsInit ? 1 : 0; }
+
 // Returns 1 and the first absolute 4096-byte LBA of the window, 0 on refusal.
 extern "C" int native_ufs_store_open (uint64_t blocks, uint64_t *firstLba, const char **why)
 {
@@ -1507,25 +1514,38 @@ extern "C" int native_ufs_store_open (uint64_t blocks, uint64_t *firstLba, const
   uint64_t first = 0;
   int headerState = -1;
   int ok = 0;
+  uint32_t large = 0, direct = 0, init = 0;
+  PE_parse_boot_argn ("t970-large-data", &large, sizeof (large));
+  PE_parse_boot_argn ("t970-ufs-data", &direct, sizeof (direct));
+  PE_parse_boot_argn ("t970-large-init", &init, sizeof (init));
+  gT970LargeNeedsInit = false;
   if (!mode) reason = "off";
   else if (!gStoreGeometry.valid || !gHost.ready) reason = "no root layout";
   else if (gStoreRegionBlocks) reason = "already open";
-  else if (!(first = t970DataFirst (1, reset | legacyReset, gStoreGeometry.first, gStoreGeometry.last,
-                                  gStoreGeometry.imageBytes, blocks, reserveBlocks ()))) {
-    reason = "requires the reviewed unixnu layout and 512 MiB seed";
+  else if (!native_ram_block_seed_sha256) reason = "seed identity unavailable";
+  else if (!(first = large ? t970LargeDataFirst (large, reset | legacyReset, direct,
+                      gStoreGeometry.first, gStoreGeometry.last, gStoreGeometry.imageBytes,
+                      blocks, reserveBlocks (), native_ram_block_seed_sha256)
+                          : t970DataFirst (1, reset | legacyReset, gStoreGeometry.first, gStoreGeometry.last,
+                                          gStoreGeometry.imageBytes, blocks, reserveBlocks ()))) {
+    reason = "unreviewed Data geometry or seed";
   } else if (native_ufs_store_gpt_check ()) reason = "GPT changed or unreadable";
   else {
     uint8_t header[4096];
-    if (!native_ram_block_seed_sha256 || hostRead4k (0, first, 1, header) != kIOReturnSuccess) {
-      reason = "seed identity or store header unavailable";
-    }
+    if (hostRead4k (0, first, 1, header) != kIOReturnSuccess) reason = "store header unavailable";
     else {
-      headerState = t970DataHeaderState (header, native_ram_block_seed_sha256);
+      if (large) {
+        uint8_t digest[32]; SHA256_CTX context;
+        SHA256_Init (&context); SHA256_Update (&context, header, sizeof (header)); SHA256_Final (digest, &context);
+        headerState = t970LargeHeaderState (header, digest);
+        if (headerState == 1 && (init != 1 || mode != 2)) headerState = -1;
+      } else headerState = t970DataHeaderState (header, native_ram_block_seed_sha256);
       if (headerState < 0) reason = "store header is foreign, damaged or for another seed";
       else if (mode == 2 && !hostStoreOpen (first, blocks)) reason = "window refused";
       else {
         gStoreRegionFirst = first;
         gStoreRegionBlocks = blocks;
+        gT970LargeNeedsInit = large && headerState == 1;
         if (firstLba) *firstLba = first;
         ok = 1;
       }

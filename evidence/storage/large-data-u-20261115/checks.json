@@ -1,0 +1,21 @@
+{
+  "sources_sha256": {
+    "drivers/ShengUfs/NativeUfs.cpp": "50e148efa687cd82f29d4ffe108a3afee8e50f9616ae739fe45ee963602d4fc6",
+    "drivers/ShengUfs/T970LargeData.h": "1607ba37e6ff5f28ea6f9c4482cd04f40a04c3e4e373007b7e8829b491fc9456",
+    "scripts/pack-wholesale-recovery.py": "bc2525b6804918c77abc5ed224054c91d43b3ccb57172c52282c54434226744a",
+    "scripts/build-boot-progress-page.py": "9c80a563f7951de2698638c0a20d257d264e3189ace3f9c916356c83ea254122",
+    "tests/t970_large_data.cpp": "4d125875e8cf026171794055b7559a11468cd7abb066a753b6e76e7f48c9d0b2",
+    "tests/test_t970_large_store.py": "f487de0884024b5921aeb6f46b6f43a6202b7fa6adf8fac27602f6734fd754eb"
+  },
+  "ramblock_commit": "d8000559a795679974393d34970d61f0fa96108d",
+  "framework_commit": "fcba93a",
+  "recovery_sha256": "8a428368652ab838f30c0cbd9ddf5ead9e2ce27566d290894cd4124a401ed794",
+  "host_checks": [
+    "fault-injected overlay initialization and resume",
+    "actual provider open refusal checks",
+    "existing RamBlock persistence suite",
+    "kernel build and symbol verification",
+    "Recovery FAT readback and kernel argument audit"
+  ],
+  "device_status": "RECOVERY upload successful; boot result pending"
+}

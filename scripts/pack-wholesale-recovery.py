@@ -10,6 +10,7 @@ from pathlib import Path
 
 PAGE = 4096
 BASE_SHA256 = "33efcec0915129321995cd4de57a3223f7fd41e36c8f73205f07fa97e7aeaeba"
+LARGE_SEED_SHA256 = "ca1543d1986cb1de5dd8ef6a3f01f48609e2a65a18bbf3f88f04b2d189031dcf"
 
 
 def require(condition, message):
@@ -46,6 +47,7 @@ def main():
     parser.add_argument("--base", type=Path, required=True)
     parser.add_argument("--payload", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--large-data-seed", action="store_true", help="allow only the reviewed 73 GiB seed")
     args = parser.parse_args()
     base = args.base.read_bytes()
     require(hashlib.sha256(base).hexdigest() == BASE_SHA256, "Expected the tested persistent Recovery wrapper")
@@ -63,14 +65,27 @@ def main():
     with tempfile.TemporaryDirectory() as temporary:
         old_fat = Path(temporary) / "base-fat.img"
         old_fat.write_bytes(base[fat_at:fat_at + old_fat_size])
-        for name in ("Payloads/scratch-data.img", "Payloads/kernel.macho.trustcache"):
-            require(fat_read(args.payload, name) == fat_read(old_fat, name), f"Changed Recovery input: {name}")
+        name = "Payloads/kernel.macho.trustcache"
+        require(fat_read(args.payload, name) == fat_read(old_fat, name), f"Changed Recovery input: {name}")
+        name = "Payloads/scratch-data.img"
+        selected = fat_read(args.payload, name)
+        if args.large_data_seed:
+            require(hashlib.sha256(selected).hexdigest() == LARGE_SEED_SHA256, "Unreviewed large Data seed")
+        else:
+            require(selected == fat_read(old_fat, name), f"Changed Recovery input: {name}")
 
     config = tomllib.loads(fat_read(args.payload, "unixnu.toml").decode())
     boot_entries = [entry for entry in config["entry"] if entry["type"] == "xnu"]
     require(len(boot_entries) == 1, "Expected one XNU boot entry")
     command_line = boot_entries[0]["args"]
     require(safe_command_line(command_line), "Unsafe storage or memory switch")
+    flags = set(command_line.split())
+    if args.large_data_seed:
+        require({"t970-large-data=1", "t970-large-init=1", "sheng-data-persist=2"} <= flags,
+                "Large Data seed requires its guarded initialization route")
+    else:
+        require(not any(w.split("=", 1)[0] in {"t970-large-data", "t970-large-init"} for w in flags),
+                "Large Data route requires the reviewed seed")
 
     dtbo = base[old_dtbo_at:old_dtbo_at + dtbo_size]
     dtb = base[dtb_at:dtb_at + dtb_size]

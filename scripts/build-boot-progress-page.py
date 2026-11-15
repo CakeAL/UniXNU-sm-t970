@@ -24,7 +24,7 @@ def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def pack(device, base, payload_image, output, work):
+def pack(device, base, payload_image, output, work, large_data_seed=False):
     """Install the built FAT payload in the tested Recovery wrapper."""
     packer = device / 'scripts/pack-wholesale-recovery.py'
     spec = importlib.util.spec_from_file_location('pack_wholesale', packer)
@@ -41,10 +41,14 @@ def pack(device, base, payload_image, output, work):
     # of this build: keep them byte for byte so Data stays the same volume.
     seed = work / 'base-scratch-data.img'
     subprocess.run(['mcopy', '-i', str(base_fat), '::/EFI/UniXNU/Payloads/scratch-data.img', str(seed)], check=True)
-    subprocess.run(['mcopy', '-o', '-i', str(payload_image), str(seed),
-                    '::/EFI/UniXNU/Payloads/scratch-data.img'], check=True)
-    subprocess.run([sys.executable, str(packer), '--base', str(base), '--payload', str(payload_image),
-                    '--output', str(output)], check=True)
+    if not large_data_seed:
+        subprocess.run(['mcopy', '-o', '-i', str(payload_image), str(seed),
+                        '::/EFI/UniXNU/Payloads/scratch-data.img'], check=True)
+    command = [sys.executable, str(packer), '--base', str(base), '--payload', str(payload_image),
+               '--output', str(output)]
+    if large_data_seed:
+        command.append('--large-data-seed')
+    subprocess.run(command, check=True)
     return output
 
 
@@ -63,6 +67,7 @@ def main():
     parser.add_argument('--data-ramdisk', type=Path,
                         default=device / 'out/step7/data-seed-512/data-512.dbr',
                         help='persistent Data seed (the existing DBRDISK1 image)')
+    parser.add_argument('--large-data-seed', action='store_true', help='use the reviewed 73 GiB Data seed')
     parser.add_argument('--mode', type=int, default=2, choices=(1, 2, 3),
                         help='1 keeps the page until the system takes the panel; 2 keeps drawing')
     parser.add_argument('--kernel-arg', action='append', default=[],
@@ -120,13 +125,14 @@ def main():
     image = payload.build(ctx, kernel=kernel)
     # The tested wrapper already carries the firmware, the shim, the device tree
     # and the persistent Data seed; only the FAT payload is replaced.
-    boot = pack(device, base, image, output / 'boot.img', output)
+    boot = pack(device, base, image, output / 'boot.img', output, args.large_data_seed)
     # pack() replaces the generated payload's seed with the one from the tested
     # Recovery wrapper. Report the bytes actually shipped, not the earlier input.
     payload_report_path = output / 'payload' / 'payload.json'
     payload_report = json.loads(payload_report_path.read_text())
     payload_report['requested_data_ramdisk_sha256'] = payload_report.get('data_ramdisk_sha256')
-    payload_report['data_ramdisk_sha256'] = sha(output / 'base-scratch-data.img')
+    embedded_seed = args.data_ramdisk.resolve() if args.large_data_seed else output / 'base-scratch-data.img'
+    payload_report['data_ramdisk_sha256'] = sha(embedded_seed)
     payload_report['payload_sha256'] = sha(image)
     payload_report_path.write_text(json.dumps(payload_report, indent=2) + '\n')
     gpt = json.loads((device / 'evidence/adb-2026-11-01/gpt.json').read_text())
@@ -146,7 +152,7 @@ def main():
                         'kernel_args_override': ctx.args.kernel_arg,
                         'kernel_args_dropped': dropped},
         'board_sha256': board_hash, 'source_kernel_sha256': kernel_hash,
-        'embedded_data_ramdisk_sha256': sha(output / 'base-scratch-data.img'),
+        'embedded_data_ramdisk_sha256': sha(embedded_seed),
         'base_recovery_sha256': sha(base), 'firmware_config_dtb_sha256': sha(dtb),
         'image_sha256': sha(boot), 'image_bytes': boot.stat().st_size,
         'recovery_partition_bytes': sizes[0], 'hardware_tested': False,

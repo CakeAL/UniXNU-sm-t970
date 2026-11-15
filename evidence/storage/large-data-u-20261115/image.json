@@ -1,0 +1,47 @@
+{
+  "device_revision": "1dc375367b006f37abc1071e56302386f1db2e23",
+  "framework_revision": "0e9e1e8182b18a6b78df983808ec296b7f30dc20",
+  "instruments": {
+    "boot_progress_mode": 2,
+    "stage_bars": true,
+    "panic_screen": true,
+    "kernel_args_override": [
+      "boot-progress=2",
+      "build-tag=large-data-u",
+      "t970-large-data=1",
+      "t970-large-init=1",
+      "native-ufs-stream2=0x4e0"
+    ],
+    "kernel_args_dropped": [
+      "panic_on_crash_disabled=1"
+    ]
+  },
+  "board_sha256": "601c27c34ead065e43b9bf075413ffa77e7046ea23d5e2357c5f52b3bbdf4e23",
+  "source_kernel_sha256": "87abfce148c9f83f9fe16fb1b8556f2c85edcb59370fd9d10869d779d3bdb12d",
+  "embedded_data_ramdisk_sha256": "ca1543d1986cb1de5dd8ef6a3f01f48609e2a65a18bbf3f88f04b2d189031dcf",
+  "base_recovery_sha256": "33efcec0915129321995cd4de57a3223f7fd41e36c8f73205f07fa97e7aeaeba",
+  "firmware_config_dtb_sha256": "86c14aa305a6cf5db46665f4095d28aadcb1ea5ce9d213cd711641a07504ed1d",
+  "image_sha256": "8a428368652ab838f30c0cbd9ddf5ead9e2ce27566d290894cd4124a401ed794",
+  "image_bytes": 86888448,
+  "recovery_partition_bytes": 86888448,
+  "hardware_tested": false,
+  "note": "Enables the boot page only; no flash or reboot performed",
+  "partition": "RECOVERY",
+  "build_command": "python3.14 scripts/build-boot-progress-page.py --mode 2 --large-data-seed --data-ramdisk out/dual-system/overlay-inspection-20261115/reference-fresh-73g.dbr --kernel-arg build-tag=large-data-u --kernel-arg t970-large-data=1 --kernel-arg t970-large-init=1 --kernel-arg native-ufs-stream2=0x4e0 --drop-kernel-arg panic_on_crash_disabled --kernel /Users/cakeal/vsc/UniXNU/out/sm-t970/ipados-17.7.11-21H461/gts7xlwifi/kernel/kernel.macho --output out/dual-system/wholesale-inputs-20261115/boot-progress-page/page-large-data-u",
+  "observation": {
+    "source": "owner screen 2026-11-15 22:11 Asia/Shanghai",
+    "time_seconds": 25,
+    "stage": "PID1 data volume enter",
+    "ramdisk_capacity_mib": 74752,
+    "ramdisk_sparse": 1,
+    "ufs_requests": 304,
+    "ufs_failures": 0,
+    "processes": 1,
+    "interpretation": "73 GiB seed loaded; storage initialization and successful mount not yet demonstrated."
+  },
+  "upload": {
+    "status": "success",
+    "partition": "RECOVERY",
+    "log": "evidence/storage/large-data-u-20261115/upload.log"
+  }
+}
