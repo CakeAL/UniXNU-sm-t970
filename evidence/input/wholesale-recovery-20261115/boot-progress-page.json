@@ -1,0 +1,18 @@
+{
+  "image": "out/dual-system/wholesale-inputs-20261115/boot-progress-page/page-mode2-d/boot.img",
+  "sha256": "50ca0cd99f080a38c2f56b5e3af3b81d1d9196e9d50873ba7ce71df84f270c14",
+  "bytes": 86888448,
+  "base_recovery_sha256": "33efcec0915129321995cd4de57a3223f7fd41e36c8f73205f07fa97e7aeaeba",
+  "source_kernel_sha256": "95e88a24acc870fdebe4c26e9e4f98cc9b1805a3764ca3cf09b4e23fb871b456",
+  "board_sha256": "601c27c34ead065e43b9bf075413ffa77e7046ea23d5e2357c5f52b3bbdf4e23",
+  "device_revision": "6ef5f90ef9cfb2683a86fb5c8b7282bc36617dda",
+  "framework_revision": "0e9e1e8182b18a6b78df983808ec296b7f30dc20",
+  "generator_sha256": "5988e99287008c3cf1cf49be51c36998d347b4fa2fab83f4499b315aefc0b7b0",
+  "instrument": "BootProgress page bound to the frame buffer (boot-progress=2) with the stage bars and the panic screen",
+  "change": "left every other board argument unchanged; no reset probe; no -v and no cpus=1",
+  "partition": "RECOVERY",
+  "upload": "RECOVERY upload successful",
+  "heimdall_exit": 0,
+  "device_boot": "awaiting observation",
+  "question": "does the panel show the boot page text rows instead of only the stage bar, and which row is the last"
+}
