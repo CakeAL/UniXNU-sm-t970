@@ -4,5 +4,7 @@
   "sha256": "9985d1824b746c3cb9a0a7df10eb41f7d457e80f20df28b47cade42591ba8f92",
   "only_payload_change": "Removed the three scheduling cluster properties from each of eight CPU nodes. CPU affinity, kernel, boot arguments, trust cache and Data seed preserved.",
   "partition": "RECOVERY",
-  "upload": "pending"
+  "upload": "RECOVERY upload successful",
+  "heimdall_exit": 0,
+  "device_boot": "awaiting observation"
 }
