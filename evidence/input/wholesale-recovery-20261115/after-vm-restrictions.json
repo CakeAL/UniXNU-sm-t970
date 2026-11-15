@@ -8,5 +8,5 @@
   "partition": "RECOVERY",
   "upload": "RECOVERY upload successful",
   "heimdall_exit": 0,
-  "device_boot": "awaiting observation"
+  "device_boot": "Owner observed an automatic reset after approximately 22 seconds, confirming vm_set_restrictions returned."
 }
