@@ -19,7 +19,20 @@
   "partition": "RECOVERY",
   "upload": "RECOVERY upload successful",
   "heimdall_log": "out/dual-system/wholesale-inputs-20261115/boot-progress-page/page-mode2-e/heimdall-flash.log",
-  "device_boot": "awaiting observation",
+  "device_boot": "panicked with the boot page visible",
   "supersedes": "50ca0cd99f080a38c2f56b5e3af3b81d1d9196e9d50873ba7ce71df84f270c14 (wrong kernel: old sm-t970 product kernel without BootProgress hooks)",
-  "question": "does the panel show the boot page text rows, and which row + which armcpu step is the last"
+  "question": "does the panel show the boot page text rows, and which row + which armcpu step is the last",
+  "observation": {
+    "time": "2026-11-15 15:59:40 +08:00",
+    "screenshot": "evidence/input/wholesale-recovery-20261115/boot-diagnostics-panic-151559.jpg",
+    "screen": "UniXNU boot diagnostics page bound and drawing; header \"UniXNU boot diagnostics - live XNU - native 4K - no automatic reboot\"",
+    "rows": [
+      "time=3s idle=0s IRQ=0 monitor=1 lost=0 root=0 proc=0 free=897392",
+      "UFS requests=0 verified4K=0 failures=0 integrity=0 published=0 | probe=0 match=0 root=0 -",
+      "TCR=22a51a25la TTBR0=c5c74000 TTBR1=c5c75000 SCTLR=3454593d",
+      "NATIVE_UFS dual stream reuse refused: UFS stream has no match sid=00e0 slot=ffffffff bank=0 refs=0 smr=00000000 s2cr=00000000 cbar=00000000 cba2r=00000000 sctlr=00000000 where=start probe=0 root=1 @NativeUfs.cpp:283"
+    ],
+    "reading": "the kernel panicked in requireDualStreamReuse at NativeUfs.cpp:283 during start: the SMMU has no SMR entry matching sid 0xe0, so the dual-stream reuse guard fired. requireDualStreamReuse returns early unless native-ufs-stream2 is set, so the guard ran only because this board carries the reference pair 0xe0/0x4e0. The single-stream path does not panic on the same state: smmuBypassStream falls back to planUfsSmmu/configureUfsSmmu and programs the bypass context itself.",
+    "health": "the boot page instrument works: hooks bound the frame buffer, console output and the panic text are on the panel"
+  }
 }

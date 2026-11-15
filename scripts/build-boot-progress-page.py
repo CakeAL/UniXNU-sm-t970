@@ -67,6 +67,8 @@ def main():
                         help='1 keeps the page until the system takes the panel; 2 keeps drawing')
     parser.add_argument('--kernel-arg', action='append', default=[],
                         help='extra diagnostic override added to the board arguments')
+    parser.add_argument('--drop-kernel-arg', action='append', default=[],
+                        help='board argument prefix removed for this image only')
     args = parser.parse_args()
     output = args.output.resolve()
     ignored = subprocess.run(['git', '-C', str(device), 'check-ignore', str(output / 'image.json')],
@@ -104,6 +106,13 @@ def main():
     for key in list(spec):
         if key.startswith('entry_probe_reset_'):
             del spec[key]
+    dropped = []
+    for prefix in args.drop_kernel_arg:
+        kept = [word for word in spec['kernel_args'] if not word.startswith(prefix)]
+        dropped += [word for word in spec['kernel_args'] if word.startswith(prefix)]
+        spec['kernel_args'] = kept
+    if dropped:
+        print('dropped board arguments:', ' '.join(dropped))
     output.mkdir(parents=True)
     ctx.work = output
     ctx.logs = output / 'logs'
@@ -126,7 +135,8 @@ def main():
         'instruments': {'boot_progress_mode': args.mode,
                         'stage_bars': True,
                         'panic_screen': bool(spec.get('panic_screen')),
-                        'kernel_args_override': ctx.args.kernel_arg},
+                        'kernel_args_override': ctx.args.kernel_arg,
+                        'kernel_args_dropped': dropped},
         'board_sha256': board_hash, 'source_kernel_sha256': kernel_hash,
         'base_recovery_sha256': sha(base), 'firmware_config_dtb_sha256': sha(dtb),
         'image_sha256': sha(boot), 'image_bytes': boot.stat().st_size,
