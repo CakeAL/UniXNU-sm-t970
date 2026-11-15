@@ -63,7 +63,7 @@ def main():
     parser.add_argument('--data-ramdisk', type=Path,
                         default=device / 'out/step7/data-seed-512/data-512.dbr',
                         help='persistent Data seed (the existing DBRDISK1 image)')
-    parser.add_argument('--mode', type=int, default=2, choices=(1, 2),
+    parser.add_argument('--mode', type=int, default=2, choices=(1, 2, 3),
                         help='1 keeps the page until the system takes the panel; 2 keeps drawing')
     parser.add_argument('--kernel-arg', action='append', default=[],
                         help='extra diagnostic override added to the board arguments')
