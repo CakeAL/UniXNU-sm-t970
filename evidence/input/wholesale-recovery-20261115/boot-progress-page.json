@@ -13,6 +13,11 @@
   "partition": "RECOVERY",
   "upload": "RECOVERY upload successful",
   "heimdall_exit": 0,
-  "device_boot": "awaiting observation",
-  "question": "does the panel show the boot page text rows instead of only the stage bar, and which row is the last"
+  "device_boot": "not observed; superseded before the observation was recorded",
+  "question": "does the panel show the boot page text rows instead of only the stage bar, and which row is the last",
+  "superseded_by": {
+    "image": "out/dual-system/wholesale-inputs-20261115/boot-progress-page/page-mode2-e/boot.img",
+    "sha256": "e69538469e529c8d440e7e1ee91995af6d92bdcd923075ed07c26e642dfb0122",
+    "reason": "this pack used the sm-t970 product kernel (old piecemeal port, no BootProgress hooks), not the wholesale gts7xlwifi product kernel; the page could not have appeared"
+  }
 }
