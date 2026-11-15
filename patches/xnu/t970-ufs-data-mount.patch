@@ -15,7 +15,7 @@
 +	 * image on the former Windows partition (t970-ufs-data=1, writable with ufsrw=1). Not a RAM seed:
 +	 * base and the seed digest stay zero, size is the container's bytes. */
 +	extern int t970_ufs_data_volume(const char *, dev_t *, char *, size_t, uint64_t *);
-+	if (t970_ufs_data_volume("5915374F-7A58-4BD3-9C6F-0BD63348ACEA", &device, device_path,
++	if (t970_ufs_data_volume("4F1C34B9-BBE3-4803-92AC-1503AEF26540", &device, device_path,
 +	    sizeof(device_path), &size)) { error = ENOENT; goto done; }
 +	if (device == NODEV || !size || (size & 4095)) goto done;
  #endif

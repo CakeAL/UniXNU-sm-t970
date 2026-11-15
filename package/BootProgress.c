@@ -512,33 +512,71 @@ static void pid1_dump(unsigned now) {
             (unsigned long long)VM_KERNEL_UNSLIDE(thread->wait_event),
             (unsigned long long)VM_KERNEL_UNSLIDE(thread->continuation));
         ++n;
-        if (n < 7) { snprintf(rows[n], BP_COLS, "  user pc=%llx lr=%llx", (unsigned long long)upc, (unsigned long long)ulr); ++n; }
-        if (n < 7) { snprintf(rows[n], BP_COLS, "  kern pc=%llx lr=%llx", (unsigned long long)kpc, (unsigned long long)klr); ++n; }
+        if (n < 7) {
+          snprintf(rows[n], BP_COLS, "  u=%llx/%llx k=%llx/%llx",
+              (unsigned long long)upc, (unsigned long long)ulr,
+              (unsigned long long)kpc, (unsigned long long)klr);
+          ++n;
+        }
         /* A blocked thread keeps no saved PC in kpcb: machine_switch_context leaves its caller
          * frame on the kernel stack, so the return addresses below are the call chain. */
         {
+          /* A thread switched out by Switch_context keeps its callee-saved registers in the
+           * arm_kernel_saved_state at the top of its kernel stack (assym.s: FP=80, LR=88,
+           * SP=96 from kstackptr). That is the only trustworthy record of where it stopped. */
+          uintptr_t low = (uintptr_t)thread->kernel_stack;
+          uintptr_t high = low + (uintptr_t)kernel_stack_size;
           uintptr_t top = (uintptr_t)thread->machine.kstackptr;
-          /* The first words of the stack are the thread's own start frames; the frames in use
-           * now sit at the deep end, so both ends are reported. */
-          uintptr_t deep[2] = {0, 0};
-          int found = 0;
-          if (top) {
-            for (int i = 1; i <= 2048; ++i) {
-              uintptr_t v = ((const uintptr_t *)top)[-i];
-              if (v < 0xfffffff007004000ULL || v > 0xfffffff030000000ULL) continue;
-              deep[0] = deep[1];
-              deep[1] = v;
-              ++found;
-            }
+          uintptr_t sp = 0, fp = 0, lr = 0;
+          if (top > low && top + 0x70 <= high) {
+            const uintptr_t *st = (const uintptr_t *)top;
+            fp = st[80 / sizeof(uintptr_t)];
+            lr = st[88 / sizeof(uintptr_t)];
+            sp = st[96 / sizeof(uintptr_t)];
           }
           if (n < 7) {
-            snprintf(rows[n], BP_COLS, "  kst=%llx deep %llx %llx n=%d",
-                (unsigned long long)top, (unsigned long long)deep[0], (unsigned long long)deep[1], found);
+            snprintf(rows[n], BP_COLS, "  kst=%llx sp=%llx fp=%llx lr=%llx",
+                (unsigned long long)top, (unsigned long long)sp,
+                (unsigned long long)fp, (unsigned long long)lr);
             ++n;
           }
           if (n < 7) {
-            snprintf(rows[n], BP_COLS, "  lp=%llx bp=%llx", (unsigned long long)thread->last_processor,
-                (unsigned long long)thread->bound_processor);
+            /* Only [sp, stack top) holds live frames: everything below sp is stale data from
+             * earlier calls. The pointers nearest sp are the innermost frames. */
+            /* AArch64 frame records: [fp] = caller's fp, [fp + 8] = return address. Walking
+             * them is exact; raw scanning cannot tell a live frame from a stale slot. */
+            char chain[BP_COLS]; int used = 0; chain[0] = 0;
+            uintptr_t f = fp;
+            for (int i = 0; i < 5 && f >= low && f + 16 <= high; ++i) {
+              const uintptr_t *rec = (const uintptr_t *)f;
+              uintptr_t ret = rec[1];
+              if (ret < 0xfffffff007004000ULL || ret > 0xfffffff008000000ULL) break;
+              used += snprintf(chain + used, sizeof(chain) - (size_t)used, " %llx",
+                  (unsigned long long)ret);
+              if (used >= (int)sizeof(chain)) break;
+              f = rec[0];
+            }
+            snprintf(rows[n], BP_COLS, "  bt:%s", chain[0] ? chain : " -");
+            ++n;
+          }
+          if (n < 7) {
+            /* Which processor holds this thread right now? A thread that reports TH_RUN and
+             * appears on no processor is queued but never dispatched; one that appears here is
+             * executing, so it is spinning rather than lost. */
+            char where[BP_COLS]; int used = 0; where[0] = 0;
+            int running_on = -1;
+            unsigned cpus = (unsigned)ml_get_cpu_count();
+            if (cpus > 8) cpus = 8;
+            for (unsigned i = 0; i < cpus; ++i) {
+              processor_t p = processor_array[i];
+              thread_t active = p ? p->active_thread : NULL;
+              if (active == thread) running_on = (int)i;
+              used += snprintf(where + used, sizeof(where) - (size_t)used, " %s%u",
+                  active == thread ? "*" : "", i);
+              if (used >= (int)sizeof(where)) break;
+            }
+            snprintf(rows[n], BP_COLS, "  run=%d cpu%s lp=%llx", running_on, where,
+                (unsigned long long)(thread->last_processor));
             ++n;
           }
         }

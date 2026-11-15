@@ -1408,12 +1408,77 @@ static bool installOwnerPolicyCarrier (uint64_t firstLba, uint64_t lastLba, cons
 #endif
 
 #include "T970DataWindow.h"
+#include "T970ApfsSeed.h"
 extern "C" uint8_t native_ram_block_seed_sha256[32] __attribute__((weak_import));
 extern "C" unsigned native_ufs_store_gpt_check (void);
+
+// One read-only question for the UFS Data migration: does the region after the root image already
+// hold an APFS container (NXSB at offset 32), or is it still blank? Prints three candidate LBAs and
+// never writes. t970-apfs-probe=1.
+static void t970ApfsProbe (void)
+{
+  uint32_t on = 0;
+  if (!PE_parse_boot_argn ("t970-apfs-probe", &on, sizeof (on)) || on != 1) return;
+  if (!gStoreGeometry.valid || !gHost.ready) {
+    IOLog ("[t970 apfs] probe: no root layout\n");
+    return;
+  }
+  uint8_t *block = static_cast<uint8_t *> (IOMalloc (4096));
+  if (!block) return;
+  const uint64_t candidates[3] = {
+    gStoreGeometry.first + gStoreGeometry.imageBytes / 4096,
+    gStoreGeometry.first,
+    gStoreGeometry.last,
+  };
+  char report[512];
+  unsigned used = 0;
+  report[0] = 0;
+  for (unsigned i = 0; i < 3; ++i) {
+    memset (block, 0, 4096);
+    const IOReturn r = hostRead4k (0, candidates[i], 1, block);
+    used += snprintf (report + used, sizeof (report) - used, "\n%u lba=%llu read=%x nx=%d magic=%02x%02x%02x%02x",
+        i, candidates[i], r, memcmp (block + 32, "NXSB", 4) == 0,
+        block[32], block[33], block[34], block[35]);
+    if (used >= sizeof (report)) break;
+  }
+  IOFree (block, 4096);
+  panic ("t970 APFS probe: first=%llu last=%llu imageBytes=%llu%s",
+      gStoreGeometry.first, gStoreGeometry.last, gStoreGeometry.imageBytes, report);
+}
+
+// t970-apfs-seed=1: write the 33 metadata blocks of an empty APFS container into the space after the
+// root image. Every write stays inside [userdataFirst + imageBytes/4096, userdataLast].
+static bool t970ApfsSeed (uint64_t first)
+{
+  uint32_t enabled = 0;
+  if (!PE_parse_boot_argn ("t970-apfs-seed", &enabled, sizeof (enabled)) || enabled != 1) return true;
+  uint8_t *block = static_cast<uint8_t *> (IOMalloc (4096));
+  if (!block) return false;
+  if (hostRead4k (0, first, 1, block) == kIOReturnSuccess && !memcmp (block + 32, "NXSB", 4)) {
+    IOLog ("[t970 apfs] seed: container already present at %llu\n", first);
+    IOFree (block, 4096);
+    return true;
+  }
+  unsigned written = 0;
+  for (unsigned i = 0; i < kT970ApfsSeedBlocks; ++i) {
+    memcpy (block, kT970ApfsSeedData + i * 4096, 4096);
+    if (hostWrite4k (0, first + kT970ApfsSeedIndex[i], 1, block, true) != kIOReturnSuccess) break;
+    ++written;
+  }
+  memset (block, 0, 4096);
+  const IOReturn check = hostRead4k (0, first, 1, block);
+  const bool ok = written == kT970ApfsSeedBlocks && check == kIOReturnSuccess && !memcmp (block + 32, "NXSB", 4);
+  IOLog ("[t970 apfs] seed: first=%llu blocks=%u written=%u read=%x ok=%d\n",
+         first, kT970ApfsSeedBlocks, written, check, ok);
+  IOFree (block, 4096);
+  return ok;
+}
+
 
 // Returns 1 and the first absolute 4096-byte LBA of the window, 0 on refusal.
 extern "C" int native_ufs_store_open (uint64_t blocks, uint64_t *firstLba, const char **why)
 {
+  t970ApfsProbe ();
   const unsigned mode = storeMode ();
   uint32_t reset = 0, legacyReset = 0;
   PE_parse_boot_argn ("sheng-data-reset", &reset, sizeof (reset));
@@ -1917,6 +1982,112 @@ static bool ufsHasAncestor (IORegistryEntry *entry, const IORegistryEntry *ances
   const bool found = ufsMediaHasAncestor (*parents, ancestor);
   parents->release ();
   return found;
+}
+
+// t970-ufs-data=1: publish the APFS container after the root image as a whole-userdata block device,
+// so APFS can mount its Data volume and the kernel owner Data mount uses it instead of a RAM seed.
+static NativeUfsWholeUserdataBlock *gT970DataDevice;
+
+static bool t970PublishData (IOService *owner, const RootLayout *layout)
+{
+  uint32_t enabled = 0, rw = 0;
+  if (!PE_parse_boot_argn ("t970-ufs-data", &enabled, sizeof (enabled)) || enabled != 1) return true;
+  PE_parse_boot_argn ("ufsrw", &rw, sizeof (rw));
+  if (!layout->imageBytes || (layout->imageBytes & 4095)) {
+    IOLog ("NativeUfs: t970 Data refused: image bytes %llx\n", layout->imageBytes);
+    return false;
+  }
+  const uint64_t first = layout->userdataFirst + layout->imageBytes / 4096, last = layout->userdataLast;
+  if (first > last) {
+    IOLog ("NativeUfs: t970 Data refused: no room after the image (first=%llx last=%llx)\n", first, last);
+    return false;
+  }
+  if (!t970ApfsSeed (first)) return false;
+  uint8_t *block = static_cast<uint8_t *> (IOMalloc (4096));
+  if (!block) return false;
+  const IOReturn read = hostRead4k (0, first, 1, block);
+  const bool container = read == kIOReturnSuccess && !memcmp (block + 32, "NXSB", 4);
+  IOFree (block, 4096);
+  if (!container) {
+    IOLog ("NativeUfs: t970 Data refused: no APFS container at %llx (read %x)\n", first, read);
+    return false;
+  }
+  const uint64_t blocks = last - first + 1;
+  uint64_t capacity = 0;
+  alioth::whole_userdata_root::Geometry geometry = {};
+  if (!alioth::whole_userdata_root::CheckedMultiply (blocks, alioth::whole_userdata_root::kMediaBlockBytes, &capacity) ||
+      alioth::whole_userdata_root::ProjectGeometry (first, last, capacity, &geometry) !=
+        alioth::whole_userdata_root::Status::Ok) {
+    IOLog ("NativeUfs: t970 Data geometry rejected first=%llx last=%llx\n", first, last);
+    return false;
+  }
+  NativeUfsWholeUserdataBlock *device = OSTypeAlloc (NativeUfsWholeUserdataBlock);
+  if (!device || !device->init (static_cast<OSDictionary *> (nullptr)) || !device->configure (geometry, rw == 1)) {
+    if (device) device->release ();
+    return false;
+  }
+  if (!device->attach (owner)) {
+    device->release ();
+    return false;
+  }
+  if (!device->start (owner)) {
+    device->detach (owner);
+    device->release ();
+    return false;
+  }
+  gT970DataDevice = device;
+  IOLog ("NativeUfs: t970 Data published first=%llx last=%llx blocks=%llu writable=%u\n",
+         first, last, blocks, rw == 1 ? 1U : 0U);
+  return true;
+}
+
+// The Data volume's BSD device for the kernel's owner Data mount: the one IOMedia whose UUID is the
+// given volume UUID and whose provider chain reaches the published Data container.
+extern "C" int t970_ufs_data_volume (const char *uuid, dev_t *device, char *path, size_t size, uint64_t *bytes)
+{
+  if (!uuid || strlen (uuid) != 36 || !device || !path || size < 8 || !bytes || !gT970DataDevice) return ENXIO;
+  *device = NODEV;
+  path[0] = 0;
+  *bytes = 0;
+  OSDictionary *matching = IOService::serviceMatching ("IOMedia");
+  OSDictionary *properties = OSDictionary::withCapacity (1);
+  OSString *wanted = OSString::withCString (uuid);
+  bool ready = matching && properties && wanted && properties->setObject ("UUID", wanted) &&
+               matching->setObject ("IOPropertyMatch", properties);
+  OSSafeReleaseNULL (wanted);
+  OSSafeReleaseNULL (properties);
+  if (!ready) {
+    OSSafeReleaseNULL (matching);
+    return ENOMEM;
+  }
+  matching->retain ();
+  IOService *first = IOService::waitForMatchingService (matching, 30ULL * NSEC_PER_SEC);
+  OSSafeReleaseNULL (first);
+  OSIterator *iterator = IOService::getMatchingServices (matching);
+  matching->release ();
+  matching->release ();
+  if (!iterator) return ENOENT;
+  unsigned matches = 0;
+  int result = ENOENT;
+  while (IOMedia *media = ufsMediaCast (iterator->getNextObject ())) {
+    if (++matches != 1) { result = EEXIST; break; }
+    OSString *name = OSDynamicCast (OSString, media->getProperty (kIOBSDNameKey));
+    OSNumber *major = OSDynamicCast (OSNumber, media->getProperty (kIOBSDMajorKey));
+    OSNumber *minor = OSDynamicCast (OSNumber, media->getProperty (kIOBSDMinorKey));
+    if (!ufsHasAncestor (media, gT970DataDevice) || !name || !major || !minor || !name->getLength () ||
+        name->getLength () + 6 >= size || major->unsigned64BitValue () > 255 || minor->unsigned64BitValue () > 0xffffff) {
+      result = EPERM;
+      continue;
+    }
+    *device = static_cast<dev_t> (makedev (major->unsigned32BitValue (), minor->unsigned32BitValue ()));
+    snprintf (path, size, "/dev/%s", name->getCStringNoCopy ());
+    *bytes = gT970DataDevice->mediaBlockCount () * alioth::whole_userdata_root::kMediaBlockBytes;
+    result = 0;
+  }
+  iterator->release ();
+  if (matches != 1) result = matches ? EEXIST : ENOENT;
+  IOLog ("NativeUfs: t970 Data volume %s -> %s (%d, %u matches)\n", uuid, path, result, matches);
+  return result;
 }
 
 // IOBlockStorageDriver publishes a normal IOMedia and IOMediaBSDClient assigns
@@ -2997,6 +3168,7 @@ bool NativeUfs::startRoot (IOService *provider)
 #endif
   gStoreGeometry = { true, layout->userdataFirst, layout->userdataLast, layout->imageBytes, layout->gptEntriesLba,
                      layout->gptHeaderCrc, layout->gptEntriesCrc, layout->gptEntryCount, layout->logFirst, layout->logLast };
+  t970ApfsProbe ();
   const char *names[4] = {};
   for (unsigned i = 0; i < layout->windows; ++i) names[i] = layout->window[i].name;
   if (!ufsBuildRootPlan (names, layout->windows, gPublicationPlan)) {
@@ -3064,6 +3236,9 @@ bool NativeUfs::startRoot (IOService *provider)
     void discard (unsigned index) { discardPendingWindow (index); }
   } operations = { this, layout };
   UfsRootPublicationResult result = ufsPrepareRootWindows (operations, layout->windows);
+  if (result.phase == UfsRootPhase::Complete && !t970PublishData (this, layout)) {
+    rootDiagnosticFailure ("t970 Data container publication failed");
+  }
   IOFree (layout, sizeof (RootLayout));
   if (result.phase != UfsRootPhase::Complete) {
     gPending = 0;

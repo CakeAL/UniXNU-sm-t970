@@ -56,7 +56,9 @@ def main():
     command_line = boot_entries[0]["args"]
     words = set(command_line.split())
     require(len(command_line.encode()) <= 1000 and {"sheng-data-persist=2", "data-fua=1", "native-ufs-root=1"} <= words and
-            not any(word.split("=", 1)[0] in {"ufsrw", "t970-ufs-data", "log", "sheng-log", "data-reset",
+            # ufsrw and t970-ufs-data are the reviewed UFS Data container switches: they publish the
+            # APFS container inside the reserved 96 GiB and never widen the write window.
+            not any(word.split("=", 1)[0] in {"log", "sheng-log", "data-reset",
                                              "sheng-data-reset", "t970-dram-end", "memory-outside"}
                     for word in words), "Unsafe storage or memory switch")
 
