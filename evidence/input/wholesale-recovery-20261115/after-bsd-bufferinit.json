@@ -1,0 +1,12 @@
+{
+  "base_recovery_sha256": "cbbf85d79a71670b0058f47839c48c2fc493428a1fae14bdd45b2056624be4f4",
+  "image": "out/dual-system/wholesale-inputs-20261115/mmu-probe/after-bsd-bufferinit/recovery.img",
+  "sha256": "e1b54e1b997b480658726347640a67e369e5a9be25ccebe661dc1f5897a13d5c",
+  "kernel_readback_sha256": "c52d1e23019203fab5a05cc076fd23d8ecfb02d583356e77e16e076fb4aa35fa",
+  "checkpoint": "first return from bsd_bufferinit in bsd_init, just before the board PMGR hook",
+  "reset_seconds": 32,
+  "partition": "RECOVERY",
+  "upload": "RECOVERY upload successful",
+  "heimdall_exit": 0,
+  "device_boot": "awaiting observation"
+}
