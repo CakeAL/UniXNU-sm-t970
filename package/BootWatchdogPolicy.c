@@ -194,19 +194,24 @@ int sheng_boot_watchdog_policy(void *process, uint64_t scratch) {
  if(st.st_uid!=0 || st.st_gid!=0 || !S_ISREG(st.st_mode) || (st.st_mode&0777)!=0644 || st.st_size!=(off_t)(strlen(policy)))error=EINVAL;
  done:
  if(fd>=0){struct close_args cl={.fd=fd};int e=sys_close(p,&cl,&result);if(!error)error=e;}
- policy_stage("policy: disabled.plist written");
+ policy_stage(error ? "policy: disabled.plist error" : "policy: disabled.plist written");
  // A real empty migration marker selects the qualified modern override loader.
  if(!error) {
   const char *marker="/private/var/db/com.apple.xpc.launchd/disabled.migrated";
+  policy_stage("policy: marker copyout enter");
   error=copyout(marker,scratch,strlen(marker)+1);
+  policy_stage(error ? "policy: marker copyout error" : "policy: marker open enter");
   if(!error) {
    struct open_args mark={.path=scratch,.flags=O_WRONLY|O_CREAT|O_EXCL|O_NOFOLLOW,.mode=0644};
    error=open(p,&mark,&result);
-   if(!error){struct close_args cl={.fd=result};error=sys_close(p,&cl,&result);}
+   policy_stage(error ? "policy: marker open error" : "policy: marker close enter");
+   if(!error){struct close_args cl={.fd=result};error=sys_close(p,&cl,&result);
+    policy_stage(error ? "policy: marker close error" : "policy: marker closed");}
    else if(error==EEXIST)error=0;
   }
  }
  sheng_watchdog_policy_status=error;
+ policy_stage(error ? "policy: returning error" : "policy: returning success");
  printf("sheng bring-up watchdogd launch policy: %d (hardware watchdog not implemented)\n",error);
  return error;
 }

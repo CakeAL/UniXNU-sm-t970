@@ -841,6 +841,7 @@ procedure = [
   "Read block sysfs and by-name links; read each LUN's primary GPT header and entry array and validate their CRC32 values without writing any block device.",
 ]
 findings = [
+  "The boot-policy diagnostic now distinguishes failed disabled.plist operations from success and traces marker copyout, open, close and return. It adds stage reporting only; device results remain pending.",
   "Recovery f654aa9fea6dd1f15b01d3e05be702a5ed85f5aa96724b06fb4fba6c952c4fa3 at 21 seconds shows Data mount returned and entered the subsequent policy, which requires a zero Data mount result. The last policy stage is ambiguous because it is emitted even on a preceding error. One process only; persistence across reboot and launchd main remain unverified.",
   "Recovery f654aa9fea6dd1f15b01d3e05be702a5ed85f5aa96724b06fb4fba6c952c4fa3 carries the new UFS Data extent and seed. Heimdall reported RECOVERY upload successful; partition readback and device boot, Data mount and persistence remain pending.",
   "The new host APFS seed passes macOS read-only fsck; compatibility with iPadOS 17 is unverified. Its opt-in initialization and prelink build pass host checks. The Recovery packer rejects simultaneous RAM overlay and UFS Data selection; device initialization, mount and persistence remain unverified.",
