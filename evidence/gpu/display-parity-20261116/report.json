@@ -36,7 +36,62 @@
   ],
   "flash_command": "sh scripts/flash-recovery-when-detected.sh out/display-parity-20261116/recovery/boot.img 47fea5265aaad1535817eb80497082c5e63435cce74efc92fb293cb33f9daf69 30",
   "flash_result": "Heimdall confirmed RECOVERY upload successful with --no-reboot.",
-  "display_observation": null,
+  "display_observation": {
+    "source": "Owner photographs at 03:05:35 and 03:06:15 Asia/Shanghai and accompanying report",
+    "tag": "display-parity-a",
+    "result": "Home Screen widgets remain blank white. Settings remains visually corrupted, and the owner reports that the UI is still laggy.",
+    "home_screen": {
+      "boot_elapsed_seconds": 80,
+      "final_swap_format": "BGRA",
+      "format_counts": {
+        "32bit": 171,
+        "xr10": 0,
+        "half_float": 0
+      },
+      "widget_opens_refused": [
+        2,
+        0
+      ],
+      "gpu_copy_offers_completed_failed": [
+        168,
+        168,
+        0
+      ],
+      "signed_text_fixups": [
+        12,
+        12
+      ]
+    },
+    "settings": {
+      "boot_elapsed_seconds": 130,
+      "final_swap_format": "BGRA",
+      "format_counts": {
+        "32bit": 460,
+        "xr10": 0,
+        "half_float": 0
+      },
+      "widget_opens_refused": [
+        2,
+        0
+      ],
+      "settings_opens_refused": [
+        2,
+        0
+      ],
+      "gpu_copy_offers_completed_failed": [
+        457,
+        457,
+        0
+      ],
+      "signed_text_fixups": [
+        12,
+        12
+      ],
+      "cache_maintenance_total_ms": 4140,
+      "coherence_samples": 31
+    },
+    "limits": "The final swap format and copy completions do not describe the contents or timing of each input layer. GPUC labeled the coherence sample count as submissions, even though it samples only every 64th submission. Its per-submission timing is invalid."
+  },
   "device_source_sha256": {
     "package/BootProgress.c": "d5ce54e51c8771302eb7b5a2c81ddaacfd399406cfcd0748e9faec2bc135181f",
     "scripts/build-adreno650.py": "2df748466d558059ae261f7ffd8e0ae4a48230f1d052540fd2f8146add73a3f0",

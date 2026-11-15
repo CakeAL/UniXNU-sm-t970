@@ -1438,13 +1438,13 @@ extern volatile int32_t t970_camera_c5[20] __attribute__((weak_import));
 extern volatile int32_t t970_sensors[16] __attribute__((weak_import));
 extern volatile uint64_t armcpu_timer_interrupts __attribute__((weak_import));
 extern volatile uint64_t native_adreno_cache_stats[5] __attribute__((weak_import));
-extern volatile uint32_t native_adreno_coherence[8] __attribute__((weak_import));
+extern volatile uint64_t native_adreno_submit_phase[7] __attribute__((weak_import));
 extern volatile uint32_t native_adreno_wc_distrusted __attribute__((weak_import));
 extern volatile uint32_t native_adreno_wc_audit[6] __attribute__((weak_import));
 extern volatile uint64_t native_adreno_reassert_ticks __attribute__((weak_import));
 extern volatile uint64_t native_adreno_audit_ticks __attribute__((weak_import));
 extern volatile uint32_t native_adreno_audit_attr __attribute__((weak_import));
-static uint64_t banner_cache_ticks,banner_cache_bytes,banner_submits;
+static uint64_t banner_cache_ticks,banner_cache_bytes,banner_submits,banner_publish_ticks;
 extern volatile uint64_t armcpu_ipi_interrupts __attribute__((weak_import));
 static volatile uint64_t sleep_n,sleep_over_sum,sleep_over_max,sleep_late50;
 static uint64_t banner_sleep_n,banner_sleep_sum,banner_sleep_late,banner_tint,banner_ipi;
@@ -1540,17 +1540,18 @@ static void crash_banner(unsigned now) {
       native_legacy_direct[0],native_legacy_direct[1],native_legacy_direct[2],native_legacy_direct[7],
       native_legacy_direct[9],native_legacy_direct[12],native_legacy_direct[13],native_legacy_direct[11],native_legacy_direct[6]);
   }
-  // GPU CPU-cache maintenance (all passes: submissions, completions, allocations) since the last paint and in total, per submission,
-  // the longest single pass and how much memory user BOs hold write-combined.
-  if(&native_adreno_cache_stats && &native_adreno_coherence && native_adreno_coherence[0]) {
+  // Use actual submissions, and time the publication phase separately from maintenance on all paths.
+  if (&native_adreno_cache_stats && &native_adreno_submit_phase && native_adreno_submit_phase[6]) {
     uint64_t f=0;__asm__ volatile("mrs %0, cntfrq_el0":"=r"(f));if(!f)f=19200000;
-    uint64_t t=native_adreno_cache_stats[0],b=native_adreno_cache_stats[1],sub=native_adreno_coherence[0];
+    uint64_t t=native_adreno_cache_stats[0],b=native_adreno_cache_stats[1],sub=native_adreno_submit_phase[6];
+    uint64_t publish=native_adreno_submit_phase[3];
     uint64_t dt=t-banner_cache_ticks,db=b-banner_cache_bytes,ds=sub-banner_submits;
-    snprintf(rows[n++],120,"GPUC  last: subs=%llu cache_ms=%llu MB=%llu per_sub_us=%llu | all: subs=%llu ms=%llu max_us=%llu wc_MB=%llu off@%u",
-      (unsigned long long)ds,(unsigned long long)(dt*1000/f),(unsigned long long)(db>>20),(unsigned long long)(ds?dt*1000000/f/ds:0),
-      (unsigned long long)sub,(unsigned long long)(t*1000/f),(unsigned long long)(native_adreno_cache_stats[2]*1000000/f),
+    uint64_t publish_us=ds?(publish-banner_publish_ticks)*1000000/f/ds:0;
+    snprintf(rows[n++],120,"GPUC  subs=%llu publish_us=%llu cache_ms=%llu MiB=%llu | total_subs=%llu cache_ms=%llu wc_MiB=%llu off@%u",
+      (unsigned long long)ds,(unsigned long long)publish_us,(unsigned long long)(dt*1000/f),(unsigned long long)(db>>20),
+      (unsigned long long)sub,(unsigned long long)(t*1000/f),
       (unsigned long long)(native_adreno_cache_stats[4]>>8),&native_adreno_wc_distrusted?native_adreno_wc_distrusted:0);
-    banner_cache_ticks=t;banner_cache_bytes=b;banner_submits=sub;
+    banner_cache_ticks=t;banner_cache_bytes=b;banner_submits=sub;banner_publish_ticks=publish;
     // The write-combine audit (int-100): submissions and IB lines compared, lines a CPU cache held dirty or stale, the first dirty page's
     // XNU attribute (1xx; 106 = write-combined, 102 = cacheable) and the last failure; int-101: pages XNU had set back to cacheable and
     // that were write-combined again, and the cost of audit and re-assertion. off@ above ends the trust.

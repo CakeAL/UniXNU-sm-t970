@@ -1,0 +1,46 @@
+{
+  "build_tag": "display-reference-a",
+  "device": "SM-T970, iPadOS 17.7.11 (21H461)",
+  "device_source_base": "f78a8c9496766e454c0e301b83397ec1006f9725",
+  "framework_revision": "945ad8db0641060f6566422d168684c3e9182d53",
+  "boot_progress_source_sha256": "5015ca784cb3694571217de03e6c3be9fad9d198e43beee61cd9ddba56355a40",
+  "reference_device_revision": "88b34f97100a01aab4ea6b86dc9c748b2114c382",
+  "frontend_base_revision": "83b667824cb88c89473480cdf0c2c7276cd3ffc8",
+  "reference_frontend_carries": [
+    "49923616b39ccc71f4eb2ce1a26b087574a40ed0",
+    "9045eb02c621a9d13ca3c3a9895738cf68cc707c"
+  ],
+  "rebuilt_frontend_tree": "70f9dd5f9c592f3ae54beca547767366bf70a405",
+  "translator_revision": "555b13d57e09bff70996a88cff64f1275256d5cf",
+  "presentation_args": [
+    "boot-progress=3",
+    "dpu-scanout=2",
+    "fb-gpu=1"
+  ],
+  "comparison": "Rebuilt reference frontend on the qualified local OS and Data layout. The direct-control image is the display-parity-a frontend with the same presentation arguments to allow an isolated comparison if needed.",
+  "direct_control_image_sha256": "b262055b8fffc1526c02bc783c1b85b6eaf469fa704550f722e08422f08aa034",
+  "partition": "RECOVERY",
+  "image": "out/display-reference-20261116/recovery/boot.img",
+  "image_sha256": "27b139a10de237d0aae6e6b27a9190c81fe911f1059a87eafdd18fb3cedf2924",
+  "image_bytes": 86888448,
+  "kernel_sha256": "a3f8e7959691f1def50233d67f48ce9473666942be9467c1021544a3ac9ce2bd",
+  "addon_sha256": "e3bbddb5928c1b6e881ecc44e269c048031e41a16203b306ac86718d167844b5",
+  "owner_trust_sha256": "1121177b35054fb103ff268157352ef0a1b1a7ac13e931e5163dedadcc01a0f5",
+  "owner_cdhashes": {
+    "gpu.addon:addons/NativeAdrenoMetal.bundle/NativeAdrenoMetal": "162f7d25c5ae91c7e47f80a3d10f3964816d267c",
+    "gpu.addon:addons/NativeAdrenoMetal.bundle/libvulkan_freedreno.dylib": "8a4d6e6c77cd4dedeb154e570b04583461179925",
+    "gpu.addon:bin/adrenoprobed": "5f3b74921bbafb2ce7bb155acf08ef4f7524ae55",
+    "--also-cdhash:e1c1e952036f99008c3f0420cc2ee26d9ad6f917": "e1c1e952036f99008c3f0420cc2ee26d9ad6f917"
+  },
+  "data_seed_sha256": "ca1543d1986cb1de5dd8ef6a3f01f48609e2a65a18bbf3f88f04b2d189031dcf",
+  "commands": [
+    "Build the 83b6678 AdrenoMetal tree with both reference frontend patches, the 62be7bc bridge recipe, 4 KiB signing and the existing signed Turnip.",
+    "python3.14 scripts/build-t970-trust-bundle.py --addon out/display-reference-20261116/gpu.addon --also-cdhash e1c1e952036f99008c3f0420cc2ee26d9ad6f917 --output out/display-reference-20261116/trust",
+    "T970_GPU_ADDON=<absolute path to candidate addon> python3.14 ./unixnu build kernel -D ../UniXNU-sm-t970",
+    "python3.14 scripts/build-boot-progress-page.py --mode 3 --large-data-seed --data-ramdisk out/dual-system/overlay-inspection-20261115/reference-fresh-73g.dbr --kernel-arg build-tag=display-reference-a --kernel-arg t970-large-data=1 --kernel-arg t970-large-init=1 --kernel-arg t970-pen=7 --kernel-arg native-ufs-stream2=0x4e0 --kernel-arg gpu-addon=1 --kernel-arg pipa-turnip-debug=noubwc,nocb --kernel-arg t970-wifi=6 --kernel-arg t970-bt=257 --kernel-arg t970-adsp=2 --kernel-arg t970-audio=32 --kernel-arg t970-haptics=3 --kernel-arg t970-sensors=243 --kernel-arg t970-usb=37 --kernel-arg t970-qud-retry=1 --kernel-arg t970-qud-resume=1 --drop-kernel-arg panic_on_crash_disabled --drop-kernel-arg armcpu-diagnostics=1 --drop-kernel-arg alioth-bt=1 --drop-kernel-arg log-gpu=1 --drop-kernel-arg t970-fb-src-wb=1 --owner-trust-cache /Users/cakeal/vsc/UniXNU-sm-t970/out/display-reference-20261116/trust/owner-trust.bundle --kernel /Users/cakeal/vsc/UniXNU/out/sm-t970/ipados-17.7.11-21H461/gts7xlwifi/kernel/kernel.macho --output /Users/cakeal/vsc/UniXNU-sm-t970/out/display-reference-20261116/recovery --kernel-arg dpu-scanout=2",
+    "sh scripts/flash-recovery-when-detected.sh out/display-reference-20261116/recovery/boot.img 27b139a10de237d0aae6e6b27a9190c81fe911f1059a87eafdd18fb3cedf2924 30"
+  ],
+  "verification": "Frontend/bridge build, shader validation, code signatures, prelink and packed addon, seed and trust readback passed. Trust changed only the rebuilt frontend CDHash. The hardware ADT fields match display-parity-a apart from the randomized seed.",
+  "flash_result": "RECOVERY upload successful with --no-reboot.",
+  "device_display_observation": null
+}
