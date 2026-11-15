@@ -726,6 +726,7 @@ id = "storage"
 status = "implemented"
 components = ["ShengUfs", "VirtioMmioBlock", "RamBlock", "VerifiedRoot"]
 paths = [
+  "evidence/storage/ufsdata-m-20261115/**",
   "scripts/pack-wholesale-recovery.py",
   "tests/test_wholesale_boot_args.py",
   "drivers/ShengUfs/T970SeedState.h",
@@ -840,6 +841,8 @@ procedure = [
   "Read block sysfs and by-name links; read each LUN's primary GPT header and entry array and validate their CRC32 values without writing any block device.",
 ]
 findings = [
+  "Recovery f654aa9fea6dd1f15b01d3e05be702a5ed85f5aa96724b06fb4fba6c952c4fa3 at 21 seconds shows Data mount returned and entered the subsequent policy, which requires a zero Data mount result. The last policy stage is ambiguous because it is emitted even on a preceding error. One process only; persistence across reboot and launchd main remain unverified.",
+  "Recovery f654aa9fea6dd1f15b01d3e05be702a5ed85f5aa96724b06fb4fba6c952c4fa3 carries the new UFS Data extent and seed. Heimdall reported RECOVERY upload successful; partition readback and device boot, Data mount and persistence remain pending.",
   "The new host APFS seed passes macOS read-only fsck; compatibility with iPadOS 17 is unverified. Its opt-in initialization and prelink build pass host checks. The Recovery packer rejects simultaneous RAM overlay and UFS Data selection; device initialization, mount and persistence remain unverified.",
   "The opt-in Data publisher now targets the scanned blank extent 42816256..62065402, with a seed sized for that extent. Initialization preflights seed blocks, refuses foreign contents, opens a bounded temporary write window and writes the superblock last; interrupted matching writes may resume. Host fault-injection and build results are tracked separately; no device write or mount has occurred.",
   "A host-only sparse APFS candidate was generated at the exact 78844506112-byte tentative extent size, with volume UUID 42888767-E4D4-467C-9FB6-A20A2645B6CC and 32 nonzero 4 KiB blocks. It is not integrated or device-tested; initialization and recovery semantics must be implemented before use.",

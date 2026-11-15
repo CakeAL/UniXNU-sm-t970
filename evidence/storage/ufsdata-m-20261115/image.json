@@ -1,0 +1,75 @@
+{
+  "device_revision": "365f46607dcc7b3b1340ef90c772be5962fbc9d8",
+  "framework_revision": "0e9e1e8182b18a6b78df983808ec296b7f30dc20",
+  "instruments": {
+    "boot_progress_mode": 2,
+    "stage_bars": true,
+    "panic_screen": true,
+    "kernel_args_override": [
+      "boot-progress=2",
+      "build-tag=ufsdata-m",
+      "t970-apfs-seed=1",
+      "t970-ufs-data=1",
+      "ufsrw=1",
+      "t970-pid1=1",
+      "native-ufs-stream2=0x4e0",
+      "sheng-data-persist=0"
+    ],
+    "kernel_args_dropped": [
+      "sheng-data-persist=2",
+      "panic_on_crash_disabled=1"
+    ]
+  },
+  "board_sha256": "601c27c34ead065e43b9bf075413ffa77e7046ea23d5e2357c5f52b3bbdf4e23",
+  "source_kernel_sha256": "d9386e605415b6ae76c912d38f3e11cffcb51ea58c0b880a7df843fe53293885",
+  "base_recovery_sha256": "33efcec0915129321995cd4de57a3223f7fd41e36c8f73205f07fa97e7aeaeba",
+  "firmware_config_dtb_sha256": "86c14aa305a6cf5db46665f4095d28aadcb1ea5ce9d213cd711641a07504ed1d",
+  "image_sha256": "f654aa9fea6dd1f15b01d3e05be702a5ed85f5aa96724b06fb4fba6c952c4fa3",
+  "image_bytes": 86888448,
+  "recovery_partition_bytes": 86888448,
+  "hardware_tested": false,
+  "note": "Enables the boot page only; no flash or reboot performed",
+  "partition": "RECOVERY",
+  "build_command": "python3.14 scripts/build-boot-progress-page.py --mode 2 --kernel-arg build-tag=ufsdata-m --kernel-arg t970-apfs-seed=1 --kernel-arg t970-ufs-data=1 --kernel-arg ufsrw=1 --kernel-arg t970-pid1=1 --kernel-arg native-ufs-stream2=0x4e0 --kernel-arg sheng-data-persist=0 --drop-kernel-arg sheng-data-persist --drop-kernel-arg panic_on_crash_disabled --kernel /Users/cakeal/vsc/UniXNU/out/sm-t970/ipados-17.7.11-21H461/gts7xlwifi/kernel/kernel.macho --output out/dual-system/wholesale-inputs-20261115/boot-progress-page/page-ufs-data-m",
+  "validation": {
+    "initial_extent_scan": "evidence/storage/ufsdata-l-20261115/adb-readonly.json",
+    "host_seed_fsck": "pass on macOS; iPadOS compatibility unverified",
+    "fault_injection": "tests/test_t970_seed_init.py passed",
+    "boot_argument_tests": "tests/test_wholesale_boot_args.py passed",
+    "seed_range_absolute_4k_lba": [
+      42816256,
+      62065402
+    ],
+    "legacy_overlay": "preserved at 62065403 and after",
+    "signed_policy": "outside seed range"
+  },
+  "upload": {
+    "status": "success",
+    "partition": "RECOVERY",
+    "tool": "Heimdall",
+    "result": "RECOVERY upload successful",
+    "log": "evidence/storage/ufsdata-m-20261115/upload.log",
+    "partition_readback": "not performed",
+    "device_boot": "observed"
+  },
+  "observation": {
+    "source": "owner-provided display image, 2026-11-15 20:25 Asia/Shanghai",
+    "time_seconds": 21,
+    "last_stage": "policy: disabled.plist written",
+    "stage_history": [
+      "Data mount returned",
+      "temporary watchdog launch policy enter",
+      "policy: motion debug log returned",
+      "policy: setup reset enter",
+      "policy: disabled.plist written"
+    ],
+    "pid1_process_count": 1,
+    "ufs_failures": 0,
+    "data_diag": [
+      0,
+      0,
+      0
+    ],
+    "interpretation": "Data mount returned successfully: the caller panics on a nonzero error before entering the policy. The displayed policy stage is emitted even on an earlier policy error; it does not by itself prove the file was written. Persistence across reboot and desktop remain unverified."
+  }
+}
