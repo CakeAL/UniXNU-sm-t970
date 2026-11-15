@@ -6,5 +6,7 @@
   "checkpoint": "first return from vm_set_restrictions in kernel_bootstrap_thread, immediately before kperf_init_early",
   "reset_seconds": 22,
   "partition": "RECOVERY",
-  "upload": "pending"
+  "upload": "RECOVERY upload successful",
+  "heimdall_exit": 0,
+  "device_boot": "awaiting observation"
 }
