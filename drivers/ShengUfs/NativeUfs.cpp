@@ -2047,7 +2047,9 @@ static bool t970PublishData (IOService *owner, const RootLayout *layout)
 
 // The Data volume's BSD device for the kernel's owner Data mount: the one IOMedia whose UUID is the
 // given volume UUID and whose provider chain reaches the published Data container.
-extern "C" int t970_ufs_data_volume (const char *uuid, dev_t *device, char *path, size_t size, uint64_t *bytes)
+/* Read by the boot page: which link of the Data publication chain is missing. */
+extern "C" { volatile uint32_t t970_data_diag = 0; volatile uint32_t t970_data_media = 0; volatile uint32_t t970_data_uuid = 0; }
+static int t970DataVolumeOnce (const char *uuid, dev_t *device, char *path, size_t size, uint64_t *bytes)
 {
   if (!uuid || strlen (uuid) != 36 || !device || !path || size < 8 || !bytes || !gT970DataDevice) return ENXIO;
   *device = NODEV;
@@ -2065,8 +2067,6 @@ extern "C" int t970_ufs_data_volume (const char *uuid, dev_t *device, char *path
     return ENOMEM;
   }
   matching->retain ();
-  IOService *first = IOService::waitForMatchingService (matching, 30ULL * NSEC_PER_SEC);
-  OSSafeReleaseNULL (first);
   OSIterator *iterator = IOService::getMatchingServices (matching);
   matching->release ();
   matching->release ();
@@ -2091,6 +2091,40 @@ extern "C" int t970_ufs_data_volume (const char *uuid, dev_t *device, char *path
   iterator->release ();
   if (matches != 1) result = matches ? EEXIST : ENOENT;
   IOLog ("NativeUfs: t970 Data volume %s -> %s (%d, %u matches)\n", uuid, path, result, matches);
+  return result;
+}
+
+/* The IOMedia for the container and its volume are published asynchronously by IOStorageFamily and
+ * APFS after t970PublishData attaches the device, so the first lookup can legitimately see nothing.
+ * Poll instead of failing the boot on the first miss. */
+extern "C" int t970_ufs_data_volume (const char *uuid, dev_t *device, char *path, size_t size, uint64_t *bytes)
+{
+  int result = ENOENT;
+  for (unsigned attempt = 0; attempt < 200; ++attempt) {
+    result = t970DataVolumeOnce (uuid, device, path, size, bytes);
+    if (result != ENOENT) break;
+    IOSleep (100);
+  }
+  if (result == ENOENT) {
+    /* Tell the boot page which step of the publication chain is missing: no IOMedia for the
+     * published block device at all, a media without the volume UUID, or a media that has one. */
+    unsigned mediaCount = 0, withUuid = 0;
+    OSDictionary *all = IOService::serviceMatching ("IOMedia");
+    OSIterator *each = all ? IOService::getMatchingServices (all) : nullptr;
+    if (each) {
+      while (IOMedia *media = ufsMediaCast (each->getNextObject ())) {
+        if (!ufsHasAncestor (media, gT970DataDevice)) continue;
+        ++mediaCount;
+        if (media->getProperty ("UUID")) ++withUuid;
+      }
+      each->release ();
+    }
+    OSSafeReleaseNULL (all);
+    t970_data_diag = mediaCount == 0 ? 1u : (withUuid == 0 ? 2u : 3u);
+    t970_data_media = mediaCount;
+    t970_data_uuid = withUuid;
+    IOLog ("NativeUfs: t970 Data volume %s absent (media=%u withUuid=%u)\n", uuid, mediaCount, withUuid);
+  }
   return result;
 }
 

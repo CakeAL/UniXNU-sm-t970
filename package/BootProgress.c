@@ -560,6 +560,15 @@ static void pid1_dump(unsigned now) {
             ++n;
           }
           if (n < 7) {
+            extern volatile uint32_t t970_data_diag __attribute__((weak_import));
+            extern volatile uint32_t t970_data_media __attribute__((weak_import));
+            extern volatile uint32_t t970_data_uuid __attribute__((weak_import));
+            unsigned diag = &t970_data_diag ? t970_data_diag : 0;
+            snprintf(rows[n], BP_COLS, "  data diag=%u media=%u uuid=%u",
+                diag, &t970_data_media ? t970_data_media : 0, &t970_data_uuid ? t970_data_uuid : 0);
+            ++n;
+          }
+          if (n < 7) {
             /* Which processor holds this thread right now? A thread that reports TH_RUN and
              * appears on no processor is queued but never dispatched; one that appears here is
              * executing, so it is spinning rather than lost. */
@@ -591,6 +600,9 @@ static void pid1_dump(unsigned now) {
 }
 /* T970_PID1_END */
 
+extern volatile uint32_t t970_data_diag __attribute__((weak_import));
+extern volatile uint32_t t970_data_media __attribute__((weak_import));
+extern volatile uint32_t t970_data_uuid __attribute__((weak_import));
 extern volatile uint32_t native_legacy_stage __attribute__((weak_import));
 extern volatile uint32_t native_legacy_pm_stage __attribute__((weak_import));
 extern volatile uint32_t native_legacy_pm_calls __attribute__((weak_import));
