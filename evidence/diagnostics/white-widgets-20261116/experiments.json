@@ -1,0 +1,55 @@
+{
+  "question": "Why do the desktop widgets render as white rounded rectangles and the Settings page garble, while the wallpaper, icons, menu bar and text draw correctly?",
+  "device_observation": {
+    "reported_by": "owner",
+    "symptom": "desktop widgets white with no content; Settings page garbled and repaints slowly; GUI otherwise correct",
+    "first_seen": "present in the earliest desktop photographs, including Recovery c5f88b1175af9478cddcd2a7998b88915fcf592d7b556fc9eb656ce2703b4337 whose boot page reported gpu offers=0 (the Metal plugin never loaded)",
+    "latest_image": "0f9ac3574e699c5be1d83f951a1b7d53f0353c721d8b8241884787e93fb7ff63",
+    "latest_page_rows": [
+      "FIX parsed=12 applied=12",
+      "SWAP calls=292 ok=292 rej=0 | gpu offers=292 done=292",
+      "GPU last: subs=0 cache_ms=299 MB=4706 | all: subs=18 ms=3365 max_us=29550"
+    ],
+    "evidence_quality": "device-observed photographs and boot-page counters; no instrumented capture of the compositor's surface descriptions"
+  },
+  "experiments": [
+    {
+      "hypothesis": "dpu-scanout=2 direct scanout presents the compositor surface incorrectly",
+      "image": "1f01649e5c6cb96bd7716ca47710c411f552cc827ce53d32319f5e6db117d714",
+      "change": "dpu-scanout removed, everything else kept",
+      "result": "widgets still white; the boot page became visible again, which separates the two effects"
+    },
+    {
+      "hypothesis": "wallpaper-freeze=1 holds Poster's frame and hides later layers",
+      "image": "e431e7e3c16901b96e8a43024cad2f522c962d2b092d3a40137cc7eae3d654a6",
+      "change": "wallpaper-freeze removed",
+      "result": "widgets still white"
+    },
+    {
+      "hypothesis": "UBWC / CB compressed surfaces are read as linear pixels",
+      "image": "ce99c443f96a10e5321844a637b83bed1258edb5537bb0012636f792e3831f0e",
+      "change": "pipa-turnip-debug=noubwc,nocb added",
+      "result": "widgets still white"
+    },
+    {
+      "hypothesis": "the Metal plugin lets Poster processes keep 10-bit XR10 surfaces",
+      "image": "0f9ac3574e699c5be1d83f951a1b7d53f0353c721d8b8241884787e93fb7ff63",
+      "change": "supportsExtendedXR10Formats answered 0 for every process; plugin rebuilt and re-signed as CDHash 4490c306601dd01d9c0539f71c86b43687a89dbc, trust bundle 46689a1a6c81c149b45045cb874f36c1fb6a494654d44d187abf06c590a74772",
+      "result": "widgets still white and Settings still garbled"
+    },
+    {
+      "hypothesis": "the twelve signed-text fixups never reach the shared cache",
+      "image": "0f9ac3574e699c5be1d83f951a1b7d53f0353c721d8b8241884787e93fb7ff63",
+      "change": "new boot-page row FIX parsed/applied",
+      "result": "parsed=12 applied=12, the sRGB/BGRA8 policy is applied"
+    }
+  ],
+  "conclusion": "None of the four display-path switches or the XR10 rule changes the symptom, and the fixups are applied, so the white regions are either the compositor's submitted surface description (format/bytes per pixel plane) or the widget renderer processes failing to draw content.",
+  "next_actions": [
+    "Remove /private/var/ngpu/addons/NativeAdrenoMetal.bundle, the publish file and the daemon from Data and boot once without the Metal plugin, to test whether the white regions need the plugin at all.",
+    "Print the submitted swap surface's pixel format, bytes per element and plane count on the boot page.",
+    "Compare against a reference-port photograph of the same iPadOS build's desktop to see whether its widgets draw.",
+    "Check whether lite=1 (package/BootWatchdogPolicy.c) disables any process that renders widget content."
+  ],
+  "revision": "b17d5ab"
+}
