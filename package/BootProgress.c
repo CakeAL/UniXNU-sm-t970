@@ -518,17 +518,29 @@ static void pid1_dump(unsigned now) {
          * frame on the kernel stack, so the return addresses below are the call chain. */
         {
           uintptr_t top = (uintptr_t)thread->machine.kstackptr;
-          int shown = 0;
-          rows[n][0] = 0;
-          if (n < 7) snprintf(rows[n], BP_COLS, "  kst=%llx bt=", (unsigned long long)top);
-          for (int i = 1; i <= 96 && shown < 4 && n < 7; ++i) {
-            uintptr_t v = ((const uintptr_t *)top)[-i];
-            if (v < 0xfffffff007004000ULL || v > 0xfffffff030000000ULL) continue;
-            size_t len = strlen(rows[n]);
-            snprintf(rows[n] + len, BP_COLS - len, " %llx", (unsigned long long)v);
-            ++shown;
+          /* The first words of the stack are the thread's own start frames; the frames in use
+           * now sit at the deep end, so both ends are reported. */
+          uintptr_t deep[2] = {0, 0};
+          int found = 0;
+          if (top) {
+            for (int i = 1; i <= 2048; ++i) {
+              uintptr_t v = ((const uintptr_t *)top)[-i];
+              if (v < 0xfffffff007004000ULL || v > 0xfffffff030000000ULL) continue;
+              deep[0] = deep[1];
+              deep[1] = v;
+              ++found;
+            }
           }
-          ++n;
+          if (n < 7) {
+            snprintf(rows[n], BP_COLS, "  kst=%llx deep %llx %llx n=%d",
+                (unsigned long long)top, (unsigned long long)deep[0], (unsigned long long)deep[1], found);
+            ++n;
+          }
+          if (n < 7) {
+            snprintf(rows[n], BP_COLS, "  lp=%llx bp=%llx", (unsigned long long)thread->last_processor,
+                (unsigned long long)thread->bound_processor);
+            ++n;
+          }
         }
       }
       task_unlock(task);
