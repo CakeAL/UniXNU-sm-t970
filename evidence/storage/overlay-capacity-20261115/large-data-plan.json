@@ -1,0 +1,18 @@
+{
+  "seed": {
+    "bytes": 78383153152,
+    "sha256": "d4372c71be216bed6f8278026fb6bd08d52fa7565fed0276a9be8fffac8b2cb9",
+    "encoded_bytes": 1507504,
+    "encoded_sha256": "ca1543d1986cb1de5dd8ef6a3f01f48609e2a65a18bbf3f88f04b2d189031dcf",
+    "packed": true
+  },
+  "proposed_window": {
+    "first_lba": 42816256,
+    "last_lba": 61953352,
+    "blocks": 19137097,
+    "bitmap_blocks": 584,
+    "logical_bytes": 78383153152,
+    "unused_extent_blocks": 112050
+  },
+  "note": "Host geometry review only; not installed or device tested."
+}

@@ -726,6 +726,9 @@ id = "storage"
 status = "implemented"
 components = ["ShengUfs", "VirtioMmioBlock", "RamBlock", "VerifiedRoot"]
 paths = [
+  "evidence/storage/overlay-capacity-20261115/**",
+  "scripts/check-t970-large-data-plan.py",
+  "tests/test_t970_large_data_plan.py",
   "evidence/storage/seed-provenance-20261115/**",
   "evidence/storage/ref-data-s-20261115/**",
   "evidence/storage/data-backup-20261115/**",
@@ -849,6 +852,8 @@ procedure = [
   "Read block sysfs and by-name links; read each LUN's primary GPT header and entry array and validate their CRC32 values without writing any block device.",
 ]
 findings = [
+  "The reference seed was expanded with seed-data-grow.py to a 73 GiB APFS container (packed SHA-256 ca1543d1986cb1de5dd8ef6a3f01f48609e2a65a18bbf3f88f04b2d189031dcf). Host-only geometry validation places a candidate seeded overlay at LBAs 42816256..61953352, clear of policy envelopes, the old overlay and the reserve. This is a proposed layout, not an implemented or installed store. TWRP read-only superblock SHA-256 f1d880ae3bb4ad6b874c44dda3a1782724622c144ad56be0d24385108db94d0f matches the prior large Data backup. Safe one-time conversion, power-loss behavior and device boot are unresolved.",
+  "The t Recovery 512 MiB persistent overlay was copied read-only from TWRP and merged with its validated seed on the host. APFS reported 6664192 bytes free; fsck reported an OK container and minor security xattr warnings without repairs. The unmodified reference seed has 176 directories and 51 files, including audit and db/timezone. The owner does not require old Data content and requests the large Data volume. A clean reference seed was expanded on the host to 78844506112 bytes, with 78721789952 bytes free. No migration or device write was performed; safe installation over the existing large Data APFS is not yet implemented.",
   "Recovery s/t actually contain packed Data seed 9a0005a5c520412006589e068264b611c3484af123547d13103387a9fb7c0afa: the packer replaces the initially requested 4591566e seed. Its logical SHA-256 52f2875d05711f8f1a974926bd251698d1f3212454c125e3ee989023592c82cb matches the recorded SHNGDATA header. Payload metadata now reports actual seed and FAT hashes after replacement; independent FAT readback passes. The previously expanded 4591566e seed is a different local seed, not the active s/t seed.",
   "Recovery 0126433fc49a4cee7920ba5621533dd9396baa39348d34fb03bab470b55551b6 with the explicit RAM personality reached SpringBoard PID 27 by 113 seconds and reports three accepted framebuffer swaps. BootProgress crash diagnostics cover the screen; 60 crash events and 133 exits were recorded. A usable desktop, persistence across reboots and GPU compositing are not yet verified.",
   "Recovery 0126433fc49a4cee7920ba5621533dd9396baa39348d34fb03bab470b55551b6 adds the missing NativeRamBlock IOKit match and selects the preserved 512 MiB Data overlay. Build and kernel personality audit passed, RECOVERY upload succeeded; device boot remains pending.",

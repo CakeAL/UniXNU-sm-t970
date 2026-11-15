@@ -1,0 +1,31 @@
+{
+  "recovery_sha256": "f81330ae5d3266ca70ce0a887ff6b56b9c9453afe6dc0e02c0dd78b485a87b3a",
+  "source": "TWRP read-only /dev/block/sda37",
+  "overlay_first_absolute_4k_lba": 62065403,
+  "overlay_bytes": 536891392,
+  "overlay_sha256": "2d29818be6a4c1ac79877cb35bf105168c63b0133a3fd749f7b5a0647d987dc4",
+  "seed_sha256": "52f2875d05711f8f1a974926bd251698d1f3212454c125e3ee989023592c82cb",
+  "merged_sha256": "6a9a199e2aeffca47467b6c8d84300ed7504980b8fa62b269c5b23cf681f4154",
+  "container_bytes": 536870912,
+  "free_bytes": 6664192,
+  "volume_uuid": "C25160D3-B586-4C11-9D3A-42CB2741227C",
+  "fsck": "container appears OK; volume reports 43 unexpected security xattr minor issues, repairs skipped",
+  "reference_seed_tree": {
+    "directories": 176,
+    "files": 51,
+    "bytes_approx": "740 KiB",
+    "examples": [
+      "audit",
+      "db/timezone"
+    ]
+  },
+  "device_writes": false,
+  "user_direction": "Discard old Data content; use large Data volume",
+  "fresh_reference_host_grow": {
+    "logical_bytes": 78844506112,
+    "free_bytes": 78721789952,
+    "volume_uuid": "C25160D3-B586-4C11-9D3A-42CB2741227C",
+    "resize_result": "host copy resized successfully after verification of virtual image and backing path",
+    "device_installed": false
+  }
+}
