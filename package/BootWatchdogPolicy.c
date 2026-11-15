@@ -160,11 +160,19 @@ int sheng_boot_watchdog_policy(void *process, uint64_t scratch) {
  }
  for(const char *c=jobs;*c;) {if((error=append_job(&c)))return error;}
  strlcat(policy,policy_tail,sizeof(policy));
+ const char *parent="/private/var/db";
  const char *directory="/private/var/db/com.apple.xpc.launchd";
  const char *path="/private/var/db/com.apple.xpc.launchd/disabled.plist";
+ struct mkdir_args md={.path=scratch,.mode=0755};
+ // A newly formatted Data volume has no directory skeleton yet. Preserve an
+ // existing db and create only the parent required by the boot policy.
+ failed_step="db copyout";
+ if((error=copyout(parent,scratch,strlen(parent)+1)))goto done;
+ failed_step="mkdir db";
+ error=mkdir(p,&md,&result);
+ if(error && error!=EEXIST)goto done;
  failed_step="directory copyout";
  if((error=copyout(directory,scratch,strlen(directory)+1)))goto done;
- struct mkdir_args md={.path=scratch,.mode=0755};
  failed_step="mkdir launchd";
  error=mkdir(p,&md,&result);
  if(error && error!=EEXIST)goto done;
