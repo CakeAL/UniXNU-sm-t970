@@ -726,6 +726,8 @@ id = "storage"
 status = "implemented"
 components = ["ShengUfs", "VirtioMmioBlock", "RamBlock", "VerifiedRoot"]
 paths = [
+  "patches/xnu/t970-data-provider-select.patch",
+  "evidence/storage/ufsdata-l-20261115/**",
   "drivers/ShengUfs/**",
   "scripts/build-verified-root-empty.py",
   "patches/xnu/series",
@@ -830,6 +832,8 @@ procedure = [
   "Read block sysfs and by-name links; read each LUN's primary GPT header and entry array and validate their CRC32 values without writing any block device.",
 ]
 findings = [
+  "The proposed writable APFS Data extent overlaps the signed OS and SystemOS policy carriers at unixnu-relative 4 KiB LBAs 5505024 and 5516624. The historical root manifest also implies a Data size different from the generated seed; revalidate the live layout and redesign before a writable boot. No carrier damage is established.",
+  "The ufsdata-l Recovery 8a9aff0678901a6d1cfa6ecacff85dca9bf0f2fb0dce9546d20313497c373811 shows Data ENOENT and diag/media/uuid 0/0/0. The build stamp enables XNU_NATIVE_RAM_BLOCK, so the UFS lookup was compiled out; these counters do not establish an APFS or media failure. Select the UFS provider explicitly with t970-ufs-data=1; device validation remains pending.",
   "The board RamBlock direct path binds to the same guarded synchronous store writes as the regular path.",
   "The wholesale ShengUfs build requires the exact unixnu GPT range, loads the two authenticated root envelopes from the existing carrier, and reuses the protected 512 MiB RamBlock Data store. Direct reference APFS Data publication was removed from the wholesale driver.",
   "On 2026-11-08 TWRP shrank the fresh MinsOS F2FS and verified both GPTs after a recovery restart. Android userdata keeps LBA 2969600 through 37292799. The new 96 GiB unixnu partition occupies LBA 37292800 through 62458623. Unrelated GPT entries, including factory duplicate GUIDs, were preserved.",

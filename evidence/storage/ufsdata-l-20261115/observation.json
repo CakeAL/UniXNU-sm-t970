@@ -1,0 +1,35 @@
+{
+  "image_sha256": "8a9aff0678901a6d1cfa6ecacff85dca9bf0f2fb0dce9546d20313497c373811",
+  "image_tag": "ufsdata-l",
+  "source": "owner-provided screen image 2026-11-15 19:57 Asia/Shanghai",
+  "upload": "Heimdall RECOVERY upload successful; /tmp/flash-ufsdata-l.log",
+  "observation": {
+    "time_s": 33,
+    "data_diag": 0,
+    "media": 0,
+    "uuid": 0,
+    "pid1_data_error": "ENOENT",
+    "pid1_processes": 1,
+    "ramdisk_capacity_mib": 0,
+    "ufs_published": 2
+  },
+  "interpretation": "Kernel build stamp XNU_NATIVE_RAM_BLOCK=1 selects the RAM provider; UFS lookup is in the excluded preprocessor branch. Zero counters do not identify an IOMedia or APFS failure. Persistent Data and launchd remain unverified.",
+  "storage_layout_risk": {
+    "root_manifest_recorded_bytes": 9382658048,
+    "partition_first_4k_lba": 37292800,
+    "partition_last_4k_lba": 62458623,
+    "candidate_apfs_first_4k_lba": 39583488,
+    "policy_first_4k_lbas": [
+      42797824,
+      42809424
+    ],
+    "explanation": "The current UFS Data geometry spans both signed policy carriers. An APFS mount with writes enabled can overwrite them. Existing seed dimensions also differ from the geometry derived from the historical root manifest; current device layout needs confirmation. No claim that damage occurred."
+  },
+  "host_fix": {
+    "kernel_sha256": "fea67892ed608162625e00f6c492597d56b714de2c4228dfccdd718485b13fc7",
+    "build": "python3.14 ./unixnu build kernel -D ../UniXNU-sm-t970 with UEFI, device, QCA and ATH12K environment inputs",
+    "result": "kernel build and prelink passed; kern_exec.o references both t970_ufs_data_volume and native_ram_block_volume_seed",
+    "device_tested": false,
+    "image_built": false
+  }
+}

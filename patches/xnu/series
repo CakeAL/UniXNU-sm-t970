@@ -18,3 +18,4 @@ t970-union-ro-create.patch
 t970-memory-outside.patch
 t970-union-statfs-fsid.patch
 t970-pid1-stages.patch
+t970-data-provider-select.patch
