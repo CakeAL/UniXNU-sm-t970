@@ -1,0 +1,58 @@
+{
+  "device_revision": "beb2255da133c807f6cf930095045371c8cfc424",
+  "framework_revision": "0e9e1e8182b18a6b78df983808ec296b7f30dc20",
+  "instruments": {
+    "boot_progress_mode": 2,
+    "stage_bars": true,
+    "panic_screen": true,
+    "kernel_args_override": [
+      "boot-progress=2",
+      "build-tag=ref-data-s",
+      "native-ufs-stream2=0x4e0"
+    ],
+    "kernel_args_dropped": [
+      "panic_on_crash_disabled=1"
+    ]
+  },
+  "board_sha256": "601c27c34ead065e43b9bf075413ffa77e7046ea23d5e2357c5f52b3bbdf4e23",
+  "source_kernel_sha256": "30066a33bff5d11dd49bc2f5c6847c12df203c3e893f6d644dd5ea8bcae56e5c",
+  "base_recovery_sha256": "33efcec0915129321995cd4de57a3223f7fd41e36c8f73205f07fa97e7aeaeba",
+  "firmware_config_dtb_sha256": "86c14aa305a6cf5db46665f4095d28aadcb1ea5ce9d213cd711641a07504ed1d",
+  "image_sha256": "0126433fc49a4cee7920ba5621533dd9396baa39348d34fb03bab470b55551b6",
+  "image_bytes": 86888448,
+  "recovery_partition_bytes": 86888448,
+  "hardware_tested": false,
+  "note": "Enables the boot page only; no flash or reboot performed",
+  "partition": "RECOVERY",
+  "build_command": "python3.14 scripts/build-boot-progress-page.py --mode 2 --kernel-arg build-tag=ref-data-s --kernel-arg native-ufs-stream2=0x4e0 --drop-kernel-arg panic_on_crash_disabled --kernel /Users/cakeal/vsc/UniXNU/out/sm-t970/ipados-17.7.11-21H461/gts7xlwifi/kernel/kernel.macho --output out/dual-system/wholesale-inputs-20261115/boot-progress-page/page-ref-data-s",
+  "validation": {
+    "previous_device_image": "d9b19ec26bf1bd84e337ad78f3a63ad67d65c84dd780e169e42f4954767d4208",
+    "ramblock_personality": "present in final kernel and config object; absent from predecessor",
+    "seed_initialization": "disabled; uses previously deployed Data seed and overlay",
+    "host_checks": "kernel build, prelink, personality audit and packaging passed"
+  },
+  "upload": {
+    "status": "success",
+    "partition": "RECOVERY",
+    "result": "RECOVERY upload successful",
+    "log": "evidence/storage/ref-data-s-20261115/upload.log",
+    "partition_readback": "not performed",
+    "device_boot": "observed"
+  },
+  "observation": {
+    "source": "owner screen 2026-11-15 21:21 Asia/Shanghai",
+    "time_seconds": 113,
+    "display": "live diagnostic crash banner",
+    "springboard_pid": 27,
+    "springboard_threads": 15,
+    "mediaserverd_pid": 29,
+    "framebuffer_swaps_total": 3,
+    "swap_validation_ok": 3,
+    "crash_events": 60,
+    "exit_events": 133,
+    "gpu_compositing_offers": 0,
+    "ufs_requests_total": 218769,
+    "storage_errors": 0,
+    "interpretation": "Old Data route progressed to running SpringBoard and accepted three CPU framebuffer swaps; crash banner displays only after boot_progress_display_owned, but a visible usable desktop and sustained operation remain unverified. Diagnostics overlay is active. Repeated process crashes need separate investigation."
+  }
+}

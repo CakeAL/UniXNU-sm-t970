@@ -726,6 +726,7 @@ id = "storage"
 status = "implemented"
 components = ["ShengUfs", "VirtioMmioBlock", "RamBlock", "VerifiedRoot"]
 paths = [
+  "evidence/storage/ref-data-s-20261115/**",
   "evidence/storage/data-backup-20261115/**",
   "evidence/storage/ref-data-r-20261115/**",
   "evidence/storage/ufsdata-p-20261115/**",
@@ -847,6 +848,8 @@ procedure = [
   "Read block sysfs and by-name links; read each LUN's primary GPT header and entry array and validate their CRC32 values without writing any block device.",
 ]
 findings = [
+  "Recovery 0126433fc49a4cee7920ba5621533dd9396baa39348d34fb03bab470b55551b6 with the explicit RAM personality reached SpringBoard PID 27 by 113 seconds and reports three accepted framebuffer swaps. BootProgress crash diagnostics cover the screen; 60 crash events and 133 exits were recorded. A usable desktop, persistence across reboots and GPU compositing are not yet verified.",
+  "Recovery 0126433fc49a4cee7920ba5621533dd9396baa39348d34fb03bab470b55551b6 adds the missing NativeRamBlock IOKit match and selects the preserved 512 MiB Data overlay. Build and kernel personality audit passed, RECOVERY upload succeeded; device boot remains pending.",
   "The wholesale defconfig now explicitly requests the separately linked RamBlock personality even with XNU_SOURCE_STORAGE. The build script tracks personality flags to invalidate KernelConfigTables and relink on changes. Kernel 30066a33bff5d11dd49bc2f5c6847c12df203c3e893f6d644dd5ea8bcae56e5c builds successfully and contains the NativeRamBlock match; the previous kernel does not. Runtime matching and persistent Data are pending.",
   "Recovery d9b19ec26bf1bd84e337ad78f3a63ad67d65c84dd780e169e42f4954767d4208 stays at Data mount returned with one process and RAMDISK capacity zero at 176 seconds. Its compiled IOKit personality table omits NativeRamBlock despite the archive being linked, because XNU_SOURCE_STORAGE suppresses that table entry. Explicit matching requires host and device validation.",
   "The new Data extent was backed up read-only over ADB: all 78844506112 bytes were streamed, gzip CRC verified and raw SHA-256 e745b6144c2ea1311604605addbab3f9c79fa03260608d8d4e62a414fa1794c0 recorded. The compressed backup stays in ignored local storage; no device writes were made.",
