@@ -1,0 +1,65 @@
+{
+  "device_serial": "R52N71CDBNM",
+  "vendor_device": "gts7xlwifi",
+  "reported_model": "SM-X810",
+  "model_context": "Owner reports One UI 8.5 port on SM-T970",
+  "source": "ADB root read-only, 2026-11-15 Asia/Shanghai",
+  "logical_block_bytes": 4096,
+  "unixnu_node": "/dev/block/sda37",
+  "unixnu_absolute_first_4k_lba": 37292800,
+  "unixnu_absolute_last_4k_lba": 62458623,
+  "unixnu_bytes": 103079215104,
+  "userdata_node": "/dev/block/sda36",
+  "root_header_magic": "SHNGROOT",
+  "root_image_bytes": 9382658048,
+  "data_old_start_partition_relative_4k_lba": 2290688,
+  "data_old_start_first_block": "all zero",
+  "policy_reads": [
+    {
+      "partition_relative_4k_lba": 5505024,
+      "bytes": 47481664,
+      "sha256": "8fefc15fecc382730c1aeae6154e0eabb195d16bc51099c6095ff1395be43dc2",
+      "matches": "evidence/storage/root-restore-twrp-20261102/carrier-receipt.json"
+    },
+    {
+      "partition_relative_4k_lba": 5516624,
+      "bytes": 25805344,
+      "sha256": "869a186ae40656ff9c3be64080120dc2e648f9307d3efa213d9ed5c2084960b8",
+      "matches": "evidence/storage/root-restore-twrp-20261102/carrier-receipt.json"
+    }
+  ],
+  "writes_performed": false,
+  "candidate_only": {
+    "absolute_first_4k_lba": 42816256,
+    "absolute_last_4k_lba": 62065402,
+    "size_blocks": 19249147,
+    "first_block": "all zero",
+    "caveat": "Read-only scan observed all zero at this time; future writes or layout changes require revalidation.",
+    "scan": {
+      "tool": "toybox cmp -n 78844506112 /dev/block/sda37 /dev/zero 22624075776 0",
+      "exit_code": 0,
+      "result": "entire 78844506112-byte candidate extent compared equal to zero",
+      "read_only": true
+    }
+  },
+  "legacy_store": {
+    "absolute_first_4k_lba": 62065403,
+    "first_block_magic": "SHNGDATA",
+    "disposition": "preserve existing overlay"
+  },
+  "host_guard": {
+    "kernel_sha256": "0ef680dfc17f417fb4cdb7ad8ccc23271fc3746a0cc84228311a0f8bb4718306",
+    "test": "clang++ -std=c++17 -Wall -Wextra -Werror -fsanitize=address,undefined tests/t970_data_extent.cpp; boundary test passed",
+    "build": "unixnu build kernel and prelink passed",
+    "device_tested": false,
+    "protected": "both policy envelopes, existing overlay and 1 GiB reserved tail"
+  },
+  "host_apfs_candidate": {
+    "raw_image": "out/dual-system/apfs-data-layout-20261115/data-blank.raw",
+    "analysis": "out/dual-system/apfs-data-layout-20261115/seed-analysis.json",
+    "bytes": 78844506112,
+    "volume_uuid": "42888767-E4D4-467C-9FB6-A20A2645B6CC",
+    "nonzero_blocks": 32,
+    "note": "Host-generated image only; seed installation and device mounting not implemented or tested."
+  }
+}

@@ -1413,6 +1413,7 @@ static bool installOwnerPolicyCarrier (uint64_t firstLba, uint64_t lastLba, cons
 
 #include "T970DataWindow.h"
 #include "T970ApfsSeed.h"
+#include "T970DataExtent.h"
 extern "C" uint8_t native_ram_block_seed_sha256[32] __attribute__((weak_import));
 extern "C" unsigned native_ufs_store_gpt_check (void);
 
@@ -2004,6 +2005,10 @@ static bool t970PublishData (IOService *owner, const RootLayout *layout)
   const uint64_t first = layout->userdataFirst + layout->imageBytes / 4096, last = layout->userdataLast;
   if (first > last) {
     IOLog ("NativeUfs: t970 Data refused: no room after the image (first=%llx last=%llx)\n", first, last);
+    return false;
+  }
+  if (!t970DataExtentSafe (layout->userdataFirst, layout->userdataLast, first, last)) {
+    IOLog ("NativeUfs: t970 Data refused: overlaps a protected range or leaves unixnu\n");
     return false;
   }
   if (!t970ApfsSeed (first)) return false;
