@@ -1,0 +1,10 @@
+{
+  "base_recovery_sha256": "cbbf85d79a71670b0058f47839c48c2fc493428a1fae14bdd45b2056624be4f4",
+  "image": "out/dual-system/wholesale-inputs-20261115/mmu-probe/after-vm-restrictions/recovery.img",
+  "sha256": "e5431b063bfa7853686f0a5264a3bc80f5fdbe85ce4e1c8250cf2f2fd0dafa80",
+  "kernel_readback_sha256": "f14ac8f7270a217b20ae77e98b1f90ea51a51d1476379d14b5bfddf795c21a72",
+  "checkpoint": "first return from vm_set_restrictions in kernel_bootstrap_thread, immediately before kperf_init_early",
+  "reset_seconds": 22,
+  "partition": "RECOVERY",
+  "upload": "pending"
+}
