@@ -1,0 +1,26 @@
+{
+  "reference": "https://github.com/rui12366B/UniXNU-gts7xlwifi/tree/88b34f97100a01aab4ea6b86dc9c748b2114c382",
+  "reference_test_framework": "62be7bc",
+  "local_framework": "945ad8db0641060f6566422d168684c3e9182d53",
+  "local_adreno_metal_base": "73d582fd4d5772b1f5fa83581a25077a16f2b6cd",
+  "verified_source_matches": [
+    "The selected board-local GopFramebuffer directory matches the reference snapshot byte for byte.",
+    "The board config's 12 display text fixups match. Cam-c1-a reported FIX parsed=12 applied=12."
+  ],
+  "reference_result": "The periph14/15 USB console records successful GPU opens and zero refusals for WidgetRenderer_Defa and Preferences. Its boot log verifies desktop presentation and scanout. These logs do not directly show what the widgets or Settings looked like.",
+  "frontend_differences_in_candidate": [
+    "Remove bridge answers for minConstantBufferAlignmentBytes and deviceLinearReadOnlyTextureAlignmentBytes so Metal supplies them, as in reference patch 49923616.",
+    "Implement the b3a8 XR10 GPU scanout conversion from reference patch 49923616, paired with the board's existing NGP_XR10 wire value.",
+    "Use the org.unixnu.metal.t970 same-user cache path from reference patch 9045eb02. Existing Data is retained."
+  ],
+  "local_differences_retained": [
+    "Samsung Recovery wrapper and the measured persistent Data seed and store.",
+    "The local framework and built-in Turnip binary. The upstream repository does not publish the tested userspace addon.",
+    "The diagnostic boot banner and GPU copy path from cam-c1-a. The periph15 reference menu also tests direct scanout."
+  ],
+  "acceptance": [
+    "Inspect widget contents on the same Home Screen after boot.",
+    "Open Settings, scroll and switch sections. Check for corruption during the first draw and later repaints.",
+    "Record the tagged screenshot's FMT, GPU opens/refused, SWAP and FIX rows as text."
+  ]
+}

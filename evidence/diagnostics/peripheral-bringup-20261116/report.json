@@ -29,7 +29,31 @@
     "check-platform.py stopped at the reviewed framework revision guard before DT/ADT validation."
   ],
   "flash_result": "Heimdall reported RECOVERY upload successful and returned 0. Session used --no-reboot. No on-device hash readback.",
-  "boot_observation": null,
-  "camera_observation": null,
-  "slpi_observation": null
+  "boot_observation": {
+    "source": "Owner photograph, 2026-11-16 02:49:09 Asia/Shanghai",
+    "tag": "cam-c1-a",
+    "elapsed_seconds": 71,
+    "result": "iPadOS desktop visible. GPU offers 128, done 128, failed 0. Signed text fixups parsed 12, applied 12."
+  },
+  "camera_observation": {
+    "stage": 8,
+    "detail": 0,
+    "cci_version": "0x10070000",
+    "front_id_word": "0x48ab0000",
+    "last_cci_irq": "0x1000",
+    "service_published": true,
+    "limits": "Only the front chip ID and service registration were exercised. No frames were requested."
+  },
+  "slpi_observation": {
+    "stage": 2,
+    "error": 0,
+    "firmware_kib": 0,
+    "slave_bits": "0xffffffff",
+    "irq": 0,
+    "glink_rx": 0,
+    "glink_tx": 0,
+    "qrtr_rx": 0,
+    "sensor_service": 0,
+    "limits": "Survey complete at 71 seconds. The driver waits up to 180 seconds for ADSP GLINK before reading SLPI firmware, so this sample does not settle the next failure stage."
+  }
 }

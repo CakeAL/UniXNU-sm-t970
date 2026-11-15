@@ -1,0 +1,50 @@
+{
+  "device": "SM-T970, iPadOS 17.7.11 (21H461)",
+  "build_tag": "display-parity-a",
+  "device_source_base": "f0aa8689255aa3a610980455c7cc3b30c9eb7ff6",
+  "framework_revision": "945ad8db0641060f6566422d168684c3e9182d53",
+  "rendering_patch_sha256": "ec871955f031152c42d5d77154611e02afd5eaf11dad27b0496ad5363f5139c2",
+  "image": "out/display-parity-20261116/recovery/boot.img",
+  "partition": "RECOVERY",
+  "image_bytes": 86888448,
+  "image_sha256": "47fea5265aaad1535817eb80497082c5e63435cce74efc92fb293cb33f9daf69",
+  "source_kernel_sha256": "c0ba19ca47414153e333d0656c31f2c8e8cb9591cb0fa5a53c229e234abcef19",
+  "packed_kernel_sha256": "88301c3498cd361515611bb10be2b47c011429fe45a1cb528cf7eeec43b4ae4e",
+  "owner_trust_sha256": "154809d105dad93df7f236ac1a14826ce1524f5f177fbc886bbbd101e974a6f7",
+  "owner_cdhashes": {
+    "gpu.addon:addons/NativeAdrenoMetal.bundle/NativeAdrenoMetal": "b2e84e5037bb8c0f8ce48b18521b1232dd4e10c8",
+    "gpu.addon:addons/NativeAdrenoMetal.bundle/libvulkan_freedreno.dylib": "8a4d6e6c77cd4dedeb154e570b04583461179925",
+    "gpu.addon:bin/adrenoprobed": "5f3b74921bbafb2ce7bb155acf08ef4f7524ae55",
+    "--also-cdhash:e1c1e952036f99008c3f0420cc2ee26d9ad6f917": "e1c1e952036f99008c3f0420cc2ee26d9ad6f917"
+  },
+  "data_seed_sha256": "ca1543d1986cb1de5dd8ef6a3f01f48609e2a65a18bbf3f88f04b2d189031dcf",
+  "embedded_addon_sha256": "506a8e7c2c728ff3fba34e219becc09f797ddae9a1d221135922630be7324422",
+  "build_commands": [
+    "In an isolated copy of AdrenoMetal 73d582f, apply xr10-withheld-everywhere.patch and gts7xlwifi-rendering.patch, with the board GopFramebuffer header.",
+    "Run the iOS 17 build-adreno-metal-plugin.py --target ios --no-replay recipe through the plugin link, reuse the prior signed Turnip binary and sign the completed bundle.",
+    "ADRENO_PLUGIN_DIR=<staged plugin output with unchanged daemon> python3.14 ../UniXNU/scripts/make-gpu-addon.py --publish out/display-parity-20261116/gpu.addon",
+    "python3.14 scripts/build-t970-trust-bundle.py --addon out/display-parity-20261116/gpu.addon --also-cdhash e1c1e952036f99008c3f0420cc2ee26d9ad6f917 --output out/display-parity-20261116/trust",
+    "T970_GPU_ADDON=<absolute path to candidate addon> python3.14 ./unixnu build kernel -D ../UniXNU-sm-t970",
+    "python3.14 scripts/build-boot-progress-page.py --mode 2 --large-data-seed --data-ramdisk out/dual-system/overlay-inspection-20261115/reference-fresh-73g.dbr --kernel-arg build-tag=display-parity-a --kernel-arg t970-large-data=1 --kernel-arg t970-large-init=1 --kernel-arg t970-pen=7 --kernel-arg native-ufs-stream2=0x4e0 --kernel-arg gpu-addon=1 --kernel-arg pipa-turnip-debug=noubwc,nocb --kernel-arg t970-wifi=6 --kernel-arg t970-bt=257 --kernel-arg t970-adsp=2 --kernel-arg t970-audio=32 --kernel-arg t970-haptics=3 --kernel-arg t970-sensors=243 --kernel-arg t970-usb=37 --kernel-arg t970-qud-retry=1 --kernel-arg t970-qud-resume=1 --drop-kernel-arg panic_on_crash_disabled --drop-kernel-arg armcpu-diagnostics=1 --drop-kernel-arg alioth-bt=1 --drop-kernel-arg log-gpu=1 --drop-kernel-arg t970-fb-src-wb=1 --owner-trust-cache /Users/cakeal/vsc/UniXNU-sm-t970/out/display-parity-20261116/trust/owner-trust.bundle --kernel /Users/cakeal/vsc/UniXNU/out/sm-t970/ipados-17.7.11-21H461/gts7xlwifi/kernel/kernel.macho --output /Users/cakeal/vsc/UniXNU-sm-t970/out/display-parity-20261116/recovery"
+  ],
+  "verification": [
+    "SPIR-V shader validation, AIR assembly, Rust bridge build, plugin link and deep strict code-signature verification passed.",
+    "The baseline owner trust bundle changed only the AdrenoMetal CDHash.",
+    "The stage retained the signed Turnip binary and probe daemon byte for byte.",
+    "Read back the packed ADT, Data seed, trust cache and embedded addon from the payload. The ADT differs from cam-c1-a only in its random seed.",
+    "The kernel arguments replace build-tag and remove t970-camera=513 from cam-c1-a."
+  ],
+  "flash_command": "sh scripts/flash-recovery-when-detected.sh out/display-parity-20261116/recovery/boot.img 47fea5265aaad1535817eb80497082c5e63435cce74efc92fb293cb33f9daf69 30",
+  "flash_result": "Heimdall confirmed RECOVERY upload successful with --no-reboot.",
+  "display_observation": null,
+  "device_source_sha256": {
+    "package/BootProgress.c": "d5ce54e51c8771302eb7b5a2c81ddaacfd399406cfcd0748e9faec2bc135181f",
+    "scripts/build-adreno650.py": "2df748466d558059ae261f7ffd8e0ae4a48230f1d052540fd2f8146add73a3f0",
+    "patches/adreno-metal/xr10-withheld-everywhere.patch": "bda06313f36b66e6078b9150deb8ec300a2d5b16531325ecd9df4dfe450ff423"
+  },
+  "host_usb_after_upload": {
+    "enumeration": "iPad (05ac:12ab), USB high speed; present in usbmuxd",
+    "lockdownd": "Placeholder UDID and timeout on unpaired QueryType",
+    "limit": "Host transport observation only. A tagged device screen is required for display acceptance."
+  }
+}

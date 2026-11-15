@@ -1507,6 +1507,7 @@ paths = [
   "scripts/build-adreno650.py",
   "scripts/gen-gpu-firmware-a650.py",
   "scripts/build-t970-trust-bundle.py",
+  "patches/adreno-metal/**",
   "configs/gts7xlwifi_defconfig",
   "board.toml",
   "evidence/adb-2026-11-01/gpu.txt",
@@ -1523,12 +1524,15 @@ inputs = [
 ]
 configuration = [
   "The diagnostic kernel build takes --gpu-soc to include the locked SM8250 A650GmuPower.h. The v104 payload replaces t970-gpu-w=1 with t970-gpu-p=1.",
+  "The 21H461 display comparison applies patches/adreno-metal/gts7xlwifi-rendering.patch after the existing XR10 advertisement fix. T970_GPU_ADDON selects the resulting signed addon for an isolated kernel build.",
   "The live DT records GPU/GMU interrupts, clocks, supplies and SMMU resources; no UniXNU GPU backend or Metal ABI has been selected.",
 ]
 procedure = [
   "Read KGSL identity and frequency nodes, list GPU firmware files and calculate the GMU/SQE hashes without executing GPU commands.",
 ]
 findings = [
+  "The reference periph15 log shows GPU opens by WidgetRenderer_Defa and Preferences with zero refusals. The board GOP sources match reference 88b34f9. The candidate completes the reference AdrenoMetal changes by leaving the two layout queries to Metal, using the separate shader-cache directory and handling b3a8 GPU conversion. Its live banner exposes the existing swap-format and GPU-client counters.",
+  "Recovery 47fea526 (display-parity-a) embeds the rebuilt frontend and preserves the prior signed Turnip, probe daemon and Data seed. The owner trust module changes only the frontend CDHash. Heimdall confirmed successful RECOVERY upload.",
   "2026-11-15: the wholesale kernel links the A650 driver for the first time. build-adreno650.py is enabled in board.toml, CONFIG_XNU_NATIVE_ADRENO=y, the repaired drivers/Adreno650, package/GpuProbe.cpp, package/GpuPowerBoard.h and package/T970GpuAddon.S links and kits/{AdrenoFirmware,AdrenoPM4,ArmSmmu4K,pipa} resolve inside the repository, package/GpuFirmwareA650.c is generated from the tablet's own a650_gmu.bin/a650_sqe.fw/a650_zap.mdt+.b00-.b02 by scripts/gen-gpu-firmware-a650.py, and the archive (32 objects, GpuProbe, the firmware and the 13647616-byte addon) is force-loaded: the prelinked kernel grows from 54771712 to 68751360 bytes and exports native_gpu_probe, t970_gpu_addon_data and t970_gpu_addon_size. scripts/build-t970-trust-bundle.py adds one owner trust module with the addon's three CDHashes (NativeAdrenoMetal 76d8d31b7ec6d94d88da38a673a1b69390d8952b, libvulkan_freedreno.dylib 307925b0c44afaefa30c1d810fa75078d8fe8b7a, adrenoprobed 083c5020baf42324c0bdcef72ceb52a292199404) ahead of Apple's two unchanged modules, and its bundle is byte-identical to UniXNU's scripts/make-owner-trust-bundle.py for the same inputs. Recovery c5f88b1175af9478cddcd2a7998b88915fcf592d7b556fc9eb656ce2703b4337 (pipa-gpu=12 log-gpu=1 fb-gpu=1 gpu-addon=1) was flashed 2026-11-15 23:08 (Asia/Shanghai); no device observation is recorded yet, so the GMU cold start, CP submission, Metal rendering and the direct-scanout frame hand-off remain unverified on the T970.",
   "Device ADB read-only extracted the four ZAP inputs; hashes match the previously inventoried stock T970 signed pair. The generated ELF matches the reference generator. The reference A650 build archived 32 objects and the staged accelerator after correcting the AdrenoMetal include path; host symbol audit passed, but no GPU image has been linked or device-tested.",
   "The same-model Adreno650 driver, HFI/SMMU/PM4 sources and 21H461 accelerator bindings compile in 34 host objects. Pinned metal2vulkan and Turnip with the reference BO retirement patch built for arm64 iOS 17, and the plugin, Turnip library and daemon passed strict signature verification. ZAP, full kernel link, display integration and GPU runtime remain pending.",
@@ -1599,9 +1603,13 @@ limits = [
   "The diagnostic SID5 mapping and FW_VER validate GMU HFI DMA, and v133 verifies GX power and clocks. ZAP authentication, CP submission and fences, rendering and Metal remain unverified on the T970.",
 ]
 next_action = [
+  "Boot display-parity-a, inspect Home Screen widgets and scroll or switch Settings sections. Record the live FMT and GPU opens/refused rows alongside each visual result.",
   "Qualify the four T970 gfx3d_user stream IDs before submitting a CP scratch marker. Obtain signed T970 ZAP inputs and qualify PAS before normal GPU submissions.",
 ]
 evidence = [
+  { kind = "source", reference = "evidence/gpu/display-parity-20261116/reference-comparison.json", result = "Reference GPU client evidence, matched sources, carried frontend differences and remaining local differences." },
+  { kind = "host", reference = "evidence/gpu/display-parity-20261116/report.json", revision = "f0aa8689255aa3a610980455c7cc3b30c9eb7ff6", command = "Build the iOS 17 frontend and T970 Recovery using the exact inputs and commands in the report.", result = "Compiled the carried display frontend, verified its code signature and independently read back the packed addon, trust cache, ADT and unchanged Data seed." },
+  { kind = "device", reference = "evidence/gpu/display-parity-20261116/recovery-upload.txt", revision = "f0aa8689255aa3a610980455c7cc3b30c9eb7ff6", command = "sh scripts/flash-recovery-when-detected.sh out/display-parity-20261116/recovery/boot.img 47fea5265aaad1535817eb80497082c5e63435cce74efc92fb293cb33f9daf69 30", result = "RECOVERY upload succeeded. Widget and Settings behavior require a separate boot observation." },
   { kind = "device", reference = "evidence/gpu/cb1-root-v136/device-result.json", revision = "9e56be0ea5b4a3d5005e0e9c1f7af85152df3fd3", command = "BOOT109ee7eb and owner three-finger report screenshot", result = "Disabled CB1 root read back six fields and audited 17 leaves with 31628 SQE bytes and retained backing. CP idle with zero ring cursors, SQE control and errors. Eight CPUs, Data query success and 205 GOP copies and retirements." },
   { kind = "device", reference = "evidence/gpu/dual-cb1-20261111/device-result.json", revision = "346f4c79098ab0bc124b2e8832efa66f5e3caca9", command = "RECOVERY 3413470c and owner three-finger report screenshot", result = "CB1 activation and withdrawal, both ASID 2 TLB syncs, clear fault status and live GMU route verified. CP submission remains pending." },
   { kind = "device", reference = "evidence/gpu/dual-streams-20261111/device-result.json", revision = "a14a0936c64e74d18554205abba23f0919240492", command = "RECOVERY 05e00331 and owner three-finger report screenshot", result = "Live SMMU slot survey reports free mask 0x3e with GMU still on slot 0. CP remains idle." },
@@ -1783,6 +1791,7 @@ procedure = [
 findings = [
   "The CAM boot banner reports the probe and service state directly from the linked driver globals. The service can be published after a failed chip-ID check, so both results must be read independently.",
   "Recovery 5fd0a19c (cam-c1-a) completed host kernel build, prelink and packaging. The linked late display probe calls t970_camera_start and t970_sensors_start. Heimdall reported a successful RECOVERY upload.",
+  "The owner's cam-c1-a desktop photograph at 71 seconds shows CAM stage 8, CCI version 0x10070000, front ID 0x48ab0000 and service status 1. The probe read the sensor ID and published the IOKit service. Frame capture was not requested.",
 ]
 completion = [
   "Read the expected sensor ID, publish the service, and verify that a client can start, receive and stop frames.",
@@ -1798,6 +1807,7 @@ evidence = [
   { kind = "source", reference = "package/T970Camera.cpp", result = "The front sensor probe powers the module off after the chip-ID read and optionally registers T970CameraService." },
   { kind = "host", reference = "evidence/diagnostics/peripheral-bringup-20261116/report.json", revision = "01c4d2af096e361dca5eda42e2de4ae83acd7928", command = "python3.14 ./unixnu build kernel -D ../UniXNU-sm-t970; python3.14 scripts/build-boot-progress-page.py (full inputs in report)", result = "Prelinked both driver entry points and packaged the hash-identified front-camera diagnostic against the existing Data seed and addon." },
   { kind = "device", reference = "evidence/diagnostics/peripheral-bringup-20261116/recovery-upload.txt", revision = "01c4d2af096e361dca5eda42e2de4ae83acd7928", command = "sh scripts/flash-recovery-when-detected.sh out/driver-bringup-20261116/camera-c1/boot.img 5fd0a19c8308a2bf0fdb869422f426ec44cd33e05706d317c991761495c3157f 30", result = "SM-T970 RECOVERY upload succeeded. The upload receipt does not establish camera or boot behavior." },
+  { kind = "device", reference = "evidence/diagnostics/peripheral-bringup-20261116/report.json", revision = "f0aa8689255aa3a610980455c7cc3b30c9eb7ff6", command = "Boot the uploaded cam-c1-a RECOVERY and read the CAM row at the desktop", result = "Front CCI ID 0x48ab0000, stage 8 and service published. Capture remains untested." },
 ]
 
 [[area]]
@@ -1825,6 +1835,7 @@ procedure = [
 findings = [
   "Recovery 9f1cabb1 carries the ADSP image in the addon (firmware/adsp/adsp.mbn, installed under /private/var/ngpu/firmware/adsp) and the audio HAL at /System/Library/Audio/Plug-Ins/HAL/T970Audio.driver; with t970-adsp=2 t970-audio=32 the owner heard sound from the speakers on the desktop. Capture, non-default routes, amplifier telemetry and DSP restart remain unobserved.",
   "The stock DT assigns PAS 12 and the 0x89200000 + 0x1500000 reserved range to SLPI. The SLPI boot banner reports firmware size, startup stage, ready bits, GLINK traffic and QRTR sensor service discovery.",
+  "Recovery 5fd0a19c reached the SLPI survey stage at 71 seconds. At that time there was no firmware read, slave-ready indication, GLINK traffic or QRTR service. With t970-adsp=2 the worker can wait up to 180 seconds for ADSP GLINK before opening the SLPI firmware.",
   "Device ADB read-only extracted all 22 ADSP fragments, each matching this T970 stock inventory. The reassembled ADSP image differs from the reference tablet image; audio and firmware authentication remain untested.",
   "The audio, ADSP and SLPI startup paths link and prelink in 21H461. The iOS 17 audio HAL passes strict local code-signature verification. Three CS35L40 files extracted offline from MinsOS match the captured board inventory. Recovery d9aa10ce leaves DSPs disabled while signed ADSP/SLPI firmware and service mounting are pending.",
   "27 ADSP/amp firmware and service-description files are hashed; loaded DSP routes are not inferred.",
@@ -2510,8 +2521,8 @@ findings = [
   "The firmware bring-up uses GOP colour markers at fixed x positions plus a 0x9ff80004 stage word read back by the arm_init probe; both are diagnostic-only and the current image still resets before XNU can report the stage word.",
   "The SCM probe is a board-side diagnostic in PlatformUfsLib: it issues a single fast SMC with the Qualcomm SIP owner and reports the return code through GOP markers; it does not change the SMMU or UFS state itself.",
   "The survey flash receipt is the device-side confirmation of the read-only UFS path; it is independent of the kernel entry probes and was captured after the full userdata rewrite.",
-  "The XR10 rule was the reference port's answer to a different symptom: rebuilding the Metal plugin to withhold supportsExtendedXR10Formats from every process (plugin CDHash 4490c306601dd01d9c0539f71c86b43687a89dbc, Recovery 0f9ac3574e699c5be1d83f951a1b7d53f0353c721d8b8241884787e93fb7ff63) left the white desktop widgets and the garbled Settings page unchanged; the reference's note describes whole-screen stripes from that cause, not white widget regions.",
-  "The twelve signed-text fixups do apply on this tablet: the new boot-page row FIX parsed=12 applied=12 on Recovery 0f9ac357 reports both counters equal, so the sRGB/BGRA8 policy of board.toml [payload] text_fixups is in force and a skipped fixup is not the reason for the white widgets.",
+  "Recovery 0f9ac357 was built with the frontend that withholds XR10 in all processes. The two surviving upload logs show handshake failures, so the historical visual observation cannot be associated with that image. Recovery 5fd0a19c carries the same addon and has a confirmed upload and desktop observation.",
+  "The boot banner on Recovery 5fd0a19c showed FIX parsed=12 applied=12, confirming that each configured signed-text fixup applied during the observed boot.",
   "The white widget regions predate the GPU: the first GPU image c5f88b11 reported gpu offers=0, so the Metal plugin never loaded, and the desktop photographs of that build already show the white regions; the defect is therefore in the compositor's submitted surface or in the widget renderers, not in whether the GPU takes frames.",
 ]
 completion = [

@@ -1419,6 +1419,7 @@ extern volatile uint64_t native_legacy_copy_last __attribute__((weak_import));
 // compositor's surface itself (dpu-scanout=2). This row is the only on-panel way to tell a stale or white frame from a slow one, because the
 // persistent log (package/BootLog.c) writes to a winre partition this tablet does not have.
 extern volatile uint32_t native_legacy_direct[14] __attribute__((weak_import));
+extern volatile uint32_t native_t970_swapfmt[5] __attribute__((weak_import));
 // The signed-text fixups (patches/xnu/native-text-fixup.patch): how many entries /chosen/text-fixups and text-fixup0..7 produced, and
 // how many pages they actually rewrote. Without this row a skipped fixup (a different shared-cache build, or a page that no longer matches
 // the recorded original bytes) is silent, and the panel keeps the XR10 composition path the fixups exist to avoid.
@@ -1513,6 +1514,26 @@ static void crash_banner(unsigned now) {
   // at the 250 ms cap with a stale or white frame on screen means the compositor submitted the swap before the command buffer ran.
   if(&cs_text_fixup_parsed) {
     snprintf(rows[n++],120,"FIX   parsed=%u applied=%u",cs_text_fixup_parsed,&cs_text_fixup_applied?cs_text_fixup_applied:0);
+  }
+  if (&native_t970_swapfmt && native_t970_swapfmt[0]) {
+    uint32_t f = native_t970_swapfmt[0];
+    snprintf(rows[n++],120,"FMT   %c%c%c%c  32bit=%u xr10=%u half=%u gpu_refused=%u",
+      (int)(f>>24),(int)((f>>16)&255),(int)((f>>8)&255),(int)(f&255),
+      native_t970_swapfmt[3],native_t970_swapfmt[1],native_t970_swapfmt[2],native_t970_swapfmt[4]);
+  }
+  if (&native_adreno_client_log && &native_t970_swapfmt && native_t970_swapfmt[0]) {
+    static const char *const names[] = {"WidgetRenderer", "Preferences", "iconservicesagent"};
+    unsigned opens[3] = {0}, refusals[3] = {0};
+    for (unsigned i=0; i<8; ++i) {
+      const struct gpu_client_record *r = &native_adreno_client_log[i];
+      for (unsigned j=0; j<3; ++j) {
+        if (strncmp(r->name,names[j],strlen(names[j])) != 0) continue;
+        opens[j] += r->opens;
+        refusals[j] += r->refused;
+      }
+    }
+    snprintf(rows[n++],120,"GPU   opens/refused widget=%u/%u settings=%u/%u icons=%u/%u",
+      opens[0],refusals[0],opens[1],refusals[1],opens[2],refusals[2]);
   }
   if(&native_legacy_direct && native_legacy_direct[0]) {
     snprintf(rows[n++],120,"SCAN  flips=%u map=%u mapf=%u fb=%u | hold=%u w250=%u w8=%u maxwait_us=%u rel=%u",

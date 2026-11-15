@@ -97,9 +97,16 @@ for source in sources:
         sys.exit(str(source) + ':\n' + result.stderr[-2500:])
     objects.append(obj)
 # gts7xlwifi: the GPU addon embedded in the kernel (package/T970GpuAddon.S), when the device repository holds one.
-ADDON = DEVICE / '.cache/firmware/gpu/gpu.addon'
-if not ADDON.is_file():
-    ADDON = PACKAGE / 'T970GpuAddon/gpu.addon'
+addon_override = os.environ.get('T970_GPU_ADDON')
+if addon_override:
+    ADDON = Path(addon_override).resolve(strict=True)
+    with ADDON.open('rb') as stream:
+        if stream.read(8) != b'NGPUADD2':
+            sys.exit(f'{ADDON}: expected a GPU addon')
+else:
+    ADDON = DEVICE / '.cache/firmware/gpu/gpu.addon'
+    if not ADDON.is_file():
+        ADDON = PACKAGE / 'T970GpuAddon/gpu.addon'
 if ADDON.is_file():
     addon_obj = out / 'T970GpuAddon.o'
     subprocess.run([c_recipe['arguments'][0], '-c', '--target=arm64-apple-ios17.0', '-DT970_GPU_ADDON="%s"' % ADDON,

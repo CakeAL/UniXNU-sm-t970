@@ -44,7 +44,8 @@
       "result": "parsed=12 applied=12, the sRGB/BGRA8 policy is applied"
     }
   ],
-  "conclusion": "None of the four display-path switches or the XR10 rule changes the symptom, and the fixups are applied, so the white regions are either the compositor's submitted surface description (format/bytes per pixel plane) or the widget renderer processes failing to draw content.",
+  "follow_up": "The surviving 0f9ac357 upload receipts show handshake failures. Its image attribution above remains unverified. A confirmed boot of Recovery 5fd0a19c carries the same Metal addon and shows FIX parsed=12 applied=12. See ../peripheral-bringup-20261116/report.json.",
+  "conclusion": "The reference's XR10 stripes and this tablet's white widgets are visually distinct. The available logs leave both the compositor output and the widget-rendering path under investigation.",
   "next_actions": [
     "Remove /private/var/ngpu/addons/NativeAdrenoMetal.bundle, the publish file and the daemon from Data and boot once without the Metal plugin, to test whether the white regions need the plugin at all.",
     "Print the submitted swap surface's pixel format, bytes per element and plane count on the boot page.",
