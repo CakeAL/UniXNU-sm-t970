@@ -1,0 +1,10 @@
+{
+  "base_recovery_sha256": "9985d1824b746c3cb9a0a7df10eb41f7d457e80f20df28b47cade42591ba8f92",
+  "image": "out/dual-system/wholesale-inputs-20261115/mmu-probe/armcpu-probe-cpu-node/recovery.img",
+  "sha256": "50204dd19d62ad2ba6edcaab2b441e53498538cb7b6d3552417f283d7ac4fc46",
+  "kernel_readback_sha256": "7661602012fa8d31b3c29ce6f93baee4e483c159768a020fef1c40bcdca0e80e",
+  "checkpoint": "ArmCpu::probe passed device_type and reg checks, before resolving the logical CPU number",
+  "reset_seconds": 0,
+  "partition": "RECOVERY",
+  "upload": "pending"
+}
