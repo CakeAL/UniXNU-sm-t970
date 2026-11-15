@@ -1,0 +1,78 @@
+{
+  "device_revision": "ee71fb5fe2a81081eb6d146b425bcd51a761852c",
+  "framework_revision": "0e9e1e8182b18a6b78df983808ec296b7f30dc20",
+  "instruments": {
+    "boot_progress_mode": 2,
+    "stage_bars": true,
+    "panic_screen": true,
+    "kernel_args_override": [
+      "boot-progress=2",
+      "build-tag=ufsdata-q",
+      "t970-ufs-data=1",
+      "ufsrw=1",
+      "native-ufs-stream2=0x4e0",
+      "sheng-data-persist=0"
+    ],
+    "kernel_args_dropped": [
+      "sheng-data-persist=2",
+      "panic_on_crash_disabled=1"
+    ]
+  },
+  "board_sha256": "601c27c34ead065e43b9bf075413ffa77e7046ea23d5e2357c5f52b3bbdf4e23",
+  "source_kernel_sha256": "2b850551d349635045f923b947a00fe1330acce5ea35ca2aec776bd47bf5644f",
+  "base_recovery_sha256": "33efcec0915129321995cd4de57a3223f7fd41e36c8f73205f07fa97e7aeaeba",
+  "firmware_config_dtb_sha256": "86c14aa305a6cf5db46665f4095d28aadcb1ea5ce9d213cd711641a07504ed1d",
+  "image_sha256": "fb9f98b3e7c4884cda679cc6165c7101c883df38a805a7947c29f771a4787c8d",
+  "image_bytes": 86888448,
+  "recovery_partition_bytes": 86888448,
+  "hardware_tested": false,
+  "note": "Enables the boot page only; no flash or reboot performed",
+  "partition": "RECOVERY",
+  "build_command": "python3.14 scripts/build-boot-progress-page.py --mode 2 --kernel-arg build-tag=ufsdata-q --kernel-arg t970-ufs-data=1 --kernel-arg ufsrw=1 --kernel-arg native-ufs-stream2=0x4e0 --kernel-arg sheng-data-persist=0 --drop-kernel-arg sheng-data-persist --drop-kernel-arg panic_on_crash_disabled --kernel /Users/cakeal/vsc/UniXNU/out/sm-t970/ipados-17.7.11-21H461/gts7xlwifi/kernel/kernel.macho --output out/dual-system/wholesale-inputs-20261115/boot-progress-page/page-ufs-data-q",
+  "validation": {
+    "previous_device_image": "c23efc935f56cccff9d58973c7f18d91bcedcc4e1dd373e31669e183ab888eac",
+    "seed_initialization": "disabled",
+    "pid1_stack_diagnostic": "disabled; unsafe saved stack read removed from kernel",
+    "host": "kernel build, prelink and packaging passed"
+  },
+  "upload": {
+    "status": "success",
+    "partition": "RECOVERY",
+    "result": "RECOVERY upload successful",
+    "log": "evidence/storage/ufsdata-q-20261115/upload.log",
+    "partition_readback": "not performed",
+    "device_boot": "observed"
+  },
+  "observation": {
+    "source": "owner screen 2026-11-15 20:49 Asia/Shanghai",
+    "time_seconds": 197,
+    "processes_current": 2,
+    "process_exit_count": 19,
+    "selected_exits": [
+      {
+        "name": "MSUEarlyBootTask",
+        "signal": 1
+      },
+      {
+        "name": "auearlyboot",
+        "exit": 1
+      },
+      {
+        "name": "tzinit",
+        "exit": 2
+      }
+    ],
+    "ufs_requests": 39479,
+    "verified_4k_blocks": 747045,
+    "ufs_failures": 0,
+    "display_owned": 0,
+    "smp_secondary_cores_step7": 7,
+    "interpretation": "launchd is running and spawned processes; early jobs exited, current process count is 2. No desktop or persistence test observed; causes of individual failures are not proven.",
+    "old_seed_comparison": {
+      "db/timezone": "directory mode 0755",
+      "audit": "directory mode 0700",
+      "new_seed": "both absent before first boot",
+      "limitation": "directory absence is plausible but not proven as cause of exits"
+    }
+  }
+}

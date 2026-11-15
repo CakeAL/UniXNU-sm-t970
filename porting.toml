@@ -845,6 +845,7 @@ procedure = [
   "Read block sysfs and by-name links; read each LUN's primary GPT header and entry array and validate their CRC32 values without writing any block device.",
 ]
 findings = [
+  "Recovery fb9f98b3e7c4884cda679cc6165c7101c883df38a805a7947c29f771a4787c8d at 197 seconds shows launchd spawned processes, 19 recorded exits, auearlyboot exit 1 and tzinit exit 2; only two processes remain and display ownership has not transferred. The diagnostic stack abort did not recur. The cause of the job exits and persistence of user files remain unverified.",
   "Recovery c23efc935f56cccff9d58973c7f18d91bcedcc4e1dd373e31669e183ab888eac creates the missing Data db parent for the launchd policy; host tests and kernel build passed. RECOVERY upload succeeded; runtime result remains pending.",
   "Recovery e24b0ee471a5db37decc170c4027fe7ba2ff4ef2eeb6d8c1f73a007cfd26cc05 reports policy mkdir launchd error=2 (ENOENT). The fresh Data seed lacks its db parent, unlike the prior seed. Boot policy now creates /private/var/db if absent before creating its launchd child; device validation is pending.",
   "Recovery e24b0ee471a5db37decc170c4027fe7ba2ff4ef2eeb6d8c1f73a007cfd26cc05 traces the policy operation and errno while preserving the existing Data volume. RECOVERY upload succeeded; device observation remains pending.",
@@ -2155,6 +2156,7 @@ id = "diagnostics"
 status = "implemented"
 components = []
 paths = [
+  "evidence/storage/ufsdata-q-20261115/**",
   "docs/gts7xlwifi-import.md",
   "scripts/symbolicate-ui-registers.py",
   "package/T970Display/UiWaitSnapshot.c",
@@ -2258,6 +2260,7 @@ procedure = [
   "Run python3 scripts/collect-adb-inventory.py --root --output evidence/<new-capture>; review per-command stderr, checksums, GPT CRC results and DT sanitization before updating this record.",
 ]
 findings = [
+  "Recovery fb9f98b3e7c4884cda679cc6165c7101c883df38a805a7947c29f771a4787c8d removes the unsafe boot-page stack walk and omits t970-pid1; Data is not reseeded. Kernel build and packaging passed and RECOVERY upload succeeded; runtime observation is pending.",
   "Recovery c23efc935f56cccff9d58973c7f18d91bcedcc4e1dd373e31669e183ab888eac reached two processes and then faulted at address 8 in the boot-page PID 1 stack walk. Host symbolication maps the fault to pid1_dump in draw. Remove saved kernel stack dereferences and stop this single-process diagnostic once nprocs changes; next image also omits t970-pid1. Launchd main and desktop remain unverified.",
   "Optional GPU trace and USB diagnostic references are satisfied by inactive definitions during the CPU-display build.",
   "The wholesale Wi-Fi build checks the pinned source checkout before fetching again; standard launch diagnostics have no on-device result for this build.",
