@@ -24,7 +24,7 @@ def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def pack(device, base, payload_image, output, work, large_data_seed=False):
+def pack(device, base, payload_image, output, work, large_data_seed=False, trust_cache=None):
     """Install the built FAT payload in the tested Recovery wrapper."""
     packer = device / 'scripts/pack-wholesale-recovery.py'
     spec = importlib.util.spec_from_file_location('pack_wholesale', packer)
@@ -48,6 +48,9 @@ def pack(device, base, payload_image, output, work, large_data_seed=False):
                '--output', str(output)]
     if large_data_seed:
         command.append('--large-data-seed')
+    if trust_cache:
+        # A reviewed owner bundle replaces the wrapper's own cache; the packer checks the bytes it ships.
+        command += ['--trust-cache', str(trust_cache)]
     subprocess.run(command, check=True)
     return output
 
@@ -68,6 +71,9 @@ def main():
                         default=device / 'out/step7/data-seed-512/data-512.dbr',
                         help='persistent Data seed (the existing DBRDISK1 image)')
     parser.add_argument('--large-data-seed', action='store_true', help='use the reviewed 73 GiB Data seed')
+    parser.add_argument('--owner-trust-cache', type=Path,
+                        help='reviewed owner trust bundle (scripts/build-t970-trust-bundle.py) to ship instead of the '
+                             'wrapper\'s original Apple cache; the addon\'s CDHashes are otherwise untrusted')
     parser.add_argument('--mode', type=int, default=2, choices=(1, 2, 3),
                         help='1 keeps the page until the system takes the panel; 2 keeps drawing')
     parser.add_argument('--kernel-arg', action='append', default=[],
@@ -88,6 +94,8 @@ def main():
     if args.out_root:
         command += ['--out', str(args.out_root.resolve())]
     command += ['--data-ramdisk', str(args.data_ramdisk.resolve())]
+    if args.owner_trust_cache:
+        command += ['--owner-trust-cache', str(args.owner_trust_cache.resolve())]
     ctx = Context(cli_parser().parse_args(command))
     # The board line keeps every other argument; the page is a command-line
     # choice of the same BootProgress component, so nothing is rebuilt.
@@ -125,7 +133,8 @@ def main():
     image = payload.build(ctx, kernel=kernel)
     # The tested wrapper already carries the firmware, the shim, the device tree
     # and the persistent Data seed; only the FAT payload is replaced.
-    boot = pack(device, base, image, output / 'boot.img', output, args.large_data_seed)
+    boot = pack(device, base, image, output / 'boot.img', output, args.large_data_seed,
+                args.owner_trust_cache.resolve() if args.owner_trust_cache else None)
     # pack() replaces the generated payload's seed with the one from the tested
     # Recovery wrapper. Report the bytes actually shipped, not the earlier input.
     payload_report_path = output / 'payload' / 'payload.json'
@@ -154,6 +163,7 @@ def main():
         'board_sha256': board_hash, 'source_kernel_sha256': kernel_hash,
         'embedded_data_ramdisk_sha256': sha(embedded_seed),
         'base_recovery_sha256': sha(base), 'firmware_config_dtb_sha256': sha(dtb),
+        'owner_trust_cache_sha256': sha(args.owner_trust_cache.resolve()) if args.owner_trust_cache else None,
         'image_sha256': sha(boot), 'image_bytes': boot.stat().st_size,
         'recovery_partition_bytes': sizes[0], 'hardware_tested': False,
         'note': 'Enables the boot page only; no flash or reboot performed',

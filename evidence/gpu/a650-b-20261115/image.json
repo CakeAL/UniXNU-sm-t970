@@ -1,0 +1,60 @@
+{
+  "device_revision": "1361c29d4a5f5c7c624deb42ddcf8965ef129ecc",
+  "framework_revision": "945ad8db0641060f6566422d168684c3e9182d53",
+  "instruments": {
+    "boot_progress_mode": 2,
+    "stage_bars": true,
+    "panic_screen": true,
+    "kernel_args_override": [
+      "boot-progress=2",
+      "build-tag=gpu-a650-b",
+      "t970-large-data=1",
+      "t970-large-init=1",
+      "t970-pen=7",
+      "native-ufs-stream2=0x4e0",
+      "gpu-addon=1"
+    ],
+    "kernel_args_dropped": [
+      "panic_on_crash_disabled=1"
+    ],
+    "gpu": {
+      "prelink_kernel_sha256": "af40b4288e2ba477f326e7ecd2b3c4754ff393b2f47f5ecc46e3e59103a95438",
+      "payload_kernel_sha256": "04c36b29bfc6eec1ec0d31ba546f275b52853afef7152278abef31377a90d390",
+      "payload_kernel_bytes": 68751360,
+      "addon_sha256": "fb32130db66e4a3dfcb0bdb4d030aa6381159e70945837b6a685a84484104ca4",
+      "addon_bytes": 13647616,
+      "owner_trust_cache_sha256": "056a0820205a7876daef5f35dcead15899ae23ddceea70ff3884e533b4157382",
+      "owner_trust_cdhashes": {
+        "addons/NativeAdrenoMetal.bundle/NativeAdrenoMetal": "d43f50079292fd8fab8b00be9ed18247419bff88",
+        "addons/NativeAdrenoMetal.bundle/libvulkan_freedreno.dylib": "8a4d6e6c77cd4dedeb154e570b04583461179925",
+        "bin/adrenoprobed": "5f3b74921bbafb2ce7bb155acf08ef4f7524ae55"
+      },
+      "board_gpu_arguments": [
+        "pipa-gpu=12",
+        "log-gpu=1",
+        "fb-gpu=1"
+      ],
+      "image_gpu_arguments": [
+        "gpu-addon=1"
+      ],
+      "supersedes": "c5f88b1175af9478cddcd2a7998b88915fcf592d7b556fc9eb656ce2703b4337 (trust bundle hashed the signature SuperBlob, not its CodeDirectory)"
+    }
+  },
+  "board_sha256": "2829961d6e452a1b0b5a930969f2ed82be3a2b9cc97115323142dd502784467f",
+  "source_kernel_sha256": "af40b4288e2ba477f326e7ecd2b3c4754ff393b2f47f5ecc46e3e59103a95438",
+  "embedded_data_ramdisk_sha256": "ca1543d1986cb1de5dd8ef6a3f01f48609e2a65a18bbf3f88f04b2d189031dcf",
+  "base_recovery_sha256": "33efcec0915129321995cd4de57a3223f7fd41e36c8f73205f07fa97e7aeaeba",
+  "firmware_config_dtb_sha256": "86c14aa305a6cf5db46665f4095d28aadcb1ea5ce9d213cd711641a07504ed1d",
+  "owner_trust_cache_sha256": "056a0820205a7876daef5f35dcead15899ae23ddceea70ff3884e533b4157382",
+  "image_sha256": "3f488107fdf08a615773369ec51d2a73672ca16c689ea069e369d49a2b2890db",
+  "image_bytes": 86888448,
+  "recovery_partition_bytes": 86888448,
+  "hardware_tested": false,
+  "note": "Enables the boot page only; no flash or reboot performed",
+  "partition": "RECOVERY",
+  "build_command": "python3.14 scripts/build-boot-progress-page.py --mode 2 --large-data-seed --data-ramdisk out/dual-system/overlay-inspection-20261115/reference-fresh-73g.dbr --kernel-arg build-tag=gpu-a650-b --kernel-arg t970-large-data=1 --kernel-arg t970-large-init=1 --kernel-arg t970-pen=7 --kernel-arg native-ufs-stream2=0x4e0 --kernel-arg gpu-addon=1 --drop-kernel-arg panic_on_crash_disabled --owner-trust-cache out/trust-bundle-20261115/owner-trust.bundle --kernel /Users/cakeal/vsc/UniXNU/out/sm-t970/ipados-17.7.11-21H461/gts7xlwifi/kernel/kernel.macho --output out/dual-system/wholesale-inputs-20261115/boot-progress-page/page-gpu-a650-b",
+  "observation": {
+    "source": null,
+    "note": "flashed 2026-11-15 23:2x Asia/Shanghai with the corrected owner trust bundle; no device observation recorded yet"
+  }
+}

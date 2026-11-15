@@ -1,0 +1,19 @@
+{
+  "image_sha256": "6c0b77a4f7da3b001f72b39dfa22d93ab6827fe491c4f89d22f3208d45c80f69",
+  "partition": "RECOVERY",
+  "image_dir": "out/dual-system/wholesale-inputs-20261115/boot-progress-page/page-usb-scan-a",
+  "kernel_args_of_interest": [
+    "t970-usb=37",
+    "t970-qud-retry=1",
+    "t970-qud-resume=1"
+  ],
+  "source": "owner report 2026-11-16 01:21 Asia/Shanghai",
+  "defect_found_and_fixed": "package/T970UsbProbe.cpp:49 t970_usb_start existed but no linked translation unit called it: this port links package/T970Power/BatteryService.cpp as its battery implementation, which did not start the USB stack, while the reference started it from package/T970Battery.cpp:456-461. Fixed by calling t970_usb_start() at the end of t970_battery_start (package/T970Power/BatteryService.cpp:317) and widening the MUIC wait from 600 to 1800 x 100 ms (package/T970UsbProbe.cpp:55), because this port routes the MUIC from the battery poll loop instead of a fixed delay.",
+  "observation": {
+    "mac_enumerates_ipad": true,
+    "trust_dialog_on_tablet": false,
+    "owner_words": "USB识别到iPad了，但是无法信任，因为平板上没有弹出信任窗口。",
+    "notes": "The Mac enumerated the tablet over USB device mode on this image: the device-mode stack began for the first time. Finder could not pair because the tablet showed no trust dialog; the display at that moment drew every window under the same white-surface defect the desktop widgets showed, so an invisible dialog is one candidate and an unanswering lockdownd the other. No usbmuxd or lockdownd transcript was captured."
+  },
+  "verification_hint": "scripts/mac-usb-check.py prints ioreg -p IOUSB (Apple vendor 0x05ac), the usbmuxd ListDevices socket and lockdownd QueryType over port 62078."
+}

@@ -1,0 +1,25 @@
+{
+  "image_sha256": "79d024fb912dec2c25e1730ed78817488b8606fb3541ae5ffe24207fbb781bf2",
+  "partition": "RECOVERY",
+  "image_dir": "out/dual-system/wholesale-inputs-20261115/boot-progress-page/page-pen-data-z",
+  "embedded_data_ramdisk_sha256": "ca1543d1986cb1de5dd8ef6a3f01f48609e2a65a18bbf3f88f04b2d189031dcf",
+  "kernel_args_of_interest": [
+    "t970-large-data=1",
+    "t970-large-init=1",
+    "sheng-data-persist=2",
+    "data-fua=1",
+    "native-ufs-root=1"
+  ],
+  "source": "owner report 2026-11-15 22:49 Asia/Shanghai, repeated 23:24 (\"Data\u4e5f\u662f, \u76f4\u63a5\u8bb0\u5f55\u5728\u5f53\u524d\u5427\")",
+  "observation": {
+    "data_volume_initialised_on_device": true,
+    "change_made_before_reboot": "A home-screen icon was moved to a new position.",
+    "survived_reboot": true,
+    "owner_words": "\u6211\u5df2\u7ecf\u6d4b\u8bd5\u8fc7Data\u4e5f\u6ca1\u95ee\u9898",
+    "notes": "The 73 GiB Data volume initialised by the large-data seed mounted read-write, kept a home-screen change across a reboot and still boots the desktop; earlier reports in evidence/storage/large-data-*.json cover the initialisation stages."
+  },
+  "related": {
+    "initialisation": "evidence/storage/large-data-y-20261115/image.json",
+    "readback_audit": "evidence/userdata-write-audit"
+  }
+}

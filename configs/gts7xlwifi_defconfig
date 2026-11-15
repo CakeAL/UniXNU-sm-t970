@@ -15,7 +15,7 @@ CONFIG_XNU_CRYPTO_BOOTSTRAP="prelinked"
 # function returns without mapping anything (same as UniXNU-alioth).
 CONFIG_XNU_DT_PANIC_REGION=y
 # The A650 kernel GPU driver and its board probe (scripts/build-adreno650.py), as UniXNU-alioth.
-# CONFIG_XNU_NATIVE_ADRENO is not set
+CONFIG_XNU_NATIVE_ADRENO=y
 # On-screen boot stages, kernel log rows and panic text (UniXNU-alioth's package/BootProgress.c,
 # 520581af). The OS profile's zzz-boot-progress.patch calls into it under this switch, and
 # build-xnu-4k-baseline.sh builds and force-loads build/boot-progress/libBootProgress.a.

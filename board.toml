@@ -52,7 +52,7 @@ archives = [
   # board probe (package/GpuProbe.cpp, pipa-gpu=<n>) and this tablet's firmware (package/GpuFirmwareA650.c).
   # GPU archive needs a650_zap.mdt/.b0N, which this tablet's vendor image does not ship;
   # it stays the M5 item of docs/board-package-migration.md.
-  # "build-adreno650.py",
+  "build-adreno650.py",
   # The CDC-ACM debug console over the DWC3 the bootloader leaves in DEVICE mode (drivers/QcomXnuUsbDebug).
   "build-qcom-usb-debug.py",
   # Apple's own USB device stack on the DWC3 (drivers/QcomDwc3 SM8250 port + package/T970UsbProbe.cpp, t970-usb=<bits>), bound to
@@ -179,6 +179,9 @@ kernel_args = ["kt_fixed_zones=120", "smp=1",
   # wallpaper freeze (AdrenoMetal: a Poster process's first big frame is kept, its later command buffers are held back).
   # Room: keepsyms, pipa-gpu-pool (BOs are pageable system memory now, the pool default is 0), offline-legacy-verdict (an early
   # bring-up panic) and staged-apps=1 (the copy finished in v91; t970-migrate-once.patch installs them) left the line.
+  # GPU: package/GpuProbe.cpp's staged bring-up (pipa-gpu=<n>, see its header for the levels), its own A650 firmware
+  # (package/GpuFirmwareA650.c) and the embedded addon. log-gpu=1 keeps the probe's per-stage record in the log.
+  "pipa-gpu=12", "log-gpu=1", "fb-gpu=1",
   "t970-battery=1"]
 # Brightness (package/BacklightProbe.cpp, the S6TUUM3 panel over DSI0 and DSI1) is on without an argument: the command line
 # is at its 1000-byte limit. t970-bl=0 turns it off.

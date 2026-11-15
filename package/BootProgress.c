@@ -1415,6 +1415,15 @@ extern volatile uint64_t native_gop_gpu_offers __attribute__((weak_import)),nati
   native_gop_gpu_failures __attribute__((weak_import)),native_gop_gpu_abandoned __attribute__((weak_import));
 extern volatile uint32_t native_legacy_gpu_fallbacks __attribute__((weak_import)),native_legacy_gpu_last_status __attribute__((weak_import));
 extern volatile uint64_t native_legacy_copy_last __attribute__((weak_import));
+// The display path's direct scanout counters (drivers/GopFramebuffer/NativeLegacyDisplay.cpp): native_legacy_direct is the display fetching the
+// compositor's surface itself (dpu-scanout=2). This row is the only on-panel way to tell a stale or white frame from a slow one, because the
+// persistent log (package/BootLog.c) writes to a winre partition this tablet does not have.
+extern volatile uint32_t native_legacy_direct[14] __attribute__((weak_import));
+// The signed-text fixups (patches/xnu/native-text-fixup.patch): how many entries /chosen/text-fixups and text-fixup0..7 produced, and
+// how many pages they actually rewrote. Without this row a skipped fixup (a different shared-cache build, or a page that no longer matches
+// the recorded original bytes) is silent, and the panel keeps the XR10 composition path the fixups exist to avoid.
+extern uint32_t cs_text_fixup_parsed __attribute__((weak_import));
+extern uint32_t cs_text_fixup_applied __attribute__((weak_import));
 extern volatile uint64_t native_legacy_early_retires __attribute__((weak_import)),native_legacy_early_failures __attribute__((weak_import));
 extern volatile uint64_t native_legacy_copy_max __attribute__((weak_import));
 extern volatile uint64_t native_legacy_copy_sum __attribute__((weak_import));
@@ -1484,6 +1493,17 @@ static void crash_banner(unsigned now) {
       &native_legacy_gpu_fallbacks?native_legacy_gpu_fallbacks:0,&native_legacy_gpu_last_status?native_legacy_gpu_last_status:0,
       (unsigned long long)(&native_legacy_early_retires?native_legacy_early_retires:0),
       (unsigned long long)(&native_legacy_early_failures?native_legacy_early_failures:0));
+  }
+  // Direct scanout: flips, surfaces mapped and map failures, swaps that fell back to the GPU copy, swaps held back until the GPU had
+  // written the frame, waits that reached 250 ms and waits of 8 ms or more (a missed flip at 120 Hz), and the longest wait in us. A wait
+  // at the 250 ms cap with a stale or white frame on screen means the compositor submitted the swap before the command buffer ran.
+  if(&cs_text_fixup_parsed) {
+    snprintf(rows[n++],120,"FIX   parsed=%u applied=%u",cs_text_fixup_parsed,&cs_text_fixup_applied?cs_text_fixup_applied:0);
+  }
+  if(&native_legacy_direct && native_legacy_direct[0]) {
+    snprintf(rows[n++],120,"SCAN  flips=%u map=%u mapf=%u fb=%u | hold=%u w250=%u w8=%u maxwait_us=%u rel=%u",
+      native_legacy_direct[0],native_legacy_direct[1],native_legacy_direct[2],native_legacy_direct[7],
+      native_legacy_direct[9],native_legacy_direct[12],native_legacy_direct[13],native_legacy_direct[11],native_legacy_direct[6]);
   }
   // GPU CPU-cache maintenance (all passes: submissions, completions, allocations) since the last paint and in total, per submission,
   // the longest single pass and how much memory user BOs hold write-combined.

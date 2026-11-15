@@ -1,0 +1,70 @@
+{
+  "question": "Can the payload live on a second volume (CACHE, 400 MiB in the GPT) so the Recovery image stops bounding the GPU/userspace addon at ~14 MiB?",
+  "inputs": {
+    "cache_probe_fat": {
+      "path": "/tmp/cachetest/cache-test.img",
+      "sha256": "5dd7289c3e3fc0b841cdca9480a7b697c39b8f25670eda152772e354411d66a7",
+      "bytes": 8388608,
+      "contents": "EFI/UniXNU/unixnu.toml with one action entry (shutdown, timeout 10 s) and MARKER.TXT; no kernel, no payload"
+    },
+    "bootstrap_probe_image": {
+      "path": "out/dual-system/cache-payload-20261115/bootstrap-probe/boot.img",
+      "sha256": "b54c631ce08d8c914034a99f59c5d8f8a53fbf7ef9146e3ad30e0e3425c2cbaf",
+      "bytes": 86888448,
+      "firmware_sha256": "f563a36634213ac3b996321ece14c25e97b1f685473baf3c991439eaad885181",
+      "ramdisk_bytes": 1048576,
+      "ramdisk_contents": "empty FAT (NOTE.TXT only, no config)",
+      "dtbo_offset": 4202496
+    },
+    "bootstrap_no_ramdisk_image": {
+      "path": "out/dual-system/cache-payload-20261115/bootstrap/boot.img",
+      "sha256": "0a327b6872294b5f2d9b1979fb31d57c8376372fd3bfdfd4aa7d62d795baf6ee",
+      "ramdisk_bytes": 0
+    },
+    "cache_payload_attempt_1": {
+      "path": "out/dual-system/cache-payload-20261115/cache-payload.img",
+      "sha256": "65d48ff8315810e1ba998c4cad3e57a0fd98870fe21bbf9cec6761db818c9fd1",
+      "bytes": 100663296
+    },
+    "cache_payload_attempt_2": {
+      "path": "out/dual-system/cache-payload-20261115/cache-payload-padded.img",
+      "sha256": "92a79abac3bf9ec93fbdfdbf95fb1f458ca864c89a942542895d10f8cd771224",
+      "bytes": 419430400
+    }
+  },
+  "device_observations": [
+    {
+      "step": "heimdall flash --CACHE cache-payload.img (96 MiB)",
+      "result": "failed",
+      "detail": "aborted at 62% (~62.9 MB): 'Failed to confirm end of file transfer sequence!'"
+    },
+    {
+      "step": "heimdall flash --CACHE cache-payload-padded.img (400 MiB, padded to the GPT size)",
+      "result": "failed",
+      "detail": "aborted at 15% (~62.9 MB), same error: the stopping point is a byte count, not a percentage"
+    },
+    {
+      "step": "heimdall flash --CACHE cache-test.img (8 MiB) in the same session as RECOVERY",
+      "result": "CACHE upload successful",
+      "detail": "8 MiB writes fine; the second partition of the same session then failed at 36%"
+    },
+    {
+      "step": "heimdall flash --RECOVERY bootstrap-probe/boot.img alone",
+      "result": "RECOVERY upload successful",
+      "detail": "the composed image with a 1 MiB ramdisk was accepted by heimdall"
+    },
+    {
+      "step": "owner power on with the bootstrap-probe Recovery image and the CACHE probe FAT",
+      "result": "device entered Download Mode instead of booting",
+      "detail": "no UniXNU menu, no self-shutdown; the bootloader refused the boot image before any firmware code produced output"
+    }
+  ],
+  "root_cause_found": {
+    "pit_vs_gpt": "The device PIT (heimdall flashing authority) declares CACHE at offset 2827264 for 102400 sectors = 50 MiB, while the iPadOS GPT declares the same start with 400 MiB. Heimdall therefore cannot write more than 50 MiB into CACHE, which is less than the 68.4 MiB the Recovery payload already carries.",
+    "failure_point": "Both oversized attempts stop at the end of the second 30 MiB transfer sequence (~62.9 MB), i.e. as soon as the transfer passes the PIT-declared 50 MiB extent.",
+    "bootloader_rejection": "A Recovery image whose ramdisk is 1 MiB (or absent) is not booted: the header is otherwise identical to the working image (same kernel/shim, dtbo, dtb, page size, v2 header, aligned offsets), only ramdisk_size and dtbo_offset differ."
+  },
+  "conclusion": "The second-volume route is not reachable with heimdall as the writer and the stock bootloader as the consumer: CACHE is capped at 50 MiB by the PIT (below the current Recovery payload budget) and a payload-less boot image is refused. Reaching it needs a UEFI storage stack that is proven on the device plus a boot-image shape the bootloader accepts, neither of which exists here.",
+  "next_action": "Deliver userspace sets by successive images instead (the kernel writes them into /private/var/ngpu on the persistent Data volume and never rewrites equal files), keeping every image inside the 0.95 x 72 MiB payload budget.",
+  "evidence_quality": "device-observed: heimdall session logs and the owner's boot report; no instrumented capture of the bootloader failure screen"
+}

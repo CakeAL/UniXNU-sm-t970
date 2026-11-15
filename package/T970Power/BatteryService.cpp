@@ -280,6 +280,12 @@ extern "C" bool t970_battery_report(char *out, unsigned length) {
     return true;
 }
 
+// The reference port starts Apple's USB device stack (package/T970UsbProbe.cpp, t970-usb=<bits>) from its battery start hook. This port's
+// battery implementation is this file, and it never did: the DWC3 worker is linked but no caller existed, so USB device mode never began
+// (subagent audit of the built kernel: zero references to t970_usb_start). Start it here, in the same single-threaded bsd_init window, so
+// AppleUSBXDCI's metaclasses load before launchd can race them.
+extern "C" void t970_usb_start(void);
+
 extern "C" void t970_battery_start(void) {
     unsigned enabled = 0;
     if (!PE_parse_boot_argn("t970-battery", &enabled, sizeof(enabled)) || enabled != 1) return;
@@ -306,4 +312,7 @@ extern "C" void t970_battery_start(void) {
     } else {
         printf("T970 battery: worker start failed=%d\n", result);
     }
+    // The worker routes the MUIC to COM_USB on its first completed gauge read and stores it in t970_muic[0]; T970UsbProbe's worker waits
+    // for that before touching the controller. t970_usb_start itself refuses to run unless t970-usb bit 0 is set.
+    t970_usb_start();
 }

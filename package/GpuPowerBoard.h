@@ -1,1 +1,1 @@
-../../../package/T970Adreno650/GpuPowerBoard.h
+T970Adreno650/GpuPowerBoard.h

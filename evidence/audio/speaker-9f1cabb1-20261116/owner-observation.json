@@ -1,0 +1,27 @@
+{
+  "image_sha256": "9f1cabb1cea8fa6507a1c09be2f022573f2b957dbf882d3aaad7f5a16eb198dc",
+  "partition": "RECOVERY",
+  "image_dir": "out/dual-system/wholesale-inputs-20261115/boot-progress-page/page-adsp-nosvc",
+  "kernel_args_of_interest": [
+    "t970-adsp=2",
+    "t970-audio=32",
+    "gpu-addon=1",
+    "t970-haptics=3"
+  ],
+  "source": "owner report 2026-11-16 00:56 Asia/Shanghai",
+  "observation": {
+    "device_boots_to_desktop": true,
+    "speaker_playback": true,
+    "haptics_pulse": true,
+    "usb_device_mode": false,
+    "owner_words": "能进桌面，音响是好使的，震动是好使的，USB貌似不能识别。",
+    "notes": "Owner confirmed audible output through the tablet speakers and a felt haptic pulse on this image. No capture, route list, level measurement or amplifier telemetry was taken; the claim is audio playing and the haptics service pulsing."
+  },
+  "addon_inputs": {
+    "audio_firmware": "addon file firmware/adsp/adsp.mbn, installed by the kernel to /private/var/ngpu/firmware/adsp",
+    "audio_hal": "addon file audio/T970Audio.driver, mounted at /System/Library/Audio/Plug-Ins/HAL/T970Audio.driver (cdhash e1c1e952036f99008c3f0420cc2ee26d9ad6f917)"
+  },
+  "related": {
+    "driver": "package/T970Adsp.cpp, package/T970Haptics.cpp"
+  }
+}

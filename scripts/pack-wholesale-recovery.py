@@ -48,6 +48,8 @@ def main():
     parser.add_argument("--payload", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--large-data-seed", action="store_true", help="allow only the reviewed 73 GiB seed")
+    parser.add_argument("--trust-cache", type=Path,
+                        help="reviewed owner trust bundle that may replace the wrapper's kernel.macho.trustcache")
     args = parser.parse_args()
     base = args.base.read_bytes()
     require(hashlib.sha256(base).hexdigest() == BASE_SHA256, "Expected the tested persistent Recovery wrapper")
@@ -66,7 +68,11 @@ def main():
         old_fat = Path(temporary) / "base-fat.img"
         old_fat.write_bytes(base[fat_at:fat_at + old_fat_size])
         name = "Payloads/kernel.macho.trustcache"
-        require(fat_read(args.payload, name) == fat_read(old_fat, name), f"Changed Recovery input: {name}")
+        if args.trust_cache:
+            # The owner bundle adds this addon's CDHashes ahead of Apple's two modules; ship exactly those bytes.
+            require(fat_read(args.payload, name) == args.trust_cache.read_bytes(), f"Recovery put another trust cache in {name}")
+        else:
+            require(fat_read(args.payload, name) == fat_read(old_fat, name), f"Changed Recovery input: {name}")
         name = "Payloads/scratch-data.img"
         selected = fat_read(args.payload, name)
         if args.large_data_seed:

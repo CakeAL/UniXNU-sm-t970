@@ -1,1 +1,1 @@
-../../../package/T970Adreno650/GpuProbe.cpp
+T970Adreno650/GpuProbe.cpp

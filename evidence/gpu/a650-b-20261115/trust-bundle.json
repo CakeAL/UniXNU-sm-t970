@@ -1,0 +1,23 @@
+{
+  "addons": [
+    {
+      "path": "/Users/cakeal/vsc/UniXNU-sm-t970/package/T970GpuAddon/gpu.addon",
+      "sha256": "fb32130db66e4a3dfcb0bdb4d030aa6381159e70945837b6a685a84484104ca4",
+      "bytes": 13647616
+    }
+  ],
+  "original_bundle_sha256": "7416ca4f8377146626bb284e2133c76bee6cb4e3ee0af5d648b186235a7323a7",
+  "original_modules_unchanged": true,
+  "modules": 3,
+  "own_cdhashes": {
+    "gpu.addon:addons/NativeAdrenoMetal.bundle/NativeAdrenoMetal": "d43f50079292fd8fab8b00be9ed18247419bff88",
+    "gpu.addon:addons/NativeAdrenoMetal.bundle/libvulkan_freedreno.dylib": "8a4d6e6c77cd4dedeb154e570b04583461179925",
+    "gpu.addon:bin/adrenoprobed": "5f3b74921bbafb2ce7bb155acf08ef4f7524ae55"
+  },
+  "bundle": "/Users/cakeal/vsc/UniXNU-sm-t970/out/trust-bundle-20261115/owner-trust.bundle",
+  "bundle_sha256": "056a0820205a7876daef5f35dcead15899ae23ddceea70ff3884e533b4157382",
+  "bundle_bytes": 61456,
+  "apple_trust_chain_verified": false,
+  "hardware_tested": false,
+  "purpose": "owner trust for this tablet's GPU addon: NativeAdrenoMetal, Turnip and adrenoprobed"
+}

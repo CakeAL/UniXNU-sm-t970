@@ -1,1 +1,1 @@
-../../../package/T970Adreno650/T970GpuAddon.S
+T970Adreno650/T970GpuAddon.S

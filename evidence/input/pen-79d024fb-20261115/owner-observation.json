@@ -1,0 +1,24 @@
+{
+  "image_sha256": "79d024fb912dec2c25e1730ed78817488b8606fb3541ae5ffe24207fbb781bf2",
+  "partition": "RECOVERY",
+  "image_dir": "out/dual-system/wholesale-inputs-20261115/boot-progress-page/page-pen-data-z",
+  "kernel_args_of_interest": [
+    "t970-pen=7",
+    "native-touch=1",
+    "touch-hid=1",
+    "t970-touch-xform=5",
+    "t970-large-data=1",
+    "t970-large-init=1"
+  ],
+  "source": "owner report 2026-11-15 22:49 Asia/Shanghai, repeated 23:24 (\"Spen\u662f\u4e4b\u524d\u7684\u6d4b\u8bd5\u7684 ... \u76f4\u63a5\u8bb0\u5f55\u5728\u5f53\u524d\u5427\")",
+  "observation": {
+    "device_boots_to_desktop": true,
+    "s_pen_recognised_as_apple_pencil": true,
+    "owner_words": "spen\u6d4b\u8bd5\u8fc7\u53ef\u7528",
+    "notes": "The owner confirmed after booting this image that the S Pen works on the desktop. No coordinate-accuracy or pressure measurement was taken; the claim is the pen being recognised and usable."
+  },
+  "related": {
+    "touch": "evidence/touch-late-20261114",
+    "pen_driver": "package/T970Pen.cpp (t970-pen=<bits>)"
+  }
+}

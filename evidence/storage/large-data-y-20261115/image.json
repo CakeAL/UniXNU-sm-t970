@@ -27,5 +27,27 @@
   "hardware_tested": false,
   "note": "Enables the boot page only; no flash or reboot performed",
   "partition": "RECOVERY",
-  "build_command": "python3.14 scripts/build-boot-progress-page.py --mode 2 --large-data-seed --data-ramdisk out/dual-system/overlay-inspection-20261115/reference-fresh-73g.dbr --kernel-arg build-tag=large-data-y --kernel-arg t970-large-data=1 --kernel-arg t970-large-init=1 --kernel-arg native-ufs-stream2=0x4e0 --drop-kernel-arg panic_on_crash_disabled --kernel /Users/cakeal/vsc/UniXNU/out/sm-t970/ipados-17.7.11-21H461/gts7xlwifi/kernel/kernel.macho --output out/dual-system/wholesale-inputs-20261115/boot-progress-page/page-large-data-y"
+  "build_command": "python3.14 scripts/build-boot-progress-page.py --mode 2 --large-data-seed --data-ramdisk out/dual-system/overlay-inspection-20261115/reference-fresh-73g.dbr --kernel-arg build-tag=large-data-y --kernel-arg t970-large-data=1 --kernel-arg t970-large-init=1 --kernel-arg native-ufs-stream2=0x4e0 --drop-kernel-arg panic_on_crash_disabled --kernel /Users/cakeal/vsc/UniXNU/out/sm-t970/ipados-17.7.11-21H461/gts7xlwifi/kernel/kernel.macho --output out/dual-system/wholesale-inputs-20261115/boot-progress-page/page-large-data-y",
+  "observation": {
+    "source": "owner screenshot and report 2026-11-15 22:45 Asia/Shanghai",
+    "time_seconds": 90,
+    "crashes": 0,
+    "exits": 6,
+    "springboard_pid": 27,
+    "backboard_pid": 55,
+    "persistence_state": 3,
+    "persistence_header": 1,
+    "gpt_before": 0,
+    "gpt_after": 0,
+    "store_first_lba_hex": "28d5300",
+    "persist_present_pages": 57170,
+    "persist_write_pages": 80497,
+    "persist_errors": 0,
+    "framebuffer_swaps_ok": 5,
+    "gpu_offers": 0,
+    "owner_reports": "Reached desktop after the diagnostic screen; touch and brightness work. S Pen, volume, and power key do not work; GPU acceleration absent.",
+    "limits": "Data persistence across a reboot, Android boot, GPU, audio and remaining peripherals not yet verified.",
+    "owner_correction": "Power button works; physical volume keys change the control-center volume indicator. Audible volume output not verified; owner reports no speaker connected.",
+    "persistence_test": "Owner rearranged a home screen icon; verify after reboot."
+  }
 }

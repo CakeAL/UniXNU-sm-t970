@@ -1,0 +1,104 @@
+{
+  "device_revision": "1361c29d4a5f5c7c624deb42ddcf8965ef129ecc",
+  "framework_revision": "945ad8db0641060f6566422d168684c3e9182d53",
+  "instruments": {
+    "boot_progress_mode": 2,
+    "stage_bars": true,
+    "panic_screen": true,
+    "kernel_args_override": [
+      "boot-progress=2",
+      "build-tag=gpu-a650-a",
+      "t970-large-data=1",
+      "t970-large-init=1",
+      "t970-pen=7",
+      "native-ufs-stream2=0x4e0",
+      "gpu-addon=1"
+    ],
+    "kernel_args_dropped": [
+      "panic_on_crash_disabled=1"
+    ],
+    "gpu": {
+      "archive": "build/adreno740/libAdreno740.a (build-adreno650.py, CONFIG_XNU_NATIVE_ADRENO=y)",
+      "source_kernel_sha256": "af40b4288e2ba477f326e7ecd2b3c4754ff393b2f47f5ecc46e3e59103a95438",
+      "kernel_in_payload_bytes": 68751360,
+      "owner_trust_cache_sha256": "6c32d1d90b31ca23f8692e805648e949cefb4e99f3de93b6cfabc0034f0e4b7b",
+      "owner_trust_cdhashes": {
+        "addons/NativeAdrenoMetal.bundle/NativeAdrenoMetal": "76d8d31b7ec6d94d88da38a673a1b69390d8952b",
+        "addons/NativeAdrenoMetal.bundle/libvulkan_freedreno.dylib": "307925b0c44afaefa30c1d810fa75078d8fe8b7a",
+        "bin/adrenoprobed": "083c5020baf42324c0bdcef72ceb52a292199404"
+      },
+      "board_gpu_arguments": [
+        "pipa-gpu=12",
+        "log-gpu=1",
+        "fb-gpu=1"
+      ],
+      "image_gpu_arguments": [
+        "gpu-addon=1"
+      ],
+      "prelink_kernel_sha256": "af40b4288e2ba477f326e7ecd2b3c4754ff393b2f47f5ecc46e3e59103a95438",
+      "payload_kernel_sha256": "04c36b29bfc6eec1ec0d31ba546f275b52853afef7152278abef31377a90d390",
+      "payload_kernel_bytes": 68751360,
+      "addon_sha256": "fb32130db66e4a3dfcb0bdb4d030aa6381159e70945837b6a685a84484104ca4",
+      "addon_bytes": 13647616
+    }
+  },
+  "board_sha256": "2829961d6e452a1b0b5a930969f2ed82be3a2b9cc97115323142dd502784467f",
+  "source_kernel_sha256": "af40b4288e2ba477f326e7ecd2b3c4754ff393b2f47f5ecc46e3e59103a95438",
+  "embedded_data_ramdisk_sha256": "ca1543d1986cb1de5dd8ef6a3f01f48609e2a65a18bbf3f88f04b2d189031dcf",
+  "base_recovery_sha256": "33efcec0915129321995cd4de57a3223f7fd41e36c8f73205f07fa97e7aeaeba",
+  "firmware_config_dtb_sha256": "86c14aa305a6cf5db46665f4095d28aadcb1ea5ce9d213cd711641a07504ed1d",
+  "owner_trust_cache_sha256": "6c32d1d90b31ca23f8692e805648e949cefb4e99f3de93b6cfabc0034f0e4b7b",
+  "image_sha256": "c5f88b1175af9478cddcd2a7998b88915fcf592d7b556fc9eb656ce2703b4337",
+  "image_bytes": 86888448,
+  "recovery_partition_bytes": 86888448,
+  "hardware_tested": false,
+  "note": "Enables the boot page only; no flash or reboot performed",
+  "partition": "RECOVERY",
+  "build_command": "python3.14 scripts/build-boot-progress-page.py --mode 2 --large-data-seed --data-ramdisk out/dual-system/overlay-inspection-20261115/reference-fresh-73g.dbr --kernel-arg build-tag=gpu-a650-a --kernel-arg t970-large-data=1 --kernel-arg t970-large-init=1 --kernel-arg t970-pen=7 --kernel-arg native-ufs-stream2=0x4e0 --kernel-arg gpu-addon=1 --drop-kernel-arg panic_on_crash_disabled --owner-trust-cache out/trust-bundle-20261115/owner-trust.bundle --kernel /Users/cakeal/vsc/UniXNU/out/sm-t970/ipados-17.7.11-21H461/gts7xlwifi/kernel/kernel.macho --output out/dual-system/wholesale-inputs-20261115/boot-progress-page/page-gpu-a650-a",
+  "observation": {
+    "source": "owner screenshot 2026-11-15 23:13 Asia/Shanghai (sha256 0cba9d36c6aacb3c3a56daa5e1876af59753fbbac0c0c2c5492464905959eb43)",
+    "boot_page": "UniXNU live diagnostics [gpu-a650-a] t=100s crashes=4 exits=11",
+    "desktop_reached": true,
+    "springboard": "pid 27, 14 threads",
+    "crashes": [
+      {
+        "process": "iconservicesagent",
+        "pids": [
+          240,
+          241,
+          243
+        ],
+        "signal": 11,
+        "pc": "0x1a038aac4",
+        "lr": "0x1a038aac4"
+      }
+    ],
+    "framebuffer": {
+      "swaps_per_s": 0,
+      "total_swaps": 130,
+      "copy_us_last": 28866,
+      "copy_us_mean": 29197,
+      "stored_kib": 19162
+    },
+    "swap": {
+      "calls": 131,
+      "ok": 131,
+      "rejected": 0,
+      "gpu_offers": 0,
+      "gpu_done": 0,
+      "gpu_failed": 0
+    },
+    "gpu": {
+      "submissions_last_second": 0,
+      "submissions_total": 1,
+      "submit_ms": 2,
+      "max_submit_us": 593,
+      "write_combined_mib": 0
+    },
+    "load": {
+      "idle_percent": 85
+    },
+    "interpretation": "The desktop comes up and the GPU driver submits once without error, but the compositor never hands a frame to the GPU client (gpu offers=0) and the framebuffer is still copied on the CPU at 29 ms per 19 MB frame. Post-hoc analysis: this image shipped a trust bundle whose three CDHashes were 76d8d31b/307925b0/083c5020, computed from the LC_CODE_SIGNATURE SuperBlob instead of its CodeDirectory (scripts/build-t970-trust-bundle.py read the BlobIndex array at offset 8 instead of 12), so they matched no shipped binary and the addon stayed untrusted. Superseded by image 3f488107 with the corrected CDHashes d43f5007/8a4d6e6c/5f3b7492.",
+    "owner": "desktop reached, \"still a bit laggy\""
+  }
+}

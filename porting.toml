@@ -861,7 +861,7 @@ procedure = [
   "Read block sysfs and by-name links; read each LUN's primary GPT header and entry array and validate their CRC32 values without writing any block device.",
 ]
 findings = [
-  "Source review found that the old direct Data superblock SHA-256 literal in u/v/w/x was transcribed incorrectly after byte 16; the verified device header therefore cannot pass the initial conversion guard. The literal was corrected, and a new host test checks it against both the independent known digest and the local gzip backup when available. Recovery 3c96d2fee176fb59abc635440e0e1ed17baaf41aef397cd412376345b6a677b1 contains the correction, and independent FAT/kernel byte inspection and the second RECOVERY upload passed; device boot is pending.",
+  "Source review found that the old direct Data superblock SHA-256 literal in u/v/w/x was transcribed incorrectly after byte 16; the verified device header therefore cannot pass the initial conversion guard. The literal was corrected, and a new host test checks it against both the independent known digest and the local gzip backup when available. Recovery 3c96d2fee176fb59abc635440e0e1ed17baaf41aef397cd412376345b6a677b1 contains the correction, and independent FAT/kernel byte inspection and the second RECOVERY upload passed. At 90 seconds device diagnostics show a fresh persistent store at LBA 42816256, GPT unchanged before and after, and zero reported store errors. Owner reports reaching desktop with touch and brightness working; persistence across reboot remains unverified.",
   "Recovery c8996f3be73e14346f5be02f291a4fee0b60be7f3da9b011137ad9a948db757e adds read-only progress markers inside native_ufs_store_open after w stopped inside that call. Host provider checks, kernel build, FAT readback and RECOVERY upload passed; runtime result pending.",
   "Recovery bb822b000ec0d2df69d7ef08c2ce7a7a75d6307ebb28ba0d15e07230a62ac8b7 adds internal attachStore stage diagnostics. Kernel build, FAT readback and RECOVERY upload passed. At 543 seconds the first GPT check reports unchanged and attachStore waits inside native_ufs_store_open, before its return.",
   "Recovery e776a5af422be4748eb9938159038398c227a15e9dfed1140b74afbe4806286f adds read-only RamBlock selection and I/O counters to diagnose the u Data wait. Kernel build, symbol audit, FAT readback and RECOVERY upload passed. At 44 seconds the device reports one matching volume, select stage 4 (entering attachStore), 300 seed reads and persistence state 0; the internal wait is not yet located.",
@@ -968,6 +968,7 @@ findings = [
   "The policy carrier therefore has exact inputs: 1483785 OS blocks and 806400 SystemOS blocks, 73285920 bytes of block hashes plus two manifests, against a 71303168-byte BOOT partition. The root image ends at LBA 5260288, so a fixed region from LBA 5505024 (about 18000 blocks) after the image is the candidate carrier, read at boot through the same handoff transport and authenticated by the compiled-in owner key before the policy table is filled.",
   "Implemented the carrier on both sides. Host: scripts/build-owner-root-manifests.py streams each window out of the sparse segments (no 9.4 GB file), signs it with the owner key through kits/VerifiedRoot/tools/manifest.py, and authenticates the result with the real C code (vr_host_open plus six sampled blocks). OS is 1483785 blocks / 47481664 bytes at LBA 5505024 and SystemOS 806400 blocks / 25805344 bytes at LBA 5516624, total 73287008 bytes; the OS UUID is the ADT root match 04769D26-2CA0-4825-B443-E2E5F88300F2 and the SystemOS UUID 8846FE78-2910-4297-AF97-D59BB6F8FC16 is the mounted cryptex volume UUID, which equals the kernel's XNU_OWNER_CACHE_VOLUME_UUID. Kernel: the linked table and count moved to .data and the real 395-byte owner key anchor is linked instead of zeros; installOwnerPolicyCarrier reads each envelope through hostRead4k, authenticates it with vr_open, and only then fills verified_root_policies, so a bad envelope still publishes nothing.",
   "Wrote both envelopes into the carrier region through the qualified recovery ADB channel (BOOT e67fe744): dd conv=fsync at LBA 5505024 and 5516624, block cache dropped, and the exact envelope bytes read back with matching SHA-256 (45a69e42 and 869da36d). Nothing outside the two ranges was written. The first readback compared whole 4096-byte blocks and failed only on the partial last block, so verification now hashes the exact envelope length.",
+  "2026-11-15: the 73 GiB Data volume is device-verified persistent. With Recovery 79d024fb (t970-large-data=1 t970-large-init=1 sheng-data-persist=2 data-fua=1) the owner moved a home-screen icon, rebooted and found the change kept, then reported Data working (evidence/storage/data-persist-79d024fb-20261115). The volume stayed mounted read-write across the reboot and the desktop still boots, so the initialisation route is settled and Data can carry installed userspace (the GPU addon) between images.",
 ]
 completion = [
   "UFS reads return correct capacity, GPT and known blocks under XNU; the chosen root mounts and writes persist only inside the allocated Data region.",
@@ -1067,6 +1068,7 @@ evidence = [
   { kind = "device", reference = "evidence/bring-up/runtime/ufs-smmu-aarch64/device-result.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/boot-autostream.img --no-reboot", result = "Kernel 975e0186 with the vendored driver panics at NativeUfs.cpp:442: SMMU AArch64 stage 1 unsupported (IDR0 bit 30 clear).", revision = "0c691088c4ffba48c4394026fd64b5312777f7d7" },
   { kind = "device", reference = "evidence/bring-up/runtime/ufs-smmu-128/device-result.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/boot-auto128.img --no-reboot", result = "Kernel 4ad53adb scans all 128 SMMU slots and finds no reusable exact stream; the SMR bypass write still reads back zero.", revision = "445bb3fc51b07d96e4ac1dcf4539b8874fd60f73" },
   { kind = "device", reference = "evidence/bring-up/runtime/ufs-nosmmu/device-result.json", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/step7/boot-nosmmu2.img --no-reboot", result = "Kernel 4cf05a58 with t970-ufs-no-smmu=1 stalls at the magenta bar and self-resets before any console output.", revision = "026fae4cfb0fccc08e9d5c77204009b972fc6b46" },
+  { kind = "device", reference = "evidence/storage/data-persist-79d024fb-20261115/owner-observation.json", command = "sh scripts/flash-recovery-when-detected.sh out/dual-system/wholesale-inputs-20261115/boot-progress-page/page-pen-data-z/boot.img 79d024fb912dec2c25e1730ed78817488b8606fb3541ae5ffe24207fbb781bf2 5400", result = "Home-screen change kept across a reboot with the 73 GiB Data volume mounted read-write; owner report.", revision = "1361c29d4a5f5c7c624deb42ddcf8965ef129ecc" },
 ]
 
 [[area]]
@@ -1419,6 +1421,7 @@ procedure = [
   "Read /proc/bus/input/devices, getevent -lp and bound I2C driver links; correlate them with the exact touch and Wacom DT nodes.",
 ]
 findings = [
+  "t970-haptics=3 publishes the haptics service and fires one 150 ms test pulse (package/T970Haptics.cpp). The owner felt the pulse on Recovery 9f1cabb1; app-driven haptics and the strength range are unmeasured.",
   "The same-board Apple Pencil HID source compiles against the 21H461 kernel recipe. Its input service is pending runtime integration.",
   "v91 BOOT65026b21 owner confirms short power locks and relights the screen. Photo12:30:44 shows power4/4,up14/14,down30/30,mask0,errors0,hid1/97/0. Volume keys react but volume adjustment is unavailable; lack of audio backend remains a hypothesis. v92/v93 retain HID; v93 has hid1/15/0 with no input errors.",
   "v91 owner report and photo on BOOT65026b21 confirm power lock and screen-on, reacting volume keys, power4/4/up14/14/down30/30, released mask0,18626 samples,0 errors and97 successful HID reports(status0). The97 reports match96 key edges plus initial neutral. System volume adjustment is unavailable; actual volume changes and the suspected audio-backend cause are unverified. Hardware suspend/resume is not claimed.",
@@ -1445,6 +1448,7 @@ findings = [
   "The filesystem-only capture did not find the three input assets; the subsequent builtin-kernel inspection above resolves their source and hashes.",
   "The bound touch driver is STM FTS; the template's Novatek implementation is not established as compatible. Wacom reports a separate input device and requires its own protocol handling.",
   "Step 2 keeps ShengNovatekTouch, QcomGeniSpi and ShengHidInput unselected: their Novatek/SPI/sheng dependencies do not match the measured STM FTS/I2C and independent Wacom input paths.",
+  "2026-11-15: the owner reported the S Pen working on the desktop with Recovery 79d024fb (t970-pen=7, native-touch=1, touch-hid=1, t970-touch-xform=5): the pen is recognised and usable as the Apple Pencil input. Coordinates, pressure and hover accuracy were not measured, and the report is the owner's, not an instrumented capture (evidence/input/pen-79d024fb-20261115).",
 ]
 completion = [
   "Touch contacts preserve stable IDs and releases, coordinates map correctly to the display, and keys/pen produce the expected HID reports.",
@@ -1454,6 +1458,7 @@ limits = [
 ]
 next_action = ["Keep the verified PMIC bits0/1 and GPIO3 one-based PPID0x4c2 mapping. Validate OS volume values and audible output after an audio route exists; lock/relight is already confirmed, hardware sleep is not."]
 evidence = [
+  { kind = "device", reference = "evidence/input/haptics-9f1cabb1-20261116/owner-observation.json", command = "sh scripts/flash-recovery-when-detected.sh out/dual-system/wholesale-inputs-20261115/boot-progress-page/page-adsp-nosvc/boot.img 9f1cabb1cea8fa6507a1c09be2f022573f2b957dbf882d3aaad7f5a16eb198dc 3600", result = "Owner felt the haptics test pulse; no instrumented capture.", revision = "1361c29d4a5f5c7c624deb42ddcf8965ef129ecc" },
   { kind = "device", reference = "evidence/input/keys-hid-v91/device-result.json", revision = "b700a694021722740e7212cfe4e28c24adce0f31", command = "BOOT65026b21; owner lock/relight feedback and photo2026-11-07 12:30:44+08:00", result = "Power short press locks and relights; three-key edges4/4,14/14,30/30; HID1/97/0,errors0. Volume key reaction observed but adjustment unavailable. Source hashes in original preparation manifest." },
   { kind = "device", reference = "evidence/input/keys-hid-v91/device-result.json", result = "SM-T970/iPadOS21H461: owner confirms short-power lock and screen-on; volume keys react but adjustment unavailable. All keys released;97 successful HID reports,0 read errors. No proof of audible volume or suspend/resume.", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/keys-hid-v91/boot-partition.img; owner key tests and three-finger runtime report", revision = "0e66aca5f5543246138f541b57d8a50dc5ab6a5c" },
   { kind = "device", reference = "evidence/input/keys-v90/device-result.json", result = "SM-T970/iPadOS21H461: power, volume-up and volume-down each2/2, neutral mask0,0 errors across15197 samples; raw input verified, no HID.", command = ".cache/heimdall/build/bin/heimdall flash --BOOT out/data-bringup/keys-v90/boot-partition.img; owner presses and three-finger runtime report", revision = "0e66aca5f5543246138f541b57d8a50dc5ab6a5c" },
@@ -1480,20 +1485,32 @@ evidence = [
   { kind = "source", reference = "evidence/device-inputs/firmware.json", result = "The filesystem-only capture did not find the three input assets; the subsequent builtin-kernel inspection above resolves their source and hashes." },
   { kind = "device", reference = "evidence/adb-2026-11-01/input.txt", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Saved input capability lists and bound fts_touch / wacom_w90xx I2C drivers.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },
   { kind = "device", reference = "evidence/adb-2026-11-01/live-device-tree.dts", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Touch and pen bus addresses, IRQ GPIOs, firmware names, supplies and coordinate properties.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },
+  { kind = "device", reference = "evidence/input/pen-79d024fb-20261115/owner-observation.json", command = "sh scripts/flash-recovery-when-detected.sh out/dual-system/wholesale-inputs-20261115/boot-progress-page/page-pen-data-z/boot.img 79d024fb912dec2c25e1730ed78817488b8606fb3541ae5ffe24207fbb781bf2 5400", result = "Desktop reached and the S Pen was usable after this Recovery image booted; owner report, no instrumented capture.", revision = "1361c29d4a5f5c7c624deb42ddcf8965ef129ecc" },
 ]
 
 [[area]]
 id = "gpu"
-status = "planned"
+status = "implemented"
 components = []
 paths = [
   "evidence/firmware/device-firmware-20261115/**",
+  "drivers/Adreno650",
   "package/T970Adreno650/**",
-  "scripts/build-t970-adreno650.py",
-  "scripts/gen-t970-adreno650-firmware.py",
+  "package/GpuProbe.cpp",
+  "package/GpuPowerBoard.h",
+  "package/GpuFirmwareA650.c",
+  "package/T970GpuAddon/**",
+  "kits/AdrenoFirmware",
+  "kits/AdrenoPM4",
+  "kits/ArmSmmu4K",
+  "kits/pipa",
+  "scripts/build-adreno650.py",
+  "scripts/gen-gpu-firmware-a650.py",
+  "scripts/build-t970-trust-bundle.py",
+  "configs/gts7xlwifi_defconfig",
+  "board.toml",
   "evidence/adb-2026-11-01/gpu.txt",
   "docs/gpu-port-plan.md",
-  "package/T970Gpu/**",
   "evidence/gpu/**",
   "tests/test_gpu_arc.py",
   "tests/test_gpu_boot_fault.py",
@@ -1512,6 +1529,7 @@ procedure = [
   "Read KGSL identity and frequency nodes, list GPU firmware files and calculate the GMU/SQE hashes without executing GPU commands.",
 ]
 findings = [
+  "2026-11-15: the wholesale kernel links the A650 driver for the first time. build-adreno650.py is enabled in board.toml, CONFIG_XNU_NATIVE_ADRENO=y, the repaired drivers/Adreno650, package/GpuProbe.cpp, package/GpuPowerBoard.h and package/T970GpuAddon.S links and kits/{AdrenoFirmware,AdrenoPM4,ArmSmmu4K,pipa} resolve inside the repository, package/GpuFirmwareA650.c is generated from the tablet's own a650_gmu.bin/a650_sqe.fw/a650_zap.mdt+.b00-.b02 by scripts/gen-gpu-firmware-a650.py, and the archive (32 objects, GpuProbe, the firmware and the 13647616-byte addon) is force-loaded: the prelinked kernel grows from 54771712 to 68751360 bytes and exports native_gpu_probe, t970_gpu_addon_data and t970_gpu_addon_size. scripts/build-t970-trust-bundle.py adds one owner trust module with the addon's three CDHashes (NativeAdrenoMetal 76d8d31b7ec6d94d88da38a673a1b69390d8952b, libvulkan_freedreno.dylib 307925b0c44afaefa30c1d810fa75078d8fe8b7a, adrenoprobed 083c5020baf42324c0bdcef72ceb52a292199404) ahead of Apple's two unchanged modules, and its bundle is byte-identical to UniXNU's scripts/make-owner-trust-bundle.py for the same inputs. Recovery c5f88b1175af9478cddcd2a7998b88915fcf592d7b556fc9eb656ce2703b4337 (pipa-gpu=12 log-gpu=1 fb-gpu=1 gpu-addon=1) was flashed 2026-11-15 23:08 (Asia/Shanghai); no device observation is recorded yet, so the GMU cold start, CP submission, Metal rendering and the direct-scanout frame hand-off remain unverified on the T970.",
   "Device ADB read-only extracted the four ZAP inputs; hashes match the previously inventoried stock T970 signed pair. The generated ELF matches the reference generator. The reference A650 build archived 32 objects and the staged accelerator after correcting the AdrenoMetal include path; host symbol audit passed, but no GPU image has been linked or device-tested.",
   "The same-model Adreno650 driver, HFI/SMMU/PM4 sources and 21H461 accelerator bindings compile in 34 host objects. Pinned metal2vulkan and Turnip with the reference BO retirement patch built for arm64 iOS 17, and the plugin, Turnip library and daemon passed strict signature verification. ZAP, full kernel link, display integration and GPU runtime remain pending.",
   "v137 mode 33 uses the audited CB1 root from the v136 procedure, synchronizes ASID 2 before and after a brief CB1 translation pulse, and checks that the live GMU SID5 route and unpublished GPU streams remain in the expected state.",
@@ -1716,6 +1734,7 @@ procedure = [
   "Read PCI IDs, driver links, wlan0's device path and firmware directory names; do not collect SSIDs, MAC addresses or network traffic.",
 ]
 findings = [
+  "Recovery 9f1cabb1 enables t970-wifi=6 and t970-bt=257 but not t970-wifi-svc=1, so the Wi-Fi supplicant launchd job and the patched Bluetooth daemons in the addon wifi-xpc/launchd.plist stay unloaded and the owner sees no Wi-Fi and Bluetooth Unavailable. The variant that sets t970-wifi-svc=1 (27a6059c) froze on the firmware handoff frame on the boot after the addon installed the cache, before the display driver took the panel, so the /System/Library/xpc bind mount is not usable as shipped.",
   "The standard QCA6390 archive recipe validates and reuses existing pinned sources before deciding to fetch. The archive passed in the first build using the legacy defconfig; the wholesale link and on-device Wi-Fi are pending.",
   "The QCA6390 Wi-Fi archive builds 110 Linux and 2 board objects against the pinned imported sources. Seven MinsOS vendor Wi-Fi files match the reference input list. Both MinsOS Bluetooth files differ from the historical Android capture. Signed wpa_supplicant, BlueTool and the donor 21H461 bluetoothd are staged in a common addon. Service mounting, keychain integration and runtime remain pending.",
   "The Wi-Fi worker and Bluetooth UART.SK transport link into the 21H461 kernel and prelink with the original HID checks intact. The USB route stays with the battery worker, and neither radio is enabled in the host-only Recovery candidate.",
@@ -1743,9 +1762,10 @@ evidence = [
 
 [[area]]
 id = "audio"
-status = "planned"
+status = "implemented"
 components = []
 paths = [
+  "evidence/audio/speaker-9f1cabb1-20261116/**",
   "evidence/firmware/device-firmware-20261115/**",
   "reference/gts7xlwifi/hal/**",
   "reference/gts7xlwifi/package/T970Sensors.cpp",
@@ -1763,6 +1783,7 @@ procedure = [
   "Collect ALSA card/PCM lists, bound amplifier links and firmware file names, then inspect the sound and ADSP DT nodes.",
 ]
 findings = [
+  "Recovery 9f1cabb1 carries the ADSP image in the addon (firmware/adsp/adsp.mbn, installed under /private/var/ngpu/firmware/adsp) and the audio HAL at /System/Library/Audio/Plug-Ins/HAL/T970Audio.driver; with t970-adsp=2 t970-audio=32 the owner heard sound from the speakers on the desktop. Capture, non-default routes, amplifier telemetry and DSP restart remain unobserved.",
   "Device ADB read-only extracted all 22 ADSP fragments, each matching this T970 stock inventory. The reassembled ADSP image differs from the reference tablet image; audio and firmware authentication remain untested.",
   "The audio, ADSP and SLPI startup paths link and prelink in 21H461. The iOS 17 audio HAL passes strict local code-signature verification. Three CS35L40 files extracted offline from MinsOS match the captured board inventory. Recovery d9aa10ce leaves DSPs disabled while signed ADSP/SLPI firmware and service mounting are pending.",
   "27 ADSP/amp firmware and service-description files are hashed; loaded DSP routes are not inferred.",
@@ -1772,12 +1793,14 @@ completion = [
   "Each declared route plays or records the selected audio format and handles start/stop through the required DSP and codec services.",
 ]
 limits = [
+  "Playback of the default output on the built-in speakers is owner-reported for Recovery 9f1cabb1; recording, alternate routes, level and amplifier state are not measured.",
   "No playback, recording, mixer writes or DSP restart was performed; loaded firmware, codec wiring and actual routes are not verified.",
 ]
 next_action = [
   "Trace the bound amplifier driver and Android audio configuration to determine firmware selection, MI2S wiring and the first playback route.",
 ]
 evidence = [
+  { kind = "device", reference = "evidence/audio/speaker-9f1cabb1-20261116/owner-observation.json", command = "sh scripts/flash-recovery-when-detected.sh out/dual-system/wholesale-inputs-20261115/boot-progress-page/page-adsp-nosvc/boot.img 9f1cabb1cea8fa6507a1c09be2f022573f2b957dbf882d3aaad7f5a16eb198dc 3600", result = "Owner reported audible speaker output after the ADSP firmware and audio HAL install; no instrumented capture.", revision = "1361c29d4a5f5c7c624deb42ddcf8965ef129ecc" },
   { kind = "source", reference = "evidence/device-inputs/firmware.json", result = "27 ADSP/amp firmware and service-description files are hashed; loaded DSP routes are not inferred." },
   { kind = "device", reference = "evidence/adb-2026-11-01/audio.txt", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Saved ALSA endpoints, four cs35l41 bindings, ADSP loader paths and firmware file inventory.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },
   { kind = "device", reference = "evidence/adb-2026-11-01/live-device-tree.dts", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Sound-card, ADSP/LPASS and amplifier declarations for this board.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },
@@ -1875,14 +1898,18 @@ evidence = [
 
 [[area]]
 id = "packaging"
-status = "planned"
+status = "implemented"
 components = [
   "SoftwareAES",
   "XnuPrelink",
 ]
 paths = [
   "evidence/input/wholesale-recovery-20261115/**",
+  "evidence/packaging/second-volume-probe-20261115/**",
   "scripts/pack-wholesale-recovery.py",
+  "scripts/build-cache-payload.py",
+  "scripts/build-bootstrap-image.py",
+  "scripts/flash-partition-when-detected.sh",
   "evidence/storage/dual-system-20261108/**",
   "evidence/display/display-continuous-v25/**",
   "evidence/display/key-state-v10/**",
@@ -2110,6 +2137,7 @@ findings = [
   "patches/xnu/t970-smmu-dump.patch now carries the t970-ufs-status probe that maps 0x9ff80000 and panics with the firmware stage word; it is the kernel half of the firmware visibility path.",
   "PlatformUfsLib now links ArmSmcLib, ArmMmuLib-free DxeServicesTableLib and BaseMemoryLib; the SCM prototype lives in BoardInit.c next to the PHY replay and is selected by the same DSC/FDF entries.",
   "The post-survey evidence records the survey BOOT build (c404ce26 from revision 09bff63) and a zero-byte read log, with userdata_written=false and recovery_written=false for that action.",
+  "The Recovery payload is a FAT inside the 82.9 MiB Recovery partition (0.95 x 72 MiB content limit); a second volume was probed and is unreachable: the device PIT gives CACHE 50 MiB although the iPadOS GPT gives it 400 MiB, so heimdall stops any larger upload at ~62.9 MB (end of the second 30 MiB sequence), and a Recovery image whose ramdisk is 1 MiB or absent is not booted (device goes straight to Download Mode) although kernel/shim/dtbo/dtb/header fields are unchanged. See evidence/packaging/second-volume-probe-20261115/probe.json; userspace sets are therefore delivered by successive images into the persistent Data volume.",
 ]
 completion = [
   "The selected profile's inputs produce a kernel, payload and a boot image matching the SM-T970 boot path.",
@@ -2118,6 +2146,7 @@ limits = [
   "Manifest inspection does not verify archive authenticity or integrity, driver ABI compatibility, or bootability.",
   "The IPSW is a local external input; its selected manifest fields are archived, but no complete image build is recorded.",
   "The selected profile kernelcache SHA256 f18b4df865405f2a287b84977d7aca745e056d656d9fc9df1662970ce2969de7 has not been checked against a locally extracted/decompressed kernelcache.",
+  "The payload is one FAT inside the 82.9 MiB Recovery partition, so an image carries at most 0.95 x 72 MiB (kernel + Data seed + trust cache + addon); a second volume is unreachable (PIT gives CACHE 50 MiB, and a payload-less boot image is not booted).",
 ]
 next_action = ["Review an exclusive bypass-context and bounded command/DMA test plan using the qualified stream fields; preserve display CB4, reject unqualified CB73 and record actual data reads separately."]
 evidence = [
@@ -2186,6 +2215,7 @@ evidence = [
   { kind = "host", reference = "evidence/bring-up/result.json", command = "PATH=.cache/bin:$PATH /opt/homebrew/bin/python3.14 ./unixnu build kernel -D ../UniXNU-sm-t970; PATH=.cache/bin:/opt/homebrew/opt/llvm/bin:$PATH /opt/homebrew/bin/python3.14 ./unixnu build package -D ../UniXNU-sm-t970; PATH=.cache/bin:$PATH /opt/homebrew/bin/python3.14 ./unixnu build payload -D ../UniXNU-sm-t970; PATH=/opt/homebrew/opt/llvm/bin:/opt/homebrew/opt/lld/bin:$PATH /opt/homebrew/bin/python3.14 ./unixnu bootimg -D . --uefi .cache/uefi-source/Mu-Silicium --fd .cache/uefi-source/Mu-Silicium/Build/gts7xlwifiPkg/DEBUG_CLANGPDB/FV/SILICIUM_UEFI.fd --dtb out/firmware-inputs/firmware.dtb --ramdisk ../UniXNU/out/sm-t970/ipados-17.7.11-21H461/sm-t970/payload/payload.img --output out/step7/boot.img", revision = "0d8fb9d0a14630f878a173241059f7687aa6b134", result = "PASS: kernel.macho b3f9ab34..., payload.img a4a0bac8... and boot.img 28f3bb9f... were built; boot.json reports header v2, ramdisk_bytes 201326592, the built FD hash and the captured firmware DTB hash; payload.json matches the kernel and the accepted trust cache. No device write or boot." },
   { kind = "host", reference = "evidence/bring-up/result.json", command = "PATH=/opt/homebrew/opt/llvm/bin:/opt/homebrew/opt/lld/bin:$PATH /opt/homebrew/bin/python3.14 ./unixnu bootimg -D . --uefi .cache/uefi-source/Mu-Silicium --fd .cache/uefi-source/Mu-Silicium/Build/gts7xlwifiPkg/DEBUG_CLANGPDB/FV/SILICIUM_UEFI.fd --dtb out/firmware-inputs/firmware.dtb --ramdisk ../UniXNU/out/sm-t970/ipados-17.7.11-21H461/sm-t970/payload/payload.img --output out/step7/boot.img", revision = "7a71f6f36f90de36dc04679500e2ea94257bfa88", result = "PASS: payload.img 58720256 bytes a87d42da... and boot.img 62713856 bytes d61f416a... fit the measured 71303168-byte boot partition; boot.json reports header v2, ramdisk_bytes 58720256, the built FD hash and the captured firmware DTB hash. Odin tars were generated; nothing was flashed." },
   { kind = "host", reference = "evidence/bring-up/runtime/pmgr-bridge/build-report.json", command = "PATH=$PWD/.cache/bin:/opt/homebrew/opt/llvm/bin:/opt/homebrew/opt/lld/bin:$PATH python3.14 ../UniXNU/unixnu build kernel -D .", result = "PMGR archive hashed 6be276d7..., exact 340-entry original ApplePMGR ABI with native IOPMGR entries and audited original imports; audit PASS, original executable unmodified.", revision = "1267235c98af2fa94156cf007095e6482c0e7dbf" },
+  {kind = "device", reference = "evidence/packaging/second-volume-probe-20261115/probe.json", command = ".cache/heimdall/build/bin/heimdall flash --CACHE /tmp/cachetest/cache-test.img", result = "CACHE accepts 8 MiB; 96 MiB and 400 MiB stop at the PIT 50 MiB extent; a 1 MiB-ramdisk Recovery image boots to Download Mode", revision = "1361c29d4a5f5c7c624deb42ddcf8965ef129ecc"},
 ]
 
 [[area]]
@@ -2193,6 +2223,8 @@ id = "diagnostics"
 status = "implemented"
 components = []
 paths = [
+  "evidence/diagnostics/display-scanout-20261116/**",
+  "evidence/diagnostics/usb-device-mode-20261116/**",
   "evidence/storage/ufsdata-q-20261115/**",
   "docs/gts7xlwifi-import.md",
   "scripts/symbolicate-ui-registers.py",
@@ -2297,6 +2329,8 @@ procedure = [
   "Run python3 scripts/collect-adb-inventory.py --root --output evidence/<new-capture>; review per-command stderr, checksums, GPT CRC results and DT sanitization before updating this record.",
 ]
 findings = [
+  "The desktop widgets render white and the kernel boot page disappears on every image that sets dpu-scanout=2 (95169672 added it; 6c0b77a4 and e431e7e3 kept it). Removing wallpaper-freeze=1 changed neither, so the direct scanout path is the remaining suspect: NativeLegacyDisplay.cpp:365-374 makes the panel fetch the compositor surface, which leaves the boot framebuffer the page draws into off screen. Image 3f488107, which had fb-gpu=1 gpu-addon=1 without dpu-scanout, rendered the desktop and the page correctly.",
+  "USB device mode works for the first time on Recovery 6c0b77a4 (t970-usb=37 t970-qud-retry=1 t970-qud-resume=1): the Mac enumerates the iPad. Root cause of the earlier silence was a missing caller, not a cable-timing rule: package/T970UsbProbe.cpp:49 t970_usb_start was linked but nothing called it, because this port links package/T970Power/BatteryService.cpp as its battery implementation and that file never started the USB stack, while the reference called it from package/T970Battery.cpp:456-461. The trust dialog does not appear on the tablet, so MobileDevice pairing still fails.",
   "Recovery fb9f98b3e7c4884cda679cc6165c7101c883df38a805a7947c29f771a4787c8d removes the unsafe boot-page stack walk and omits t970-pid1; Data is not reseeded. Kernel build and packaging passed and RECOVERY upload succeeded; runtime observation is pending.",
   "Recovery c23efc935f56cccff9d58973c7f18d91bcedcc4e1dd373e31669e183ab888eac reached two processes and then faulted at address 8 in the boot-page PID 1 stack walk. Host symbolication maps the fault to pid1_dump in draw. Remove saved kernel stack dereferences and stop this single-process diagnostic once nprocs changes; next image also omits t970-pid1. Launchd main and desktop remain unverified.",
   "Optional GPU trace and USB diagnostic references are satisfied by inactive definitions during the CPU-display build.",
@@ -2432,6 +2466,9 @@ findings = [
   "The firmware bring-up uses GOP colour markers at fixed x positions plus a 0x9ff80004 stage word read back by the arm_init probe; both are diagnostic-only and the current image still resets before XNU can report the stage word.",
   "The SCM probe is a board-side diagnostic in PlatformUfsLib: it issues a single fast SMC with the Qualcomm SIP owner and reports the return code through GOP markers; it does not change the SMMU or UFS state itself.",
   "The survey flash receipt is the device-side confirmation of the read-only UFS path; it is independent of the kernel entry probes and was captured after the full userdata rewrite.",
+  "The XR10 rule was the reference port's answer to a different symptom: rebuilding the Metal plugin to withhold supportsExtendedXR10Formats from every process (plugin CDHash 4490c306601dd01d9c0539f71c86b43687a89dbc, Recovery 0f9ac3574e699c5be1d83f951a1b7d53f0353c721d8b8241884787e93fb7ff63) left the white desktop widgets and the garbled Settings page unchanged; the reference's note describes whole-screen stripes from that cause, not white widget regions.",
+  "The twelve signed-text fixups do apply on this tablet: the new boot-page row FIX parsed=12 applied=12 on Recovery 0f9ac357 reports both counters equal, so the sRGB/BGRA8 policy of board.toml [payload] text_fixups is in force and a skipped fixup is not the reason for the white widgets.",
+  "The white widget regions predate the GPU: the first GPU image c5f88b11 reported gpu offers=0, so the Metal plugin never loaded, and the desktop photographs of that build already show the white regions; the defect is therefore in the compositor's submitted surface or in the widget renderers, not in whether the GPU takes frames.",
 ]
 completion = [
   "Every claimed UniXNU milestone has matching source/image revisions, a reproducible command and accessible firmware/kernel logs.",
@@ -2441,6 +2478,8 @@ limits = [
 ]
 next_action = ["After committing this verified milestone, continue normal service/Data bring-up and measure memory use; preserve genuine main-marker evidence and256MiB owned-memory constraints. Current870a11da is terminal diagnostic, not a normal system image."]
 evidence = [
+  { kind = "device", reference = "evidence/diagnostics/display-scanout-20261116/owner-observation.json", command = "sh scripts/flash-recovery-when-detected.sh out/dual-system/wholesale-inputs-20261115/boot-progress-page/page-usb-scan-b/boot.img e431e7e3c16901b96e8a43024cad2f522c962d2b092d3a40137cc7eae3d654a6 3600", result = "Owner reported white desktop widgets and no boot page, without wallpaper-freeze.", revision = "1361c29d4a5f5c7c624deb42ddcf8965ef129ecc" },
+  { kind = "device", reference = "evidence/diagnostics/usb-device-mode-20261116/owner-observation.json", command = "sh scripts/flash-recovery-when-detected.sh out/dual-system/wholesale-inputs-20261115/boot-progress-page/page-usb-scan-a/boot.img 6c0b77a4f7da3b001f72b39dfa22d93ab6827fe491c4f89d22f3208d45c80f69 3600", result = "Owner reported the Mac enumerating the iPad over USB device mode with no trust dialog on the tablet.", revision = "1361c29d4a5f5c7c624deb42ddcf8965ef129ecc" },
   { kind = "device", reference = "evidence/storage/watchdogd/runtime-report/device-result.json", revision = "2fcc9f9a4237a50af2d85bfd8f6ec27459291a0e", command = "BOOTeeeba83b, target120-second one-shot runtime report; owner photo19:36:40", result = "109 processes including SpringBoard27/backboardd56/runningboardd26, watchdogd not observed, genuine main1 and D0/W0/S4. Timer wait and sampler executed; no calibrated timing/rendering/desktop proof." },
   { kind = "host", reference = "evidence/storage/watchdogd/runtime-report/build.json", revision = "95050554b3de986d8b254217fec17ca420701c04", command = "Build with t970-runtime-report=120; check-runtime-report.py; check-data-payload.py --watchdog-policy --runtime-report-seconds 120", result = "Sourceab84b0ca and full BOOTeeeba83b build/host verification pass; kernel helper and policy regression pass. Upload exit0; timer/physical process snapshot pending." },
   { kind = "device", reference = "evidence/storage/watchdogd/boot-state-main/device-result.json", revision = "387cef760da554ccefd0a5e1ab37e5d2ebbc50b3", command = "BOOT28268af5 terminal readonly main/Data/policy observer; owner photo19:10:24", result = "main1 e0 D0 W0 S4 proves genuine main after successful Data and policy installer writes, not later launchd policy consumption or services. Normal2387e904 restored afterward." },

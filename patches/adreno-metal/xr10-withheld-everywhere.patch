@@ -1,0 +1,15 @@
+--- a/NativeBridgeMetalFrontend.mm
++++ b/NativeBridgeMetalFrontend.mm
+@@ -4964,7 +4964,11 @@
+    // Extended-range 10-bit (XR10) framebuffers are withheld: this display chain presents 8-bit BGRX scanout only. The render server picks its
+    // wide-gamut 64-bit (and Apple-compressed) framebuffer when a device offers them, and the display driver could not show it (int-089: the
+    // swap's surface was '&w4a', 8 bytes per pixel, and every swap was refused).
+-   if(!strcmp(name,"supportsExtendedXR10Formats") && (!strstr(getprogname(),"Poster") || !strcmp(getprogname(),"PosterBoard")))value=0;
++   // sm-t970: withheld from the wallpaper and widget processes too. They keep XR10 under the upstream rule (everything whose name contains
++   // "Poster", and PosterBoard itself), and on this tablet a single XR10 layer leaves its region white on the 8-bit BGRX scanout while the
++   // rest of the desktop draws correctly. The gts7xlwifi reference port reached the same rule for the same reason (its
++   // docs/host-patches/adreno-metal-main/0001-gts7xlwifi-local-changes-next2.next11.patch replaces this condition with value=0 for every process).
++   if(!strcmp(name,"supportsExtendedXR10Formats"))value=0;
+    gAnswers[sel]=value;
+    class_addMethod(cls,sel,kind==NMB_ANSWER_COUNT?(IMP)countAnswer:(IMP)flagAnswer,kind==NMB_ANSWER_COUNT?"Q16@0:8":"B16@0:8");
+    break;

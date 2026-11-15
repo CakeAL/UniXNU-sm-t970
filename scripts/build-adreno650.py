@@ -19,8 +19,9 @@ out = ROOT / 'build/adreno740'
 out.mkdir(parents=True, exist_ok=True)
 # The driver checkout is an input for the same reason as the kits: Adreno650 is not a
 # component in UniXNU's catalogue, so the tree has no drivers/Adreno650 unless this names it.
-# gts7xlwifi: the driver and the kits are vendored in this device repository; the tree links its package as kits/gts7xlwifi.
-DEVICE = Path(os.path.realpath(ROOT / 'kits/gts7xlwifi')).parent
+# sm-t970: the driver and the kits are vendored in this device repository; the tree links its package as kits/sm-t970.
+# T970_DEVICE_DIR is the same input the other component recipes take (build-qcom-usb-debug.py).
+DEVICE = Path(os.environ.get('T970_DEVICE_DIR') or os.path.realpath(ROOT / 'kits/sm-t970')).parent
 driver = Path(os.environ.get('ADRENO650_DRIVER', str(DEVICE / 'drivers/Adreno650')))
 # The three upstream kits this recipe compiles are not copied into the generated tree unless a
 # selected component asks for them, so the directory is an input rather than an assumption:
@@ -97,6 +98,8 @@ for source in sources:
     objects.append(obj)
 # gts7xlwifi: the GPU addon embedded in the kernel (package/T970GpuAddon.S), when the device repository holds one.
 ADDON = DEVICE / '.cache/firmware/gpu/gpu.addon'
+if not ADDON.is_file():
+    ADDON = PACKAGE / 'T970GpuAddon/gpu.addon'
 if ADDON.is_file():
     addon_obj = out / 'T970GpuAddon.o'
     subprocess.run([c_recipe['arguments'][0], '-c', '--target=arm64-apple-ios17.0', '-DT970_GPU_ADDON="%s"' % ADDON,

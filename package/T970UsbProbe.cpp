@@ -48,10 +48,11 @@ uint32_t rails(bool superSpeed) {
 }
 void worker(void *, wait_result_t) {
     thread_set_thread_name(current_thread(), "t970-usb");
-    // Wait at most 60 s for the battery worker to complete and restore the shared GPIO bus.
+    // Wait at most 180 s for the battery worker to complete, restore the shared GPIO bus and route the MUIC to COM_USB: this port routes
+    // from the battery poll loop (package/T970Power/BatteryService.cpp) after waitForBSD and a full gauge read, not from a fixed delay.
     unsigned waited = 0;
     int route = 0;
-    while (&t970_muic && waited < 600 && !(route = __atomic_load_n(&t970_muic[0], __ATOMIC_ACQUIRE))) {
+    while (&t970_muic && waited < 1800 && !(route = __atomic_load_n(&t970_muic[0], __ATOMIC_ACQUIRE))) {
         IOSleep(100);
         ++waited;
     }

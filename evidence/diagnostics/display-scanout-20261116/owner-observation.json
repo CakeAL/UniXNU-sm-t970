@@ -1,0 +1,20 @@
+{
+  "image_sha256": "e431e7e3c16901b96e8a43024cad2f522c962d2b092d3a40137cc7eae3d654a6",
+  "partition": "RECOVERY",
+  "image_dir": "out/dual-system/wholesale-inputs-20261115/boot-progress-page/page-usb-scan-b",
+  "source": "owner reports 2026-11-16 01:21 and 01:25 Asia/Shanghai",
+  "observation": {
+    "boot_page_visible": false,
+    "desktop_widgets_white": true,
+    "trust_dialog_visible": false,
+    "owner_words": "没有弹出信任窗口，诊断页没了，小部件还是白色",
+    "notes": "On this image the kernel boot page no longer appears although it is built with boot-progress=2 (keeps drawing), and the desktop widgets stayed white after wallpaper-freeze=1 was removed. Both are consistent with the panel fetching the compositor surface directly (dpu-scanout=2): NativeLegacyDisplay.cpp:365-374 rewrites the SSPP source address and flushes the CTL, so the boot framebuffer the page draws into is no longer scanned."
+  },
+  "timeline": {
+    "a650-b_3f488107": "gpu-addon=1 only: desktop rendered correctly, gpu offers=2871, 22 ms CPU copy per frame",
+    "a650-d_95169672": "adds dpu-scanout=2 wallpaper-freeze=1: scrolling smoother, widgets start rendering white",
+    "usb-scan-a_6c0b77a4": "same display arguments plus the USB fix: widgets still white, boot page no longer on the panel",
+    "usb-scan-b_e431e7e3": "wallpaper-freeze removed, dpu-scanout kept: widgets still white, boot page still absent"
+  },
+  "next_test": "usb-scan-c 1f01649e removes dpu-scanout entirely (GPU full-frame copy): expect the boot page back and the widgets drawn, which confirms the direct scanout path as the cause."
+}

@@ -1,0 +1,16 @@
+{
+  "image_sha256": "9f1cabb1cea8fa6507a1c09be2f022573f2b957dbf882d3aaad7f5a16eb198dc",
+  "partition": "RECOVERY",
+  "kernel_args_of_interest": [
+    "t970-haptics=3"
+  ],
+  "source": "owner report 2026-11-16 00:56 Asia/Shanghai",
+  "observation": {
+    "haptics_test_pulse": true,
+    "owner_words": "震动是好使的",
+    "notes": "t970-haptics=3 publishes the service and fires one 150 ms test pulse (package/T970Haptics.cpp). The owner felt the pulse; app-driven haptics and the strength range were not measured."
+  },
+  "related": {
+    "driver": "package/T970Haptics.cpp"
+  }
+}
