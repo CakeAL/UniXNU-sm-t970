@@ -1,0 +1,47 @@
+{
+  "device_revision": "ac34556ba3a9d28a0d964d46434e5ce9f9436020",
+  "framework_revision": "0e9e1e8182b18a6b78df983808ec296b7f30dc20",
+  "instruments": {
+    "boot_progress_mode": 3,
+    "stage_bars": true,
+    "panic_screen": true,
+    "kernel_args_override": [
+      "boot-progress=3",
+      "build-tag=ref-ui-t",
+      "native-ufs-stream2=0x4e0"
+    ],
+    "kernel_args_dropped": [
+      "panic_on_crash_disabled=1"
+    ]
+  },
+  "board_sha256": "601c27c34ead065e43b9bf075413ffa77e7046ea23d5e2357c5f52b3bbdf4e23",
+  "source_kernel_sha256": "30066a33bff5d11dd49bc2f5c6847c12df203c3e893f6d644dd5ea8bcae56e5c",
+  "base_recovery_sha256": "33efcec0915129321995cd4de57a3223f7fd41e36c8f73205f07fa97e7aeaeba",
+  "firmware_config_dtb_sha256": "86c14aa305a6cf5db46665f4095d28aadcb1ea5ce9d213cd711641a07504ed1d",
+  "image_sha256": "f81330ae5d3266ca70ce0a887ff6b56b9c9453afe6dc0e02c0dd78b485a87b3a",
+  "image_bytes": 86888448,
+  "recovery_partition_bytes": 86888448,
+  "hardware_tested": false,
+  "note": "Enables the boot page only; no flash or reboot performed",
+  "partition": "RECOVERY",
+  "build_command": "python3.14 scripts/build-boot-progress-page.py --mode 3 --kernel-arg build-tag=ref-ui-t --kernel-arg native-ufs-stream2=0x4e0 --drop-kernel-arg panic_on_crash_disabled --kernel /Users/cakeal/vsc/UniXNU/out/sm-t970/ipados-17.7.11-21H461/gts7xlwifi/kernel/kernel.macho --output out/dual-system/wholesale-inputs-20261115/boot-progress-page/page-ref-ui-t",
+  "validation": {
+    "previous_device_image": "0126433fc49a4cee7920ba5621533dd9396baa39348d34fb03bab470b55551b6",
+    "difference": "boot-progress=3 and build tag; same prelinked kernel and existing Data route",
+    "checked": "no t970-ufs-data, t970-apfs-seed, ufsrw, t970-pid1 or -v; diagnostics framebuffer disabled",
+    "device_boot": "pending"
+  },
+  "upload": {
+    "status": "success",
+    "partition": "RECOVERY",
+    "result": "RECOVERY upload successful",
+    "log": "evidence/display/ref-ui-t-20261115/upload.log",
+    "partition_readback": "not performed",
+    "device_boot": "observed"
+  },
+  "observation": {
+    "source": "owner report after approximately two minutes",
+    "current_display": "Apple logo remains",
+    "interpretation": "Disabling the diagnostics overlay did not produce an observed welcome or desktop within two minutes. This does not alone identify the blocking process."
+  }
+}

@@ -726,6 +726,7 @@ id = "storage"
 status = "implemented"
 components = ["ShengUfs", "VirtioMmioBlock", "RamBlock", "VerifiedRoot"]
 paths = [
+  "evidence/storage/seed-provenance-20261115/**",
   "evidence/storage/ref-data-s-20261115/**",
   "evidence/storage/data-backup-20261115/**",
   "evidence/storage/ref-data-r-20261115/**",
@@ -848,6 +849,7 @@ procedure = [
   "Read block sysfs and by-name links; read each LUN's primary GPT header and entry array and validate their CRC32 values without writing any block device.",
 ]
 findings = [
+  "Recovery s/t actually contain packed Data seed 9a0005a5c520412006589e068264b611c3484af123547d13103387a9fb7c0afa: the packer replaces the initially requested 4591566e seed. Its logical SHA-256 52f2875d05711f8f1a974926bd251698d1f3212454c125e3ee989023592c82cb matches the recorded SHNGDATA header. Payload metadata now reports actual seed and FAT hashes after replacement; independent FAT readback passes. The previously expanded 4591566e seed is a different local seed, not the active s/t seed.",
   "Recovery 0126433fc49a4cee7920ba5621533dd9396baa39348d34fb03bab470b55551b6 with the explicit RAM personality reached SpringBoard PID 27 by 113 seconds and reports three accepted framebuffer swaps. BootProgress crash diagnostics cover the screen; 60 crash events and 133 exits were recorded. A usable desktop, persistence across reboots and GPU compositing are not yet verified.",
   "Recovery 0126433fc49a4cee7920ba5621533dd9396baa39348d34fb03bab470b55551b6 adds the missing NativeRamBlock IOKit match and selects the preserved 512 MiB Data overlay. Build and kernel personality audit passed, RECOVERY upload succeeded; device boot remains pending.",
   "The wholesale defconfig now explicitly requests the separately linked RamBlock personality even with XNU_SOURCE_STORAGE. The build script tracks personality flags to invalidate KernelConfigTables and relink on changes. Kernel 30066a33bff5d11dd49bc2f5c6847c12df203c3e893f6d644dd5ea8bcae56e5c builds successfully and contains the NativeRamBlock match; the previous kernel does not. Runtime matching and persistent Data are pending.",
@@ -1053,6 +1055,7 @@ id = "display"
 status = "implemented"
 components = ["GopFramebuffer"]
 paths = [
+  "evidence/display/ref-ui-t-20261115/**",
   "scripts/build-gop-legacy-display.py",
   "evidence/display/setup-skip-v84/**",
   "evidence/display/setup-fb-cache-v83/**",
@@ -1152,6 +1155,8 @@ procedure = [
   "Collect DRM modes, panel type and brightness limits; read only display-selection tokens from /proc/cmdline and match the selected S6TUUM3 node in the live DT.",
 ]
 findings = [
+  "Recovery f81330ae5d3266ca70ce0a887ff6b56b9c9453afe6dc0e02c0dd78b485a87b3a remained on the Apple logo after roughly two minutes according to the owner. The preceding s image showed SpringBoard and three frame swaps under a diagnostic banner; this does not establish why the new boot has no visible desktop.",
+  "Recovery f81330ae5d3266ca70ce0a887ff6b56b9c9453afe6dc0e02c0dd78b485a87b3a uses the s kernel and persistent Data with boot-progress=3, the reference framebuffer-neutral setting. RECOVERY upload succeeded; actual display and usability remain pending.",
   "The reference GOP and HID archive has passed its 21H461 ABI audit and compiles through the standard build.",
   "The v84 trace measured 42.531 ms for its last CPU framebuffer copy and 49.297 ms maximum. This timer covers copying a completed frame to scanout and the memory barrier. The v62 trace separately measured 93.587 seconds from display publication to its first copy.",
   "The v123 diagnostic display archive links the pinned A650GmuRegions and AdrenoFirmware planner objects and embeds the hash-checked A650 image only when explicitly requested.",

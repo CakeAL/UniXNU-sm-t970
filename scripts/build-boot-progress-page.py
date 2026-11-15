@@ -121,6 +121,14 @@ def main():
     # The tested wrapper already carries the firmware, the shim, the device tree
     # and the persistent Data seed; only the FAT payload is replaced.
     boot = pack(device, base, image, output / 'boot.img', output)
+    # pack() replaces the generated payload's seed with the one from the tested
+    # Recovery wrapper. Report the bytes actually shipped, not the earlier input.
+    payload_report_path = output / 'payload' / 'payload.json'
+    payload_report = json.loads(payload_report_path.read_text())
+    payload_report['requested_data_ramdisk_sha256'] = payload_report.get('data_ramdisk_sha256')
+    payload_report['data_ramdisk_sha256'] = sha(output / 'base-scratch-data.img')
+    payload_report['payload_sha256'] = sha(image)
+    payload_report_path.write_text(json.dumps(payload_report, indent=2) + '\n')
     gpt = json.loads((device / 'evidence/adb-2026-11-01/gpt.json').read_text())
     sizes = [p['size_bytes'] for lun in gpt.values() for p in lun['partitions'] if p['name'] == 'recovery']
     if len(sizes) != 1 or boot.stat().st_size != sizes[0]:
@@ -138,6 +146,7 @@ def main():
                         'kernel_args_override': ctx.args.kernel_arg,
                         'kernel_args_dropped': dropped},
         'board_sha256': board_hash, 'source_kernel_sha256': kernel_hash,
+        'embedded_data_ramdisk_sha256': sha(output / 'base-scratch-data.img'),
         'base_recovery_sha256': sha(base), 'firmware_config_dtb_sha256': sha(dtb),
         'image_sha256': sha(boot), 'image_bytes': boot.stat().st_size,
         'recovery_partition_bytes': sizes[0], 'hardware_tested': False,

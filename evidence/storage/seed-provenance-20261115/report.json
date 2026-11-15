@@ -1,0 +1,9 @@
+{
+  "image_sha256": "f81330ae5d3266ca70ce0a887ff6b56b9c9453afe6dc0e02c0dd78b485a87b3a",
+  "actual_packed_seed_sha256": "9a0005a5c520412006589e068264b611c3484af123547d13103387a9fb7c0afa",
+  "actual_logical_seed_sha256": "52f2875d05711f8f1a974926bd251698d1f3212454c125e3ee989023592c82cb",
+  "other_local_packed_seed_sha256": "4591566eccd77f0f9d13a1338ecaf3c73ce86cd04aeea732d91db6b2e100ca3a",
+  "volume_uuid": "C25160D3-B586-4C11-9D3A-42CB2741227C",
+  "observation": "Recovery packer replaces the payload-builder input with the base wrapper seed; the old payload report recorded the earlier input hash. Actual seed logical hash matches the previously captured SHNGDATA header. Both local seeds contain essential directory skeleton, but are distinct. Actual active overlay contents and available space are not established.",
+  "fix": "Report the seed and payload hash after replacement; verified with independent FAT readback of a host-only image."
+}
