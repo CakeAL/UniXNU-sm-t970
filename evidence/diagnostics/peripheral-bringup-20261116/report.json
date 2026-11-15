@@ -1,0 +1,35 @@
+{
+  "device": "Samsung Galaxy Tab S7+ Wi-Fi SM-T970",
+  "target_os": "iPadOS 17.7.11 (21H461)",
+  "build_tag": "cam-c1-a",
+  "source_base_revision": "01c4d2af096e361dca5eda42e2de4ae83acd7928",
+  "framework_revision": "945ad8db0641060f6566422d168684c3e9182d53",
+  "soc_revision": "166235ec2480ff0992627b7aafa15c65ce6b4efa",
+  "boot_progress_source_sha256": "0e37f07982c67827c33a22e2c854f61443049b9a89bccd1a6b1d0b27d2036f01",
+  "source_kernel_sha256": "c3787d196b1264fa5ccffdb0d33ea9af4a89bd5abd4e9ca8208b9b4dd4830ea1",
+  "packed_kernel_sha256": "e53bcafa56376bbaa73cb268d84e5136c3ace5482ec860aa7018816688fc59bc",
+  "partition": "RECOVERY",
+  "image": "out/driver-bringup-20261116/camera-c1/boot.img",
+  "image_sha256": "5fd0a19c8308a2bf0fdb869422f426ec44cd33e05706d317c991761495c3157f",
+  "image_bytes": 86888448,
+  "firmware_dtb_sha256": "86c14aa305a6cf5db46665f4095d28aadcb1ea5ce9d213cd711641a07504ed1d",
+  "trust_cache_sha256": "46689a1a6c81c149b45045cb874f36c1fb6a494654d44d187abf06c590a74772",
+  "data_ramdisk_sha256": "ca1543d1986cb1de5dd8ef6a3f01f48609e2a65a18bbf3f88f04b2d189031dcf",
+  "embedded_addon_sha256": "2298eaf929cf31196e51aeae71c048a31e6a0db88200cca68d7b22a68bab617e",
+  "build_commands": [
+    "python3.14 ./unixnu defconfig gts7xlwifi_defconfig -D ../UniXNU-sm-t970",
+    "python3.14 ./unixnu build kernel -D ../UniXNU-sm-t970",
+    "python3.14 scripts/build-boot-progress-page.py --mode 2 --large-data-seed --data-ramdisk out/dual-system/overlay-inspection-20261115/reference-fresh-73g.dbr --kernel-arg build-tag=cam-c1-a --kernel-arg t970-large-data=1 --kernel-arg t970-large-init=1 --kernel-arg t970-pen=7 --kernel-arg native-ufs-stream2=0x4e0 --kernel-arg gpu-addon=1 --kernel-arg pipa-turnip-debug=noubwc,nocb --kernel-arg t970-wifi=6 --kernel-arg t970-bt=257 --kernel-arg t970-adsp=2 --kernel-arg t970-audio=32 --kernel-arg t970-haptics=3 --kernel-arg t970-sensors=243 --kernel-arg t970-usb=37 --kernel-arg t970-qud-retry=1 --kernel-arg t970-qud-resume=1 --drop-kernel-arg panic_on_crash_disabled --drop-kernel-arg armcpu-diagnostics=1 --drop-kernel-arg alioth-bt=1 --drop-kernel-arg log-gpu=1 --drop-kernel-arg t970-fb-src-wb=1 --owner-trust-cache out/trust-bundle-xr10-20261116/owner-trust.bundle --kernel /Users/cakeal/vsc/UniXNU/out/sm-t970/ipados-17.7.11-21H461/gts7xlwifi/kernel/kernel.macho --output out/driver-bringup-20261116/camera-c1 --kernel-arg t970-camera=513"
+  ],
+  "flash_command": "sh scripts/flash-recovery-when-detected.sh out/driver-bringup-20261116/camera-c1/boot.img 5fd0a19c8308a2bf0fdb869422f426ec44cd33e05706d317c991761495c3157f 30",
+  "host_checks": [
+    "XNU built and prelinked. Late display probe disassembly calls both t970_camera_start and t970_sensors_start.",
+    "The packed ADT has the same properties as page-xr10-a except the generated random-seed.",
+    "Verified the same embedded addon, trust cache and Data seed. Boot arguments add t970-camera=513 and replace build-tag.",
+    "check-platform.py stopped at the reviewed framework revision guard before DT/ADT validation."
+  ],
+  "flash_result": "Heimdall reported RECOVERY upload successful and returned 0. Session used --no-reboot. No on-device hash readback.",
+  "boot_observation": null,
+  "camera_observation": null,
+  "slpi_observation": null
+}

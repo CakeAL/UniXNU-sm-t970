@@ -1,0 +1,7 @@
+Protocol initialisation successful.
+Session begun.
+PIT file download successful.
+Uploading RECOVERY
+RECOVERY upload successful
+Ending session...
+Releasing device interface...

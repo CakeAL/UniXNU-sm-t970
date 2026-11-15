@@ -1761,6 +1761,46 @@ evidence = [
 ]
 
 [[area]]
+id = "camera"
+status = "implemented"
+components = []
+paths = [
+  "package/T970Camera*.cpp",
+  "package/T970CameraAbi.h",
+  "scripts/build-t970cam*.py",
+]
+inputs = [
+  "The captured Android DT assigns the front sensor to CCI0 master 1 at seven-bit address 0x2d, MCLK2 GPIO 96, reset GPIO 30, VANA GPIO 38 and shared VIO GPIO 37.",
+  "The board driver owns CAMCC clocks, CCI setup and sensor power sequencing. The optional streaming path uses CSIPHY 3, CSID-lite0, IFE-lite0 and the reserved CDSP window.",
+]
+configuration = [
+  "The wholesale display archive links the board camera worker and the iPadOS 21H461 IOKit service. The late display probe starts the worker when t970-camera selects a sensor.",
+  "t970-camera=513 selects the front sensor's CCI chip-ID check and service registration. Capture and streaming require a separate request.",
+]
+procedure = [
+  "Boot a hash-identified Recovery candidate with t970-camera=513. Read the CAM row for the stage, CCI version, front sensor ID and service status.",
+]
+findings = [
+  "The CAM boot banner reports the probe and service state directly from the linked driver globals. The service can be published after a failed chip-ID check, so both results must be read independently.",
+  "Recovery 5fd0a19c (cam-c1-a) completed host kernel build, prelink and packaging. The linked late display probe calls t970_camera_start and t970_sensors_start. Heimdall reported a successful RECOVERY upload.",
+]
+completion = [
+  "Read the expected sensor ID, publish the service, and verify that a client can start, receive and stop frames.",
+]
+limits = [
+  "Reference camera sources are integrated. The front sensor response, service registration and frame delivery are separate device checks.",
+]
+next_action = [
+  "Check the CCI chip ID and service status first. Qualify CSI receive and frame DMA on a separate boot before exercising a userspace client.",
+]
+evidence = [
+  { kind = "source", reference = "evidence/adb-2026-11-01/live-device-tree.dts", result = "The captured camera nodes record the CCI address and front, rear and ultra-wide module wiring." },
+  { kind = "source", reference = "package/T970Camera.cpp", result = "The front sensor probe powers the module off after the chip-ID read and optionally registers T970CameraService." },
+  { kind = "host", reference = "evidence/diagnostics/peripheral-bringup-20261116/report.json", revision = "01c4d2af096e361dca5eda42e2de4ae83acd7928", command = "python3.14 ./unixnu build kernel -D ../UniXNU-sm-t970; python3.14 scripts/build-boot-progress-page.py (full inputs in report)", result = "Prelinked both driver entry points and packaged the hash-identified front-camera diagnostic against the existing Data seed and addon." },
+  { kind = "device", reference = "evidence/diagnostics/peripheral-bringup-20261116/recovery-upload.txt", revision = "01c4d2af096e361dca5eda42e2de4ae83acd7928", command = "sh scripts/flash-recovery-when-detected.sh out/driver-bringup-20261116/camera-c1/boot.img 5fd0a19c8308a2bf0fdb869422f426ec44cd33e05706d317c991761495c3157f 30", result = "SM-T970 RECOVERY upload succeeded. The upload receipt does not establish camera or boot behavior." },
+]
+
+[[area]]
 id = "audio"
 status = "implemented"
 components = []
@@ -1784,6 +1824,7 @@ procedure = [
 ]
 findings = [
   "Recovery 9f1cabb1 carries the ADSP image in the addon (firmware/adsp/adsp.mbn, installed under /private/var/ngpu/firmware/adsp) and the audio HAL at /System/Library/Audio/Plug-Ins/HAL/T970Audio.driver; with t970-adsp=2 t970-audio=32 the owner heard sound from the speakers on the desktop. Capture, non-default routes, amplifier telemetry and DSP restart remain unobserved.",
+  "The stock DT assigns PAS 12 and the 0x89200000 + 0x1500000 reserved range to SLPI. The SLPI boot banner reports firmware size, startup stage, ready bits, GLINK traffic and QRTR sensor service discovery.",
   "Device ADB read-only extracted all 22 ADSP fragments, each matching this T970 stock inventory. The reassembled ADSP image differs from the reference tablet image; audio and firmware authentication remain untested.",
   "The audio, ADSP and SLPI startup paths link and prelink in 21H461. The iOS 17 audio HAL passes strict local code-signature verification. Three CS35L40 files extracted offline from MinsOS match the captured board inventory. Recovery d9aa10ce leaves DSPs disabled while signed ADSP/SLPI firmware and service mounting are pending.",
   "27 ADSP/amp firmware and service-description files are hashed; loaded DSP routes are not inferred.",
@@ -1797,6 +1838,7 @@ limits = [
   "No playback, recording, mixer writes or DSP restart was performed; loaded firmware, codec wiring and actual routes are not verified.",
 ]
 next_action = [
+  "Read the stock slpi.mdt and slpi.bNN files through Android, reconcile their hashes and assemble slpi.mbn for the addon. Qualify SLPI readiness and QRTR before testing motion events.",
   "Trace the bound amplifier driver and Android audio configuration to determine firmware selection, MI2S wiring and the first playback route.",
 ]
 evidence = [
@@ -2223,6 +2265,8 @@ id = "diagnostics"
 status = "implemented"
 components = []
 paths = [
+  "package/BootProgress.c",
+  "evidence/diagnostics/peripheral-bringup-20261116/**",
   "evidence/diagnostics/display-scanout-20261116/**",
   "evidence/diagnostics/usb-device-mode-20261116/**",
   "evidence/storage/ufsdata-q-20261115/**",

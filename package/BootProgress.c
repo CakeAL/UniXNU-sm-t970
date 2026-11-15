@@ -1432,6 +1432,9 @@ extern volatile uint64_t native_legacy_copy_bytes_sum __attribute__((weak_import
 extern char native_cpufreq_row[120] __attribute__((weak_import));
 extern char native_wi_log[4][100] __attribute__((weak_import));
 extern volatile unsigned native_wi_count __attribute__((weak_import));
+extern volatile int32_t t970_camera[40] __attribute__((weak_import));
+extern volatile int32_t t970_camera_c5[20] __attribute__((weak_import));
+extern volatile int32_t t970_sensors[16] __attribute__((weak_import));
 extern volatile uint64_t armcpu_timer_interrupts __attribute__((weak_import));
 extern volatile uint64_t native_adreno_cache_stats[5] __attribute__((weak_import));
 extern volatile uint32_t native_adreno_coherence[8] __attribute__((weak_import));
@@ -1472,6 +1475,17 @@ static void crash_banner(unsigned now) {
     snprintf(rows[n++],120,"%s%.108s",part?"       ":"REASON ",exit_records.reason+part*108);
   for(unsigned i=0;i<3 && i<failed;++i)snprintf(rows[n++],120,"EXIT  %.100s",exit_records.failures[(failed-1-i)%3]);
   __atomic_store_n(&exit_lock,0,__ATOMIC_RELEASE);
+  if (&t970_camera && t970_camera[0]) {
+    snprintf(rows[n++],120,"CAM   st=%d det=%x cci=%x front=%08x rear=%08x wide=%08x irq=%x svc=%d",
+      t970_camera[0],(unsigned)t970_camera[1],(unsigned)t970_camera[3],
+      (unsigned)t970_camera[4],(unsigned)t970_camera[5],(unsigned)t970_camera[6],
+      (unsigned)t970_camera[7],&t970_camera_c5?t970_camera_c5[9]:0);
+  }
+  if (&t970_sensors && t970_sensors[0]) {
+    snprintf(rows[n++],120,"SLPI  st=%d err=%d fw=%d KiB slave=%x irq=%d glink=%d/%d qrtr=%d sns=%x",
+      t970_sensors[0],t970_sensors[1],t970_sensors[6],(unsigned)t970_sensors[3],t970_sensors[2],
+      t970_sensors[8],t970_sensors[9],t970_sensors[12],(unsigned)t970_sensors[14]);
+  }
   // Presentation cost: swaps in the last second and the time of the pixel copy (last / mean / maximum, microseconds).
   if(&native_legacy_copy_n && native_legacy_copy_n) {
     uint64_t f=0,c=native_legacy_copy_n;__asm__ volatile("mrs %0, cntfrq_el0":"=r"(f));if(!f)f=19200000;
