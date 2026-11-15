@@ -1,0 +1,12 @@
+{
+  "base_recovery_sha256": "9985d1824b746c3cb9a0a7df10eb41f7d457e80f20df28b47cade42591ba8f92",
+  "image": "out/dual-system/wholesale-inputs-20261115/mmu-probe/before-cpu-count-sleep/recovery.img",
+  "sha256": "266979f62a0a6e8c9b4445774d4cb11fbf4426e54722d61d86a268329e40f1ff",
+  "kernel_readback_sha256": "f76ff3aedfd234abbcd0c3bb9e988b983756baa5b0a3b035be432845f8a5841b",
+  "checkpoint": "immediately before the call to lck_mtx_sleep inside ml_wait_max_cpus",
+  "reset_seconds": 0,
+  "partition": "RECOVERY",
+  "upload": "RECOVERY upload successful",
+  "heimdall_exit": 0,
+  "device_boot": "awaiting observation"
+}
