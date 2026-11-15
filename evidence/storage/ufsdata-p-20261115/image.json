@@ -1,0 +1,61 @@
+{
+  "device_revision": "412844e60807f13c41afd232fbaff15f6117239e",
+  "framework_revision": "0e9e1e8182b18a6b78df983808ec296b7f30dc20",
+  "instruments": {
+    "boot_progress_mode": 2,
+    "stage_bars": true,
+    "panic_screen": true,
+    "kernel_args_override": [
+      "boot-progress=2",
+      "build-tag=ufsdata-p",
+      "t970-ufs-data=1",
+      "ufsrw=1",
+      "t970-pid1=1",
+      "native-ufs-stream2=0x4e0",
+      "sheng-data-persist=0"
+    ],
+    "kernel_args_dropped": [
+      "sheng-data-persist=2",
+      "panic_on_crash_disabled=1"
+    ]
+  },
+  "board_sha256": "601c27c34ead065e43b9bf075413ffa77e7046ea23d5e2357c5f52b3bbdf4e23",
+  "source_kernel_sha256": "4ed7945a1b476d0b96d6d5addddadac5a59d592810481a28ce9cd12d0ef1397b",
+  "base_recovery_sha256": "33efcec0915129321995cd4de57a3223f7fd41e36c8f73205f07fa97e7aeaeba",
+  "firmware_config_dtb_sha256": "86c14aa305a6cf5db46665f4095d28aadcb1ea5ce9d213cd711641a07504ed1d",
+  "image_sha256": "c23efc935f56cccff9d58973c7f18d91bcedcc4e1dd373e31669e183ab888eac",
+  "image_bytes": 86888448,
+  "recovery_partition_bytes": 86888448,
+  "hardware_tested": false,
+  "note": "Enables the boot page only; no flash or reboot performed",
+  "partition": "RECOVERY",
+  "build_command": "python3.14 scripts/build-boot-progress-page.py --mode 2 --kernel-arg build-tag=ufsdata-p --kernel-arg t970-ufs-data=1 --kernel-arg ufsrw=1 --kernel-arg t970-pid1=1 --kernel-arg native-ufs-stream2=0x4e0 --kernel-arg sheng-data-persist=0 --drop-kernel-arg sheng-data-persist --drop-kernel-arg panic_on_crash_disabled --kernel /Users/cakeal/vsc/UniXNU/out/sm-t970/ipados-17.7.11-21H461/gts7xlwifi/kernel/kernel.macho --output out/dual-system/wholesale-inputs-20261115/boot-progress-page/page-ufs-data-p",
+  "validation": {
+    "previous_device_image": "e24b0ee471a5db37decc170c4027fe7ba2ff4ef2eeb6d8c1f73a007cfd26cc05",
+    "seed_initialization": "disabled",
+    "change": "create missing Data db directory before launchd policy directory",
+    "host_test": "tests/test_boot_policy_parent.py with address and undefined behavior sanitizers passed"
+  },
+  "upload": {
+    "status": "success",
+    "partition": "RECOVERY",
+    "result": "RECOVERY upload successful",
+    "log": "evidence/storage/ufsdata-p-20261115/upload.log",
+    "partition_readback": "not performed",
+    "device_boot": "observed"
+  },
+  "observation": {
+    "source": "owner-provided screen 2026-11-15 20:41 Asia/Shanghai",
+    "time_seconds": 24,
+    "processes": 2,
+    "ufs_requests": 34014,
+    "verified_4k_blocks": 740055,
+    "ufs_failures": 0,
+    "fault_pc": "0xfffffff007a4aec4",
+    "fault_lr": "0xfffffff007a4ae80",
+    "fault_address": "0x8",
+    "esr": "0x96000005",
+    "symbolication": "pid1_dump BootProgress.c:552, inlined in draw, monitor thread",
+    "interpretation": "Diagnostic frame walk dereferenced a null frame at address 8. This is a diagnostic-induced kernel abort. Two processes observed; launchd main and desktop not established."
+  }
+}

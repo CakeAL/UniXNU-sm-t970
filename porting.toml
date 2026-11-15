@@ -726,6 +726,7 @@ id = "storage"
 status = "implemented"
 components = ["ShengUfs", "VirtioMmioBlock", "RamBlock", "VerifiedRoot"]
 paths = [
+  "evidence/storage/ufsdata-p-20261115/**",
   "tests/test_boot_policy_parent.py",
   "evidence/storage/ufsdata-o-20261115/**",
   "evidence/storage/ufsdata-n-20261115/**",
@@ -844,6 +845,7 @@ procedure = [
   "Read block sysfs and by-name links; read each LUN's primary GPT header and entry array and validate their CRC32 values without writing any block device.",
 ]
 findings = [
+  "Recovery c23efc935f56cccff9d58973c7f18d91bcedcc4e1dd373e31669e183ab888eac creates the missing Data db parent for the launchd policy; host tests and kernel build passed. RECOVERY upload succeeded; runtime result remains pending.",
   "Recovery e24b0ee471a5db37decc170c4027fe7ba2ff4ef2eeb6d8c1f73a007cfd26cc05 reports policy mkdir launchd error=2 (ENOENT). The fresh Data seed lacks its db parent, unlike the prior seed. Boot policy now creates /private/var/db if absent before creating its launchd child; device validation is pending.",
   "Recovery e24b0ee471a5db37decc170c4027fe7ba2ff4ef2eeb6d8c1f73a007cfd26cc05 traces the policy operation and errno while preserving the existing Data volume. RECOVERY upload succeeded; device observation remains pending.",
   "A local-only copy of the original 512 MiB OwnerData seed, UUID C25160D3-B586-4C11-9D3A-42CB2741227C, was expanded to 78844506112 bytes using diskutil after validating the virtual backing image. It retains the old directory skeleton; it has not been installed to the tablet. New policy diagnostics report the failing operation and errno.",
@@ -2256,6 +2258,7 @@ procedure = [
   "Run python3 scripts/collect-adb-inventory.py --root --output evidence/<new-capture>; review per-command stderr, checksums, GPT CRC results and DT sanitization before updating this record.",
 ]
 findings = [
+  "Recovery c23efc935f56cccff9d58973c7f18d91bcedcc4e1dd373e31669e183ab888eac reached two processes and then faulted at address 8 in the boot-page PID 1 stack walk. Host symbolication maps the fault to pid1_dump in draw. Remove saved kernel stack dereferences and stop this single-process diagnostic once nprocs changes; next image also omits t970-pid1. Launchd main and desktop remain unverified.",
   "Optional GPU trace and USB diagnostic references are satisfied by inactive definitions during the CPU-display build.",
   "The wholesale Wi-Fi build checks the pinned source checkout before fetching again; standard launch diagnostics have no on-device result for this build.",
   "The QcomDwc3 archive has 102 AppleUSBXDCI bindings verified against the local 21H461 prelink with AppleUSBXDCI and AppleUSBDeviceMux roots, and links into Recovery c5e1456a. Finder enumeration remains unobserved on this tablet.",
