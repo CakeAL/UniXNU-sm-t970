@@ -6,5 +6,7 @@
   "checkpoint": "first return from inittodr in bsd_init, before the root search via setconf",
   "reset_seconds": 28,
   "partition": "RECOVERY",
-  "upload": "pending"
+  "upload": "RECOVERY upload successful",
+  "heimdall_exit": 0,
+  "device_boot": "awaiting observation"
 }
