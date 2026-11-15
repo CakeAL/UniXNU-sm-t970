@@ -42,5 +42,11 @@
   ],
   "verification": "Frontend/bridge build, shader validation, code signatures, prelink and packed addon, seed and trust readback passed. Trust changed only the rebuilt frontend CDHash. The hardware ADT fields match display-parity-a apart from the randomized seed.",
   "flash_result": "RECOVERY upload successful with --no-reboot.",
-  "device_display_observation": null
+  "device_display_observation": {
+    "source": "Owner report after booting display-reference-a",
+    "widgets": "Still blank white",
+    "settings": "Visually corrupted on opening, then clears after a wait, as on the previous image",
+    "scrolling": "Intermittent dropped frames persist",
+    "direct_scanout_counters": null
+  }
 }

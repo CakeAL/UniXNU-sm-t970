@@ -52,5 +52,6 @@
     "Compare against a reference-port photograph of the same iPadOS build's desktop to see whether its widgets draw.",
     "Check whether lite=1 (package/BootWatchdogPolicy.c) disables any process that renders widget content."
   ],
-  "revision": "b17d5ab"
+  "revision": "b17d5ab",
+  "turnip_option_audit": "The packaged 83b6678 and 73d582f frontends read tu-debug= from kern.bootargs and set TU_DEBUG before creating the device. Neither reads the NativeTurnipDebug property set by the board for pipa-turnip-debug=. The historical pipa-turnip-debug=noubwc,nocb image did not establish that UBWC was disabled."
 }

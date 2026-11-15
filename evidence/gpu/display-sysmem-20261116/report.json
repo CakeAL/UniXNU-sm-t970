@@ -1,0 +1,18 @@
+{
+  "image": "out/display-reference-20261116/sysmem-exact/boot.img",
+  "image_sha256": "90f08ba4f7369bfc5c2f8525d540627b0ee6050e8052e04542f7b05764bc0a18",
+  "partition": "RECOVERY",
+  "boot_tag": "display-sysmem-a",
+  "baseline_image_sha256": "27b139a10de237d0aae6e6b27a9190c81fe911f1059a87eafdd18fb3cedf2924",
+  "kernel_args": "boot-progress=3 build-tag=display-sysmem-a t970-large-data=1 t970-large-init=1 t970-pen=7 native-ufs-stream2=0x4e0 gpu-addon=1 tu-debug=sysmem t970-wifi=6 t970-bt=257 t970-adsp=2 t970-audio=32 t970-haptics=3 t970-sensors=243 t970-usb=37 t970-qud-retry=1 t970-qud-resume=1 dpu-scanout=2 kt_fixed_zones=120 smp=1 armcpu-spi-ipi=1 armcpu-spi-ipi-base=544 armcpu-self-ipi=1 pmgr=2 native-ufs-root=1 native-ufs-stream=0xe0 sheng-data-persist=2 data-fua=1 offline-mobile-graphics-load=1 offline-legacy-pm=1 offline-legacy-register=1 offline-legacy-gop=1 offline-legacy-validate=1 offline-legacy-phase=4 offline-legacy-transfer=1 offline-legacy-cpu-present=1 vsync=60 lite=1 disable-jobs=com.apple.liveactivitiesd,com.apple.cryptexd,com.apple.routined disable-watchdogd=1 aks=1 offline-hid-input=1 offline-key-events=1 cpufreq=4 cpufreq-cap=2000 qcom-usb-debug=1 qcom-usb-ctl=1 t970-fb-wc=1 native-touch=1 touch-hid=1 t970-touch-xform=5 pipa-gpu=12 fb-gpu=1 t970-battery=1",
+  "unchanged_payload_files_sha256": {
+    "Payloads/kernel.macho": "bae317bb56b739a2fbc8427a897be7dcc41f65caf072dbc036797dbff35be210",
+    "Payloads/kernel.macho.adt": "71ab77292a736adc575fe7c9273e817d63c1fd99b0fb2b424fde54be68721cf5",
+    "Payloads/kernel.macho.trustcache": "1121177b35054fb103ff268157352ef0a1b1a7ac13e931e5163dedadcc01a0f5",
+    "Payloads/scratch-data.img": "ca1543d1986cb1de5dd8ef6a3f01f48609e2a65a18bbf3f88f04b2d189031dcf"
+  },
+  "pack_command": "python3.14 scripts/pack-wholesale-recovery.py --base out/dual-system/data-persistence-20261111/recovery-persistent.img --payload out/display-reference-20261116/sysmem-exact/payload.img --output out/display-reference-20261116/sysmem-exact/boot.img --large-data-seed --trust-cache out/display-reference-20261116/trust/owner-trust.bundle",
+  "device_result": null,
+  "flash_command": "sh scripts/flash-recovery-when-detected.sh out/display-reference-20261116/sysmem-exact/boot.img 90f08ba4f7369bfc5c2f8525d540627b0ee6050e8052e04542f7b05764bc0a18 30",
+  "flash_result": "RECOVERY upload successful, --no-reboot."
+}
