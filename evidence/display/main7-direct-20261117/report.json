@@ -1,0 +1,37 @@
+{
+  "reference": "https://github.com/rui12366B/UniXNU-gts7xlwifi/blob/88b34f97100a01aab4ea6b86dc9c748b2114c382/board.toml",
+  "source_base": "968fbdbf83f27e8e256f094fac395a1e16ddc7f3",
+  "framework_revision": "945ad8db0641060f6566422d168684c3e9182d53",
+  "local_worktree_diff_sha256": "8a508317c60e47c92e2e9fa7496b9e1ac6c1b490c9a015d77655b9bdb72ed50e",
+  "baseline_recovery": "269096a92a1b83b303f947424c4843def784253efdf34f936259e6796fdfeb0a",
+  "image": "out/main7-direct-ready-20261117/boot.img",
+  "arguments": {
+    "added": "dpu-scanout=2",
+    "removed": "armcpu-self-ipi=1",
+    "reason": "Remove the boot-only per-CPU SGI self-test to fit the Recovery command line.",
+    "command_line_bytes": 994
+  },
+  "implementation": [
+    "Use the same-model DPU pipe, display mapping and kernel fence path. Reuse the matched AdrenoMetal and Turnip bundle from 269096a9.",
+    "The SMMU ready check matches only 0x80000000 plus the bank index. Error codes 0xdead0001 through 0xdead0006 now leave the GPU copy available.",
+    "Paired USB reports direct initialization state, flip requests, CTL flush acknowledgements, copy fallback count, and latch intervals up to 100 ms. Timing measures CTL acknowledgement, not optical panel output."
+  ],
+  "build": "Run sh out/main7-direct-ready-20261117/build.sh from the device repo. It uses the normal UniXNU 21H461 kernel and prelink command, local AppleKeyStoreState 8c70daf, and the retained 269096a9 addon. pack.py repacks FAT16 in the existing Samsung wrapper.",
+  "verification": [
+    "Kernel build, prelink and Recovery readback passed. The packed kernel provides native_ufs_dpu_ready, native_t970_scanout_latches and the USB scanout log format.",
+    "Verified unchanged firmware shim, DTBO and DTB. Verified exact resident addon, trust bundle, ADT and Data seed.",
+    "Display unittest discovery (two tests), GOP fence-wait source check and the extracted SMMU ready check (256 bank values, six error codes and unset state) passed."
+  ],
+  "kernel_sha256": "0ba4747fd5599a46ee75cc5add25caedc646e806d54bfc04270b42085cadcc21",
+  "resident_addon_sha256": "b68a86b681f1fd01b0ae5e4465c57b60289d9e30640065ca8ebe1cb54ad46870",
+  "fat_clusters": 19688,
+  "boot_image_sha256": "33a88fa54763dfafbe1360548e3ee2594506ccb877d05d7a18d385fb65a53d7b",
+  "boot_bytes": 86888448,
+  "upload": {
+    "partition": "RECOVERY",
+    "date": "2026-11-17T02:14:14+08:00",
+    "receipt": "evidence/display/main7-direct-20261117/recovery-upload.txt",
+    "result": "Heimdall confirmed successful RECOVERY upload; manual reboot required."
+  },
+  "runtime": null
+}

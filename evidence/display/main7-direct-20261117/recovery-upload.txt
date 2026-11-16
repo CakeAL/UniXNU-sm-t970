@@ -1,0 +1,6 @@
+command: sh scripts/flash-recovery-when-detected.sh out/main7-direct-ready-20261117/boot.img 33a88fa54763dfafbe1360548e3ee2594506ccb877d05d7a18d385fb65a53d7b 60
+device detected, flashing RECOVERY
+Protocol initialisation successful.
+PIT file download successful.
+RECOVERY upload successful
+flashed 33a88fa54763dfafbe1360548e3ee2594506ccb877d05d7a18d385fb65a53d7b

@@ -196,11 +196,17 @@ extern "C" uint32_t native_ufs_dpu_map (unsigned slot, const uint64_t *pages, un
 }
 
 
+// Only the installed state is 0x80000000 plus the 8-bit context bank. Error codes also set bit 31.
+extern "C" bool native_ufs_dpu_ready ()
+{
+  return (native_ufs_dpu_state & 0xffffff00U) == 0x80000000U;
+}
+
 // The window build itself. Called through the forwarder in NativeUfs.cpp, which the exported entry point below the namespace uses.
 static int dpuWindowBuildImpl (uintptr_t smmu)
 {
   if (!smmu) return 0;
-  if (native_ufs_dpu_state >> 31) return 1;                       // already built
+  if (native_ufs_dpu_ready ()) return 1;                       // already built
   uint32_t dpu = 0, scanout = 0;
   PE_parse_boot_argn ("dpu", &dpu, sizeof (dpu));
   PE_parse_boot_argn ("dpu-scanout", &scanout, sizeof (scanout));
@@ -212,5 +218,5 @@ static int dpuWindowBuildImpl (uintptr_t smmu)
   PE_parse_boot_argn ("native-dpu-boot-iova", &bootIova, sizeof (bootIova));
   const uint16_t streams[2] = { static_cast<uint16_t> (s1), static_cast<uint16_t> (s2) };
   dpuWindowSetup (smmu, streams, 2, scanout, bootIova);
-  return (native_ufs_dpu_state >> 31) ? 1 : 0;
+  return native_ufs_dpu_ready () ? 1 : 0;
 }

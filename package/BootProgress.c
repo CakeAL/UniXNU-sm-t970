@@ -1446,6 +1446,8 @@ extern volatile uint64_t native_legacy_copy_last __attribute__((weak_import));
 // compositor's surface itself (dpu-scanout=2). This row is the only on-panel way to tell a stale or white frame from a slow one, because the
 // persistent log (package/BootLog.c) writes to a winre partition this tablet does not have.
 extern volatile uint32_t native_legacy_direct[14] __attribute__((weak_import));
+extern volatile uint32_t native_t970_direct[11] __attribute__((weak_import));
+extern volatile uint64_t native_t970_scanout_latches[5] __attribute__((weak_import));
 extern volatile uint32_t native_t970_swapfmt[5] __attribute__((weak_import));
 // The signed-text fixups (patches/xnu/native-text-fixup.patch): how many entries /chosen/text-fixups and text-fixup0..7 produced, and
 // how many pages they actually rewrote. Without this row a skipped fixup (a different shared-cache build, or a page that no longer matches
@@ -1633,6 +1635,22 @@ static void crash_banner(unsigned now, bool paint) {
     }
     snprintf(rows[n++],120,"GPU   opens/refused widget=%u/%u settings=%u/%u icons=%u/%u",
       opens[0],refusals[0],opens[1],refusals[1],opens[2],refusals[2]);
+  }
+  if(!paint && &native_t970_direct && &native_legacy_direct && &native_t970_scanout_latches) {
+    static uint64_t prior_latches, prior_intervals, prior_us, prior_slow;
+    static uint32_t prior_state, prior_flips, prior_copy;
+    const uint32_t state=native_t970_direct[0], flips=native_legacy_direct[0], copy=native_legacy_direct[7];
+    const uint64_t latches=native_t970_scanout_latches[0], intervals=native_t970_scanout_latches[2];
+    const uint64_t us=native_t970_scanout_latches[3], slow=native_t970_scanout_latches[4];
+    const uint64_t count=intervals-prior_intervals;
+    if(state!=prior_state || flips!=prior_flips || latches!=prior_latches || copy!=prior_copy) {
+      os_log(OS_LOG_DEFAULT,"t970 scanout: state=%u smmu=%x span_s=%u flips=%u latched=%llu copy_fallback=%u intervals=%llu mean_us=%llu over_budget=%llu",
+        state,native_t970_direct[10],interval,flips-prior_flips,(unsigned long long)(latches-prior_latches),
+        copy-prior_copy,(unsigned long long)count,(unsigned long long)(count?(us-prior_us)/count:0),
+        (unsigned long long)(slow-prior_slow));
+      prior_state=state;prior_flips=flips;prior_latches=latches;prior_copy=copy;
+      prior_intervals=intervals;prior_us=us;prior_slow=slow;
+    }
   }
   if(&native_legacy_direct && native_legacy_direct[0]) {
     snprintf(rows[n++],120,"SCAN  flips=%u map=%u mapf=%u fb=%u | hold=%u w250=%u w8=%u maxwait_us=%u rel=%u",

@@ -1083,6 +1083,7 @@ id = "display"
 status = "implemented"
 components = ["GopFramebuffer"]
 paths = [
+  "evidence/display/main7-direct-20261117/report.json",
   "evidence/display/ref-ui-t-20261115/**",
   "scripts/build-gop-legacy-display.py",
   "evidence/display/setup-skip-v84/**",
@@ -1188,6 +1189,7 @@ findings = [
   "The te-a comparison (71e5b9d0) boots with verified USB pairing and zero TE waits. The owner reports desktop scrolling feels about the same. Settings averages 17.881 ms over 294 GPU copies. The desktop averages 37.361 ms over 291 copies and still has window averages of 188.675 ms and 117.935 ms. SplashBoard fcntl EPERM recurs. AdrenoMetal explicitly reports BinaryArchiveMiss for fixed_frag_lph_cph with no final fallback result recorded.",
   "Recovery 4f84e763 carries the same-model public periph15 copy display profile onto the verified Recovery wrapper. It reinstates the reference TE behavior and passes its Turnip options through tu-debug=, which the packaged plugin reads. The packed kernel, firmware, Data seed, addon and trust match te-a. Hardware result pending.",
   "Recovery e72b68a7 embeds the matched AdrenoMetal and Turnip binaries with the wireless files and uses the 4f84e763 copy profile. USB pairing worked. The owner reports the desktop still has no wallpaper. Both poster providers repeat setup error -2220. Three windows with six SpringBoard swipe starts show 183 successful copies at 28.282 ms mean offer-to-completion, with 155 taking at least 16.667 ms. Hardware flip intervals remain unmeasured.",
+  "The main7 direct Recovery enables dpu-scanout=2 on the 269096a9 runtime inputs. Display startup requires the SMMU success pattern 0x80000000 plus the context-bank index. A 0xdead failure code has the high bit set too and now retains GPU copy. USB timing counts CTL flush acknowledgements separately from flip requests and reports intervals up to 100 ms.",
   "The same-model main7 at 88b34f9 selects dpu-scanout=2. Its direct path and T970's current sources both use the global submitted/retired fence, but the packed 269096a9 arguments select the periph15 GPU-copy path with fb-gpu=1 and vsync=60. A command-line refresh request is not a hardware frame-rate result.",
   "The Pad 7 NSR-XINE report shows that a drained CP ring is insufficient for direct scanout. Its gpucomp31 uses the Metal frontend's command completions before requesting a DPU flip, with a watchdog for unanswered requests. The sheng-gkxqh iPadOS 27 report separately records 68.2 and 72.1 FPS average and 35.2 and 41.5 FPS lows with its experimental Metal flow off.",
   "The current AdrenoMetal build already requests user-interactive QoS in serveScanout. Compare Metal completion and actual DPU latch intervals before attributing the excess copy latency to CPU scheduling or claiming a stable 60 FPS.",
@@ -1301,6 +1303,8 @@ next_action = [
 ]
 
 evidence = [
+  { kind = "device", reference = "evidence/display/main7-direct-20261117/recovery-upload.txt", revision = "968fbdbf83f27e8e256f094fac395a1e16ddc7f3", command = "Upload the reviewed 33a88fa5 image to RECOVERY from Download Mode.", result = "Heimdall confirmed RECOVERY upload. Desktop, USB and latch timing await reboot." },
+  { kind = "host", reference = "evidence/display/main7-direct-20261117/report.json", revision = "968fbdbf83f27e8e256f094fac395a1e16ddc7f3", command = "Build and verify Recovery with the main7 DPU option and the matched Metal bundle.", result = "SMMU readiness and fence checks passed. Readback verified the new kernel, 994-byte arguments, and matching addon, ADT, seed, trust, and firmware." },
   { kind = "device", reference = "evidence/display/poster-assets-20261117/recovery-upload.txt", revision = "2d4370f7f86b4876cda10e031b481ecca24ff5de", command = "Upload 269096a9 with flash-recovery-when-detected.sh.", result = "RECOVERY upload and paired USB verified. Wallpaper overlay mounted and both executables were visible, but wallpaper was absent. User still observed stutter; 203 of 212 copies exceeded 16.667 ms." },
   { kind = "host", reference = "evidence/display/poster-assets-20261117/report.json", revision = "9104328891df5e2e09d41ff01b86e922cf964c91", command = "Generate the stock PNG overlay, rebuild the kernel and verify the packed Recovery.", result = "Wallpaper CAML and PNGs, exact embedded addon and FAT16 geometry verified. GPU arguments and Data seed match e72b68a7. Hardware result pending." },
   { kind = "device", reference = "evidence/display/upstream-display-bundle-20261117/report.json", revision = "a04eb8b4c5f2848dd5d7d9a11bfebed056ef050f", command = "Boot e72b68a7 and collect paired USB logs during home screen swipes and wallpaper setup.", result = "USB pairing and timed GPU copies work. Copies remain over budget during interaction and the poster providers still fail setup." },

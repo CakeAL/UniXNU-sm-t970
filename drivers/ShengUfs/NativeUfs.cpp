@@ -92,7 +92,7 @@ extern "C" void boot_progress_poll (void) __attribute__((weak_import));
 volatile uint32_t native_ufs_probe_calls = 0;
 // The display's stage 1 window (DpuWindow.h, from FFT-infra/NativeUfs-alioth d6bd207: same SM8250 display streams 0x820/0x821 and
 // the same boot scanout at 0x9c000000 here). Defined at file scope outside every namespace: the display driver imports them by these
-// names. native_ufs_dpu_state bit 31 means "translation installed"; NativeLegacyDisplay checks that bit before it takes the direct path.
+// names. NativeLegacyDisplay checks native_ufs_dpu_ready() before it takes the direct path.
 volatile uint32_t native_ufs_dpu_smmu[24] = {};
 volatile uint32_t native_ufs_dpu_state = 0;
 volatile uint32_t native_ufs_dpu_check[8] = {};

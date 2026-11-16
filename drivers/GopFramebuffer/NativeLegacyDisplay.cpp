@@ -60,6 +60,8 @@ extern "C" {volatile uint32_t native_t970_swapfmt[5];}
 // [9] swaps held back until the GPU had written the frame (the compositor submits the swap when the command buffer is scheduled), [10] total
 // and [11] longest wait (us), [12] waits that reached 250 ms, [13] waits of 8 ms or more (longer than a refresh at 120 Hz: the frame missed a flip).
 extern "C" {volatile uint32_t native_legacy_direct[14];}
+// Confirmed CTL latches, last latch tick, in-burst intervals, total interval us, and intervals over budget.
+extern "C" {volatile uint64_t native_t970_scanout_latches[5];}
 extern "C" bool native_adreno_fences(uint32_t *submitted,uint32_t *retired) __attribute__((weak_import));
 extern "C" bool native_adreno_fences_detail(uint32_t *,uint32_t *,uint32_t *) __attribute__((weak_import));
 // The swap lifecycle: native_legacy_ring holds the newest native_legacy_ring_cap events (allocated at start: a static array of this size no longer fits the kernel's data segment), {[0] microseconds since boot (64 bit), [1] event << 56 | slot + 1 << 48 |
@@ -75,6 +77,7 @@ extern "C" {volatile uint64_t (*native_legacy_ring)[2]=nullptr;volatile uint32_t
 extern "C" {volatile uint32_t native_legacy_swap_drops;}
 extern "C" uint32_t native_ufs_dpu_map(unsigned slot,const uint64_t *pages,unsigned count) __attribute__((weak_import));
 extern "C" volatile uint32_t native_ufs_dpu_state __attribute__((weak_import));
+extern "C" bool native_ufs_dpu_ready(void) __attribute__((weak_import));
 static void noteSurface(OSObject *surface,IOMemoryDescriptor *memory)
 {
     static OSObject *seen[4];
@@ -309,7 +312,7 @@ class NativeLegacyDisplay : public IOMobileFramebufferLegacy {
     void startDirect() {
         unsigned mode=0;PE_parse_boot_argn("dpu-scanout",&mode,sizeof(mode));
         native_t970_direct[10]=&native_ufs_dpu_state?native_ufs_dpu_state:0;
-        if(mode<2 || !&native_ufs_dpu_map || !&native_ufs_dpu_state || !(native_ufs_dpu_state>>31) || !primary || !bootMapping)
+        if(mode<2 || !&native_ufs_dpu_map || !&native_ufs_dpu_ready || !native_ufs_dpu_ready() || !primary || !bootMapping)
             {native_t970_direct[0]=2;return;}
         /* kona-sde.dtsi declares the MDP block as 0xae00000 + 0x84208; from 0xae01000 0x83208 bytes remain (alioth DpuProbe). */
         IODeviceMemory *memory=IODeviceMemory::withRange(0xae01000,0x84000);
@@ -450,9 +453,25 @@ class NativeLegacyDisplay : public IOMobileFramebufferLegacy {
     static void latchFired(OSObject *owner,IOTimerEventSource *) {static_cast<NativeLegacyDisplay *>(owner)->latchTick();}
     void latchTick() {
         if(!latchRequest)return;
-        uint64_t ns=0;absolutetime_to_nanoseconds(mach_absolute_time()-latchStart,&ns);
-        gpuTraceEvent(GpuTraceDisplayLatch,0,traceId(latchRequest),mdp[ctlFlush/4],ns,shownSlot,pendingSlot);
-        if((mdp[ctlFlush/4]&flushMask) && ns<50000000ull){latchTimer->setTimeoutUS(500);return;}
+        const uint64_t now=mach_absolute_time();
+        uint64_t ns=0;absolutetime_to_nanoseconds(now-latchStart,&ns);
+        const uint32_t flush=mdp[ctlFlush/4];
+        gpuTraceEvent(GpuTraceDisplayLatch,0,traceId(latchRequest),flush,ns,shownSlot,pendingSlot);
+        if((flush&flushMask) && ns<50000000ull){latchTimer->setTimeoutUS(500);return;}
+        if(!(flush&flushMask)) {
+            const uint64_t last=native_t970_scanout_latches[1];
+            uint64_t interval=0;
+            if(last)absolutetime_to_nanoseconds(now-last,&interval);
+            if(interval && interval<=100000000ull) {
+                native_t970_scanout_latches[3]=native_t970_scanout_latches[3]+interval/1000;
+                if(interval>=16667000ull)native_t970_scanout_latches[4]=native_t970_scanout_latches[4]+1;
+                native_t970_scanout_latches[2]=native_t970_scanout_latches[2]+1;
+            }
+            native_t970_scanout_latches[1]=now;
+            native_t970_scanout_latches[0]=native_t970_scanout_latches[0]+1;
+        } else {
+            native_t970_scanout_latches[1]=0;
+        }
         if(ns>=50000000ull)native_legacy_direct[3]=native_legacy_direct[3]+1;
         const uint32_t us=uint32_t(ns/1000);
         if(us>native_legacy_direct[4])native_legacy_direct[4]=us;
