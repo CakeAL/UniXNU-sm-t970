@@ -1481,8 +1481,9 @@ extern volatile uint32_t native_t970_dpu[5] __attribute__((weak_import));
 static uint64_t banner_gpu_completions, banner_gpu_total, banner_gpu_slow;
 static uint32_t banner_dpu_waits, banner_dpu_total, banner_dpu_timeouts;
 static uint32_t banner_load[4];
-static void crash_banner(unsigned now) {
-  if(!boot_progress_display_owned || display.bound || !display.frame || !display.scale || now-banner_second<2)return;
+static void crash_banner(unsigned now, bool paint) {
+  if(!boot_progress_display_owned || now-banner_second<2)return;
+  if(paint && (display.bound || !display.frame || !display.scale))return;
   // Each repaint is about a million device stores. A swap overwrites the whole frame, so repaint only when a swap has happened
   // since the last paint or the crash records changed; an idle screen keeps the banner.
   uint64_t gpu_sig=0;
@@ -1534,6 +1535,12 @@ static void crash_banner(unsigned now) {
       t970_camera[0],(unsigned)t970_camera[1],(unsigned)t970_camera[3],
       (unsigned)t970_camera[4],(unsigned)t970_camera[5],(unsigned)t970_camera[6],
       (unsigned)t970_camera[7],&t970_camera_c5?t970_camera_c5[9]:0);
+    if (t970_camera[16]) {
+      const unsigned size=(unsigned)t970_camera[13];
+      snprintf(rows[n++],120,"CSI   st=%d %ux%u lanes=%u irq=%x packets=%u ecc=%x crc=%u",
+        t970_camera[16],size&65535,size>>16,((unsigned)t970_camera[25]>>8)&255,
+        (unsigned)t970_camera[18],(unsigned)t970_camera[19],(unsigned)t970_camera[20],(unsigned)t970_camera[21]);
+    }
   }
   if (&t970_sensors && t970_sensors[0]) {
     snprintf(rows[n++],120,"SLPI  st=%d err=%d fw=%d KiB slave=%x irq=%d glink=%d/%d qrtr=%d sns=%x",
@@ -1636,7 +1643,7 @@ static void crash_banner(unsigned now) {
   // the wait chain boot-ui-follow traces: the process SpringBoard sends to (role U) and the one that process sends to (role B).
   // They take only what the panel's height leaves after the rows below (load, UFS, scheduler, CPU, eight GPU rows, three panic rows).
   unsigned stack_rows=0;
-  if(&boot_ui_trace_role_rows) {
+  if(paint && &boot_ui_trace_role_rows) {
     unsigned fit=(display.height-8)/(14*display.scale),cap=fit>2?fit-2:0;if(cap>48)cap=48;
     static const unsigned roles[3]={1,3,0},limit[3]={8,7,6};
     for(unsigned k=0;k<3 && n+15+6<=cap;++k){unsigned room=cap-15-n;unsigned got=boot_ui_trace_role_rows(roles[k],rows+n,room<limit[k]?room:limit[k],k==0);n+=got;stack_rows+=got;}
@@ -1690,6 +1697,13 @@ static void crash_banner(unsigned now) {
     snprintf(rows[n++],120,"%s%s",part?"      ":"PANIC ",piece);
   }
   if(!n)return;
+  char head[120]={};
+  snprintf(head,sizeof head," UniXNU live diagnostics%s%s%s  t=%us  crashes=%u exits=%u",build_tag[0]?"  [":"",build_tag,
+    build_tag[0]?"]":"",now,crashes,failed);
+  memcpy(boot_progress_banner_text[0],head,sizeof head);
+  for(unsigned i=0;i<n;++i)strlcpy(boot_progress_banner_text[i+1],rows[i],120);
+  boot_progress_banner_rows=n+1;
+  if(!paint)return;
   unsigned cell=14*display.scale,cols=display.width/(6*display.scale);if(cols>119)cols=119;
   if(display.height<(n+2)*cell+8)return;
   // A title row above the panel; the panel grows upwards from the bottom edge. When it shrank since the last paint, the rows it
@@ -1701,13 +1715,7 @@ static void crash_banner(unsigned now) {
       for(unsigned x=0;x<cols*6*display.scale;++x)*(volatile uint32_t *)(display.frame+(uintptr_t)y*display.stride+x*4)=0xff000000;
     }
   banner_top=title;
-  char head[120];
-  snprintf(head,sizeof head," UniXNU live diagnostics%s%s%s  t=%us  crashes=%u exits=%u",build_tag[0]?"  [":"",build_tag,
-    build_tag[0]?"]":"",now,crashes,failed);
   px_text(0,title,head,cols,0xffffffff,BP_BAR_LIVE);
-  memcpy(boot_progress_banner_text[0],head,120);
-  for(unsigned i=0;i<n;++i)memcpy(boot_progress_banner_text[i+1],rows[i],120);
-  boot_progress_banner_rows=n+1;
   for(unsigned i=0;i<n;++i) {
     if(__atomic_load_n(&display.yield_requested,__ATOMIC_ACQUIRE))return;
     const char *r=rows[i];
@@ -1723,13 +1731,16 @@ static void touch_overlay(void) {
   // the painters hold render_busy for about a million uncached stores, which a swap's scanout hand-off has to wait for.
   static int banner_off=-1;
   if(banner_off<0){unsigned v=1;PE_parse_boot_argn("banner",&v,sizeof(v));banner_off=v==0;}
-  if(banner_off)return;
+  if(banner_off) {
+    crash_banner(seconds(),false);
+    return;
+  }
   __atomic_fetch_add(&touch_passes,1,__ATOMIC_RELAXED);
   // Same rule as the text renderer: draw only while holding render_busy, so a display handoff (which takes it before
   // retiring the mapping) can never overlap these stores. A pass that finds it taken is simply skipped.
   if(__atomic_exchange_n(&render_busy,1,__ATOMIC_ACQUIRE))return;
   ext_overlay_locked();
-  crash_banner(seconds());
+  crash_banner(seconds(),true);
   if(&native_touch_stage_req && native_touch_stage_req)touch_overlay_locked();
   __atomic_store_n(&render_busy,0,__ATOMIC_RELEASE);
 }

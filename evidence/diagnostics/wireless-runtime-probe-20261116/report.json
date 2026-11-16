@@ -38,7 +38,14 @@
       "device_log_time": "Nov 15 04:24:38 (device clock), at 178 seconds uptime during the Nov 16 host capture",
       "sequence": "Settings Other Network sends a password; wifid classifies the request as WPA (isWPA=1, isSAE=0) and IO80211 returns -3903 without a type-20 request.",
       "metrics": "Security 0x2; WPA information element with protocol 0x1, multicast cipher 0x4, unicast cipher bitmap 0xc and AKM 0x2. No RSN element is reported for this attempt.",
-      "limit": "The existing station path is WPA2-Personal/CCMP (RSN). The manual request does not exercise the reference WPA2 path. A known WPA2-Personal AES network selected from the scan list remains the control."
+      "limit": "The existing station path is WPA2-Personal/CCMP (RSN). The manual request does not exercise the reference WPA2 path. A known WPA2-Personal AES network selected from the scan list remains the control.",
+      "hotspot": {
+        "owner_result": "A Xiaomi 15 hotspot joined successfully. The original WPA/WPA2-Personal mixed network still showed WPA in iPadOS.",
+        "host_capture_local": "2026-11-16 16:59 +0800",
+        "associated_network": "wifid reports security=wpa3-transition, group and unicast AES-CCM, AKMs PSK and SAE, MFP capable.",
+        "negotiation": "The built station accepts PSK/CCMP and constructs an RSN PSK request, so the successful transition hotspot exercised the WPA2-compatible option. A WPA3-only SAE handshake and sustained IP traffic were not verified.",
+        "mixed_network_limit": "The Mac found one BSS on the same channel but returned no IE bytes. The capture does not establish which IEs the mixed network transmitted on air."
+      }
     }
   }
 }

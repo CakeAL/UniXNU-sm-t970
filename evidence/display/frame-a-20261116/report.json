@@ -1,0 +1,36 @@
+{
+  "build_tag": "frame-a",
+  "device_source_base": "e8266f61a7e4146b4a9d199cb4fa4ad475e919dc",
+  "framework_revision": "945ad8db0641060f6566422d168684c3e9182d53",
+  "baseline_image_sha256": "3fbc958cc0d01ec6ceb55b58c0c22238de0ee13bb1b3c9fedb04d62457ee3b5f",
+  "image_sha256": "60bbdcccda3813d2686ca736306d0f623742a5deb6cfdc31581b6f4f42740353",
+  "kernel_sha256": "e3b1862775d1065cb1d15bf6b5c79b94cd786aac4892637cd8111a7f3b624090",
+  "image_bytes": 86888448,
+  "partition": "RECOVERY",
+  "image": "out/peripherals-and-frame-pacing-20261116/frame-a/recovery/boot.img",
+  "build_command": "In UniXNU with the previous wholesale environment: T970_GPU_ADDON=<same addon-wireless.bin> python3.14 ./unixnu build kernel -D ../UniXNU-sm-t970 --local-module AppleKeyStoreState=<clean worktree at 8c70daf>",
+  "pack_command": "python3.14 scripts/build-boot-progress-page.py --mode 2 --large-data-seed --data-ramdisk out/dual-system/overlay-inspection-20261115/reference-fresh-73g.dbr --kernel-arg build-tag=frame-a --kernel-arg t970-large-data=1 --kernel-arg t970-large-init=1 --kernel-arg t970-pen=7 --kernel-arg native-ufs-stream2=0x4e0 --kernel-arg gpu-addon=1 --kernel-arg t970-wifi-svc=1 --kernel-arg t970-wifi=6 --kernel-arg t970-bt=257 --kernel-arg t970-adsp=2 --kernel-arg t970-audio=32 --kernel-arg t970-haptics=3 --kernel-arg t970-sensors=243 --kernel-arg t970-usb=37 --kernel-arg t970-qud-retry=1 --kernel-arg t970-qud-resume=1 --drop-kernel-arg panic_on_crash_disabled --drop-kernel-arg armcpu-diagnostics=1 --drop-kernel-arg log-gpu=1 --drop-kernel-arg t970-fb-src-wb=1 --owner-trust-cache /Users/cakeal/vsc/UniXNU-sm-t970/out/wireless-reference-20261116/trust/owner-trust.bundle --kernel /Users/cakeal/vsc/UniXNU/out/sm-t970/ipados-17.7.11-21H461/gts7xlwifi/kernel/kernel.macho --output /Users/cakeal/vsc/UniXNU-sm-t970/out/peripherals-and-frame-pacing-20261116/frame-a/recovery --kernel-arg banner=0",
+  "host_verification": "Prelink succeeded. Read back unchanged wireless addon, ADT except random seed, Data seed and owner trust bundle. The 985-byte command line changes only build-tag and banner=0 compared with 3fbc958c.",
+  "experiment": "After display takeover, collect the existing presentation and crash counters without framebuffer writes or the overlay render_busy lock. The wireless, Metal and display presentation settings follow the baseline. Camera is not enabled in the frame-a boot arguments.",
+  "counter_access": "BootLog consumes the in-memory rows when the log sink is available. The local persistent Data layout does not guarantee a WinRE log window. In that case the current frame-a comparison requires owner observation.",
+  "flash_result": "Heimdall reported RECOVERY upload successful with --no-reboot.",
+  "flash_command": "sh scripts/flash-recovery-when-detected.sh out/peripherals-and-frame-pacing-20261116/frame-a/recovery/boot.img 60bbdcccda3813d2686ca736306d0f623742a5deb6cfdc31581b6f4f42740353 30",
+  "runtime": {
+    "device_boot": "USB enumerates as an iPad after flashing and rebooting. MobileDevice validates the existing pairing and starts a session, and syslog relay opens.",
+    "desktop_frame_pacing": "The owner completed the desktop swipe comparison and reported about the same stutter with the live banner disabled.",
+    "syslog_window": "Device clock 04:23:10\u201304:23:59 on the Nov 16 host capture. SpringBoard reports user-initiated scrolling; Preferences enters the foreground.",
+    "observed_in_window": {
+      "quartzcore_metal_pipeline_load_fault_log_records": 12,
+      "posterkit_nil_configuration_assert_log_records": 9
+    },
+    "interpretation": "Removing overlay framebuffer writes did not visibly improve this run. Log records can repeat, do not give frame intervals, and do not establish which fault missed a frame.",
+    "wifi_retest": "The latest Other Network manual request again returned IO80211 -3903 without a type-20 ASSOCIATE request. The previously successful WPA3-transition hotspot test remains a separate observation."
+  },
+  "usb3_followup": {
+    "image": "out/peripherals-and-frame-pacing-20261116/usb3-a/recovery/boot.img",
+    "image_sha256": "73310c59e160b93b7846e2f655afd2130298a17f2a6769b99e3ea9a90b78bf26",
+    "pack_command": "python3.14 scripts/build-boot-progress-page.py --mode 2 --large-data-seed --data-ramdisk out/dual-system/overlay-inspection-20261115/reference-fresh-73g.dbr --kernel-arg build-tag=usb3-a --kernel-arg t970-large-data=1 --kernel-arg t970-large-init=1 --kernel-arg t970-pen=7 --kernel-arg native-ufs-stream2=0x4e0 --kernel-arg gpu-addon=1 --kernel-arg t970-wifi-svc=1 --kernel-arg t970-wifi=6 --kernel-arg t970-bt=257 --kernel-arg t970-adsp=2 --kernel-arg t970-audio=32 --kernel-arg t970-haptics=3 --kernel-arg t970-sensors=243 --kernel-arg t970-usb=39 --kernel-arg t970-qud-retry=1 --kernel-arg t970-qud-resume=1 --drop-kernel-arg panic_on_crash_disabled --drop-kernel-arg armcpu-diagnostics=1 --drop-kernel-arg log-gpu=1 --drop-kernel-arg t970-fb-src-wb=1 --owner-trust-cache /Users/cakeal/vsc/UniXNU-sm-t970/out/wireless-reference-20261116/trust/owner-trust.bundle --kernel /Users/cakeal/vsc/UniXNU/out/sm-t970/ipados-17.7.11-21H461/gts7xlwifi/kernel/kernel.macho --output /Users/cakeal/vsc/UniXNU-sm-t970/out/peripherals-and-frame-pacing-20261116/usb3-a/recovery --kernel-arg banner=0",
+    "verification": "Same packed kernel, trust, ADT except random seed, Data seed and addon. Changes only t970-usb from 37 to 39 and build-tag.",
+    "device_status": "Not uploaded or booted."
+  }
+}

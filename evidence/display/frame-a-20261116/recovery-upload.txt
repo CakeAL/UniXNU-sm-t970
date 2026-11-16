@@ -1,0 +1,10 @@
+sh scripts/flash-recovery-when-detected.sh out/peripherals-and-frame-pacing-20261116/frame-a/recovery/boot.img 60bbdcccda3813d2686ca736306d0f623742a5deb6cfdc31581b6f4f42740353 30
+
+Protocol initialisation successful.
+Session begun.
+PIT file download successful.
+Uploading RECOVERY
+RECOVERY upload successful
+Ending session...
+Releasing device interface...
+flashed 60bbdcccda3813d2686ca736306d0f623742a5deb6cfdc31581b6f4f42740353
