@@ -1,0 +1,21 @@
+{
+  "reference": "https://github.com/rui12366B/UniXNU-gts7xlwifi/blob/88b34f97100a01aab4ea6b86dc9c748b2114c382/porting.toml",
+  "baseline_recovery": "e72b68a7309e2c2d6a1ad4bf3d3bd33fc332dcd67f90cd5dc280367a3f08b92c",
+  "source_base": "9104328891df5e2e09d41ff01b86e922cf964c91",
+  "framework_revision": "945ad8db0641060f6566422d168684c3e9182d53",
+  "local_worktree_diff_sha256": "8fbf9374a877544d256b75ca835be1224ec0fca7212377d70c9877d080ccf656",
+  "os": "iPadOS 17.7.11 (21H461)",
+  "baseline_evidence": "The paired USB log for e72b68a7 has 88 PosterBoard ExtensionFoundation process-identity entries under com.apple.posterkit.provider. All name com.apple.weather.poster. CollectionsPoster and LegacyPoster both return -2220. The 21H461 OS volume contains both signed .appex bundles and the shipped LaunchServices database includes CollectionsPoster.appex. This evidence does not identify whether visibility or discovery filtering excludes the system providers.",
+  "overlay": "The framework make-wallpaper-overlay.py generates the stock 7570 animation with PNG resources. Reconverted its original two HEIC images with sips -Z 1366 -s format png to fit the verified FAT16 layout. Parsed CAML CGImage src attributes and verified the new PNGs. The 22 earlier addon entries match byte for byte and five wallpaper files are added.",
+  "kernel_trace": "After mounting the root view, look up the stock CollectionsPoster and LegacyPoster executables. The paired USB log prints those two result codes, the LaunchServices store maintenance result and the wallpaper overlay mount status.",
+  "build_command": "Use the same build inputs as e72b68a7, with T970_GPU_ADDON=<device>/out/poster-assets-20261117/complete.addon. Run python3.14 ./unixnu build kernel -D <device> --local-module AppleKeyStoreState=<device>/.cache/AppleKeyStoreState-8c70daf.",
+  "pack_command": "UNIXNU_UEFI=.cache/uefi-source/Mu-Silicium python3.14 out/poster-assets-20261117/pack.py",
+  "image": "out/poster-assets-20261117/boot.img",
+  "verification": "Kernel and prelink succeeded. Readback confirms the exact embedded addon, ADT, trust, Data seed, 998-byte arguments, and valid FAT16 with 655360 free bytes. The packed kernel contains the new diagnostic format string. Two display tests and the porting record check passed.",
+  "runtime": null,
+  "kernel_sha256": "4589cd614c1789dd3d213cf7e7d7da80a996e7f06e519d844efb88aff268d27d",
+  "resident_addon_sha256": "b68a86b681f1fd01b0ae5e4465c57b60289d9e30640065ca8ebe1cb54ad46870",
+  "fat_clusters": 19688,
+  "boot_image_sha256": "269096a92a1b83b303f947424c4843def784253efdf34f936259e6796fdfeb0a",
+  "boot_bytes": 86888448
+}

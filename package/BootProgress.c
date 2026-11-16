@@ -1481,6 +1481,8 @@ extern volatile uint64_t native_gop_gpu_timing[3] __attribute__((weak_import));
 extern volatile uint32_t native_t970_dpu[5] __attribute__((weak_import));
 extern volatile int native_cryptex_os_stage __attribute__((weak_import));
 extern volatile int native_cryptex_os_status __attribute__((weak_import));
+extern volatile int native_ls_store_status __attribute__((weak_import));
+extern volatile int t970_poster_path_status[2] __attribute__((weak_import));
 static uint64_t banner_gpu_completions, banner_gpu_total, banner_gpu_slow;
 static uint32_t banner_dpu_waits, banner_dpu_total, banner_dpu_timeouts;
 static uint32_t banner_load[4];
@@ -1502,6 +1504,15 @@ static void crash_banner(unsigned now, bool paint) {
   if (!logged_cryptex && &native_cryptex_os_stage && &native_cryptex_os_status && native_cryptex_os_status >= 0) {
     os_log(OS_LOG_DEFAULT,"t970 WebKit cryptex view: stage=%d status=%d",native_cryptex_os_stage,native_cryptex_os_status);
     logged_cryptex=true;
+  }
+  static unsigned poster_log_interval;
+  const unsigned poster_interval = now / 30;
+  if (!paint && poster_interval != poster_log_interval && &t970_poster_path_status &&
+      t970_poster_path_status[1] >= 0 && &native_ls_store_status && &native_gpu_addon3_stage && &native_gpu_addon3_status) {
+    poster_log_interval = poster_interval;
+    os_log(OS_LOG_DEFAULT, "t970 poster paths: collection=%d legacy=%d ls_store=%d overlay=%d/%d",
+      t970_poster_path_status[0], t970_poster_path_status[1], native_ls_store_status,
+      native_gpu_addon3_stage, native_gpu_addon3_status);
   }
   char rows[48][120];unsigned n=0;
   if(__atomic_exchange_n(&exit_lock,1,__ATOMIC_ACQUIRE))return;

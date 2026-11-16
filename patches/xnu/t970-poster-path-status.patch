@@ -1,0 +1,37 @@
+diff --git a/bsd/kern/kern_exec.c b/bsd/kern/kern_exec.c
+--- a/bsd/kern/kern_exec.c
++++ b/bsd/kern/kern_exec.c
+@@ -7705,6 +7705,25 @@ native_ls_store_drop(proc_t p, user_addr_t scratch)
+ 	(void)native_gpu_addon_write(marker, (const uint8_t *)"1\n", 2, 0644, ctx);
+ 	native_ls_store_status = removed;
+ }
++
++/* Probe the two stock 21H461 providers after the root and addon mounts. */
++volatile int t970_poster_path_status[2] = { -1, -1 };
++static void
++t970_check_poster_paths(void)
++{
++	static const char *const paths[] = {
++		"/System/Library/PrivateFrameworks/WallpaperKit.framework/PlugIns/CollectionsPoster.appex/CollectionsPoster",
++		"/Applications/PaperBoard.app/PlugIns/LegacyPoster.appex/LegacyPoster",
++	};
++	for (size_t i = 0; i < sizeof(paths) / sizeof(paths[0]); ++i) {
++		vnode_t vnode = NULLVP;
++		int error = vnode_lookup(paths[i], 0, &vnode, vfs_context_current());
++		if (!error) {
++			vnode_put(vnode);
++		}
++		t970_poster_path_status[i] = error;
++	}
++}
+ static void
+ native_gpu_addon_prepare(proc_t p, user_addr_t scratch)
+ {
+@@ -7762,6 +7781,7 @@ native_gpu_addon_prepare(proc_t p, user_addr_t scratch)
+ 	native_cryptex_os_view(p, scratch);
+ 	native_gestalt_cache_drop(p, scratch);
+ 	native_ls_store_drop(p, scratch);
++	t970_check_poster_paths();
+ }
+ 
+ /* The deletable system apps (Weather, Notes, Calendar, ...) ship in the OS volume's /private/var/staged_system_apps. A restore copies
