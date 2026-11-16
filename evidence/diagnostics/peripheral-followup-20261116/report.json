@@ -20,5 +20,17 @@
   ],
   "flash_command": "sh scripts/flash-recovery-when-detected.sh out/peripheral-followup-20261116/recovery/boot.img 980f9fc9c38fa06d149b64b640c0ca4b9271b5d2b51b6cc0fb6b1b640a77d491 30",
   "flash_result": "RECOVERY upload successful with --no-reboot.",
-  "runtime": null
+  "runtime": {
+    "source": "Owner report and 16:25:37 Asia/Shanghai photo, 2026-11-16",
+    "uptime_s": 400,
+    "net_row": "xpc=5/0 sync=-1 add=0/0 pcie=20 wifi=7 scan=10 bss=41 err=0 bt=13",
+    "wifi": "Password-based join failed. No JOIN row in the owner photo.",
+    "bt_row": "sk=1/0 req=2 read=2 ctl=1 chan=1 tx=6771 rx=71455",
+    "discovery_row": "cmds=108 last=200c reply=200c/0 inquiry=10 adv=1699",
+    "bluetooth": "Owner reports pairing succeeds, connecting fails and other nearby devices are not shown.",
+    "keys_row": "st=3 err=0 irq=36 reports=36 mask=0 apid=13/81",
+    "usb": "Trust dialog appeared and was accepted on the device, but Finder still refused pairing. Mac usbmuxd reported kAMDPasswordProtectedError (0xe800001a); Finder pairing also failed with code -402653035.",
+    "wallpaper": "Owner reports wallpaper disappeared after the trust attempt. The screenshot shows wallpaper previews in Settings; the cause of the reported desktop symptom is unknown.",
+    "present_row": "n=0; TE=80000001; no frame in the sampled interval."
+  }
 }

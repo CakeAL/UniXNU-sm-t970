@@ -73,3 +73,18 @@ Metal 构建在参考 UniXNU `62be7bc` 上运行。AdrenoMetal 为 `83b667824cb8
 结论：触控源码与接线已在本仓库完成并提交；要让平板真正拿到触控，
 需要先用 26.x SDK（或补回上述 SDK 文件）重建一次内核，再走
 `relink → prelink → pack-dual-data-recovery.py → Heimdall` 刷 RECOVERY。
+
+## 同型号参考与实刷配置对照（2026-11-16）
+
+对照对象是远端 `main` 的 `88b34f9`、其中公开的 `periph15` 启动菜单，以及本机实刷的 `peripheral-followup-a`（RECOVERY `980f9fc9`）。参考 README 还汇总了更晚的 main7、combo25 等结果，公开菜单中的启动参数只是其中一个早期构建。 [参考菜单](https://github.com/rui12366B/UniXNU-gts7xlwifi/blob/88b34f97100a01aab4ea6b86dc9c748b2114c382/docs/menu/unixnu.toml) · [参考运行记录](https://github.com/rui12366B/UniXNU-gts7xlwifi/blob/88b34f97100a01aab4ea6b86dc9c748b2114c382/porting.toml)
+
+| 项目 | 同型号参考 | 当前实刷和结论 |
+| --- | --- | --- |
+| 系统与构建 | 21H461、UniXNU `62be7bc` 加三组 host carries；AppleKeyStoreState `8c70daf`，AdrenoMetal carries 目标 `9045eb0` | 21H461、UniXNU `945ad8d`。已从独立工作树构建相同 KeyStore；本机用参考 Metal carries 重建过插件，运行时文件留在本机 Data。参考未发布实际签名 addon，因此只能比对源码、配方和本机构建哈希。 |
+| Wi-Fi | 菜单是 `t970-wifi=4`。实际 WPA2、DHCP、DNS、TCP 来自 `t970-wifi=6 t970-wifi-svc=1` 的后续运行。 | 已用阶段 6 并挂载签名服务缓存。PCIe worker、ath11k 接线、缓存挂载补丁与参考文件逐字节相同；Apple80211 代码只多关联计数。最新本机截图扫到 41 条，输入密码失败后 `JOIN` 未出现，先查无线守护进程向 Apple80211 提交请求的阶段。 |
+| 蓝牙 | `t970-bt=257`、BlueTool、21H461 的 HCI 兼容补丁；公开日志证明守护进程建立传输、Settings 开关可用。 | 同参数、同兼容补丁，板级驱动只多 HCI 计数。最新实机有 10 个 Inquiry 类事件和 1699 个 LE 广播事件；用户可配对，连接与 Settings 发现仍失败。本机 addon 的两个蓝牙固件哈希与此前 Android 库存不同。 |
+| USB | main7b `t970-usb=5`，记录覆盖 USB 枚举和 Finder 识别。 | 本机 `37=5+32` 还提供 J120 的 MobileGestalt 芯片/板 ID。启用 `t970-fsid=1` 后已出现平板信任框；Mac 在配对期间记录 `kAMDPasswordProtectedError`。补入 sheng 配对方案中的 `aks-sls=3`，让 KeyStore 如实报告移植系统无密码。 |
+| 显示与壁纸 | periph15 的两条入口分别用直扫和 GPU 复制。参考 board 默认还带 `wallpaper-freeze=1`，公开菜单两条入口均未带这个选项。 | 两边的显示主驱动逐字节相同；本机现用 GPU 复制和实时横幅，直扫此前未消除白块或掉帧。参考的 12 条 BGRA 文本修补已加载。壁纸消失需要单独观察 Poster 进程与桌面输出，截图没有建立与点击信任的因果关系。 |
+| Data、内存、日志 | 从 UEFI 的 ESP 启动；用 `t970-ufs-data=1 ufsrw=1` 挂载原 Windows 分区上的 APFS，使用 `t970-dram-end=0x280000000`，日志写参考机的备用分区。 | 本机从 Android RECOVERY 封装启动；持久 Data 由 `sheng-data-persist=2 data-fua=1` 和本机专用 `unixnu` 窗口承载。参考 Data、DRAM 和日志开关绑定了另一套分区及 UEFI 内存布局。 |
+
+`pairing-state-a` 继续使用上一版的同一预链接内核、嵌入 addon、信任缓存和 Data 种子。独立回读确认启动参数只增加 `aks-sls=3` 并更新版本标签。 [回读报告](../evidence/diagnostics/pairing-state-20261116/report.json) · [sheng 配对配置](https://unixnu.com/porting/usb)

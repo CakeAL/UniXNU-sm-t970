@@ -1,0 +1,226 @@
+{
+  "aks-sls": {
+    "reference_board": null,
+    "reference_periph15_direct": null,
+    "reference_periph15_copy": null,
+    "local_peripheral_followup_a": null,
+    "local_pairing_state_a": "3"
+  },
+  "armcpu-diagnostics": {
+    "reference_board": "1",
+    "reference_periph15_direct": null,
+    "reference_periph15_copy": null,
+    "local_peripheral_followup_a": null,
+    "local_pairing_state_a": null
+  },
+  "boot-progress": {
+    "reference_board": "3",
+    "reference_periph15_direct": "3",
+    "reference_periph15_copy": "3",
+    "local_peripheral_followup_a": "2",
+    "local_pairing_state_a": "2"
+  },
+  "build-tag": {
+    "reference_board": null,
+    "reference_periph15_direct": null,
+    "reference_periph15_copy": null,
+    "local_peripheral_followup_a": "peripheral-followup-a",
+    "local_pairing_state_a": "pairing-state-a"
+  },
+  "cpufreq": {
+    "reference_board": "3",
+    "reference_periph15_direct": "4",
+    "reference_periph15_copy": "4",
+    "local_peripheral_followup_a": "4",
+    "local_pairing_state_a": "4"
+  },
+  "data-fua": {
+    "reference_board": null,
+    "reference_periph15_direct": null,
+    "reference_periph15_copy": null,
+    "local_peripheral_followup_a": "1",
+    "local_pairing_state_a": "1"
+  },
+  "dpu-scanout": {
+    "reference_board": "2",
+    "reference_periph15_direct": "2",
+    "reference_periph15_copy": null,
+    "local_peripheral_followup_a": null,
+    "local_pairing_state_a": null
+  },
+  "log": {
+    "reference_board": "1",
+    "reference_periph15_direct": "1",
+    "reference_periph15_copy": "1",
+    "local_peripheral_followup_a": null,
+    "local_pairing_state_a": null
+  },
+  "log-gpu": {
+    "reference_board": null,
+    "reference_periph15_direct": "1",
+    "reference_periph15_copy": "1",
+    "local_peripheral_followup_a": null,
+    "local_pairing_state_a": null
+  },
+  "panic_on_crash_disabled": {
+    "reference_board": "1",
+    "reference_periph15_direct": "1",
+    "reference_periph15_copy": "1",
+    "local_peripheral_followup_a": null,
+    "local_pairing_state_a": null
+  },
+  "pipa-turnip-debug": {
+    "reference_board": "noubwc,nocb",
+    "reference_periph15_direct": "noubwc,nocb",
+    "reference_periph15_copy": "noubwc,nocb",
+    "local_peripheral_followup_a": null,
+    "local_pairing_state_a": null
+  },
+  "sheng-data-persist": {
+    "reference_board": null,
+    "reference_periph15_direct": null,
+    "reference_periph15_copy": null,
+    "local_peripheral_followup_a": "2",
+    "local_pairing_state_a": "2"
+  },
+  "t970-adsp": {
+    "reference_board": null,
+    "reference_periph15_direct": null,
+    "reference_periph15_copy": null,
+    "local_peripheral_followup_a": "2",
+    "local_pairing_state_a": "2"
+  },
+  "t970-audio": {
+    "reference_board": null,
+    "reference_periph15_direct": null,
+    "reference_periph15_copy": null,
+    "local_peripheral_followup_a": "32",
+    "local_pairing_state_a": "32"
+  },
+  "t970-battery": {
+    "reference_board": null,
+    "reference_periph15_direct": "1",
+    "reference_periph15_copy": "1",
+    "local_peripheral_followup_a": "1",
+    "local_pairing_state_a": "1"
+  },
+  "t970-bt": {
+    "reference_board": null,
+    "reference_periph15_direct": null,
+    "reference_periph15_copy": null,
+    "local_peripheral_followup_a": "257",
+    "local_pairing_state_a": "257"
+  },
+  "t970-dram-end": {
+    "reference_board": "0x280000000",
+    "reference_periph15_direct": "0x280000000",
+    "reference_periph15_copy": "0x280000000",
+    "local_peripheral_followup_a": null,
+    "local_pairing_state_a": null
+  },
+  "t970-fb-src-wb": {
+    "reference_board": "1",
+    "reference_periph15_direct": "1",
+    "reference_periph15_copy": "1",
+    "local_peripheral_followup_a": null,
+    "local_pairing_state_a": null
+  },
+  "t970-fsid": {
+    "reference_board": null,
+    "reference_periph15_direct": null,
+    "reference_periph15_copy": null,
+    "local_peripheral_followup_a": "1",
+    "local_pairing_state_a": "1"
+  },
+  "t970-haptics": {
+    "reference_board": null,
+    "reference_periph15_direct": null,
+    "reference_periph15_copy": null,
+    "local_peripheral_followup_a": "3",
+    "local_pairing_state_a": "3"
+  },
+  "t970-large-data": {
+    "reference_board": null,
+    "reference_periph15_direct": null,
+    "reference_periph15_copy": null,
+    "local_peripheral_followup_a": "1",
+    "local_pairing_state_a": "1"
+  },
+  "t970-large-init": {
+    "reference_board": null,
+    "reference_periph15_direct": null,
+    "reference_periph15_copy": null,
+    "local_peripheral_followup_a": "1",
+    "local_pairing_state_a": "1"
+  },
+  "t970-pen": {
+    "reference_board": null,
+    "reference_periph15_direct": null,
+    "reference_periph15_copy": null,
+    "local_peripheral_followup_a": "7",
+    "local_pairing_state_a": "7"
+  },
+  "t970-qud-resume": {
+    "reference_board": null,
+    "reference_periph15_direct": "1",
+    "reference_periph15_copy": "1",
+    "local_peripheral_followup_a": "1",
+    "local_pairing_state_a": "1"
+  },
+  "t970-qud-retry": {
+    "reference_board": null,
+    "reference_periph15_direct": "1",
+    "reference_periph15_copy": "1",
+    "local_peripheral_followup_a": "1",
+    "local_pairing_state_a": "1"
+  },
+  "t970-sensors": {
+    "reference_board": null,
+    "reference_periph15_direct": null,
+    "reference_periph15_copy": null,
+    "local_peripheral_followup_a": "243",
+    "local_pairing_state_a": "243"
+  },
+  "t970-ufs-data": {
+    "reference_board": "1",
+    "reference_periph15_direct": "1",
+    "reference_periph15_copy": "1",
+    "local_peripheral_followup_a": null,
+    "local_pairing_state_a": null
+  },
+  "t970-usb": {
+    "reference_board": null,
+    "reference_periph15_direct": null,
+    "reference_periph15_copy": null,
+    "local_peripheral_followup_a": "37",
+    "local_pairing_state_a": "37"
+  },
+  "t970-wifi": {
+    "reference_board": null,
+    "reference_periph15_direct": "4",
+    "reference_periph15_copy": "4",
+    "local_peripheral_followup_a": "6",
+    "local_pairing_state_a": "6"
+  },
+  "t970-wifi-svc": {
+    "reference_board": null,
+    "reference_periph15_direct": null,
+    "reference_periph15_copy": null,
+    "local_peripheral_followup_a": "1",
+    "local_pairing_state_a": "1"
+  },
+  "ufsrw": {
+    "reference_board": "1",
+    "reference_periph15_direct": "1",
+    "reference_periph15_copy": "1",
+    "local_peripheral_followup_a": null,
+    "local_pairing_state_a": null
+  },
+  "wallpaper-freeze": {
+    "reference_board": "1",
+    "reference_periph15_direct": null,
+    "reference_periph15_copy": null,
+    "local_peripheral_followup_a": null,
+    "local_pairing_state_a": null
+  }
+}

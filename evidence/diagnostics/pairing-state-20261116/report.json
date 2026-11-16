@@ -1,0 +1,16 @@
+{
+  "build_tag": "pairing-state-a",
+  "source_base": "9bc5a8df87b8ff6efd24f92e1396ada79b27d5d8",
+  "framework_revision": "945ad8db0641060f6566422d168684c3e9182d53",
+  "reference_revision": "88b34f97100a01aab4ea6b86dc9c748b2114c382",
+  "kernel_sha256": "d27ec08c6fce59f1467d43a7ab107e73ba2c7ea4031d79e7130a12708c847c72",
+  "image_sha256": "5d245d0dc08d0a56847d0a60b91e0d6af7d56238b94b5cf5b59022d0a0dd0390",
+  "image_bytes": 86888448,
+  "image": "out/pairing-state-20261116/recovery/boot.img",
+  "reason": "The tablet accepted Trust and Mac usbmuxd reported kAMDPasswordProtectedError on 980f9fc9. MobileKeyBag lock state 3 reports no passcode in the reference sheng USB configuration.",
+  "verification": "Byte-identical packed kernel, owner trust, embedded wireless addon and Data seed; same ADT except random seed. Only the version tag and aks-sls=3 differ in kernel arguments.",
+  "build_command": "python3.14 scripts/build-boot-progress-page.py --mode 2 --large-data-seed --data-ramdisk out/dual-system/overlay-inspection-20261115/reference-fresh-73g.dbr --kernel-arg build-tag=pairing-state-a --kernel-arg t970-large-data=1 --kernel-arg t970-large-init=1 --kernel-arg t970-pen=7 --kernel-arg native-ufs-stream2=0x4e0 --kernel-arg gpu-addon=1 --kernel-arg t970-wifi-svc=1 --kernel-arg t970-wifi=6 --kernel-arg t970-bt=257 --kernel-arg t970-adsp=2 --kernel-arg t970-audio=32 --kernel-arg t970-haptics=3 --kernel-arg t970-sensors=243 --kernel-arg t970-usb=37 --kernel-arg t970-qud-retry=1 --kernel-arg t970-qud-resume=1 --drop-kernel-arg panic_on_crash_disabled --drop-kernel-arg armcpu-diagnostics=1 --drop-kernel-arg log-gpu=1 --drop-kernel-arg t970-fb-src-wb=1 --owner-trust-cache /Users/cakeal/vsc/UniXNU-sm-t970/out/wireless-reference-20261116/trust/owner-trust.bundle --kernel /Users/cakeal/vsc/UniXNU/out/sm-t970/ipados-17.7.11-21H461/gts7xlwifi/kernel/kernel.macho --output /Users/cakeal/vsc/UniXNU-sm-t970/out/pairing-state-20261116/recovery",
+  "flash_command": "sh scripts/flash-recovery-when-detected.sh out/pairing-state-20261116/recovery/boot.img 5d245d0dc08d0a56847d0a60b91e0d6af7d56238b94b5cf5b59022d0a0dd0390 30",
+  "flash_result": "RECOVERY upload successful with --no-reboot.",
+  "runtime": null
+}
