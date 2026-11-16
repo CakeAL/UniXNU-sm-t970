@@ -1,0 +1,11 @@
+sh scripts/flash-recovery-when-detected.sh out/te-control-20261116/recovery/boot.img 71e5b9d099ba862063b7001d82c55f35c4a0ea6f2d5e8a75b235e2f30a0ccebd 30
+Host date: 2026-11-16 21:13 CST
+
+Protocol initialisation successful.
+Session begun.
+PIT file download successful.
+Uploading RECOVERY
+RECOVERY upload successful
+Ending session...
+Releasing device interface...
+flashed 71e5b9d099ba862063b7001d82c55f35c4a0ea6f2d5e8a75b235e2f30a0ccebd

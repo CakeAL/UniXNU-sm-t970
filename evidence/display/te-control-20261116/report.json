@@ -12,5 +12,20 @@
   "behavior": "te=0 bypasses the INTF1 frame-counter wait in the GPU copy path. Normal boots default to waiting. Panel autorefresh, copied frame, and timing counters remain in use. Look for zero TE waits and compare the same interactions for copy duration, cadence and tearing.",
   "webkit": "Publishes the OS cryptex stage and status, and logs the unchanging helper identifier, errno and mount read-only flag only when a fatal launch constraint check names a WebKit helper. The check returns its original result.",
   "verification": "Kernel build and prelink succeeded. Readback compared the actual images and verified the firmware wrapper, DTB, embedded FAT, owner trust, persistent Data seed and wireless addon. ADT properties match outside the random seed. The only boot argument changes are te=0 and the new tag (997 bytes). The packed kernel includes both WebKit log messages. Two display tests passed.",
-  "runtime": null
+  "upload": {
+    "host_date": "2026-11-16T21:13+08:00",
+    "partition": "RECOVERY",
+    "receipt": "evidence/display/te-control-20261116/recovery-upload.txt",
+    "result": "Heimdall confirmed upload with manual reboot."
+  },
+  "runtime": {
+    "usb": "AMDeviceIsPaired=1, ValidatePairing=0, StartSession=0, and com.apple.syslog_relay=0.",
+    "owner": "Desktop scrolling felt about the same. Tearing and Safari page pixels were not reported.",
+    "desktop": {"device_window_ends": "05:06:33–45", "windows": 7, "included_seconds": 14, "successful_copies": 291, "mean_offer_to_completion_us": 37361, "copies_over_budget": 234, "te_waits": 0, "slowest_window_means_us": [188675, 117935]},
+    "settings": {"device_window_ends": "05:06:49–59", "windows": 6, "included_seconds": 12, "successful_copies": 294, "mean_offer_to_completion_us": 17881, "copies_over_budget": 158, "te_waits": 0},
+    "display_limit": "Windows cover recorded user gestures. Offer-to-completion covers the copy path. It does not measure the physical panel cadence. Leave the reference TE behavior enabled after this comparison.",
+    "metal": "The first 21 explicit frontend refusals were BinaryArchiveMiss for fixed_frag_lph_cph at pipeline creation. The capture does not prove what the caller's fallback compiled. This diagnostic is not an Adreno hardware submission failure.",
+    "switcher": "Four snapshot completions at device time 05:07:04–11 returned 0, and eight SplashBoard fcntl calls returned EPERM in the same window.",
+    "safari": "After hotspot DHCP and clock synchronization, four WebKit subprocess launch errors occurred and two Safari TLS connections succeeded. Neither new WebKit kernel diagnostic appeared in the collected window. CrashReport copy only found the older WebContent CODESIGNING report. The current launch denial cause remains unverified."
+  }
 }

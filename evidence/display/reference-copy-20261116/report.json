@@ -1,0 +1,36 @@
+{
+  "reference_revision": "88b34f97100a01aab4ea6b86dc9c748b2114c382",
+  "reference_menu": "https://github.com/rui12366B/UniXNU-gts7xlwifi/blob/88b34f97100a01aab4ea6b86dc9c748b2114c382/docs/menu/unixnu.toml",
+  "reference_entry": "gts7xlwifi-copy",
+  "reference_entry_arguments": "kt_fixed_zones=120 smp=1 armcpu-spi-ipi=1 armcpu-spi-ipi-base=544 armcpu-self-ipi=1 boot-progress=3 pmgr=2 native-ufs-root=1 native-ufs-stream=0xe0 native-ufs-stream2=0x4e0 t970-ufs-data=1 ufsrw=1 t970-dram-end=0x280000000 panic_on_crash_disabled=1 offline-mobile-graphics-load=1 offline-legacy-pm=1 offline-legacy-register=1 offline-legacy-gop=1 offline-legacy-validate=1 offline-legacy-phase=4 offline-legacy-transfer=1 offline-legacy-cpu-present=1 vsync=60 lite=1 disable-jobs=com.apple.liveactivitiesd,com.apple.cryptexd,com.apple.routined disable-watchdogd=1 aks=1 offline-hid-input=1 offline-key-events=1 alioth-bt=1 log=1 cpufreq=4 cpufreq-cap=2000 qcom-usb-debug=1 qcom-usb-ctl=1 t970-fb-wc=1 t970-fb-src-wb=1 pipa-gpu=12 pipa-turnip-debug=noubwc,nocb gpu-addon=1 fb-gpu=1 native-touch=1 touch-hid=1 t970-touch-xform=5 t970-wifi=4 t970-qud-resume=1 t970-qud-retry=1 log-gpu=1 t970-battery=1",
+  "reference_publication": "The current public main is the cited commit. No GitHub release is available. The published menu labels the two entries periph15, while the README status refers to main7. The full main7 or main7b device config and privately built payload are not published.",
+  "exact_source_matches": [
+    "dts/gts7xlwifi.dts",
+    "drivers/GopFramebuffer/NativeLegacyDisplay.cpp",
+    "package/GpuProbe.cpp",
+    "package/T970WifiStack.cpp",
+    "package/T970Audio.cpp",
+    "package/T970Pen.cpp",
+    "package/T970Battery.cpp"
+  ],
+  "reference_display_args_reused": [
+    "boot-progress=3",
+    "vsync=60",
+    "pipa-gpu=12",
+    "gpu-addon=1",
+    "fb-gpu=1",
+    "t970-fb-wc=1",
+    "log-gpu=1"
+  ],
+  "translation": "The signed frontend in the existing Data setup consumes TU_DEBUG from tu-debug=, so tu-debug=noubwc,nocb carries the reference menu value. The published and local sources contain t970-fb-src-wb=1 only in config and do not show an implementation for it. This image uses the public GPU copy entry without a dpu-scanout override.",
+  "peripherals": "Reference Wi-Fi stage 6, supplicant service, Bluetooth, audio, S Pen, battery and sensor boot flags remain in use. SLPI firmware was not found in the local prepared inputs. USB keeps the local tested t970-usb=37, retry/resume, union fsid, and no-passcode state. No camera flag is enabled.",
+  "storage": "Reference config points Data at the former Windows partition and uses a WinRE log partition. The local Recovery wrapper and UFS Data route are retained.",
+  "image": "out/reference-copy-20261116/recovery/boot.img",
+  "image_sha256": "4f84e76372c6e7f1578942b88512d57351215c6944fd035dba199632d78a2071",
+  "image_bytes": 86888448,
+  "source_revision": "27ed5724f70bd4778844010fa8dc5be63155c4f2",
+  "framework_revision": "945ad8db0641060f6566422d168684c3e9182d53",
+  "packed_kernel_sha256": "0d2e35f757226728ccedf8417f71f91c5b1dd657e9ad4ed34b719f1634bdfdf7",
+  "pack_command": "python3.14 scripts/build-boot-progress-page.py --mode 3 --large-data-seed --data-ramdisk out/dual-system/overlay-inspection-20261115/reference-fresh-73g.dbr --kernel-arg t970-large-data=1 --kernel-arg t970-large-init=1 --kernel-arg t970-pen=7 --kernel-arg native-ufs-stream2=0x4e0 --kernel-arg gpu-addon=1 --kernel-arg t970-wifi-svc=1 --kernel-arg t970-wifi=6 --kernel-arg t970-bt=257 --kernel-arg t970-adsp=2 --kernel-arg t970-audio=32 --kernel-arg t970-haptics=3 --kernel-arg t970-sensors=243 --kernel-arg t970-usb=37 --kernel-arg t970-qud-retry=1 --kernel-arg t970-qud-resume=1 --drop-kernel-arg panic_on_crash_disabled --drop-kernel-arg armcpu-diagnostics=1 --drop-kernel-arg t970-fb-src-wb=1 --owner-trust-cache /Users/cakeal/vsc/UniXNU-sm-t970/out/wireless-reference-20261116/trust/owner-trust.bundle --kernel /Users/cakeal/vsc/UniXNU/out/sm-t970/ipados-17.7.11-21H461/gts7xlwifi/kernel/kernel.macho --output /Users/cakeal/vsc/UniXNU-sm-t970/out/reference-copy-20261116/recovery --kernel-arg banner=0 --kernel-arg tu-debug=noubwc,nocb",
+  "verification": "Read back the actual embedded FAT and checked kernel, firmware and firmware DTB, hardware ADT fields, Data seed, wireless addon and owner trust. Changed arguments are boot-progress=3 and tu-debug=noubwc,nocb, with the te-a build tag and te=0 removed. 998 argument bytes. No hardware result."
+}
