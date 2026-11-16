@@ -472,8 +472,11 @@ extern "C" int t970_dpu_timing_row(char *row, size_t cap)
 // native_t970_dpu[0] autorefresh before, [1] after, [2] frame waits, [3] waits that timed out, [4] total microseconds waited.
 extern "C" {volatile uint32_t native_t970_dpu[5];}
 static constexpr uint32_t kIntf1 = 0x6b800, kIntfFrameCount = 0xac, kIntfAutorefresh = 0x2b4;
+static unsigned gCopyWaitForTe = 1;
 extern "C" void t970_dpu_set_refresh(void)
 {
+    // Keep the panel in autorefresh. te=0 only bypasses the wait before each GPU copy.
+    PE_parse_boot_argn("te", &gCopyWaitForTe, sizeof gCopyWaitForTe);
     if (!gMdp) {
         IODeviceMemory *memory = IODeviceMemory::withRange(0xae00000, 0x84208);
         IOMemoryMap *map = memory ? memory->map(kIOMapAnywhere | kIOMapInhibitCache) : nullptr;
@@ -491,7 +494,7 @@ extern "C" void t970_dpu_set_refresh(void)
 // began or ended), at most 20 ms later, so the 1.7 ms copy runs inside the gap between two updates instead of across one (tearing).
 extern "C" void t970_dpu_wait_frame(void)
 {
-    if (!gMdp) return;
+    if (!gMdp || !gCopyWaitForTe) return;
     const uint64_t began = mach_absolute_time();
     const uint32_t start = gMdp[(kIntf1 + kIntfFrameCount) / 4];
     bool moved = false;

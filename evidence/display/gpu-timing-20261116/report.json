@@ -48,6 +48,13 @@
       "mean_te_wait_us": 7743,
       "te_timeouts": 0
     },
-    "interpretation": "Window means are weighted by successful copies or waits. The driver's test is >=16667 us. The wait occurs before the GPU copy and accounts for part of the overall offer-to-completion interval. The counters do not measure physical panel flips or distinguish queueing from GPU execution. QuartzCore also reported pipeline load faults, without a correlated AdrenoMetal pipeline refusal message for those events."
+    "interpretation": "Window means are weighted by successful copies or waits. The driver's test is >=16667 us. The wait occurs before the GPU copy and accounts for part of the overall offer-to-completion interval. The counters do not measure physical panel flips or distinguish queueing from GPU execution.",
+    "metal": "SpringBoard and Preferences log initialization of NativeAdrenoMetal. The first full USB capture records 71 BackBoard QuartzCore pipeline-load faults across 28 distinct names, including repeated BGRA pipelines. It has no matching AdrenoMetal pipeline refusal reason. The copy counters and frontend initialization do not establish successful rendering of every Metal pass.",
+    "switcher": {
+      "owner": "Background application previews were white on this boot.",
+      "reproduction": "A separate paired USB capture logged the app switcher gesture at 21:07:28, four Settings or Clock snapshot completions with error 0 at 21:07:30–37, and eight SplashBoard fcntl failures with EPERM for those apps in the same window.",
+      "static_check": "21H461 SystemOS dyld cache UUID 590d839a-82d2-30f1-a17d-0cc053420f73. SplashBoard uses fcntl command 0x40 at 0x2028e74cc and branches to the logged error on return -1. The matching XNU fcntl.h defines 64 as F_SETPROTECTIONCLASS. The live log does not establish whether MACF or the filesystem returned EPERM.",
+      "reference": "https://github.com/roothide/Bootstrap-basebin/blob/main/roothidehooks/springboard.x"
+    }
   }
 }

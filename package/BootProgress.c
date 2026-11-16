@@ -1479,6 +1479,8 @@ static unsigned banner_second,banner_top;
 static uint64_t banner_copy_n,banner_signature,banner_ufs_v,banner_ufs_r,banner_ufs_n,banner_ufs_b;
 extern volatile uint64_t native_gop_gpu_timing[3] __attribute__((weak_import));
 extern volatile uint32_t native_t970_dpu[5] __attribute__((weak_import));
+extern volatile int native_cryptex_os_stage __attribute__((weak_import));
+extern volatile int native_cryptex_os_status __attribute__((weak_import));
 static uint64_t banner_gpu_completions, banner_gpu_total, banner_gpu_slow;
 static uint32_t banner_dpu_waits, banner_dpu_total, banner_dpu_timeouts;
 static uint32_t banner_load[4];
@@ -1496,6 +1498,11 @@ static void crash_banner(unsigned now, bool paint) {
   uint64_t signature=(&native_legacy_copy_n?native_legacy_copy_n:0)*1000003ULL+swaps*1009ULL+(now/10)*977ULL+(&native_wi_count?native_wi_count:0)*7919ULL+exit_records.crashes*131ULL+exit_records.failed+gpu_sig*17ULL;
   if(signature==banner_signature)return;
   banner_signature=signature;banner_second=now;
+  static bool logged_cryptex;
+  if (!logged_cryptex && &native_cryptex_os_stage && &native_cryptex_os_status && native_cryptex_os_status >= 0) {
+    os_log(OS_LOG_DEFAULT,"t970 WebKit cryptex view: stage=%d status=%d",native_cryptex_os_stage,native_cryptex_os_status);
+    logged_cryptex=true;
+  }
   char rows[48][120];unsigned n=0;
   if(__atomic_exchange_n(&exit_lock,1,__ATOMIC_ACQUIRE))return;
   unsigned crashes=exit_records.crashes,failed=exit_records.failed;

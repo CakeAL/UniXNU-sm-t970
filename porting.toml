@@ -1183,6 +1183,9 @@ procedure = [
   "Collect DRM modes, panel type and brightness limits; read only display-selection tokens from /proc/cmdline and match the selected S6TUUM3 node in the live DT.",
 ]
 findings = [
+  "The owner reports white background app cards on ea65492b. The paired USB reproduction showed four Settings and Clock snapshot completions with error 0, alongside eight SplashBoard fcntl errors with EPERM. The 21H461 SplashBoard error branch follows F_SETPROTECTIONCLASS. RootHide has a compatibility workaround limited to its relocated snapshot store for this same call. The T970 still needs to distinguish a MACF rejection from the APFS protection-class operation and confirm the preview pixels.",
+  "SpringBoard and Preferences initialize NativeAdrenoMetal on ea65492b. BackBoard logs 71 QuartzCore pipeline-load faults across 28 names during the first capture, with no correlated plugin refusal reason. GPU copies continued. Trace pipeline cache lookup, actual compilation or rejection, and GPU submission before attributing the visual faults to a single renderer stage.",
+  "The te-a comparison (71e5b9d0) bypasses just the INTF1 pre-copy wait with te=0 and retains panel autorefresh. Recheck transfer times and visible tearing on the same swipe sequence. Its additional WebKit trace reports fatal launch constraint denials without changing policy. Host image readback passed.",
   "Recovery ea65492b keeps frame-a nonpainting mode and uses the reference Metal log switch. It exports active GPU transfer and TE wait windows through XNU unified logging for the paired USB relay. This correlates pipeline errors and transfer timings without the reference WinRE log partition. A real panel interval trace remains pending.",
   "On ea65492b, four windows covering seven SpringBoard swipe starts recorded 180 successful GPU copies, 167 taking at least 16.667 ms from offer to completion. The mean was 31.119 ms, and 180 pre-copy TE waits averaged 8.761 ms without timeouts. These are transfer timings. Sheng and the Pad 7 track actual display latches separately.",
   "Recovery 60bbdccc (frame-a) isolates post-handoff diagnostic drawing. With banner=0 the monitor still collects presentation and crash rows but returns before framebuffer access or render_busy. It uses the same GPU-copy configuration as the wireless runtime baseline. Prelink and payload readback succeeded and Heimdall uploaded RECOVERY. The owner reports about the same stutter. The paired log records QuartzCore pipeline load faults and PosterKit assertions during the swipe window; it has no frame timings.",
@@ -1292,6 +1295,7 @@ next_action = [
 ]
 
 evidence = [
+  { kind = "host", reference = "evidence/display/te-control-20261116/report.json", revision = "ad4fd55114b54c9adc7ad6c112a6901fec295009", command = "Build kernel, prelink and pack the te-a comparison. Read back the two Recovery images and run the display tests.", result = "997-byte arguments, expected TE test option, WebKit diagnostics and matching firmware and persistence inputs. Two display tests passed. Hardware test pending." },
   { kind = "device", reference = "evidence/display/gpu-timing-20261116/report.json", revision = "b7371bb7d8e268905ee5d655e99bf9813a8067ea", command = "Boot gpu-log-a, swipe the home screen and open Settings while logging through paired USB.", result = "Dual-boot Recovery reached the home screen and restored USB pairing. The capture records GPU copy and TE wait timings during owner interaction." },
   { kind = "device", reference = "evidence/display/gpu-timing-20261116/recovery-upload.txt", revision = "b7371bb7d8e268905ee5d655e99bf9813a8067ea", command = "Wait for Download Mode and upload gpu-log-a using flash-recovery-when-detected.sh.", result = "Heimdall confirmed RECOVERY upload for image ea65492b." },
   { kind = "host", reference = "evidence/display/gpu-timing-20261116/report.json", revision = "7a46666418228e889d0de92563afd83b7416f84d", command = "Build and prelink kernel, pack gpu-log-a and read back the actual image.", result = "Verified logging code, 997-byte kernel arguments and persistent inputs matching frame-a." },
@@ -1768,6 +1772,7 @@ paths = [
   "package/LegacyDisplayProbe.cpp",
   "package/BootProgress.c",
   "patches/xnu/t970-wifi-service-mount.patch",
+  "patches/xnu/t970-webkit-launch-log.patch",
   "evidence/network/wireless-reference-20261116/**",
   "evidence/network/wireless-start-20261116/**",
   "evidence/network/safari-hotspot-20261116/**",

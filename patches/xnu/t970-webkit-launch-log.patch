@@ -1,0 +1,20 @@
+diff --git a/security/mac_process.c b/security/mac_process.c
+--- a/security/mac_process.c
++++ b/security/mac_process.c
+@@ -987,6 +987,16 @@ policy_fail:
+ 			    __func__, path, fatal_failure_desc_len, fatal_failure_desc);
+ 		}
+ 
++		/* WebKit's UI log hides the launch error. Publish the known helper name and errno. */
++		const char *helper = strrchr(path, '/');
++		if (helper && (!strcmp(helper, "/com.apple.WebKit.WebContent") ||
++		    !strcmp(helper, "/com.apple.WebKit.Networking") ||
++		    !strcmp(helper, "/com.apple.WebKit.GPU"))) {
++			os_log_error(OS_LOG_DEFAULT,
++			    "t970 WebKit launch constraint: helper=%{public}s errno=%d readonly=%d",
++			    helper + 1, error, vnode_vfsisrdonly(vp));
++		}
++
+ 		os_reason_t reason = os_reason_create(OS_REASON_CODESIGNING,
+ 		    CODESIGNING_EXIT_REASON_LAUNCH_CONSTRAINT_VIOLATION);
+ 

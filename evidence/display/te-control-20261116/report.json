@@ -1,0 +1,16 @@
+{
+  "build_tag": "te-a",
+  "source_base": "ad4fd55114b54c9adc7ad6c112a6901fec295009",
+  "framework_revision": "945ad8db0641060f6566422d168684c3e9182d53",
+  "image": "out/te-control-20261116/recovery/boot.img",
+  "image_bytes": 86888448,
+  "image_sha256": "71e5b9d099ba862063b7001d82c55f35c4a0ea6f2d5e8a75b235e2f30a0ccebd",
+  "packed_kernel_sha256": "0d2e35f757226728ccedf8417f71f91c5b1dd657e9ad4ed34b719f1634bdfdf7",
+  "base_image_sha256": "ea65492b6b4727a0b6c22766c681ad4f3e15364701cadf9460f94ed820aec1b9",
+  "build_command": "In the UniXNU checkout, set PATH to Homebrew Python 3.14 and set UNIXNU_UEFI=<device>/.cache/uefi-source/Mu-Silicium, T970_DEVICE_DIR=<device>/kits, T970_QCA_BLUETOOTH_DIR=drivers/QcaBluetooth, T970_ATH12K_WIFI_DIR=drivers/Ath12kWifi, and T970_GPU_ADDON=<device>/out/dual-system/firmware-inputs-20261114/addon-wireless.bin. Run python3.14 ./unixnu build kernel -D ../UniXNU-sm-t970 --local-module AppleKeyStoreState=<device>/.cache/AppleKeyStoreState-8c70daf.",
+  "pack_command": "python3.14 scripts/build-boot-progress-page.py --mode 2 --large-data-seed --data-ramdisk out/dual-system/overlay-inspection-20261115/reference-fresh-73g.dbr --kernel-arg build-tag=te-a --kernel-arg t970-large-data=1 --kernel-arg t970-large-init=1 --kernel-arg t970-pen=7 --kernel-arg native-ufs-stream2=0x4e0 --kernel-arg gpu-addon=1 --kernel-arg t970-wifi-svc=1 --kernel-arg t970-wifi=6 --kernel-arg t970-bt=257 --kernel-arg t970-adsp=2 --kernel-arg t970-audio=32 --kernel-arg t970-haptics=3 --kernel-arg t970-sensors=243 --kernel-arg t970-usb=37 --kernel-arg t970-qud-retry=1 --kernel-arg t970-qud-resume=1 --drop-kernel-arg panic_on_crash_disabled --drop-kernel-arg armcpu-diagnostics=1 --drop-kernel-arg t970-fb-src-wb=1 --owner-trust-cache /Users/cakeal/vsc/UniXNU-sm-t970/out/wireless-reference-20261116/trust/owner-trust.bundle --kernel /Users/cakeal/vsc/UniXNU/out/sm-t970/ipados-17.7.11-21H461/gts7xlwifi/kernel/kernel.macho --output /Users/cakeal/vsc/UniXNU-sm-t970/out/te-control-20261116/recovery --kernel-arg banner=0 --kernel-arg te=0",
+  "behavior": "te=0 bypasses the INTF1 frame-counter wait in the GPU copy path. Normal boots default to waiting. Panel autorefresh, copied frame, and timing counters remain in use. Look for zero TE waits and compare the same interactions for copy duration, cadence and tearing.",
+  "webkit": "Publishes the OS cryptex stage and status, and logs the unchanging helper identifier, errno and mount read-only flag only when a fatal launch constraint check names a WebKit helper. The check returns its original result.",
+  "verification": "Kernel build and prelink succeeded. Readback compared the actual images and verified the firmware wrapper, DTB, embedded FAT, owner trust, persistent Data seed and wireless addon. ADT properties match outside the random seed. The only boot argument changes are te=0 and the new tag (997 bytes). The packed kernel includes both WebKit log messages. Two display tests passed.",
+  "runtime": null
+}
