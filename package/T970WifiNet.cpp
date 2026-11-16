@@ -44,6 +44,8 @@ extern "C" {
 extern "C" void native_wifi_logf(int level, const char *fmt, ...);
 extern "C" int t970_wifi_file(const char *name, const uint8_t **data, size_t *size);
 extern "C" void t970_wifi_wake(void);   // T970WifiStack.cpp: the Wi-Fi worker sends the queued frame now
+// Requests, ioctl error, Apple80211 auth mode, key cipher, station result. No network identifiers or credentials.
+extern "C" { volatile int32_t t970_wifi_join[5]; }
 
 #define SIOCSA80211 0x802869c8UL   // _IOW('i', 200, struct apple80211req)
 #define SIOCGA80211 0xc02869c9UL   // _IOWR('i', 201, struct apple80211req)
@@ -233,6 +235,7 @@ void on_scan_done() { __atomic_store_n(&gScanning, 0u, __ATOMIC_RELEASE); gScanC
 thread_call_t gCachedScan;
 void cached_scan_done(thread_call_param_t, thread_call_param_t) { on_scan_done(); }
 void on_connect_done(int result) {
+  t970_wifi_join[4] = result;
   if (!gPower || gLinkSuppressed) {
     log(6, "wifi-net: ignore join completion after explicit disconnect: %d", result);
     return;
@@ -577,9 +580,14 @@ int apple80211(bool set, apple80211req &rq) {
       if (result) { __atomic_store_n(&gScanning, 0u, __ATOMIC_RELEASE); return ENETDOWN; }
       t970_wifi_wake(); return 0; }
     case kAssociate: {
+      t970_wifi_join[0] = t970_wifi_join[0] + 1;
+      t970_wifi_join[2] = t970_wifi_join[3] = -1;
+      t970_wifi_join[4] = -1;
       assoc_parameters a{};
       struct Clear { assoc_parameters &p; ~Clear() { memset(&p, 0, sizeof p); } } clear{a};
       int error = copy_association(rq, a); if (error) return error;
+      t970_wifi_join[2] = gAuthUpper;
+      t970_wifi_join[3] = a.key_cipher;
       if (!a.ssid_length || a.ssid_length > 32 || a.key_length > 64) return EINVAL;
       // The station accepts open networks, WPA passphrases and a 32-byte PMK.
       // Do not silently interpret an unknown cipher as a password or an open network.
@@ -690,6 +698,7 @@ errno_t if_ioctl(ifnet_t, unsigned long cmd, void *data) {
     apple80211req *rq = static_cast<apple80211req *>(data);
     const uint32_t len = rq->req_len; const int32_t val = rq->req_val;
     int e = apple80211(cmd == SIOCSA80211, *rq);
+    if (cmd == SIOCSA80211 && rq->req_type == kAssociate) t970_wifi_join[1] = e;
     // every request with its answer, for the first few hundred; then a type's first one only
     static unsigned shown; const int type = rq->req_type; const bool first = type >= 0 && type < 256 && !(gLogged[type / 32] & (1u << (type % 32)));
     if (type >= 0 && type < 256) gLogged[type / 32] |= 1u << (type % 32);

@@ -77,6 +77,8 @@ volatile uint32_t t970_bt_sk[8];
 // 2 Command Complete (status = its first return byte), 3 Command Status, 4 any other event (opcode = event code, status = 0). bluetoothd
 // restarts after a failed init step without its unified log reaching disk; this names the step.
 volatile uint32_t t970_bt_hci[26];
+// Inquiry/scan commands, last command, last reply (opcode << 8 | status), inquiry and LE advertising events.
+volatile uint32_t t970_bt_discovery[5];
 // The start-up log lines (btqca's own and this file's), '|' separated, for BootLog.
 char t970_bt_text[1024];
 volatile uint32_t t970_bt_text_length;
@@ -285,6 +287,16 @@ H4Parser gH2c, gC2h;
 uint32_t gRing[24], gRingAt, gRingCount;
 void record(uint32_t kind, uint32_t opcode, uint32_t status) {
     gRing[gRingAt] = kind << 28 | (opcode & 0xfffff) << 8 | (status & 255); gRingAt = (gRingAt + 1) % 24; ++gRingCount;
+    switch (opcode) {
+    case 0x0401: case 0x0402: case 0x200b: case 0x200c: case 0x2041: case 0x2042:
+        if (kind == 1) {
+            t970_bt_discovery[0] = t970_bt_discovery[0] + 1;
+            t970_bt_discovery[1] = opcode;
+        } else if (kind == 2 || kind == 3) {
+            t970_bt_discovery[2] = opcode << 8 | (status & 255);
+        }
+        break;
+    }
 }
 void traceSnapshot() {
     ++t970_bt_hci[25];
@@ -320,6 +332,10 @@ void trace(H4Parser &p, const uint8_t *bytes, size_t n, bool fromHost) {
         case 4: {
             const uint32_t len = h[2], kept = p.have - 3;
             payload = len - kept;
+            if (h[1] == 0x02 || h[1] == 0x22 || h[1] == 0x2f)
+                t970_bt_discovery[3] = t970_bt_discovery[3] + 1;
+            if (h[1] == 0x3e && kept && (h[3] == 0x02 || h[3] == 0x0d))
+                t970_bt_discovery[4] = t970_bt_discovery[4] + 1;
             if (h[1] == 0x0e && kept >= 4) record(2, uint32_t(h[4] | h[5] << 8), h[6]);
             else if (h[1] == 0x0f && kept >= 4) record(3, uint32_t(h[5] | h[6] << 8), h[3]);
             else record(4, h[1], 0);

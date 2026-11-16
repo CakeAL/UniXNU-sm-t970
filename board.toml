@@ -169,6 +169,8 @@ kernel_args = ["kt_fixed_zones=120", "smp=1",
   "disable-watchdogd=1",
   # Key store stand-in, HID publisher, key events and the PON/PM8150L buttons (ButtonProbe.cpp).
   "aks=1", "offline-hid-input=1", "offline-key-events=1", "alioth-bt=1",
+  # BaseBoard compares /System and the union-mounted daemon's fsid before presenting USB Trust.
+  "t970-fsid=1",
   # Reference load-based EPSS DVFS and GOP cache policy.
   "cpufreq=4", "cpufreq-cap=2000", "qcom-usb-debug=1", "qcom-usb-ctl=1", "t970-fb-wc=1", "t970-fb-src-wb=1",
   # Touch: package/T970FtsTouch.cpp (STM fts1ba90a, GPIO I2C on GPIO 12/13, RPMh L13/L14) feeding ShengHidInput.

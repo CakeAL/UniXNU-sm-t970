@@ -1,0 +1,24 @@
+{
+  "build_tag": "peripheral-followup-a",
+  "baseline": "wireless-start-a, 59996f9e3ade556df671eb3372e0ed0485ce84a7f4fa93e85f508fe61f6c78d7",
+  "device_source_base": "bc3a50fcf5500523431f513fc36693c53ac858f7",
+  "framework_revision": "945ad8db0641060f6566422d168684c3e9182d53",
+  "apple_key_store_revision": "8c70daf814aafdf4a3d35e40dde0322655fd0a83",
+  "kernel_sha256": "d27ec08c6fce59f1467d43a7ab107e73ba2c7ea4031d79e7130a12708c847c72",
+  "image": "out/peripheral-followup-20261116/recovery/boot.img",
+  "image_sha256": "980f9fc9c38fa06d149b64b640c0ca4b9271b5d2b51b6cc0fb6b1b640a77d491",
+  "image_bytes": 86888448,
+  "build_commands": [
+    "In UniXNU with the same board environment and wireless addon: python3.14 ./unixnu build kernel -D ../UniXNU-sm-t970 --local-module AppleKeyStoreState=<clean local worktree at 8c70daf>",
+    "python3.14 scripts/build-boot-progress-page.py --mode 2 --large-data-seed --data-ramdisk out/dual-system/overlay-inspection-20261115/reference-fresh-73g.dbr --kernel-arg build-tag=peripheral-followup-a --kernel-arg t970-large-data=1 --kernel-arg t970-large-init=1 --kernel-arg t970-pen=7 --kernel-arg native-ufs-stream2=0x4e0 --kernel-arg gpu-addon=1 --kernel-arg t970-wifi-svc=1 --kernel-arg t970-wifi=6 --kernel-arg t970-bt=257 --kernel-arg t970-adsp=2 --kernel-arg t970-audio=32 --kernel-arg t970-haptics=3 --kernel-arg t970-sensors=243 --kernel-arg t970-usb=37 --kernel-arg t970-qud-retry=1 --kernel-arg t970-qud-resume=1 --drop-kernel-arg panic_on_crash_disabled --drop-kernel-arg armcpu-diagnostics=1 --drop-kernel-arg log-gpu=1 --drop-kernel-arg t970-fb-src-wb=1 --owner-trust-cache /Users/cakeal/vsc/UniXNU-sm-t970/out/wireless-reference-20261116/trust/owner-trust.bundle --kernel /Users/cakeal/vsc/UniXNU/out/sm-t970/ipados-17.7.11-21H461/gts7xlwifi/kernel/kernel.macho --output /Users/cakeal/vsc/UniXNU-sm-t970/out/peripheral-followup-20261116/recovery"
+  ],
+  "verification": [
+    "The final kernel contains the button worker and stats, Wi-Fi join and Bluetooth discovery counters, GPU present timing, hardware frame wait counters, and t970-fsid handling.",
+    "The packed argument comparison adds alioth-bt=1 and t970-fsid=1, and changes build-tag. All other arguments match wireless-start-a.",
+    "The packed Data seed, owner trust cache and wireless addon are byte-identical to wireless-start-a. ADT properties match except random-seed.",
+    "Existing key probe, display scanout hold and wholesale boot argument tests passed."
+  ],
+  "flash_command": "sh scripts/flash-recovery-when-detected.sh out/peripheral-followup-20261116/recovery/boot.img 980f9fc9c38fa06d149b64b640c0ca4b9271b5d2b51b6cc0fb6b1b640a77d491 30",
+  "flash_result": "RECOVERY upload successful with --no-reboot.",
+  "runtime": null
+}

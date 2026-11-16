@@ -456,6 +456,9 @@ extern volatile uint32_t t970_wifi_stack[16] __attribute__((weak_import));
 extern volatile uint32_t t970_wifi_stats[] __attribute__((weak_import));
 extern volatile int32_t t970_bt[32] __attribute__((weak_import));
 extern volatile uint32_t t970_bt_sk[8] __attribute__((weak_import));
+extern volatile int32_t t970_wifi_join[5] __attribute__((weak_import));
+extern volatile uint32_t t970_bt_discovery[5] __attribute__((weak_import));
+extern volatile int32_t native_buttons_stats[10] __attribute__((weak_import));
 
 static int wifi_status(char *row, size_t capacity) {
   if (!&native_gpu_addon5_stage || !&native_gpu_addon5_status || !&t970_addon_full_sync ||
@@ -1472,6 +1475,10 @@ static volatile uint64_t sleep_n,sleep_over_sum,sleep_over_max,sleep_late50;
 static uint64_t banner_sleep_n,banner_sleep_sum,banner_sleep_late,banner_tint,banner_ipi;
 static unsigned banner_second,banner_top;
 static uint64_t banner_copy_n,banner_signature,banner_ufs_v,banner_ufs_r,banner_ufs_n,banner_ufs_b;
+extern volatile uint64_t native_gop_gpu_timing[3] __attribute__((weak_import));
+extern volatile uint32_t native_t970_dpu[5] __attribute__((weak_import));
+static uint64_t banner_gpu_completions, banner_gpu_total, banner_gpu_slow;
+static uint32_t banner_dpu_waits, banner_dpu_total, banner_dpu_timeouts;
 static uint32_t banner_load[4];
 static void crash_banner(unsigned now) {
   if(!boot_progress_display_owned || display.bound || !display.frame || !display.scale || now-banner_second<2)return;
@@ -1499,11 +1506,22 @@ static void crash_banner(unsigned now) {
   for(unsigned i=0;i<3 && i<failed;++i)snprintf(rows[n++],120,"EXIT  %.100s",exit_records.failures[(failed-1-i)%3]);
   __atomic_store_n(&exit_lock,0,__ATOMIC_RELEASE);
   if (wifi_status(rows[n],sizeof rows[n])) ++n;
+  if (&t970_wifi_join && t970_wifi_join[0])
+    snprintf(rows[n++],120,"JOIN  req=%d errno=%d auth=%x cipher=%d result=%d",
+      t970_wifi_join[0],t970_wifi_join[1],(unsigned)t970_wifi_join[2],t970_wifi_join[3],t970_wifi_join[4]);
   if (&t970_bt && t970_bt[0] && &t970_bt_sk) {
     snprintf(rows[n++],120,"BT    sk=%u/%d req=%u read=%u ctl=%u chan=%u tx=%u rx=%u",
       t970_bt_sk[0],(int)t970_bt_sk[1],t970_bt_sk[2],t970_bt_sk[3],t970_bt_sk[4],
       t970_bt_sk[5],t970_bt_sk[6],t970_bt_sk[7]);
   }
+  if (&t970_bt_discovery && t970_bt_discovery[0])
+    snprintf(rows[n++],120,"DISC  cmds=%u last=%x reply=%x/%u inquiry=%u adv=%u",
+      t970_bt_discovery[0],t970_bt_discovery[1],t970_bt_discovery[2]>>8,t970_bt_discovery[2]&255,
+      t970_bt_discovery[3],t970_bt_discovery[4]);
+  if (&native_buttons_stats && native_buttons_stats[0])
+    snprintf(rows[n++],120,"KEYS  st=%d err=%d irq=%d reports=%d mask=%x apid=%d/%d",
+      native_buttons_stats[0],native_buttons_stats[8],native_buttons_stats[1],native_buttons_stats[2],
+      (unsigned)native_buttons_stats[3],native_buttons_stats[4],native_buttons_stats[5]);
   if (&t970_camera && t970_camera[0]) {
     snprintf(rows[n++],120,"CAM   st=%d det=%x cci=%x front=%08x rear=%08x wide=%08x irq=%x svc=%d",
       t970_camera[0],(unsigned)t970_camera[1],(unsigned)t970_camera[3],
@@ -1536,6 +1554,18 @@ static void crash_banner(unsigned now) {
       &native_legacy_gpu_fallbacks?native_legacy_gpu_fallbacks:0,&native_legacy_gpu_last_status?native_legacy_gpu_last_status:0,
       (unsigned long long)(&native_legacy_early_retires?native_legacy_early_retires:0),
       (unsigned long long)(&native_legacy_early_failures?native_legacy_early_failures:0));
+  }
+  if (&native_gop_gpu_timing && &native_gop_gpu_completions && native_gop_gpu_completions && &native_t970_dpu) {
+    uint64_t copies=native_gop_gpu_completions, total=native_gop_gpu_timing[0], slow=native_gop_gpu_timing[2];
+    uint64_t delta=copies-banner_gpu_completions;
+    uint32_t waits=native_t970_dpu[2], wait_us=native_t970_dpu[4], timeouts=native_t970_dpu[3];
+    uint32_t wait_count=waits-banner_dpu_waits;
+    snprintf(rows[n++],120,"PRESENT n=%llu mean=%lluus slow=%llu max=%lluus | TE=%08x wait=%uus timeout=%u",
+      (unsigned long long)delta,(unsigned long long)(delta?(total-banner_gpu_total)/delta:0),
+      (unsigned long long)(slow-banner_gpu_slow),(unsigned long long)native_gop_gpu_timing[1],
+      native_t970_dpu[1],wait_count?(wait_us-banner_dpu_total)/wait_count:0,timeouts-banner_dpu_timeouts);
+    banner_gpu_completions=copies;banner_gpu_total=total;banner_gpu_slow=slow;
+    banner_dpu_waits=waits;banner_dpu_total=wait_us;banner_dpu_timeouts=timeouts;
   }
   // Direct scanout: flips, surfaces mapped and map failures, swaps that fell back to the GPU copy, swaps held back until the GPU had
   // written the frame, waits that reached 250 ms and waits of 8 ms or more (a missed flip at 120 Hz), and the longest wait in us. A wait

@@ -13,6 +13,8 @@ extern "C" {
 volatile uint32_t native_gop_ready,native_gop_failures;
 volatile uint64_t native_gop_transfers,native_gop_bytes,native_gop_physical,native_gop_virtual;
 volatile uint64_t native_gop_gpu_offers,native_gop_gpu_completions,native_gop_gpu_failures,native_gop_gpu_abandoned;
+// Successful GPU copies: total and maximum offer-to-complete microseconds, count beyond a 60 Hz frame.
+volatile uint64_t native_gop_gpu_timing[3];
 /* waitSwap: [0] calls, [1] timeouts, [2] the requested timeout of the last call (ms), [3] time the last timed-out call really waited (ns), [4] the shortest
  * and [5] the longest such wait (ns), [6] total ns waited in timed-out calls. A timed wait that returns long before its deadline shows here. */
 volatile uint64_t native_gop_wait_stats[7];
@@ -42,7 +44,7 @@ class NativeGOPPresenter : public IOService {
     // GPU hand-off (fb-gpu=1): one offered frame at a time, from the display driver to the privileged client.
     bool gpuMode=false,gpuClient=false;
     struct {bool offered,delivered;uint64_t sequence;void *display;IOMemoryDescriptor *memory;IOMemoryMap *map;
-            uint64_t stride;uint32_t width,height,format;uint64_t deliveredAt;} swap={};
+            uint64_t stride;uint32_t width,height,format;uint64_t offeredAt,deliveredAt;} swap={};
     uint64_t swapSequence=0;
     // The compositor swaps the same few surfaces. Each one's mapping into the client stays here under an id (NGPSwap reserved), so the client
     // keeps its GPU import of those pages and neither side maps 12000 scattered pages again per frame (untagged-203fd45bf: a half-float
@@ -148,7 +150,7 @@ bool NativeGOPPresenter::offer(void *display,IOMemoryDescriptor *memory,uint64_t
     bool accepted=online && gpuClient && !swap.offered;
     if(accepted) {
         memory->retain();
-        swap={true,false,++swapSequence,display,memory,nullptr,stride,width,height,format,0};
+        swap={true,false,++swapSequence,display,memory,nullptr,stride,width,height,format,mach_absolute_time(),0};
         native_gop_gpu_offers=native_gop_gpu_offers+1;
         IOLockWakeup(gate,&swap,false);
     }
@@ -228,6 +230,14 @@ IOReturn NativeGOPPresenter::completeSwap(uint64_t sequence,int status) {
     IOLockLock(gate);
     if(!swap.offered || !swap.delivered || swap.sequence!=sequence) {IOLockUnlock(gate);return kIOReturnBadArgument;}
     auto done=swap;swap={};
+    if (!status) {
+        uint64_t ns = 0;
+        absolutetime_to_nanoseconds(mach_absolute_time() - done.offeredAt, &ns);
+        const uint64_t us = ns / 1000;
+        native_gop_gpu_timing[0] = native_gop_gpu_timing[0] + us;
+        if (us > native_gop_gpu_timing[1]) native_gop_gpu_timing[1] = us;
+        if (us >= 16667) native_gop_gpu_timing[2] = native_gop_gpu_timing[2] + 1;
+    }
     IOLockUnlock(gate);
     OSSafeReleaseNULL(done.map);done.memory->release();
     if(status)__atomic_fetch_add(&native_gop_gpu_failures,1,__ATOMIC_RELAXED);

@@ -21,5 +21,15 @@
   ],
   "flash_command": "sh scripts/flash-recovery-when-detected.sh out/wireless-start-20261116/recovery/boot.img 59996f9e3ade556df671eb3372e0ed0485ce84a7f4fa93e85f508fe61f6c78d7 30",
   "flash_result": "RECOVERY upload successful with --no-reboot.",
-  "runtime": null
+  "runtime": {
+    "source": "Owner observations and photographs at 16:10:16 and 16:10:54 Asia/Shanghai, 2026-11-16",
+    "uptime_s": 400,
+    "net_row": "xpc=5/0 sync=-1 add=0/0 pcie=20 wifi=7 scan=16 bss=47 err=0 bt=13",
+    "wifi": "Settings enabled Wi-Fi and displayed networks. One password-based join reported Unable to Join. Authentication mode, association result and DHCP were not captured.",
+    "bt_row": "sk=1/0 req=2 read=2 ctl=1 chan=1 tx=16140 rx=80117",
+    "bluetooth": "Settings could turn Bluetooth on and UART.SK carried HCI traffic. The owner saw no nearby devices.",
+    "usb": "Finder displayed Trust request denied, with no trust prompt on the tablet. mac-usb-check.py confirmed an iPad on USB 05ac:12ab at 480 Mbps, a populated USB serial and usbmux UDID, QueryType com.apple.mobile.lockdown, ProductType iPad7,1, HardwareModel J120AP, ChipID 32785, BoardId 12 and present UniqueDeviceID and UniqueChipID. Exact identifiers omitted.",
+    "buttons": "Power, volume up and volume down did not respond in iPadOS. The packed arguments omitted alioth-bt=1.",
+    "display": "Owner still reports stutter on desktop and other screens. 4059 validated swaps and 4056 successful GPU copies were recorded, with zero GPU copy failures. Frame latency was not recorded."
+  }
 }
