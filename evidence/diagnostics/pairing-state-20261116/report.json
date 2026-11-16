@@ -12,5 +12,59 @@
   "build_command": "python3.14 scripts/build-boot-progress-page.py --mode 2 --large-data-seed --data-ramdisk out/dual-system/overlay-inspection-20261115/reference-fresh-73g.dbr --kernel-arg build-tag=pairing-state-a --kernel-arg t970-large-data=1 --kernel-arg t970-large-init=1 --kernel-arg t970-pen=7 --kernel-arg native-ufs-stream2=0x4e0 --kernel-arg gpu-addon=1 --kernel-arg t970-wifi-svc=1 --kernel-arg t970-wifi=6 --kernel-arg t970-bt=257 --kernel-arg t970-adsp=2 --kernel-arg t970-audio=32 --kernel-arg t970-haptics=3 --kernel-arg t970-sensors=243 --kernel-arg t970-usb=37 --kernel-arg t970-qud-retry=1 --kernel-arg t970-qud-resume=1 --drop-kernel-arg panic_on_crash_disabled --drop-kernel-arg armcpu-diagnostics=1 --drop-kernel-arg log-gpu=1 --drop-kernel-arg t970-fb-src-wb=1 --owner-trust-cache /Users/cakeal/vsc/UniXNU-sm-t970/out/wireless-reference-20261116/trust/owner-trust.bundle --kernel /Users/cakeal/vsc/UniXNU/out/sm-t970/ipados-17.7.11-21H461/gts7xlwifi/kernel/kernel.macho --output /Users/cakeal/vsc/UniXNU-sm-t970/out/pairing-state-20261116/recovery",
   "flash_command": "sh scripts/flash-recovery-when-detected.sh out/pairing-state-20261116/recovery/boot.img 5d245d0dc08d0a56847d0a60b91e0d6af7d56238b94b5cf5b59022d0a0dd0390 30",
   "flash_result": "RECOVERY upload successful with --no-reboot.",
-  "runtime": null
+  "runtime": {
+    "owner_photo_local": "2026-11-16 16:36:28 +0800",
+    "banner": "pairing-state-a, 380 s, 64 crashes, 74 exits",
+    "usb": {
+      "link": "05ac:12ab at high speed (480 Mb/s)",
+      "lockdown": "USB via usbmuxd, com.apple.mobile.lockdown, iPad7,1 / 17.7.11 (21H461)",
+      "paired_session": [
+        "AMDeviceIsPaired returned 1",
+        "AMDeviceValidatePairing and AMDeviceStartSession both returned 0",
+        "Read a PosterBoard crash report over crashreportcopymobile and streamed syslog_relay with the existing pairing"
+      ]
+    },
+    "wifi": {
+      "owner": "Settings can scan, but joining with a password still fails.",
+      "banner": "PCIe 20, Wi-Fi 7, 10 scans, 41 BSS entries, err=0. No JOIN row.",
+      "syslog_local": "2026-11-16 16:39:03 +0800",
+      "sequence": [
+        "Preferences supplies the password and requests a manual association.",
+        "wifid receives ASSOC, selects STA, and starts low-level association with a private address.",
+        "APPLE80211_IOC_6G_MODE returns -3903. Stock wifid proceeds to its separate associate call regardless of that return.",
+        "IO80211 _performAssociation returns -3903 and the manual request is rejected. No Apple80211 ASSOCIATE (type 20) was observed for this attempt."
+      ],
+      "static_abi_audit": {
+        "wifid_sha256": "0975e378998e650d4f9053dc7946e6dce6b6c404cd0f9a297bf65fef505de336",
+        "wifid_control_flow": "0x10006fce8 sets request 422. The retry exit at 0x10006fd24 always calls the separate association entry at 0x10006fd30.",
+        "cache_uuid": "590d839a-82d2-30f1-a17d-0cc053420f73",
+        "io80211": "Unslid address 0x1dfd9b004 returns -3903 on an unsupported WPA/RSN capability path. The observed log does not identify the exact branch or negotiated AKM."
+      }
+    },
+    "bluetooth": {
+      "owner": "Can pair. Nearby discovery and connecting a paired device still fail.",
+      "banner": {
+        "controller_stage": 13,
+        "control_connections": 1,
+        "channel_requests": 1,
+        "classic_inquiry_events": 0,
+        "le_advertising_events": 1493
+      },
+      "syslog": "bluetoothd reports passive LE scan start success. Some Broadcom-specific hardware-filter commands return 701. No controller connection completion tied to a manual attempt was captured.",
+      "limits": "Passive scan and advertising reception do not show Settings discovery, ACL establishment, authentication, service discovery or audio playback."
+    },
+    "wallpaper": {
+      "crash_report_sha256": "b88553aea94c3eeb1b5b4eb720316d176581487a4f9708df73d8111555611bea",
+      "capture_local": "2026-11-16 16:37:14 +0800",
+      "exception": "EXC_BREAKPOINT / SIGTRAP, PosterKit arm64 257c0359-cbaa-342c-88ff-4ec430686c54",
+      "frames": [
+        "-[PRPosterCollection configuredPropertiesForPoster:] + 260",
+        "-[PBFLockScreenRoleCoordinator determineActivePosterConfigurationForStorage:context:] + 1144"
+      ],
+      "syslog": "PRPosterCollection.m:263 asserts _bs_assert_object != nil for PRPosterConfiguration. PosterBoard also reports -2220 setting up com.apple.WallpaperKit.CollectionsPoster after resolving default wallpaper 7570.",
+      "stock_image": "The signed CollectionsPoster.appex and its entry in the stock LaunchServices seed are present in the read-only 21H461 IPSW OS volume.",
+      "limits": "The captured assertion is in wallpaper configuration. Cause of the provider setup failure and any link to USB Trust are unestablished."
+    },
+    "raw_evidence": "Ignored out/pairing-runtime-20261116. The record omits identifiers, network names, hardware addresses and raw logs."
+  }
 }

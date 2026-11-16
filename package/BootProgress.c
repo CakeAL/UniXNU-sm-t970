@@ -458,6 +458,7 @@ extern volatile int32_t t970_bt[32] __attribute__((weak_import));
 extern volatile uint32_t t970_bt_sk[8] __attribute__((weak_import));
 extern volatile int32_t t970_wifi_join[5] __attribute__((weak_import));
 extern volatile uint32_t t970_bt_discovery[5] __attribute__((weak_import));
+extern volatile uint32_t t970_bt_connections[7] __attribute__((weak_import));
 extern volatile int32_t native_buttons_stats[10] __attribute__((weak_import));
 
 static int wifi_status(char *row, size_t capacity) {
@@ -1518,6 +1519,12 @@ static void crash_banner(unsigned now) {
     snprintf(rows[n++],120,"DISC  cmds=%u last=%x reply=%x/%u inquiry=%u adv=%u",
       t970_bt_discovery[0],t970_bt_discovery[1],t970_bt_discovery[2]>>8,t970_bt_discovery[2]&255,
       t970_bt_discovery[3],t970_bt_discovery[4]);
+  if (&t970_bt_connections && (t970_bt_connections[0] || t970_bt_connections[3] || t970_bt_connections[5])) {
+    const uint32_t reply=t970_bt_connections[2], complete=t970_bt_connections[4], disconnect=t970_bt_connections[6];
+    snprintf(rows[n++],120,"BTCON cmds=%u last=%x reply=%x/%u complete=%u:%x/%u disc=%u:%u/%u",
+      t970_bt_connections[0],t970_bt_connections[1],reply>>8,reply&255,
+      t970_bt_connections[3],complete>>8,complete&255,t970_bt_connections[5],disconnect>>8,disconnect&255);
+  }
   if (&native_buttons_stats && native_buttons_stats[0])
     snprintf(rows[n++],120,"KEYS  st=%d err=%d irq=%d reports=%d mask=%x apid=%d/%d",
       native_buttons_stats[0],native_buttons_stats[8],native_buttons_stats[1],native_buttons_stats[2],

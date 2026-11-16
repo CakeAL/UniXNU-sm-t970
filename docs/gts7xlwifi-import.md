@@ -88,3 +88,9 @@ Metal 构建在参考 UniXNU `62be7bc` 上运行。AdrenoMetal 为 `83b667824cb8
 | Data、内存、日志 | 从 UEFI 的 ESP 启动；用 `t970-ufs-data=1 ufsrw=1` 挂载原 Windows 分区上的 APFS，使用 `t970-dram-end=0x280000000`，日志写参考机的备用分区。 | 本机从 Android RECOVERY 封装启动；持久 Data 由 `sheng-data-persist=2 data-fua=1` 和本机专用 `unixnu` 窗口承载。参考 Data、DRAM 和日志开关绑定了另一套分区及 UEFI 内存布局。 |
 
 `pairing-state-a` 继续使用上一版的同一预链接内核、嵌入 addon、信任缓存和 Data 种子。独立回读确认启动参数只增加 `aks-sls=3` 并更新版本标签。 [回读报告](../evidence/diagnostics/pairing-state-20261116/report.json) · [sheng 配对配置](https://unixnu.com/porting/usb)
+
+## 配对后的实机日志（2026-11-16）
+
+- `pairing-state-a` 已通过 Mac 的 MobileDevice 配对验证，并能读取崩溃报告和系统日志。Wi‑Fi 手动加入到达 `wifid`，随后 IO80211 返回 `-3903`，采样中未提交类型 20 的关联请求。对照 21H461 的 `wifid` 确认类型 422（6 GHz 模式）的返回值不会阻断后续关联。新版再次复现。两次均由设置的「其他网络」入口提交，记录的是 WPA 信息元素，未报告 RSN。用扫描列表里的已知 WPA2-Personal（AES）网络验证同型号参考的关联路径。
+- 蓝牙被动 LE 扫描已启动，固件送回了广播。用户仍报告设置中搜不到设备、配对后连不上。Recovery `3fbc958c` 新增 `BTCON`。刷入后的 USB 日志已确认该配对设备建成经典 ACL、启用 AES-CCM 加密并成功连接 GATT；同一设备的 PAN 网络共享连接返回 305（PAN 客户端日志 3471）。设置列表里的完整发现以及其他服务仍待验证。
+- PosterBoard 在 PosterKit 的 `configuredPropertiesForPoster:` 遇到空配置断言。它找到了系统墙纸 7570，同时报告默认 `CollectionsPoster` 扩展初始化失败（`-2220`）。21H461 原版 OS 内有签名扩展及对应 LaunchServices 种子条目，新一轮启动还记录了该扩展的容器和旧版回退扩展同样返回 `-2220`。继续查扩展查询和激活，因为容器存在时 PosterBoard 仍取不到配置。 [配对后实测](../evidence/diagnostics/pairing-state-20261116/report.json) · [蓝牙诊断镜像](../evidence/diagnostics/wireless-runtime-probe-20261116/report.json)

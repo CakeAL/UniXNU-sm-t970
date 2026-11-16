@@ -1,0 +1,44 @@
+{
+  "build_tag": "wireless-runtime-probe-a",
+  "source_base": "23d771f5f070d7d54854c0f92f2822c81c13180b",
+  "framework_revision": "945ad8db0641060f6566422d168684c3e9182d53",
+  "apple_key_store_revision": "8c70daf814aafdf4a3d35e40dde0322655fd0a83",
+  "base_image_sha256": "5d245d0dc08d0a56847d0a60b91e0d6af7d56238b94b5cf5b59022d0a0dd0390",
+  "image": "out/wireless-runtime-probe-20261116/recovery/boot.img",
+  "image_sha256": "3fbc958cc0d01ec6ceb55b58c0c22238de0ee13bb1b3c9fedb04d62457ee3b5f",
+  "image_bytes": 86888448,
+  "kernel_sha256": "93fbc69695f73c9ff0b4f9c815b94e6dc62a97e29dd144f2585282b7cbe27416",
+  "build_command": "In UniXNU with the prior wholesale build environment: T970_GPU_ADDON=<same addon-wireless.bin> python3.14 ./unixnu build kernel -D ../UniXNU-sm-t970 --local-module AppleKeyStoreState=<clean worktree at 8c70daf>",
+  "pack_command": "python3.14 scripts/build-boot-progress-page.py --mode 2 --large-data-seed --data-ramdisk out/dual-system/overlay-inspection-20261115/reference-fresh-73g.dbr --kernel-arg build-tag=wireless-runtime-probe-a --kernel-arg t970-large-data=1 --kernel-arg t970-large-init=1 --kernel-arg t970-pen=7 --kernel-arg native-ufs-stream2=0x4e0 --kernel-arg gpu-addon=1 --kernel-arg t970-wifi-svc=1 --kernel-arg t970-wifi=6 --kernel-arg t970-bt=257 --kernel-arg t970-adsp=2 --kernel-arg t970-audio=32 --kernel-arg t970-haptics=3 --kernel-arg t970-sensors=243 --kernel-arg t970-usb=37 --kernel-arg t970-qud-retry=1 --kernel-arg t970-qud-resume=1 --drop-kernel-arg panic_on_crash_disabled --drop-kernel-arg armcpu-diagnostics=1 --drop-kernel-arg log-gpu=1 --drop-kernel-arg t970-fb-src-wb=1 --owner-trust-cache /Users/cakeal/vsc/UniXNU-sm-t970/out/wireless-reference-20261116/trust/owner-trust.bundle --kernel /Users/cakeal/vsc/UniXNU/out/sm-t970/ipados-17.7.11-21H461/gts7xlwifi/kernel/kernel.macho --output /Users/cakeal/vsc/UniXNU-sm-t970/out/wireless-runtime-probe-20261116/recovery",
+  "host_verification": [
+    "Prelink passed. The packed image matches the known Data seed, owner trust, wireless addon and ADT except for random seed. Boot arguments differ only in build-tag.",
+    "The prelinked kernel exports t970_bt_connections and the prior Wi-Fi, Bluetooth and USB startup symbols.",
+    "The extracted production H4 parser passes a fragmented packet check under AddressSanitizer and UBSan: classic and LE completions, short packets, command status, disconnection reason, discovery counts and session roll-over.",
+    "Full suite: 82 discovered, 11 skipped, one existing storage test module cannot compile because native_ufs_store_gpt_check is undeclared. check-platform.py stops on its historical framework revision guard."
+  ],
+  "probe": "BTCON reports outbound HCI connect requests, command response status, classic and LE connection completions, and disconnect reason. No peer IDs, handles or keys are included.",
+  "flash_command": "sh scripts/flash-recovery-when-detected.sh out/wireless-runtime-probe-20261116/recovery/boot.img 3fbc958cc0d01ec6ceb55b58c0c22238de0ee13bb1b3c9fedb04d62457ee3b5f 30",
+  "flash_result": "Heimdall reported RECOVERY upload successful with --no-reboot.",
+  "runtime": {
+    "first_paired_usb_host_time": "2026-11-16 16:53 +0800",
+    "image_binding": "RECOVERY upload verified by SHA-256, followed by the owner booting iPadOS and a new USB enumeration. Awaiting owner photo of the live build tag.",
+    "usb": "AMDeviceIsPaired 1; AMDeviceValidatePairing and AMDeviceStartSession both 0; syslog_relay returns a live stream after reboot.",
+    "bluetooth": {
+      "device_log_time": "Nov 15 04:23:22–04:23:35 (device clock), in the Nov 16 host capture",
+      "observed": [
+        "bluetoothd reports a connectable peer from BLE advertising; classic Inquiry toggles On and Off.",
+        "Outgoing classic ACL connects with status 0. SDP runs and authentication enables AES-CCM encryption with status 0.",
+        "The GATT profile returns status 0 and Settings receives BluetoothDeviceConnectSuccessNotification.",
+        "The same peer’s Bluetooth PAN tethering client profile returns result 305; PanConsumerProfile also logs failure 3471."
+      ],
+      "limit": "The reported failed operation is PAN for this paired peer. External accessory discovery in Settings, audio and other profiles remain unverified. BTCON has not been confirmed by a second photo."
+    },
+    "wallpaper": "PosterBoard reproduces -2220 for both CollectionsPoster and the legacy poster fallback, then selects a null poster and traps. containermanagerd has a CollectionsPoster container record. Having a container does not verify discovery or extension activation.",
+    "wifi": {
+      "device_log_time": "Nov 15 04:24:38 (device clock), at 178 seconds uptime during the Nov 16 host capture",
+      "sequence": "Settings Other Network sends a password; wifid classifies the request as WPA (isWPA=1, isSAE=0) and IO80211 returns -3903 without a type-20 request.",
+      "metrics": "Security 0x2; WPA information element with protocol 0x1, multicast cipher 0x4, unicast cipher bitmap 0xc and AKM 0x2. No RSN element is reported for this attempt.",
+      "limit": "The existing station path is WPA2-Personal/CCMP (RSN). The manual request does not exercise the reference WPA2 path. A known WPA2-Personal AES network selected from the scan list remains the control."
+    }
+  }
+}

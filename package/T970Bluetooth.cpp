@@ -79,6 +79,9 @@ volatile uint32_t t970_bt_sk[8];
 volatile uint32_t t970_bt_hci[26];
 // Inquiry/scan commands, last command, last reply (opcode << 8 | status), inquiry and LE advertising events.
 volatile uint32_t t970_bt_discovery[5];
+// Connection commands, last opcode, last reply, completions, last completion,
+// disconnections, and last disconnect (status << 8 | reason).
+volatile uint32_t t970_bt_connections[7];
 // The start-up log lines (btqca's own and this file's), '|' separated, for BootLog.
 char t970_bt_text[1024];
 volatile uint32_t t970_bt_text_length;
@@ -296,6 +299,14 @@ void record(uint32_t kind, uint32_t opcode, uint32_t status) {
             t970_bt_discovery[2] = opcode << 8 | (status & 255);
         }
         break;
+    case 0x0405: case 0x0409: case 0x200d: case 0x2043: case 0x2085:
+        if (kind == 1) {
+            t970_bt_connections[0] = t970_bt_connections[0] + 1;
+            t970_bt_connections[1] = opcode;
+        } else if (kind == 2 || kind == 3) {
+            t970_bt_connections[2] = opcode << 8 | (status & 255);
+        }
+        break;
     }
 }
 void traceSnapshot() {
@@ -336,6 +347,19 @@ void trace(H4Parser &p, const uint8_t *bytes, size_t n, bool fromHost) {
                 t970_bt_discovery[3] = t970_bt_discovery[3] + 1;
             if (h[1] == 0x3e && kept && (h[3] == 0x02 || h[3] == 0x0d))
                 t970_bt_discovery[4] = t970_bt_discovery[4] + 1;
+            // Connection Complete (classic/SCO) or LE Meta Connection Complete.
+            // Keep the event and status only. Skip handles and peer addresses.
+            if ((h[1] == 0x03 || h[1] == 0x2c) && kept >= 1) {
+                t970_bt_connections[3] = t970_bt_connections[3] + 1;
+                t970_bt_connections[4] = uint32_t(h[1]) << 16 | h[3];
+            } else if (h[1] == 0x3e && kept >= 2 &&
+                       (h[3] == 0x01 || h[3] == 0x0a || h[3] == 0x29)) {
+                t970_bt_connections[3] = t970_bt_connections[3] + 1;
+                t970_bt_connections[4] = uint32_t(h[1]) << 16 | uint32_t(h[3]) << 8 | h[4];
+            } else if (h[1] == 0x05 && kept >= 4) {
+                t970_bt_connections[5] = t970_bt_connections[5] + 1;
+                t970_bt_connections[6] = uint32_t(h[3]) << 8 | h[6];
+            }
             if (h[1] == 0x0e && kept >= 4) record(2, uint32_t(h[4] | h[5] << 8), h[6]);
             else if (h[1] == 0x0f && kept >= 4) record(3, uint32_t(h[5] | h[6] << 8), h[3]);
             else record(4, h[1], 0);
