@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: BSD-2-Clause-Patent
-"""Build the owner trust bundle for this tablet's GPU addon.
+"""Build the owner trust bundle for this tablet's runtime addons.
 
 The addon (package/T970GpuAddon/gpu.addon, scripts/make-gpu-addon.py output) carries three signed, ad-hoc binaries the
 kernel mounts under /private/var/ngpu and the userspace then loads: the NativeAdrenoMetal plugin (compositing), its Turnip
 Vulkan driver and adrenoprobed. AMFI refuses all three unless their CDHashes are in the boot image's trust cache, and the
 original Apple bundle (build/original-static-system-trust/original-static-system.bundle) has only Apple's two modules.
+For wireless addons, verify the signed launchd cache and include its CDHash alongside the service executables.
 
 The bundle keeps the same structure DarwinBoot's ValidTrustCaches accepts: a header of one u32 module count and that many
 u32 module offsets, then the modules -- here one owner module (the addon CDHashes, version 2, SHA-256 entries) followed by
@@ -17,8 +18,11 @@ Usage: scripts/build-t970-trust-bundle.py [--addon FILE] [--original FILE] [--ou
 import argparse
 import hashlib
 import json
+import re
 import struct
+import subprocess
 import sys
+import tempfile
 import uuid
 import zlib
 from pathlib import Path
@@ -38,6 +42,8 @@ ADDON_BINARIES = (
     'bt-bin/BlueTool',
     'bt-bin/bluetoothd',
 )
+LAUNCHD_CACHE = 'wifi-xpc/launchd.plist'
+LAUNCHD_SIGNATURE = LAUNCHD_CACHE + '.sig'
 
 
 def addon_files(data):
@@ -86,6 +92,23 @@ def code_directory(macho):
     raise SystemExit('the image carries no CodeDirectory')
 
 
+def launchd_cache_cdhash(cache, signature):
+    """Verify the detached signature against the exact plist in the addon."""
+    with tempfile.TemporaryDirectory(prefix='t970-launchd-cache-') as folder:
+        plist = Path(folder) / 'launchd.plist'
+        detached = plist.with_suffix('.plist.sig')
+        plist.write_bytes(cache)
+        detached.write_bytes(signature)
+        options = ['--detached', str(detached), str(plist)]
+        subprocess.run(['codesign', '--verify', '--strict', *options], check=True)
+        detail = subprocess.check_output(
+            ['codesign', '--display', '--verbose=4', *options], stderr=subprocess.STDOUT, text=True)
+    match = re.search(r'^CDHash=([0-9a-f]{40})$', detail, re.MULTILINE)
+    if not match:
+        raise SystemExit('The detached launchd cache signature has no CDHash')
+    return match[1]
+
+
 def valid_like_the_loader(data):
     """The structural checks of DarwinBoot's ValidTrustCaches, so a bundle it would refuse never leaves this script."""
     count = struct.unpack_from('<I', data)[0]
@@ -131,6 +154,11 @@ def main():
         for name in [n for n in ADDON_BINARIES if n in files]:
             directory = code_directory(files[name])
             cdhashes[f'{addon.name}:{name}'] = hashlib.sha256(directory).hexdigest()[:40]
+        if (LAUNCHD_CACHE in files) != (LAUNCHD_SIGNATURE in files):
+            raise SystemExit(f'{addon}: launchd cache and detached signature must travel together')
+        if LAUNCHD_CACHE in files:
+            cdhashes[f'{addon.name}:{LAUNCHD_CACHE}'] = launchd_cache_cdhash(
+                files[LAUNCHD_CACHE], files[LAUNCHD_SIGNATURE])
     for value in args.also_cdhash:
         if len(value) != 40 or any(c not in '0123456789abcdef' for c in value):
             raise SystemExit(f'{value} is not a 40-hex CDHash')
@@ -163,7 +191,7 @@ def main():
         'bundle': str(out), 'bundle_sha256': hashlib.sha256(bundle).hexdigest(), 'bundle_bytes': len(bundle),
         'apple_trust_chain_verified': False,
         'hardware_tested': False,
-        'purpose': 'owner trust for this tablet\'s GPU addon: NativeAdrenoMetal, Turnip and adrenoprobed',
+        'purpose': 'owner trust for the supplied runtime addons and detached launchd cache',
     }
     (args.output / 'owner-trust.json').write_text(json.dumps(report, indent=2) + '\n')
     print(f'PASS: {len(parts)} trust modules, {len(hashes)} owner CDHashes, {len(bundle)} bytes, '

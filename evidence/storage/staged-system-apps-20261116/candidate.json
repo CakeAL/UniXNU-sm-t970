@@ -15,7 +15,12 @@
     "Payloads/scratch-data.img": "ca1543d1986cb1de5dd8ef6a3f01f48609e2a65a18bbf3f88f04b2d189031dcf"
   },
   "pack_command": "python3.14 scripts/pack-wholesale-recovery.py --base out/dual-system/data-persistence-20261111/recovery-persistent.img --payload out/display-reference-20261116/staged-apps/payload.img --output out/display-reference-20261116/staged-apps/boot.img --large-data-seed --trust-cache out/display-reference-20261116/trust/owner-trust.bundle",
-  "device_result": null,
+  "device_result": {
+    "source": "Owner report after staged-apps-a upload",
+    "widgets": "Still white",
+    "settings": "Corrupted when first opened",
+    "app_installation": "Owner did not report whether missing apps reappeared"
+  },
   "note": "On the first boot with no complete-copy marker, the existing path copies the built-in app bundles into iPadOS Data before launchd. The guarded migration then moves the prior completion preferences aside so SystemAppMigrator can run.",
   "flash_command": "sh scripts/flash-recovery-when-detected.sh out/display-reference-20261116/staged-apps/boot.img 4a0548d7caec302627fceceadf9c65b025cc335be5aa7efc2da7f68191b9a505 30",
   "flash_result": "RECOVERY upload successful, --no-reboot."

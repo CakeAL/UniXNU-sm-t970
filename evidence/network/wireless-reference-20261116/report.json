@@ -1,0 +1,45 @@
+{
+  "build_tag": "wireless-ref-a",
+  "device_source_base": "daa9d647bf7b22bf1e610c4c9d1c8bb2284b19d5",
+  "framework_revision": "945ad8db0641060f6566422d168684c3e9182d53",
+  "reference_revision": "88b34f97100a01aab4ea6b86dc9c748b2114c382",
+  "reference_record": "https://github.com/rui12366B/UniXNU-gts7xlwifi/blob/88b34f97100a01aab4ea6b86dc9c748b2114c382/porting.toml",
+  "matching_sources": [
+    "package/T970WifiStack.cpp",
+    "package/T970WifiNet.cpp",
+    "patches/xnu/t970-wifi-service-mount.patch"
+  ],
+  "detached_cache_cdhash": "8e0044ddb8b9f000ba0c63a3911bb8a27d770879",
+  "distinction": "The previous owner trust bundle had the three wireless executables but omitted the CDHash of the detached launchd cache. The candidate verifies the matching signature, includes its CDHash and retains the previously installed GPU executable hashes and both original Apple modules.",
+  "embedded_wireless_addon": {
+    "path": "out/dual-system/firmware-inputs-20261114/addon-wireless.bin",
+    "sha256": "d0678aab30641dc4c89451a4b8cad23405bac1740badd435521e86f136cb51d1",
+    "bytes": 6752984
+  },
+  "data_seed_sha256": "ca1543d1986cb1de5dd8ef6a3f01f48609e2a65a18bbf3f88f04b2d189031dcf",
+  "trust_cache_sha256": "adf958ca07a8ede87629f3d39487f78d16e1db668badeeca69bd67f1c2430c5e",
+  "owner_cdhashes": {
+    "gpu.addon:addons/NativeAdrenoMetal.bundle/NativeAdrenoMetal": "162f7d25c5ae91c7e47f80a3d10f3964816d267c",
+    "gpu.addon:addons/NativeAdrenoMetal.bundle/libvulkan_freedreno.dylib": "8a4d6e6c77cd4dedeb154e570b04583461179925",
+    "gpu.addon:bin/adrenoprobed": "5f3b74921bbafb2ce7bb155acf08ef4f7524ae55",
+    "addon-wireless.bin:wifi-bin/unixnu-wpa_supplicant": "272b3429dbe1e8a25b123b415cbb067e7eaa9750",
+    "addon-wireless.bin:bt-bin/BlueTool": "ba33c568415d709a70626f477638e240535c28b8",
+    "addon-wireless.bin:bt-bin/bluetoothd": "069721cfd98fd6b5152386cb4402cd9584bd663f",
+    "addon-wireless.bin:wifi-xpc/launchd.plist": "8e0044ddb8b9f000ba0c63a3911bb8a27d770879",
+    "--also-cdhash:e1c1e952036f99008c3f0420cc2ee26d9ad6f917": "e1c1e952036f99008c3f0420cc2ee26d9ad6f917"
+  },
+  "kernel_sha256": "e915ad8b153c9c536cfa298951c47dc683ea7d557fa434cda2d79e63dbc4c066",
+  "image": "out/wireless-reference-20261116/recovery/boot.img",
+  "image_sha256": "0a06483f94f852410d196d5f1775ec9478d091191e8d5c6737340bafed06a4b0",
+  "image_bytes": 86888448,
+  "partition": "RECOVERY",
+  "build_commands": [
+    "python3.14 scripts/build-t970-trust-bundle.py --addon out/display-reference-20261116/gpu.addon --addon out/dual-system/firmware-inputs-20261114/addon-wireless.bin --also-cdhash e1c1e952036f99008c3f0420cc2ee26d9ad6f917 --output out/wireless-reference-20261116/trust",
+    "T970_GPU_ADDON=<absolute path to addon-wireless.bin> python3.14 ./unixnu build kernel -D ../UniXNU-sm-t970",
+    "python3.14 scripts/build-boot-progress-page.py --mode 2 --large-data-seed --data-ramdisk out/dual-system/overlay-inspection-20261115/reference-fresh-73g.dbr --kernel-arg build-tag=wireless-ref-a --kernel-arg t970-large-data=1 --kernel-arg t970-large-init=1 --kernel-arg t970-pen=7 --kernel-arg native-ufs-stream2=0x4e0 --kernel-arg gpu-addon=1 --kernel-arg t970-wifi-svc=1 --kernel-arg t970-wifi=6 --kernel-arg t970-bt=257 --kernel-arg t970-adsp=2 --kernel-arg t970-audio=32 --kernel-arg t970-haptics=3 --kernel-arg t970-sensors=243 --kernel-arg t970-usb=37 --kernel-arg t970-qud-retry=1 --kernel-arg t970-qud-resume=1 --drop-kernel-arg panic_on_crash_disabled --drop-kernel-arg armcpu-diagnostics=1 --drop-kernel-arg alioth-bt=1 --drop-kernel-arg log-gpu=1 --drop-kernel-arg t970-fb-src-wb=1 --owner-trust-cache /Users/cakeal/vsc/UniXNU-sm-t970/out/wireless-reference-20261116/trust/owner-trust.bundle --kernel /Users/cakeal/vsc/UniXNU/out/sm-t970/ipados-17.7.11-21H461/gts7xlwifi/kernel/kernel.macho --output /Users/cakeal/vsc/UniXNU-sm-t970/out/wireless-reference-20261116/recovery"
+  ],
+  "verification": "Detached signature passed codesign --strict; a modified cache failed. All three launchd jobs target binaries embedded in the addon. Read back the packed addon, trust cache, unchanged Data seed and enabled ADT wlan and bluetooth nodes. The new NET row exposes cache mount stage/status, addon write failures, F_FULLFSYNC and Wi-Fi milestone and scan counts.",
+  "flash_command": "sh scripts/flash-recovery-when-detected.sh out/wireless-reference-20261116/recovery/boot.img 0a06483f94f852410d196d5f1775ec9478d091191e8d5c6737340bafed06a4b0 30",
+  "flash_result": "RECOVERY upload successful with --no-reboot.",
+  "network_device_result": null
+}

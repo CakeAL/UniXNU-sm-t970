@@ -1545,6 +1545,7 @@ findings = [
   "Recovery 27b139a1 (display-reference-a) rebuilds AdrenoMetal 83b6678 with both reference carries and uses the periph15 presentation flags boot-progress=3 and dpu-scanout=2. The local signed Turnip, probe daemon, Data seed and Recovery wrapper are retained. The packed image passed readback and Heimdall reported a successful upload.",
   "The owner reports that Recovery 27b139a1 still displays white widgets, initial Settings corruption which clears later, and intermittent dropped frames. Direct-scanout activation and frame times were not measured on this boot.",
   "The packaged 83b6678 and 73d582f frontends set TU_DEBUG from tu-debug= in kern.bootargs. Neither reads the NativeTurnipDebug registry property populated by pipa-turnip-debug=. The earlier pipa-turnip-debug=noubwc,nocb experiment did not establish which options Turnip consumed.",
+  "Neither packaged frontend reads NativeMetalWithhold, the property published by pipa-metal-withhold. The reference frontend reports Apple1 through Apple3 to keep Core Image on Metal and preserve QuartzCore's batching. Changing this property did not test feature negotiation in either frontend. The reference USB log records 1150 retired frames with two copies; the local BGRA test recorded successful GPU copies, a different presentation path. Neither counter validates widget pixels or steady frame time.",
   "2026-11-15: the wholesale kernel links the A650 driver for the first time. build-adreno650.py is enabled in board.toml, CONFIG_XNU_NATIVE_ADRENO=y, the repaired drivers/Adreno650, package/GpuProbe.cpp, package/GpuPowerBoard.h and package/T970GpuAddon.S links and kits/{AdrenoFirmware,AdrenoPM4,ArmSmmu4K,pipa} resolve inside the repository, package/GpuFirmwareA650.c is generated from the tablet's own a650_gmu.bin/a650_sqe.fw/a650_zap.mdt+.b00-.b02 by scripts/gen-gpu-firmware-a650.py, and the archive (32 objects, GpuProbe, the firmware and the 13647616-byte addon) is force-loaded: the prelinked kernel grows from 54771712 to 68751360 bytes and exports native_gpu_probe, t970_gpu_addon_data and t970_gpu_addon_size. scripts/build-t970-trust-bundle.py adds one owner trust module with the addon's three CDHashes (NativeAdrenoMetal 76d8d31b7ec6d94d88da38a673a1b69390d8952b, libvulkan_freedreno.dylib 307925b0c44afaefa30c1d810fa75078d8fe8b7a, adrenoprobed 083c5020baf42324c0bdcef72ceb52a292199404) ahead of Apple's two unchanged modules, and its bundle is byte-identical to UniXNU's scripts/make-owner-trust-bundle.py for the same inputs. Recovery c5f88b1175af9478cddcd2a7998b88915fcf592d7b556fc9eb656ce2703b4337 (pipa-gpu=12 log-gpu=1 fb-gpu=1 gpu-addon=1) was flashed 2026-11-15 23:08 (Asia/Shanghai); no device observation is recorded yet, so the GMU cold start, CP submission, Metal rendering and the direct-scanout frame hand-off remain unverified on the T970.",
   "Device ADB read-only extracted the four ZAP inputs; hashes match the previously inventoried stock T970 signed pair. The generated ELF matches the reference generator. The reference A650 build archived 32 objects and the staged accelerator after correcting the AdrenoMetal include path; host symbol audit passed, but no GPU image has been linked or device-tested.",
   "The same-model Adreno650 driver, HFI/SMMU/PM4 sources and 21H461 accelerator bindings compile in 34 host objects. Pinned metal2vulkan and Turnip with the reference BO retirement patch built for arm64 iOS 17, and the plugin, Turnip library and daemon passed strict signature verification. ZAP, full kernel link, display integration and GPU runtime remain pending.",
@@ -1740,10 +1741,15 @@ evidence = [
 
 [[area]]
 id = "network"
-status = "planned"
+status = "implemented"
 components = []
 paths = [
   "scripts/build-t970-wifi.py",
+  "scripts/build-t970-trust-bundle.py",
+  "package/T970Wifi*.cpp",
+  "package/T970Bluetooth.cpp",
+  "patches/xnu/t970-wifi-service-mount.patch",
+  "evidence/network/wireless-reference-20261116/**",
   "reference/gts7xlwifi/package/T970Wifi*.cpp",
   "reference/gts7xlwifi/package/T970Bluetooth.cpp",
   "evidence/adb-2026-11-01/network.txt",
@@ -1754,12 +1760,13 @@ inputs = [
   "The live DT WLAN node is named qcom,cnss-qca6490@b0000000 and declares compatible qcom,cnss-qca6490; the naming difference is retained as an unresolved input.",
 ]
 configuration = [
-  "The PCIe DT records clocks, supplies, resets and iommu-map inputs; no UniXNU network component or OS network interface has been selected.",
+  "The wholesale kernel links the reference ath11k transport and en0 integration. The wireless image exports /arm-io/wlan and /arm-io/bluetooth and uses t970-wifi=6, t970-wifi-svc=1 and t970-bt=257.",
 ]
 procedure = [
   "Read PCI IDs, driver links, wlan0's device path and firmware directory names; do not collect SSIDs, MAC addresses or network traffic.",
 ]
 findings = [
+  "The Wi-Fi transport, en0 integration and XPC mount patch match reference 88b34f9. The old trust bundle omitted the detached launchd cache CDHash while including all three wireless binaries. Recovery 0a06483f (wireless-ref-a) verifies the signature against the packed cache and includes its CDHash. Both original Apple modules and the persistent Data seed are preserved.",
   "Recovery 9f1cabb1 enables t970-wifi=6 and t970-bt=257 but not t970-wifi-svc=1, so the Wi-Fi supplicant launchd job and the patched Bluetooth daemons in the addon wifi-xpc/launchd.plist stay unloaded and the owner sees no Wi-Fi and Bluetooth Unavailable. The variant that sets t970-wifi-svc=1 (27a6059c) froze on the firmware handoff frame on the boot after the addon installed the cache, before the display driver took the panel, so the /System/Library/xpc bind mount is not usable as shipped.",
   "The standard QCA6390 archive recipe validates and reuses existing pinned sources before deciding to fetch. The archive passed in the first build using the legacy defconfig; the wholesale link and on-device Wi-Fi are pending.",
   "The QCA6390 Wi-Fi archive builds 110 Linux and 2 board objects against the pinned imported sources. Seven MinsOS vendor Wi-Fi files match the reference input list. Both MinsOS Bluetooth files differ from the historical Android capture. Signed wpa_supplicant, BlueTool and the donor 21H461 bluetoothd are staged in a common addon. Service mounting, keychain integration and runtime remain pending.",
@@ -1777,10 +1784,13 @@ limits = [
   "No Wi-Fi scans, reconnects, traffic tests or firmware loading were initiated; the DT/firmware naming difference is unresolved.",
 ]
 next_action = [
+  "Read the wireless-ref-a NET row. Stage xpc=6 with no addon failures defers the mount until the next boot. A successful mount precedes testing the Settings scan, association and address assignment. Test Bluetooth independently.",
   "Qualify SM8250 PCIe0 handoff, rails, reset, PHY/link, BAR, MSI and DMA for QCA6390. Select a compatible ath11k transport/core and identify the actual bdwlan variant before firmware startup and OS association tests.",
   "Resolve PCI 17cb:1101 and the board firmware selection in the matching Android driver before choosing a UniXNU network implementation.",
 ]
 evidence = [
+  { kind = "host", reference = "evidence/network/wireless-reference-20261116/report.json", revision = "daa9d647bf7b22bf1e610c4c9d1c8bb2284b19d5", command = "Build the wireless trust cache and Recovery as recorded in report.json.", result = "Verified detached cache signature and service paths, rejected a modified cache and read back the resulting wireless addon and trust cache." },
+  { kind = "device", reference = "evidence/network/wireless-reference-20261116/recovery-upload.txt", revision = "daa9d647bf7b22bf1e610c4c9d1c8bb2284b19d5", command = "sh scripts/flash-recovery-when-detected.sh out/wireless-reference-20261116/recovery/boot.img 0a06483f94f852410d196d5f1775ec9478d091191e8d5c6737340bafed06a4b0 30", result = "Successful RECOVERY upload. Wi-Fi and Bluetooth runtime verification is pending." },
   { kind = "source", reference = "evidence/device-inputs/firmware.json", result = "Eight Wi-Fi files and two Bluetooth files are hashed. The Wi-Fi board-data variant is not selected." },
   { kind = "device", reference = "evidence/adb-2026-11-01/network.txt", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "Saved PCI endpoint IDs, cnss_pci binding, firmware names and optional-path errors.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },
   { kind = "device", reference = "evidence/adb-2026-11-01/live-device-tree.dts", command = "/opt/homebrew/bin/python3.14 scripts/collect-adb-inventory.py --root --output evidence/adb-2026-11-01-complete", result = "The board DT WLAN compatible and PCIe resource declarations, including the qca6490 name.", revision = "54fafba28ae100130a1d21bf0936983ab632c782" },

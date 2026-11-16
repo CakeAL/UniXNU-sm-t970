@@ -1,0 +1,8 @@
+Protocol initialisation successful.
+Session begun.
+PIT file download successful.
+Uploading RECOVERY
+RECOVERY upload successful
+Ending session...
+Releasing device interface...
+flashed 0a06483f94f852410d196d5f1775ec9478d091191e8d5c6737340bafed06a4b0
