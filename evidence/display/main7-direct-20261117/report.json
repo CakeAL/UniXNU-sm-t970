@@ -33,5 +33,60 @@
     "receipt": "evidence/display/main7-direct-20261117/recovery-upload.txt",
     "result": "Heimdall confirmed successful RECOVERY upload; manual reboot required."
   },
-  "runtime": null
+  "runtime": {
+    "usb": "Existing pairing validated; MobileDevice session and syslog relay opened.",
+    "display": "Booted to desktop; direct scanout initialized with display bank 4 (0x80000004). Owner completed the swipe test and still observed stutter.",
+    "windows": [
+      {
+        "end_device_time": "09:55:22",
+        "state": 1,
+        "span_s": 2,
+        "flips": 37,
+        "latched": 36,
+        "copy_fallback": 0,
+        "intervals": 35,
+        "mean_us": 32018,
+        "over_budget": 29
+      },
+      {
+        "end_device_time": "09:55:24",
+        "state": 1,
+        "span_s": 2,
+        "flips": 78,
+        "latched": 79,
+        "copy_fallback": 0,
+        "intervals": 78,
+        "mean_us": 23995,
+        "over_budget": 56
+      },
+      {
+        "end_device_time": "09:55:26",
+        "state": 1,
+        "span_s": 2,
+        "flips": 80,
+        "latched": 80,
+        "copy_fallback": 0,
+        "intervals": 79,
+        "mean_us": 23913,
+        "over_budget": 58
+      },
+      {
+        "end_device_time": "09:55:28",
+        "state": 1,
+        "span_s": 2,
+        "flips": 81,
+        "latched": 81,
+        "copy_fallback": 0,
+        "intervals": 80,
+        "mean_us": 22985,
+        "over_budget": 54
+      }
+    ],
+    "measured_latches": 276,
+    "copy_fallbacks": 0,
+    "measured_intervals": 272,
+    "intervals_over_budget": 197,
+    "weighted_interval_mean_us": 24706.5,
+    "acceptance": "DPU direct scanout and USB verified. Sustained 60 FPS is not met. CTL acknowledgements cover the display path and do not distinguish compositor work from display scheduling."
+  }
 }
