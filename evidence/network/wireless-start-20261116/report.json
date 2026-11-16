@@ -1,0 +1,25 @@
+{
+  "build_tag": "wireless-start-a",
+  "device_source_base": "6d82b554457dfde11143401aa44d88694f5dc65e",
+  "framework_revision": "945ad8db0641060f6566422d168684c3e9182d53",
+  "apple_key_store_revision": "8c70daf814aafdf4a3d35e40dde0322655fd0a83",
+  "image": "out/wireless-start-20261116/recovery/boot.img",
+  "image_sha256": "59996f9e3ade556df671eb3372e0ed0485ce84a7f4fa93e85f508fe61f6c78d7",
+  "image_bytes": 86888448,
+  "kernel_sha256": "fb1c13034ab8949339b552e9c7141b7e8dcd89d451b250fd3ee3b68eaed31cf3",
+  "partition": "RECOVERY",
+  "build_commands": [
+    "In UniXNU: python3.14 ./unixnu defconfig gts7xlwifi_defconfig -D ../UniXNU-sm-t970",
+    "In UniXNU: T970_GPU_ADDON=<absolute path to addon-wireless.bin> python3.14 ./unixnu build kernel -D ../UniXNU-sm-t970 --local-module AppleKeyStoreState=<clean local worktree at 8c70daf>",
+    "python3.14 scripts/build-boot-progress-page.py --mode 2 --large-data-seed --data-ramdisk out/dual-system/overlay-inspection-20261115/reference-fresh-73g.dbr --kernel-arg build-tag=wireless-start-a --kernel-arg t970-large-data=1 --kernel-arg t970-large-init=1 --kernel-arg t970-pen=7 --kernel-arg native-ufs-stream2=0x4e0 --kernel-arg gpu-addon=1 --kernel-arg t970-wifi-svc=1 --kernel-arg t970-wifi=6 --kernel-arg t970-bt=257 --kernel-arg t970-adsp=2 --kernel-arg t970-audio=32 --kernel-arg t970-haptics=3 --kernel-arg t970-sensors=243 --kernel-arg t970-usb=37 --kernel-arg t970-qud-retry=1 --kernel-arg t970-qud-resume=1 --drop-kernel-arg panic_on_crash_disabled --drop-kernel-arg armcpu-diagnostics=1 --drop-kernel-arg alioth-bt=1 --drop-kernel-arg log-gpu=1 --drop-kernel-arg t970-fb-src-wb=1 --owner-trust-cache /Users/cakeal/vsc/UniXNU-sm-t970/out/wireless-reference-20261116/trust/owner-trust.bundle --kernel /Users/cakeal/vsc/UniXNU/out/sm-t970/ipados-17.7.11-21H461/gts7xlwifi/kernel/kernel.macho --output /Users/cakeal/vsc/UniXNU-sm-t970/out/wireless-start-20261116/recovery"
+  ],
+  "verification": [
+    "The earlier linked late probe called the weak alioth_pcie_init stub despite containing the t970_wifi_start symbol. The new prelinked kernel calls t970_wifi_start directly and retains t970_bluetooth_start.",
+    "The staged framework AppleKeyStoreState checkout lacks key wrap and unwrap and reads sheng-aks; the old kernel used aks=1. The isolated source matches the catalog and same-model reference. Its host test verifies wrap and unwrap, state and bookkeeping, and failure of unsupported selectors. The new prelinked kernel includes deviceKey and the board device-identity callback.",
+    "Unpacked the Recovery payload and compared the Data seed, owner trust and wireless addon byte-for-byte with the baseline. ADT properties match except the random seed; the hardware inputs include wlan, bluetooth and the unchanged device identity.",
+    "The embedded 21H461 bluetoothd already has the optional-0c5b, unsupported-628, legacy-le-only and public-scan-address edits. The optional volatile-root-keys edit is absent."
+  ],
+  "flash_command": "sh scripts/flash-recovery-when-detected.sh out/wireless-start-20261116/recovery/boot.img 59996f9e3ade556df671eb3372e0ed0485ce84a7f4fa93e85f508fe61f6c78d7 30",
+  "flash_result": "RECOVERY upload successful with --no-reboot.",
+  "runtime": null
+}

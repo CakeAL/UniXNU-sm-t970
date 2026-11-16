@@ -1,0 +1,10 @@
+sh scripts/flash-recovery-when-detected.sh out/wireless-start-20261116/recovery/boot.img 59996f9e3ade556df671eb3372e0ed0485ce84a7f4fa93e85f508fe61f6c78d7 30
+
+waiting for Download Mode (image 59996f9e3ade556df671eb3372e0ed0485ce84a7f4fa93e85f508fe61f6c78d7, timeout 30s)
+device detected, flashing RECOVERY
+PIT file download successful.
+Uploading RECOVERY
+RECOVERY upload successful
+Ending session...
+Releasing device interface...
+flashed 59996f9e3ade556df671eb3372e0ed0485ce84a7f4fa93e85f508fe61f6c78d7

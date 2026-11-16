@@ -453,16 +453,18 @@ extern volatile int t970_addon_full_sync __attribute__((weak_import));
 extern volatile int native_gpu_addon_written __attribute__((weak_import));
 extern volatile int native_gpu_addon_failed __attribute__((weak_import));
 extern volatile uint32_t t970_wifi_stack[16] __attribute__((weak_import));
+extern volatile uint32_t t970_wifi_stats[] __attribute__((weak_import));
 extern volatile int32_t t970_bt[32] __attribute__((weak_import));
+extern volatile uint32_t t970_bt_sk[8] __attribute__((weak_import));
 
 static int wifi_status(char *row, size_t capacity) {
   if (!&native_gpu_addon5_stage || !&native_gpu_addon5_status || !&t970_addon_full_sync ||
       !&native_gpu_addon_written || !&native_gpu_addon_failed || !&t970_wifi_stack) return 0;
   unsigned requested = 0;
   if (!PE_parse_boot_argn("t970-wifi-svc", &requested, sizeof requested) || !(requested & 1)) return 0;
-  snprintf(row,capacity,"NET  xpc=%d/%d sync=%d add=%d/%d wifi=%x scan=%u bss=%u err=%d bt=%d",
+  snprintf(row,capacity,"NET  xpc=%d/%d sync=%d add=%d/%d pcie=%d wifi=%x scan=%u bss=%u err=%d bt=%d",
     native_gpu_addon5_stage,native_gpu_addon5_status,t970_addon_full_sync,
-    native_gpu_addon_written,native_gpu_addon_failed,t970_wifi_stack[0],
+    native_gpu_addon_written,native_gpu_addon_failed,&t970_wifi_stats?(int)t970_wifi_stats[0]:0,t970_wifi_stack[0],
     (t970_wifi_stack[1]>>8)&255,t970_wifi_stack[1]>>16,(int)t970_wifi_stack[11],&t970_bt?t970_bt[0]:0);
   return 1;
 }
@@ -1497,6 +1499,11 @@ static void crash_banner(unsigned now) {
   for(unsigned i=0;i<3 && i<failed;++i)snprintf(rows[n++],120,"EXIT  %.100s",exit_records.failures[(failed-1-i)%3]);
   __atomic_store_n(&exit_lock,0,__ATOMIC_RELEASE);
   if (wifi_status(rows[n],sizeof rows[n])) ++n;
+  if (&t970_bt && t970_bt[0] && &t970_bt_sk) {
+    snprintf(rows[n++],120,"BT    sk=%u/%d req=%u read=%u ctl=%u chan=%u tx=%u rx=%u",
+      t970_bt_sk[0],(int)t970_bt_sk[1],t970_bt_sk[2],t970_bt_sk[3],t970_bt_sk[4],
+      t970_bt_sk[5],t970_bt_sk[6],t970_bt_sk[7]);
+  }
   if (&t970_camera && t970_camera[0]) {
     snprintf(rows[n++],120,"CAM   st=%d det=%x cci=%x front=%08x rear=%08x wide=%08x irq=%x svc=%d",
       t970_camera[0],(unsigned)t970_camera[1],(unsigned)t970_camera[3],

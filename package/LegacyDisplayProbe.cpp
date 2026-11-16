@@ -971,10 +971,9 @@ void native_legacy_display_late_probe(void) {
 	extern void alioth_buttons_probe(void) __attribute__((weak_import));
 	if (&alioth_buttons_probe) alioth_buttons_probe();
 
-	// The Wi-Fi controller's power and clock steps. Opt-in through pcie=<n>; step 1 only reads.
-	// gts7xlwifi: no PCIe port, so weak.
-	extern void alioth_pcie_init(void) __attribute__((weak_import));
-	if (&alioth_pcie_init) alioth_pcie_init();
+	// Start the QCA6390 board worker when t970-wifi is set. It brings up PCIe0 and starts ath11k.
+	extern void t970_wifi_start(void);
+	t970_wifi_start();
 	// periph14: the MAX77705 battery (package/T970Battery.cpp, t970-battery=1); it waits for IOBSD on its own thread.
 	extern void t970_battery_start(void) __attribute__((weak_import));
 	if (&t970_battery_start) t970_battery_start();

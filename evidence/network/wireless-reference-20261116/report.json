@@ -41,5 +41,17 @@
   "verification": "Detached signature passed codesign --strict; a modified cache failed. All three launchd jobs target binaries embedded in the addon. Read back the packed addon, trust cache, unchanged Data seed and enabled ADT wlan and bluetooth nodes. The new NET row exposes cache mount stage/status, addon write failures, F_FULLFSYNC and Wi-Fi milestone and scan counts.",
   "flash_command": "sh scripts/flash-recovery-when-detected.sh out/wireless-reference-20261116/recovery/boot.img 0a06483f94f852410d196d5f1775ec9478d091191e8d5c6737340bafed06a4b0 30",
   "flash_result": "RECOVERY upload successful with --no-reboot.",
-  "network_device_result": null
+  "network_device_result": {
+    "source": "Owner report and live diagnostic photo at 15:51:11 Asia/Shanghai, 2026-11-16",
+    "tag": "wireless-ref-a",
+    "uptime_s": 182,
+    "net_row": "xpc=5/0 sync=-1 add=0/0 wifi=0 scan=0 bss=0 err=0 bt=13",
+    "supplicant": "Repeated exit 255",
+    "wifi": "Settings could not enable Wi-Fi.",
+    "bluetooth": "Settings reported Unavailable. Stage 13 is kStageReady after UART controller initialization; the screenshot did not expose UART.SK state.",
+    "widgets": "Visible, per owner.",
+    "settings_corruption": "No new observation reported.",
+    "desktop_scroll": "Intermittent frame drops, per owner.",
+    "display": "878 successful swaps and 877 GPU copy completions with zero failures. 877 32-bit BGRA frames. Counts give no per-frame latency or panel latch timing."
+  }
 }
