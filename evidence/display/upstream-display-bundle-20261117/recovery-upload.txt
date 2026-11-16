@@ -1,0 +1,11 @@
+sh scripts/flash-recovery-when-detected.sh out/upstream-display-bundle-20261117/boot.img e72b68a7309e2c2d6a1ad4bf3d3bd33fc332dcd67f90cd5dc280367a3f08b92c 180
+Host date: 2026-11-17 01:41 CST
+
+Protocol initialisation successful.
+Session begun.
+PIT file download successful.
+Uploading RECOVERY
+RECOVERY upload successful
+Ending session...
+Releasing device interface...
+flashed e72b68a7309e2c2d6a1ad4bf3d3bd33fc332dcd67f90cd5dc280367a3f08b92c

@@ -20,10 +20,23 @@
     "The FAT is FAT16 and has 4 KiB clusters. The actual boot image contains the verified FAT. The original reference-copy ADT, arguments, Data seed and owner trust are byte-identical.",
     "The packed kernel contains the complete addon with no second loader addon to take precedence."
   ],
-  "limits": "Current local in-progress source changes were preserved. Runtime results, wallpaper provider activation and frame cadence are pending.",
+  "limits": "Current local in-progress source changes were preserved. Hardware flip intervals and the exact wallpaper provider discovery failure remain unmeasured.",
   "kernel_sha256": "90c60c72da8bef521bec23128486f8dc8c999d7763ec0e32f3e66f84dd788a9e",
   "resident_addon_sha256": "b9b3ed2238bc0de7ef9bc43880e7186de39e13ab2c36608c049c30a7491880a0",
   "fat_clusters": 19688,
   "boot_image_sha256": "e72b68a7309e2c2d6a1ad4bf3d3bd33fc332dcd67f90cd5dc280367a3f08b92c",
-  "boot_bytes": 86888448
+  "boot_bytes": 86888448,
+  "upload": {
+    "date": "2026-11-17T01:41+08:00",
+    "partition": "RECOVERY",
+    "receipt": "evidence/display/upstream-display-bundle-20261117/recovery-upload.txt",
+    "result": "Heimdall confirmed upload with manual reboot."
+  },
+  "runtime": {
+    "usb": "Existing pairing, MobileDevice session and com.apple.syslog_relay all succeeded.",
+    "owner": "Wallpaper remained absent. The owner exercised the home screen swipe.",
+    "desktop": {"device_window_ends": "05:07:24–28", "windows": 3, "included_seconds": 6, "successful_copies": 183, "mean_offer_to_completion_us": 28282, "copies_over_budget": 155},
+    "metal": "BackBoard reported BinaryArchiveMiss during pipeline creation. The capture does not establish which fallback pipelines compiled or their execution latency.",
+    "wallpaper": "PosterBoard reports setup failure -2220 for CollectionsPoster and LegacyPoster, with a nil PRPosterConfiguration. The store also logs a successful SQLite commit. No CollectionsPoster process was observed in the captured log. The 21H461 PosterBoard framework has a path returning -2220 with providerIdentifier when its objectForKey: lookup returns nil. Other paths use the same code, so the specific call site remains unconfirmed."
+  }
 }
