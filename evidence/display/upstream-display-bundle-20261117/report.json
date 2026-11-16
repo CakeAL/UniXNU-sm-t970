@@ -1,0 +1,29 @@
+{
+  "reference_revision": "88b34f97100a01aab4ea6b86dc9c748b2114c382",
+  "reference": "https://github.com/rui12366B/UniXNU-gts7xlwifi/tree/88b34f97100a01aab4ea6b86dc9c748b2114c382",
+  "source_base": "44027518d3a0f4e2d026af6d78e1d2b644ba1792",
+  "framework_revision": "945ad8db0641060f6566422d168684c3e9182d53",
+  "existing_device_source_diff_sha256": "f55b3dc540b86804ca0d9dcf6442f2f3fae41d195370cc32efb475817459653f",
+  "image": "out/upstream-display-bundle-20261117/boot.img",
+  "baseline_image": "4f84e76372c6e7f1578942b88512d57351215c6944fd035dba199632d78a2071",
+  "build_command": "In UniXNU with the board build inputs, export T970_GPU_ADDON=<device>/out/upstream-display-bundle-20261117/complete.addon and run python3.14 ./unixnu build kernel -D <device> --local-module AppleKeyStoreState=<device>/.cache/AppleKeyStoreState-8c70daf.",
+  "pack_command": "UNIXNU_UEFI=.cache/uefi-source/Mu-Silicium python3.14 out/upstream-display-bundle-20261117/pack.py",
+  "inputs": [
+    "out/display-reference-20261116/gpu.addon",
+    "out/dual-system/firmware-inputs-20261114/addon-wireless.bin"
+  ],
+  "complete_addon_records": 22,
+  "trust_bundle_sha256": "adf958ca07a8ede87629f3d39487f78d16e1db668badeeca69bd67f1c2430c5e",
+  "verification": [
+    "Kernel build and prelink passed. The entry diagnostics were applied once to the fresh output.",
+    "All 22 addon entries match the exact source files. The strict bundle and Turnip signatures and the detached wireless launchd cache signature verify.",
+    "The FAT is FAT16 and has 4 KiB clusters. The actual boot image contains the verified FAT. The original reference-copy ADT, arguments, Data seed and owner trust are byte-identical.",
+    "The packed kernel contains the complete addon with no second loader addon to take precedence."
+  ],
+  "limits": "Current local in-progress source changes were preserved. Runtime results, wallpaper provider activation and frame cadence are pending.",
+  "kernel_sha256": "90c60c72da8bef521bec23128486f8dc8c999d7763ec0e32f3e66f84dd788a9e",
+  "resident_addon_sha256": "b9b3ed2238bc0de7ef9bc43880e7186de39e13ab2c36608c049c30a7491880a0",
+  "fat_clusters": 19688,
+  "boot_image_sha256": "e72b68a7309e2c2d6a1ad4bf3d3bd33fc332dcd67f90cd5dc280367a3f08b92c",
+  "boot_bytes": 86888448
+}
