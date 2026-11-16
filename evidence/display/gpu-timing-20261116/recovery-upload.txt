@@ -1,0 +1,11 @@
+sh scripts/flash-recovery-when-detected.sh out/gpu-timing-20261116/recovery/boot.img ea65492b6b4727a0b6c22766c681ad4f3e15364701cadf9460f94ed820aec1b9 180
+Host date: 2026-11-16 20:51 CST
+
+Protocol initialisation successful.
+Session begun.
+PIT file download successful.
+Uploading RECOVERY
+RECOVERY upload successful
+Ending session...
+Releasing device interface...
+flashed ea65492b6b4727a0b6c22766c681ad4f3e15364701cadf9460f94ed820aec1b9

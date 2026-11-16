@@ -1184,6 +1184,7 @@ procedure = [
 ]
 findings = [
   "Recovery ea65492b keeps frame-a nonpainting mode and uses the reference Metal log switch. It exports active GPU transfer and TE wait windows through XNU unified logging for the paired USB relay. This correlates pipeline errors and transfer timings without the reference WinRE log partition. A real panel interval trace remains pending.",
+  "On ea65492b, four windows covering seven SpringBoard swipe starts recorded 180 successful GPU copies, 167 taking at least 16.667 ms from offer to completion. The mean was 31.119 ms, and 180 pre-copy TE waits averaged 8.761 ms without timeouts. These are transfer timings. Sheng and the Pad 7 track actual display latches separately.",
   "Recovery 60bbdccc (frame-a) isolates post-handoff diagnostic drawing. With banner=0 the monitor still collects presentation and crash rows but returns before framebuffer access or render_busy. It uses the same GPU-copy configuration as the wireless runtime baseline. Prelink and payload readback succeeded and Heimdall uploaded RECOVERY. The owner reports about the same stutter. The paired log records QuartzCore pipeline load faults and PosterKit assertions during the swipe window; it has no frame timings.",
   "Recovery f81330ae5d3266ca70ce0a887ff6b56b9c9453afe6dc0e02c0dd78b485a87b3a remained on the Apple logo after roughly two minutes according to the owner. The preceding s image showed SpringBoard and three frame swaps under a diagnostic banner; this does not establish why the new boot has no visible desktop.",
   "Recovery f81330ae5d3266ca70ce0a887ff6b56b9c9453afe6dc0e02c0dd78b485a87b3a uses the s kernel and persistent Data with boot-progress=3, the reference framebuffer-neutral setting. RECOVERY upload succeeded; actual display and usability remain pending.",
@@ -1291,7 +1292,9 @@ next_action = [
 ]
 
 evidence = [
-  { kind = "host", reference = "evidence/display/gpu-timing-20261116/report.json", revision = "7a46666418228e889d0de92563afd83b7416f84d", command = "Build and prelink kernel, pack gpu-log-a and read back the actual image.", result = "Verified logging code, 997-byte kernel arguments and unchanged persistent inputs. Hardware boot and trace collection pending." },
+  { kind = "device", reference = "evidence/display/gpu-timing-20261116/report.json", revision = "b7371bb7d8e268905ee5d655e99bf9813a8067ea", command = "Boot gpu-log-a, swipe the home screen and open Settings while logging through paired USB.", result = "Dual-boot Recovery reached the home screen and restored USB pairing. The capture records GPU copy and TE wait timings during owner interaction." },
+  { kind = "device", reference = "evidence/display/gpu-timing-20261116/recovery-upload.txt", revision = "b7371bb7d8e268905ee5d655e99bf9813a8067ea", command = "Wait for Download Mode and upload gpu-log-a using flash-recovery-when-detected.sh.", result = "Heimdall confirmed RECOVERY upload for image ea65492b." },
+  { kind = "host", reference = "evidence/display/gpu-timing-20261116/report.json", revision = "7a46666418228e889d0de92563afd83b7416f84d", command = "Build and prelink kernel, pack gpu-log-a and read back the actual image.", result = "Verified logging code, 997-byte kernel arguments and persistent inputs matching frame-a." },
   { kind = "host", reference = "evidence/display/frame-a-20261116/report.json", revision = "e8266f61a7e4146b4a9d199cb4fa4ad475e919dc", command = "Build kernel and compare the extracted payload against 3fbc958c.", result = "The no-draw comparison retains the existing wireless inputs, Data and presentation settings." },
   { kind = "host", reference = "evidence/display/setup-skip-v84/preparation.json", revision = "30ced50af55aa9e17c2f246c7b602d6fd887ad25", command = "python3.14 evidence/display/setup-skip-v84/prepare.py", result = "Repacked BOOT with the framework Setup-skip Data seed; kernel, configuration, ADT, trust cache and firmware unchanged. BOOT215edec4 FAT readback passed." },
   { kind = "device", reference = "evidence/display/setup-skip-v84/device-result.json", revision = "df42af32146e344df4c326cd92b2ad104e9711d2", command = "Owner photo of the home screen after BOOT215edec4 upload", result = "Reached the home screen with Setup skipped (Setup exec 0/0/0). SpringBoard PID 27, 277 swaps, 276 copies at 42531/49297 us, zero rejections." },
@@ -1767,6 +1770,7 @@ paths = [
   "patches/xnu/t970-wifi-service-mount.patch",
   "evidence/network/wireless-reference-20261116/**",
   "evidence/network/wireless-start-20261116/**",
+  "evidence/network/safari-hotspot-20261116/**",
   "reference/gts7xlwifi/package/T970Wifi*.cpp",
   "reference/gts7xlwifi/package/T970Bluetooth.cpp",
   "evidence/adb-2026-11-01/network.txt",
@@ -1783,6 +1787,7 @@ procedure = [
   "Read PCI IDs, driver links, wlan0's device path and firmware directory names; do not collect SSIDs, MAC addresses or network traffic.",
 ]
 findings = [
+  "On ea65492b, the Xiaomi hotspot supplied IPv4 and DNS via DHCP. A MobileSafari CFNetwork task completed and Safari logged successful TLS 1.3 for h2 and h3. Page rendering remained broken and MobileSafari logged six private WebKit child launch errors. The same tablet retained an older WebContent CODESIGNING crash, and the reference combo25 documented a WebContent launch constraint mismatch with working Wi-Fi. A current launch constraint denial remains unconfirmed.",
   "The owner joined a Xiaomi 15 hotspot on Recovery 3fbc958c. The paired syslog identifies the associated network as wpa3-transition with AES-CCM, PSK and SAE, optional MFP. The station implementation sends RSN PSK. The original WPA/WPA2 mixed network is still classified as WPA by iPadOS; the Mac did not return its raw IEs.",
   "On the post-upload boot, bluetoothd reports outgoing classic ACL connected status 0, SDP results, AES-CCM encryption status 0 and GATT profile success. The same peer fails PAN tethering (service result 305, PAN consumer 3471). Wi-Fi Other Network again returns IO80211 -3903 before type 20, with WPA information element and no RSN in the reported metrics. WPA2-Personal AES from the scan list remains to be exercised.",
   "The next Recovery 3fbc958c adds a BTCON row to the existing H4 monitor. It counts connection commands and returns the HCI completion/disconnect status without recording peer state or traffic. Build, parser checks and packed readback pass; RECOVERY upload succeeded.",
@@ -1809,11 +1814,13 @@ limits = [
   "No Wi-Fi scans, reconnects, traffic tests or firmware loading were initiated; the DT/firmware naming difference is unresolved.",
 ]
 next_action = [
+  "Use the paired USB relay to check the OS cryptex view and determine whether the active launch policy rejects a WebKit helper. Verify a full Safari page load over the hotspot independently of the WPA/WPA2 association test.",
   "Boot wireless-start-a and record PCIe and ath11k states from NET, then test Settings scan, association and address assignment. Record UART.SK boot reads, control connections and channel requests from BT before testing Bluetooth toggle and pairing.",
   "Qualify SM8250 PCIe0 handoff, rails, reset, PHY/link, BAR, MSI and DMA for QCA6390. Select a compatible ath11k transport/core and identify the actual bdwlan variant before firmware startup and OS association tests.",
   "Resolve PCI 17cb:1101 and the board firmware selection in the matching Android driver before choosing a UniXNU network implementation.",
 ]
 evidence = [
+  { kind = "device", reference = "evidence/network/safari-hotspot-20261116/report.json", revision = "b7371bb7d8e268905ee5d655e99bf9813a8067ea", command = "Read syslog during hotspot use and copy existing WebKit crash reports through the trusted USB connection.", result = "IPv4, DNS, TLS and one CFNetwork task succeeded. Safari reported WebKit launch failures and pages remained unavailable. An older WebContent report shows a CODESIGNING kill." },
   { kind = "device", reference = "evidence/diagnostics/wireless-runtime-probe-20261116/report.json", revision = "23d771f5f070d7d54854c0f92f2822c81c13180b", command = "Read the paired syslog relay while the owner joins Wi-Fi and requests a Bluetooth connection in Settings.", result = "WPA manual association still rejected before the driver entry; classic Bluetooth ACL, encrypted link and GATT succeed, PAN tethering fails for this peer." },
   { kind = "host", reference = "evidence/diagnostics/wireless-runtime-probe-20261116/report.json", revision = "23d771f5f070d7d54854c0f92f2822c81c13180b", command = "Build kernel, read back Recovery, and run the H4 fragmentation check.", result = "Connection request, response, completion and disconnect fields verified with fragmented packets." },
   { kind = "device", reference = "evidence/diagnostics/pairing-state-20261116/report.json", revision = "23d771f5f070d7d54854c0f92f2822c81c13180b", command = "Capture the pairing-state-a live banner and a manual join through the paired syslog relay.", result = "Manual Wi-Fi join stops in IO80211. Bluetooth LE advertisements reach the transport and passive scanning starts; a manual connection status is still missing." },

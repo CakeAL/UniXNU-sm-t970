@@ -18,5 +18,36 @@
   "new_kernel_log": "For active nonpainting intervals, t970 present reports duration, successful GPU copies, mean offer-to-completion time, over-16.67-ms count, TE waits, average wait, and timeouts via OS_LOG_DEFAULT. These are transfer and wait measurements, not panel flip intervals.",
   "plugin_logging": "log-gpu=1 turns on the existing AdrenoMetal pipeline journal and emits pipeline refusal reasons through unified logging.",
   "verification": "Prelink and payload readback passed. Verified the kernel contains the log format string. ADT except random seed, Data seed, wireless addon and owner trust match frame-a. Command line adds log-gpu=1 and changes the build tag (997 bytes).",
-  "runtime": null
+  "upload": {
+    "host_date": "2026-11-16T20:51+08:00",
+    "partition": "RECOVERY",
+    "receipt": "evidence/display/gpu-timing-20261116/recovery-upload.txt",
+    "result": "Heimdall confirmed upload with manual reboot."
+  },
+  "runtime": {
+    "usb": "AMDeviceIsPaired=1, ValidatePairing=0, StartSession=0, and com.apple.syslog_relay=0. The relay received the image's new transfer rows.",
+    "desktop": {
+      "device_time_window": "Nov 15 04:23:12–04:23:18 (four window end times, spanning seven logged SpringBoard scroll starts and the transition to Settings)",
+      "windows": 4,
+      "included_seconds": 8,
+      "successful_copies": 180,
+      "mean_offer_to_completion_us": 31119,
+      "copies_over_budget": 167,
+      "te_waits": 180,
+      "mean_te_wait_us": 8761,
+      "te_timeouts": 0
+    },
+    "settings_foreground": {
+      "device_time_window": "Nov 15 04:23:20–04:23:42 (twelve window end times following the Preferences foreground transition)",
+      "windows": 12,
+      "included_seconds": 24,
+      "successful_copies": 457,
+      "mean_offer_to_completion_us": 28192,
+      "copies_over_budget": 376,
+      "te_waits": 458,
+      "mean_te_wait_us": 7743,
+      "te_timeouts": 0
+    },
+    "interpretation": "Window means are weighted by successful copies or waits. The driver's test is >=16667 us. The wait occurs before the GPU copy and accounts for part of the overall offer-to-completion interval. The counters do not measure physical panel flips or distinguish queueing from GPU execution. QuartzCore also reported pipeline load faults, without a correlated AdrenoMetal pipeline refusal message for those events."
+  }
 }

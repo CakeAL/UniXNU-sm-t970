@@ -1,0 +1,25 @@
+{
+  "build_tag": "gpu-log-a",
+  "image_sha256": "ea65492b6b4727a0b6c22766c681ad4f3e15364701cadf9460f94ed820aec1b9",
+  "method": "Existing trusted MobileDevice session over USB. Capture com.apple.syslog_relay during hotspot association and Safari use, then look for WebKit reports through com.apple.crashreportcopymobile.",
+  "results": {
+    "owner": "Date and time synchronized over the Xiaomi 15 hotspot, and Safari still could not show web pages.",
+    "dhcp": "DHCP en0 reported BOUND and published IPv4, DNS and DHCP at device time Nov 15 04:23:47 before the clock adjustment.",
+    "dns": "mDNSResponder received acceptable UDP DNS replies through en0, including address results. MobileSafari's resolver produced IPv4 endpoints for its HTTPS task.",
+    "safari_task": "At Nov 16 20:55:37 MobileSafari completed TLS 1.3 handshakes with ALPN h2 and h3. Its CFNetwork task reported response ended and finished successfully. This does not establish that a requested page loaded.",
+    "safari_launch": "From Nov 16 20:55:10 to 20:55:14 MobileSafari reported six WebKit process launch failures, with description and reason redacted by the device.",
+    "historical_crash_on_same_tablet": {
+      "os": "17.7.11 (21H461)",
+      "time": "2026-11-14T12:30:06-08:00",
+      "binary": "/System/Library/ExtensionKit/Extensions/WebContentExtension.appex/com.apple.WebKit.WebContent",
+      "parent": "launchd",
+      "exception": "EXC_CRASH / SIGKILL - CODESIGNING",
+      "limit": "Older report with no termination field or associated Recovery hash. It does not identify the cause of the six current launch failures."
+    }
+  },
+  "reference": {
+    "same_device_port": "https://github.com/rui12366B/UniXNU-gts7xlwifi/blob/88b34f97100a01aab4ea6b86dc9c748b2114c382/docs/wifi-sources.md",
+    "result": "On combo25 a kernel log showed a launch constraint mismatch for WebContentExtension after other apps already worked over Wi-Fi. Safari rendered pages after the combo26 policy comparison."
+  },
+  "pending": "Verify the current OS cryptex view and whether the active launch constraint check rejects one of the WebKit helpers. The original WPA/WPA2 association error is a separate failure."
+}
