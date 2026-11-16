@@ -1,0 +1,22 @@
+{
+  "build_tag": "gpu-log-a",
+  "source_base": "7a46666418228e889d0de92563afd83b7416f84d",
+  "framework_revision": "945ad8db0641060f6566422d168684c3e9182d53",
+  "image": "out/gpu-timing-20261116/recovery/boot.img",
+  "image_sha256": "ea65492b6b4727a0b6c22766c681ad4f3e15364701cadf9460f94ed820aec1b9",
+  "image_bytes": 86888448,
+  "packed_kernel_sha256": "ade222ed40b80393cf8b21b52a4ad2e0357e7521d6b6dd07ca65f0ed36f5c30d",
+  "base_image_sha256": "60bbdcccda3813d2686ca736306d0f623742a5deb6cfdc31581b6f4f42740353",
+  "references": {
+    "same_model": "https://github.com/rui12366B/UniXNU-gts7xlwifi/blob/88b34f97100a01aab4ea6b86dc9c748b2114c382/porting.toml",
+    "latency_method": "https://unixnu.com/porting/gpu-diagnostics",
+    "shader_cache_method": "https://unixnu.com/porting/gpu",
+    "direct_scanout_fence": "https://unixnu.com/devices/uke-nsr-xine"
+  },
+  "build_command": "In UniXNU with the previous wholesale environment: T970_GPU_ADDON=<same addon-wireless.bin> python3.14 ./unixnu build kernel -D ../UniXNU-sm-t970 --local-module AppleKeyStoreState=<clean worktree at 8c70daf>",
+  "pack_command": "python3.14 scripts/build-boot-progress-page.py --mode 2 --large-data-seed --data-ramdisk out/dual-system/overlay-inspection-20261115/reference-fresh-73g.dbr --kernel-arg build-tag=gpu-log-a --kernel-arg t970-large-data=1 --kernel-arg t970-large-init=1 --kernel-arg t970-pen=7 --kernel-arg native-ufs-stream2=0x4e0 --kernel-arg gpu-addon=1 --kernel-arg t970-wifi-svc=1 --kernel-arg t970-wifi=6 --kernel-arg t970-bt=257 --kernel-arg t970-adsp=2 --kernel-arg t970-audio=32 --kernel-arg t970-haptics=3 --kernel-arg t970-sensors=243 --kernel-arg t970-usb=37 --kernel-arg t970-qud-retry=1 --kernel-arg t970-qud-resume=1 --drop-kernel-arg panic_on_crash_disabled --drop-kernel-arg armcpu-diagnostics=1 --drop-kernel-arg t970-fb-src-wb=1 --owner-trust-cache /Users/cakeal/vsc/UniXNU-sm-t970/out/wireless-reference-20261116/trust/owner-trust.bundle --kernel /Users/cakeal/vsc/UniXNU/out/sm-t970/ipados-17.7.11-21H461/gts7xlwifi/kernel/kernel.macho --output /Users/cakeal/vsc/UniXNU-sm-t970/out/gpu-timing-20261116/recovery --kernel-arg banner=0",
+  "new_kernel_log": "For active nonpainting intervals, t970 present reports duration, successful GPU copies, mean offer-to-completion time, over-16.67-ms count, TE waits, average wait, and timeouts via OS_LOG_DEFAULT. These are transfer and wait measurements, not panel flip intervals.",
+  "plugin_logging": "log-gpu=1 turns on the existing AdrenoMetal pipeline journal and emits pipeline refusal reasons through unified logging.",
+  "verification": "Prelink and payload readback passed. Verified the kernel contains the log format string. ADT except random seed, Data seed, wireless addon and owner trust match frame-a. Command line adds log-gpu=1 and changes the build tag (997 bytes).",
+  "runtime": null
+}

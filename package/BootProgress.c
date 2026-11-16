@@ -25,6 +25,7 @@ extern int proc_selfpid(void);
 #include <kern/processor.h>
 #include <arm/thread.h>
 #include <console/video_console.h>
+#include <os/log.h>
 #include "BootProgressCore.h"
 #include "BootProgressDisplay.h"
 #include "BootProgressPulse.h"
@@ -1484,6 +1485,7 @@ static uint32_t banner_load[4];
 static void crash_banner(unsigned now, bool paint) {
   if(!boot_progress_display_owned || now-banner_second<2)return;
   if(paint && (display.bound || !display.frame || !display.scale))return;
+  const unsigned interval=now-banner_second;
   // Each repaint is about a million device stores. A swap overwrites the whole frame, so repaint only when a swap has happened
   // since the last paint or the crash records changed; an idle screen keeps the banner.
   uint64_t gpu_sig=0;
@@ -1572,12 +1574,19 @@ static void crash_banner(unsigned now, bool paint) {
   if (&native_gop_gpu_timing && &native_gop_gpu_completions && native_gop_gpu_completions && &native_t970_dpu) {
     uint64_t copies=native_gop_gpu_completions, total=native_gop_gpu_timing[0], slow=native_gop_gpu_timing[2];
     uint64_t delta=copies-banner_gpu_completions;
+    const uint64_t mean_us=delta?(total-banner_gpu_total)/delta:0;
+    const uint64_t over_budget=slow-banner_gpu_slow;
     uint32_t waits=native_t970_dpu[2], wait_us=native_t970_dpu[4], timeouts=native_t970_dpu[3];
     uint32_t wait_count=waits-banner_dpu_waits;
+    const uint32_t mean_wait_us=wait_count?(wait_us-banner_dpu_total)/wait_count:0;
     snprintf(rows[n++],120,"PRESENT n=%llu mean=%lluus slow=%llu max=%lluus | TE=%08x wait=%uus timeout=%u",
-      (unsigned long long)delta,(unsigned long long)(delta?(total-banner_gpu_total)/delta:0),
-      (unsigned long long)(slow-banner_gpu_slow),(unsigned long long)native_gop_gpu_timing[1],
-      native_t970_dpu[1],wait_count?(wait_us-banner_dpu_total)/wait_count:0,timeouts-banner_dpu_timeouts);
+      (unsigned long long)delta,(unsigned long long)mean_us,(unsigned long long)over_budget,
+      (unsigned long long)native_gop_gpu_timing[1],native_t970_dpu[1],mean_wait_us,timeouts-banner_dpu_timeouts);
+    // With screen painting off, send active intervals to the regular system log for USB collection.
+    if(!paint && delta)
+      os_log(OS_LOG_DEFAULT,"t970 present: span_s=%u copies=%llu mean_us=%llu over_budget=%llu te_waits=%u mean_te_us=%u te_timeout=%u",
+        interval,(unsigned long long)delta,(unsigned long long)mean_us,(unsigned long long)over_budget,
+        wait_count,mean_wait_us,timeouts-banner_dpu_timeouts);
     banner_gpu_completions=copies;banner_gpu_total=total;banner_gpu_slow=slow;
     banner_dpu_waits=waits;banner_dpu_total=wait_us;banner_dpu_timeouts=timeouts;
   }

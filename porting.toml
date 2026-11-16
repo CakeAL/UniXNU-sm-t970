@@ -1183,6 +1183,7 @@ procedure = [
   "Collect DRM modes, panel type and brightness limits; read only display-selection tokens from /proc/cmdline and match the selected S6TUUM3 node in the live DT.",
 ]
 findings = [
+  "Recovery ea65492b keeps frame-a nonpainting mode and uses the reference Metal log switch. It exports active GPU transfer and TE wait windows through XNU unified logging for the paired USB relay. This correlates pipeline errors and transfer timings without the reference WinRE log partition. A real panel interval trace remains pending.",
   "Recovery 60bbdccc (frame-a) isolates post-handoff diagnostic drawing. With banner=0 the monitor still collects presentation and crash rows but returns before framebuffer access or render_busy. It uses the same GPU-copy configuration as the wireless runtime baseline. Prelink and payload readback succeeded and Heimdall uploaded RECOVERY. The owner reports about the same stutter. The paired log records QuartzCore pipeline load faults and PosterKit assertions during the swipe window; it has no frame timings.",
   "Recovery f81330ae5d3266ca70ce0a887ff6b56b9c9453afe6dc0e02c0dd78b485a87b3a remained on the Apple logo after roughly two minutes according to the owner. The preceding s image showed SpringBoard and three frame swaps under a diagnostic banner; this does not establish why the new boot has no visible desktop.",
   "Recovery f81330ae5d3266ca70ce0a887ff6b56b9c9453afe6dc0e02c0dd78b485a87b3a uses the s kernel and persistent Data with boot-progress=3, the reference framebuffer-neutral setting. RECOVERY upload succeeded; actual display and usability remain pending.",
@@ -1290,6 +1291,7 @@ next_action = [
 ]
 
 evidence = [
+  { kind = "host", reference = "evidence/display/gpu-timing-20261116/report.json", revision = "7a46666418228e889d0de92563afd83b7416f84d", command = "Build and prelink kernel, pack gpu-log-a and read back the actual image.", result = "Verified logging code, 997-byte kernel arguments and unchanged persistent inputs. Hardware boot and trace collection pending." },
   { kind = "host", reference = "evidence/display/frame-a-20261116/report.json", revision = "e8266f61a7e4146b4a9d199cb4fa4ad475e919dc", command = "Build kernel and compare the extracted payload against 3fbc958c.", result = "The no-draw comparison retains the existing wireless inputs, Data and presentation settings." },
   { kind = "host", reference = "evidence/display/setup-skip-v84/preparation.json", revision = "30ced50af55aa9e17c2f246c7b602d6fd887ad25", command = "python3.14 evidence/display/setup-skip-v84/prepare.py", result = "Repacked BOOT with the framework Setup-skip Data seed; kernel, configuration, ADT, trust cache and firmware unchanged. BOOT215edec4 FAT readback passed." },
   { kind = "device", reference = "evidence/display/setup-skip-v84/device-result.json", revision = "df42af32146e344df4c326cd92b2ad104e9711d2", command = "Owner photo of the home screen after BOOT215edec4 upload", result = "Reached the home screen with Setup skipped (Setup exec 0/0/0). SpringBoard PID 27, 277 swaps, 276 copies at 42531/49297 us, zero rejections." },
