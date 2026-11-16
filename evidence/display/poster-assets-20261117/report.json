@@ -12,7 +12,68 @@
   "pack_command": "UNIXNU_UEFI=.cache/uefi-source/Mu-Silicium python3.14 out/poster-assets-20261117/pack.py",
   "image": "out/poster-assets-20261117/boot.img",
   "verification": "Kernel and prelink succeeded. Readback confirms the exact embedded addon, ADT, trust, Data seed, 998-byte arguments, and valid FAT16 with 655360 free bytes. The packed kernel contains the new diagnostic format string. Two display tests and the porting record check passed.",
-  "runtime": null,
+  "upload": {
+    "partition": "RECOVERY",
+    "date": "2026-11-17T01:56+08:00",
+    "receipt": "evidence/display/poster-assets-20261117/recovery-upload.txt",
+    "result": "Heimdall confirmed upload with manual reboot."
+  },
+  "runtime": {
+    "usb": "Existing pair validated and paired log relay opened.",
+    "poster_paths": {
+      "collections": 0,
+      "legacy": 0,
+      "launchservices_store": -2,
+      "overlay_stage": 5,
+      "overlay_error": 0
+    },
+    "wallpaper": "User observed no wallpaper. Both built-in providers still returned -2220. Logged PosterBoard provider identities named Weather. The LaunchServices return does not establish that the provider was registered.",
+    "desktop": {
+      "swipes": 13,
+      "two_second_windows": [
+        [
+          61,
+          30873,
+          57
+        ],
+        [
+          41,
+          35145,
+          40
+        ],
+        [
+          11,
+          29221,
+          11
+        ],
+        [
+          26,
+          83810,
+          25
+        ],
+        [
+          58,
+          32405,
+          56
+        ],
+        [
+          15,
+          32251,
+          14
+        ]
+      ],
+      "window_fields": [
+        "copies",
+        "mean_us",
+        "over_budget"
+      ],
+      "copies": 212,
+      "weighted_mean_us": 38622.4,
+      "over_budget": 203,
+      "budget_us": 16667,
+      "result": "User still observed stutter. Latency measures offer to copy completion."
+    }
+  },
   "kernel_sha256": "4589cd614c1789dd3d213cf7e7d7da80a996e7f06e519d844efb88aff268d27d",
   "resident_addon_sha256": "b68a86b681f1fd01b0ae5e4465c57b60289d9e30640065ca8ebe1cb54ad46870",
   "fat_clusters": 19688,
