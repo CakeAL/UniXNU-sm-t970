@@ -287,6 +287,27 @@ class NativeLegacyDisplay : public IOMobileFramebufferLegacy {
     uint64_t vsyncInterval=0,vsyncNext=0;
     unsigned vsyncHz=0;
     bool vsyncArmed=false;
+    // Hardware frame counting (t970-hw-vsync=1). No vblank source is exposed to the family, and the synthetic grid
+    // drifts against the panel by a few lines per second, so the compositor periodically gets a frame that lands one
+    // refresh late. This reads the MDP's own INTF frame counter out of the block the firmware left scanning and times
+    // every notification from a real panel frame; the grid timer stays installed as the fallback.
+    static constexpr unsigned kHwIntfCount=4;
+    // qcom,sde-intf-off 0x6b000 0x6b800 0x6c000 0x6c800 from the MDP base, minus this mapping's 0xae01000 base.
+    static constexpr uint32_t kHwIntfOffset[kHwIntfCount]={0x6a000,0x6a800,0x6b000,0x6b800};
+    static constexpr uint32_t kHwIntfEngine=0x0,kHwIntfFrameEnable=0xa8,kHwIntfFrameCount=0xac,kHwIntfLineCount=0xb0;
+    // Periodic, read-only DPU accounting: the boot-time rows scroll past before any capture connects, so the same
+    // facts are re-read every five seconds and logged, which also settles whether the vsync path started at all.
+    IOTimerEventSource *diagTimer=nullptr;
+    IOMemoryMap *diagMap=nullptr;
+    volatile uint32_t *diagMdp=nullptr;
+    uint32_t diagFrames[kHwIntfCount]={};
+    uint64_t diagAt=0;
+    IOTimerEventSource *hwVsyncTimer=nullptr;
+    IOMemoryMap *hwVsyncMap=nullptr;
+    volatile uint32_t *hwmdp=nullptr;
+    uint32_t hwIntfBase=0,hwLastFrame=0,hwPollUs=500;
+    uint64_t hwLastEdge=0,hwLastNotify=0,hwInterval=0,hwNotify=0,hwFrames=0,hwGapMin=~0ull,hwGapMax=0,hwLastLog=0;
+    bool hwVsync=false;
     // Direct scanout state, used on the work loop only. DPU 9.2 inside the MDP block (0xae01000): VIG 0 and 1 at 0x4000 and 0x6000 (source
     // address 0 at +0x14, stride 0 at +0x24; VIG 1 takes the right half through its own source x), CTL 0 at 0x15000 (flush at +0x18, VIG 0
     // and 1 are bits 0 and 1). i562: a flush of the two pipes latched within 5.4 ms with no start (the panel refreshes by itself).
@@ -576,7 +597,13 @@ class NativeLegacyDisplay : public IOMobileFramebufferLegacy {
     // the last client is removed.
     void armVsync() {
         if(!vsyncTimer || vsyncArmed || !vsyncWanted())return;
-        vsyncArmed=true;vsyncNext=mach_absolute_time()+vsyncInterval;
+        vsyncArmed=true;
+        if(hwVsync) {
+            uint64_t poll=0;nanoseconds_to_absolutetime((uint64_t)hwPollUs*1000ull,&poll);
+            hwLastEdge=mach_absolute_time();hwLastFrame=hwmdp[(hwIntfBase+kHwIntfFrameCount)/4];
+            hwVsyncTimer->wakeAtTime(hwLastEdge+poll);native_legacy_vsync_observed(0,vsyncHz);return;
+        }
+        vsyncNext=mach_absolute_time()+vsyncInterval;
         vsyncTimer->wakeAtTime(vsyncNext);native_legacy_vsync_observed(0,vsyncHz);
     }
     static void vsyncFired(OSObject *owner,IOTimerEventSource *) {static_cast<NativeLegacyDisplay *>(owner)->vsyncTick();}
@@ -585,14 +612,156 @@ class NativeLegacyDisplay : public IOMobileFramebufferLegacy {
         if(!vsyncTimer)return;
         if(!vsyncWanted()){native_legacy_vsync_observed(2,vsyncHz);return;}
         const uint64_t now=mach_absolute_time();
-        native_legacy_vsync_notify(this,now,mach_continuous_time(),vsyncInterval);
+        // Report the grid time this tick stands for, not the time the work loop got to it: a late tick then does not
+        // move the compositor's deadline later, which is what the timer's scheduling jitter otherwise does every frame.
+        native_legacy_vsync_notify(this,vsyncNext,mach_continuous_time(),vsyncInterval);
         native_legacy_vsync_observed(1,vsyncHz);
         vsyncNext+=vsyncInterval;
         if(vsyncNext<=now){vsyncNext=now+vsyncInterval;native_legacy_vsync_observed(3,vsyncHz);}
         vsyncArmed=true;vsyncTimer->wakeAtTime(vsyncNext);
     }
+    // Read the INTF the firmware left scanning and turn its frame counter on. The counter is a read-only view of the
+    // panel's own refresh, so it can be sampled without disturbing scanout; only INTF+0xa8 (the count enable) is written.
+    bool hwVsyncProbe() {
+        // On by default: the counter is read-only until the frame count is enabled, and the probe falls back to the
+        // synthetic grid with one console row when no INTF is scanning. t970-hw-vsync=0 turns it off for a control run.
+        unsigned mode=1;PE_parse_boot_argn("t970-hw-vsync",&mode,sizeof(mode));
+        if(mode==0 || hwVsyncTimer || !primary)return false;
+        unsigned poll=0;if(PE_parse_boot_argn("t970-hw-vsync-poll",&poll,sizeof(poll)) && poll>=50 && poll<=5000)hwPollUs=poll;
+        IODeviceMemory *memory=IODeviceMemory::withRange(0xae01000,0x84000);
+        hwVsyncMap=memory?memory->map(kIOMapAnywhere|kIOMapInhibitCache):nullptr;
+        if(memory)memory->release();
+        if(!hwVsyncMap)return false;
+        hwmdp=reinterpret_cast<volatile uint32_t *>(hwVsyncMap->getVirtualAddress());
+        // The engine-enable word reads zero on all four interfaces even on the live one, so the interface is found by the
+        // counter that moves: the firmware already leaves frame counting on (INTF1 counts at 59.7 Hz on the panel).
+        uint32_t before[kHwIntfCount]={};unsigned chosen=0;uint32_t best=0;
+        for(unsigned k=0;k<kHwIntfCount;++k)before[k]=hwmdp[(kHwIntfOffset[k]+kHwIntfFrameCount)/4];
+        IODelay(20000);
+        for(unsigned k=0;k<kHwIntfCount;++k) {
+            const uint32_t delta=hwmdp[(kHwIntfOffset[k]+kHwIntfFrameCount)/4]-before[k];
+            if(delta>best){best=delta;chosen=k;}
+        }
+        if(!best) {
+            IOLog("t970 hwvsync: no INTF counter moved (%x %x %x %x)\n",before[0],before[1],before[2],before[3]);
+            OSSafeReleaseNULL(hwVsyncMap);hwmdp=nullptr;return false;
+        }
+        hwIntfBase=kHwIntfOffset[chosen];
+        hwLastFrame=hwmdp[(hwIntfBase+kHwIntfFrameCount)/4];
+        hwLastEdge=mach_absolute_time();
+        IOWorkLoop *loop=getWorkLoop();
+        if(!loop){OSSafeReleaseNULL(hwVsyncMap);hwmdp=nullptr;return false;}
+        IOTimerEventSource *timer=IOTimerEventSource::timerEventSource(this,&NativeLegacyDisplay::hwVsyncFired);
+        if(!timer)return false;
+        if(loop->addEventSource(timer)!=kIOReturnSuccess){timer->release();OSSafeReleaseNULL(hwVsyncMap);hwmdp=nullptr;return false;}
+        hwVsyncTimer=timer;hwVsync=true;
+        IOLog("t970 hwvsync: intf=%x index=%u frames_moved=%u frame=%u line=%u\n",hwIntfBase,chosen,best,
+              hwLastFrame,hwmdp[(hwIntfBase+kHwIntfLineCount)/4]);
+        return true;
+    }
+    static void hwVsyncFired(OSObject *owner,IOTimerEventSource *) {static_cast<NativeLegacyDisplay *>(owner)->hwVsyncTick();}
+    void hwVsyncTick() {
+        if(!hwVsyncTimer)return;
+        if(!vsyncWanted()){hwVsyncTimer->cancelTimeout();native_legacy_vsync_observed(2,vsyncHz);return;}
+        const uint64_t now=mach_absolute_time();
+        const uint32_t frame=hwmdp[(hwIntfBase+kHwIntfFrameCount)/4];
+        if(frame!=hwLastFrame) {
+            uint64_t ns=0;absolutetime_to_nanoseconds(now-hwLastEdge,&ns);
+            hwLastFrame=frame;hwLastEdge=now;hwFrames=hwFrames+1;
+            if(ns>2000000ull && ns<50000000ull) {
+                hwInterval=hwInterval?(hwInterval*7+ns)/8:ns;
+                if(ns<hwGapMin)hwGapMin=ns;
+                if(ns>hwGapMax)hwGapMax=ns;
+            }
+            // The panel may run at twice the rate the family configured (this one is 120 Hz against a 60 Hz grid):
+            // keep the notifications on the family's cadence but phase-lock them to a real panel frame.
+            if(!hwLastNotify || now-hwLastNotify>=vsyncInterval-vsyncInterval/4) {
+                uint64_t interval=vsyncInterval;
+                if(hwInterval)nanoseconds_to_absolutetime(hwInterval,&interval);
+                native_legacy_vsync_notify(this,now,mach_continuous_time(),interval);
+                hwLastNotify=now;hwNotify=hwNotify+1;
+            }
+            if(!hwLastLog || now-hwLastLog>5000000000ull) {
+                hwLastLog=now;
+                uint64_t mean=0;absolutetime_to_nanoseconds(hwInterval,&mean);
+                IOLog("t970 hwvsync: intf=%x frames=%llu notify=%llu mean_us=%llu min_us=%llu max_us=%llu\n",hwIntfBase,
+                      (unsigned long long)hwFrames,(unsigned long long)hwNotify,(unsigned long long)(mean/1000),
+                      (unsigned long long)(hwGapMin/1000),(unsigned long long)(hwGapMax/1000));
+            }
+        }
+        uint64_t poll=0;nanoseconds_to_absolutetime((uint64_t)hwPollUs*1000ull,&poll);
+        hwVsyncTimer->wakeAtTime(now+poll);
+    }
+    // Read-only: the four INTF blocks, their engine enable and frame counter sampled twice. This runs whatever the vsync
+    // path decides, so one boot says whether a panel frame counter is moving on this image and at which rate.
+    void hwVsyncDiagnose() {
+        unsigned mode=1;PE_parse_boot_argn("t970-hw-vsync",&mode,sizeof(mode));
+        if(mode==0)return;
+        unsigned hz=native_legacy_refresh_hz();
+        IODeviceMemory *memory=IODeviceMemory::withRange(0xae01000,0x84000);
+        IOMemoryMap *map=memory?memory->map(kIOMapAnywhere|kIOMapInhibitCache):nullptr;
+        if(memory)memory->release();
+        if(!map){IOLog("t970 hwvsync: no MDP map (hz=%u primary=%d map=%d)\n",hz,primary?1:0,bootMapping?1:0);return;}
+        volatile uint32_t *regs=reinterpret_cast<volatile uint32_t *>(map->getVirtualAddress());
+        uint32_t engine[kHwIntfCount]={},first[kHwIntfCount]={},second[kHwIntfCount]={};
+        for(unsigned k=0;k<kHwIntfCount;++k) {
+            engine[k]=regs[(kHwIntfOffset[k]+kHwIntfEngine)/4];
+            first[k]=regs[(kHwIntfOffset[k]+kHwIntfFrameCount)/4];
+        }
+        IODelay(20000);
+        for(unsigned k=0;k<kHwIntfCount;++k)second[k]=regs[(kHwIntfOffset[k]+kHwIntfFrameCount)/4];
+        IOLog("t970 hwvsync diag: hz=%u primary=%d map=%d engines=%08x/%08x/%08x/%08x frames=%x>%x %x>%x %x>%x %x>%x\n",hz,primary?1:0,
+              bootMapping?1:0,engine[0],engine[1],engine[2],engine[3],first[0],second[0],first[1],second[1],first[2],second[2],first[3],second[3]);
+        OSSafeReleaseNULL(map);
+    }
+    static void diagFired(OSObject *owner,IOTimerEventSource *) {static_cast<NativeLegacyDisplay *>(owner)->diagTick();}
+    void diagTick() {
+        if(!diagTimer)return;
+        if(!diagMdp) {
+            IODeviceMemory *memory=IODeviceMemory::withRange(0xae01000,0x84000);
+            diagMap=memory?memory->map(kIOMapAnywhere|kIOMapInhibitCache):nullptr;
+            if(memory)memory->release();
+            if(!diagMap){IOLog("t970 dpu diag: no map\n");return;}
+            diagMdp=reinterpret_cast<volatile uint32_t *>(diagMap->getVirtualAddress());
+        }
+        const uint64_t now=mach_absolute_time();
+        uint64_t ns=0;if(diagAt)absolutetime_to_nanoseconds(now-diagAt,&ns);
+        uint32_t engine[kHwIntfCount]={},frames[kHwIntfCount]={},rate[kHwIntfCount]={};
+        for(unsigned k=0;k<kHwIntfCount;++k) {
+            engine[k]=diagMdp[(kHwIntfOffset[k]+kHwIntfEngine)/4];
+            frames[k]=diagMdp[(kHwIntfOffset[k]+kHwIntfFrameCount)/4];
+            if(ns && diagAt && frames[k]!=diagFrames[k])
+                rate[k]=(uint32_t)(((uint64_t)((frames[k]-diagFrames[k])&0xffffu))*10000000000ull/ns);
+            diagFrames[k]=frames[k];
+        }
+        diagAt=now;
+        IOLog("t970 dpu diag: hz=%u primary=%d map=%d timer=%d en=%x/%x/%x/%x frames=%x/%x/%x/%x fps10=%u/%u/%u/%u\n",
+              native_legacy_refresh_hz(),primary?1:0,bootMapping?1:0,vsyncTimer?1:0,engine[0],engine[1],engine[2],engine[3],
+              frames[0],frames[1],frames[2],frames[3],rate[0],rate[1],rate[2],rate[3]);
+        diagTimer->setTimeoutUS(5000000);
+    }
+    void startDiag() {
+        if(diagTimer)return;
+        unsigned mode=1;PE_parse_boot_argn("t970-dpu-diag",&mode,sizeof(mode));
+        if(mode==0)return;
+        IOWorkLoop *loop=getWorkLoop();
+        if(!loop)return;
+        IOTimerEventSource *timer=IOTimerEventSource::timerEventSource(this,&NativeLegacyDisplay::diagFired);
+        if(!timer)return;
+        if(loop->addEventSource(timer)!=kIOReturnSuccess){timer->release();return;}
+        diagTimer=timer;diagTimer->setTimeoutUS(5000000);
+    }
+    void stopDiag() {
+        if(diagTimer) {
+            diagTimer->cancelTimeout();
+            if(IOWorkLoop *loop=getWorkLoop())loop->removeEventSource(diagTimer);
+            OSSafeReleaseNULL(diagTimer);
+        }
+        OSSafeReleaseNULL(diagMap);diagMdp=nullptr;diagAt=0;
+    }
     void startVsync() {
         unsigned hz=native_legacy_refresh_hz();
+        IOLog("t970 vsync-start: hz=%u primary=%d map=%d timer=%d\n",hz,primary?1:0,bootMapping?1:0,vsyncTimer?1:0);
         if(!hz || hz>240 || !primary || !bootMapping || vsyncTimer)return;
         IOWorkLoop *loop=getWorkLoop();
         if(!loop)return;
@@ -601,12 +770,21 @@ class NativeLegacyDisplay : public IOMobileFramebufferLegacy {
         if(loop->addEventSource(timer)!=kIOReturnSuccess){timer->release();return;}
         nanoseconds_to_absolutetime(1000000000ull/hz,&vsyncInterval);
         vsyncHz=hz;vsyncTimer=timer;native_legacy_vsync_observed(4,hz);
+        // The hardware path only decides which timer times the notifications; the grid stays installed for the fallback.
+        hwVsyncProbe();
         // A client may already have registered: arm under the gate, like the registration does.
         loop->runAction([](OSObject *owner,void *,void *,void *,void *)->IOReturn {
             static_cast<NativeLegacyDisplay *>(owner)->armVsync();return kIOReturnSuccess;
         },this);
     }
     void stopVsync() {
+        if(hwVsyncTimer) {
+            hwVsyncTimer->cancelTimeout();
+            if(IOWorkLoop *loop=getWorkLoop())loop->removeEventSource(hwVsyncTimer);
+            OSSafeReleaseNULL(hwVsyncTimer);
+        }
+        hwVsync=false;OSSafeReleaseNULL(hwVsyncMap);hwmdp=nullptr;
+        stopDiag();
         if(!vsyncTimer)return;
         vsyncTimer->cancelTimeout();
         if(IOWorkLoop *loop=getWorkLoop())loop->removeEventSource(vsyncTimer);
@@ -644,7 +822,7 @@ public:
     bool start(IOService *provider) override {
         if(!startDisplay(provider))return false;
         publishOneLayer();
-        startVsync();startDirect();return true;
+        hwVsyncDiagnose();startVsync();startDirect();startDiag();return true;
     }
     // CoreAnimation reads how many layers the display scans out from IOMFBNumLayers (MaxNumLayers). Without the property it may hand a
     // full-screen layer (an app's Metal layer) to the display as a detached layer of its own, copied through the IOSurfaceAccelerator

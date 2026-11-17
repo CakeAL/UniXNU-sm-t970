@@ -1,5 +1,7 @@
 # UniXNU — Samsung Galaxy Tab S7+ Wi-Fi (SM-T970)
 
+## 烧不起token了，先放一放。主要是卡的地方太多了，而且我用的模型又好弱智，实在是受不了了，又需要可以去看看https://github.com/rui12366B/UniXNU-gts7xlwifi
+
 设备代号 `gts7xlwifi`，SM8250-AB（Snapdragon 865+），目标 iPadOS 17.7.11（21H461）。
 本仓库按官方 `examples/device` 建立，保存板级配置、实机输入、固件接入和适配记录。
 
