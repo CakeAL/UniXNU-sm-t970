@@ -1,0 +1,41 @@
+{
+  "build_tag": "tu-default-a",
+  "baseline": "cadence-b ed73a75e491c618801110d0847302f0454b9390445cdf2b6ff3805a1f7ae8c8f",
+  "source_kernel_sha256": "2661ecbec4f3f39a11eeac336843f3e9364a7231b0455c0a03065283139bc1db",
+  "packed_kernel_sha256": "4d20ecd51c07fc212e147ea10e7eff729d9a56acca651858be13fe3d2352f245",
+  "payload_sha256": "1f0891cdd0c7615eb81f142a4fb4f9671ec81eefc1347ddd807380349c664c4f",
+  "boot_image": "out/tu-default-a-20261117/boot.img",
+  "boot_image_sha256": "bbf7d1f564d8c7769fae4a637fbb25f5b13a00f65f2edd0610e6b2730d77dba8",
+  "boot_bytes": 86888448,
+  "command_line_bytes": 973,
+  "implementation": [
+    "Removes only tu-debug=noubwc,nocb from the device-tested cadence-b command line. The kernel, ADT, owner trust cache, Data seed, Recovery wrapper, GPU addon and every other option are byte-identical to cadence-b.",
+    "With the argument absent the Turnip frontend sets no TU_DEBUG, so allow_concurrent_binning follows A6XX drirc and UBWC stays enabled: this board has run with UBWC bandwidth compression and concurrent binning disabled since the white-screen investigation, and that investigation used pipa-turnip-debug, which neither packaged frontend reads.",
+    "The change tests GPU bandwidth and binning overlap as the source of the 7.592 ms mean GPU fence wait measured on cadence-b; it changes no display, fence, latch or retirement code."
+  ],
+  "host_tests": [
+    "python3.14 scripts/prepare-arg-image.py --base out/cadence-b-20261117 --unset tu-debug=noubwc,nocb",
+    "python3.14 ../UniXNU/scripts/porting-record.py check --device .",
+    "git diff --check"
+  ],
+  "verification": [
+    "The preserved payload members (kernel, ADT, trust cache, Data seed) compare byte-equal before and after the menu edit, and the packed Recovery's payload is compared against the edited payload.",
+    "The menu round-trips to 973 bytes with exactly one removed argument and no added argument.",
+    "The Recovery is 86888448 bytes; final size, FAT readback and packed-payload readback passed."
+  ],
+  "recovery_upload": {
+    "result": "RECOVERY upload successful",
+    "receipt": "evidence/display/tu-default-a-20261117/recovery-upload.txt",
+    "no_reboot": true,
+    "other_partitions_written": false
+  },
+  "device_result": {
+    "boot": "Recovery bbf7d1f5 booted the 21H461 desktop and restored paired USB.",
+    "capture": "out/pairing-runtime-20261116/syslog-tu-default-a.txt",
+    "analysis": "evidence/display/tu-default-a-20261117/device-analysis.json",
+    "outcome": "rejected as a working configuration",
+    "numbers": "Mean interval 34.156 ms against 26.510 ms on cadence-b. Fence wait 5.054 ms against 7.592 ms; post-arrival 4.578 ms against 5.698 ms; arrival 20.677 ms against 11.467 ms; ack 9.129 ms against 9.775 ms. Zero copy fallback, zero CTL timeout."
+  },
+  "hardware_tested": true,
+  "limits": "Host result plus a verified RECOVERY upload. The upload does not establish boot, and the experiment is unmeasured until the same interaction workload is captured on this image. Visual corruption, a return of the settings-page artifacts, or a worse GPU fence wait means UBWC or concurrent binning has to be restored and bisected separately."
+}

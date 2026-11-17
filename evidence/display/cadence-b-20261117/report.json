@@ -1,0 +1,52 @@
+{
+  "build_tag": "cadence-b",
+  "baseline": "cadence-a 900e487a5b8bdb3e19ba5f409e97b30563501cb5d17e69a0f453138343717da1",
+  "source_kernel_sha256": "2661ecbec4f3f39a11eeac336843f3e9364a7231b0455c0a03065283139bc1db",
+  "packed_kernel_sha256": "4d20ecd51c07fc212e147ea10e7eff729d9a56acca651858be13fe3d2352f245",
+  "payload_sha256": "308254c62198a349a673d8b4db857d845b4ea18f81c1886782451de598cf477c",
+  "boot_image": "out/cadence-b-20261117/boot.img",
+  "boot_image_sha256": "ed73a75e491c618801110d0847302f0454b9390445cdf2b6ff3805a1f7ae8c8f",
+  "boot_bytes": 86888448,
+  "resident_addon_sha256": "b68a86b681f1fd01b0ae5e4465c57b60289d9e30640065ca8ebe1cb54ad46870",
+  "command_line_bytes": 994,
+  "implementation": [
+    "For each active prior-latch-to-flip gap, split time at the request's existing validateSwap timestamp. Arrival is time after the prior latch before a new swap appears; post-arrival is time after both the prior latch and request are available until flip.",
+    "Requests validated before the prior latch are counted as prequeued. Arrival plus post-arrival equals the corresponding active gap; idle gaps remain excluded.",
+    "The existing GPU fence wait counters are exported in the same two-second gap-phase row. No fence, mapping, flip, latch or retirement behavior changed."
+  ],
+  "host_tests": [
+    "python3.14 drivers/GopFramebuffer/Test/check-cadence.py",
+    "python3.14 drivers/GopFramebuffer/Test/check-fence-wait.py",
+    "python3.14 -m unittest tests/test_analyze_t970_cadence.py -v",
+    "python3.14 -m unittest discover -s tests -p test_display*.py -v",
+    "git diff --check"
+  ],
+  "verification": [
+    "The actual cadence methods pass ASan/UBSan for post-latch arrival, post-arrival time, a prequeued request, idle exclusion, confirmed ACK and timeout reset.",
+    "The analyzer passes compositor-arrival and GPU-fence routing cases in addition to cadence-a regression cases.",
+    "The full 21H461 archive, display ABI audit, link and prelink passed. Packed symbols include native_t970_cadence, native_t970_gap_phase and native_t970_scanout_latches.",
+    "Readback preserved the exact cadence-a GPU addon and the same 994-byte boot configuration; payload packing and final Recovery size checks passed."
+  ],
+  "recovery_upload": {
+    "result": "RECOVERY upload successful",
+    "no_reboot": true,
+    "other_partitions_written": false
+  },
+  "device_result": {
+    "booted_os_build": "21H461",
+    "paired_usb_restored": true,
+    "capture_seconds": 64,
+    "flips": 1981,
+    "latches": 1982,
+    "copy_fallbacks": 0,
+    "ctl_timeouts": 0,
+    "mean_interval_us": 26509.73,
+    "mean_swap_arrival_us": 11466.73,
+    "mean_post_arrival_us": 5698.08,
+    "gpu_fence_waits": 1709,
+    "mean_gpu_fence_wait_us": 7592.46,
+    "analysis": "evidence/display/cadence-b-20261117/device-analysis.json"
+  },
+  "hardware_tested": true,
+  "limits": "The result covers one 64-second interactive workload and has no matched reference-port trace. The first uploaded image logged the existing at-least-250-ms fence counter under the historical fence_timeout spelling; the analyzer normalizes it to fence_slow_250ms."
+}

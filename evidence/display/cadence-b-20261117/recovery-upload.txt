@@ -1,0 +1,7 @@
+command: sh scripts/flash-recovery-when-detected.sh out/cadence-b-20261117/boot.img ed73a75e491c618801110d0847302f0454b9390445cdf2b6ff3805a1f7ae8c8f 300
+device detected, flashing RECOVERY
+Protocol initialisation successful.
+PIT file download successful.
+RECOVERY upload successful
+flashed ed73a75e491c618801110d0847302f0454b9390445cdf2b6ff3805a1f7ae8c8f
+note: --no-reboot was used; no BOOT, userdata or GPT write was issued.

@@ -39,6 +39,8 @@ def main():
                         help='preserved Data seed (default: the board build output)')
     parser.add_argument('--owner-trust-cache', type=Path,
                         help='owner trust bundle that replaces the board trust cache')
+    parser.add_argument('--gpu-addon', type=Path,
+                        help='owner GPU addon (scripts/make-gpu-addon.py) carried by this payload')
     parser.add_argument('--size-mib', type=int, default=96,
                         help='FAT size in MiB; stays below the 400 MiB cache partition')
     parser.add_argument('--kernel-arg', action='append', default=[],
@@ -67,6 +69,8 @@ def main():
         command += ['--data-ramdisk', str(args.data_ramdisk.resolve())]
     if args.owner_trust_cache:
         command += ['--owner-trust-cache', str(args.owner_trust_cache.resolve())]
+    if args.gpu_addon:
+        command += ['--gpu-addon', str(args.gpu_addon.resolve())]
     ctx = Context(cli_parser().parse_args(command))
     ctx.args.kernel_arg = list(args.kernel_arg)
     ctx.uefi = ctx.option('uefi', 'UNIXNU_UEFI')

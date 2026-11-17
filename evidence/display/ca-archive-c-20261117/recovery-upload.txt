@@ -1,0 +1,7 @@
+target: RECOVERY (Samsung SM-T970, Heimdall; --no-reboot)
+image: out/ca-archive-c-20261117/boot.img
+sha256: 2031251c865d4ce9975daf3cdc27cbae7d5fdbbc99a114d6dbb041f68c2405ca
+size: 86888448 bytes
+result: RECOVERY upload successful (100%), no BOOT/userdata/GPT write
+purpose: build-tagged plugin - render pipeline refusals now carry the [b2] prefix
+baseline: ca-archive-b 19c04121 (new plugin logged in apps but never in backboardd; 93 refusals)

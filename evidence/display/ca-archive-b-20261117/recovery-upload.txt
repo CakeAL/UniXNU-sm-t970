@@ -1,0 +1,8 @@
+target: RECOVERY (Samsung SM-T970, Heimdall protocol session; --no-reboot)
+image: out/ca-archive-b-20261117/boot.img
+sha256: 19c041216fad29a520ae756c0178369256cece1cd9e44ad04d3a2c7cd753fc7a
+size: 86888448 bytes
+result: RECOVERY upload successful (100%), session ended without reboot
+other_partitions_written: none
+purpose: diagnostic build - unconditional plugin banner and archive-open line
+baseline: ca-archive-a cd68aa92 (seeding never logged, 53 BinaryArchiveMiss in 300 s)

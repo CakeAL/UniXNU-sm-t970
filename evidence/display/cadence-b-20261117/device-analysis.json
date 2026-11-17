@@ -1,0 +1,42 @@
+{
+  "build_tag": "cadence-b",
+  "boot_image_sha256": "ed73a75e491c618801110d0847302f0454b9390445cdf2b6ff3805a1f7ae8c8f",
+  "os_build": "21H461",
+  "capture_seconds": 64,
+  "scanout": {
+    "flips": 1981,
+    "latches": 1982,
+    "copy_fallbacks": 0,
+    "ctl_timeouts": 0,
+    "mean_interval_us": 26509.73,
+    "mean_gap_us": 17164.74,
+    "gaps_over_20ms": 626,
+    "active_gaps": 1942,
+    "mean_ack_us": 9775.11,
+    "acks_over_3ms": 1754,
+    "ack_samples": 1982
+  },
+  "gap_phase": {
+    "mean_swap_arrival_us": 11466.73,
+    "arrival_over_8ms": 938,
+    "mean_post_arrival_us": 5698.08,
+    "post_arrival_over_3ms": 1395,
+    "prequeued": 374,
+    "active_gaps": 1942,
+    "gpu_fence_waits": 1709,
+    "mean_gpu_fence_wait_us": 7592.46,
+    "gpu_fence_waits_over_8ms": 521,
+    "gpu_fence_waits_reaching_250ms": 1
+  },
+  "interpretation": [
+    "Direct scanout remains reliable: the capture has no copy fallback and no CTL timeout.",
+    "The active gap is mixed. Swap production arrives about 11.5 ms after the prior latch on average, while post-arrival work contributes another 5.7 ms.",
+    "About 88 percent of active gaps encounter an unfinished GPU fence. The measured fence interval averages about 7.6 ms, so real GPU work contributes materially; a polling-wakeup change alone cannot remove it.",
+    "The roughly 9.8 ms acknowledgement interval includes waiting for a physical 60 Hz refresh. It is not evidence that the display driver can safely retire the IOSurface early."
+  ],
+  "limits": [
+    "This is one 64-second interactive desktop workload, not a matched trace from the reference port.",
+    "Two-second counter windows can begin or end during a fence wait, so aggregate fence and post-arrival means need not close exactly.",
+    "The uploaded image called the existing at-least-250-ms counter fence_timeout in its log. The source and analyzer now use the accurate name fence_slow250; behavior is unchanged."
+  ]
+}

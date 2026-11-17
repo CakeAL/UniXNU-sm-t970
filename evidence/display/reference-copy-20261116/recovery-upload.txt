@@ -1,0 +1,22 @@
+Host date: 2026-11-16 21:26:47 CST
+Flashed RECOVERY with out/reference-copy-20261116/recovery/boot.img
+SHA-256: 4f84e76372c6e7f1578942b88512d57351215c6944fd035dba199632d78a2071
+
+Protocol initialisation successful.
+
+Beginning session...
+
+Some devices may take up to 2 minutes to respond.
+Please be patient!
+
+Session begun.
+
+Downloading device's PIT file...
+PIT file download successful.
+
+Uploading RECOVERY
+RECOVERY upload successful
+
+Ending session...
+Releasing device interface...
+

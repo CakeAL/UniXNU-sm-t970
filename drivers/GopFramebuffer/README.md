@@ -8,6 +8,8 @@ Direct display keeps the first successful GPU fence snapshot for each swap. Busy
 
 Run the fence-wait regression check with `python3 Test/check-fence-wait.py`. It compiles the display's fence-wait and cancellation methods against a simulated GPU with AddressSanitizer and UndefinedBehaviorSanitizer.
 
+Run `python3 Test/check-cadence.py` to verify the direct-scanout split between the previous confirmed latch and the next flip (`gap`) and between that flip and CTL confirmation (`ack`). Idle gaps over 100 ms and unconfirmed 50 ms CTL timeouts are reported separately.
+
 Build and interface details: [documentation](https://unixnu.com/drivers/gop-framebuffer). Component sources and dependencies: [catalog](https://unixnu.com/reference/components).
 
 ## Frame diagnostics

@@ -1,0 +1,77 @@
+{
+  "format": 1,
+  "build_tag": "tu-default-a",
+  "baseline_build_tag": "cadence-b",
+  "baseline_boot_sha256": "ed73a75e491c618801110d0847302f0454b9390445cdf2b6ff3805a1f7ae8c8f",
+  "image_boot_sha256": "bbf7d1f564d8c7769fae4a637fbb25f5b13a00f65f2edd0610e6b2730d77dba8",
+  "capture": "out/pairing-runtime-20261116/syslog-tu-default-a.txt",
+  "baseline_capture": "out/pairing-runtime-20261116/syslog-cadence-b.txt",
+  "workload": "Continuous home-screen page swipes followed by one Settings launch and return, same instruction given for both captures. The tu-default-a capture window is the complete 74-second sample, not the partial read taken while it was still recording.",
+  "single_variable": "tu-debug=noubwc,nocb removed from the command line; UBWC bandwidth compression and concurrent binning fall back to Turnip defaults.",
+  "comparison": {
+    "mean_interval_ms": {
+      "cadence_b": 26.51,
+      "tu_default_a": 34.156
+    },
+    "gap_mean_ms": {
+      "cadence_b": 17.165,
+      "tu_default_a": 25.255
+    },
+    "arrival_mean_ms": {
+      "cadence_b": 11.467,
+      "tu_default_a": 20.677
+    },
+    "post_arrival_mean_ms": {
+      "cadence_b": 5.698,
+      "tu_default_a": 4.578
+    },
+    "fence_mean_ms": {
+      "cadence_b": 7.592,
+      "tu_default_a": 5.054
+    },
+    "fence_over_8ms_rate": {
+      "cadence_b": 0.305,
+      "tu_default_a": 0.175
+    },
+    "ack_mean_ms": {
+      "cadence_b": 9.775,
+      "tu_default_a": 9.192
+    },
+    "span_seconds": {
+      "cadence_b": 64,
+      "tu_default_a": 74
+    },
+    "gap_samples": {
+      "cadence_b": 1942,
+      "tu_default_a": 1424
+    },
+    "flips": {
+      "cadence_b": 1981,
+      "tu_default_a": 1459
+    },
+    "copy_fallback": {
+      "cadence_b": 0,
+      "tu_default_a": 0
+    },
+    "ctl_timeout": {
+      "cadence_b": 0,
+      "tu_default_a": 0
+    },
+    "binary_archive_miss": {
+      "cadence_b": 45,
+      "tu_default_a": 118
+    },
+    "binary_archive_miss_per_second": {
+      "cadence_b": 0.703,
+      "tu_default_a": 1.595
+    }
+  },
+  "result": "The GPU side improved and the frame rate fell. The mean GPU fence wait dropped from 7.592 ms to 5.054 ms (over-8 ms rate 30.5% to 17.5%) and post-arrival work dropped from 5.698 ms to 4.578 ms, but swap arrival rose from 11.467 ms to 20.677 ms, so the mean interval worsened from 26.510 ms to 34.156 ms over 1459 flips. Direct scanout still had zero copy fallback and zero CTL timeout. This run is superseded as a comparison by device-analysis-repeat in the cadence-b evidence: the same unchanged image measured 26.51 ms and then 36.13 ms, so the 34.16 ms seen here is inside the run-to-run spread.",
+  "conclusion": "Not attributable. The measured 34.16 ms lies inside the spread of two unchanged cadence-b runs (26.51 ms and 36.13 ms), so this image neither proves nor disproves an effect from removing tu-debug=noubwc,nocb. It stays out of the working command line until an alternating A/B run under one session shows a difference larger than that spread; it is not evidence that UBWC or concurrent binning is wrong.",
+  "confound": "Run-to-run variation of swap arrival on this board is about 12 ms, which dominates the difference this image was built to expose.",
+  "next_measurement": "Restore the cadence-b command line and capture the same workload again to bound run-to-run spread of swap arrival before any further GPU argument experiment.",
+  "artifact_check": {
+    "requested": true,
+    "observed": "The operator did not report visual corruption; the settings page rendered. No frame-level artifact evidence is recorded, so this is not a verification of UBWC correctness."
+  }
+}

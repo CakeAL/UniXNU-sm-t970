@@ -1,0 +1,10 @@
+target: RECOVERY (Samsung SM-T970, Heimdall; --no-reboot)
+image: out/align-a-20261117/boot.img
+sha256: e98dec49ef47c078ec41d60d45f4733dfb7d68518c122e50cc86e175e96edabc
+size: 86888448 bytes
+result: RECOVERY upload successful (100%), no BOOT/userdata/GPT write
+purpose: align the consumed boot arguments with the reference port
+arguments added: armcpu-self-ipi=1, t970-fb-src-wb=1
+argument renamed: tu-debug=noubwc,nocb -> pipa-turnip-debug=noubwc,nocb (the reference spelling; the packaged frontends do not read it)
+arguments dropped for the 1000-byte limit: banner=0, log-gpu=1, t970-qud-retry=1, t970-qud-resume=1
+command line: 984 bytes; kernel, addon, trust cache, ADT and Data seed byte-identical to ca-archive-e

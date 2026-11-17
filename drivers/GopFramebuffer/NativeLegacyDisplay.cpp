@@ -62,6 +62,14 @@ extern "C" {volatile uint32_t native_t970_swapfmt[5];}
 extern "C" {volatile uint32_t native_legacy_direct[14];}
 // Confirmed CTL latches, last latch tick, in-burst intervals, total interval us, and intervals over budget.
 extern "C" {volatile uint64_t native_t970_scanout_latches[5];}
+// Direct-scanout cadence, split at the flip: [0] gap samples, [1] gap total us, [2] gap max us, [3] gaps >=20 ms,
+// [4] confirmed-ack samples, [5] ack total us, [6] ack max us, [7] acks >=3 ms, [8] CTL flush timeouts, [9] gaps over
+// 100 ms excluded as idle. A gap runs from the previous confirmed latch to this flip; ack runs from this flip to CTL confirmation.
+extern "C" {volatile uint64_t native_t970_cadence[10];}
+// Active gap split: [0] samples, [1] post-latch arrival total us, [2] arrival max, [3] arrivals >=8 ms,
+// [4] post-arrival total us, [5] post-arrival max, [6] post-arrival >=3 ms, [7] requests already queued at the prior latch.
+// arrival + post-arrival equals the corresponding active cadence gap. This does not relabel compositor pacing as GPU execution.
+extern "C" {volatile uint64_t native_t970_gap_phase[8];}
 extern "C" bool native_adreno_fences(uint32_t *submitted,uint32_t *retired) __attribute__((weak_import));
 extern "C" bool native_adreno_fences_detail(uint32_t *,uint32_t *,uint32_t *) __attribute__((weak_import));
 // The swap lifecycle: native_legacy_ring holds the newest native_legacy_ring_cap events (allocated at start: a static array of this size no longer fits the kernel's data segment), {[0] microseconds since boot (64 bit), [1] event << 56 | slot + 1 << 48 |
@@ -290,7 +298,7 @@ class NativeLegacyDisplay : public IOMobileFramebufferLegacy {
     uint64_t *directPages=nullptr;
     IOTimerEventSource *latchTimer=nullptr;
     const OriginalLegacySwapRequest *latchRequest=nullptr;
-    uint64_t latchStart=0,directClock=0;
+    uint64_t latchStart=0,lastLatchAck=0,directClock=0;
     int shownSlot=-1,pendingSlot=-1;
     uint32_t shownStride=0;
     // Keep the first successful fence snapshot for this request across pending and busy polls.
@@ -300,6 +308,7 @@ class NativeLegacyDisplay : public IOMobileFramebufferLegacy {
     bool fenceCaptured=false,fenceSlow=false;
     IOTimerEventSource *fenceTimer=nullptr;
     bool directOn=false,directBoot=true;
+    uint64_t lastDirectAt=0;IOTimerEventSource *idleTimer=nullptr;
     /* gts7xlwifi: sheng's pipes (VIG 0x4000/0x6000), CTL flush (0x15018) and boot scanout (0xb8000000, stride 0x2fa0) are SM8550
      * values. On this SM8250 they are read from the controller at start: the live pipes are the source pipes whose SRC0_ADDR points
      * into the boot memory (alioth's DpuProbe found its one at 0x4000 with src0 0x9c000000; this panel is split over two DSI links,
@@ -352,6 +361,12 @@ class NativeLegacyDisplay : public IOMobileFramebufferLegacy {
             native_t970_direct[0]=7;return;
         }
         directOn=true;gDirectDisplay=this;native_t970_direct[0]=1;
+        // gts7xlwifi: when the compositor stops swapping, hand the panel back to the boot memory so the diagnostic page (which is
+        // drawn there every second and is otherwise invisible under direct scanout) can be read and photographed.
+        if(idleTimer)idleTimer->cancelTimeout();
+        idleTimer=loop?IOTimerEventSource::timerEventSource(this,&NativeLegacyDisplay::idleFired):nullptr;
+        if(idleTimer && loop->addEventSource(idleTimer)==kIOReturnSuccess)idleTimer->setTimeoutUS(1000000);
+        else OSSafeReleaseNULL(idleTimer);
     }
     // The diagnostic screenshot reads the boot memory, which the display no longer scans: draw the surface on screen into it (rows of the
     // visible width) so the picture shows what the panel shows.
@@ -450,6 +465,64 @@ class NativeLegacyDisplay : public IOMobileFramebufferLegacy {
     }
     static void fenceFired(OSObject *owner,IOTimerEventSource *) {static_cast<NativeLegacyDisplay *>(owner)->fenceTick();}
     void fenceTick() {transferred=false;kickSwapQueue();}
+    uint64_t validatedUs(const OriginalLegacySwapRequest *request) const {
+        for(unsigned i=0;i<8;++i)if(validated[i]==request)return validatedAt[i];
+        return 0;
+    }
+    void recordDirectGap(uint64_t now,const OriginalLegacySwapRequest *request) {
+        if(!lastLatchAck || now<=lastLatchAck)return;
+        uint64_t ns=0;absolutetime_to_nanoseconds(now-lastLatchAck,&ns);
+        if(ns>100000000ull){
+            native_t970_cadence[9]=native_t970_cadence[9]+1;
+            // A long interval is the freeze the owner feels; the aggregate means exclude it, so name where it sat.
+            static unsigned stallLogged;
+            if(stallLogged<64) {
+                ++stallLogged;
+                uint64_t ackNs=0,flipNs=0;absolutetime_to_nanoseconds(lastLatchAck,&ackNs);absolutetime_to_nanoseconds(now,&flipNs);
+                const uint64_t ackUs=ackNs/1000,flipUs=flipNs/1000,arrivalAt=validatedUs(request);
+                const unsigned long long gapUs=ns/1000;
+                if(arrivalAt && arrivalAt<=flipUs) {
+                    const bool pre=arrivalAt<=ackUs;
+                    const unsigned long long arrival=pre?0:arrivalAt-ackUs;
+                    const unsigned long long post=flipUs-(pre?ackUs:arrivalAt);
+                    IOLog("t970 stall: gap_us=%llu arrival_us=%llu post_us=%llu pre=%u\n",gapUs,arrival,post,pre?1:0);
+                } else {
+                    IOLog("t970 stall: gap_us=%llu arrival=unknown\n",gapUs);
+                }
+            }
+            return;
+        }
+        const uint64_t us=ns/1000;
+        native_t970_cadence[1]=native_t970_cadence[1]+us;
+        if(us>native_t970_cadence[2])native_t970_cadence[2]=us;
+        if(ns>=20000000ull)native_t970_cadence[3]=native_t970_cadence[3]+1;
+        native_t970_cadence[0]=native_t970_cadence[0]+1;
+        uint64_t ackNs=0,flipNs=0;absolutetime_to_nanoseconds(lastLatchAck,&ackNs);absolutetime_to_nanoseconds(now,&flipNs);
+        const uint64_t ackUs=ackNs/1000,flipUs=flipNs/1000,arrivalAt=validatedUs(request);
+        if(!arrivalAt || arrivalAt>flipUs)return;
+        const bool prequeued=arrivalAt<=ackUs;
+        const uint64_t arrival=prequeued?0:arrivalAt-ackUs;
+        const uint64_t post=flipUs-(prequeued?ackUs:arrivalAt);
+        native_t970_gap_phase[1]=native_t970_gap_phase[1]+arrival;
+        if(arrival>native_t970_gap_phase[2])native_t970_gap_phase[2]=arrival;
+        if(arrival>=8000)native_t970_gap_phase[3]=native_t970_gap_phase[3]+1;
+        native_t970_gap_phase[4]=native_t970_gap_phase[4]+post;
+        if(post>native_t970_gap_phase[5])native_t970_gap_phase[5]=post;
+        if(post>=3000)native_t970_gap_phase[6]=native_t970_gap_phase[6]+1;
+        if(prequeued)native_t970_gap_phase[7]=native_t970_gap_phase[7]+1;
+        native_t970_gap_phase[0]=native_t970_gap_phase[0]+1;
+    }
+    void recordDirectAck(uint64_t now,bool confirmed) {
+        if(!confirmed) {
+            native_t970_cadence[8]=native_t970_cadence[8]+1;lastLatchAck=0;return;
+        }
+        uint64_t ns=0;absolutetime_to_nanoseconds(now-latchStart,&ns);
+        const uint64_t us=ns/1000;
+        native_t970_cadence[5]=native_t970_cadence[5]+us;
+        if(us>native_t970_cadence[6])native_t970_cadence[6]=us;
+        if(ns>=3000000ull)native_t970_cadence[7]=native_t970_cadence[7]+1;
+        native_t970_cadence[4]=native_t970_cadence[4]+1;lastLatchAck=now;
+    }
     static void latchFired(OSObject *owner,IOTimerEventSource *) {static_cast<NativeLegacyDisplay *>(owner)->latchTick();}
     void latchTick() {
         if(!latchRequest)return;
@@ -458,7 +531,9 @@ class NativeLegacyDisplay : public IOMobileFramebufferLegacy {
         const uint32_t flush=mdp[ctlFlush/4];
         gpuTraceEvent(GpuTraceDisplayLatch,0,traceId(latchRequest),flush,ns,shownSlot,pendingSlot);
         if((flush&flushMask) && ns<50000000ull){latchTimer->setTimeoutUS(500);return;}
-        if(!(flush&flushMask)) {
+        const bool confirmed=!(flush&flushMask);
+        recordDirectAck(now,confirmed);
+        if(confirmed) {
             const uint64_t last=native_t970_scanout_latches[1];
             uint64_t interval=0;
             if(last)absolutetime_to_nanoseconds(now-last,&interval);
@@ -481,10 +556,17 @@ class NativeLegacyDisplay : public IOMobileFramebufferLegacy {
         const OriginalLegacySwapRequest *request=latchRequest;latchRequest=nullptr;
         finishTransfer(request,true);
     }
+    static void idleFired(OSObject *owner,IOTimerEventSource *) {static_cast<NativeLegacyDisplay *>(owner)->idleTick();}
+    void idleTick() {
+        if(!directOn || directBoot || !idleTimer) return;
+        uint64_t ns=0;absolutetime_to_nanoseconds(mach_absolute_time()-lastDirectAt,&ns);
+        if(ns>1500000000ull) directToBoot();
+        idleTimer->setTimeoutUS(1000000);
+    }
     // Back to the boot loader's memory (the blank frame and the copy are drawn there).
     void directToBoot() {
         if(!directOn || directBoot)return;
-        flip(bootIova,bootStride);directBoot=true;shownSlot=-1;
+        flip(bootIova,bootStride);directBoot=true;shownSlot=-1;lastLatchAck=0;
         native_legacy_direct[8]=native_legacy_direct[8]+1;
     }
     bool vsyncWanted() const {
@@ -540,7 +622,7 @@ public:
         };
         if(loop)loop->runAction(action,this,&args);else finishGpuSwap(status);
     }
-    void free() override {stopVsync();if(logicalPM){PMstop();logicalPM=false;}primary=false;OSSafeReleaseNULL(bootMapping);IOMobileFramebufferLegacy::free();}
+    void free() override {if(idleTimer)idleTimer->cancelTimeout();OSSafeReleaseNULL(idleTimer);stopVsync();if(logicalPM){PMstop();logicalPM=false;}primary=false;OSSafeReleaseNULL(bootMapping);IOMobileFramebufferLegacy::free();}
     void stop(IOService *provider) override {
         stopVsync();
         transferred=false;for(auto &entry: validated)entry=nullptr;gpuRequest=nullptr;gpuRetired=false;
@@ -745,11 +827,12 @@ public:
             const int slot=directSlot(surface,memory);
             if(slot>=0) {
                 native_legacy_swap_stage(1);
-                flip(directSlots[slot].iova,uint32_t(sourceStride));directBoot=false;
+                const uint64_t flipAt=mach_absolute_time();recordDirectGap(flipAt,request);latchStart=flipAt;
+                flip(directSlots[slot].iova,uint32_t(sourceStride));directBoot=false;lastDirectAt=flipAt;
                 native_legacy_direct[0]=native_legacy_direct[0]+1;
                 stat(9);note(4,slot,request);noteFlipDelay(request);
                 shadowValid=false;pendingSlot=slot;latchRequest=request;transferred=true;
-                latchStart=mach_absolute_time();latchTimer->setTimeoutUS(500);
+                latchTimer->setTimeoutUS(500);
                 return;
             }
             native_legacy_direct[7]=native_legacy_direct[7]+1;

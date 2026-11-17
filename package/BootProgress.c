@@ -453,11 +453,16 @@ extern volatile int native_gpu_addon5_status __attribute__((weak_import));
 extern volatile int t970_addon_full_sync __attribute__((weak_import));
 extern volatile int native_gpu_addon_written __attribute__((weak_import));
 extern volatile int native_gpu_addon_failed __attribute__((weak_import));
+extern volatile uint64_t native_gop_gpu_deliver[3] __attribute__((weak_import));
+extern volatile uint64_t native_gop_gpu_after[3] __attribute__((weak_import));
 extern volatile uint32_t t970_wifi_stack[16] __attribute__((weak_import));
 extern volatile uint32_t t970_wifi_stats[] __attribute__((weak_import));
 extern volatile int32_t t970_bt[32] __attribute__((weak_import));
 extern volatile uint32_t t970_bt_sk[8] __attribute__((weak_import));
 extern volatile int32_t t970_wifi_join[5] __attribute__((weak_import));
+// The WiFi module's message ring: the newest Apple80211 requests the wireless daemon made and the ring's own refusals.
+extern char native_wifi_text[512][112] __attribute__((weak_import));
+extern volatile uint32_t native_wifi_text_n __attribute__((weak_import));
 extern volatile uint32_t t970_bt_discovery[5] __attribute__((weak_import));
 extern volatile uint32_t t970_bt_connections[7] __attribute__((weak_import));
 extern volatile int32_t native_buttons_stats[10] __attribute__((weak_import));
@@ -984,6 +989,30 @@ static void refresh(unsigned now) {
     }
     draw(now);
   }
+  // gts7xlwifi: with the direct scanout (dpu-scanout=2) the page is not the scanout, so the same rows are also teed to the USB
+  // console and to kprintf, where a USB syslog relay sees them. One pass a second; only the presentation rows.
+  {
+    static unsigned teed_at;
+    unsigned direct = 0;
+    if (now != teed_at && PE_parse_boot_argn("dpu-scanout", &direct, sizeof direct) && direct == 2) {
+      static const char *const keys[] = {"SWAP ", "PRESENT ", "PHASE ", "CADENCE", "GAP ", "DIRECT", "FB ", "GPU ", "GPU2", "NET ", "EXIT ", "CRASH"};
+      teed_at = now;
+      for (unsigned r = 0; r < 48; ++r) {
+        const char *text = boot_progress_page_text[r];
+        for (unsigned k = 0; k < sizeof keys / sizeof keys[0]; ++k)
+          if (!strncmp(text, keys[k], strlen(keys[k]))) {
+            char log[160];
+            int n = snprintf(log, sizeof log, "T970DIAG %s\n", text);
+            if (n > 0) {
+              size_t used = (size_t)n < sizeof log ? (size_t)n : sizeof log - 1;
+              if (&qcom_usb_debug_write) qcom_usb_debug_write(log, used);
+              printf("%s", log);
+            }
+            break;
+          }
+      }
+    }
+  }
   __atomic_store_n(&render_busy,0,__ATOMIC_RELEASE);
 }
 
@@ -1448,6 +1477,8 @@ extern volatile uint64_t native_legacy_copy_last __attribute__((weak_import));
 extern volatile uint32_t native_legacy_direct[14] __attribute__((weak_import));
 extern volatile uint32_t native_t970_direct[11] __attribute__((weak_import));
 extern volatile uint64_t native_t970_scanout_latches[5] __attribute__((weak_import));
+extern volatile uint64_t native_t970_cadence[10] __attribute__((weak_import));
+extern volatile uint64_t native_t970_gap_phase[8] __attribute__((weak_import));
 extern volatile uint32_t native_t970_swapfmt[5] __attribute__((weak_import));
 // The signed-text fixups (patches/xnu/native-text-fixup.patch): how many entries /chosen/text-fixups and text-fixup0..7 produced, and
 // how many pages they actually rewrote. Without this row a skipped fixup (a different shared-cache build, or a page that no longer matches
@@ -1530,6 +1561,13 @@ static void crash_banner(unsigned now, bool paint) {
   for(unsigned i=0;i<3 && i<failed;++i)snprintf(rows[n++],120,"EXIT  %.100s",exit_records.failures[(failed-1-i)%3]);
   __atomic_store_n(&exit_lock,0,__ATOMIC_RELEASE);
   if (wifi_status(rows[n],sizeof rows[n])) ++n;
+  if (&native_wifi_text_n && &native_wifi_text && native_wifi_text_n) {
+    for (unsigned k = 0; k < 3; ++k) {
+      uint32_t ix = native_wifi_text_n - 1 - k;
+      if (ix >= 512 || !native_wifi_text[ix][0]) break;
+      snprintf(rows[n++], 120, "WIFI  %u %.100s", (unsigned)ix, native_wifi_text[ix]);
+    }
+  }
   if (&t970_wifi_join && t970_wifi_join[0])
     snprintf(rows[n++],120,"JOIN  req=%d errno=%d auth=%x cipher=%d result=%d",
       t970_wifi_join[0],t970_wifi_join[1],(unsigned)t970_wifi_join[2],t970_wifi_join[3],t970_wifi_join[4]);
@@ -1602,6 +1640,11 @@ static void crash_banner(unsigned now, bool paint) {
     snprintf(rows[n++],120,"PRESENT n=%llu mean=%lluus slow=%llu max=%lluus | TE=%08x wait=%uus timeout=%u",
       (unsigned long long)delta,(unsigned long long)mean_us,(unsigned long long)over_budget,
       (unsigned long long)native_gop_gpu_timing[1],native_t970_dpu[1],mean_wait_us,timeouts-banner_dpu_timeouts);
+    if (&native_gop_gpu_deliver && &native_gop_gpu_after && native_gop_gpu_deliver[2] && native_gop_gpu_after[2])
+      snprintf(rows[n++],120,"PHASE deliver=%lluus/%lluus after=%lluus/%lluus n=%llu",
+        (unsigned long long)(native_gop_gpu_deliver[0]/native_gop_gpu_deliver[2]), (unsigned long long)native_gop_gpu_deliver[1],
+        (unsigned long long)(native_gop_gpu_after[0]/native_gop_gpu_after[2]), (unsigned long long)native_gop_gpu_after[1],
+        (unsigned long long)native_gop_gpu_after[2]);
     // With screen painting off, send active intervals to the regular system log for USB collection.
     if(!paint && delta)
       os_log(OS_LOG_DEFAULT,"t970 present: span_s=%u copies=%llu mean_us=%llu over_budget=%llu te_waits=%u mean_te_us=%u te_timeout=%u",
@@ -1636,6 +1679,22 @@ static void crash_banner(unsigned now, bool paint) {
     snprintf(rows[n++],120,"GPU   opens/refused widget=%u/%u settings=%u/%u icons=%u/%u",
       opens[0],refusals[0],opens[1],refusals[1],opens[2],refusals[2]);
   }
+  if(&native_t970_cadence && (native_t970_cadence[0] || native_t970_cadence[4] || native_t970_cadence[8])) {
+    const uint64_t gn=native_t970_cadence[0],an=native_t970_cadence[4];
+    snprintf(rows[n++],120,"CADENCE gap=%lluus/%lluus >20=%llu n=%llu ack=%lluus/%lluus >3=%llu n=%llu to=%llu",
+      (unsigned long long)(gn?native_t970_cadence[1]/gn:0),(unsigned long long)native_t970_cadence[2],
+      (unsigned long long)native_t970_cadence[3],(unsigned long long)gn,
+      (unsigned long long)(an?native_t970_cadence[5]/an:0),(unsigned long long)native_t970_cadence[6],
+      (unsigned long long)native_t970_cadence[7],(unsigned long long)an,(unsigned long long)native_t970_cadence[8]);
+  }
+  if(&native_t970_gap_phase && native_t970_gap_phase[0]) {
+    const uint64_t nphase=native_t970_gap_phase[0];
+    snprintf(rows[n++],120,"GAP   arrival=%lluus/%lluus >8=%llu post=%lluus/%lluus >3=%llu n=%llu pre=%llu",
+      (unsigned long long)(native_t970_gap_phase[1]/nphase),(unsigned long long)native_t970_gap_phase[2],
+      (unsigned long long)native_t970_gap_phase[3],(unsigned long long)(native_t970_gap_phase[4]/nphase),
+      (unsigned long long)native_t970_gap_phase[5],(unsigned long long)native_t970_gap_phase[6],
+      (unsigned long long)nphase,(unsigned long long)native_t970_gap_phase[7]);
+  }
   if(!paint && &native_t970_direct && &native_legacy_direct && &native_t970_scanout_latches) {
     static uint64_t prior_latches, prior_intervals, prior_us, prior_slow;
     static uint32_t prior_state, prior_flips, prior_copy;
@@ -1650,6 +1709,34 @@ static void crash_banner(unsigned now, bool paint) {
         (unsigned long long)(slow-prior_slow));
       prior_state=state;prior_flips=flips;prior_latches=latches;prior_copy=copy;
       prior_intervals=intervals;prior_us=us;prior_slow=slow;
+    }
+    if(&native_t970_cadence) {
+      static uint64_t pgc,pgt,pgo,pac,pat,pao,pto,pidle;
+      const uint64_t gc=native_t970_cadence[0],ac=native_t970_cadence[4];
+      const uint64_t dg=gc-pgc,da=ac-pac;
+      if(dg || da || native_t970_cadence[8]!=pto || native_t970_cadence[9]!=pidle)
+        os_log(OS_LOG_DEFAULT,"t970 cadence: span_s=%u gap_n=%llu gap_mean_us=%llu gap_over20=%llu ack_n=%llu ack_mean_us=%llu ack_over3=%llu ack_timeout=%llu gap_idle=%llu",
+          interval,(unsigned long long)dg,(unsigned long long)(dg?(native_t970_cadence[1]-pgt)/dg:0),
+          (unsigned long long)(native_t970_cadence[3]-pgo),(unsigned long long)da,
+          (unsigned long long)(da?(native_t970_cadence[5]-pat)/da:0),(unsigned long long)(native_t970_cadence[7]-pao),
+          (unsigned long long)(native_t970_cadence[8]-pto),(unsigned long long)(native_t970_cadence[9]-pidle));
+      pgc=gc;pgt=native_t970_cadence[1];pgo=native_t970_cadence[3];pac=ac;pat=native_t970_cadence[5];
+      pao=native_t970_cadence[7];pto=native_t970_cadence[8];pidle=native_t970_cadence[9];
+    }
+    if(&native_t970_gap_phase && &native_legacy_direct) {
+      static uint64_t ppc,ppat,ppao,pppt,pppo,ppre;
+      static uint32_t pfw,pft,pfo,pfx;
+      const uint64_t pc=native_t970_gap_phase[0],dp=pc-ppc;
+      const uint32_t fw=native_legacy_direct[9],dfw=fw-pfw;
+      if(dp || dfw || native_legacy_direct[12]!=pfx)
+        os_log(OS_LOG_DEFAULT,"t970 gap-phase: span_s=%u n=%llu arrival_mean_us=%llu arrival_over8=%llu post_mean_us=%llu post_over3=%llu prequeued=%llu fence_n=%u fence_mean_us=%u fence_over8=%u fence_slow250=%u",
+          interval,(unsigned long long)dp,(unsigned long long)(dp?(native_t970_gap_phase[1]-ppat)/dp:0),
+          (unsigned long long)(native_t970_gap_phase[3]-ppao),(unsigned long long)(dp?(native_t970_gap_phase[4]-pppt)/dp:0),
+          (unsigned long long)(native_t970_gap_phase[6]-pppo),(unsigned long long)(native_t970_gap_phase[7]-ppre),
+          dfw,dfw?(native_legacy_direct[10]-pft)/dfw:0,native_legacy_direct[13]-pfo,native_legacy_direct[12]-pfx);
+      ppc=pc;ppat=native_t970_gap_phase[1];ppao=native_t970_gap_phase[3];pppt=native_t970_gap_phase[4];
+      pppo=native_t970_gap_phase[6];ppre=native_t970_gap_phase[7];pfw=fw;pft=native_legacy_direct[10];
+      pfo=native_legacy_direct[13];pfx=native_legacy_direct[12];
     }
   }
   if(&native_legacy_direct && native_legacy_direct[0]) {

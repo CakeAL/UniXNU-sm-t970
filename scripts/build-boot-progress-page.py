@@ -71,6 +71,9 @@ def main():
                         default=device / 'out/step7/data-seed-512/data-512.dbr',
                         help='persistent Data seed (the existing DBRDISK1 image)')
     parser.add_argument('--large-data-seed', action='store_true', help='use the reviewed 73 GiB Data seed')
+    parser.add_argument('--gpu-addon', type=Path,
+                        help='owner GPU addon (scripts/make-gpu-addon.py) shipped in the payload; the kernel writes its '
+                             'files into the Data volume at boot, so a plugin rebuild reaches the tablet without reseeding Data')
     parser.add_argument('--owner-trust-cache', type=Path,
                         help='reviewed owner trust bundle (scripts/build-t970-trust-bundle.py) to ship instead of the '
                              'wrapper\'s original Apple cache; the addon\'s CDHashes are otherwise untrusted')
@@ -94,6 +97,8 @@ def main():
     if args.out_root:
         command += ['--out', str(args.out_root.resolve())]
     command += ['--data-ramdisk', str(args.data_ramdisk.resolve())]
+    if args.gpu_addon:
+        command += ['--gpu-addon', str(args.gpu_addon.resolve())]
     if args.owner_trust_cache:
         command += ['--owner-trust-cache', str(args.owner_trust_cache.resolve())]
     ctx = Context(cli_parser().parse_args(command))
@@ -164,6 +169,7 @@ def main():
         'embedded_data_ramdisk_sha256': sha(embedded_seed),
         'base_recovery_sha256': sha(base), 'firmware_config_dtb_sha256': sha(dtb),
         'owner_trust_cache_sha256': sha(args.owner_trust_cache.resolve()) if args.owner_trust_cache else None,
+        'gpu_addon_sha256': sha(args.gpu_addon.resolve()) if args.gpu_addon else None,
         'image_sha256': sha(boot), 'image_bytes': boot.stat().st_size,
         'recovery_partition_bytes': sizes[0], 'hardware_tested': False,
         'note': 'Enables the boot page only; no flash or reboot performed',

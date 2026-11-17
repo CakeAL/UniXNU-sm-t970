@@ -1,0 +1,43 @@
+{
+  "format": 1,
+  "build_tag": "cadence-b",
+  "boot_image_sha256": "ed73a75e491c618801110d0847302f0454b9390445cdf2b6ff3805a1f7ae8c8f",
+  "purpose": "Bound the run-to-run spread of the frame cadence counters on one unchanged image before attributing any difference to a command-line or driver change.",
+  "captures": [
+    "out/pairing-runtime-20261116/syslog-cadence-b.txt",
+    "out/pairing-runtime-20261116/syslog-cadence-b2.txt"
+  ],
+  "runs": {
+    "first": {
+      "span_seconds": 64,
+      "flips": 1981,
+      "mean_interval_ms": 26.51,
+      "gap_ms": 17.16,
+      "arrival_ms": 11.47,
+      "post_arrival_ms": 5.7,
+      "fence_ms": 7.59,
+      "ack_ms": 9.78
+    },
+    "second": {
+      "span_seconds": 238,
+      "flips": 6429,
+      "mean_interval_ms": 36.13,
+      "gap_ms": 27.13,
+      "arrival_ms": 23.33,
+      "post_arrival_ms": 3.8,
+      "fence_ms": 3.99,
+      "ack_ms": 9.1
+    },
+    "delta": {
+      "mean_interval_ms": 9.62,
+      "gap_ms": 9.96,
+      "arrival_ms": 11.86,
+      "post_arrival_ms": -1.89,
+      "fence_ms": -3.61,
+      "ack_ms": -0.68
+    }
+  },
+  "result": "The same image, same command line and same instruction produced a mean interval of 26.51 ms and then 36.13 ms. Swap arrival moved by 11.86 ms and the GPU fence wait by 3.61 ms with no software change.",
+  "consequence": "The spread of a single run is larger than every single-variable difference measured so far on this board. The tu-default-a result at 34.16 ms lies inside this spread, so removing tu-debug=noubwc,nocb cannot be credited or blamed for it. Every further comparison needs alternating runs of both configurations in one session, or a median of several runs, taken with the tablet in the same state.",
+  "open_question": "What makes one run 26 ms and another 36 ms is unknown. Candidates are thermal state, CPU frequency, the low DRAM envelope and background work; the counters cannot separate them yet."
+}

@@ -1,0 +1,31 @@
+{
+  "build_tag": "ca-archive-e",
+  "baseline": "cadence-b ed73a75e (addon b68a86b6)",
+  "boot_image_sha256": "5a968b45be812d4b5e2bb2acd616ad25115ba81d985d7b8b2fbde9e1799f699b",
+  "addon_sha256": "e8953e6704ccfd57125fdcba6932b0d16158b29e2da98910c08c92d5bdfdae86",
+  "kernel_sha256": "ac8e004d4ed6b19173cb94e734786aa6364c74f8f8cf0dec67a5a0f68d94a45d",
+  "change": "On an MTLPipelineOptionFailOnBinaryArchiveMiss failure the bridge now retries the same render descriptor with the option cleared, compiling the pipeline instead of returning nil, and logs [b4] per compile. Refusal rows also carry the archive seed status.",
+  "device_result": {
+    "refusals": {
+      "b3": 0,
+      "previous_runs": "29-118 per capture"
+    },
+    "fallback_compiles": 32,
+    "failed_to_load_render_pipeline": 1,
+    "cadence": {
+      "span_s": 166,
+      "flips": 680,
+      "interval_ms": 25.1,
+      "gap_ms": 16.12,
+      "arrival_ms": 10.66,
+      "post_arrival_ms": 5.46,
+      "fence_ms": 6.52,
+      "ack_ms": 9.15,
+      "copy_fallback": 0,
+      "ctl_timeout": 0
+    }
+  },
+  "conclusion": "The QuartzCore archive omission no longer costs the render server its pipelines: every creation that used to be refused now compiles, [b3] refusals are gone and CA's failed-to-load message dropped from 45 to 1. Frame pacing stayed inside the unchanged-image spread (25.1 ms interval against 26.5-36.1 ms measured on cadence-b), so the blur/path pipelines were not the frame-time bottleneck. The owner still reports the desktop as very slow.",
+  "open": "The archive itself is still never seeded from CA: no NativeAdrenoMetal archive row appears, so newBinaryArchiveWithDescriptor: is not on the path CA uses in backboardd; the fallback is what makes the pipelines exist. The wallpaper is a separate PosterBoard crash (configuredPropertiesForPoster: nil assertion), not these pipelines.",
+  "hardware_tested": true
+}

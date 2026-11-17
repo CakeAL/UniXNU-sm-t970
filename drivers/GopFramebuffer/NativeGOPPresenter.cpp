@@ -15,6 +15,9 @@ volatile uint64_t native_gop_transfers,native_gop_bytes,native_gop_physical,nati
 volatile uint64_t native_gop_gpu_offers,native_gop_gpu_completions,native_gop_gpu_failures,native_gop_gpu_abandoned;
 // Successful GPU copies: total and maximum offer-to-complete microseconds, count beyond a 60 Hz frame.
 volatile uint64_t native_gop_gpu_timing[3];
+/* gts7xlwifi: split of the offer->complete time: [0] sum, [1] max of offer->delivered (the panel's hand-off) and the same of
+ * delivered->complete (the client's copy plus its bookkeeping), so a slow frame can be attributed to one of them. */
+volatile uint64_t native_gop_gpu_deliver[3], native_gop_gpu_after[3];
 /* waitSwap: [0] calls, [1] timeouts, [2] the requested timeout of the last call (ms), [3] time the last timed-out call really waited (ns), [4] the shortest
  * and [5] the longest such wait (ns), [6] total ns waited in timed-out calls. A timed wait that returns long before its deadline shows here. */
 volatile uint64_t native_gop_wait_stats[7];
@@ -237,6 +240,12 @@ IOReturn NativeGOPPresenter::completeSwap(uint64_t sequence,int status) {
         native_gop_gpu_timing[0] = native_gop_gpu_timing[0] + us;
         if (us > native_gop_gpu_timing[1]) native_gop_gpu_timing[1] = us;
         if (us >= 16667) native_gop_gpu_timing[2] = native_gop_gpu_timing[2] + 1;
+        uint64_t dns = 0, ans = 0;
+        absolutetime_to_nanoseconds(done.deliveredAt - done.offeredAt, &dns);
+        absolutetime_to_nanoseconds(mach_absolute_time() - done.deliveredAt, &ans);
+        const uint64_t dus = dns / 1000, aus = ans / 1000;
+        native_gop_gpu_deliver[0] = native_gop_gpu_deliver[0] + dus; if (dus > native_gop_gpu_deliver[1]) native_gop_gpu_deliver[1] = dus; native_gop_gpu_deliver[2] = native_gop_gpu_deliver[2] + 1;
+        native_gop_gpu_after[0] = native_gop_gpu_after[0] + aus; if (aus > native_gop_gpu_after[1]) native_gop_gpu_after[1] = aus; native_gop_gpu_after[2] = native_gop_gpu_after[2] + 1;
     }
     IOLockUnlock(gate);
     OSSafeReleaseNULL(done.map);done.memory->release();

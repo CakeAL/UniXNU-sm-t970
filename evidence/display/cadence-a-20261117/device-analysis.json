@@ -1,0 +1,41 @@
+{
+  "image_sha256": "900e487a5b8bdb3e19ba5f409e97b30563501cb5d17e69a0f453138343717da1",
+  "boot_result": "iPadOS 17.7.11 21H461 reached the desktop and restored the existing paired USB transport",
+  "workload": "58 seconds covering home-screen interaction and an app transition",
+  "raw_capture": "ignored out/pairing-runtime-20261116/syslog-cadence-a.txt; identifiers are not copied into tracked evidence",
+  "analyzer": "python3.14 scripts/analyze-t970-cadence.py out/pairing-runtime-20261116/syslog-cadence-a.txt",
+  "rows": {
+    "scanout": 29,
+    "cadence": 29,
+    "malformed": 0
+  },
+  "scanout": {
+    "span_seconds": 58,
+    "flips": 1796,
+    "latched": 1796,
+    "copy_fallback": 0,
+    "intervals": 1750,
+    "mean_interval_us": 27082.970857142856,
+    "over_16_667ms": 1332
+  },
+  "cadence": {
+    "gap_samples": 1759,
+    "gap_mean_us": 17758.339397384876,
+    "gap_over_20ms": 616,
+    "gap_over_20ms_rate": 0.3501989766913019,
+    "ack_samples": 1796,
+    "ack_mean_us": 9697.39420935412,
+    "ack_over_3ms": 1589,
+    "ack_over_3ms_rate": 0.8847438752783965,
+    "ack_timeout": 0,
+    "idle_gap_excluded": 37
+  },
+  "closure": {
+    "gap_plus_ack_us": 27455.733606738998,
+    "scanout_interval_us": 27082.970857142856,
+    "difference_us": 372.762749596142,
+    "difference_rate": 0.013763732689475924
+  },
+  "result": "The direct path is real and stable: every flip latched, with no copy fallback or CTL timeout. The active interval is explained by the measured gap plus ACK within about 1.4 percent. Both probe thresholds fire, but ACK includes the real wait for the next panel refresh; at the configured 60 Hz an average refresh wait near 8.3 ms is expected, so early retirement would be unsafe. The actionable unknown is the 17.8 ms gap: split prior-latch-to-swap-arrival from swap-arrival-to-flip and export the existing GPU fence waits before changing Metal or display ownership.",
+  "hardware_tested": true
+}

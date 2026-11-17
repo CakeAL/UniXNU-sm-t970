@@ -1,0 +1,7 @@
+command: sh scripts/flash-recovery-when-detected.sh out/gpu-timeline-a-20261117/boot.img 03cb927a4241e5ff9306a4a01fa3ee73c3bdc2e47e64edbb82e3079842d41d6e 300
+image_sha256: 03cb927a4241e5ff9306a4a01fa3ee73c3bdc2e47e64edbb82e3079842d41d6e
+image_bytes: 86888448
+partition: RECOVERY
+heimdall_result: RECOVERY upload successful
+no_reboot: true
+other_partitions_written: false

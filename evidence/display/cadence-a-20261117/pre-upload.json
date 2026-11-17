@@ -1,0 +1,24 @@
+{
+  "observed_local": "2026-11-17T16:04:00+08:00",
+  "expected_image_sha256": "900e487a5b8bdb3e19ba5f409e97b30563501cb5d17e69a0f453138343717da1",
+  "usb": {
+    "vendor_id": "04e8",
+    "product_id": "685d",
+    "vendor": "Samsung",
+    "product": "SM8250",
+    "class": "CDC-ACM",
+    "port": "/dev/cu.usbmodem21201",
+    "serial_present": false
+  },
+  "adb_devices": [],
+  "download_mode_detected": false,
+  "control_probe": {
+    "request": "read-only SXNU1 HELLO",
+    "reply_ascii": "FAILunknown command",
+    "valid_sxnu_reply": false,
+    "reboot_requested": false
+  },
+  "result": "The tablet is connected but is neither ADB Recovery nor Samsung Download Mode. No partition write or reboot command was issued; wait for an owner-initiated reboot to TWRP/Android Recovery.",
+  "partition_writes_issued": false,
+  "cadence_image_observed": false
+}

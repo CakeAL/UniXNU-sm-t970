@@ -1,0 +1,9 @@
+purpose: restore the cadence-b command line after tu-default-a measured slower on device
+image: out/cadence-b-20261117/boot.img
+sha256: ed73a75e491c618801110d0847302f0454b9390445cdf2b6ff3805a1f7ae8c8f
+size: 86888448 bytes
+helper: scripts/flash-recovery-when-detected.sh (verifies the exact SHA-256 before writing)
+result: RECOVERY upload successful (100%), session ended without reboot
+other_partitions_written: none (no BOOT, userdata, GPT or PIT write)
+replaced: tu-default-a bbf7d1f564d8c7769fae4a637fbb25f5b13a00f65f2edd0610e6b2730d77dba8
+next: capture the same interaction workload on this restored image to bound run-to-run swap arrival

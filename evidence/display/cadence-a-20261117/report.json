@@ -1,0 +1,46 @@
+{
+  "build_tag": "cadence-a",
+  "source_base": "b0e3d62f49fffbc190aa146f60fa42c876989704",
+  "framework_revision": "945ad8db0641060f6566422d168684c3e9182d53",
+  "local_worktree_diff_sha256": "eaa301722479247aa13dfeb5f101e011e71f4f9c50a65d79ed3d19adafc02416",
+  "baseline_boot_sha256": "33a88fa54763dfafbe1360548e3ee2594506ccb877d05d7a18d385fb65a53d7b",
+  "image": "out/cadence-a-20261117/boot.img",
+  "source_kernel_sha256": "cacf49761c2272b4424e98008bedd58a7760d851196ea1aa1bc72a3fb4de7582",
+  "packed_kernel_sha256": "7f4d140e29617808cffbf202ab9ef6d3e591dae4aa30ad3528587f5ba5b15b5b",
+  "payload_sha256": "9900e03b5b42c510b2660602854519cead537e4fb338db1fed695ca4c34ce472",
+  "boot_image_sha256": "900e487a5b8bdb3e19ba5f409e97b30563501cb5d17e69a0f453138343717da1",
+  "boot_bytes": 86888448,
+  "resident_addon_sha256": "b68a86b681f1fd01b0ae5e4465c57b60289d9e30640065ca8ebe1cb54ad46870",
+  "command_line_bytes": 994,
+  "build_command": "In ../UniXNU, set UNIXNU_UEFI, T970_DEVICE_DIR, T970_QCA_BLUETOOTH_DIR, T970_ATH12K_WIFI_DIR and T970_GPU_ADDON to the same inputs as main7; run python3.14 ./unixnu build kernel -D ../UniXNU-sm-t970 --local-module AppleKeyStoreState=../UniXNU-sm-t970/.cache/AppleKeyStoreState-8c70daf.",
+  "pack_command": "UNIXNU_UEFI=.cache/uefi-source/Mu-Silicium python3.14 out/cadence-a-20261117/pack.py",
+  "host_tests": [
+    "python3.14 drivers/GopFramebuffer/Test/check-cadence.py",
+    "python3.14 drivers/GopFramebuffer/Test/check-fence-wait.py",
+    "python3.14 -m unittest discover -s tests -p test_display*.py -v",
+    "python3.14 -m unittest tests/test_analyze_t970_cadence.py -v",
+    "git diff --check"
+  ],
+  "implementation": [
+    "native_t970_cadence splits the direct path into the previous confirmed CTL latch to the next flip (gap) and that flip to CTL flush confirmation (ack).",
+    "The first frame, idle gaps over 100 ms and unconfirmed 50 ms CTL timeouts are separate. Static desktop time is not counted as a slow produced frame.",
+    "BootProgress publishes lifetime CADENCE means and maxima and two-second delta rows through the paired USB syslog path. Existing PHASE copy/presenter counters are unchanged.",
+    "scripts/analyze-t970-cadence.py weights the delta rows by sample count, reports threshold rates and emits a conservative routing hint only after 30 gap and 30 confirmed ACK samples."
+  ],
+  "verification": [
+    "The actual accounting methods pass ASan/UBSan for first frame, active gap, slow gap, slow ack, idle exclusion and timeout reset. Existing fence and display tests pass.",
+    "The full 21H461 kernel archive, ABI audit, link and prelink passed. The packed kernel exports native_t970_cadence and native_t970_scanout_latches and contains both CADENCE log formats.",
+    "Readback verified the exact main7 addon, owner trust, ADT, Data seed, Samsung wrapper and 994-byte command line. The only baseline configuration replacement remains armcpu-self-ipi=1 to dpu-scanout=2.",
+    "The cadence analyzer passes weighted-gap, ACK-timeout, malformed-row and insufficient-sample regression cases. Running it on the pre-cadence main7 log finds 91 scanout rows and correctly refuses to invent cadence samples."
+  ],
+  "expected_device_result": "During the same desktop swipe workload, gap_mean_us plus ack_mean_us should account for the measured latch interval. gap over 20 ms selects the Metal/Turnip/submission branch; ack over 3 ms selects the CTL flush/latch branch.",
+  "recovery_upload": {
+    "command": "sh scripts/flash-recovery-when-detected.sh out/cadence-a-20261117/boot.img 900e487a5b8bdb3e19ba5f409e97b30563501cb5d17e69a0f453138343717da1 300",
+    "result": "RECOVERY upload successful",
+    "no_reboot": true,
+    "other_partitions_written": false
+  },
+  "device_result": "evidence/display/cadence-a-20261117/device-analysis.json",
+  "hardware_tested": true,
+  "limits": "The 58-second capture establishes the direct-scanout cadence split for this workload, not universal frame rate or a safe early-retire policy. ACK includes the physical refresh wait. The gap still combines compositor swap arrival with post-arrival fence, mapping and work-loop time; cadence-b separates those before an optimization is selected."
+}

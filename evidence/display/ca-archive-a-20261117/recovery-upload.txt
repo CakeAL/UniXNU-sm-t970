@@ -1,0 +1,8 @@
+target: RECOVERY (Samsung SM-T970, Heimdall protocol session; --no-reboot)
+image: out/ca-archive-a-20261117/boot.img
+sha256: cd68aa9244f9cc0ae1c1be4cdbd738bcc79934d757502cd0836f267d402454f9
+size: 86888448 bytes
+result: RECOVERY upload successful (100%), session ended without reboot
+other_partitions_written: none (no BOOT, userdata, GPT or PIT write)
+baseline: cadence-b ed73a75e… (addon b68a86b6…, kernel 4d20ecd5…)
+single_variable: AdrenoMetal plugin executable with QuartzCore archive seeding; Turnip dylib byte-identical

@@ -1,0 +1,6 @@
+target: RECOVERY (Samsung SM-T970, Heimdall; --no-reboot)
+image: out/ca-archive-e-20261117/boot.img
+sha256: 5a968b45be812d4b5e2bb2acd616ad25115ba81d985d7b8b2fbde9e1799f699b
+size: 86888448 bytes
+result: RECOVERY upload successful (100%), no BOOT/userdata/GPT write
+purpose: seed-status diagnostics plus compile fallback for MTLPipelineOptionFailOnBinaryArchiveMiss

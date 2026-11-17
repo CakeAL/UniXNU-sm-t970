@@ -1,0 +1,23 @@
+# 2026-11-16 23:06 CST: flashed the first image that carries the reference port's
+# AdrenoMetal plugin patch set (embedded GPU addon) to RECOVERY only.
+image        out/gpu-addon-20261116/recovery/boot.img
+sha256       37ff0735f03fc8110fb834dc9c97678409bdd92d9954277fe24e02688946f850
+bytes        86888448  (RECOVERY partition size match)
+payload      77 MiB FAT32 (cluster 16 sectors via UNIXNU_PAYLOAD_SPC=16), 90,112 B free
+kernel       fresh rebuild, no instrumentation: /Users/cakeal/vsc/UniXNU/out/sm-t970/ipados-17.7.11-21H461/gts7xlwifi/kernel/kernel.macho sha256 063389299f02abcb98ab268b20a0e39fbbf4b6776e8f753ddfc450852d7462e2
+gpu addon    /tmp/plugin-sign16k.addon sha256 d8cb97064a973b0839afa590be9f2fae06155b6f0e76d521bb6f59d8ee8ae5d8 (5 files, 10,127,592 B; plugin + Info.plist + CodeResources + gpu-build.json, NO libvulkan_freedreno.dylib)
+plugin       CDHash ca3051485d84e594ae19b70b6f35a45c810bd578 (16 KiB code-signing pages, __TEXT,__eh_frame zeroed to fit)
+trust        /Users/cakeal/vsc/UniXNU/build/adreno-metal-plugin/owner-trust.bundle sha256 a400f1b20702d26856d09622899cf53190619936f18f1041e70c6260f7573fa9
+args         no-lc=1, log-gpu=1, gpu-addon=1, tu-debug=noubwc,nocb; panic_on_crash_disabled and armcpu-diagnostics dropped
+why          reference gts7xlwifi patch 0001 (XR10 convertXr, PUBLIC_ANSWERS minConstantBufferAlignmentBytes/deviceLinearReadOnlyTextureAlignmentBytes removed, supportsExtendedXR10Formats=0) applied to drivers/AdrenoMetal so CoreAnimation stops using its software compositor
+
+## 23:12 retry: payload FAT must be FAT16
+image        out/gpu-addon-20261116/recovery/boot.img
+sha256       be076db85398794dc2454786eee25aa4f2a01a1ba4bf149e9cb331057b8e39ac
+previous     37ff0735 booted to "no boot entry found": the payload was FAT32 with 16-sector
+             clusters (9,856 clusters), and EDK2 EnhancedFatDxe refuses that geometry
+             (Init.c: if FatType==Fat32 && MaxCluster < FAT_MAX_FAT16_CLUSTER(65525)
+             return EFI_VOLUME_CORRUPTED), so no volume carried EFI/UniXNU/unixnu.toml.
+now          payload FAT16, 8 sectors/cluster (4 KiB), 157,696 sectors, 126,976 B free;
+             MaxCluster 19,712 is a valid FAT16 count. Content identical to 37ff0735
+             (same kernel 063389299f02, same addon d8cb9706, same trust a400f1b2).
